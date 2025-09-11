@@ -29,23 +29,23 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.ALLOW_UNAUTHORIZED_CERTS;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT_TYPE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.FOLLOW_REDIRECT;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.FULL_RESPONSE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.HEADERS;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.IGNORE_RESPONSE_CODE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.PROXY;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.QUERY_PARAMETERS;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_CONTENT_TYPE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_FILENAME;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.TIMEOUT;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.URI;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY_CONTENT;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY_CONTENT_MIME_TYPE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY_CONTENT_TYPE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.FOLLOW_ALL_REDIRECTS;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.FOLLOW_REDIRECT;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.FULL_RESPONSE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.HEADERS;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.IGNORE_RESPONSE_CODE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.PROXY;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.QUERY_PARAMETERS;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.RESPONSE_CONTENT_TYPE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.RESPONSE_FILENAME;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.TIMEOUT;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.URI;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -83,12 +83,12 @@ public class HttpClientActionUtils {
                             .description("Content-Type to use when sending body parameters.")
                             .options(
                                 option("None", ""),
-                                option("JSON", Http.BodyContentType.JSON.name()),
-                                option("XML", Http.BodyContentType.XML.name()),
-                                option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
-                                option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
-                                option("Raw", Http.BodyContentType.RAW.name()),
-                                option("Binary", Http.BodyContentType.BINARY.name())),
+                                option("JSON", BodyContentType.JSON.name()),
+                                option("XML", BodyContentType.XML.name()),
+                                option("Form-Data", BodyContentType.FORM_DATA.name()),
+                                option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
+                                option("Raw", BodyContentType.RAW.name()),
+                                option("Binary", BodyContentType.BINARY.name())),
                         object(BODY_CONTENT)
                             .label("Body Content - JSON")
                             .description("Body Parameters to send.")

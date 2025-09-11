@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientComponentConstants {
+public class HttpClientConstants {
 
     public static final String ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
     public static final String BODY = "body";
@@ -53,11 +53,6 @@ public class HttpClientComponentConstants {
 
     public static final List<? extends Property> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
-
-            //
-            // General properties
-            //
-
             string(URI)
                 .label("URI")
                 .description(
@@ -96,21 +91,11 @@ public class HttpClientComponentConstants {
                 .label("Response Filename")
                 .description("The name of the file if the response is returned as a file object.")
                 .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.getType())),
-
-            //
-            // Header properties
-            //
-
             object(HEADERS)
                 .label("Headers")
                 .description("Headers to send.")
                 .placeholder("Add header")
                 .additionalProperties(array().items(string())),
-
-            //
-            // Query parameters properties
-            //
-
             object(QUERY_PARAMETERS)
                 .label("Query Parameters")
                 .description("Query parameters to send.")

@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
-import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
+import com.bytechef.component.http.client.constant.HttpClientConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 
 /**
@@ -34,16 +34,7 @@ public class HttpClientPatchAction {
         .description("The request method to use.")
         .properties(
             HttpClientActionUtils.toArray(
-                //
-                // Common properties
-                //
-
-                HttpClientComponentConstants.COMMON_PROPERTIES,
-
-                //
-                // Options
-                //
-
+                HttpClientConstants.COMMON_PROPERTIES,
                 HttpClientActionUtils.options(true)))
         .output()
         .perform(HttpClientActionUtils.getPerform(RequestMethod.PATCH));
