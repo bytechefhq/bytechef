@@ -126,7 +126,6 @@ export const useWorkflowBuilder = () => {
         }
 
         const listener = (event: MessageEvent) => {
-            console.log('listener');
             if (event.data.type === 'EMBED_INIT') {
                 const sharedConnectionIds = event.data.params.sharedConnectionIds;
                 const connectionDialogAllowed = event.data.params.connectionDialogAllowed ?? false;
