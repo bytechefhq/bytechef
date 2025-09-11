@@ -35,63 +35,71 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApiTokenLocation;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 
 public class HttpClientConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .properties(string(BASE_URI).label("Base URI")
-            .description("If set, it will be combined HTTP Client Component URI attribute value."))
+        .properties(
+            string(BASE_URI)
+                .label("Base URI")
+                .description("If set, it will be combined HTTP Client Component URI attribute value."))
         .authorizationRequired(false)
         .authorizations(
-            authorization(Authorization.AuthorizationType.API_KEY)
+            authorization(AuthorizationType.API_KEY)
                 .title("API Key")
                 .properties(
                     string(KEY)
                         .label("Key")
                         .required(true)
                         .defaultValue(Authorization.API_TOKEN),
-                    string(VALUE).label("Value")
+                    string(VALUE)
+                        .label("Value")
                         .required(true),
                     string(ADD_TO)
                         .label("Add to")
                         .required(true)
                         .options(
-                            option(
-                                "Header", Authorization.ApiTokenLocation.HEADER.name()),
-                            option(
-                                "QueryParams",
-                                Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))),
-            authorization(Authorization.AuthorizationType.BEARER_TOKEN)
+                            option("Header", ApiTokenLocation.HEADER.name()),
+                            option("QueryParams", ApiTokenLocation.QUERY_PARAMETERS.name()))),
+            authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(TOKEN)
                         .label("Token")
                         .required(true)),
-            authorization(Authorization.AuthorizationType.BASIC_AUTH)
+            authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
-                    string(USERNAME).label("Username")
+                    string(USERNAME)
+                        .label("Username")
                         .required(true),
-                    string(PASSWORD).label("Password")
+                    string(PASSWORD)
+                        .label("Password")
                         .required(true)),
-            authorization(Authorization.AuthorizationType.DIGEST_AUTH)
+            authorization(AuthorizationType.DIGEST_AUTH)
                 .title("Digest Auth")
                 .properties(
-                    string(USERNAME).label("Username")
+                    string(USERNAME)
+                        .label("Username")
                         .required(true),
-                    string(PASSWORD).label("Password")
+                    string(PASSWORD)
+                        .label("Password")
                         .required(true)),
-            authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(AUTHORIZATION_URL)
                         .label("Authorization URL")
                         .required(true),
-                    string(TOKEN_URL).label("Token URL")
+                    string(TOKEN_URL)
+                        .label("Token URL")
                         .required(true),
-                    string(CLIENT_ID).label("Client Id")
+                    string(CLIENT_ID)
+                        .label("Client Id")
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
@@ -102,14 +110,15 @@ public class HttpClientConnection {
                     string(SCOPES)
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)),
-            authorization(Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE)
+                        .controlType(ControlType.TEXT_AREA)),
+            authorization(AuthorizationType.OAUTH2_IMPLICIT_CODE)
                 .title("OAuth2 Implicit Code")
                 .properties(
                     string(AUTHORIZATION_URL)
                         .label("Authorization URL")
                         .required(true),
-                    string(CLIENT_ID).label("Client Id")
+                    string(CLIENT_ID)
+                        .label("Client Id")
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
@@ -120,13 +129,15 @@ public class HttpClientConnection {
                     string(SCOPES)
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)),
-            authorization(Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                        .controlType(ControlType.TEXT_AREA)),
+            authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
                 .title("OAuth2 Client Credentials")
                 .properties(
-                    string(TOKEN_URL).label("Token URL")
+                    string(TOKEN_URL)
+                        .label("Token URL")
                         .required(true),
-                    string(CLIENT_ID).label("Client Id")
+                    string(CLIENT_ID)
+                        .label("Client Id")
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
@@ -137,5 +148,5 @@ public class HttpClientConnection {
                     string(SCOPES)
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)));
+                        .controlType(ControlType.TEXT_AREA)));
 }
