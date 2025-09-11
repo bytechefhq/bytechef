@@ -259,7 +259,11 @@ public class User {
     }
 
     public void setUuid(String uuid) {
-        this.uuid = UUID.fromString(uuid);
+        if (uuid == null) {
+            this.uuid = null;
+        } else {
+            this.uuid = UUID.fromString(uuid);
+        }
     }
 
     public void setUuid(UUID uuid) {
