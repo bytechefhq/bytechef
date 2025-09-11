@@ -154,6 +154,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         return Objects.equals(workflowConnection.workflowNodeName(), connection.getWorkflowNodeName())
             && Objects.equals(workflowConnection.key(), connection.getWorkflowConnectionKey());
     }
+
     private void validateConnections(
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections, Workflow workflow) {
 
