@@ -43,9 +43,8 @@ public class McpServerConfiguration {
 
     @SuppressFBWarnings("EI")
     public McpServerConfiguration(ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools,
-        ComponentTools componentTools,
-        FlowTools flowTools) {
+        ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools, FlowTools flowTools) {
+
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.componentTools = componentTools;
