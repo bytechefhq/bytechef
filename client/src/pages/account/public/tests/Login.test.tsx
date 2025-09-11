@@ -84,7 +84,7 @@ it('should not submit form when only "show password" button is clicked', async (
     await userEvent.click(showPasswordButton);
 
     await waitFor(() => {
-        expect(useAuthenticationStore().login).not.toHaveBeenCalled();
+        expect(useAuthenticationStore((state) => state).login).not.toHaveBeenCalled();
     });
 });
 
@@ -146,7 +146,11 @@ it('should submit form with correct login details when "Log in" is clicked', asy
     await userEvent.click(logInButton);
 
     await waitFor(() => {
-        expect(useAuthenticationStore().login).toHaveBeenCalledWith('test@example.com', 'password', true);
+        expect(useAuthenticationStore((state) => state).login).toHaveBeenCalledWith(
+            'test@example.com',
+            'password',
+            true
+        );
     });
 });
 

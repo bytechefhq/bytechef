@@ -2,6 +2,7 @@ import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {PostHog} from 'posthog-js';
 import {useRef} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
 export interface AnalyticsI {
     captureComponentUsed(name: string, actionName?: string, triggerName?: string): void;
@@ -30,7 +31,12 @@ export const useAnalytics = (): AnalyticsI => {
     const identifyRef = useRef(false);
     const posthogRef = useRef<PostHog | null>(null);
 
-    const {analytics, application} = useApplicationInfoStore();
+    const {analytics, application} = useApplicationInfoStore(
+        useShallow((state) => ({
+            analytics: state.analytics,
+            application: state.application,
+        }))
+    );
 
     const getPostHog = async () => {
         if (!posthogRef.current) {

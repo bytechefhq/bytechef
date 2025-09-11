@@ -3,6 +3,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {init} from 'commandbar';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 export interface HelpHubI {
     addRouter(): void;
@@ -16,7 +17,12 @@ export const useHelpHub = (): HelpHubI => {
     const initRef = useRef(false);
     const bootRef = useRef(false);
 
-    const {application, helpHub} = useApplicationInfoStore();
+    const {application, helpHub} = useApplicationInfoStore(
+        useShallow((state) => ({
+            application: state.application,
+            helpHub: state.helpHub,
+        }))
+    );
 
     const navigate = useNavigate();
 
