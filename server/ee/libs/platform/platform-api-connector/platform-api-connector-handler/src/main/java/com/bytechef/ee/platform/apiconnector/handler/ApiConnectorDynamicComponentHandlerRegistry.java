@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.apiconnector.handler;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
-import com.bytechef.ee.platform.apiconnector.handler.util.ComponentDefinitionHelper;
+import com.bytechef.ee.platform.apiconnector.handler.reader.ComponentDefinitionReader;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,14 +28,14 @@ import org.springframework.stereotype.Component;
 public class ApiConnectorDynamicComponentHandlerRegistry implements DynamicComponentHandlerRegistry {
 
     private final ApiConnectorService apiConnectorService;
-    private final ComponentDefinitionHelper componentDefinitionHelper;
+    private final ComponentDefinitionReader componentDefinitionReader;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorDynamicComponentHandlerRegistry(
-        ApiConnectorService apiConnectorService, ComponentDefinitionHelper componentDefinitionHelper) {
+        ApiConnectorService apiConnectorService, ComponentDefinitionReader componentDefinitionReader) {
 
         this.apiConnectorService = apiConnectorService;
-        this.componentDefinitionHelper = componentDefinitionHelper;
+        this.componentDefinitionReader = componentDefinitionReader;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ApiConnectorDynamicComponentHandlerRegistry implements DynamicCompo
         return apiConnectorService.getApiConnectors()
             .stream()
             .filter(ApiConnector::getEnabled)
-            .map(componentDefinitionHelper::readComponentDefinition)
+            .map(componentDefinitionReader::readComponentDefinition)
             .map(componentDefinition -> (ComponentHandler) () -> componentDefinition)
             .toList();
     }
@@ -51,6 +51,6 @@ public class ApiConnectorDynamicComponentHandlerRegistry implements DynamicCompo
     @Override
     public Optional<ComponentHandler> fetchComponentHandler(String name, int connectorVersion) {
         return apiConnectorService.fetchApiConnector(name, connectorVersion)
-            .map(apiConnector -> () -> componentDefinitionHelper.readComponentDefinition(apiConnector));
+            .map(apiConnector -> () -> componentDefinitionReader.readComponentDefinition(apiConnector));
     }
 }

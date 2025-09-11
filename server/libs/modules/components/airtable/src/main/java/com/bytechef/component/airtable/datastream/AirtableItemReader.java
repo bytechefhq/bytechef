@@ -19,8 +19,8 @@ package com.bytechef.component.airtable.datastream;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.datastream.ItemReader;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class AirtableItemReader implements ItemReader {
 
-    public static final ClusterElementDefinition<AirtableItemReader> CLUSTER_ELEMENT_DEFINITION =
+    public static final ModifiableClusterElementDefinition<AirtableItemReader> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<AirtableItemReader>clusterElement("read")
             .title("Read table row")
             .type(SOURCE)

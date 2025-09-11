@@ -775,6 +775,19 @@ public final class ComponentDsl {
             return Objects.hash(
                 super.hashCode(), items, optionsLookupDependsOn, multipleValues, options, optionsFunction);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableArrayProperty{" +
+                "items=" + items +
+                ", optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", maxItems=" + maxItems +
+                ", minItems=" + minItems +
+                ", multipleValues=" + multipleValues +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableAuthorization implements Authorization {
@@ -1077,6 +1090,32 @@ public final class ComponentDsl {
                 clientIdFunction, clientSecretFunction, detectOn, description, name, properties, refreshFunction,
                 refreshOn, refreshUrlFunction, scopesFunction, pkceFunction, title, tokenUrlFunction, type);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableAuthorization{" +
+                "acquireFunction=" + acquireFunction +
+                ", applyFunction=" + applyFunction +
+                ", authorizationCallbackFunction=" + authorizationCallbackFunction +
+                ", authorizationUrlFunction=" + authorizationUrlFunction +
+                ", clientIdFunction=" + clientIdFunction +
+                ", clientSecretFunction=" + clientSecretFunction +
+                ", refreshTokenFunction=" + refreshTokenFunction +
+                ", detectOn=" + detectOn +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                ", oAuth2AuthorizationExtraQueryParametersFunction=" + oAuth2AuthorizationExtraQueryParametersFunction +
+                ", pkceFunction=" + pkceFunction +
+                ", properties=" + properties +
+                ", refreshFunction=" + refreshFunction +
+                ", refreshOn=" + refreshOn +
+                ", refreshUrlFunction=" + refreshUrlFunction +
+                ", scopesFunction=" + scopesFunction +
+                ", title='" + title + '\'' +
+                ", tokenUrlFunction=" + tokenUrlFunction +
+                ", type=" + type +
+                '}';
+        }
     }
 
     public static final class ModifiableBooleanProperty
@@ -1142,16 +1181,23 @@ public final class ComponentDsl {
         public int hashCode() {
             return Objects.hash(super.hashCode(), options);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableBooleanProperty{" +
+                "options=" + options +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<? extends ActionDefinition> actionDefinitions;
+        private List<? extends ActionDefinition> actions;
         private List<ComponentCategory> componentCategories;
-        private ConnectionDefinition connectionDefinition;
+        private ConnectionDefinition connection;
         private Boolean customAction;
         private Help customActionHelp;
-        private List<? extends ClusterElementDefinition<?>> clusterElementDefinitions;
+        private List<? extends ClusterElementDefinition<?>> clusterElements;
         private String description;
         private String icon;
         private List<String> tags;
@@ -1160,8 +1206,8 @@ public final class ComponentDsl {
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<? extends TriggerDefinition> triggerDefinitions;
-        private UnifiedApiDefinition unifiedApiDefinition;
+        private List<? extends TriggerDefinition> triggers;
+        private UnifiedApiDefinition unifiedApi;
 
         private ModifiableComponentDefinition() {
         }
@@ -1171,18 +1217,12 @@ public final class ComponentDsl {
         }
 
         @SafeVarargs
-        public final <A extends ActionDefinition> ModifiableComponentDefinition actions(
-            A... actionDefinitions) {
-
-            if (actionDefinitions != null) {
-                return actions(List.of(actionDefinitions));
-            }
-
-            return this;
+        public final <A extends ActionDefinition> ModifiableComponentDefinition actions(A... actionDefinitions) {
+            return actions(List.of(Objects.requireNonNull(actionDefinitions)));
         }
 
         public <A extends ActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
-            this.actionDefinitions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
+            this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
 
             return this;
         }
@@ -1200,19 +1240,19 @@ public final class ComponentDsl {
         }
 
         public ModifiableComponentDefinition clusterElements(ClusterElementDefinition<?>... clusterElements) {
-            this.clusterElementDefinitions = List.of(clusterElements);
+            return clusterElements(List.of(Objects.requireNonNull(clusterElements)));
+        }
+
+        public <C extends ClusterElementDefinition<?>> ModifiableComponentDefinition clusterElements(
+            List<C> clusterElements) {
+
+            this.clusterElements = Collections.unmodifiableList(clusterElements);
 
             return this;
         }
 
-        public ModifiableComponentDefinition clusterElements(List<ClusterElementDefinition<?>> clusterElements) {
-            this.clusterElementDefinitions = new ArrayList<>(clusterElements);
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
-            this.connectionDefinition = connectionDefinition;
+        public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
+            this.connection = connectionDefinition;
 
             return this;
         }
@@ -1285,26 +1325,18 @@ public final class ComponentDsl {
         }
 
         @SafeVarargs
-        public final <T extends TriggerDefinition> ModifiableComponentDefinition triggers(
-            T... triggerDefinitions) {
-
-            if (triggerDefinitions != null) {
-                return triggers(List.of(triggerDefinitions));
-            }
-
-            return this;
+        public final <T extends TriggerDefinition> ModifiableComponentDefinition triggers(T... triggerDefinitions) {
+            return triggers(List.of(Objects.requireNonNull(triggerDefinitions)));
         }
 
-        public <T extends TriggerDefinition> ModifiableComponentDefinition triggers(
-            List<T> triggerDefinitions) {
-
-            this.triggerDefinitions = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
+        public <T extends TriggerDefinition> ModifiableComponentDefinition triggers(List<T> triggerDefinitions) {
+            this.triggers = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
 
             return this;
         }
 
         public ModifiableComponentDefinition unifiedApi(UnifiedApiDefinition unifiedApi) {
-            this.unifiedApiDefinition = unifiedApi;
+            this.unifiedApi = unifiedApi;
 
             return this;
         }
@@ -1317,7 +1349,7 @@ public final class ComponentDsl {
 
         @Override
         public Optional<List<? extends ActionDefinition>> getActions() {
-            return Optional.ofNullable(actionDefinitions == null ? null : actionDefinitions);
+            return Optional.ofNullable(actions == null ? null : actions);
         }
 
         @Override
@@ -1327,7 +1359,7 @@ public final class ComponentDsl {
 
         @Override
         public Optional<ConnectionDefinition> getConnection() {
-            return Optional.ofNullable(connectionDefinition);
+            return Optional.ofNullable(connection);
         }
 
         @Override
@@ -1342,7 +1374,7 @@ public final class ComponentDsl {
 
         @Override
         public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
-            return Optional.ofNullable(clusterElementDefinitions);
+            return Optional.ofNullable(clusterElements);
         }
 
         @Override
@@ -1383,12 +1415,12 @@ public final class ComponentDsl {
 
         @Override
         public Optional<List<? extends TriggerDefinition>> getTriggers() {
-            return Optional.ofNullable(triggerDefinitions == null ? null : triggerDefinitions);
+            return Optional.ofNullable(triggers == null ? null : triggers);
         }
 
         @Override
         public Optional<UnifiedApiDefinition> getUnifiedApi() {
-            return Optional.ofNullable(unifiedApiDefinition);
+            return Optional.ofNullable(unifiedApi);
         }
 
         @Override
@@ -1406,23 +1438,23 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(actionDefinitions, that.actionDefinitions) &&
+            return Objects.equals(actions, that.actions) &&
                 Objects.equals(componentCategories, that.componentCategories) &&
-                Objects.equals(connectionDefinition, that.connectionDefinition) &&
+                Objects.equals(connection, that.connection) &&
                 Objects.equals(customAction, that.customAction) &&
                 Objects.equals(customActionHelp, that.customActionHelp) &&
-                Objects.equals(clusterElementDefinitions, that.clusterElementDefinitions) &&
+                Objects.equals(clusterElements, that.clusterElements) &&
                 Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
                 Objects.equals(tags, that.tags) && Objects.equals(metadata, that.metadata) &&
                 Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
-                Objects.equals(title, that.title) && Objects.equals(triggerDefinitions, that.triggerDefinitions);
+                Objects.equals(title, that.title) && Objects.equals(triggers, that.triggers);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(actionDefinitions, componentCategories, connectionDefinition, customAction,
-                customActionHelp,
-                description, icon, tags, metadata, name, resources, version, title, triggerDefinitions);
+            return Objects.hash(
+                actions, componentCategories, connection, customAction, customActionHelp, description, icon, tags,
+                metadata, name, resources, version, title, triggers);
         }
 
         @Override
@@ -1432,16 +1464,16 @@ public final class ComponentDsl {
                 ", version=" + version +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", connectionDefinition=" + connectionDefinition +
+                ", connectionDefinition=" + connection +
                 ", categories='" + componentCategories + '\'' +
                 ", customAction=" + customAction +
                 ", customActionHelp=" + customActionHelp +
-                ", clusterElementDefinitions=" + clusterElementDefinitions +
+                ", clusterElementDefinitions=" + clusterElements +
                 ", metadata=" + metadata +
                 ", resources=" + resources +
                 ", tags=" + tags +
-                ", actionDefinitions=" + actionDefinitions +
-                ", triggerDefinitions=" + triggerDefinitions +
+                ", actionDefinitions=" + actions +
+                ", triggerDefinitions=" + triggers +
                 ", icon='" + icon + '\'' +
                 '}';
         }
@@ -1884,6 +1916,15 @@ public final class ComponentDsl {
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableDateProperty{" +
+                "optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableDateTimeProperty
@@ -1985,6 +2026,15 @@ public final class ComponentDsl {
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableDateTimeProperty{" +
+                "optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableDynamicPropertiesProperty
@@ -2063,6 +2113,15 @@ public final class ComponentDsl {
         public int hashCode() {
             return Objects.hash(super.hashCode(), propertiesLookupDependsOn, propertiesFunction);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableDynamicPropertiesProperty{" +
+                "header='" + header + '\'' +
+                ", propertiesLookupDependsOn=" + propertiesLookupDependsOn +
+                ", propertiesFunction=" + propertiesFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableFileEntryProperty
@@ -2111,6 +2170,13 @@ public final class ComponentDsl {
         @Override
         public List<? extends ValueProperty<?>> getProperties() {
             return new ArrayList<>(properties);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableFileEntryProperty{" +
+                "properties=" + properties +
+                "} " + super.toString();
         }
     }
 
@@ -2246,6 +2312,17 @@ public final class ComponentDsl {
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableIntegerProperty{" +
+                "optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", maxValue=" + maxValue +
+                ", minValue=" + minValue +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableNullProperty
@@ -2263,6 +2340,11 @@ public final class ComponentDsl {
         @Override
         public ControlType getControlType() {
             return ControlType.NULL;
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableNullProperty{} " + super.toString();
         }
     }
 
@@ -2466,6 +2548,20 @@ public final class ComponentDsl {
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableNumberProperty{" +
+                "optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", maxNumberPrecision=" + maxNumberPrecision +
+                ", maxValue=" + maxValue +
+                ", minNumberPrecision=" + minNumberPrecision +
+                ", minValue=" + minValue +
+                ", numberPrecision=" + numberPrecision +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableObjectProperty
@@ -2631,6 +2727,18 @@ public final class ComponentDsl {
         public Optional<List<? extends ValueProperty<?>>> getProperties() {
             return Optional.ofNullable(properties);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableObjectProperty{" +
+                "additionalProperties=" + additionalProperties +
+                ", optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", multipleValues=" + multipleValues +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                ", properties=" + properties +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableOption<T> implements Option<T> {
@@ -2691,6 +2799,15 @@ public final class ComponentDsl {
         @Override
         public T getValue() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableOption{" +
+                "description='" + description + '\'' +
+                ", label='" + label + '\'' +
+                ", value=" + value +
+                '}';
         }
     }
 
@@ -2840,6 +2957,21 @@ public final class ComponentDsl {
         @Override
         public Property.Type getType() {
             return type;
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableProperty{" +
+                "advancedOption=" + advancedOption +
+                ", description='" + description + '\'' +
+                ", displayCondition='" + displayCondition + '\'' +
+                ", expressionEnabled=" + expressionEnabled +
+                ", hidden=" + hidden +
+                ", metadata=" + metadata +
+                ", required=" + required +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                '}';
         }
     }
 
@@ -3012,6 +3144,20 @@ public final class ComponentDsl {
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableStringProperty{" +
+                "controlType=" + controlType +
+                ", languageId='" + languageId + '\'' +
+                ", optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", maxLength=" + maxLength +
+                ", minLength=" + minLength +
+                ", regex='" + regex + '\'' +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
+        }
     }
 
     public static final class ModifiableTimeProperty
@@ -3108,6 +3254,15 @@ public final class ComponentDsl {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableTimeProperty{" +
+                "optionsLookupDependsOn=" + optionsLookupDependsOn +
+                ", options=" + options +
+                ", optionsFunction=" + optionsFunction +
+                "} " + super.toString();
         }
     }
 

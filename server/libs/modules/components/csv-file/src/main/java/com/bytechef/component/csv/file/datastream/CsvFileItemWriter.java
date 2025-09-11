@@ -18,8 +18,8 @@ package com.bytechef.component.csv.file.datastream;
 
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.WRITE_PROPERTIES;
 
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.datastream.ItemWriter;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class CsvFileItemWriter implements ItemWriter {
 
-    public static final ClusterElementDefinition<CsvFileItemWriter> CLUSTER_ELEMENT_DEFINITION =
+    public static final ModifiableClusterElementDefinition<CsvFileItemWriter> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<CsvFileItemWriter>clusterElement("writer")
             .title("Write CSV file rows")
             .type(DESTINATION)

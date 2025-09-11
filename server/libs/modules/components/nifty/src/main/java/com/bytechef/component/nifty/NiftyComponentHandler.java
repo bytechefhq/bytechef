@@ -44,7 +44,7 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
     }
 
     @Override
-    public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
             List<Property> properties = new ArrayList<>(propertiesOptional.orElse(Collections.emptyList()));

@@ -140,18 +140,17 @@ public class ComponentDefinitionRegistry {
 
             if (componentDefinitionMap != null) {
                 componentDefinition = componentDefinitionMap.get(version);
+            }
 
-                if (componentDefinition == null) {
-                    componentDefinition = dynamicComponentHandlerListFactories.stream()
-                        .map(
-                            dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
-                                name, version))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .findFirst()
-                        .map(ComponentHandler::getDefinition)
-                        .orElse(null);
-                }
+            if (componentDefinition == null) {
+                componentDefinition = dynamicComponentHandlerListFactories.stream()
+                    .map(dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
+                        name, version))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst()
+                    .map(ComponentHandler::getDefinition)
+                    .orElse(null);
             }
         }
 
@@ -230,13 +229,13 @@ public class ComponentDefinitionRegistry {
         Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitionsMap.get(
             StringUtils.upperCase(name));
 
-        if (integerComponentDefinitionMap == null) {
-            return List.of();
-        }
+        List<ComponentDefinition> filteredComponentDefinitions = List.of();
 
-        List<ComponentDefinition> filteredComponentDefinitions = integerComponentDefinitionMap.values()
-            .stream()
-            .toList();
+        if (integerComponentDefinitionMap != null) {
+            filteredComponentDefinitions = integerComponentDefinitionMap.values()
+                .stream()
+                .toList();
+        }
 
         if (filteredComponentDefinitions.isEmpty()) {
             filteredComponentDefinitions = dynamicComponentHandlerListFactories.stream()

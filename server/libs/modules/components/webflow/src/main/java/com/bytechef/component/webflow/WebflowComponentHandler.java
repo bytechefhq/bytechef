@@ -39,7 +39,7 @@ import java.util.Optional;
 public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
 
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "getCollectionItem")) {

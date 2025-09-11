@@ -28,9 +28,9 @@ import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
@@ -52,17 +52,17 @@ import java.util.Optional;
 public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> getCustomActions() {
+    public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(DiscordSendDirectMessageAction.ACTION_DEFINITION);
     }
 
     @Override
-    public List<ClusterElementDefinition<?>> getCustomClusterElements() {
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(tool(DiscordSendDirectMessageAction.ACTION_DEFINITION));
     }
 
     @Override
-    public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
 
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "sendChannelMessage")) {

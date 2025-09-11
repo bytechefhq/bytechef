@@ -45,7 +45,7 @@ import java.util.Optional;
 public class AhaComponentHandler extends AbstractAhaComponentHandler {
 
     @Override
-    public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
+    public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "createFeature")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();

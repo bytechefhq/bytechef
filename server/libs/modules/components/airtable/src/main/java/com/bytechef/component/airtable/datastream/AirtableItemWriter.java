@@ -20,8 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
-import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.datastream.ItemWriter;
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class AirtableItemWriter implements ItemWriter {
 
-    public static final ClusterElementDefinition<AirtableItemWriter> CLUSTER_ELEMENT_DEFINITION =
+    public static final ModifiableClusterElementDefinition<AirtableItemWriter> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<AirtableItemWriter>clusterElement("write")
             .title("Write tabel rows")
             .type(DESTINATION)
