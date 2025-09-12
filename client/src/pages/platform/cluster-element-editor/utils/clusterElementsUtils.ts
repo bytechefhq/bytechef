@@ -109,7 +109,7 @@ export function addElementToClusterRoot({
     }
 }
 
-function getTypeSegments(type: string = ''): {componentName: string; version: number; operationName: string} {
+export function getTypeSegments(type: string = ''): {componentName: string; version: number; operationName: string} {
     const segments = type.split('/');
 
     return {
@@ -163,6 +163,46 @@ export function extractClusterElementComponentOperations(
 
         return collectedOperations;
     }, existingClusterElementsOperations);
+}
+
+export function extractClusterElementIcons(
+    clusterElements: ClusterElementsType,
+    collectedIcons: Array<{icon: string; label: string}> = []
+): Array<{icon: string; label: string}> {
+    if (!clusterElements) {
+        console.error('Cluster elements not found');
+
+        return collectedIcons;
+    }
+
+    const processClusterElement = (element: ClusterElementItemType) => {
+        if (!element) {
+            console.error('Cluster element not found');
+
+            return;
+        }
+
+        const {componentName} = getTypeSegments(element.type);
+
+        collectedIcons.push({
+            icon: `/icons/${componentName}.svg`,
+            label: element.label || componentName || '',
+        });
+
+        if (element.clusterElements) {
+            extractClusterElementIcons(element.clusterElements, collectedIcons);
+        }
+    };
+
+    Object.values(clusterElements).forEach((element) => {
+        if (Array.isArray(element)) {
+            element.forEach(processClusterElement);
+        } else if (isPlainObject(element)) {
+            processClusterElement(element);
+        }
+    });
+
+    return collectedIcons;
 }
 
 export function getClusterElementByName(clusterElements: ClusterElementsType, elementName: string) {
