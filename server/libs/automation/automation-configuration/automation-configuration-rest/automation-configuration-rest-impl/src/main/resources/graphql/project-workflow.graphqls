@@ -1,4 +1,5 @@
 extend type Query {
+    preBuiltWorkflowTemplates(query: String, category: String): [WorkflowTemplate!]!
     sharedWorkflow(workflowUuid: String!): SharedWorkflow
     workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
 }
@@ -10,9 +11,15 @@ extend type Mutation {
 }
 
 type WorkflowTemplate {
-    components: [ComponentDefinition]!
+    authorEmail: String
+    authorName: String
+    authorRole: String
+    authorSocialLinks: [String]!
+    categories: [String!]!
+    components: [ComponentDefinition!]!
+    id: ID
+    lastModifiedDate: String
     description: String
-    exported: Boolean!
     projectVersion: Int
     publicUrl: String
     workflow: SharedWorkflowInfo

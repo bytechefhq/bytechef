@@ -38,6 +38,8 @@ public interface ProjectWorkflowFacade {
 
     void exportSharedWorkflow(String workflowId, @Nullable String description);
 
+    List<WorkflowTemplateDTO> getPreBuiltWorkflowTemplates(String query, String category);
+
     ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId);
 
     ProjectWorkflowDTO getProjectWorkflow(String workflowId);
@@ -52,7 +54,7 @@ public interface ProjectWorkflowFacade {
 
     WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow);
 
-    long importWorkflowTemplate(long projectId, String workflowUuid, boolean sharedWorkflow);
+    long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow);
 
     void updateWorkflow(String workflowId, String definition, int version);
 }

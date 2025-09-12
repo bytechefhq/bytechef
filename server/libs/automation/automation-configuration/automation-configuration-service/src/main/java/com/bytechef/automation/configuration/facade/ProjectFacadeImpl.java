@@ -26,14 +26,17 @@ import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.ComponentDefinitionTuple;
+import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -60,6 +63,9 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +76,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProjectFacadeImpl.class);
+
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
+    private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -88,16 +97,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         ApplicationProperties applicationProperties, CategoryService categoryService,
-        ComponentDefinitionHelper componentDefinitionHelper, ProjectWorkflowService projectWorkflowService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
-        SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
-        TagService tagService,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
+        ProjectWorkflowService projectWorkflowService, ProjectDeploymentService projectDeploymentService,
+        ProjectService projectService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectWorkflowFacade projectWorkflowFacade, SharedTemplateFileStorage sharedTemplateFileStorage,
+        SharedTemplateService sharedTemplateService, TagService tagService, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
+        this.preBuiltTemplateService = preBuiltTemplateService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
@@ -232,7 +242,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @Transactional(readOnly = true)
     public ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject) {
-        ProjectTemplateDTO projectTemplateDTO = null;
+        byte[] data;
 
         if (sharedProject) {
             SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
@@ -242,30 +252,81 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
 
             try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
-                TemplateFiles templateFiles = readTemplate(inputStream.readAllBytes(), true);
-
-                ProjectInfo projectInfo = JsonUtils.read(templateFiles.projectJson, ProjectInfo.class);
-                Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
-
-                List<Workflow> workflows = getWorkflows(templateFiles);
-
-                List<ComponentDefinitionTuple> components = getComponentDefinitions(workflows);
-
-                ProjectTemplateDTO.ProjectInfo project = new ProjectTemplateDTO.ProjectInfo(
-                    projectInfo.name, projectInfo.description);
-                List<ProjectTemplateDTO.WorkflowInfo> workflowInfos = workflows.stream()
-                    .map(workflow -> new ProjectTemplateDTO.WorkflowInfo(
-                        workflow.getId(), workflow.getLabel(), workflow.getDescription()))
-                    .toList();
-
-                projectTemplateDTO = new ProjectTemplateDTO(
-                    components, template.description, true, project, template.projectVersion, publicUrl, workflowInfos);
+                data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);
             }
+        } else {
+            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
         }
 
-        return projectTemplateDTO;
+        TemplateFiles templateFiles = readTemplate(data, true);
+
+        ProjectInfo projectInfo = JsonUtils.read(templateFiles.projectJson, ProjectInfo.class);
+        Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
+
+        List<Workflow> workflows = getWorkflows(templateFiles);
+
+        List<ComponentDefinitionTuple> components = getComponentDefinitions(workflows);
+
+        ProjectTemplateDTO.ProjectInfo project = new ProjectTemplateDTO.ProjectInfo(
+            projectInfo.name, projectInfo.description);
+        List<WorkflowInfo> workflowInfos = workflows.stream()
+            .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getLabel(), workflow.getDescription()))
+            .toList();
+
+        List<String> categories = template.categories == null || template.categories.isEmpty()
+            ? List.of("other") : template.categories;
+
+        return new ProjectTemplateDTO(
+            template.authorName, template.authorEmail, template.authorRole, template.authorSocialLinks,
+            categories, components, template.description, id, template.lastModifiedDate, project,
+            template.projectVersion, publicUrl, workflowInfos);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectTemplateDTO> getPreBuiltProjectTemplates(String query, String category) {
+        return preBuiltTemplateService.getFiles("projects")
+            .stream()
+            .map(fileItem -> {
+                try {
+                    ProjectTemplateDTO projectTemplateDTO = getProjectTemplate(
+                        EncodingUtils.base64EncodeToString(fileItem.path()), false);
+
+                    if (StringUtils.isEmpty(query) && StringUtils.isEmpty(category)) {
+                        return projectTemplateDTO;
+                    } else {
+                        if (StringUtils.isNotEmpty(query)) {
+                            ProjectTemplateDTO.ProjectInfo project = projectTemplateDTO.project();
+
+                            if (StringUtils.containsIgnoreCase(projectTemplateDTO.description(), query) ||
+                                StringUtils.containsIgnoreCase(project.name(), query) ||
+                                StringUtils.containsIgnoreCase(project.description(), query)) {
+
+                                return projectTemplateDTO;
+                            }
+                        }
+
+                        if (StringUtils.isNotEmpty(category)) {
+                            List<String> categories = projectTemplateDTO.categories();
+
+                            if (categories != null && categories.contains(category)) {
+                                return projectTemplateDTO;
+                            }
+                        }
+
+                        return null;
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to get workflow template", e);
+
+                    return null;
+                }
+
+            })
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override
@@ -329,48 +390,26 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public long importProject(byte[] projectData, long workspaceId) {
-        TemplateFiles templateFiles = readTemplate(projectData, false);
-
-        ProjectInfo projectInfo = JsonUtils.read(templateFiles.projectJson, ProjectInfo.class);
-
-        Project project = new Project();
-
-        project.setName(projectInfo.name());
-        project.setDescription(projectInfo.description());
-        project.setWorkspaceId(workspaceId);
-
-        ProjectDTO projectDTO = new ProjectDTO(project);
-
-        long projectId = createProject(projectDTO);
-
-        for (String workflowJson : templateFiles.workflowJsons) {
-            String definition = JsonUtils.read(workflowJson, String.class);
-
-            projectWorkflowFacade.addWorkflow(projectId, definition);
-        }
-
-        return projectId;
+        return importProjectTemplate(projectData, workspaceId);
     }
 
     @Override
     public long importProjectTemplate(String id, long workspaceId, boolean sharedProject) {
-        long projectId;
+        byte[] data;
 
         if (sharedProject) {
             SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
 
             try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
-                byte[] projectData = inputStream.readAllBytes();
-
-                projectId = importProject(projectData, workspaceId);
+                data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);
             }
         } else {
-            projectId = 0;
+            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
         }
 
-        return projectId;
+        return importProjectTemplate(data, workspaceId);
     }
 
     @Override
@@ -472,9 +511,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             for (ProjectWorkflow projectWorkflow : projectWorkflows) {
                 Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
-                String fileName = String.format("workflow-%s.json", projectWorkflow.getUuid());
-
-                ZipEntry workflowZipEntry = new ZipEntry(fileName);
+                ZipEntry workflowZipEntry = new ZipEntry(String.format("workflow-%s.json", projectWorkflow.getUuid()));
 
                 zipOutputStream.putNextEntry(workflowZipEntry);
 
@@ -572,13 +609,36 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return componentDefinitions;
     }
 
-    private TemplateFiles readTemplate(byte[] templateData, boolean sharedTemplate) {
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(templateData))) {
+    private long importProjectTemplate(byte[] projectData, long workspaceId) {
+        TemplateFiles templateFiles = readTemplate(projectData, false);
+
+        ProjectInfo projectInfo = JsonUtils.read(templateFiles.projectJson, ProjectInfo.class);
+
+        Project project = new Project();
+
+        project.setName(projectInfo.name());
+        project.setDescription(projectInfo.description());
+        project.setWorkspaceId(workspaceId);
+
+        ProjectDTO projectDTO = new ProjectDTO(project);
+
+        long projectId = createProject(projectDTO);
+
+        for (String workflowJson : templateFiles.workflowJsons) {
+            String definition = JsonUtils.read(workflowJson, String.class);
+
+            projectWorkflowFacade.addWorkflow(projectId, definition);
+        }
+
+        return projectId;
+    }
+
+    private TemplateFiles readTemplate(byte[] data, boolean sharedTemplate) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(data))) {
             String projectJson = null;
             String templateJson = null;
-            List<String> workflowJsons = new ArrayList<>();
-
             ZipEntry zipEntry;
+            List<String> workflowJsons = new ArrayList<>();
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 byte[] entryData = zipInputStream.readAllBytes();
@@ -589,7 +649,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     projectJson = new String(entryData, StandardCharsets.UTF_8);
                 } else if ("template.json".equals(name)) {
                     templateJson = new String(entryData, StandardCharsets.UTF_8);
-                } else if (name.startsWith("workflow-")) {
+                } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
                     workflowJsons.add(new String(entryData, StandardCharsets.UTF_8));
                 }
 
@@ -621,11 +681,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private record Template(
-        String description, List<String> categories, String authorName, String authorRole, String authorEmail,
-        String authorSocialLinks, Instant lastModifiedDate, Integer projectVersion) {
+        String authorName, String authorRole, String authorEmail, String authorSocialLinks, List<String> categories,
+        String description, Instant lastModifiedDate, Integer projectVersion) {
 
         public Template(String description, int lastProjectVersion) {
-            this(description, Collections.emptyList(), null, null, null, null, Instant.now(), lastProjectVersion);
+            this(null, null, null, null, Collections.emptyList(), description, Instant.now(), lastProjectVersion);
         }
     }
 

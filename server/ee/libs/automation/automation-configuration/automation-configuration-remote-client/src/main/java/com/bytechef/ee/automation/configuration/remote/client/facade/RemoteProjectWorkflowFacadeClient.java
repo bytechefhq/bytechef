@@ -51,6 +51,11 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     }
 
     @Override
+    public List<WorkflowTemplateDTO> getPreBuiltWorkflowTemplates(String query, String category) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
         throw new UnsupportedOperationException();
     }
@@ -88,7 +93,7 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     }
 
     @Override
-    public long importWorkflowTemplate(long projectId, String workflowUuid, boolean sharedWorkflow) {
+    public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
         throw new UnsupportedOperationException();
     }
 

@@ -67,6 +67,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
+    public List<ProjectTemplateDTO> getPreBuiltProjectTemplates(String query, String category) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
         throw new UnsupportedOperationException();
     }

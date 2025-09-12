@@ -1,4 +1,5 @@
 extend type Query {
+    preBuiltProjectTemplates(query: String, category: String): [ProjectTemplate!]!
     project(id: ID): Project
     projectTemplate(id: String!, sharedProject: Boolean!): ProjectTemplate
     projects: [Project]
@@ -19,13 +20,19 @@ type Project {
 }
 
 type ProjectTemplate {
-    components: [ComponentDefinitionTuple]!
+    authorEmail: String
+    authorName: String
+    authorRole: String
+    authorSocialLinks: [String]!
+    categories: [String!]!
+    components: [ComponentDefinitionTuple!]!
     description: String
-    exported: Boolean!
+    id: ID
+    lastModifiedDate: String
     project: ProjectInfo
     projectVersion: Int
     publicUrl: String
-    workflows: [WorkflowInfo]!
+    workflows: [WorkflowInfo!]!
 }
 
 type SharedProject {

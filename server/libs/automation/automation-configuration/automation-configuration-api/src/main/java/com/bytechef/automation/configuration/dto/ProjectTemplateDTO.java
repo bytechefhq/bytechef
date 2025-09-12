@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -25,12 +26,9 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectTemplateDTO(
-    List<ComponentDefinitionTuple> components, String description, boolean exported, ProjectInfo project,
-    Integer projectVersion, String publicUrl, List<WorkflowInfo> workflows) {
-
-    public ProjectTemplateDTO(boolean exported) {
-        this(List.of(), null, exported, null, null, null, List.of());
-    }
+    String authorName, String authorEmail, String authorRole, String authorSocialLinks, List<String> categories,
+    List<ComponentDefinitionTuple> components, String description, String id, Instant lastModifiedDate,
+    ProjectInfo project, Integer projectVersion, String publicUrl, List<WorkflowInfo> workflows) {
 
     public record ComponentDefinitionTuple(String key, List<ComponentDefinition> value) {
     }

@@ -45,6 +45,8 @@ public interface ProjectFacade {
 
     ProjectDTO getProject(long id);
 
+    List<ProjectTemplateDTO> getPreBuiltProjectTemplates(String query, String category);
+
     List<ProjectDTO> getProjects(
         @Nullable Long categoryId, @Nullable Boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
 

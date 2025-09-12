@@ -44,6 +44,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -112,6 +113,9 @@ public class ProjectFacadeIntTest {
 
     @MockitoBean
     private SharedTemplateService sharedTemplateService;
+
+    @MockitoBean
+    private com.bytechef.automation.configuration.service.PreBuiltTemplateService preBuiltTemplateService;
 
     private Workspace workspace;
 
@@ -313,6 +317,60 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testGetPreBuiltProjectTemplates() {
+        byte[] projectZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson =
+                "{\"description\":\"Catalog description\",\"projectVersion\":1,\"categories\":[\"sales\"]}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+
+            String projectJson = "{\"name\":\"Catalog Project\",\"description\":\"Catalog imported project\"}";
+
+            zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-test.json"));
+
+            String workflowJson = "\"{\\\"tasks\\\":[]}\"";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            projectZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getFiles("projects"))
+            .thenReturn(List.of(new FileItem("projects/catalog-project.zip", 0, "sha", "ref", null)));
+
+        when(preBuiltTemplateService.getPrebuiltTemplateData(any(String.class))).thenReturn(projectZip);
+
+        List<ProjectTemplateDTO> templates = projectFacade.getPreBuiltProjectTemplates(null, null);
+
+        assertThat(templates).isNotNull();
+        assertThat(templates).hasSize(1);
+        assertThat(templates.get(0)
+            .project()
+            .name()).isEqualTo("Catalog Project");
+        assertThat(templates.get(0)
+            .categories()).contains("sales");
+    }
+
+    @Test
     public void testGetProject() {
         Project project = new Project();
 
@@ -411,6 +469,122 @@ public class ProjectFacadeIntTest {
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");
+    }
+
+    @Test
+    public void testGetProjectTemplatePreBuilt() {
+        byte[] projectZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"PB description\",\"projectVersion\":1}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+
+            String projectJson = "{\"name\":\"PB Project\",\"description\":\"PB imported project\"}";
+
+            zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-test.json"));
+
+            String workflowJson = "\"{\\\"tasks\\\":[]}\"";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            projectZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getPrebuiltTemplateData(any(String.class)))
+            .thenReturn(projectZip);
+
+        ProjectTemplateDTO projectTemplateDTO = projectFacade.getProjectTemplate("any-id", false);
+
+        assertThat(projectTemplateDTO).isNotNull();
+        assertThat(projectTemplateDTO.description()).isEqualTo("PB description");
+        assertThat(projectTemplateDTO.project()
+            .name()).isEqualTo("PB Project");
+        assertThat(projectTemplateDTO.workflows()).hasSize(1);
+        assertThat(projectTemplateDTO.components()).isNotNull();
+    }
+
+    @Test
+    public void testGetProjectTemplateShared() {
+        byte[] projectZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"Shared description\",\"projectVersion\":1}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+
+            String projectJson = "{\"name\":\"Imported Project\",\"description\":\"Test imported project\"}";
+
+            zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-test.json"));
+
+            String workflowJson = "\"{\\\"tasks\\\":[]}\""; // a JSON string containing workflow definition
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.finish();
+
+            projectZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        FileEntry templateFileEntry = new FileEntry(
+            "project.zip", "zip", "application/zip", "http://localhost/shared/project.zip");
+
+        SharedTemplate sharedTemplate = new SharedTemplate();
+
+        sharedTemplate.setTemplate(templateFileEntry);
+
+        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+            .thenReturn(new ByteArrayInputStream(projectZip));
+
+        String projectUuid = "11111111-2222-3333-4444-555555555557";
+
+        when(sharedTemplateService.getSharedTemplate(UUID.fromString(projectUuid)))
+            .thenReturn(sharedTemplate);
+
+        ProjectTemplateDTO projectTemplateDTO = projectFacade.getProjectTemplate(projectUuid, true);
+
+        assertThat(projectTemplateDTO).isNotNull();
+        assertThat(projectTemplateDTO.description()).isEqualTo("Shared description");
+
+        ProjectTemplateDTO.ProjectInfo project = projectTemplateDTO.project();
+
+        assertThat(project).isNotNull();
+        assertThat(project.name()).isEqualTo("Imported Project");
+
+        assertThat(projectTemplateDTO.workflows()).hasSize(1);
+        assertThat(projectTemplateDTO.components()).isNotNull();
     }
 
     @Test
@@ -573,7 +747,57 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
-    public void testImportProjectTemplate() {
+    public void testImportProjectTemplatePreBuilt() {
+        List<ProjectDTO> initialProjects = projectFacade.getProjects(null, null, null, null);
+        int initialCount = initialProjects.size();
+
+        byte[] projectZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+            String templateJson = "{\"description\":\"PB description\",\"projectVersion\":1}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+
+            String projectJson = "{\"name\":\"PB Project\",\"description\":\"PB imported project\"}";
+
+            zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-test.json"));
+
+            String workflowJson = "\"{\\\"tasks\\\":[]}\"";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            projectZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getPrebuiltTemplateData(any(String.class)))
+            .thenReturn(projectZip);
+
+        long importedProjectId = projectFacade.importProjectTemplate("any-id", workspace.getId(), false);
+
+        assertThat(importedProjectId).isGreaterThan(0);
+
+        List<ProjectDTO> updatedProjects = projectFacade.getProjects(null, null, null, null);
+        assertThat(updatedProjects).hasSize(initialCount + 1);
+    }
+
+    @Test
+    public void testImportProjectTemplateShared() {
         List<ProjectDTO> initialProjects = projectFacade.getProjects(null, null, null, null);
         int initialCount = initialProjects.size();
 
@@ -695,69 +919,5 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectDTO.tags()).hasSize(1);
         assertThat(projectDTO.name()).isEqualTo("Updated Name");
-    }
-
-    @Test
-    public void testGetProjectTemplate() {
-        byte[] projectZip;
-
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
-
-            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
-
-            String templateJson = "{\"description\":\"Shared description\",\"projectVersion\":1}";
-
-            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
-
-            String projectJson = "{\"name\":\"Imported Project\",\"description\":\"Test imported project\"}";
-
-            zipOutputStream.write(projectJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("workflow-test.json"));
-
-            String workflowJson = "\"{\\\"tasks\\\":[]}\""; // a JSON string containing workflow definition
-
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.finish();
-
-            projectZip = byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        FileEntry templateFileEntry = new FileEntry(
-            "project.zip", "zip", "application/zip", "http://localhost/shared/project.zip");
-
-        SharedTemplate sharedTemplate = new SharedTemplate();
-
-        sharedTemplate.setTemplate(templateFileEntry);
-
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
-            .thenReturn(new ByteArrayInputStream(projectZip));
-
-        String projectUuid = "11111111-2222-3333-4444-555555555557";
-
-        when(sharedTemplateService.getSharedTemplate(UUID.fromString(projectUuid)))
-            .thenReturn(sharedTemplate);
-
-        ProjectTemplateDTO projectTemplateDTO = projectFacade.getProjectTemplate(projectUuid, true);
-
-        assertThat(projectTemplateDTO).isNotNull();
-        assertThat(projectTemplateDTO.exported()).isTrue();
-        assertThat(projectTemplateDTO.description()).isEqualTo("Shared description");
-        assertThat(projectTemplateDTO.project()).isNotNull();
-        assertThat(projectTemplateDTO.project()
-            .name()).isEqualTo("Imported Project");
-        assertThat(projectTemplateDTO.workflows()).hasSize(1);
-        assertThat(projectTemplateDTO.components()).isNotNull();
     }
 }
