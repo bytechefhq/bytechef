@@ -16,7 +16,7 @@ const ProjectTitle = ({project}: {project: Project}) => {
                             className="flex space-x-1 bg-white"
                             variant={project.lastStatus === ProjectStatus.Published ? 'success' : 'outline'}
                         >
-                            <span>V{project.lastVersion}</span>
+                            <span>V{project.lastProjectVersion}</span>
 
                             <span>{project.lastStatus}</span>
                         </Badge>

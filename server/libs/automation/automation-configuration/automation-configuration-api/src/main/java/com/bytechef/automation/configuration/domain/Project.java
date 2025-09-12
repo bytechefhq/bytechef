@@ -176,7 +176,7 @@ public final class Project {
         return getMaxProjectVersion().getStatus();
     }
 
-    public int getLastVersion() {
+    public int getLastProjectVersion() {
         return getMaxProjectVersion().getVersion();
     }
 

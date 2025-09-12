@@ -169,7 +169,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 ProjectDeploymentErrorType.PROJECT_NOT_PUBLISHED);
         }
 
-        if (project.getLastVersion() == projectDeployment.getProjectVersion()) {
+        if (project.getLastProjectVersion() == projectDeployment.getProjectVersion()) {
             throw new ConfigurationException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectDeployment.getProjectVersion()),
                 ProjectDeploymentErrorType.INVALID_PROJECT_VERSION);

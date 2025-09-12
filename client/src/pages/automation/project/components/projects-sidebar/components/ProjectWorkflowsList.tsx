@@ -52,15 +52,15 @@ const ProjectWorkflowsList = ({
                         )}
                     </Tooltip>
 
-                    {project.lastPublishedDate && project.lastVersion ? (
+                    {project.lastPublishedDate && project.lastProjectVersion ? (
                         <Badge className="flex space-x-1" variant="success">
-                            <span>V{project.lastVersion - 1}</span>
+                            <span>V{project.lastProjectVersion - 1}</span>
 
                             <span>PUBLISHED</span>
                         </Badge>
                     ) : (
                         <Badge className="flex space-x-1" variant="secondary">
-                            <span>V{project.lastVersion}</span>
+                            <span>V{project.lastProjectVersion}</span>
 
                             <span>{project.lastStatus}</span>
                         </Badge>

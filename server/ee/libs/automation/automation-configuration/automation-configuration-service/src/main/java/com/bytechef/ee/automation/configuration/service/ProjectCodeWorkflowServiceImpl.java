@@ -37,7 +37,7 @@ public class ProjectCodeWorkflowServiceImpl implements ProjectCodeWorkflowServic
 
         projectCodeWorkflow.setCodeWorkflowContainer(codeWorkflowContainer);
         projectCodeWorkflow.setProject(project);
-        projectCodeWorkflow.setProjectVersion(project.getLastVersion());
+        projectCodeWorkflow.setProjectVersion(project.getLastProjectVersion());
 
         return projectCodeWorkflowRepository.save(projectCodeWorkflow);
     }

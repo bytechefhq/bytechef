@@ -81,7 +81,8 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
 
         Project project = projectService.getProject(projectId);
 
-        List<Workflow> oldWorkflows = projectWorkflowService.getProjectWorkflows(projectId, project.getLastVersion())
+        List<Workflow> oldWorkflows = projectWorkflowService
+            .getProjectWorkflows(projectId, project.getLastProjectVersion())
             .stream()
             .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId()))
             .toList();
@@ -135,7 +136,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         Project project = projectService.getProject(projectId);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            projectId, project.getLastVersion());
+            projectId, project.getLastProjectVersion());
 
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 

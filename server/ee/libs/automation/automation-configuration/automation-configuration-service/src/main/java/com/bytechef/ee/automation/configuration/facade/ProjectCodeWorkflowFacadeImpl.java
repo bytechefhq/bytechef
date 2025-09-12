@@ -85,7 +85,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         for (Map.Entry<String, String> entry : workflowNameIds.entrySet()) {
             projectWorkflowService.addWorkflow(
-                project.getId(), project.getLastVersion(), entry.getValue(),
+                project.getId(), project.getLastProjectVersion(), entry.getValue(),
                 EncodingUtils.base64EncodeToString(projectDefinition.getName() + '-' + entry.getKey()));
         }
 
