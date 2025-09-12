@@ -16,13 +16,11 @@
 
 package com.bytechef.ai.mcp.server.config;
 
-import com.bytechef.ai.mcp.tool.automation.GenericTools;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequestContributor;
 import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
-import com.bytechef.ai.mcp.tool.platform.ComponentTools;
-import com.bytechef.ai.mcp.tool.platform.FlowTools;
+import com.bytechef.ai.mcp.tool.platform.GenericTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -55,7 +53,7 @@ public class McpServerConfiguration {
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
         return ToolCallbackProvider.from(
-            ToolCallbacks.from(projectTools, projectWorkflowTools, componentTools, flowTools));
+            ToolCallbacks.from(projectTools, projectWorkflowTools, genericTools));
     }
 
     @Bean

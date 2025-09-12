@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ai.mcp.tool.automation.ToolUtils.PropertyDecorator;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils.PropertyDecorator;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.BooleanProperty;
 import com.bytechef.platform.component.domain.IntegerProperty;

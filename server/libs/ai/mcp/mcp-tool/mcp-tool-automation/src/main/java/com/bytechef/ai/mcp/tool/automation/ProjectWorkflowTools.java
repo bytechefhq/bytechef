@@ -16,6 +16,9 @@
 
 package com.bytechef.ai.mcp.tool.automation;
 
+import com.bytechef.ai.mcp.tool.platform.GenericTools;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.ai.mcp.tool.platform.validator.WorkflowValidator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -30,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-import utils.WorkflowValidator;
 
 /**
  * The ProjectWorkflowTools class provides utility methods and components to facilitate the management and execution of

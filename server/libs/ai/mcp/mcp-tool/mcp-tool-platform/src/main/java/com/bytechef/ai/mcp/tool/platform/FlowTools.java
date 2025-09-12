@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform;
 
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;

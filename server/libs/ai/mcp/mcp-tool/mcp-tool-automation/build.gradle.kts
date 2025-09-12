@@ -4,4 +4,5 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
 }
