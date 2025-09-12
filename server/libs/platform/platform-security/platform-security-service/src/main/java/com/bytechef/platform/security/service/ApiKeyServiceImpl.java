@@ -60,7 +60,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     @Transactional(readOnly = true)
     public ApiKey getApiKey(String secretKey, long environmentId) {
         return apiKeyRepository.findBySecretKeyAndEnvironment(secretKey, (int) environmentId)
-            .orElseThrow(() -> new IllegalArgumentException("Api key not found for secretKey: " + secretKey));
+            .orElseThrow(() -> new IllegalArgumentException("Api key not found for the specified environment."));
     }
 
     @Override
