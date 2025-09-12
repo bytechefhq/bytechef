@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;

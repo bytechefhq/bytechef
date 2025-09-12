@@ -27,7 +27,7 @@ public record ConnectedUserProjectWorkflowDTO(
 
         this(
             connectedUserProjectWorkflow.getId(), connectedUserId, enabled, lastExecutionDate,
-            projectWorkflow.getProjectId(), workflow, projectWorkflow.getUuid(),
+            projectWorkflow.getProjectId(), workflow, projectWorkflow.getUuidAsString(),
             connectedUserProjectWorkflow.getWorkflowVersion());
     }
 }

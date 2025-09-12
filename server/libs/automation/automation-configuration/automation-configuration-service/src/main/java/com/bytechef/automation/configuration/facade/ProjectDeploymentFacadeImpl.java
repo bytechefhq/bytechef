@@ -386,7 +386,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow.setProjectDeploymentId(projectId);
                 projectDeploymentWorkflow.setWorkflowId(curProjectWorkflow.getWorkflowId());
 
-                if (Objects.equals(curProjectWorkflow.getUuid(), workflowUuid)) {
+                if (Objects.equals(curProjectWorkflow.getUuidAsString(), workflowUuid)) {
                     projectDeploymentWorkflow.setConnections(connections);
                     projectDeploymentWorkflow.setEnabled(
                         getFirst(curProjectWorkflow, oldProjectDeploymentWorkflows, projectDeployment)
@@ -422,7 +422,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                         projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
 
                 return Objects.equals(
-                    projectDeploymentWorkflowUuid, curProjectWorkflow.getUuid());
+                    projectDeploymentWorkflowUuid, curProjectWorkflow.getUuidAsString());
             })
             .findFirst();
     }
@@ -477,14 +477,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     .filter(curProjectWorkflow -> Objects.equals(
                         curProjectWorkflow.getWorkflowId(), projectDeploymentWorkflow.getWorkflowId()))
                     .findFirst()
-                    .map(ProjectWorkflow::getUuid)
+                    .map(ProjectWorkflow::getUuidAsString)
                     .orElseThrow(() -> new IllegalArgumentException(
                         "Project workflow with workflowId=%s not found".formatted(
                             projectDeploymentWorkflow.getWorkflowId())));
 
                 String oldWorkflowId = allProjectWorkflows.stream()
                     .filter(curProjectWorkflow -> Objects.equals(
-                        curProjectWorkflow.getUuid(), workflowUuid) &&
+                        curProjectWorkflow.getUuidAsString(), workflowUuid) &&
                         curProjectWorkflow.getProjectVersion() == oldProjectVersion)
                     .map(ProjectWorkflow::getWorkflowId)
                     .findFirst()
@@ -548,14 +548,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 .filter(curProjectWorkflow -> Objects.equals(
                     curProjectWorkflow.getWorkflowId(), oldProjectDeploymentWorkflow.getWorkflowId()))
                 .findFirst()
-                .map(ProjectWorkflow::getUuid)
+                .map(ProjectWorkflow::getUuidAsString)
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Project workflow with workflowId=%s not found".formatted(
                         oldProjectDeploymentWorkflow.getWorkflowId())));
 
             String workflowId = allProjectWorkflows.stream()
                 .filter(curProjectWorkflow -> Objects.equals(
-                    curProjectWorkflow.getUuid(), workflowUuid) &&
+                    curProjectWorkflow.getUuidAsString(), workflowUuid) &&
                     curProjectWorkflow.getProjectVersion() == projectDeployment.getProjectVersion())
                 .findFirst()
                 .map(ProjectWorkflow::getWorkflowId)
@@ -594,7 +594,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
-                projectWorkflow.getUuid(), workflowTrigger.getName());
+                projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
@@ -673,7 +673,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
-                projectWorkflow.getUuid(), workflowTrigger.getName());
+                projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, workflowNodeType,
@@ -745,7 +745,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        ModeType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuid(),
+                        ModeType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
                         workflowTrigger.getName()));
             }
         }
@@ -776,7 +776,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId) &&
                 projectWorkflow.getProjectVersion() == projectVersion)
             .findFirst()
-            .map(ProjectWorkflow::getUuid)
+            .map(ProjectWorkflow::getUuidAsString)
             .orElseThrow();
     }
 
@@ -790,7 +790,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         List<String> workflowUuidWorkflowIds = projectWorkflows.stream()
             .filter(projectWorkflow -> Objects.equals(
-                projectWorkflow.getUuid(), workflowUuid))
+                projectWorkflow.getUuidAsString(), workflowUuid))
             .map(ProjectWorkflow::getWorkflowId)
             .toList();
 

@@ -276,7 +276,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
-                integrationWorkflow.getUuid(), workflowTrigger.getName());
+                integrationWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
@@ -313,7 +313,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
-                integrationWorkflow.getUuid(), workflowTrigger.getName());
+                integrationWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),

@@ -118,8 +118,12 @@ public final class IntegrationWorkflow {
         return workflowId;
     }
 
-    public String getUuid() {
-        return uuid.toString();
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getUuidAsString() {
+        return uuid == null ? null : uuid.toString();
     }
 
     public String getCreatedBy() {

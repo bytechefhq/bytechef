@@ -113,6 +113,6 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     public String getWorkflowUuid(String workflowId) {
         ProjectWorkflow workflowProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        return workflowProjectWorkflow.getUuid();
+        return workflowProjectWorkflow.getUuidAsString();
     }
 }

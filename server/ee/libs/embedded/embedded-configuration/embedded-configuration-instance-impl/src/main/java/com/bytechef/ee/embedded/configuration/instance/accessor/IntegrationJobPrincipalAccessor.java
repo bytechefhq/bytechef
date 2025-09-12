@@ -108,6 +108,6 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
             workflowId);
 
-        return integrationWorkflow.getUuid();
+        return integrationWorkflow.getUuidAsString();
     }
 }

@@ -42,7 +42,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
         this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
-        this.workflowUuid = projectWorkflow.getUuid();
+        this.workflowUuid = projectWorkflow.getUuidAsString();
     }
 
     public ProjectWorkflowDTO(WorkflowDTO workflowDTO, ProjectWorkflow projectWorkflow) {
@@ -55,7 +55,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
         this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
-        this.workflowUuid = projectWorkflow.getUuid();
+        this.workflowUuid = projectWorkflow.getUuidAsString();
     }
 
     public int getProjectVersion() {

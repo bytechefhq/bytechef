@@ -149,7 +149,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
 
-        return projectWorkflow.getUuid();
+        return projectWorkflow.getUuidAsString();
     }
 
     @Override
@@ -467,7 +467,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         projectWorkflow = projectWorkflowService
             .fetchProjectWorkflow(
-                projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1, projectWorkflow.getUuid())
+                projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion() - 1,
+                projectWorkflow.getUuidAsString())
             .orElse(null);
 
         if (projectWorkflow == null) {
