@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class JsonUtils {
 
     private JsonUtils() {
-        // Utility class
     }
 
     /**
