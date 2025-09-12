@@ -56,6 +56,7 @@ const WorkflowDialog = ({
             label: workflow?.label || '',
         } as Workflow,
     });
+    const labelRef = useRef<HTMLInputElement>(null);
 
     const {control, getValues, handleSubmit, reset} = form;
 
@@ -176,7 +177,11 @@ const WorkflowDialog = ({
                                 <FormLabel>Label</FormLabel>
 
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input
+                                        {...field}
+                                        onKeyDown={handleEnterKeyPress(submitSavedWorkflow)}
+                                        ref={labelRef}
+                                    />
                                 </FormControl>
 
                                 <FormMessage />
