@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.platform.codeworkflow.configuration.service;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.repository.CodeWorkflowContainerRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -34,7 +34,7 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
     @Override
     public CodeWorkflowContainer create(CodeWorkflowContainer codeWorkflowContainer) {
         Assert.notNull(codeWorkflowContainer, "'codeWorkflow' must not be null");
-        Assert.notNull(codeWorkflowContainer.getWorkflowsFile(), "'workflowsFile' must not be null");
+        Assert.notNull(codeWorkflowContainer.getWorkflows(), "'workflowsFile' must not be null");
         Assert.isTrue(codeWorkflowContainer.getId() == null, "'id' must be null");
         Assert.notNull(codeWorkflowContainer.getName(), "'name' must not be null");
 
@@ -42,9 +42,9 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
     }
 
     @Override
-    public CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerReference) {
-        return OptionalUtils.get(
-            codeWorkflowContainerRepository.findByCodeWorkflowContainerReference(codeWorkflowContainerReference));
+    public CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid) {
+        return codeWorkflowContainerRepository.findByUuid(UUID.fromString(codeWorkflowContainerUuid))
+            .orElseThrow(() -> new IllegalArgumentException("CodeWorkflowContainer not found"));
     }
 
 }
