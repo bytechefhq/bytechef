@@ -91,10 +91,10 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentType(selectedType);
 
         if (selectedType === ModeType.AUTOMATION) {
-            navigate('/automation' + (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'));
+            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
         } else if (selectedType === ModeType.EMBEDDED) {
             navigate(
-                '/embedded' + (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations')
+                `/embedded${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`
             );
         }
     };
@@ -103,9 +103,9 @@ const DesktopSidebarBottomMenu = () => {
         setCurrentEnvironmentId(+value);
 
         if (currentType === ModeType.AUTOMATION) {
-            navigate('/automation' + (+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'));
+            navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
         } else if (currentType === ModeType.EMBEDDED) {
-            navigate('/embedded' + (+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'));
+            navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
         }
     };
 
@@ -178,7 +178,7 @@ const DesktopSidebarBottomMenu = () => {
                             <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
                                 <BlendIcon className="size-5" />
 
-                                <span>Mode: {currentType === ModeType.AUTOMATION ? 'Automation' : 'Embedded'}</span>
+                                <span>{`Mode: ${currentType === ModeType.AUTOMATION ? 'Automation' : 'Embedded'}`}</span>
                             </DropdownMenuSubTrigger>
 
                             <DropdownMenuPortal>
