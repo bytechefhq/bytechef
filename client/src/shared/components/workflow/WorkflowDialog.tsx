@@ -18,8 +18,16 @@ import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationW
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useEffect, useState} from 'react';
+import {KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
+
+const handleEnterKeyPress = (handler: () => void) => {
+    return (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handler();
+        }
+    };
+};
 
 interface WorkflowDialogProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -133,6 +141,8 @@ const WorkflowDialog = ({
         closeDialog();
     }
 
+    const submitSavedWorkflow = handleSubmit(saveWorkflow);
+
     useEffect(() => {
         reset({
             description: workflow?.description || '',
@@ -153,7 +163,13 @@ const WorkflowDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent
+                onInteractOutside={(event) => event.preventDefault()}
+                onOpenAutoFocus={(e) => {
+                    e.preventDefault();
+                    labelRef.current?.focus();
+                }}
+            >
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
                         <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
@@ -213,7 +229,7 @@ const WorkflowDialog = ({
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={isPending} onClick={handleSubmit(saveWorkflow)} type="submit">
+                        <Button disabled={isPending} onClick={submitSavedWorkflow} type="submit">
                             Save
                         </Button>
                     </DialogFooter>
