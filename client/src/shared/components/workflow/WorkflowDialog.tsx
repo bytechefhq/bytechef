@@ -21,7 +21,7 @@ import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react
 import {KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
-const handleEnterKeyPress = (handler: () => void) => {
+const handleEnterKeyDown = (handler: () => void) => {
     return (e: KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             handler();
@@ -141,7 +141,7 @@ const WorkflowDialog = ({
         closeDialog();
     }
 
-    const submitSavedWorkflow = handleSubmit(saveWorkflow);
+    const submitWorkflowToSaving = handleSubmit(saveWorkflow);
 
     useEffect(() => {
         reset({
@@ -195,7 +195,7 @@ const WorkflowDialog = ({
                                 <FormControl>
                                     <Input
                                         {...field}
-                                        onKeyDown={handleEnterKeyPress(submitSavedWorkflow)}
+                                        onKeyDown={handleEnterKeyDown(submitWorkflowToSaving)}
                                         ref={labelRef}
                                     />
                                 </FormControl>
@@ -217,7 +217,7 @@ const WorkflowDialog = ({
                                     <Textarea
                                         placeholder="Cute description of your project deployment"
                                         {...field}
-                                        onKeyDown={handleEnterKeyPress(submitSavedWorkflow)}
+                                        onKeyDown={handleEnterKeyDown(submitWorkflowToSaving)}
                                     />
                                 </FormControl>
 
@@ -233,7 +233,7 @@ const WorkflowDialog = ({
                             </Button>
                         </DialogClose>
 
-                        <Button disabled={isPending} onClick={submitSavedWorkflow} type="submit">
+                        <Button disabled={isPending} onClick={submitWorkflowToSaving} type="submit">
                             Save
                         </Button>
                     </DialogFooter>
