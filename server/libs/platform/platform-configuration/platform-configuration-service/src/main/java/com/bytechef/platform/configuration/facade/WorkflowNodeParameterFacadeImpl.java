@@ -698,11 +698,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                 if (curTaskMap != null) {
                                     return curTaskMap;
                                 }
-                            } else {
-                                Class<?> itemClass = curItem.getClass();
-
-                                throw new IllegalStateException(
-                                    String.format("Unexpected list item type: %s", itemClass.getName()));
                             }
                         }
                     } else if (curList.getFirst() instanceof List<?>) {
@@ -731,11 +726,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                     if (curTaskMap != null) {
                                         return curTaskMap;
                                     }
-                                } else {
-                                    Class<?> itemClass = curItem.getClass();
-
-                                    throw new IllegalStateException(
-                                        String.format("Unexpected list item type: %s", itemClass.getName()));
                                 }
                             }
                         }
