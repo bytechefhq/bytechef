@@ -17,11 +17,10 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
-import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import java.util.List;
 import org.springframework.lang.Nullable;
 
@@ -30,38 +29,26 @@ import org.springframework.lang.Nullable;
  */
 public interface ProjectFacade {
 
-    ProjectWorkflow addWorkflow(long id, String definition);
-
     long createProject(ProjectDTO projectDTO);
 
     void deleteProject(long id);
 
-    void deleteWorkflow(String workflowId);
+    void deleteSharedProject(long id);
 
     ProjectDTO duplicateProject(long id);
 
-    String duplicateWorkflow(long id, String workflowId);
-
     byte[] exportProject(long id);
+
+    void exportSharedProject(long id, @Nullable String description);
+
+    ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject);
 
     ProjectDTO getProject(long id);
 
-    List<Category> getProjectCategories();
-
-    List<Tag> getProjectTags();
-
-    ProjectWorkflowDTO getProjectWorkflow(String workflowId);
-
-    ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId);
-
-    List<ProjectWorkflowDTO> getProjectWorkflows();
-
-    List<ProjectWorkflowDTO> getProjectWorkflows(long projectId);
-
-    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion, boolean includeAllFields);
-
     List<ProjectDTO> getProjects(
         @Nullable Long categoryId, @Nullable Boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
+
+    SharedProjectDTO getSharedProject(String projectUuid);
 
     List<ProjectDTO> getWorkspaceProjects(
         Boolean apiCollections, @Nullable Long categoryId, boolean includeAllFields, Boolean projectDeployments,
@@ -71,11 +58,9 @@ public interface ProjectFacade {
 
     long importProject(byte[] projectData, long workspaceId);
 
+    long importProjectTemplate(String id, long workspaceId, boolean sharedProject);
+
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
     void updateProject(ProjectDTO projectDTO);
-
-    void updateProjectTags(long id, List<Tag> tags);
-
-    void updateWorkflow(String workflowId, String definition, int version);
 }

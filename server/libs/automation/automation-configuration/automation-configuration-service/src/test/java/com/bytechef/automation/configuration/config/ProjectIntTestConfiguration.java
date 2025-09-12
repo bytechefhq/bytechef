@@ -16,25 +16,40 @@
 
 package com.bytechef.automation.configuration.config;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
+import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -55,7 +70,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
-@ProjectIntTestConfigurationSharedMocks
 @Configuration
 public class ProjectIntTestConfiguration {
 
@@ -71,8 +85,38 @@ public class ProjectIntTestConfiguration {
     }
 
     @Bean
+    SharedTemplateFileStorage sharedFileStorage() {
+        SharedTemplateFileStorage sharedTemplateFileStorage = mock(SharedTemplateFileStorage.class);
+
+        Mockito.when(
+            sharedTemplateFileStorage.storeFileContent(anyString(), any(InputStream.class)))
+            .thenAnswer(invocation -> {
+                String name = invocation.getArgument(0);
+
+                FileEntry fileEntry = mock(FileEntry.class);
+
+                Mockito.when(fileEntry.getName())
+                    .thenReturn(name);
+                Mockito.when(fileEntry.toId())
+                    .thenReturn(String.valueOf(UUID.randomUUID()));
+
+                return fileEntry;
+            });
+
+        return sharedTemplateFileStorage;
+    }
+
+    @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {
         return new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
+    }
+
+    @Bean
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
     @EnableJdbcRepositories(
@@ -93,7 +137,9 @@ public class ProjectIntTestConfiguration {
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
+                new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper));
         }
     }

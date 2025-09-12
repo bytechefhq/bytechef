@@ -1,6 +1,14 @@
 extend type Query {
     project(id: ID): Project
+    projectTemplate(id: String!, sharedProject: Boolean!): ProjectTemplate
     projects: [Project]
+    sharedProject(projectUuid: String!): SharedProject
+}
+
+extend type Mutation {
+    deleteSharedProject(id: ID!): Boolean!
+    exportSharedProject(id: ID!, description: String): Boolean
+    importProjectTemplate(id: String!, workspaceId: ID!, sharedProject: Boolean!): ID!
 }
 
 type Project {
@@ -8,4 +16,37 @@ type Project {
     name: String!
     category: Category
     tags: [Tag]
+}
+
+type ProjectTemplate {
+    components: [ComponentDefinitionTuple]!
+    description: String
+    exported: Boolean!
+    project: ProjectInfo
+    projectVersion: Int
+    publicUrl: String
+    workflows: [WorkflowInfo]!
+}
+
+type SharedProject {
+    description: String
+    exported: Boolean!
+    projectVersion: Int
+    publicUrl: String
+}
+
+type ComponentDefinitionTuple {
+    key: String
+    value: [ComponentDefinition]!
+}
+
+type ProjectInfo {
+    description: String
+    name: String!
+}
+
+type WorkflowInfo {
+    description: String
+    label: String!
+    id: String!
 }

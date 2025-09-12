@@ -8,12 +8,12 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +23,8 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteProjectFacadeClient implements ProjectFacade {
-
-    @Override
-    public ProjectWorkflow addWorkflow(long id, String definition) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public long createProject(ProjectDTO projectDTO) {
@@ -41,7 +37,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(String workflowId) {
+    public void deleteSharedProject(long id) {
         throw new UnsupportedOperationException();
     }
 
@@ -51,13 +47,18 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public String duplicateWorkflow(long id, String workflowId) {
+    public byte[] exportProject(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public byte[] exportProject(long id) {
-        return new byte[0];
+    public void exportSharedProject(long id, String description) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -66,43 +67,12 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public List<Category> getProjectCategories() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<Tag> getProjectTags() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProjectWorkflowDTO getProjectWorkflow(String workflowId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ProjectWorkflowDTO> getProjectWorkflows() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ProjectWorkflowDTO> getProjectWorkflows(long projectId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ProjectWorkflowDTO>
-        getProjectVersionWorkflows(long projectId, int projectVersion, boolean includeAllFields) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SharedProjectDTO getSharedProject(String projectUuid) {
         throw new UnsupportedOperationException();
     }
 
@@ -121,7 +91,12 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public long importProject(byte[] projectData, long workspaceId) {
-        return 0;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long importProjectTemplate(String id, long workspaceId, boolean sharedProject) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -131,16 +106,6 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public void updateProject(ProjectDTO projectDTO) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateProjectTags(long id, List<Tag> tags) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }
 }
