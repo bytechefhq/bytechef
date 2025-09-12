@@ -2020,6 +2020,96 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    void testGetClusterElementDisplayConditionsWithMultipleSiblingNestedRootsSameType() {
+        // Given
+        String workflowId = "workflow1";
+        String workflowNodeName = "taskWithClusters";
+        String rootTypeName = "loop";
+        String innerTypeName = "case";
+        String targetChildName = "childA";
+
+        // Build child cluster elements
+        Map<String, Object> childA = new HashMap<>();
+
+        childA.put("name", targetChildName);
+        childA.put("type", "component/v1/action");
+        childA.put("parameters", new HashMap<>());
+        childA.put("metadata", new HashMap<>());
+
+        Map<String, Object> childB = new HashMap<>();
+
+        childB.put("name", "childB");
+        childB.put("type", "component/v1/action");
+        childB.put("parameters", new HashMap<>());
+        childB.put("metadata", new HashMap<>());
+
+        // Build two sibling nested cluster roots of the same type under the task
+        Map<String, Object> rootA = new HashMap<>();
+
+        rootA.put("name", "rootA");
+        rootA.put("type", "loop/v1/loop");
+
+        Map<String, Object> rootAClusterElements = new HashMap<>();
+
+        rootAClusterElements.put(innerTypeName, List.of(childA));
+
+        rootA.put("clusterElements", rootAClusterElements);
+
+        Map<String, Object> rootB = new HashMap<>();
+
+        rootB.put("name", "rootB");
+        rootB.put("type", "loop/v1/loop");
+
+        Map<String, Object> rootBClusterElements = new HashMap<>();
+
+        rootBClusterElements.put(innerTypeName, List.of(childB));
+
+        rootB.put("clusterElements", rootBClusterElements);
+
+        // Put rootB first to ensure traversal hits a sibling without the target child before finding it
+        Map<String, Object> topClusterElements = new HashMap<>();
+
+        topClusterElements.put(rootTypeName, List.of(rootB, rootA));
+
+        Map<String, Object> task = new HashMap<>();
+
+        task.put("name", workflowNodeName);
+        task.put("type", "component/v1/action");
+        task.put("parameters", new HashMap<>());
+        task.put("clusterElements", topClusterElements);
+
+        Map<String, Object> definitionMap = new HashMap<>();
+        definitionMap.put("tasks", List.of(task));
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+            when(clusterElementDefinition.getProperties()).thenReturn(List.of());
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            // When: request display conditions for a child under one of the siblings
+            DisplayConditionResultDTO result = workflowNodeParameterFacade.getClusterElementDisplayConditions(
+                workflowId, workflowNodeName, innerTypeName, targetChildName, 0);
+
+            // Then: should not throw and should return a result
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+        }
+    }
+
+    @Test
     void testDeleteClusterElementParameterWithListStructure() {
         // Given
         String workflowId = "workflow1";
