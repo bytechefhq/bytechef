@@ -29,6 +29,6 @@ public interface CustomComponentMapper extends Converter<CustomComponent, Custom
 
     @InheritInverseConfiguration
     @DelegatingConverter
-    @Mapping(target = "componentFile", ignore = true)
+    @Mapping(target = "component", ignore = true)
     CustomComponent invertConvert(CustomComponentModel customComponentModel);
 }
