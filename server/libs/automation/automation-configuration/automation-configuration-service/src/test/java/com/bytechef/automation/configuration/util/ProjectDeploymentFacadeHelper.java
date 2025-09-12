@@ -99,7 +99,7 @@ public class ProjectDeploymentFacadeHelper {
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
             new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
                 0,
-                workflowDTO.getId(), projectWorkflow.getUuid());
+                workflowDTO.getId(), projectWorkflow.getUuidAsString());
 
         Project dbProject = projectRepository.findById(publishedProject.id())
             .orElseThrow();

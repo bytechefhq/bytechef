@@ -124,7 +124,11 @@ public final class ProjectWorkflow {
         return workflowId;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getUuidAsString() {
         return uuid == null ? null : uuid.toString();
     }
 

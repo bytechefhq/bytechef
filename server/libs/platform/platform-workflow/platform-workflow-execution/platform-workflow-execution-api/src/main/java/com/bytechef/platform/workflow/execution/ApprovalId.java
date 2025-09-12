@@ -62,7 +62,7 @@ public class ApprovalId implements Serializable {
         return Objects.requireNonNull(tenantId);
     }
 
-    public String getUuid() {
+    public String getUuidAsString() {
         return uuid;
     }
 

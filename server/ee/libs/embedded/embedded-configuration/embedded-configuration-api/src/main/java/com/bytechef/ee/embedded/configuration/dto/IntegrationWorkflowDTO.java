@@ -41,7 +41,7 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
 
         this.integrationVersion = integrationWorkflow.getIntegrationVersion();
         this.integrationWorkflowId = integrationWorkflow.getId();
-        this.workflowUuid = integrationWorkflow.getUuid();
+        this.workflowUuid = integrationWorkflow.getUuidAsString();
     }
 
     public IntegrationWorkflowDTO(WorkflowDTO workflow, IntegrationWorkflow integrationWorkflow) {
@@ -54,7 +54,7 @@ public final class IntegrationWorkflowDTO extends WorkflowDTO {
 
         this.integrationVersion = integrationWorkflow.getIntegrationVersion();
         this.integrationWorkflowId = integrationWorkflow.getId();
-        this.workflowUuid = integrationWorkflow.getUuid();
+        this.workflowUuid = integrationWorkflow.getUuidAsString();
     }
 
     public int getIntegrationVersion() {

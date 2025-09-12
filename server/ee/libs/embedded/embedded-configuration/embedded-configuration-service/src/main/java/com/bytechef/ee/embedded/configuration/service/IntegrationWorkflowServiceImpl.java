@@ -130,7 +130,8 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
         update(integrationWorkflow);
 
         integrationWorkflow = new IntegrationWorkflow(
-            integrationId, oldIntegrationVersion, oldWorkflowId, UUID.fromString(integrationWorkflow.getUuid()));
+            integrationId, oldIntegrationVersion, oldWorkflowId,
+            UUID.fromString(integrationWorkflow.getUuidAsString()));
 
         integrationWorkflowRepository.save(integrationWorkflow);
     }
@@ -146,7 +147,7 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
         curIntegrationWorkflow.setIntegrationVersion(integrationWorkflow.getIntegrationVersion());
         curIntegrationWorkflow.setWorkflowId(integrationWorkflow.getWorkflowId());
-        curIntegrationWorkflow.setUuid(integrationWorkflow.getUuid());
+        curIntegrationWorkflow.setUuid(integrationWorkflow.getUuidAsString());
 
         return integrationWorkflowRepository.save(curIntegrationWorkflow);
     }

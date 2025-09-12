@@ -82,7 +82,7 @@ public class ProjectWorkflowTools {
 
             return new ProjectWorkflowInfo(
                 projectWorkflow.getId(), projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion(),
-                projectWorkflow.getWorkflowId(), projectWorkflow.getUuid(),
+                projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString(),
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
                 projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
         } catch (Exception e) {

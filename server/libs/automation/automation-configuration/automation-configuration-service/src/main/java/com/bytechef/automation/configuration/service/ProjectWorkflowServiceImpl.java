@@ -152,7 +152,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     public String getProjectDeploymentWorkflowUuid(long projectDeploymentId, String workflowId) {
         return projectWorkflowRepository
             .findByProjectDeploymentIdAndWorkflowId(projectDeploymentId, workflowId)
-            .map(ProjectWorkflow::getUuid)
+            .map(ProjectWorkflow::getUuidAsString)
             .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
     }
 
@@ -177,7 +177,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         update(projectWorkflow);
 
         projectWorkflow = new ProjectWorkflow(
-            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuid()));
+            projectId, oldProjectVersion, oldWorkflowId, UUID.fromString(projectWorkflow.getUuidAsString()));
 
         projectWorkflowRepository.save(projectWorkflow);
     }
@@ -192,7 +192,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
         curProjectWorkflow.setProjectVersion(projectWorkflow.getProjectVersion());
         curProjectWorkflow.setWorkflowId(projectWorkflow.getWorkflowId());
-        curProjectWorkflow.setUuid(projectWorkflow.getUuid());
+        curProjectWorkflow.setUuid(projectWorkflow.getUuidAsString());
 
         return projectWorkflowRepository.save(projectWorkflow);
     }

@@ -135,7 +135,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
                     workflowId);
 
                 WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                    ModeType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getUuid(),
+                    ModeType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getUuidAsString(),
                     appEventTriggerName);
 
                 try {
