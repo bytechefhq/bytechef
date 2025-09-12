@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 /**
  * Utility class for building validation messages with consistent formatting.
@@ -22,7 +22,6 @@ package utils;
 public class ValidationErrorBuilder {
 
     private ValidationErrorBuilder() {
-        // Utility class
     }
 
     /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.bytechef.ai.mcp.tool.automation.ToolUtils;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -623,8 +623,7 @@ class WorkflowValidatorTest {
             new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
             new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
             new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -661,8 +660,7 @@ class WorkflowValidatorTest {
             new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
             new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
             new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null)
-        );
+            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -726,7 +724,8 @@ class WorkflowValidatorTest {
             Property 'night' is in incorrect date format. Impossible date: 2025-02-30
             Property 'from' is in incorrect time format. Impossible time: 45:45:73
             Property 'to' is in incorrect time format. Format should be in: 'hh:mm:ss'
-            Property 'specific_date' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'""", errors.toString());
+            Property 'specific_date' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'""",
+            errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -3286,7 +3285,8 @@ class WorkflowValidatorTest {
             fail("Should not throw exception: " + e.getMessage());
         }
     }
-        @Test
+
+    @Test
     void validateWorkflowTasks_flowConditionAndLoop_noErrors() {
         String tasksJson = """
             [
@@ -3400,8 +3400,7 @@ class WorkflowValidatorTest {
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null))
-            );
+                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionArr,
@@ -3418,8 +3417,10 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number", errors.toString());
-            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
+            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
+                errors.toString());
+            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }

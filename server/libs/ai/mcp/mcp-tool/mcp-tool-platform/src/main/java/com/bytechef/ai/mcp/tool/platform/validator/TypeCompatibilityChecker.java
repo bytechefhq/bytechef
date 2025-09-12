@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 /**
  * Utility class for checking type compatibility between data pill expressions and their target fields.
@@ -22,14 +22,13 @@ package utils;
 public class TypeCompatibilityChecker {
 
     private TypeCompatibilityChecker() {
-        // Utility class
     }
 
     /**
      * Checks if two types are compatible for data pill assignments.
      */
     public static boolean isTypeCompatible(String expectedType, String actualType) {
-        if (expectedType == null || actualType == null) {
+        if (actualType == null) {
             return true;
         }
 
@@ -45,18 +44,10 @@ public class TypeCompatibilityChecker {
         }
 
         // Any type can be converted to string
-        if ("string".equalsIgnoreCase(expectedType)) {
+        if (expectedType.equalsIgnoreCase("string")) {
             return true;
         }
 
         return false;
-    }
-
-    private static String extractFieldNameFromPath(String fieldPath) {
-        if (fieldPath.contains(".")) {
-            String[] parts = fieldPath.split("\\.");
-            return parts[parts.length - 1];
-        }
-        return fieldPath;
     }
 }

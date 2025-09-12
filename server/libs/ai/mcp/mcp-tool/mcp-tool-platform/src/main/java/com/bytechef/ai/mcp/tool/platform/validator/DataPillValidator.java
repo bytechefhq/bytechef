@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
-import com.bytechef.ai.mcp.tool.automation.ToolUtils;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
@@ -62,14 +62,15 @@ public class DataPillValidator {
     }
 
     /**
-     * Validates data pills in a task's parameters, with access to all tasks for loop type validation, task
-     * definition for type checking, and optional task order validation skipping.
+     * Validates data pills in a task's parameters, with access to all tasks for loop type validation, task definition
+     * for type checking, and optional task order validation skipping.
      */
     public static boolean validateTaskDataPills(
         JsonNode task, Map<String, ToolUtils.PropertyInfo> taskOutput,
         List<String> taskNames, Map<String, String> taskNameToTypeMap,
         StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
-        List<ToolUtils.PropertyInfo> taskDefinition, boolean skipTaskOrderValidation, boolean skipNestedTaskValidation) {
+        List<ToolUtils.PropertyInfo> taskDefinition, boolean skipTaskOrderValidation,
+        boolean skipNestedTaskValidation) {
         if (!task.has("parameters") || !task.get("parameters")
             .isObject()) {
             return false;
@@ -111,7 +112,7 @@ public class DataPillValidator {
                 // Skip validation of this array since it contains nested tasks that will be validated separately
                 return;
             }
-            
+
             for (int i = 0; i < node.size(); i++) {
                 if (context.stopProcessing)
                     break;
@@ -142,7 +143,7 @@ public class DataPillValidator {
         for (String part : pathParts) {
             // Remove array indices from the part (e.g., "items[0]" becomes "items")
             String propertyName = part.replaceAll("\\[\\d+\\]", "");
-            
+
             ToolUtils.PropertyInfo foundProperty = null;
             for (ToolUtils.PropertyInfo prop : currentProperties) {
                 if (propertyName.equals(prop.name())) {
@@ -158,8 +159,12 @@ public class DataPillValidator {
             // Check if this is an ARRAY type with TASK nested properties
             if ("ARRAY".equalsIgnoreCase(foundProperty.type()) &&
                 foundProperty.nestedProperties() != null &&
-                foundProperty.nestedProperties().size() == 1 &&
-                "TASK".equalsIgnoreCase(foundProperty.nestedProperties().get(0).type())) {
+                foundProperty.nestedProperties()
+                    .size() == 1
+                &&
+                "TASK".equalsIgnoreCase(foundProperty.nestedProperties()
+                    .get(0)
+                    .type())) {
                 return true;
             }
 
@@ -455,7 +460,7 @@ public class DataPillValidator {
             ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties()
                 .get(0);
             if (arrayElementProperty != null) {
-                
+
                 // Extract the property name from the data pill expression
                 // For example, from "loop1.item.propBool" we want "propBool"
                 if (dataPillExpression.contains(".item.")) {
@@ -487,11 +492,13 @@ public class DataPillValidator {
                     // Handle direct item references like "loop1.item"
                     // When referencing the item directly, we need to determine what type it represents
                     // For arrays of objects, we use the first property of the object as the default type
-                    if (arrayElementProperty.nestedProperties() != null && !arrayElementProperty.nestedProperties().isEmpty()) {
+                    if (arrayElementProperty.nestedProperties() != null && !arrayElementProperty.nestedProperties()
+                        .isEmpty()) {
                         // Get the first property of the array element as the default type
-                        ToolUtils.PropertyInfo firstProperty = arrayElementProperty.nestedProperties().get(0);
+                        ToolUtils.PropertyInfo firstProperty = arrayElementProperty.nestedProperties()
+                            .get(0);
                         String actualType = JsonUtils.mapTypeToString(firstProperty.type());
-                        
+
                         if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
                             String errorMessage = String.format(
                                 "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
@@ -501,7 +508,7 @@ public class DataPillValidator {
                     } else {
                         // For arrays of primitive types, use the array element type directly
                         String actualType = JsonUtils.mapTypeToString(arrayElementProperty.type());
-                        
+
                         if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
                             String errorMessage = String.format(
                                 "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
