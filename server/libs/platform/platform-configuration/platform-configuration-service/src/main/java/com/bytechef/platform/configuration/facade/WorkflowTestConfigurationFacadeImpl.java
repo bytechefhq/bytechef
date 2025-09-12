@@ -146,11 +146,14 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         List<ComponentConnection> taskComponentConnections, WorkflowTestConfigurationConnection connection) {
 
         return taskComponentConnections.stream()
-            .noneMatch(workflowConnection -> Objects.equals(
-                workflowConnection.workflowNodeName(), connection.getWorkflowNodeName()) &&
-                Objects.equals(workflowConnection.key(), connection.getWorkflowConnectionKey()));
+            .noneMatch(workflowConnection -> matchesConnection(workflowConnection, connection));
     }
 
+    private static boolean matchesConnection(
+        ComponentConnection workflowConnection, WorkflowTestConfigurationConnection connection) {
+        return Objects.equals(workflowConnection.workflowNodeName(), connection.getWorkflowNodeName())
+            && Objects.equals(workflowConnection.key(), connection.getWorkflowConnectionKey());
+    }
     private void validateConnections(
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections, Workflow workflow) {
 
