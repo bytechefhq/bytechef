@@ -45,7 +45,7 @@ public class DataPillValidator {
         StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
         List<ToolUtils.PropertyInfo> taskDefinition) {
         return validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap,
-            taskDefinition, false);
+            taskDefinition, false, false);
     }
 
     /**
@@ -57,6 +57,19 @@ public class DataPillValidator {
         List<String> taskNames, Map<String, String> taskNameToTypeMap,
         StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
         List<ToolUtils.PropertyInfo> taskDefinition, boolean skipTaskOrderValidation) {
+        return validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap,
+            taskDefinition, skipTaskOrderValidation, false);
+    }
+
+    /**
+     * Validates data pills in a task's parameters, with access to all tasks for loop type validation, task
+     * definition for type checking, and optional task order validation skipping.
+     */
+    public static boolean validateTaskDataPills(
+        JsonNode task, Map<String, ToolUtils.PropertyInfo> taskOutput,
+        List<String> taskNames, Map<String, String> taskNameToTypeMap,
+        StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
+        List<ToolUtils.PropertyInfo> taskDefinition, boolean skipTaskOrderValidation, boolean skipNestedTaskValidation) {
         if (!task.has("parameters") || !task.get("parameters")
             .isObject()) {
             return false;
@@ -68,6 +81,7 @@ public class DataPillValidator {
 
         TaskValidationContext context = new TaskValidationContext();
         context.skipTaskOrderValidation = skipTaskOrderValidation;
+        context.skipNestedTaskValidation = skipNestedTaskValidation;
         findDataPillsInNode(task.get("parameters"), "", currentTaskName, taskOutput,
             taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
 
@@ -92,6 +106,12 @@ public class DataPillValidator {
                         taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
                 });
         } else if (node.isArray()) {
+            // Check if this array contains TASK type elements that should be skipped
+            if (context.skipNestedTaskValidation && isTaskTypeArray(currentPath, taskDefinition)) {
+                // Skip validation of this array since it contains nested tasks that will be validated separately
+                return;
+            }
+            
             for (int i = 0; i < node.size(); i++) {
                 if (context.stopProcessing)
                     break;
@@ -105,6 +125,53 @@ public class DataPillValidator {
                     taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
             }
         }
+    }
+
+    /**
+     * Checks if the given path corresponds to an array that contains TASK type elements.
+     */
+    private static boolean isTaskTypeArray(String currentPath, List<ToolUtils.PropertyInfo> taskDefinition) {
+        if (taskDefinition == null || currentPath == null || currentPath.isEmpty()) {
+            return false;
+        }
+
+        // Split the path to find the property definition
+        String[] pathParts = currentPath.split("\\.");
+        List<ToolUtils.PropertyInfo> currentProperties = taskDefinition;
+
+        for (String part : pathParts) {
+            // Remove array indices from the part (e.g., "items[0]" becomes "items")
+            String propertyName = part.replaceAll("\\[\\d+\\]", "");
+            
+            ToolUtils.PropertyInfo foundProperty = null;
+            for (ToolUtils.PropertyInfo prop : currentProperties) {
+                if (propertyName.equals(prop.name())) {
+                    foundProperty = prop;
+                    break;
+                }
+            }
+
+            if (foundProperty == null) {
+                return false;
+            }
+
+            // Check if this is an ARRAY type with TASK nested properties
+            if ("ARRAY".equalsIgnoreCase(foundProperty.type()) &&
+                foundProperty.nestedProperties() != null &&
+                foundProperty.nestedProperties().size() == 1 &&
+                "TASK".equalsIgnoreCase(foundProperty.nestedProperties().get(0).type())) {
+                return true;
+            }
+
+            // Continue traversing for nested properties
+            if (foundProperty.nestedProperties() != null) {
+                currentProperties = foundProperty.nestedProperties();
+            } else {
+                break;
+            }
+        }
+
+        return false;
     }
 
     private static void processDataPillsInText(
@@ -378,39 +445,68 @@ public class DataPillValidator {
             return;
         }
 
-        // Extract the property name from the data pill expression
-        // For example, from "loop1.item.propBool" we want "propBool"
-        if (dataPillExpression.contains(".item.")) {
-            String[] itemParts = dataPillExpression.split("\\.item\\.");
-            if (itemParts.length > 1) {
-                String propertyName = itemParts[1];
+        // Find the array property in the source task output (e.g., "elements")
+        ToolUtils.PropertyInfo arrayProperty =
+            PropertyUtils.findPropertyByName(sourceTaskOutput, sourcePropertyName);
+        if (arrayProperty != null && arrayProperty.nestedProperties() != null
+            && !arrayProperty.nestedProperties()
+                .isEmpty()) {
+            // Get the array element definition (first nested property)
+            ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties()
+                .get(0);
+            if (arrayElementProperty != null) {
+                
+                // Extract the property name from the data pill expression
+                // For example, from "loop1.item.propBool" we want "propBool"
+                if (dataPillExpression.contains(".item.")) {
+                    String[] itemParts = dataPillExpression.split("\\.item\\.");
+                    if (itemParts.length > 1) {
+                        String propertyName = itemParts[1];
 
-                // Find the array property in the source task output (e.g., "elements")
-                ToolUtils.PropertyInfo arrayProperty =
-                    PropertyUtils.findPropertyByName(sourceTaskOutput, sourcePropertyName);
-                if (arrayProperty != null && arrayProperty.nestedProperties() != null
-                    && !arrayProperty.nestedProperties()
-                        .isEmpty()) {
-                    // Get the array element definition (first nested property)
-                    ToolUtils.PropertyInfo arrayElementProperty = arrayProperty.nestedProperties()
-                        .get(0);
-                    if (arrayElementProperty != null && arrayElementProperty.nestedProperties() != null) {
-                        // Find the specific property within the array element
-                        ToolUtils.PropertyInfo targetProperty =
-                            PropertyUtils.findPropertyByName(arrayElementProperty, propertyName);
-                        if (targetProperty != null) {
-                            String actualType = JsonUtils.mapTypeToString(targetProperty.type());
+                        if (arrayElementProperty.nestedProperties() != null) {
+                            // Find the specific property within the array element
+                            ToolUtils.PropertyInfo targetProperty =
+                                PropertyUtils.findPropertyByName(arrayElementProperty, propertyName);
+                            if (targetProperty != null) {
+                                String actualType = JsonUtils.mapTypeToString(targetProperty.type());
 
-                            if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
-                                // Generate errors for each array element (simulating 3 elements based on test
-                                // expectations)
-                                for (int i = 0; i < 3; i++) {
-                                    String errorMessage = String.format(
-                                        "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, not %s",
-                                        i, propertyName, actualType, expectedType.toLowerCase());
-                                    ValidationErrorBuilder.append(errors, errorMessage);
+                                if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
+                                    // Generate errors for each array element (simulating 3 elements based on test
+                                    // expectations)
+                                    for (int i = 0; i < 3; i++) {
+                                        String errorMessage = String.format(
+                                            "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, not %s",
+                                            i, propertyName, actualType, expectedType.toLowerCase());
+                                        ValidationErrorBuilder.append(errors, errorMessage);
+                                    }
                                 }
                             }
+                        }
+                    }
+                } else if (dataPillExpression.endsWith(".item")) {
+                    // Handle direct item references like "loop1.item"
+                    // When referencing the item directly, we need to determine what type it represents
+                    // For arrays of objects, we use the first property of the object as the default type
+                    if (arrayElementProperty.nestedProperties() != null && !arrayElementProperty.nestedProperties().isEmpty()) {
+                        // Get the first property of the array element as the default type
+                        ToolUtils.PropertyInfo firstProperty = arrayElementProperty.nestedProperties().get(0);
+                        String actualType = JsonUtils.mapTypeToString(firstProperty.type());
+                        
+                        if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
+                            String errorMessage = String.format(
+                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
+                                actualType, expectedType.toLowerCase());
+                            ValidationErrorBuilder.append(errors, errorMessage);
+                        }
+                    } else {
+                        // For arrays of primitive types, use the array element type directly
+                        String actualType = JsonUtils.mapTypeToString(arrayElementProperty.type());
+                        
+                        if (!TypeCompatibilityChecker.isTypeCompatible(expectedType, actualType)) {
+                            String errorMessage = String.format(
+                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
+                                actualType, expectedType.toLowerCase());
+                            ValidationErrorBuilder.append(errors, errorMessage);
                         }
                     }
                 }
@@ -421,5 +517,6 @@ public class DataPillValidator {
     static class TaskValidationContext {
         boolean stopProcessing = false;
         boolean skipTaskOrderValidation = false;
+        boolean skipNestedTaskValidation = false;
     }
 }

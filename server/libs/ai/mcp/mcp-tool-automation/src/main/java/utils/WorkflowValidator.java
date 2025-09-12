@@ -236,6 +236,31 @@ public class WorkflowValidator {
             warnings, allTasksMap, taskDefinition, skipTaskOrderValidation);
     }
 
+    /**
+     * Validates data pill expressions in task parameters with access to all tasks for loop type validation, task
+     * definition for type checking, optional task order validation skipping, and optional nested task validation skipping.
+     *
+     * @param task                        the task JsonNode containing parameters to validate
+     * @param taskOutput                  map of task types to their output PropertyInfo
+     * @param taskNames                   list of task names in workflow order
+     * @param taskNameToTypeMap           mapping from task names to task types
+     * @param errors                      StringBuilder to collect validation errors
+     * @param warnings                    StringBuilder to collect validation warnings
+     * @param allTasksMap                 map of all task names to their JsonNode for loop validation
+     * @param taskDefinition              list of PropertyInfo representing the task definition for type checking
+     * @param skipTaskOrderValidation     whether to skip task order validation (useful for nested tasks)
+     * @param skipNestedTaskValidation    whether to skip validation of nested TASK type arrays
+     * @return true if task order errors were found (indicating processing should stop)
+     */
+    public static boolean validateTaskDataPills(
+        JsonNode task, Map<String, ToolUtils.PropertyInfo> taskOutput,
+        List<String> taskNames, Map<String, String> taskNameToTypeMap,
+        StringBuilder errors, StringBuilder warnings, Map<String, JsonNode> allTasksMap,
+        List<ToolUtils.PropertyInfo> taskDefinition, boolean skipTaskOrderValidation, boolean skipNestedTaskValidation) {
+        return DataPillValidator.validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors,
+            warnings, allTasksMap, taskDefinition, skipTaskOrderValidation, skipNestedTaskValidation);
+    }
+
     private static StringBuilder validateProcessedTaskDefinition(
         JsonNode currentPropsNode, String processedTaskDefinition, String originalTaskDefinition,
         StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
@@ -313,8 +338,9 @@ public class WorkflowValidator {
             allTasksMap);
 
         if (taskDefinition != null && !taskDefinition.isEmpty()) {
+            // Skip nested task validation for main task validation - nested tasks will be validated separately
             validateTaskDataPills(task, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTasksMap,
-                taskDefinition);
+                taskDefinition, false, true);
         }
     }
 
@@ -371,6 +397,18 @@ public class WorkflowValidator {
                     for (int i = 0; i < taskArray.size(); i++) {
                         JsonNode nestedTask = taskArray.get(i);
                         if (nestedTask.has("type")) {
+                            // Add nested task to the maps for proper task order validation
+                            if (nestedTask.has("name")) {
+                                String nestedTaskName = nestedTask.get("name").asText();
+                                String nestedTaskType = nestedTask.get("type").asText();
+                                
+                                if (!taskNames.contains(nestedTaskName)) {
+                                    taskNames.add(nestedTaskName);
+                                }
+                                allTasksMap.put(nestedTaskName, nestedTask);
+                                taskNameToTypeMap.put(nestedTaskName, nestedTaskType);
+                            }
+                            
                             // Validate the nested task structure
                             validateTaskStructure(nestedTask.toString(), errors);
 
