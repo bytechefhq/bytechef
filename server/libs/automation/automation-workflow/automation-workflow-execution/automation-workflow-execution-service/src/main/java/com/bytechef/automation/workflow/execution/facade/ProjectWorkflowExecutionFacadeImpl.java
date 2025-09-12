@@ -70,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
+public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -90,7 +90,7 @@ public class ProjectProjectWorkflowExecutionFacadeImpl implements ProjectWorkflo
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectProjectWorkflowExecutionFacadeImpl(
+    public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,

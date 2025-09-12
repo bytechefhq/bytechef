@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -82,6 +83,9 @@ public final class Project {
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectVersion> projectVersions = new HashSet<>();
 
+    @Column("uuid")
+    private UUID uuid;
+
     @Version
     private int version;
 
@@ -95,7 +99,7 @@ public final class Project {
     @PersistenceCreator
     public Project(
         AggregateReference<Category, Long> categoryId, String description, Long id, String name,
-        Set<ProjectTag> projectTags, Set<ProjectVersion> projectVersions, int version) {
+        Set<ProjectTag> projectTags, Set<ProjectVersion> projectVersions, UUID uuid, int version) {
 
         this.categoryId = categoryId;
         this.description = description;
@@ -103,6 +107,7 @@ public final class Project {
         this.name = name;
         this.projectTags.addAll(projectTags);
         this.projectVersions.addAll(projectVersions);
+        this.uuid = uuid;
         this.version = version;
     }
 
@@ -199,6 +204,10 @@ public final class Project {
             .toList();
     }
 
+    public String getUuid() {
+        return uuid == null ? null : uuid.toString();
+    }
+
     public int getVersion() {
         return version;
     }
@@ -268,6 +277,14 @@ public final class Project {
         if (!CollectionUtils.isEmpty(tags)) {
             setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = UUID.fromString(uuid);
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setVersion(int version) {

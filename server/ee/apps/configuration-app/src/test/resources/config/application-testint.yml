@@ -9,6 +9,9 @@ openapi:
       platform: /api/platform
 
 spring:
+  graphql:
+    schema:
+      locations: classpath*:graphql/**/
   liquibase:
     contexts: configuration
 

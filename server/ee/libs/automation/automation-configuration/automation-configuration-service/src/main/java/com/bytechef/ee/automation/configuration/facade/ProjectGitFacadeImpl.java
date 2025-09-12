@@ -15,6 +15,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
@@ -45,6 +46,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     private final ProjectGitConfigurationService projectGitConfigurationService;
     private final ProjectGitService projectGitService;
     private final ProjectService projectService;
+    private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
     private final WorkspaceService workspaceService;
@@ -53,14 +55,16 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     public ProjectGitFacadeImpl(
         GitConfigurationFacade gitConfigurationFacade, ProjectFacade projectFacade,
         ProjectGitConfigurationService projectGitConfigurationService, ProjectGitService projectGitService,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService, WorkspaceService workspaceService) {
+        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
+        WorkspaceService workspaceService) {
 
         this.gitConfigurationFacade = gitConfigurationFacade;
         this.projectFacade = projectFacade;
         this.projectGitConfigurationService = projectGitConfigurationService;
         this.projectGitService = projectGitService;
         this.projectService = projectService;
+        this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
         this.workspaceService = workspaceService;
@@ -94,11 +98,11 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
                 .orElse(null);
 
             if (oldWorkflow == null) {
-                projectFacade.addWorkflow(projectId, workflow.getDefinition());
+                projectWorkflowFacade.addWorkflow(projectId, workflow.getDefinition());
             } else {
                 oldWorkflow.setDefinition(workflow.getDefinition());
 
-                projectFacade.updateWorkflow(
+                projectWorkflowFacade.updateWorkflow(
                     Objects.requireNonNull(oldWorkflow.getId()), workflow.getDefinition(), oldWorkflow.getVersion());
             }
 

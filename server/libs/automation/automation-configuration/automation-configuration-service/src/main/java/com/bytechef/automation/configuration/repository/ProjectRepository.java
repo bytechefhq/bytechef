@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -39,6 +40,8 @@ public interface ProjectRepository
     Optional<Project> findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
     Optional<Project> findByNameIgnoreCase(String name);
+
+    Optional<Project> findByUuid(UUID uuid);
 
     @Query("""
             SELECT project.* FROM project

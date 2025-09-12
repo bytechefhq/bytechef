@@ -18,6 +18,9 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
+import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
@@ -30,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -42,19 +46,22 @@ import org.springframework.stereotype.Controller;
 public class ProjectGraphQlController {
 
     private final CategoryService categoryService;
+    private final ProjectFacade projectFacade;
     private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectGraphQlController(
-        CategoryService categoryService, ProjectService projectService, TagService tagService) {
+        CategoryService categoryService, ProjectFacade projectFacade, ProjectService projectService,
+        TagService tagService) {
 
         this.categoryService = categoryService;
+        this.projectFacade = projectFacade;
         this.projectService = projectService;
         this.tagService = tagService;
     }
 
-    @SchemaMapping
+    @SchemaMapping(typeName = "Project", field = "category")
     public Category category(Project project) {
         if (project.getCategoryId() == null) {
             return null;
@@ -63,14 +70,43 @@ public class ProjectGraphQlController {
         return categoryService.getCategory(project.getCategoryId());
     }
 
-    @QueryMapping
+    @MutationMapping(name = "deleteSharedProject")
+    public Boolean deleteSharedProject(@Argument Long id) {
+        projectFacade.deleteSharedProject(id);
+
+        return true;
+    }
+
+    @MutationMapping(name = "exportSharedProject")
+    public void exportSharedProject(@Argument Long id, @Argument("description") String description) {
+        projectFacade.exportSharedProject(id, description);
+    }
+
+    @QueryMapping(name = "projectTemplate")
+    public ProjectTemplateDTO projectTemplate(@Argument String id, @Argument boolean sharedProject) {
+        return projectFacade.getProjectTemplate(id, sharedProject);
+    }
+
+    @MutationMapping(name = "importProjectTemplate")
+    public Long importProjectTemplate(
+        @Argument String id, @Argument Long workspaceId, @Argument boolean sharedProject) {
+
+        return projectFacade.importProjectTemplate(id, workspaceId, sharedProject);
+    }
+
+    @QueryMapping(name = "project")
     public Project project(@Argument long id) {
         return projectService.getProject(id);
     }
 
-    @QueryMapping
+    @QueryMapping(name = "projects")
     public List<Project> projects() {
         return projectService.getProjects();
+    }
+
+    @QueryMapping(name = "sharedProject")
+    public SharedProjectDTO sharedProject(@Argument String projectUuid) {
+        return projectFacade.getSharedProject(projectUuid);
     }
 
     @BatchMapping

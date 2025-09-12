@@ -16,36 +16,28 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
-import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.mapper.ProjectMapper;
-import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
-import com.bytechef.automation.configuration.web.rest.model.TagModel;
-import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import jakarta.servlet.ServletException;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
@@ -79,6 +71,9 @@ public class ProjectApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
+    private ProjectCategoryFacade projectCategoryFacade;
+
+    @MockitoBean
     private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
@@ -86,6 +81,12 @@ public class ProjectApiControllerIntTest {
 
     @MockitoBean
     private ProjectService projectService;
+
+    @MockitoBean
+    private ProjectTagFacade projectTagFacade;
+
+    @MockitoBean
+    private ProjectWorkflowFacade projectWorkflowFacade;
 
     @MockitoBean
     private WorkflowService workflowService;
@@ -142,78 +143,6 @@ public class ProjectApiControllerIntTest {
                 .isOk()
                 .expectBody(ProjectModel.class)
                 .isEqualTo(Validate.notNull(projectMapper.convert(projectDTO), "projectModel"));
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetProjectCategories() {
-        try {
-            when(projectFacade.getProjectCategories())
-                .thenReturn(List.of(new Category(1, "name")));
-
-            this.webTestClient
-                .get()
-                .uri("/internal/projects/categories")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(CategoryModel.class)
-                .hasSize(1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetProjectTags() {
-        when(projectFacade.getProjectTags())
-            .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
-
-        try {
-            this.webTestClient
-                .get()
-                .uri("/internal/projects/tags")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo(1)
-                .jsonPath("$.[1].id")
-                .isEqualTo(2)
-                .jsonPath("$.[0].name")
-                .isEqualTo("tag1")
-                .jsonPath("$.[1].name")
-                .isEqualTo("tag2");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetProjectWorkflows() {
-        try {
-            ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L);
-
-            ProjectWorkflowDTO workflow =
-                new ProjectWorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), projectWorkflow);
-
-            when(projectFacade.getProjectWorkflows(1L))
-                .thenReturn(List.of(workflow));
-
-            this.webTestClient
-                .get()
-                .uri("/internal/projects/1/workflows")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo("workflow1");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -299,31 +228,6 @@ public class ProjectApiControllerIntTest {
     }
 
     @Test
-    public void testPostProjectWorkflows() {
-        String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
-
-        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L);
-        WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-
-        when(projectFacade.addWorkflow(anyLong(), any()))
-            .thenReturn(projectWorkflow);
-
-        this.webTestClient
-            .post()
-            .uri("/internal/projects/1/workflows")
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(workflowModel)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(Long.class)
-            .isEqualTo(1L);
-
-        verify(projectFacade).addWorkflow(anyLong(), any());
-    }
-
-    @Test
     public void testPutIntegration() {
         ProjectModel projectModel = new ProjectModel()
             .id(1L)
@@ -342,36 +246,6 @@ public class ProjectApiControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testPutIntegrationTags() {
-        try {
-            this.webTestClient
-                .put()
-                .uri("/internal/projects/1/tags")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-
-        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
-
-        verify(projectFacade).updateProjectTags(anyLong(), tagsArgumentCaptor.capture());
-
-        List<Tag> capturedTags = tagsArgumentCaptor.getValue();
-
-        Iterator<Tag> tagIterator = capturedTags.iterator();
-
-        Tag capturedTag = tagIterator.next();
-
-        Assertions.assertEquals("tag1", capturedTag.getName());
     }
 
     @Test

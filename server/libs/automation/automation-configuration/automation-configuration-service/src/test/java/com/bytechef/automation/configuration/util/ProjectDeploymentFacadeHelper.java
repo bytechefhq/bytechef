@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.commons.util.RandomUtils;
@@ -51,24 +52,23 @@ public class ProjectDeploymentFacadeHelper {
     public static final String PREFIX_CATEGORY = "CATEGORY_";
 
     private final CategoryRepository categoryRepository;
-
     private final ProjectFacade projectFacade;
-
     private final ProjectRepository projectRepository;
-
     private final ProjectDeploymentFacade projectDeploymentFacade;
-
+    private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowRepository projectWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeHelper(
         CategoryRepository categoryRepository, ProjectFacade projectFacade, ProjectRepository projectRepository,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowRepository projectWorkflowRepository) {
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowRepository projectWorkflowRepository) {
 
         this.categoryRepository = categoryRepository;
         this.projectFacade = projectFacade;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectRepository = projectRepository;
+        this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowRepository = projectWorkflowRepository;
     }
 
@@ -126,11 +126,11 @@ public class ProjectDeploymentFacadeHelper {
     public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
-        ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             Validate.notNull(project.getId(), "id"),
             "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
 
-        return projectFacade.getProjectWorkflow(projectWorkflow.getId());
+        return projectWorkflowFacade.getProjectWorkflow(projectWorkflow.getId());
     }
 
     private List<Tag> randomTags() {
@@ -146,5 +146,4 @@ public class ProjectDeploymentFacadeHelper {
     private String randomDescription() {
         return PREFIX_PROJECT_DESCRIPTION + RandomUtils.generateActivationKey();
     }
-
 }

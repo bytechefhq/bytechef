@@ -16,7 +16,14 @@
 
 package com.bytechef.automation.configuration.web.rest.config;
 
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -36,4 +43,23 @@ import org.springframework.context.annotation.Import;
 @Import(JacksonConfiguration.class)
 public class AutomationConfigurationRestTestConfiguration {
 
+    @Bean
+    ComponentConnectionFacade componentConnectionFacade() {
+        return mock(ComponentConnectionFacade.class);
+    }
+
+    @Bean
+    ComponentDefinitionService componentDefinitionService() {
+        return mock(ComponentDefinitionService.class);
+    }
+
+    @Bean
+    WorkflowService workflowService() {
+        return mock(WorkflowService.class);
+    }
+
+    @Bean
+    WorkflowFacade workflowFacade() {
+        return mock(WorkflowFacade.class);
+    }
 }

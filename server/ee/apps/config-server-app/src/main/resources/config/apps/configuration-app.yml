@@ -6,6 +6,9 @@ management:
           include: readinessState,db
 
 spring:
+  graphql:
+    schema:
+      locations: classpath*:graphql/**/
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}
