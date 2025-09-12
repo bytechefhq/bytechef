@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class PropertyValidator {
 
     private PropertyValidator() {
-        // Utility class
     }
 
     /**
@@ -428,7 +427,6 @@ public class PropertyValidator {
             }
 
             // Find the matching schema based on discriminator field (typically "type")
-            boolean foundMatch = false;
             if (element.has("type")) {
                 String typeValue = element.get("type")
                     .asText();
@@ -445,16 +443,8 @@ public class PropertyValidator {
                         // Validate this element against the matching schema
                         FieldValidator.validateObjectArrayElementsWithWarnings(singleElementArray, schema,
                             elementPath.substring(0, elementPath.lastIndexOf('[')), errors, warnings);
-                        foundMatch = true;
                     }
                 }
-            }
-
-            if (!foundMatch) {
-                // No matching schema found, but since this is a discriminated union with non-required elements,
-                // we'll be lenient and not generate warnings. This allows for flexible validation of union types.
-                // ValidationErrorBuilder.append(warnings, "Property '" + elementPath + "' could not be matched to any
-                // schema in the union type");
             }
         }
     }

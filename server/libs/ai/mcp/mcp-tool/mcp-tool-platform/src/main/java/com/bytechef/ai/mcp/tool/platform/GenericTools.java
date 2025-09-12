@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform;
 
-import com.bytechef.ai.mcp.tool.automation.ComponentTools.ActionDetailedInfo;
-import com.bytechef.ai.mcp.tool.automation.ComponentTools.ActionMinimalInfo;
-import com.bytechef.ai.mcp.tool.automation.ComponentTools.TriggerDetailedInfo;
-import com.bytechef.ai.mcp.tool.automation.ComponentTools.TriggerMinimalInfo;
-import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowInfo;
-import com.bytechef.ai.mcp.tool.automation.FlowTools.FlowMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.ActionDetailedInfo;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.ActionMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerDetailedInfo;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.FlowTools.FlowInfo;
+import com.bytechef.ai.mcp.tool.platform.FlowTools.FlowMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.ai.mcp.tool.platform.validator.WorkflowValidator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-import utils.WorkflowValidator;
 
 /**
  * @author Marko Kriskovic

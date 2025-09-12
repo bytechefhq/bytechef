@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils;
+package com.bytechef.ai.mcp.tool.platform.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -450,7 +450,7 @@ public class FieldValidator {
         if (node.isNull() && !"null".equalsIgnoreCase(expectedType)) {
             return true;
         }
-        
+
         return switch (expectedType.toLowerCase()) {
             case "string" -> node.isTextual();
             case "float" -> node.isFloatingPointNumber();
@@ -471,97 +471,104 @@ public class FieldValidator {
      * Validates DATE format (yyyy-MM-dd).
      */
     private static boolean validateDateFormat(String dateValue) {
-        if (dateValue == null || dateValue.trim().isEmpty()) {
+        if (dateValue == null || dateValue.trim()
+            .isEmpty()) {
             return false;
         }
-        
+
         // Check format pattern first
         if (!dateValue.matches("\\d{4}-\\d{2}-\\d{2}")) {
             return false;
         }
-        
+
         // Parse and validate actual date
         try {
             String[] parts = dateValue.split("-");
             int year = Integer.parseInt(parts[0]);
             int month = Integer.parseInt(parts[1]);
             int day = Integer.parseInt(parts[2]);
-            
+
             // Basic range checks
-            if (month < 1 || month > 12) return false;
-            if (day < 1 || day > 31) return false;
-            
+            if (month < 1 || month > 12)
+                return false;
+            if (day < 1 || day > 31)
+                return false;
+
             // Check days in month
-            int[] daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-            
+            int[] daysInMonth = {
+                31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+            };
+
             // Check for leap year
             if (month == 2 && isLeapYear(year)) {
                 daysInMonth[1] = 29;
             }
-            
+
             return day <= daysInMonth[month - 1];
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return false;
         }
     }
-    
+
     /**
      * Validates TIME format (hh:mm:ss).
      */
     private static boolean validateTimeFormat(String timeValue) {
-        if (timeValue == null || timeValue.trim().isEmpty()) {
+        if (timeValue == null || timeValue.trim()
+            .isEmpty()) {
             return false;
         }
-        
+
         // Check format pattern first
         if (!timeValue.matches("\\d{2}:\\d{2}:\\d{2}")) {
             return false;
         }
-        
+
         // Parse and validate actual time
         try {
             String[] parts = timeValue.split(":");
             int hours = Integer.parseInt(parts[0]);
             int minutes = Integer.parseInt(parts[1]);
             int seconds = Integer.parseInt(parts[2]);
-            
-            return hours >= 0 && hours <= 23 && 
-                   minutes >= 0 && minutes <= 59 && 
-                   seconds >= 0 && seconds <= 59;
+
+            return hours >= 0 && hours <= 23 &&
+                minutes >= 0 && minutes <= 59 &&
+                seconds >= 0 && seconds <= 59;
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return false;
         }
     }
-    
+
     /**
      * Validates DATE_TIME format (yyyy-MM-ddThh:mm:ss).
      */
     private static boolean validateDateTimeFormat(String dateTimeValue) {
-        if (dateTimeValue == null || dateTimeValue.trim().isEmpty()) {
+        if (dateTimeValue == null || dateTimeValue.trim()
+            .isEmpty()) {
             return false;
         }
-        
+
         // Check format pattern first
         if (!dateTimeValue.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}")) {
             return false;
         }
-        
+
         // Split date and time parts
         String[] parts = dateTimeValue.split("T");
         if (parts.length != 2) {
             return false;
         }
-        
+
         return validateDateFormat(parts[0]) && validateTimeFormat(parts[1]);
     }
-    
+
     /**
      * Checks if a year is a leap year.
      */
     private static boolean isLeapYear(int year) {
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
-    
+
     /**
      * Checks if the expected type is a date/time type that needs format validation.
      */
@@ -569,42 +576,46 @@ public class FieldValidator {
         String lowerType = expectedType.toLowerCase();
         return "date".equals(lowerType) || "time".equals(lowerType) || "date_time".equals(lowerType);
     }
-    
+
     /**
      * Validates date/time format and returns specific error message if invalid.
      */
     private static String validateDateTimeTypeWithError(String value, String expectedType, String propertyPath) {
         String lowerType = expectedType.toLowerCase();
-        
+
         switch (lowerType) {
             case "date":
                 if (!value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                    return "Property '" + propertyPath + "' is in incorrect date format. Format should be in: 'yyyy-MM-dd'";
+                    return "Property '" + propertyPath
+                        + "' is in incorrect date format. Format should be in: 'yyyy-MM-dd'";
                 }
                 if (!validateDateFormat(value)) {
                     return "Property '" + propertyPath + "' is in incorrect date format. Impossible date: " + value;
                 }
                 break;
-                
+
             case "time":
                 if (!value.matches("\\d{2}:\\d{2}:\\d{2}")) {
-                    return "Property '" + propertyPath + "' is in incorrect time format. Format should be in: 'hh:mm:ss'";
+                    return "Property '" + propertyPath
+                        + "' is in incorrect time format. Format should be in: 'hh:mm:ss'";
                 }
                 if (!validateTimeFormat(value)) {
                     return "Property '" + propertyPath + "' is in incorrect time format. Impossible time: " + value;
                 }
                 break;
-                
+
             case "date_time":
                 if (!value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}")) {
-                    return "Property '" + propertyPath + "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
+                    return "Property '" + propertyPath
+                        + "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
                 }
                 if (!validateDateTimeFormat(value)) {
-                    return "Property '" + propertyPath + "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
+                    return "Property '" + propertyPath
+                        + "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
                 }
                 break;
         }
-        
+
         return null; // No error
     }
 
