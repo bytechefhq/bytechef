@@ -26,6 +26,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Project getProject(UUID uuid) {
+        return projectRepository.findByUuid(uuid)
+            .orElseThrow(() -> new IllegalArgumentException("Project not found"));
     }
 
     @Override

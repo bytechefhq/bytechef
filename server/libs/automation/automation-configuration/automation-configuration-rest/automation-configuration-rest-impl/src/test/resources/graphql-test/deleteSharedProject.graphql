@@ -1,0 +1,3 @@
+mutation deleteSharedProject($id: ID!) {
+    deleteSharedProject(id: $id)
+}

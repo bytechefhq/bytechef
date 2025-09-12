@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -93,6 +94,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectFacade projectFacade;
     private final ProjectService projectService;
+    private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
@@ -107,8 +109,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectFacade projectFacade,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
+        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectUserProjectService = connectUserProjectService;
@@ -123,6 +126,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectFacade = projectFacade;
         this.projectService = projectService;
+        this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
@@ -134,7 +138,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
-        ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             connectedUserProject.getProjectId(), StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
 
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
@@ -174,7 +178,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     connectedUserProjectWorkflowService.delete(connectedUserProjectWorkflow.getId());
                 });
 
-            projectFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
+            projectWorkflowFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
         }
 
         for (Long connectionId : connectionIds) {

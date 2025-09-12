@@ -16,11 +16,50 @@
 
 package com.bytechef.automation.configuration.web.graphql.config;
 
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.tag.service.TagService;
+import org.mockito.Mockito;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
- *
+ * Test configuration for ProjectGraphQlController tests. Provides mock beans for all dependencies required by the
+ * controller.
  */
 @Configuration
 public class ProjectConfigurationGraphQlTestConfiguration {
+
+    @Bean
+    @Primary
+    public CategoryService categoryService() {
+        return Mockito.mock(CategoryService.class);
+    }
+
+    @Bean
+    @Primary
+    public ProjectFacade projectFacade() {
+        return Mockito.mock(ProjectFacade.class);
+    }
+
+    @Bean
+    @Primary
+    public ProjectService projectService() {
+        return Mockito.mock(ProjectService.class);
+    }
+
+    @Bean
+    @Primary
+    public ProjectWorkflowFacade projectWorkflowFacade() {
+        return Mockito.mock(ProjectWorkflowFacade.class);
+    }
+
+    @Bean
+    @Primary
+    public TagService tagService() {
+        return Mockito.mock(TagService.class);
+    }
 }

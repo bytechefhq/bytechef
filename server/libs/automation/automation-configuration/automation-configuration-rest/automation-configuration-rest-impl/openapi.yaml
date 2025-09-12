@@ -1255,6 +1255,9 @@ components:
           description: "The last version of a project."
           type: "integer"
           readOnly: true
+        uuid:
+          description: "The uuid of a project."
+          type: "string"
     ProjectDeployment:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."

@@ -33,14 +33,15 @@ public record ProjectDTO(
     Category category, String createdBy, Instant createdDate, String description, Long id, String name,
     String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus,
     int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags,
-    int version, Long workspaceId) {
+    String uuid, int version, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
             project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
-            project.getProjectVersions(), projectWorkflowIds, tags, project.getVersion(), project.getWorkspaceId());
+            project.getProjectVersions(), projectWorkflowIds, tags, project.getUuid(), project.getVersion(),
+            project.getWorkspaceId());
     }
 
     public ProjectDTO(Project project) {
@@ -49,7 +50,7 @@ public record ProjectDTO(
             project.getCreatedDate(), project.getDescription(), project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
             project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
-            List.of(), project.getVersion(), project.getWorkspaceId());
+            List.of(), project.getUuid(), project.getVersion(), project.getWorkspaceId());
     }
 
     public static Builder builder() {
@@ -85,6 +86,7 @@ public record ProjectDTO(
         private Status lastStatus = Status.DRAFT;
         private int lastProjectVersion;
         private List<Tag> tags;
+        private String uuid;
         private int version;
         private List<ProjectVersion> projectVersions;
         private List<Long> projectWorkflowIds;
@@ -177,6 +179,12 @@ public record ProjectDTO(
             return this;
         }
 
+        public Builder uuid(String uuid) {
+            this.uuid = uuid;
+
+            return this;
+        }
+
         public Builder version(int version) {
             this.version = version;
 
@@ -192,8 +200,8 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, version,
-                workspaceId);
+                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid,
+                version, workspaceId);
         }
     }
 }

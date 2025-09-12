@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -62,8 +63,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     TriggerExecutionService.class, TriggerLifecycleFacade.class, ComponentConnectionFacade.class, WorkflowFacade.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class,
     OAuth2ParametersFacade.class, ProjectDeploymentFacade.class, ProjectDeploymentService.class,
-    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowService.class,
-    WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
+    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class,
+    ProjectWorkflowService.class, WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }

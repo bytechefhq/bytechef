@@ -1,5 +1,6 @@
 type Workflow {
     id: ID!
+    description: String
     label: String!
     createdBy: String
     createdDate: Long

@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
@@ -44,28 +44,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
-    private final ProjectFacade projectFacade;
+    private final ProjectWorkflowFacade projectWorkflowFacade;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
+        ConversionService conversionService, ProjectWorkflowFacade projectWorkflowFacade,
+        WorkflowService workflowService) {
 
         super(workflowService);
 
         this.conversionService = conversionService;
-        this.projectFacade = projectFacade;
+        this.projectWorkflowFacade = projectWorkflowFacade;
     }
 
     @Override
     public ResponseEntity<Long> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
-        ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(id, workflowModel.getDefinition());
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(id, workflowModel.getDefinition());
 
         return ResponseEntity.ok(projectWorkflow.getId());
     }
 
     @Override
-    public ResponseEntity<Void> deleteWorkflow(String workflowId) {
-        projectFacade.deleteWorkflow(workflowId);
+    public ResponseEntity<Void> deleteWorkflow(String id) {
+        projectWorkflowFacade.deleteWorkflow(id);
 
         return ResponseEntity.noContent()
             .build();
@@ -73,7 +74,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<String> duplicateWorkflow(Long id, String workflowId) {
-        return ResponseEntity.ok(projectFacade.duplicateWorkflow(id, workflowId));
+        return ResponseEntity.ok(projectWorkflowFacade.duplicateWorkflow(id, workflowId));
     }
 
     @GetMapping("/workflows/{id}/export")
@@ -85,14 +86,15 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     @Override
     public ResponseEntity<WorkflowModel> getProjectWorkflow(Long projectWorkflowId) {
         return ResponseEntity.ok(
-            conversionService.convert(projectFacade.getProjectWorkflow(projectWorkflowId), WorkflowModel.class));
+            conversionService.convert(
+                projectWorkflowFacade.getProjectWorkflow(projectWorkflowId), WorkflowModel.class));
     }
 
     @Override
     public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                projectFacade.getProjectWorkflows(id),
+                projectWorkflowFacade.getProjectWorkflows(id),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
@@ -102,7 +104,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                projectFacade.getProjectVersionWorkflows(id, projectVersion, includeAllFields),
+                projectWorkflowFacade.getProjectVersionWorkflows(id, projectVersion, includeAllFields),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
@@ -110,14 +112,15 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         // TODO Add check regarding platform type
 
-        return ResponseEntity.ok(conversionService.convert(projectFacade.getProjectWorkflow(id), WorkflowModel.class));
+        return ResponseEntity.ok(
+            conversionService.convert(projectWorkflowFacade.getProjectWorkflow(id), WorkflowModel.class));
     }
 
     @Override
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                projectFacade.getProjectWorkflows(),
+                projectWorkflowFacade.getProjectWorkflows(),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
@@ -125,7 +128,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     public ResponseEntity<Void> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 
-        projectFacade.updateWorkflow(
+        projectWorkflowFacade.updateWorkflow(
             id, workflowModel.getDefinition(), Objects.requireNonNull(workflowModel.getVersion()));
 
         return ResponseEntity.noContent()

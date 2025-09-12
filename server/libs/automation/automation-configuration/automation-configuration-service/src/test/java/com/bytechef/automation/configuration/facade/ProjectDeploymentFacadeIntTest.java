@@ -73,6 +73,9 @@ public class ProjectDeploymentFacadeIntTest {
     private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Autowired
+    private ProjectWorkflowFacade projectWorkflowFacade;
+
+    @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
 
     @Autowired
@@ -103,7 +106,8 @@ public class ProjectDeploymentFacadeIntTest {
         workspace = workspaceRepository.save(new Workspace("test"));
 
         projectDeploymentFacadeHelper = new ProjectDeploymentFacadeHelper(
-            categoryRepository, projectFacade, projectRepository, projectDeploymentFacade, projectWorkflowRepository);
+            categoryRepository, projectFacade, projectRepository, projectDeploymentFacade, projectWorkflowFacade,
+            projectWorkflowRepository);
     }
 
     @Disabled
