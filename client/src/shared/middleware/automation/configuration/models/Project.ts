@@ -100,7 +100,7 @@ export interface Project {
      * @type {number}
      * @memberof Project
      */
-    readonly lastVersion?: number;
+    readonly lastProjectVersion?: number;
     /**
      * 
      * @type {Category}
@@ -163,7 +163,7 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'name': json['name'],
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
-        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
@@ -176,7 +176,7 @@ export function ProjectToJSON(json: any): Project {
     return ProjectToJSONTyped(json, false);
 }
 
-export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
