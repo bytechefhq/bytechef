@@ -2898,7 +2898,7 @@ class WorkflowValidatorTest {
                                 "name": "task3",
                                 "type": "component/v1/action1",
                                 "parameters": {
-                                    "name": "${loop1.item.propNumber}"
+                                    "name": "${loop1.item}"
                                 }
                             },
                             {
@@ -2906,7 +2906,7 @@ class WorkflowValidatorTest {
                                 "name": "task2",
                                 "type": "component/v1/action2",
                                 "parameters": {
-                                    "age": "${loop1.item.propBool}"
+                                    "age": "${loop1.item}"
                                 }
                             }
                          ]
@@ -2943,10 +2943,7 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("""
-                Property 'loop1.item[0].propBool' in output of 'loop/v1' is of type boolean, not number
-                Property 'loop1.item[1].propBool' in output of 'loop/v1' is of type boolean, not number
-                Property 'loop1.item[2].propBool' in output of 'loop/v1' is of type boolean, not number""",
+            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -3186,9 +3183,7 @@ class WorkflowValidatorTest {
             fail("Should not throw exception: " + e.getMessage());
         }
     }
-
-    // TODO
-    @Test
+        @Test
     void validateWorkflowTasks_flowConditionAndLoop_noErrors() {
         String tasksJson = """
             [
@@ -3210,21 +3205,40 @@ class WorkflowValidatorTest {
                             [
                                 {
                                     "type": "string",
-                                    "value1": "${task1.propString}",
+                                    "value1": "${task1.elements[0]}",
                                     "operation": "EQUALS",
                                     "value2": "Mario"
                                 }
                             ]
                          ],
                          "caseTrue": [
-                            {
-                                "label": "Task 3",
-                                "name": "task3",
-                                "type": "component/v1/action1",
+                             {
+                                "label": "Loop",
+                                "name": "loop1",
+                                "type": "loop/v1",
                                 "parameters": {
-                                    "name": "${task1.propString}"
+                                    "items": "${task1.elements}",
+                                    "loopForever": false,
+                                    "iteratee": [
+                                        {
+                                           "label": "Task 3",
+                                           "name": "task3",
+                                           "type": "component/v1/action1",
+                                           "parameters": {
+                                               "name": "${loop1.item}"
+                                           }
+                                        },
+                                        {
+                                           "label": "Task 4",
+                                           "name": "task4",
+                                           "type": "component/v1/action2",
+                                           "parameters": {
+                                               "age": "${loop1.item}"
+                                           }
+                                        }
+                                    ]
                                 }
-                            }
+                             }
                          ],
                          "caseFalse": [
                             {
@@ -3275,11 +3289,19 @@ class WorkflowValidatorTest {
                     new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
                 new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
                     new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
+            "loop/v1", List.of(
+                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
+                new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
+                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "component/v1/action2", List.of(
+                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null))
+            );
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
-            "component/v1/trigger1", trigger1,
+            "component/v1/trigger1", actionArr,
             "component/v1/action1", action1);
 
         try {
@@ -3293,8 +3315,8 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
 
-            assertEquals("", errors.toString());
-            assertEquals("", warnings.toString());
+            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number", errors.toString());
+            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -3625,7 +3647,7 @@ class WorkflowValidatorTest {
                                     "name": "task3",
                                     "type": "component/v1/action1",
                                     "parameters": {
-                                        "name": "${loop1.item.propNumber}"
+                                        "name": "${loop1.item}"
                                     }
                                 },
                                 {
@@ -3633,7 +3655,7 @@ class WorkflowValidatorTest {
                                     "name": "task2",
                                     "type": "component/v1/action2",
                                     "parameters": {
-                                        "age": "${loop1.item.propBool}"
+                                        "age": "${loop1.item}"
                                     }
                                 }
                              ]
