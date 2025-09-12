@@ -54,6 +54,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -989,6 +991,64 @@ public class WorkflowNodeParameterFacadeTest {
             assertNotNull(result.displayConditions());
             assertNotNull(result.missingRequiredProperties());
             verify(workflowService).getWorkflow(workflowId);
+        }
+    }
+
+    @Test
+    void testGetWorkflowNodeDisplayConditionsWithArrayItemInLoopItems() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "logger1";
+
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(mock(ActionDefinition.class));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            // Use mutable maps since the implementation modifies them
+            Map<String, Object> task = new HashMap<>();
+            task.put("name", "loop1");
+            task.put("type", "loop/v1");
+
+            List<String> arrayItem = List.of(RandomStringUtils.randomAlphanumeric(20));
+            Map<String, Object> parameters = new TreeMap<>();
+            parameters.put("items", List.of(arrayItem));
+
+            Map<String, Object> iteratee = new HashMap<>();
+            iteratee.put("name", "logger1");
+            iteratee.put("type", "logger/v1/info");
+            iteratee.put("parameters", Map.of("text", RandomStringUtils.randomAlphanumeric(20)));
+            iteratee.put("metadata", new HashMap<>());
+
+            parameters.put("iteratee", List.of(iteratee));
+
+            task.put("parameters", parameters);
+            task.put("metadata", new HashMap<>());
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
+                workflowId, workflowNodeName, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
         }
     }
 
