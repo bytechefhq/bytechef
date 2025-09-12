@@ -40,6 +40,7 @@ import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
@@ -93,6 +94,9 @@ public class ProjectWorkflowFacadeIntTest {
 
     @MockitoBean
     private SharedTemplateService sharedTemplateService;
+
+    @MockitoBean
+    private com.bytechef.automation.configuration.service.PreBuiltTemplateService preBuiltTemplateService;
 
     private Workspace workspace;
 
@@ -160,9 +164,9 @@ public class ProjectWorkflowFacadeIntTest {
             zipOutputStream.write(metaJson.getBytes(StandardCharsets.UTF_8));
             zipOutputStream.closeEntry();
 
-            zipOutputStream.putNextEntry(new ZipEntry("workflow.json"));
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
             String workflowJson =
-                "\"{\\\"label\\\":\\\"Test Shared Workflow\\\",\\\"description\\\":\\\"WF desc\\\",\\\"tasks\\\":[]}\"";
+                "{\"label\":\"Test Shared Workflow\",\"description\":\"WF desc\",\"tasks\":[]}";
             zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
             zipOutputStream.closeEntry();
 
@@ -227,7 +231,205 @@ public class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
-    public void testImportWorkflowTemplate() {
+    public void testGetWorkflowTemplatePreBuilt() {
+        byte[] workflowZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+
+            String workflowJson =
+                "{\"label\":\"WF Label PB\",\"description\":\"WF Desc PB\",\"tasks\":[]}";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"WF Template PB\",\"projectVersion\":3}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            workflowZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString()))
+            .thenReturn(workflowZip);
+
+        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate("any-id", false);
+
+        assertThat(importTemplate).isNotNull();
+        assertThat(importTemplate.description()).isEqualTo("WF Template PB");
+        assertThat(importTemplate.projectVersion()).isEqualTo(3);
+
+        WorkflowTemplateDTO.WorkflowInfo workflow = importTemplate.workflow();
+
+        assertThat(workflow).isNotNull();
+        assertThat(workflow.label()).isEqualTo("WF Label PB");
+    }
+
+    @Test
+    public void testGetWorkflowTemplateShared() {
+        byte[] workflowZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+
+            String workflowJson =
+                "{\"label\":\"WF Label\",\"description\":\"WF Desc\",\"tasks\":[]}";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"WF Template\",\"projectVersion\":2}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            workflowZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        FileEntry templateFileEntry = new FileEntry(
+            "workflow.zip", "zip", "application/zip", "http://localhost/shared/workflow.zip");
+        SharedTemplate sharedTemplate = new SharedTemplate();
+
+        sharedTemplate.setTemplate(templateFileEntry);
+
+        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+            .thenReturn(new ByteArrayInputStream(workflowZip));
+
+        UUID uuid = UUID.randomUUID();
+
+        when(sharedTemplateService.getSharedTemplate(uuid))
+            .thenReturn(sharedTemplate);
+
+        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate(uuid.toString(), true);
+
+        assertThat(importTemplate).isNotNull();
+        assertThat(importTemplate.description()).isEqualTo("WF Template");
+        assertThat(importTemplate.projectVersion()).isEqualTo(2);
+
+        WorkflowTemplateDTO.WorkflowInfo workflow = importTemplate.workflow();
+
+        assertThat(workflow).isNotNull();
+        assertThat(workflow.label()).isEqualTo("WF Label");
+    }
+
+    @Test
+    public void testGetPreBuiltWorkflowTemplates() {
+        byte[] workflowZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+
+            String workflowJson =
+                "{\"label\":\"PB Label\",\"description\":\"PB Desc\",\"tasks\":[]}";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"PB Template\",\"projectVersion\":5}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.finish();
+
+            workflowZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getFiles("workflows"))
+            .thenReturn(List.of(new FileItem("workflows/pb-workflow.zip", 100L, "sha", "ref", "raw")));
+        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString())).thenReturn(workflowZip);
+
+        List<WorkflowTemplateDTO> templates = projectWorkflowFacade.getPreBuiltWorkflowTemplates("", "");
+
+        assertThat(templates).isNotNull();
+        assertThat(templates).hasSize(1);
+        assertThat(templates.get(0)
+            .workflow()
+            .label()).isEqualTo("PB Label");
+
+        // simple query filter check
+        List<WorkflowTemplateDTO> filtered = projectWorkflowFacade.getPreBuiltWorkflowTemplates("PB Label", "");
+        assertThat(filtered).hasSize(1);
+    }
+
+    @Test
+    public void testImportWorkflowTemplatePreBuilt() {
+        Project project = new Project();
+
+        project.setName("Test Project PB");
+        project.setWorkspaceId(workspace.getId());
+
+        project = projectRepository.save(project);
+
+        int initialCount = projectWorkflowFacade.getProjectWorkflows(project.getId())
+            .size();
+
+        byte[] workflowZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+
+            String workflowJson = "{\"label\":\"PB Workflow\",\"tasks\":[]}";
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String metaJson = "{\"projectVersion\":1,\"description\":\"pb desc\"}";
+
+            zipOutputStream.write(metaJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            workflowZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString()))
+            .thenReturn(workflowZip);
+
+        projectWorkflowFacade.importWorkflowTemplate(project.getId(), "any-id", false);
+
+        List<ProjectWorkflowDTO> updatedWorkflows = projectWorkflowFacade.getProjectWorkflows(project.getId());
+
+        assertThat(updatedWorkflows).hasSize(initialCount + 1);
+    }
+
+    @Test
+    public void testImportWorkflowTemplateShared() {
         Project project = new Project();
 
         project.setName("Test Project");
@@ -241,26 +443,26 @@ public class ProjectWorkflowFacadeIntTest {
 
         byte[] workflowZip;
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(baos)) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
 
-            zos.putNextEntry(new ZipEntry("workflow.json"));
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
 
-            String workflowJson = "\"{\\\"label\\\":\\\"Test Workflow\\\",\\\"tasks\\\":[]}\"";
+            String workflowJson = "{\"label\":\"Test Workflow\",\"tasks\":[]}";
 
-            zos.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-            zos.closeEntry();
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
 
-            zos.putNextEntry(new ZipEntry("template.json"));
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
 
             String metaJson = "{\"projectVersion\":1,\"description\":\"desc\"}";
 
-            zos.write(metaJson.getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.write(metaJson.getBytes(StandardCharsets.UTF_8));
 
-            zos.closeEntry();
-            zos.finish();
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
 
-            workflowZip = baos.toByteArray();
+            workflowZip = byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -287,61 +489,5 @@ public class ProjectWorkflowFacadeIntTest {
         List<ProjectWorkflowDTO> updatedWorkflows = projectWorkflowFacade.getProjectWorkflows(project.getId());
 
         assertThat(updatedWorkflows).hasSize(initialCount + 1);
-    }
-
-    @Test
-    public void testGetWorkflowTemplate() {
-        byte[] workflowZip;
-
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
-
-            zipOutputStream.putNextEntry(new ZipEntry("workflow.json"));
-
-            String workflowJson =
-                "\"{\\\"label\\\":\\\"WF Label\\\",\\\"description\\\":\\\"WF Desc\\\",\\\"tasks\\\":[]}\"";
-
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
-
-            String templateJson = "{\"description\":\"WF Template\",\"projectVersion\":2}";
-
-            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.finish();
-
-            workflowZip = byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        FileEntry templateFileEntry = new FileEntry(
-            "workflow.zip", "zip", "application/zip", "http://localhost/shared/workflow.zip");
-        SharedTemplate sharedTemplate = new SharedTemplate();
-
-        sharedTemplate.setTemplate(templateFileEntry);
-
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
-            .thenReturn(new ByteArrayInputStream(workflowZip));
-
-        UUID uuid = UUID.randomUUID();
-
-        when(sharedTemplateService.getSharedTemplate(uuid))
-            .thenReturn(sharedTemplate);
-
-        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate(uuid.toString(), true);
-
-        assertThat(importTemplate).isNotNull();
-        assertThat(importTemplate.exported()).isTrue();
-        assertThat(importTemplate.description()).isEqualTo("WF Template");
-        assertThat(importTemplate.projectVersion()).isEqualTo(2);
-        assertThat(importTemplate.workflow()).isNotNull();
-        assertThat(importTemplate.workflow()
-            .label()).isEqualTo("WF Label");
     }
 }

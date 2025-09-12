@@ -87,6 +87,11 @@ public class ProjectGraphQlController {
         return projectFacade.getProjectTemplate(id, sharedProject);
     }
 
+    @QueryMapping(name = "preBuiltProjectTemplates")
+    public List<ProjectTemplateDTO> preBuiltProjectTemplates(@Argument String query, @Argument String category) {
+        return projectFacade.getPreBuiltProjectTemplates(query, category);
+    }
+
     @MutationMapping(name = "importProjectTemplate")
     public Long importProjectTemplate(
         @Argument String id, @Argument Long workspaceId, @Argument boolean sharedProject) {

@@ -98,7 +98,6 @@ openapi:
       embedded: /api/embedded
       platform: /api/platform
 
-
 spring:
   ai:
     mcp:
@@ -221,7 +220,12 @@ springdoc:
     operationsSorter: method
     tags-sorter: alpha
 
-#####
+templates:
+  owner: bytechefhq
+  ref: master
+  repo: bytechef-workflows
+
+######################################################################
 
 bytechef:
   ai:

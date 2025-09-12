@@ -143,6 +143,7 @@ include("server:libs:platform:platform-data-storage:platform-data-storage-jdbc:p
 include("server:libs:platform:platform-feature-flags")
 include("server:libs:platform:platform-file-storage:platform-file-storage-api")
 include("server:libs:platform:platform-file-storage:platform-file-storage-impl")
+include("server:libs:platform:platform-github-proxy-client")
 include("server:libs:platform:platform-mail")
 include("server:libs:platform:platform-mcp:platform-mcp-api")
 include("server:libs:platform:platform-mcp:platform-mcp-graphql")

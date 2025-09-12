@@ -24,6 +24,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -32,6 +33,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,11 +228,87 @@ public class ProjectGraphQlControllerIntTest {
     }
 
     @Test
+    void testProjectTemplate() {
+        // Given
+        ProjectTemplateDTO dto = new ProjectTemplateDTO(
+            "Alice", "alice@example.com", "DEV", null, List.of("cat1"), List.of(), "PT Desc", "tpl-1", Instant.now(),
+            new ProjectTemplateDTO.ProjectInfo("Proj One", "Proj Desc"), 1, "http://public-url",
+            List.of(new ProjectTemplateDTO.WorkflowInfo("wf-1", "WF Label", "WF Desc")));
+
+        when(projectFacade.getProjectTemplate(eq("tpl-1"), eq(true))).thenReturn(dto);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                query {
+                    projectTemplate(id: \"tpl-1\", sharedProject: true) {
+                        id
+                        description
+                        projectVersion
+                        project { name }
+                    }
+                }
+                """)
+            .execute()
+            .path("projectTemplate.id")
+            .entity(String.class)
+            .isEqualTo("tpl-1")
+            .path("projectTemplate.description")
+            .entity(String.class)
+            .isEqualTo("PT Desc")
+            .path("projectTemplate.projectVersion")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("projectTemplate.project.name")
+            .entity(String.class)
+            .isEqualTo("Proj One");
+    }
+
+    @Test
+    void testPreBuiltProjectTemplates() {
+        // Given
+        ProjectTemplateDTO dto1 = new ProjectTemplateDTO(
+            null, null, null, null, List.of(), List.of(), "Desc 1", "tpl-1", Instant.now(),
+            new ProjectTemplateDTO.ProjectInfo("P1", null), 1, null, List.of());
+        ProjectTemplateDTO dto2 = new ProjectTemplateDTO(
+            null, null, null, null, List.of(), List.of(),
+            "Desc 2", "tpl-2", Instant.now(),
+            new ProjectTemplateDTO.ProjectInfo("P2", null), 1, null,
+            List.of());
+
+        when(projectFacade.getPreBuiltProjectTemplates(anyString(), anyString())).thenReturn(List.of(dto1, dto2));
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                query {
+                    preBuiltProjectTemplates(query: \"\", category: \"\") {
+                        id
+                        description
+                    }
+                }
+                """)
+            .execute()
+            .path("preBuiltProjectTemplates")
+            .entityList(Object.class)
+            .hasSize(2)
+            .path("preBuiltProjectTemplates[0].id")
+            .entity(String.class)
+            .isEqualTo("tpl-1")
+            .path("preBuiltProjectTemplates[1].id")
+            .entity(String.class)
+            .isEqualTo("tpl-2");
+    }
+
+    @Test
     void testTagsBatchMapping() {
         // Given
         Project mockProject1 = createMockProject(1L, "Project 1");
+
         mockProject1.setTagIds(List.of(1L, 2L));
+
         Project mockProject2 = createMockProject(2L, "Project 2");
+
         mockProject2.setTagIds(List.of(2L, 3L));
 
         List<Project> mockProjects = List.of(mockProject1, mockProject2);

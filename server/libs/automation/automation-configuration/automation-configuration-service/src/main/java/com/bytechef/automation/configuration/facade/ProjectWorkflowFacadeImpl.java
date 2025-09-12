@@ -27,6 +27,8 @@ import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO.WorkflowInfo;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -34,6 +36,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
@@ -63,7 +66,10 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,8 +80,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowFacadeImpl.class);
+
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final EnvironmentService environmentService;
+    private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -90,8 +99,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowFacadeImpl(
-        ComponentDefinitionHelper componentDefinitionHelper, ApplicationProperties applicationProperties,
-        EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
+        ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
+        ApplicationProperties applicationProperties, EnvironmentService environmentService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
@@ -99,6 +109,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.componentDefinitionHelper = componentDefinitionHelper;
+        this.preBuiltTemplateService = preBuiltTemplateService;
         this.environmentService = environmentService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -193,23 +204,23 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
 
-            ZipEntry workflowZipEntry = new ZipEntry("workflow.json");
+            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+            ZipEntry workflowZipEntry = new ZipEntry(String.format("workflow-%s.json", projectWorkflow.getUuid()));
 
             zipOutputStream.putNextEntry(workflowZipEntry);
 
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            String workflowJson = JsonUtils.write(workflow.getDefinition());
+            String definition = workflow.getDefinition();
 
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.write(definition.getBytes(StandardCharsets.UTF_8));
 
             zipOutputStream.closeEntry();
 
             ZipEntry templateZipEntry = new ZipEntry("template.json");
 
             zipOutputStream.putNextEntry(templateZipEntry);
-
-            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
             String templateJson = JsonUtils.write(new Template(description, projectWorkflow.getProjectVersion()));
 
@@ -229,6 +240,49 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         } catch (IOException e) {
             throw new RuntimeException("Failed to export shared workflow", e);
         }
+    }
+
+    @Override
+    public List<WorkflowTemplateDTO> getPreBuiltWorkflowTemplates(String query, String category) {
+        return preBuiltTemplateService.getFiles("workflows")
+            .stream()
+            .map(fileItem -> {
+                try {
+                    WorkflowTemplateDTO workflowTemplateDTO = getWorkflowTemplate(EncodingUtils.base64EncodeToString(
+                        fileItem.path()), false);
+
+                    if (StringUtils.isEmpty(query) && StringUtils.isEmpty(category)) {
+                        return workflowTemplateDTO;
+                    } else {
+                        if (StringUtils.isNotEmpty(query)) {
+                            WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
+
+                            if (StringUtils.containsIgnoreCase(workflowTemplateDTO.description(), query) ||
+                                StringUtils.containsIgnoreCase(workflow.label(), query) ||
+                                StringUtils.containsIgnoreCase(workflow.description(), query)) {
+
+                                return workflowTemplateDTO;
+                            }
+                        }
+
+                        if (StringUtils.isNotEmpty(category)) {
+                            List<String> categories = workflowTemplateDTO.categories();
+
+                            if (categories != null && categories.contains(category)) {
+                                return workflowTemplateDTO;
+                            }
+                        }
+
+                        return null;
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to get workflow template", e);
+
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override
@@ -313,12 +367,16 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             if (sharedTemplate.getTemplate() == null) {
                 sharedWorkflowDTO = new SharedWorkflowDTO(false);
             } else {
-                TemplateFiles templateFiles = readTemplate(sharedTemplate.getTemplate());
+                try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+                    TemplateFiles templateFiles = readTemplate(inputStream.readAllBytes());
 
-                Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
+                    Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
 
-                sharedWorkflowDTO =
-                    new SharedWorkflowDTO(template.description, true, template.projectVersion, publicUrl);
+                    sharedWorkflowDTO = new SharedWorkflowDTO(
+                        template.description, true, template.projectVersion, publicUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to import shared project", e);
+                }
             }
         }
 
@@ -328,53 +386,63 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @Override
     @Transactional(readOnly = true)
     public WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow) {
-        WorkflowTemplateDTO workflowTemplateDTO = null;
+        byte[] data;
 
         if (sharedWorkflow) {
-            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(
-                UUID.fromString(id));
+            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
 
             if (sharedTemplate.getTemplate() == null) {
                 throw new IllegalStateException("Shared template is not available");
             }
 
-            TemplateFiles templateFiles = readTemplate(sharedTemplate.getTemplate());
-
-            Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
-            String definition = JsonUtils.read(templateFiles.workflowJson, String.class);
-
-            Workflow workflow = new Workflow(definition, Workflow.Format.JSON);
-
-            List<ComponentDefinition> componentDefinitions = componentDefinitionHelper.getComponentDefinitions(
-                workflow);
-
-            workflowTemplateDTO = new WorkflowTemplateDTO(
-                componentDefinitions, template.description, true, template.projectVersion, publicUrl,
-                new WorkflowTemplateDTO.WorkflowInfo(workflow.getLabel(), workflow.getDescription()));
+            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+                data = inputStream.readAllBytes();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to import shared project", e);
+            }
+        } else {
+            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
         }
 
-        return workflowTemplateDTO;
+        TemplateFiles templateFiles = readTemplate(data);
+
+        Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
+
+        Workflow workflow = new Workflow(templateFiles.workflowJson, Workflow.Format.JSON);
+
+        List<ComponentDefinition> componentDefinitions = componentDefinitionHelper.getComponentDefinitions(
+            workflow);
+
+        List<String> categories = template.categories == null || template.categories.isEmpty()
+            ? List.of("other") : template.categories;
+
+        return new WorkflowTemplateDTO(
+            template.authorName, template.authorEmail, template.authorRole, template.authorSocialLinks,
+            categories, componentDefinitions, template.description, id, template.lastModifiedDate,
+            template.projectVersion, publicUrl, new WorkflowInfo(workflow.getLabel(), workflow.getDescription()));
     }
 
     @Override
-    public long importWorkflowTemplate(long projectId, String workflowUuid, boolean sharedWorkflow) {
-        long projectWorkflowId;
+    public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
+        byte[] data;
 
         if (sharedWorkflow) {
-            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(workflowUuid));
+            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
 
-            TemplateFiles templateFiles = readTemplate(sharedTemplate.getTemplate());
-
-            String definition = JsonUtils.read(templateFiles.workflowJson, String.class);
-
-            ProjectWorkflow projectWorkflow = addWorkflow(projectId, definition);
-
-            projectWorkflowId = projectWorkflow.getId();
+            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+                data = inputStream.readAllBytes();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to import shared project", e);
+            }
         } else {
-            projectWorkflowId = 0;
+            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
         }
 
-        return projectWorkflowId;
+        TemplateFiles templateFiles = readTemplate(data);
+
+        ProjectWorkflow projectWorkflow = addWorkflow(projectId, templateFiles.workflowJson);
+
+        return projectWorkflow.getId();
     }
 
     @Override
@@ -388,13 +456,10 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         }
     }
 
-    private TemplateFiles readTemplate(FileEntry fileEntry) {
-        String templateJson = null;
-        String workflowJson = null;
-
-        try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(fileEntry);
-            ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-
+    private TemplateFiles readTemplate(byte[] data) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(data))) {
+            String templateJson = null;
+            String workflowJson = null;
             ZipEntry zipEntry;
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
@@ -402,9 +467,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
                 if ("template.json".equals(name)) {
                     templateJson = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
-                }
-
-                if ("workflow.json".equals(name)) {
+                } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
                     workflowJson = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
                 }
 
@@ -422,11 +485,11 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     private record Template(
-        String description, List<String> categories, String authorName, String authorRole, String authorEmail,
-        String authorSocialLinks, Instant lastModifiedDate, Integer projectVersion) {
+        String authorName, String authorRole, String authorEmail, String authorSocialLinks, List<String> categories,
+        String description, Instant lastModifiedDate, Integer projectVersion) {
 
         public Template(String description, int lastProjectVersion) {
-            this(description, Collections.emptyList(), null, null, null, null, Instant.now(), lastProjectVersion);
+            this(null, null, null, null, Collections.emptyList(), description, Instant.now(), lastProjectVersion);
         }
     }
 

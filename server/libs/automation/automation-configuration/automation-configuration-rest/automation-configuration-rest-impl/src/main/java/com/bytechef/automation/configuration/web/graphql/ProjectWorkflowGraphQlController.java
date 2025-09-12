@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -61,6 +62,11 @@ public class ProjectWorkflowGraphQlController {
         @Argument String id, @Argument Long projectId, @Argument boolean sharedWorkflow) {
 
         return projectWorkflowFacade.importWorkflowTemplate(projectId, id, sharedWorkflow);
+    }
+
+    @QueryMapping(name = "preBuiltWorkflowTemplates")
+    public List<WorkflowTemplateDTO> preBuiltWorkflowTemplates(@Argument String query, @Argument String category) {
+        return projectWorkflowFacade.getPreBuiltWorkflowTemplates(query, category);
     }
 
     @QueryMapping(name = "sharedWorkflow")
