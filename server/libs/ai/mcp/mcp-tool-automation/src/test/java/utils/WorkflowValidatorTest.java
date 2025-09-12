@@ -39,6 +39,8 @@ class WorkflowValidatorTest {
         new ToolUtils.PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
     private static final ToolUtils.PropertyInfo action3 =
         new ToolUtils.PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
+    private static final ToolUtils.PropertyInfo action4 =
+        new ToolUtils.PropertyInfo("propDateTime", "DATE_TIME", null, false, true, null, null);
     private static final ToolUtils.PropertyInfo actionObj = new ToolUtils.PropertyInfo(
         "element", "OBJECT", null, false, true, null, List.of(
             action1, action2, action3));
@@ -595,6 +597,82 @@ class WorkflowValidatorTest {
     }
 
     @Test
+    void validateTaskParameters_typeMatching() {
+        String currentTaskParameters = """
+            {
+                "string": "test",
+                "integer": 123,
+                "boolean": true,
+                "number": 123.456,
+                "array": [1, 2, 3],
+                "object": {},
+                "null": null,
+                "date": "2025-01-01",
+                "time": "09:46:38",
+                "date_time": "2025-09-23T11:46:19"
+            }
+            """;
+
+        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
+            new ToolUtils.PropertyInfo("string", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("integer", "INTEGER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("number", "NUMBER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("array", "ARRAY", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("object", "OBJECT", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null)
+        );
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateTaskParameters_nullTypeMatching() {
+        String currentTaskParameters = """
+            {
+                "string": null,
+                "integer": null,
+                "boolean": null,
+                "number": null,
+                "array": null,
+                "object": null,
+                "null": null,
+                "date": null,
+                "time": null,
+                "date_time": null
+            }
+            """;
+
+        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
+            new ToolUtils.PropertyInfo("string", "STRING", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("integer", "INTEGER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("number", "NUMBER", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("array", "ARRAY", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("object", "OBJECT", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null)
+        );
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
     void validateTaskParameters_wrongType_addsError() {
         String currentTaskParameters = """
             {
@@ -617,6 +695,38 @@ class WorkflowValidatorTest {
             Property 'name' has incorrect type. Expected: string, but got: integer
             Property 'age' has incorrect type. Expected: integer, but got: string
             Property 'active' has incorrect type. Expected: boolean, but got: string""", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateTaskParameters_wrongTypeFormat_addsError() {
+        String currentTaskParameters = """
+            {
+                "day": "2025-1-1",
+                "night": "2025-02-30",
+                "from": "45:45:73",
+                "to": "2:5:5",
+                "specific_date": "2025-09-23F11:46:12"
+            }
+            """;
+
+        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
+            new ToolUtils.PropertyInfo("day", "DATE", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("night", "DATE", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("from", "TIME", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("to", "TIME", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("specific_date", "DATE_TIME", null, true, true, null, null));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        assertEquals("""
+            Property 'day' is in incorrect date format. Format should be in: 'yyyy-MM-dd'
+            Property 'night' is in incorrect date format. Impossible date: 2025-02-30
+            Property 'from' is in incorrect time format. Impossible time: 45:45:73
+            Property 'to' is in incorrect time format. Format should be in: 'hh:mm:ss'
+            Property 'specific_date' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'""", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -862,7 +972,7 @@ class WorkflowValidatorTest {
         StringBuilder warnings = new StringBuilder();
         WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Property 'nullable' has incorrect type. Expected: string, but got: null", errors.toString());
+        assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -907,26 +1017,6 @@ class WorkflowValidatorTest {
 
         assertEquals("", errors.toString());
         assertEquals("Property 'anyProperty' is not defined in task definition", warnings.toString());
-    }
-
-    @Test
-    void validateTaskParameters_caseInsensitiveTypeMatching() {
-        String currentTaskParameters = """
-            {
-                "upperCaseType": "test"
-            }
-            """;
-
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("upperCaseType", "STRING", null, true, true, null, null));
-
-        StringBuilder errors = new StringBuilder();
-        StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
-
-        assertEquals("", errors.toString());
-        assertEquals("", warnings.toString());
-
     }
 
     @Test
@@ -1527,7 +1617,7 @@ class WorkflowValidatorTest {
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of(
             new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "FLOAT", null, true, true, null, null),
+            new ToolUtils.PropertyInfo("enableAdvanced", "NUMBER", null, true, true, null, null),
             new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced >= 4", null));
 
         StringBuilder errors = new StringBuilder();
@@ -1945,8 +2035,6 @@ class WorkflowValidatorTest {
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
     }
-
-    // same name tasks error, maybe workflow_struct
 
     @Test
     void validateWorkflowTasks_validTasks_noErrors() {
@@ -2418,7 +2506,7 @@ class WorkflowValidatorTest {
                     "name": "task2",
                     "type": "component/v1/action1",
                     "parameters": {
-                        "active": true
+                        "date": "2025-09-23T11:46:19"
                     }
                 },
                 {
@@ -2426,7 +2514,8 @@ class WorkflowValidatorTest {
                     "name": "task3",
                     "type": "component/v1/action1",
                     "parameters": {
-                        "name": "Name: ${task1.propString}, Other: ${task2.propBool}"
+                        "name": "Name: ${task1.propString}, Other: ${task2.propDateTime}",
+                        "date": "${task2.propDateTime}"
                     }
                 }
             ]
@@ -2437,11 +2526,11 @@ class WorkflowValidatorTest {
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)));
+                new ToolUtils.PropertyInfo("date", "DATE_TIME", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", trigger1,
-            "component/v1/action1", action1);
+            "component/v1/action1", action4);
 
         try {
             JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
@@ -2463,7 +2552,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_invalidDataPillFormat_ignoresGracefully() {
+    void validateTaskDataPills_nonExistentTask_ignoresGracefully() {
         String tasksJson = """
             [
                 {
@@ -2565,7 +2654,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_objectDataPillValidation_validatesCorrectly() {
+    void validateTaskDataPills_objectTypeValidation_validatesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2585,6 +2674,16 @@ class WorkflowValidatorTest {
                         "height": "${task1.element.propNumber}",
                         "age": "${task1.propInteger}"
                     }
+                },
+                {
+                    "label": "Task 3",
+                    "name": "task3",
+                    "type": "component/v1/action2",
+                    "parameters": {
+                        "activeString": "${task1.element.propBool}",
+                        "heightString": "${task1.element.propNumber}",
+                        "ageString": "${task1.propInteger}"
+                    }
                 }
             ]
             """;
@@ -2595,7 +2694,11 @@ class WorkflowValidatorTest {
             "component/v1/action1", List.of(
                 new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
                 new ToolUtils.PropertyInfo("height", "NUMBER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)));
+                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+            "component/v1/action2", List.of(
+                new ToolUtils.PropertyInfo("activeString", "STRING", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("heightString", "STRING", null, false, true, null, null),
+                new ToolUtils.PropertyInfo("ageString", "STRING", null, false, true, null, null)));
 
         Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
             "component/v1/trigger1", actionObj);
@@ -2619,7 +2722,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_arrayDataPillValidation_validatesCorrectly() {
+    void validateTaskDataPills_arrayTypeValidation_validatesCorrectly() {
         String tasksJson = """
             [
                 {
