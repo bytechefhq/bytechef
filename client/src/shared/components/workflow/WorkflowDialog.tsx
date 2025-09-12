@@ -23,7 +23,7 @@ import {useForm} from 'react-hook-form';
 
 const handleEnterKeyPress = (handler: () => void) => {
     return (e: KeyboardEvent) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
             handler();
         }
     };
@@ -214,7 +214,11 @@ const WorkflowDialog = ({
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea placeholder="Cute description of your project deployment" {...field} />
+                                    <Textarea
+                                        placeholder="Cute description of your project deployment"
+                                        {...field}
+                                        onKeyDown={handleEnterKeyPress(submitSavedWorkflow)}
+                                    />
                                 </FormControl>
 
                                 <FormMessage />
