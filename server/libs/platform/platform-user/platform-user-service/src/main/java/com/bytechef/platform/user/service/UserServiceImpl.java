@@ -447,7 +447,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(long id) {
         return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found for id: " + id));
+            .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
