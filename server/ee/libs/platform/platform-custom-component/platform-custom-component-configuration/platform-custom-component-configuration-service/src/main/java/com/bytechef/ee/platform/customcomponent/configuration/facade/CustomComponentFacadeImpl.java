@@ -58,7 +58,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
         customComponentService.delete(id);
 
-        customComponentFileStorage.deleteCustomComponentFile(customComponent.getComponentFile());
+        customComponentFileStorage.deleteCustomComponentFile(customComponent.getComponent());
     }
 
     @Transactional(readOnly = true)
@@ -92,7 +92,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         CustomComponent customComponent = new CustomComponent();
 
         customComponent.setComponentVersion(componentVersion);
-        customComponent.setComponentFile(componentFileEntry);
+        customComponent.setComponent(componentFileEntry);
         customComponent.setDescription(OptionalUtils.orElse(componentDefinition.getDescription(), null));
         customComponent.setEnabled(true);
         customComponent.setIcon(OptionalUtils.orElse(componentDefinition.getIcon(), null));
