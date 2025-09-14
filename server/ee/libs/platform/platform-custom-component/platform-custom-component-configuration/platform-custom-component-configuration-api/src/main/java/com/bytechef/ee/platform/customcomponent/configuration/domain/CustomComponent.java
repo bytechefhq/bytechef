@@ -55,8 +55,8 @@ public class CustomComponent {
         }
     }
 
-    @Column("component_file")
-    private FileEntry componentFile;
+    @Column("component")
+    private FileEntry component;
 
     @Column("component_version")
     private int componentVersion;
@@ -119,8 +119,8 @@ public class CustomComponent {
         return getClass().hashCode();
     }
 
-    public FileEntry getComponentFile() {
-        return componentFile;
+    public FileEntry getComponent() {
+        return component;
     }
 
     public int getComponentVersion() {
@@ -175,8 +175,8 @@ public class CustomComponent {
         return version;
     }
 
-    public void setComponentFile(FileEntry componentFile) {
-        this.componentFile = componentFile;
+    public void setComponent(FileEntry component) {
+        this.component = component;
     }
 
     public void setComponentVersion(int componentVersion) {
@@ -221,7 +221,7 @@ public class CustomComponent {
             "id=" + id +
             ", name='" + name + '\'' +
             ", componentVersion=" + componentVersion +
-            ", componentFile=" + componentFile +
+            ", componentFile=" + component +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
