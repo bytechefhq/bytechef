@@ -24,15 +24,9 @@ import java.net.URL;
  */
 public interface CodeWorkflowFileStorage {
 
-    void deleteCodeWorkflowDefinition(FileEntry definitionFile);
+    void deleteCodeWorkflowFile(FileEntry fileEntry);
 
-    void deleteCodeWorkflowFile(FileEntry codeFile);
-
-    String readCodeWorkflowDefinition(FileEntry definitionFile);
-
-    URL getCodeWorkflowFileURL(FileEntry codeFile);
-
-    FileEntry storeCodeWorkflowDefinition(String filename, String definition);
+    URL getCodeWorkflowFileURL(FileEntry fileEntry);
 
     FileEntry storeCodeWorkflowFile(String filename, byte[] bytes);
 }

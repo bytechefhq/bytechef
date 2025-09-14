@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.codeworkflow.configuration.domain;
 
-import com.bytechef.file.storage.domain.FileEntry;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -21,30 +21,18 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("code_workflow")
 public class CodeWorkflow {
 
-    @Column
-    private FileEntry definition;
-
-    @Column
-    private String description;
-
-    @Column
-    private String label;
+    @Id
+    private UUID id;
 
     @Column
     private String name;
 
-    @Id
-    private String workflowId;
-
     private CodeWorkflow() {
     }
 
-    public CodeWorkflow(String workflowId, String name, String label, String description, FileEntry definition) {
+    public CodeWorkflow(UUID id, String name) {
+        this.id = id;
         this.name = name;
-        this.label = label;
-        this.description = description;
-        this.definition = definition;
-        this.workflowId = workflowId;
     }
 
     @Override
@@ -57,7 +45,7 @@ public class CodeWorkflow {
             return false;
         }
 
-        return Objects.equals(workflowId, codeWorkflow.workflowId);
+        return Objects.equals(id, codeWorkflow.id);
     }
 
     @Override
@@ -65,34 +53,19 @@ public class CodeWorkflow {
         return getClass().hashCode();
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public FileEntry getDefinition() {
-        return definition;
-    }
-
-    public String getLabel() {
-        return label;
+    public String getId() {
+        return id.toString();
     }
 
     public String getName() {
         return name;
     }
 
-    public String getWorkflowId() {
-        return workflowId;
-    }
-
     @Override
     public String toString() {
         return "CodeWorkflow{" +
-            "workflowId='" + workflowId + '\'' +
+            "id='" + id + '\'' +
             ", name='" + name + '\'' +
-            ", label='" + label + '\'' +
-            ", definition='" + definition + '\'' +
-            ", description='" + description + '\'' +
             '}';
     }
 }

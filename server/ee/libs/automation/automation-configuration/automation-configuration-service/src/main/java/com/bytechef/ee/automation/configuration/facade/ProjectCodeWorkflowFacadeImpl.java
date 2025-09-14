@@ -10,8 +10,6 @@ package com.bytechef.ee.automation.configuration.facade;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -84,9 +82,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         Map<String, String> workflowNameIds = codeWorkflowContainer.getWorkflowNameIds();
 
         for (Map.Entry<String, String> entry : workflowNameIds.entrySet()) {
-            projectWorkflowService.addWorkflow(
-                project.getId(), project.getLastProjectVersion(), entry.getValue(),
-                EncodingUtils.base64EncodeToString(projectDefinition.getName() + '-' + entry.getKey()));
+            projectWorkflowService.addWorkflow(project.getId(), project.getLastProjectVersion(), entry.getValue());
         }
 
         projectService.publishProject(project.getId(), null, false);
@@ -95,7 +91,9 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {
         Project project = new Project();
 
-        project.setDescription(OptionalUtils.orElse(projectDefinition.getDescription(), null));
+        project.setDescription(
+            projectDefinition.getDescription()
+                .orElse(null));
         project.setName(projectDefinition.getName());
         project.setWorkspaceId(workspaceId);
 
@@ -120,7 +118,9 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     private Project updateProject(Project project, ProjectDefinition projectDefinition) {
-        project.setDescription(OptionalUtils.orElse(projectDefinition.getDescription(), null));
+        project.setDescription(
+            projectDefinition.getDescription()
+                .orElse(null));
 
         return projectService.update(project);
     }

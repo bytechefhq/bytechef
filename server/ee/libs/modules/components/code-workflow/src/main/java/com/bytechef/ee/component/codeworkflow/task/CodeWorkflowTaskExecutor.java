@@ -47,10 +47,10 @@ public class CodeWorkflowTaskExecutor {
     }
 
     public Object executePerform(
-        String codeWorkflowContainerReference, String workflowName, String taskName, ModeType type) {
+        String codeWorkflowContainerUuid, String workflowName, String taskName, ModeType type) {
 
         CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
-            codeWorkflowContainerReference);
+            codeWorkflowContainerUuid);
 
         List<WorkflowDefinition> workflows = getWorkflowDefinitions(codeWorkflowContainer, type);
 
@@ -70,13 +70,14 @@ public class CodeWorkflowTaskExecutor {
         return performFunction.apply();
     }
 
-    private List<WorkflowDefinition>
-        getWorkflowDefinitions(CodeWorkflowContainer codeWorkflowContainer, ModeType type) {
+    private List<WorkflowDefinition> getWorkflowDefinitions(
+        CodeWorkflowContainer codeWorkflowContainer, ModeType type) {
+
         List<WorkflowDefinition> workflows = List.of();
 
         if (ModeType.AUTOMATION.equals(type)) {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
-                codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflowsFile()),
+                codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflows()),
                 codeWorkflowContainer.getLanguage(),
                 EncodingUtils.base64EncodeToString(codeWorkflowContainer.toString()), cacheManager);
 

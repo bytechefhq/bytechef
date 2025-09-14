@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.platform.codeworkflow.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,15 +43,17 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final ObjectMapper objectMapper;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public CodeWorkflowContainerFacadeImpl(
         CodeWorkflowContainerService codeWorkflowContainerService, CodeWorkflowFileStorage codeWorkflowFileStorage,
-        ObjectMapper objectMapper) {
+        ObjectMapper objectMapper, WorkflowService workflowService) {
 
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.objectMapper = objectMapper;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -57,20 +62,17 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         byte[] bytes, ModeType type) {
 
         try {
-            CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer();
+            UUID codeWorkflowContainerId = UUID.randomUUID();
 
-            String codeWorkflowContainerReference = String.valueOf(UUID.randomUUID());
-
-            codeWorkflowContainer.setCodeWorkflowContainerReference(codeWorkflowContainerReference);
+            CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(codeWorkflowContainerId);
 
             for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-                String workflowId = String.valueOf(UUID.randomUUID());
+                String definition = getDefinition(String.valueOf(codeWorkflowContainerId), workflowDefinition, type);
+
+                Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
                 codeWorkflowContainer.addCodeWorkflow(
-                    workflowId, workflowDefinition.getName(), OptionalUtils.orElse(workflowDefinition.getLabel(), null),
-                    OptionalUtils.orElse(workflowDefinition.getDescription(), null),
-                    codeWorkflowFileStorage.storeCodeWorkflowDefinition(
-                        workflowId + ".json", getDefinition(codeWorkflowContainerReference, workflowDefinition, type)));
+                    UUID.fromString(Objects.requireNonNull(workflow.getId())), workflowDefinition.getName());
             }
 
             codeWorkflowContainer.setExternalVersion(externalVersion);
@@ -78,9 +80,9 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             codeWorkflowContainer.setName(name);
 
             FileEntry workflowsFileEntry = codeWorkflowFileStorage.storeCodeWorkflowFile(
-                codeWorkflowContainerReference + "." + language.getExtension(), bytes);
+                codeWorkflowContainerId + "." + language.getExtension(), bytes);
 
-            codeWorkflowContainer.setWorkflowsFile(workflowsFileEntry);
+            codeWorkflowContainer.setWorkflows(workflowsFileEntry);
 
             return codeWorkflowContainerService.create(codeWorkflowContainer);
         } catch (Exception e) {
@@ -89,8 +91,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     private ArrayNode toArrayNode(
-        String codeWorkflowContainerReference, WorkflowDefinition workflowDefinition,
-        List<? extends TaskDefinition> tasks, ModeType type) {
+        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, List<? extends TaskDefinition> tasks,
+        ModeType type) {
 
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
@@ -105,7 +107,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
                     .set(
                         "parameters",
                         objectMapper.createObjectNode()
-                            .put("codeWorkflowContainerReference", codeWorkflowContainerReference)
+                            .put("codeWorkflowContainerUuid", codeWorkflowContainerUuid)
                             .put("workflowName", workflowDefinition.getName())
                             .put("taskName", taskDefinition.getName())
                             .put("type", type.ordinal())));
@@ -115,7 +117,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     private String getDefinition(
-        String codeWorkflowContainerReference, WorkflowDefinition workflowDefinition, ModeType type) {
+        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, ModeType type) {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
 
@@ -130,8 +132,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             workflowDefinition.getTriggers(), triggers -> objectNode.set("triggers", objectMapper.createArrayNode()));
         OptionalUtils.ifPresent(
             workflowDefinition.getTasks(),
-            tasks -> objectNode.set(
-                "tasks", toArrayNode(codeWorkflowContainerReference, workflowDefinition, tasks, type)));
+            tasks -> objectNode.set("tasks", toArrayNode(codeWorkflowContainerUuid, workflowDefinition, tasks, type)));
 
         try {
             return objectMapper.writeValueAsString(objectNode);

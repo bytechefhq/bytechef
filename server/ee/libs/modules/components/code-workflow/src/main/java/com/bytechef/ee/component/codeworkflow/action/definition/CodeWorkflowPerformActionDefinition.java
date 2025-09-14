@@ -46,7 +46,7 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
         Parameters extensions, ActionContext actionContext) {
 
         return codeWorkflowTaskExecutor.executePerform(
-            inputParameters.getRequiredString("codeWorkflowContainerReference"),
+            inputParameters.getRequiredString("codeWorkflowContainerUuid"),
             inputParameters.getRequiredString("workflowName"), inputParameters.getRequiredString("taskName"),
             inputParameters.getRequired(MetadataConstants.TYPE, ModeType.class));
     }
