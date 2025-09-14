@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -60,8 +61,12 @@ public class CodeWorkflowContainer {
         }
     }
 
-    @Column("code_workflow_container_reference")
-    private String codeWorkflowContainerReference;
+    private CodeWorkflowContainer() {
+    }
+
+    public CodeWorkflowContainer(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     @MappedCollection(idColumn = "code_workflow_container_id")
     private Set<CodeWorkflow> codeWorkflows = new HashSet<>();
@@ -94,8 +99,11 @@ public class CodeWorkflowContainer {
     @Column
     private String name;
 
-    @Column("workflows_file")
-    private FileEntry workflowsFile;
+    @Column("uuid")
+    private UUID uuid;
+
+    @Column("workflows")
+    private FileEntry workflows;
 
     @Version
     private int version;
@@ -113,10 +121,8 @@ public class CodeWorkflowContainer {
         return Objects.equals(id, codeWorkflow.id);
     }
 
-    public void addCodeWorkflow(
-        String workflowId, String name, String label, String description, FileEntry definition) {
-
-        codeWorkflows.add(new CodeWorkflow(workflowId, name, label, description, definition));
+    public void addCodeWorkflow(UUID id, String name) {
+        codeWorkflows.add(new CodeWorkflow(id, name));
     }
 
     @Override
@@ -124,17 +130,8 @@ public class CodeWorkflowContainer {
         return getClass().hashCode();
     }
 
-    public String getCodeWorkflowContainerReference() {
-        return codeWorkflowContainerReference;
-    }
-
-    public FileEntry getDefinition(String workflowId) {
-        return codeWorkflows.stream()
-            .filter(codeWorkflow -> codeWorkflow.getWorkflowId()
-                .equals(workflowId))
-            .findFirst()
-            .map(CodeWorkflow::getDefinition)
-            .orElseThrow(() -> new IllegalArgumentException("Workflow workflowId=%s not found ".formatted(workflowId)));
+    public String getUuid() {
+        return uuid.toString();
     }
 
     public Long getId() {
@@ -169,8 +166,8 @@ public class CodeWorkflowContainer {
         return name;
     }
 
-    public FileEntry getWorkflowsFile() {
-        return workflowsFile;
+    public FileEntry getWorkflows() {
+        return workflows;
     }
 
     public int getVersion() {
@@ -179,11 +176,11 @@ public class CodeWorkflowContainer {
 
     public Map<String, String> getWorkflowNameIds() {
         return codeWorkflows.stream()
-            .collect(Collectors.toMap(CodeWorkflow::getName, CodeWorkflow::getWorkflowId));
+            .collect(Collectors.toMap(CodeWorkflow::getName, CodeWorkflow::getId));
     }
 
-    public void setCodeWorkflowContainerReference(String codeWorkflowContainerReference) {
-        this.codeWorkflowContainerReference = codeWorkflowContainerReference;
+    public void setUuid(String uuid) {
+        this.uuid = UUID.fromString(uuid);
     }
 
     public void setExternalVersion(String externalVersion) {
@@ -202,8 +199,8 @@ public class CodeWorkflowContainer {
         this.name = name;
     }
 
-    public void setWorkflowsFile(FileEntry workflowsFile) {
-        this.workflowsFile = workflowsFile;
+    public void setWorkflows(FileEntry workflows) {
+        this.workflows = workflows;
     }
 
     @Override
@@ -211,10 +208,10 @@ public class CodeWorkflowContainer {
         return "CodeWorkflow{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", codeWorkflowContainerReference='" + codeWorkflowContainerReference + '\'' +
+            ", uuid='" + uuid + '\'' +
             ", externalVersion='" + externalVersion + '\'' +
             ", language='" + language + '\'' +
-            ", workflowsFile='" + workflowsFile + '\'' +
+            ", workflowsFile='" + workflows + '\'' +
             ", externalVersion=" + externalVersion +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
