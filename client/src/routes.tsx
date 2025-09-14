@@ -15,6 +15,7 @@ import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient} from '@tanstack/react-query';
 import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
@@ -654,12 +655,14 @@ export const getRouter = (queryClient: QueryClient) =>
             element: <App />,
             errorElement: <ErrorPage />,
             loader: async () => {
-                const environments = await queryClient.fetchQuery({
-                    queryFn: () => new EnvironmentApi().getEnvironments(),
-                    queryKey: EnvironmentKeys,
-                });
+                if (authenticationStore.getState().authenticated) {
+                    const environments = await queryClient.fetchQuery({
+                        queryFn: () => new EnvironmentApi().getEnvironments(),
+                        queryKey: EnvironmentKeys,
+                    });
 
-                environmentStore.getState().setEnvironments(environments);
+                    environmentStore.getState().setEnvironments(environments);
+                }
             },
             path: '/',
         },
