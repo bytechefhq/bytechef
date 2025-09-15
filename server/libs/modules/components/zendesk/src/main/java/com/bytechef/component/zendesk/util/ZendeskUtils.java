@@ -34,24 +34,21 @@ import java.util.Map;
  * @author Nikolina Spehar
  */
 public class ZendeskUtils {
-    private ZendeskUtils() {
-    }
 
-    public static String checkIfNull(String value) {
-        return value == null ? "" : value;
+    private ZendeskUtils() {
     }
 
     public static List<Option<Long>> getTicketIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<Long>> options = new ArrayList<>();
+
         Map<String, Object> response = context.http(http -> http.get("/tickets"))
             .configuration(responseType(ResponseType.JSON))
             .header("Accept", "application/json")
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<Long>> options = new ArrayList<>();
 
         if (response.get("tickets") instanceof List<?> tickets) {
             for (Object ticket : tickets) {

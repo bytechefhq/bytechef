@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
@@ -88,23 +87,11 @@ public class ZendeskNewTicketTrigger {
                         string("organization_id")
                             .description("ID of the organization associated with the requester."),
                         string("priority")
-                            .description("Priority of the ticket.")
-                            .options(
-                                option("Low", "low"),
-                                option("Normal", "normal"),
-                                option("High", "high"),
-                                option("Urgent", "urgent")),
+                            .description("Priority of the ticket."),
                         string("requester_id")
                             .description("ID of the user who requested the ticket."),
                         string("status")
-                            .description("Current status of the ticket.")
-                            .options(
-                                option("New", "new"),
-                                option("Open", "open"),
-                                option("Pending", "pending"),
-                                option("Hold", "hold"),
-                                option("Solved", "solved"),
-                                option("Closed", "closed")),
+                            .description("Current status of the ticket."),
                         string("subject")
                             .description("Subject line of the ticket."),
                         string("submitter_id")
@@ -115,12 +102,7 @@ public class ZendeskNewTicketTrigger {
                                 string()
                                     .description("List of tags associated with the ticket.")),
                         string("type")
-                            .description("Type of the ticket.")
-                            .options(
-                                option("Problem", "problem"),
-                                option("Incident", "incident"),
-                                option("Question", "question"),
-                                option("Task", "task")),
+                            .description("Type of the ticket."),
                         string("updated_at")
                             .description("Timestamp of the last update to the ticket."),
                         object("via")
@@ -154,8 +136,8 @@ public class ZendeskNewTicketTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
         Map<String, Map<String, Object>> response = context.http(http -> http.post("/webhooks"))
             .configuration(responseType(ResponseType.JSON))
@@ -171,8 +153,8 @@ public class ZendeskNewTicketTrigger {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        String webhookId = (String) response.get(WEBHOOK)
-            .get(ID);
+        Map<String, Object> webhook = response.get(WEBHOOK);
+        String webhookId = (String) webhook.get(ID);
 
         return new WebhookEnableOutput(Map.of(ID, webhookId), null);
     }

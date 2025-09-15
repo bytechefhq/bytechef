@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
@@ -78,12 +77,7 @@ public class ZendeskConstants {
                 integer("generated_timestamp")
                     .description("UNIX timestamp when the ticket was generated."),
                 string("type")
-                    .description("Type of the ticket.")
-                    .options(
-                        option("Problem", "problem"),
-                        option("Incident", "incident"),
-                        option("Question", "question"),
-                        option("Task", "task")),
+                    .description("Type of the ticket."),
                 string("subject")
                     .description("Subject line of the ticket."),
                 string("raw_subject")
@@ -91,21 +85,9 @@ public class ZendeskConstants {
                 string("description")
                     .description("Detailed description of the ticket issue."),
                 string("priority")
-                    .description("Priority of the ticket.")
-                    .options(
-                        option("Low", "low"),
-                        option("Normal", "normal"),
-                        option("High", "high"),
-                        option("Urgent", "urgent")),
+                    .description("Priority of the ticket."),
                 string("status")
-                    .description("Current status of the ticket.")
-                    .options(
-                        option("New", "new"),
-                        option("Open", "open"),
-                        option("Pending", "pending"),
-                        option("Hold", "hold"),
-                        option("Solved", "solved"),
-                        option("Closed", "closed")),
+                    .description("Current status of the ticket."),
                 string("recipient")
                     .description("Email address of the ticket recipient."),
                 integer("requester_id")
@@ -120,14 +102,10 @@ public class ZendeskConstants {
                     .description("ID of the group associated with the ticket."),
                 array("collaborator_ids")
                     .description("List of user IDs who are collaborators on the ticket.")
-                    .items(
-                        integer("id")
-                            .description("List of user IDs who are collaborators on the ticket.")),
+                    .items(integer()),
                 array("follower_ids")
                     .description("List of user IDs following the ticket.")
-                    .items(
-                        integer("id")
-                            .description("List of user IDs following the ticket.")),
+                    .items(integer()),
                 array("email_cc_ids")
                     .description("List of ticket CCs user IDs."),
                 array("forum_topic_ids")
@@ -162,10 +140,7 @@ public class ZendeskConstants {
                         integer("id")
                             .description("ID of the satisfaction rating."),
                         string("score")
-                            .description("Score given in the satisfaction rating.")
-                            .options(
-                                option("Good", "good"),
-                                option("Bad", "bad")))
+                            .description("Score given in the satisfaction rating."))
                     .description("Customer satisfaction rating for the ticket."),
                 array("sharing_agreement_ids")
                     .items(

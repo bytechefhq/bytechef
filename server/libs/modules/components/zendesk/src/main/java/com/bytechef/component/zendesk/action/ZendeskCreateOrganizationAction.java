@@ -30,7 +30,6 @@ import static com.bytechef.component.zendesk.constant.ZendeskConstants.DOMAIN_NA
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.NAME;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.NOTES;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.ORGANIZATION;
-import static com.bytechef.component.zendesk.util.ZendeskUtils.checkIfNull;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -43,6 +42,7 @@ import java.util.Map;
  * @author Nikolina Spehar
  */
 public class ZendeskCreateOrganizationAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createOrganization")
         .title("Create Organization")
         .description("Creates an organization.")
@@ -90,8 +90,7 @@ public class ZendeskCreateOrganizationAction {
                             .description("Date when the organization was last updated."),
                         array("domain_names")
                             .description("Array of domain names of the organization.")
-                            .items(
-                                string("domain_name")),
+                            .items(string()),
                         string("detail")
                             .description("Details about the organization."),
                         string("notes")
@@ -100,8 +99,7 @@ public class ZendeskCreateOrganizationAction {
                             .description("Group ID of the organization."),
                         array("tags")
                             .description("Tags of the organization.")
-                            .items(
-                                string("tag")),
+                            .items(string()),
                         object("organization_fields")
                             .description("Custom organization fields of the organization."))))
         .perform(ZendeskCreateOrganizationAction::perform);
@@ -115,11 +113,13 @@ public class ZendeskCreateOrganizationAction {
         return context.http(http -> http.post("/organizations"))
             .body(
                 Body.of(
-                    ORGANIZATION, Map.of(
+                    ORGANIZATION,
+                    new Object[] {
                         NAME, inputParameters.getRequiredString(NAME),
                         DOMAIN_NAMES, inputParameters.getRequiredList(DOMAIN_NAMES),
-                        DETAILS, checkIfNull(inputParameters.getString(DETAILS)),
-                        NOTES, checkIfNull(inputParameters.getString(NOTES)))))
+                        DETAILS, inputParameters.getString(DETAILS),
+                        NOTES, inputParameters.getString(NOTES)
+                    }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

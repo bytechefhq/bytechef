@@ -55,15 +55,6 @@ class ZendeskUtilsTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testCheckIfNull() {
-        String nullValue = ZendeskUtils.checkIfNull(null);
-        assertEquals("", nullValue);
-
-        String notNullValue = ZendeskUtils.checkIfNull("test");
-        assertEquals("test", notNullValue);
-    }
-
-    @Test
     void testGetTicketIdOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
