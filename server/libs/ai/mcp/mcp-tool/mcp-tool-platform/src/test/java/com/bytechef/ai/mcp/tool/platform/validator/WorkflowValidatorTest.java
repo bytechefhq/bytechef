@@ -50,7 +50,7 @@ class WorkflowValidatorTest {
                 action1, action2, action3))));
 
     @Test
-    void validateWorkflowStructure_validWorkflow_noErrors() {
+    void validateWorkflowStructureValidWorkflowNoErrors() {
         String validWorkflow = """
             {
                 "label": "workflowName",
@@ -74,7 +74,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_missingLabel_addsError() {
+    void validateWorkflowStructureMissingLabelAddsError() {
         String invalidWorkflow = """
             {
                 "description": "workflowDescription",
@@ -97,7 +97,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonStringLabel_addsError() {
+    void validateWorkflowStructureNonStringLabelAddsError() {
         String invalidWorkflow = """
             {
                 "label": 123,
@@ -121,7 +121,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_missingDescription_addsError() {
+    void validateWorkflowStructureMissingDescriptionAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -144,7 +144,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonStringDescription_addsError() {
+    void validateWorkflowStructureNonStringDescriptionAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -168,7 +168,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_missingTriggers_addsError() {
+    void validateWorkflowStructureMissingTriggersAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -185,7 +185,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonArrayTriggers_addsError() {
+    void validateWorkflowStructureNonArrayTriggersAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -203,7 +203,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_multipleTriggers_addsError() {
+    void validateWorkflowStructureMultipleTriggersAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -232,7 +232,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonObjectTrigger_addsError() {
+    void validateWorkflowStructureNonObjectTriggerAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -252,7 +252,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_missingTasks_addsError() {
+    void validateWorkflowStructureMissingTasksAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -275,7 +275,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonArrayTasks_addsError() {
+    void validateWorkflowStructureNonArrayTasksAddsError() {
         String invalidWorkflow = """
             {
                 "label": "workflowName",
@@ -299,7 +299,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_nonObject_addsError() {
+    void validateWorkflowStructureNonObjectAddsError() {
         String invalidWorkflow = "\"not an object\"";
 
         StringBuilder errors = new StringBuilder();
@@ -310,7 +310,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructure_invalidJson_addsError() {
+    void validateWorkflowStructureInvalidJsonAddsError() {
         String invalidWorkflow = "{invalid json}";
 
         StringBuilder errors = new StringBuilder();
@@ -321,7 +321,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_validTask_noErrors() {
+    void validateTaskStructureValidTaskNoErrors() {
         String validTask = """
             {
                 "label": "Test Task",
@@ -338,7 +338,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_missingLabel_addsError() {
+    void validateTaskStructureMissingLabelAddsError() {
         String invalidTask = """
             {
                 "name": "testTask",
@@ -354,7 +354,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_nonStringLabel_addsError() {
+    void validateTaskStructureNonStringLabelAddsError() {
         String invalidTask = """
             {
                 "label": 123,
@@ -371,7 +371,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_missingName_addsError() {
+    void validateTaskStructureMissingNameAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -387,7 +387,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_nonStringName_addsError() {
+    void validateTaskStructureNonStringNameAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -404,7 +404,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_missingType_addsError() {
+    void validateTaskStructureMissingTypeAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -420,7 +420,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_nonStringType_addsError() {
+    void validateTaskStructureNonStringTypeAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -437,7 +437,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_invalidTypePattern_addsError() {
+    void validateTaskStructureInvalidTypePatternAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -455,7 +455,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_validTypePatterns_noErrors() {
+    void validateTaskStructureValidTypePatternsNoErrors() {
         String[] validTypes = {
             "component/v1",
             "component/v1/action",
@@ -463,14 +463,14 @@ class WorkflowValidatorTest {
         };
 
         for (String type : validTypes) {
-            String validTask = String.format("""
-                {
-                    "label": "Test Task",
-                    "name": "testTask",
-                    "type": "%s",
-                    "parameters": {}
-                }
-                """, type);
+            String validTask = String.format(
+                "{%n" +
+                    "    \"label\": \"Test Task\",%n" +
+                    "    \"name\": \"testTask\",%n" +
+                    "    \"type\": \"%s\",%n" +
+                    "    \"parameters\": {}%n" +
+                    "}",
+                type);
 
             StringBuilder errors = new StringBuilder();
             WorkflowValidator.validateTaskStructure(validTask, errors);
@@ -480,7 +480,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_missingParameters_addsError() {
+    void validateTaskStructureMissingParametersAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -496,7 +496,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_nonObjectParameters_addsError() {
+    void validateTaskStructureNonObjectParametersAddsError() {
         String invalidTask = """
             {
                 "label": "Test Task",
@@ -513,7 +513,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_nonObject_addsError() {
+    void validateTaskStructureNonObjectAddsError() {
         String invalidTask = "\"not an object\"";
 
         StringBuilder errors = new StringBuilder();
@@ -523,7 +523,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructure_invalidJson_addsError() {
+    void validateTaskStructureInvalidJsonAddsError() {
         String invalidTask = "{invalid json}";
 
         StringBuilder errors = new StringBuilder();
@@ -534,7 +534,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_validParameters_noErrors() {
+    void validateTaskParametersValidParametersNoErrors() {
         String currentTaskParameters = """
             {
                 "name": "John",
@@ -557,7 +557,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_extraProperty_addsWarning() {
+    void validateTaskParametersExtraPropertyAddsWarning() {
         String currentTaskParameters = """
             {
                 "name": "John",
@@ -577,7 +577,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_missingRequiredProperty_addsError() {
+    void validateTaskParametersMissingRequiredPropertyAddsError() {
         String currentTaskParameters = """
             {
                 "age": 30
@@ -597,7 +597,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_typeMatching() {
+    void validateTaskParametersTypeMatching() {
         String currentTaskParameters = """
             {
                 "string": "test",
@@ -634,7 +634,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nullTypeMatching() {
+    void validateTaskParametersNullTypeMatching() {
         String currentTaskParameters = """
             {
                 "string": null,
@@ -671,7 +671,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_wrongType_addsError() {
+    void validateTaskParametersWrongTypeAddsError() {
         String currentTaskParameters = """
             {
                 "name": 123,
@@ -697,7 +697,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_wrongTypeFormat_addsError() {
+    void validateTaskParametersWrongTypeFormatAddsError() {
         String currentTaskParameters = """
             {
                 "day": "2025-1-1",
@@ -730,7 +730,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_wrongTypeInArrayAndObject_addsError() {
+    void validateTaskParametersWrongTypeInArrayAndObjectAddsError() {
         String currentTaskParameters = """
             {
                 "obj": {
@@ -765,7 +765,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_arrayAndObjectTypes_noErrors() {
+    void validateTaskParametersArrayAndObjectTypesNoErrors() {
         String currentTaskParameters = """
             {
                 "items": [],
@@ -788,7 +788,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_arrayMultipleValues_noErrors() {
+    void validateTaskParametersArrayMultipleValuesNoErrors() {
         String currentTaskParameters = """
             {
                 "items": [
@@ -814,7 +814,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_arrayMultipleValues_objectWrongAttribute() {
+    void validateTaskParametersArrayMultipleValuesObjectWrongAttribute() {
         String currentTaskParameters = """
             {
                 "items": [
@@ -849,7 +849,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_arrayMultipleValues_indexDisplayCondition() {
+    void validateTaskParametersArrayMultipleValuesIndexDisplayCondition() {
         String currentTaskParameters = """
             {
                 "items": [
@@ -886,7 +886,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_typesInArrayAndObject_noErrors() {
+    void validateTaskParametersTypesInArrayAndObjectNoErrors() {
         String currentTaskParameters = """
             {
                 "items": ["string"],
@@ -909,7 +909,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nonObjectCurrentParameters_addsError() {
+    void validateTaskParametersNonObjectCurrentParametersAddsError() {
         String currentTaskParameters = "\"not an object\"";
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of();
@@ -923,7 +923,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nonObjectTaskDefinition_addsError() {
+    void validateTaskParametersNonObjectTaskDefinitionAddsError() {
         String currentTaskParameters = """
             {
                 "name": "John"
@@ -942,7 +942,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_invalidJsonCurrentParameters_addsError() {
+    void validateTaskParametersInvalidJsonCurrentParametersAddsError() {
         String currentTaskParameters = "{invalid json}";
 
         List<ToolUtils.PropertyInfo> taskDefinition = List.of();
@@ -957,7 +957,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nullValue_correctType() {
+    void validateTaskParametersNullValueCorrectType() {
         String currentTaskParameters = """
             {
                 "nullable": null
@@ -976,7 +976,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_mixedValidationScenario() {
+    void validateTaskParametersMixedValidationScenario() {
         String currentTaskParameters = """
             {
                 "validString": "hello",
@@ -1001,7 +1001,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_emptyParametersDefinition_allowsAnyParameters() {
+    void validateTaskParametersEmptyParametersDefinitionAllowsAnyParameters() {
         String currentTaskParameters = """
             {
                 "anyProperty": "any value"
@@ -1019,7 +1019,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrue_includesConditionalProperty() {
+    void validateTaskParametersDisplayConditionTrueIncludesConditionalProperty() {
         String currentTaskParameters = """
             {
                 "enableFeature": true,
@@ -1045,7 +1045,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrue_includesConditionalPropertyReverseOrder() {
+    void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyReverseOrder() {
         String currentTaskParameters = """
             {
                 "enableFeature": true,
@@ -1071,7 +1071,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrue_includesConditionalPropertyString() {
+    void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyString() {
         String currentTaskParameters = """
             {
                 "enableFeature": "true",
@@ -1097,7 +1097,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrue_includesConditionalPropertyContains() {
+    void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyContains() {
         String currentTaskParameters = """
             {
                 "enableFeature": "true",
@@ -1124,7 +1124,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionFalse_includesConditionalPropertyContains() {
+    void validateTaskParametersDisplayConditionFalseIncludesConditionalPropertyContains() {
         String currentTaskParameters = """
             {
                 "enableFeature": "false",
@@ -1154,7 +1154,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrue_invalidDisplayConditionOperation() {
+    void validateTaskParametersDisplayConditionTrueInvalidDisplayConditionOperation() {
         String currentTaskParameters = """
             {
                 "enableFeature": "true",
@@ -1185,7 +1185,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionFalseFloat_errorWhenConditionalPropertyProvided() {
+    void validateTaskParametersDisplayConditionFalseFloatErrorWhenConditionalPropertyProvided() {
         String currentTaskParameters = """
             {
                 "enableFeature": 4,
@@ -1211,7 +1211,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_displayConditionTrueIntegerInverted_errorWhenConditionalPropertyProvided() {
+    void validateTaskParametersDisplayConditionTrueIntegerInvertedErrorWhenConditionalPropertyProvided() {
         String currentTaskParameters = """
             {
                 "enableFeature": 4.1,
@@ -1236,7 +1236,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_multipleDisplayConditions_filtersByCondition_incorrectCondition() {
+    void validateTaskParametersMultipleDisplayConditionsFiltersByConditionIncorrectCondition() {
         String currentTaskParameters = """
             {
                 "mode": "advanced",
@@ -1265,7 +1265,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_duplicatePropertiesWithDifferentConditions_includesCorrectOne() {
+    void validateTaskParametersDuplicatePropertiesWithDifferentConditionsIncludesCorrectOne() {
         String currentTaskParameters = """
             {
                 "bodyContentType": true,
@@ -1297,7 +1297,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_duplicatePropertiesWithDifferentConditions_excludesIncorrectOne() {
+    void validateTaskParametersDuplicatePropertiesWithDifferentConditionsExcludesIncorrectOne() {
         String currentTaskParameters = """
             {
                 "bodyContentType": false,
@@ -1326,7 +1326,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_duplicatePropertiesWithDifferentConditions_includesIncorrect() {
+    void validateTaskParametersDuplicatePropertiesWithDifferentConditionsIncludesIncorrect() {
         String currentTaskParameters = """
             {
                 "bodyContentType": true,
@@ -1358,7 +1358,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nestedDisplayConditions_validatesCorrectly() {
+    void validateTaskParametersNestedDisplayConditionsValidatesCorrectly() {
         String currentTaskParameters = """
             {
                 "parentEnabled": true,
@@ -1387,7 +1387,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_stringValueCondition_worksCorrectly() {
+    void validateTaskParametersStringValueConditionWorksCorrectly() {
         String currentTaskParameters = """
             {
                 "format": "json",
@@ -1413,7 +1413,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_missingFieldForCondition_excludesConditionalProperty() {
+    void validateTaskParametersMissingFieldForConditionExcludesConditionalProperty() {
         String currentTaskParameters = """
             {
                 "name": "test"
@@ -1434,7 +1434,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_complexNestedConditions_validatesAllLevels() {
+    void validateTaskParametersComplexNestedConditionsValidatesAllLevels() {
         String currentTaskParameters = """
             {
                 "level1": "enabled",
@@ -1468,7 +1468,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_complexNestedConditions_deepMissingError() {
+    void validateTaskParametersComplexNestedConditionsDeepMissingError() {
         String currentTaskParameters = """
             {
                 "level1": "enabled",
@@ -1503,7 +1503,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_complexNestedConditions_deepWarning() {
+    void validateTaskParametersComplexNestedConditionsDeepWarning() {
         String currentTaskParameters = """
             {
                 "level1": "enabled",
@@ -1539,7 +1539,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineCondition_excludesRequiredProperty() {
+    void validateTaskParametersInlineConditionExcludesRequiredProperty() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1561,7 +1561,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineConditionReversed_excludesRequiredProperty() {
+    void validateTaskParametersInlineConditionReversedExcludesRequiredProperty() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1584,7 +1584,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineConditionDoesntIncludeRequiredProperty_missingError() {
+    void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyMissingError() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1606,7 +1606,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineConditionDoesntIncludeRequiredPropertyInteger_missingError() {
+    void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyIntegerMissingError() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1628,7 +1628,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineConditionDoesntIncludeRequiredPropertyReversedFloat_noErrors() {
+    void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyReversedFloatNoErrors() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1650,7 +1650,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_inlineConditionDoesntIncludeRequiredPropertyContains_noErrors() {
+    void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyContainsNoErrors() {
         String currentTaskParameters = """
             {
                 "name": "test",
@@ -1674,7 +1674,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_complexNestedInlineConditions_validatesAllLevels() {
+    void validateTaskParametersComplexNestedInlineConditionsValidatesAllLevels() {
         String currentTaskParameters = """
             {
                 "level1": "enabled",
@@ -1709,7 +1709,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nestedInlineCondition_missingError() {
+    void validateTaskParametersNestedInlineConditionMissingError() {
         String currentTaskParameters = """
             {
                 "level1": "enabled",
@@ -1744,7 +1744,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_nestedInlineCondition_notMatchingCondition() {
+    void validateTaskParametersNestedInlineConditionNotMatchingCondition() {
         String currentTaskParameters = """
             {
                 "level1": "not_enabled",
@@ -1775,7 +1775,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_httpClientPost() {
+    void validateTaskParametersHttpClientPost() {
         String currentTaskParameters = """
             {
                 "uri": "https://api.example.com/v1/users",
@@ -1851,7 +1851,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_conditionFlow_rawExpressionTrue() {
+    void validateTaskParametersConditionFlowRawExpressionTrue() {
         String currentTaskParameters = """
             {
                 "rawExpression": true,
@@ -1902,7 +1902,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_conditionFlow_rawExpressionTrueWithTask() {
+    void validateTaskParametersConditionFlowRawExpressionTrueWithTask() {
         String currentTaskParameters = """
             {
                 "rawExpression": true,
@@ -1962,7 +1962,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskParameters_conditionFlow_rawExpressionFalse() {
+    void validateTaskParametersConditionFlowRawExpressionFalse() {
         String currentTaskParameters = """
             {
                 "rawExpression": false,
@@ -2036,7 +2036,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_validTasks_noErrors() {
+    void validateWorkflowTasksValidTasksNoErrors() {
         String tasksJson = """
             [
                 {
@@ -2090,7 +2090,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_invalidTaskStructure_addsError() {
+    void validateWorkflowTasksInvalidTaskStructureAddsError() {
         String tasksJson = """
             [
                 {
@@ -2127,7 +2127,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_invalidTaskParameters_addsError() {
+    void validateWorkflowTasksInvalidTaskParametersAddsError() {
         String tasksJson = """
             [
                 {
@@ -2170,7 +2170,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_noSuchAttributeOutput_addsError() {
+    void validateWorkflowTasksNoSuchAttributeOutputAddsError() {
         String tasksJson = """
             [
                 {
@@ -2225,7 +2225,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_wrongDataPillType_addsError() {
+    void validateWorkflowTasksWrongDataPillTypeAddsError() {
         String tasksJson = """
             [
                 {
@@ -2281,7 +2281,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_incorrectOutputOrder_addsError() {
+    void validateWorkflowTasksIncorrectOutputOrderAddsError() {
         String tasksJson = """
             [
                 {
@@ -2349,7 +2349,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_taskWithMissingParametersField_handlesCorrectly() {
+    void validateWorkflowTasksTaskWithMissingParametersFieldHandlesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2387,7 +2387,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_multipleTasks_validatesAll() {
+    void validateWorkflowTasksMultipleTasksValidatesAll() {
         String tasksJson = """
             [
                 {
@@ -2439,7 +2439,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_arrayParameters_validatesCorrectly() {
+    void validateTaskDataPillsArrayParametersValidatesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2489,7 +2489,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_multipleDataPillsInSameValue_validatesAll() {
+    void validateTaskDataPillsMultipleDataPillsInSameValueValidatesAll() {
         String tasksJson = """
             [
                 {
@@ -2551,7 +2551,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_nonExistentTask_ignoresGracefully() {
+    void validateTaskDataPillsNonExistentTaskIgnoresGracefully() {
         String tasksJson = """
             [
                 {
@@ -2603,7 +2603,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_missingTaskOutputInfo_handlesGracefully() {
+    void validateTaskDataPillsMissingTaskOutputInfoHandlesGracefully() {
         String tasksJson = """
             [
                 {
@@ -2653,7 +2653,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_objectTypeValidation_validatesCorrectly() {
+    void validateTaskDataPillsObjectTypeValidationValidatesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2721,7 +2721,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_arrayTypeValidation_validatesCorrectly() {
+    void validateTaskDataPillsArrayTypeValidationValidatesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2775,7 +2775,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_complexNestedArrayWithDataPills_validatesCorrectly() {
+    void validateTaskDataPillsComplexNestedArrayWithDataPillsValidatesCorrectly() {
         String tasksJson = """
             [
                 {
@@ -2837,7 +2837,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPills_malformedDataPillFormat_ignoresGracefully() {
+    void validateTaskDataPillsMalformedDataPillFormatIgnoresGracefully() {
         String tasksJson = """
             [
                 {
@@ -2891,7 +2891,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_flowLoop_wrongTypes() {
+    void validateWorkflowTasksFlowLoopWrongTypes() {
         String tasksJson = """
             [
                 {
@@ -2976,7 +2976,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_flowLoop_wrongParameters() {
+    void validateWorkflowTasksFlowLoopWrongParameters() {
         String tasksJson = """
             [
                 {
@@ -3054,7 +3054,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_flowCondition_noErrors() {
+    void validateWorkflowTasksFlowConditionNoErrors() {
         String tasksJson = """
             [
                 {
@@ -3166,7 +3166,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_flowCondition_withErrors() {
+    void validateWorkflowTasksFlowConditionWithErrors() {
         String tasksJson = """
             [
                 {
@@ -3287,7 +3287,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_flowConditionAndLoop_noErrors() {
+    void validateWorkflowTasksFlowConditionAndLoopNoErrors() {
         String tasksJson = """
             [
                 {
@@ -3427,7 +3427,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateCompleteWorkflow_validWorkflow_noErrors() {
+    void validateCompleteWorkflowValidWorkflowNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3472,7 +3472,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateCompleteWorkflow_invalidStructure_hasErrors() {
+    void validateCompleteWorkflowInvalidStructureHasErrors() {
         String workflow = """
             {
                 "description": "Missing label",
@@ -3495,7 +3495,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateCompleteWorkflow_duplicateTaskNames_hasErrors() {
+    void validateCompleteWorkflowDuplicateTaskNamesHasErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3539,7 +3539,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsCondition_noErrors() {
+    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsConditionNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3617,7 +3617,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsLoop_noErrors() {
+    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsLoopNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3684,7 +3684,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasks_addsNestedTasksToTaskDefinitionsMultipleFlows_noErrors() {
+    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsMultipleFlowsNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3791,7 +3791,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateSingleTask_validTask_noErrors() {
+    void validateSingleTaskValidTaskNoErrors() {
         String task = """
             {
                 "label": "Test Task",
@@ -3818,7 +3818,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateSingleTask_invalidStructure_hasErrors() {
+    void validateSingleTaskInvalidStructureHasErrors() {
         String task = """
             {
                 "name": "test_task",
@@ -3839,7 +3839,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateSingleTask_missingRequiredParameter_hasErrors() {
+    void validateSingleTaskMissingRequiredParameterHasErrors() {
         String task = """
             {
                 "label": "Test Task",
@@ -3865,7 +3865,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void taskDefinitionProvider_functionalInterface_worksCorrectly() {
+    void taskDefinitionProviderFunctionalInterfaceWorksCorrectly() {
         WorkflowValidator.TaskDefinitionProvider provider = (taskType, kind) -> {
             if ("test/v1".equals(taskType)) {
                 return List.of(new ToolUtils.PropertyInfo("test", "STRING", null, false, true, null, null));
@@ -3883,7 +3883,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void taskOutputProvider_functionalInterface_worksCorrectly() {
+    void taskOutputProviderFunctionalInterfaceWorksCorrectly() {
         WorkflowValidator.TaskOutputProvider provider = (taskType, kind, warnings) -> {
             if ("test/v1".equals(taskType)) {
                 return new ToolUtils.PropertyInfo("output", "STRING", null, false, false, null, null);

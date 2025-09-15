@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class ToolUtilsTest {
 
     @Test
-    void testListDisplayConditions_EmptyList() {
+    void testListDisplayConditionsEmptyList() {
         List<PropertyDecorator> properties = List.of();
 
         Map<String, List<String>> result = ToolUtils.listDisplayConditions(properties);
@@ -43,7 +43,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_SimpleProperties() {
+    void testListDisplayConditionsSimpleProperties() {
         StringProperty property1 = mock(StringProperty.class);
         when(property1.getName()).thenReturn("prop1");
         when(property1.getDisplayCondition()).thenReturn("condition1");
@@ -69,7 +69,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_PropertiesWithoutDisplayCondition() {
+    void testListDisplayConditionsPropertiesWithoutDisplayCondition() {
         StringProperty property1 = mock(StringProperty.class);
         when(property1.getName()).thenReturn("prop1");
         when(property1.getDisplayCondition()).thenReturn(null);
@@ -93,7 +93,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_NestedObjectProperties() {
+    void testListDisplayConditionsNestedObjectProperties() {
         StringProperty nestedProp1 = mock(StringProperty.class);
         when(nestedProp1.getName()).thenReturn("nestedProp1");
         when(nestedProp1.getDisplayCondition()).thenReturn("nestedCondition1");
@@ -118,7 +118,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_NestedArrayProperties() {
+    void testListDisplayConditionsNestedArrayProperties() {
         StringProperty arrayItemProp = mock(StringProperty.class);
         when(arrayItemProp.getName()).thenReturn("arrayItem");
         when(arrayItemProp.getDisplayCondition()).thenReturn("arrayItemCondition");
@@ -138,7 +138,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_DeepNesting() {
+    void testListDisplayConditionsDeepNesting() {
         StringProperty deepNestedProp = mock(StringProperty.class);
         when(deepNestedProp.getName()).thenReturn("deepProp");
         when(deepNestedProp.getDisplayCondition()).thenReturn("deepCondition");
@@ -164,7 +164,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testListDisplayConditions_MixedConditions() {
+    void testListDisplayConditionsMixedConditions() {
         StringProperty prop1 = mock(StringProperty.class);
         when(prop1.getName()).thenReturn("prop1");
         when(prop1.getDisplayCondition()).thenReturn("sharedCondition");
@@ -190,7 +190,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_EmptyProperties() {
+    void testGenerateObjectValueEmptyProperties() {
         List<PropertyDecorator> properties = List.of();
 
         String result = ToolUtils.generateObjectValue(properties, "", "\"");
@@ -199,7 +199,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_SingleStringProperty() {
+    void testGenerateObjectValueSingleStringProperty() {
         StringProperty stringProp = mock(StringProperty.class);
         when(stringProp.getName()).thenReturn("testString");
         when(stringProp.getRequired()).thenReturn(false);
@@ -212,7 +212,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_RequiredStringProperty() {
+    void testGenerateObjectValueRequiredStringProperty() {
         StringProperty stringProp = mock(StringProperty.class);
         when(stringProp.getName()).thenReturn("requiredString");
         when(stringProp.getRequired()).thenReturn(true);
@@ -225,7 +225,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_MultipleSimpleProperties() {
+    void testGenerateObjectValueMultipleSimpleProperties() {
         StringProperty stringProp = mock(StringProperty.class);
         when(stringProp.getName()).thenReturn("name");
         when(stringProp.getRequired()).thenReturn(true);
@@ -251,7 +251,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_NestedObject() {
+    void testGenerateObjectValueNestedObject() {
         StringProperty nestedProp = mock(StringProperty.class);
         when(nestedProp.getName()).thenReturn("nestedField");
         when(nestedProp.getRequired()).thenReturn(true);
@@ -271,7 +271,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_ArrayProperty() {
+    void testGenerateObjectValueArrayProperty() {
         StringProperty arrayItemProp = mock(StringProperty.class);
         when(arrayItemProp.getName()).thenReturn("item");
         when(arrayItemProp.getRequired()).thenReturn(true);
@@ -289,7 +289,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_ConditionalBodyContent() {
+    void testGenerateObjectValueConditionalBodyContent() {
         StringProperty bodyContentType = mock(StringProperty.class);
         when(bodyContentType.getName()).thenReturn("bodyContentType");
         when(bodyContentType.getRequired()).thenReturn(false);
@@ -343,7 +343,7 @@ class ToolUtilsTest {
     }
 
     @Test
-    void testGenerateObjectValue_ComplexNestedStructure() {
+    void testGenerateObjectValueComplexNestedStructure() {
         StringProperty deepProp = mock(StringProperty.class);
         when(deepProp.getName()).thenReturn("deepProperty");
         when(deepProp.getRequired()).thenReturn(true);
