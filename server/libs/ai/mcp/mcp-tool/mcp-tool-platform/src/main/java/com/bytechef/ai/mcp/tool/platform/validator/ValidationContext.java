@@ -18,6 +18,7 @@ package com.bytechef.ai.mcp.tool.platform.validator;
 
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +35,6 @@ public class ValidationContext {
     private final Map<String, ToolUtils.PropertyInfo> taskOutputs;
     private final StringBuilder errors;
     private final StringBuilder warnings;
-
-    // Computed fields
     private final List<String> taskNames;
     private final Map<String, String> taskNameToTypeMap;
     private final Map<String, JsonNode> allTasksMap;
@@ -46,8 +45,6 @@ public class ValidationContext {
         this.taskOutputs = builder.taskOutputs;
         this.errors = builder.errors;
         this.warnings = builder.warnings;
-
-        // Build computed fields
         this.taskNames = new ArrayList<>();
         this.taskNameToTypeMap = new HashMap<>();
         this.allTasksMap = new HashMap<>();
@@ -74,35 +71,38 @@ public class ValidationContext {
         return new Builder();
     }
 
-    // Getters
     public List<JsonNode> getTasks() {
-        return tasks;
+        return new ArrayList<>(tasks);
     }
 
     public Map<String, List<ToolUtils.PropertyInfo>> getTaskDefinitions() {
-        return taskDefinitions;
+        return new HashMap<>(taskDefinitions);
     }
 
     public Map<String, ToolUtils.PropertyInfo> getTaskOutputs() {
-        return taskOutputs;
+        return new HashMap<>(taskOutputs);
     }
 
+    @SuppressFBWarnings("EI")
     public StringBuilder getErrors() {
         return errors;
     }
 
+    @SuppressFBWarnings("EI")
     public StringBuilder getWarnings() {
         return warnings;
     }
 
     public List<String> getTaskNames() {
-        return taskNames;
+        return new ArrayList<>(taskNames);
     }
 
+    @SuppressFBWarnings("EI")
     public Map<String, String> getTaskNameToTypeMap() {
         return taskNameToTypeMap;
     }
 
+    @SuppressFBWarnings("EI")
     public Map<String, JsonNode> getAllTasksMap() {
         return allTasksMap;
     }
@@ -115,25 +115,27 @@ public class ValidationContext {
         private StringBuilder warnings;
 
         public Builder withTasks(List<JsonNode> tasks) {
-            this.tasks = tasks;
+            this.tasks = new ArrayList<>(tasks);
             return this;
         }
 
         public Builder withTaskDefinitions(Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions) {
-            this.taskDefinitions = taskDefinitions;
+            this.taskDefinitions = new HashMap<>(taskDefinitions);
             return this;
         }
 
         public Builder withTaskOutputs(Map<String, ToolUtils.PropertyInfo> taskOutputs) {
-            this.taskOutputs = taskOutputs;
+            this.taskOutputs = new HashMap<>(taskOutputs);
             return this;
         }
 
+        @SuppressFBWarnings("EI2")
         public Builder withErrors(StringBuilder errors) {
             this.errors = errors;
             return this;
         }
 
+        @SuppressFBWarnings("EI2")
         public Builder withWarnings(StringBuilder warnings) {
             this.warnings = warnings;
             return this;

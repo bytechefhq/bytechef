@@ -228,7 +228,7 @@ public class PropertyValidator {
                         originalCurrentParams);
                 } else if (defValue.isArray() && defValue.size() > 0) {
                     validateArrayPropertyWithArraySupport(currentNode, propertyName, defValue, propertyPath, errors,
-                        warnings, originalTaskDefinitionForArrays, originalCurrentParams);
+                        warnings, originalTaskDefinitionForArrays);
                 }
             });
     }
@@ -261,8 +261,7 @@ public class PropertyValidator {
      */
     private static void validateArrayPropertyWithArraySupport(
         JsonNode currentNode, String propertyName, JsonNode defValue, String propertyPath,
-        StringBuilder errors, StringBuilder warnings, String originalTaskDefinitionForArrays,
-        String originalCurrentParams) {
+        StringBuilder errors, StringBuilder warnings, String originalTaskDefinitionForArrays) {
         if (!currentNode.has(propertyName)) {
             return;
         }
@@ -394,11 +393,6 @@ public class PropertyValidator {
             // If task has parameters, validate them recursively if we have the task type
             if (taskElement.has("parameters") && taskElement.has("type")) {
                 JsonNode parameters = taskElement.get("parameters");
-                String taskType = taskElement.get("type")
-                    .asText();
-
-                // For now, we'll skip detailed parameter validation since we don't have task definitions
-                // This could be enhanced in the future to lookup task definitions and validate parameters
 
                 // Basic parameter structure validation
                 if (!parameters.isObject()) {

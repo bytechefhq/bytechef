@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.tool.platform.validator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -123,8 +124,7 @@ public class FieldValidator {
         JsonNode currentNode, String propertyName, String propertyDef,
         String propertyPath, StringBuilder errors, StringBuilder warnings,
         String originalTaskDefinition, String originalCurrentParams) {
-        // Check for inline display conditions
-        if (propertyDef.contains("@") && propertyDef.contains("@")) {
+        if (propertyDef.contains("@")) {
             try {
                 boolean shouldInclude = WorkflowParser.extractAndEvaluateCondition(propertyDef,
                     WorkflowParser.parseJsonString(originalCurrentParams));
@@ -132,7 +132,7 @@ public class FieldValidator {
                     return; // Skip validation if condition is false
                 }
             } catch (Exception e) {
-                // If condition evaluation fails, continue with validation
+                errors.append(e.getMessage());
             }
         }
 
@@ -325,7 +325,6 @@ public class FieldValidator {
                     JsonNode fieldDef = objectDef.get(fieldName);
                     if (fieldDef == null) {
                         // Property not defined in schema at all
-                        String fieldPath = elementPath + "." + fieldName;
                         ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "[index]." + fieldName
                             + "' is not defined in task definition");
                     } else if (fieldDef.isTextual()) {
@@ -335,16 +334,12 @@ public class FieldValidator {
                             String condition = extractDisplayCondition(fieldDefText);
                             String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 
-                            try {
-                                boolean shouldShowProperty = WorkflowParser
-                                    .extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
-                                if (!shouldShowProperty) {
-                                    // Property exists but display condition is false - generate warning
-                                    ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "["
-                                        + currentIndex + "]." + fieldName + "' is not defined in task definition");
-                                }
-                            } catch (Exception e) {
-                                // If condition evaluation fails, assume property should be shown
+                            boolean shouldShowProperty = WorkflowParser
+                                .extractAndEvaluateCondition("@" + resolvedCondition + "@", rootParameters);
+                            if (!shouldShowProperty) {
+                                // Property exists but display condition is false - generate warning
+                                ValidationErrorBuilder.append(warnings, "Property '" + propertyPath + "["
+                                    + currentIndex + "]." + fieldName + "' is not defined in task definition");
                             }
                         }
                     }
@@ -408,8 +403,8 @@ public class FieldValidator {
      * Extracts the display condition from a field definition text.
      */
     private static String extractDisplayCondition(String fieldDefText) {
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("@([^@]+)@");
-        java.util.regex.Matcher matcher = pattern.matcher(fieldDefText);
+        Pattern pattern = Pattern.compile("@([^@]+)@");
+        Matcher matcher = pattern.matcher(fieldDefText);
         if (matcher.find()) {
             return matcher.group(1)
                 .trim();
@@ -614,6 +609,7 @@ public class FieldValidator {
                         + "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
                 }
                 break;
+            default:
         }
 
         return null; // No error

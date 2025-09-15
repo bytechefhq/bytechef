@@ -135,7 +135,9 @@ public class GenericTools {
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
             boolean includeFlows = normalizedType == null || "flow".equals(normalizedType);
 
-            int actionsCount = 0, triggersCount = 0, flowsCount = 0;
+            int actionsCount = 0;
+            int triggersCount = 0;
+            int flowsCount = 0;
 
             // Add actions if requested
             if (includeActions) {
@@ -214,7 +216,9 @@ public class GenericTools {
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
             boolean includeFlows = normalizedType == null || "flow".equals(normalizedType);
 
-            int actionsCount = 0, triggersCount = 0, flowsCount = 0;
+            int actionsCount = 0;
+            int triggersCount = 0;
+            int flowsCount = 0;
 
             // Search actions if requested
             if (includeActions) {

@@ -119,12 +119,10 @@ public class DataPillValidator {
                 findDataPillsInNode(node.get(i), currentPath + "[" + i + "]", currentTaskName,
                     taskOutput, taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
             }
-        } else if (node.isTextual()) {
-            if (!context.stopProcessing) {
-                String textValue = node.asText();
-                processDataPillsInText(textValue, currentPath, currentTaskName, taskOutput,
-                    taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
-            }
+        } else if (node.isTextual() && !context.stopProcessing) {
+            String textValue = node.asText();
+            processDataPillsInText(textValue, currentPath, currentTaskName, taskOutput,
+                taskNames, taskNameToTypeMap, errors, warnings, context, allTasksMap, taskDefinition);
         }
     }
 
@@ -249,7 +247,7 @@ public class DataPillValidator {
             // Get expected type from task definition if available
             String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
 
-            validateLoopItemTypes(dataPillExpression, referencedTaskName, expectedType, fieldPath, allTasksMap, errors,
+            validateLoopItemTypes(dataPillExpression, referencedTaskName, expectedType, allTasksMap, errors,
                 text, taskOutput);
             return;
         }
@@ -266,7 +264,7 @@ public class DataPillValidator {
             }
 
             validateTypeCompatibility(dataPillExpression, referencedTaskType, propertyName, fieldPath,
-                outputInfo, errors, text, referencedTaskName, allTasksMap, taskDefinition);
+                outputInfo, errors, text, taskDefinition);
         } else {
             ValidationErrorBuilder.append(warnings,
                 "Property '" + dataPillExpression + "' might not exist in the output of '" + referencedTaskType + "'");
@@ -277,7 +275,7 @@ public class DataPillValidator {
         String dataPillExpression, String referencedTaskType,
         String propertyName, String fieldPath,
         ToolUtils.PropertyInfo outputInfo, StringBuilder errors, String text,
-        String referencedTaskName, Map<String, JsonNode> allTasksMap, List<ToolUtils.PropertyInfo> taskDefinition) {
+        List<ToolUtils.PropertyInfo> taskDefinition) {
         String actualType = PropertyUtils.getPropertyType(outputInfo, propertyName);
 
         // Get expected type from task definition if available
@@ -366,7 +364,7 @@ public class DataPillValidator {
 
     private static void validateLoopItemTypes(
         String dataPillExpression, String loopTaskName,
-        String expectedType, String fieldPath,
+        String expectedType,
         Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
         Map<String, ToolUtils.PropertyInfo> taskOutput) {
         JsonNode loopTask = allTasksMap.get(loopTaskName);
@@ -413,16 +411,16 @@ public class DataPillValidator {
             // Handle data pill references like "${task1.items}"
             String itemsValue = items.asText();
             if (itemsValue.startsWith("${") && itemsValue.endsWith("}")) {
-                validateLoopItemTypesFromDataPill(dataPillExpression, itemsValue, expectedType,
-                    fieldPath, allTasksMap, errors, text, taskOutput);
+                validateLoopItemTypesFromDataPill(dataPillExpression, itemsValue, expectedType, allTasksMap, errors,
+                    taskOutput);
             }
         }
     }
 
     private static void validateLoopItemTypesFromDataPill(
         String dataPillExpression, String itemsDataPill,
-        String expectedType, String fieldPath,
-        Map<String, JsonNode> allTasksMap, StringBuilder errors, String text,
+        String expectedType,
+        Map<String, JsonNode> allTasksMap, StringBuilder errors,
         Map<String, ToolUtils.PropertyInfo> taskOutput) {
         // Extract the data pill content (e.g., "task1.items" from "${task1.items}")
         String dataPillContent = itemsDataPill.substring(2, itemsDataPill.length() - 1);
