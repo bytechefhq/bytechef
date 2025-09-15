@@ -165,3 +165,5 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     parallel: 'parallelData',
     subflow: 'subflowData',
 };
+
+export const DEFAULT_CANVAS_WIDTH = 670;

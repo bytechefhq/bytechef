@@ -1,5 +1,4 @@
 import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, TASK_DISPATCHER_NAMES} from '@/shared/constants';
-import defaultNodes from '@/shared/defaultNodes';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -28,6 +27,7 @@ import createParallelNode from '../utils/createParallelNode';
 import {
     collectTaskDispatcherData,
     convertTaskToNode,
+    createDefaultNodes,
     createEdgeFromTaskDispatcherBottomGhostNode,
     getLayoutedElements,
     getTaskAncestry,
@@ -54,8 +54,9 @@ export default function useLayout({
 
     const {tasks, triggers} = workflow;
 
-    const {setEdges, setNodes} = useWorkflowDataStore(
+    const {initializeWithCanvasWidth, setEdges, setNodes} = useWorkflowDataStore(
         useShallow((state) => ({
+            initializeWithCanvasWidth: state.initializeWithCanvasWidth,
             setEdges: state.setEdges,
             setNodes: state.setNodes,
         }))
@@ -73,8 +74,8 @@ export default function useLayout({
             return convertTaskToNode(triggers[0], triggerDefinition, 0);
         }
 
-        return defaultNodes[0];
-    }, [triggerDefinition, triggers]);
+        return createDefaultNodes(canvasWidth)[0];
+    }, [triggerDefinition, triggers, canvasWidth]);
 
     let allNodes: Array<Node> = [triggerNode];
 
@@ -457,4 +458,10 @@ export default function useLayout({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, tasks, triggers]);
+
+    useEffect(() => {
+        if (canvasWidth > 0) {
+            initializeWithCanvasWidth(canvasWidth);
+        }
+    }, [canvasWidth, initializeWithCanvasWidth]);
 }
