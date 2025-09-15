@@ -73,7 +73,6 @@ models/TriggerDefinition.ts
 models/TriggerDefinitionBasic.ts
 models/TriggerType.ts
 models/UnifiedApiCategory.ts
-models/UpdateClusterElementParameter200Response.ts
 models/UpdateClusterElementParameterRequest.ts
 models/ValueProperty.ts
 models/Workflow.ts

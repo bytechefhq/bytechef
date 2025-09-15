@@ -20,6 +20,12 @@ import { mapValues } from '../runtime';
  */
 export interface DeleteClusterElementParameterRequest {
     /**
+     * If path and value type should be included in metadata 
+     * @type {boolean}
+     * @memberof DeleteClusterElementParameterRequest
+     */
+    includeInMetadata?: boolean;
+    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof DeleteClusterElementParameterRequest
@@ -45,6 +51,7 @@ export function DeleteClusterElementParameterRequestFromJSONTyped(json: any, ign
     }
     return {
         
+        'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
     };
 }
@@ -60,6 +67,7 @@ export function DeleteClusterElementParameterRequestToJSONTyped(value?: DeleteCl
 
     return {
         
+        'includeInMetadata': value['includeInMetadata'],
         'path': value['path'],
     };
 }

@@ -57,7 +57,6 @@ export * from './TriggerDefinition';
 export * from './TriggerDefinitionBasic';
 export * from './TriggerType';
 export * from './UnifiedApiCategory';
-export * from './UpdateClusterElementParameter200Response';
 export * from './UpdateClusterElementParameterRequest';
 export * from './ValueProperty';
 export * from './Workflow';
