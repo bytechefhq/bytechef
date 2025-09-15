@@ -81,20 +81,20 @@ Type: OBJECT
 | created_at | STRING | Timestamp when the ticket was created. |
 | updated_at | STRING | Timestamp of the last update to the ticket. |
 | generated_timestamp | INTEGER | UNIX timestamp when the ticket was generated. |
-| type | STRING <details> <summary> Options </summary> problem, incident, question, task </details> | Type of the ticket. |
+| type | STRING | Type of the ticket. |
 | subject | STRING | Subject line of the ticket. |
 | raw_subject | STRING | Unprocessed subject line of the ticket. |
 | description | STRING | Detailed description of the ticket issue. |
-| priority | STRING <details> <summary> Options </summary> low, normal, high, urgent </details> | Priority of the ticket. |
-| status | STRING <details> <summary> Options </summary> new, open, pending, hold, solved, closed </details> | Current status of the ticket. |
+| priority | STRING | Priority of the ticket. |
+| status | STRING | Current status of the ticket. |
 | recipient | STRING | Email address of the ticket recipient. |
 | requester_id | INTEGER | ID of the user who requested the ticket. |
 | submitter_id | INTEGER | ID of the user who submitted the ticket. |
 | assignee_id | INTEGER | ID of the agent assigned to the ticket. |
 | organization_id | INTEGER | ID of the organization associated with the requester. |
 | group_id | INTEGER | ID of the group associated with the ticket. |
-| collaborator_ids | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | List of user IDs who are collaborators on the ticket. |
-| follower_ids | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | List of user IDs following the ticket. |
+| collaborator_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of user IDs who are collaborators on the ticket. |
+| follower_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of user IDs following the ticket. |
 | email_cc_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of ticket CCs user IDs. |
 | forum_topic_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of forum ID topics. |
 | problem_id | INTEGER | ID of the problem the ticket is linked to. |
@@ -230,11 +230,11 @@ Type: OBJECT
 | external_id | INTEGER | External ID of the organization. |
 | created_at | STRING | Date when the organization was created. |
 | updated_at | STRING | Date when the organization was last updated. |
-| domain_names | ARRAY <details> <summary> Items </summary> [STRING\($domain_name)] </details> | Array of domain names of the organization. |
+| domain_names | ARRAY <details> <summary> Items </summary> [STRING] </details> | Array of domain names of the organization. |
 | detail | STRING | Details about the organization. |
 | notes | STRING | Notes about the organization. |
 | group_id | INTEGER | Group ID of the organization. |
-| tags | ARRAY <details> <summary> Items </summary> [STRING\($tag)] </details> | Tags of the organization. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the organization. |
 | organization_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom organization fields of the organization. |
 
 
@@ -310,20 +310,20 @@ Type: OBJECT
 | created_at | STRING | Timestamp when the ticket was created. |
 | updated_at | STRING | Timestamp of the last update to the ticket. |
 | generated_timestamp | INTEGER | UNIX timestamp when the ticket was generated. |
-| type | STRING <details> <summary> Options </summary> problem, incident, question, task </details> | Type of the ticket. |
+| type | STRING | Type of the ticket. |
 | subject | STRING | Subject line of the ticket. |
 | raw_subject | STRING | Unprocessed subject line of the ticket. |
 | description | STRING | Detailed description of the ticket issue. |
-| priority | STRING <details> <summary> Options </summary> low, normal, high, urgent </details> | Priority of the ticket. |
-| status | STRING <details> <summary> Options </summary> new, open, pending, hold, solved, closed </details> | Current status of the ticket. |
+| priority | STRING | Priority of the ticket. |
+| status | STRING | Current status of the ticket. |
 | recipient | STRING | Email address of the ticket recipient. |
 | requester_id | INTEGER | ID of the user who requested the ticket. |
 | submitter_id | INTEGER | ID of the user who submitted the ticket. |
 | assignee_id | INTEGER | ID of the agent assigned to the ticket. |
 | organization_id | INTEGER | ID of the organization associated with the requester. |
 | group_id | INTEGER | ID of the group associated with the ticket. |
-| collaborator_ids | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | List of user IDs who are collaborators on the ticket. |
-| follower_ids | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | List of user IDs following the ticket. |
+| collaborator_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of user IDs who are collaborators on the ticket. |
+| follower_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of user IDs following the ticket. |
 | email_cc_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of ticket CCs user IDs. |
 | forum_topic_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of forum ID topics. |
 | problem_id | INTEGER | ID of the problem the ticket is linked to. |
@@ -452,13 +452,13 @@ Type: OBJECT
 | id | STRING | Ticket ID. |
 | is_public | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket is public. |
 | organization_id | STRING | ID of the organization associated with the requester. |
-| priority | STRING <details> <summary> Options </summary> low, normal, high, urgent </details> | Priority of the ticket. |
+| priority | STRING | Priority of the ticket. |
 | requester_id | STRING | ID of the user who requested the ticket. |
-| status | STRING <details> <summary> Options </summary> new, open, pending, hold, solved, closed </details> | Current status of the ticket. |
+| status | STRING | Current status of the ticket. |
 | subject | STRING | Subject line of the ticket. |
 | submitter_id | STRING | ID of the user who submitted the ticket. |
 | tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of tags associated with the ticket. |
-| type | STRING <details> <summary> Options </summary> problem, incident, question, task </details> | Type of the ticket. |
+| type | STRING | Type of the ticket. |
 | updated_at | STRING | Timestamp of the last update to the ticket. |
 | via | OBJECT <details> <summary> Properties </summary> &#123;STRING\(channel), &#123;&#123;&#125;\(from), &#123;&#125;\(to), &#123;&#125;\(rel)&#125;\(source)&#125; </details> | Information for how the ticket was created. |
 

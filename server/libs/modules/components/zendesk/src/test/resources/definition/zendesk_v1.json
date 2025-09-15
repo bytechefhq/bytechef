@@ -269,7 +269,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Type of the ticket.",
             "displayCondition" : null,
@@ -282,23 +282,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "type",
-            "options" : [ {
-              "description" : null,
-              "label" : "Problem",
-              "value" : "problem"
-            }, {
-              "description" : null,
-              "label" : "Incident",
-              "value" : "incident"
-            }, {
-              "description" : null,
-              "label" : "Question",
-              "value" : "question"
-            }, {
-              "description" : null,
-              "label" : "Task",
-              "value" : "task"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -369,7 +353,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Priority of the ticket.",
             "displayCondition" : null,
@@ -382,23 +366,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "priority",
-            "options" : [ {
-              "description" : null,
-              "label" : "Low",
-              "value" : "low"
-            }, {
-              "description" : null,
-              "label" : "Normal",
-              "value" : "normal"
-            }, {
-              "description" : null,
-              "label" : "High",
-              "value" : "high"
-            }, {
-              "description" : null,
-              "label" : "Urgent",
-              "value" : "urgent"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -406,7 +374,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Current status of the ticket.",
             "displayCondition" : null,
@@ -419,31 +387,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "status",
-            "options" : [ {
-              "description" : null,
-              "label" : "New",
-              "value" : "new"
-            }, {
-              "description" : null,
-              "label" : "Open",
-              "value" : "open"
-            }, {
-              "description" : null,
-              "label" : "Pending",
-              "value" : "pending"
-            }, {
-              "description" : null,
-              "label" : "Hold",
-              "value" : "hold"
-            }, {
-              "description" : null,
-              "label" : "Solved",
-              "value" : "solved"
-            }, {
-              "description" : null,
-              "label" : "Closed",
-              "value" : "closed"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -578,7 +522,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs who are collaborators on the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -587,7 +531,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -618,7 +562,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs following the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -627,7 +571,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -957,7 +901,7 @@
               "type" : "INTEGER"
             }, {
               "advancedOption" : null,
-              "controlType" : "SELECT",
+              "controlType" : "TEXT",
               "defaultValue" : null,
               "description" : "Score given in the satisfaction rating.",
               "displayCondition" : null,
@@ -970,15 +914,7 @@
               "metadata" : { },
               "minLength" : null,
               "name" : "score",
-              "options" : [ {
-                "description" : null,
-                "label" : "Good",
-                "value" : "good"
-              }, {
-                "description" : null,
-                "label" : "Bad",
-                "value" : "bad"
-              } ],
+              "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
               "regex" : null,
@@ -1546,7 +1482,7 @@
           "type" : "INTEGER"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Type of the ticket.",
           "displayCondition" : null,
@@ -1559,23 +1495,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "type",
-          "options" : [ {
-            "description" : null,
-            "label" : "Problem",
-            "value" : "problem"
-          }, {
-            "description" : null,
-            "label" : "Incident",
-            "value" : "incident"
-          }, {
-            "description" : null,
-            "label" : "Question",
-            "value" : "question"
-          }, {
-            "description" : null,
-            "label" : "Task",
-            "value" : "task"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -1646,7 +1566,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Priority of the ticket.",
           "displayCondition" : null,
@@ -1659,23 +1579,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "priority",
-          "options" : [ {
-            "description" : null,
-            "label" : "Low",
-            "value" : "low"
-          }, {
-            "description" : null,
-            "label" : "Normal",
-            "value" : "normal"
-          }, {
-            "description" : null,
-            "label" : "High",
-            "value" : "high"
-          }, {
-            "description" : null,
-            "label" : "Urgent",
-            "value" : "urgent"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -1683,7 +1587,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Current status of the ticket.",
           "displayCondition" : null,
@@ -1696,31 +1600,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "status",
-          "options" : [ {
-            "description" : null,
-            "label" : "New",
-            "value" : "new"
-          }, {
-            "description" : null,
-            "label" : "Open",
-            "value" : "open"
-          }, {
-            "description" : null,
-            "label" : "Pending",
-            "value" : "pending"
-          }, {
-            "description" : null,
-            "label" : "Hold",
-            "value" : "hold"
-          }, {
-            "description" : null,
-            "label" : "Solved",
-            "value" : "solved"
-          }, {
-            "description" : null,
-            "label" : "Closed",
-            "value" : "closed"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -1855,7 +1735,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs who are collaborators on the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -1864,7 +1744,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -1895,7 +1775,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs following the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -1904,7 +1784,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -2234,7 +2114,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Score given in the satisfaction rating.",
             "displayCondition" : null,
@@ -2247,15 +2127,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "score",
-            "options" : [ {
-              "description" : null,
-              "label" : "Good",
-              "value" : "good"
-            }, {
-              "description" : null,
-              "label" : "Bad",
-              "value" : "bad"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -2832,7 +2704,7 @@
               "maxLength" : null,
               "metadata" : { },
               "minLength" : null,
-              "name" : "domain_name",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -2935,7 +2807,7 @@
               "maxLength" : null,
               "metadata" : { },
               "minLength" : null,
-              "name" : "tag",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -3193,7 +3065,7 @@
             "maxLength" : null,
             "metadata" : { },
             "minLength" : null,
-            "name" : "domain_name",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -3296,7 +3168,7 @@
             "maxLength" : null,
             "metadata" : { },
             "minLength" : null,
-            "name" : "tag",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -3721,7 +3593,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Type of the ticket.",
             "displayCondition" : null,
@@ -3734,23 +3606,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "type",
-            "options" : [ {
-              "description" : null,
-              "label" : "Problem",
-              "value" : "problem"
-            }, {
-              "description" : null,
-              "label" : "Incident",
-              "value" : "incident"
-            }, {
-              "description" : null,
-              "label" : "Question",
-              "value" : "question"
-            }, {
-              "description" : null,
-              "label" : "Task",
-              "value" : "task"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -3821,7 +3677,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Priority of the ticket.",
             "displayCondition" : null,
@@ -3834,23 +3690,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "priority",
-            "options" : [ {
-              "description" : null,
-              "label" : "Low",
-              "value" : "low"
-            }, {
-              "description" : null,
-              "label" : "Normal",
-              "value" : "normal"
-            }, {
-              "description" : null,
-              "label" : "High",
-              "value" : "high"
-            }, {
-              "description" : null,
-              "label" : "Urgent",
-              "value" : "urgent"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -3858,7 +3698,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Current status of the ticket.",
             "displayCondition" : null,
@@ -3871,31 +3711,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "status",
-            "options" : [ {
-              "description" : null,
-              "label" : "New",
-              "value" : "new"
-            }, {
-              "description" : null,
-              "label" : "Open",
-              "value" : "open"
-            }, {
-              "description" : null,
-              "label" : "Pending",
-              "value" : "pending"
-            }, {
-              "description" : null,
-              "label" : "Hold",
-              "value" : "hold"
-            }, {
-              "description" : null,
-              "label" : "Solved",
-              "value" : "solved"
-            }, {
-              "description" : null,
-              "label" : "Closed",
-              "value" : "closed"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -4030,7 +3846,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs who are collaborators on the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -4039,7 +3855,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -4070,7 +3886,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs following the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -4079,7 +3895,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -4409,7 +4225,7 @@
               "type" : "INTEGER"
             }, {
               "advancedOption" : null,
-              "controlType" : "SELECT",
+              "controlType" : "TEXT",
               "defaultValue" : null,
               "description" : "Score given in the satisfaction rating.",
               "displayCondition" : null,
@@ -4422,15 +4238,7 @@
               "metadata" : { },
               "minLength" : null,
               "name" : "score",
-              "options" : [ {
-                "description" : null,
-                "label" : "Good",
-                "value" : "good"
-              }, {
-                "description" : null,
-                "label" : "Bad",
-                "value" : "bad"
-              } ],
+              "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
               "regex" : null,
@@ -4998,7 +4806,7 @@
           "type" : "INTEGER"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Type of the ticket.",
           "displayCondition" : null,
@@ -5011,23 +4819,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "type",
-          "options" : [ {
-            "description" : null,
-            "label" : "Problem",
-            "value" : "problem"
-          }, {
-            "description" : null,
-            "label" : "Incident",
-            "value" : "incident"
-          }, {
-            "description" : null,
-            "label" : "Question",
-            "value" : "question"
-          }, {
-            "description" : null,
-            "label" : "Task",
-            "value" : "task"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -5098,7 +4890,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Priority of the ticket.",
           "displayCondition" : null,
@@ -5111,23 +4903,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "priority",
-          "options" : [ {
-            "description" : null,
-            "label" : "Low",
-            "value" : "low"
-          }, {
-            "description" : null,
-            "label" : "Normal",
-            "value" : "normal"
-          }, {
-            "description" : null,
-            "label" : "High",
-            "value" : "high"
-          }, {
-            "description" : null,
-            "label" : "Urgent",
-            "value" : "urgent"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -5135,7 +4911,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Current status of the ticket.",
           "displayCondition" : null,
@@ -5148,31 +4924,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "status",
-          "options" : [ {
-            "description" : null,
-            "label" : "New",
-            "value" : "new"
-          }, {
-            "description" : null,
-            "label" : "Open",
-            "value" : "open"
-          }, {
-            "description" : null,
-            "label" : "Pending",
-            "value" : "pending"
-          }, {
-            "description" : null,
-            "label" : "Hold",
-            "value" : "hold"
-          }, {
-            "description" : null,
-            "label" : "Solved",
-            "value" : "solved"
-          }, {
-            "description" : null,
-            "label" : "Closed",
-            "value" : "closed"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -5307,7 +5059,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs who are collaborators on the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -5316,7 +5068,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -5347,7 +5099,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs following the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -5356,7 +5108,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -5686,7 +5438,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Score given in the satisfaction rating.",
             "displayCondition" : null,
@@ -5699,15 +5451,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "score",
-            "options" : [ {
-              "description" : null,
-              "label" : "Good",
-              "value" : "good"
-            }, {
-              "description" : null,
-              "label" : "Bad",
-              "value" : "bad"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -6449,7 +6193,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Type of the ticket.",
             "displayCondition" : null,
@@ -6462,23 +6206,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "type",
-            "options" : [ {
-              "description" : null,
-              "label" : "Problem",
-              "value" : "problem"
-            }, {
-              "description" : null,
-              "label" : "Incident",
-              "value" : "incident"
-            }, {
-              "description" : null,
-              "label" : "Question",
-              "value" : "question"
-            }, {
-              "description" : null,
-              "label" : "Task",
-              "value" : "task"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -6549,7 +6277,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Priority of the ticket.",
             "displayCondition" : null,
@@ -6562,23 +6290,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "priority",
-            "options" : [ {
-              "description" : null,
-              "label" : "Low",
-              "value" : "low"
-            }, {
-              "description" : null,
-              "label" : "Normal",
-              "value" : "normal"
-            }, {
-              "description" : null,
-              "label" : "High",
-              "value" : "high"
-            }, {
-              "description" : null,
-              "label" : "Urgent",
-              "value" : "urgent"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -6586,7 +6298,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Current status of the ticket.",
             "displayCondition" : null,
@@ -6599,31 +6311,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "status",
-            "options" : [ {
-              "description" : null,
-              "label" : "New",
-              "value" : "new"
-            }, {
-              "description" : null,
-              "label" : "Open",
-              "value" : "open"
-            }, {
-              "description" : null,
-              "label" : "Pending",
-              "value" : "pending"
-            }, {
-              "description" : null,
-              "label" : "Hold",
-              "value" : "hold"
-            }, {
-              "description" : null,
-              "label" : "Solved",
-              "value" : "solved"
-            }, {
-              "description" : null,
-              "label" : "Closed",
-              "value" : "closed"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -6758,7 +6446,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs who are collaborators on the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -6767,7 +6455,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -6798,7 +6486,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs following the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -6807,7 +6495,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -7137,7 +6825,7 @@
               "type" : "INTEGER"
             }, {
               "advancedOption" : null,
-              "controlType" : "SELECT",
+              "controlType" : "TEXT",
               "defaultValue" : null,
               "description" : "Score given in the satisfaction rating.",
               "displayCondition" : null,
@@ -7150,15 +6838,7 @@
               "metadata" : { },
               "minLength" : null,
               "name" : "score",
-              "options" : [ {
-                "description" : null,
-                "label" : "Good",
-                "value" : "good"
-              }, {
-                "description" : null,
-                "label" : "Bad",
-                "value" : "bad"
-              } ],
+              "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
               "regex" : null,
@@ -7726,7 +7406,7 @@
           "type" : "INTEGER"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Type of the ticket.",
           "displayCondition" : null,
@@ -7739,23 +7419,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "type",
-          "options" : [ {
-            "description" : null,
-            "label" : "Problem",
-            "value" : "problem"
-          }, {
-            "description" : null,
-            "label" : "Incident",
-            "value" : "incident"
-          }, {
-            "description" : null,
-            "label" : "Question",
-            "value" : "question"
-          }, {
-            "description" : null,
-            "label" : "Task",
-            "value" : "task"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -7826,7 +7490,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Priority of the ticket.",
           "displayCondition" : null,
@@ -7839,23 +7503,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "priority",
-          "options" : [ {
-            "description" : null,
-            "label" : "Low",
-            "value" : "low"
-          }, {
-            "description" : null,
-            "label" : "Normal",
-            "value" : "normal"
-          }, {
-            "description" : null,
-            "label" : "High",
-            "value" : "high"
-          }, {
-            "description" : null,
-            "label" : "Urgent",
-            "value" : "urgent"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -7863,7 +7511,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Current status of the ticket.",
           "displayCondition" : null,
@@ -7876,31 +7524,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "status",
-          "options" : [ {
-            "description" : null,
-            "label" : "New",
-            "value" : "new"
-          }, {
-            "description" : null,
-            "label" : "Open",
-            "value" : "open"
-          }, {
-            "description" : null,
-            "label" : "Pending",
-            "value" : "pending"
-          }, {
-            "description" : null,
-            "label" : "Hold",
-            "value" : "hold"
-          }, {
-            "description" : null,
-            "label" : "Solved",
-            "value" : "solved"
-          }, {
-            "description" : null,
-            "label" : "Closed",
-            "value" : "closed"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -8035,7 +7659,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs who are collaborators on the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -8044,7 +7668,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -8075,7 +7699,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs following the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -8084,7 +7708,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -8414,7 +8038,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Score given in the satisfaction rating.",
             "displayCondition" : null,
@@ -8427,15 +8051,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "score",
-            "options" : [ {
-              "description" : null,
-              "label" : "Good",
-              "value" : "good"
-            }, {
-              "description" : null,
-              "label" : "Bad",
-              "value" : "bad"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -9014,7 +8630,7 @@
               "maxLength" : null,
               "metadata" : { },
               "minLength" : null,
-              "name" : "domain_name",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -9117,7 +8733,7 @@
               "maxLength" : null,
               "metadata" : { },
               "minLength" : null,
-              "name" : "tag",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -9375,7 +8991,7 @@
             "maxLength" : null,
             "metadata" : { },
             "minLength" : null,
-            "name" : "domain_name",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -9478,7 +9094,7 @@
             "maxLength" : null,
             "metadata" : { },
             "minLength" : null,
-            "name" : "tag",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -9905,7 +9521,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Type of the ticket.",
             "displayCondition" : null,
@@ -9918,23 +9534,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "type",
-            "options" : [ {
-              "description" : null,
-              "label" : "Problem",
-              "value" : "problem"
-            }, {
-              "description" : null,
-              "label" : "Incident",
-              "value" : "incident"
-            }, {
-              "description" : null,
-              "label" : "Question",
-              "value" : "question"
-            }, {
-              "description" : null,
-              "label" : "Task",
-              "value" : "task"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -10005,7 +9605,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Priority of the ticket.",
             "displayCondition" : null,
@@ -10018,23 +9618,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "priority",
-            "options" : [ {
-              "description" : null,
-              "label" : "Low",
-              "value" : "low"
-            }, {
-              "description" : null,
-              "label" : "Normal",
-              "value" : "normal"
-            }, {
-              "description" : null,
-              "label" : "High",
-              "value" : "high"
-            }, {
-              "description" : null,
-              "label" : "Urgent",
-              "value" : "urgent"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -10042,7 +9626,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Current status of the ticket.",
             "displayCondition" : null,
@@ -10055,31 +9639,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "status",
-            "options" : [ {
-              "description" : null,
-              "label" : "New",
-              "value" : "new"
-            }, {
-              "description" : null,
-              "label" : "Open",
-              "value" : "open"
-            }, {
-              "description" : null,
-              "label" : "Pending",
-              "value" : "pending"
-            }, {
-              "description" : null,
-              "label" : "Hold",
-              "value" : "hold"
-            }, {
-              "description" : null,
-              "label" : "Solved",
-              "value" : "solved"
-            }, {
-              "description" : null,
-              "label" : "Closed",
-              "value" : "closed"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -10214,7 +9774,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs who are collaborators on the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -10223,7 +9783,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -10254,7 +9814,7 @@
               "advancedOption" : null,
               "controlType" : "INTEGER",
               "defaultValue" : null,
-              "description" : "List of user IDs following the ticket.",
+              "description" : null,
               "displayCondition" : null,
               "exampleValue" : null,
               "expressionEnabled" : null,
@@ -10263,7 +9823,7 @@
               "maxValue" : null,
               "metadata" : { },
               "minValue" : null,
-              "name" : "id",
+              "name" : null,
               "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
@@ -10593,7 +10153,7 @@
               "type" : "INTEGER"
             }, {
               "advancedOption" : null,
-              "controlType" : "SELECT",
+              "controlType" : "TEXT",
               "defaultValue" : null,
               "description" : "Score given in the satisfaction rating.",
               "displayCondition" : null,
@@ -10606,15 +10166,7 @@
               "metadata" : { },
               "minLength" : null,
               "name" : "score",
-              "options" : [ {
-                "description" : null,
-                "label" : "Good",
-                "value" : "good"
-              }, {
-                "description" : null,
-                "label" : "Bad",
-                "value" : "bad"
-              } ],
+              "options" : null,
               "optionsDataSource" : null,
               "placeholder" : null,
               "regex" : null,
@@ -11182,7 +10734,7 @@
           "type" : "INTEGER"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Type of the ticket.",
           "displayCondition" : null,
@@ -11195,23 +10747,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "type",
-          "options" : [ {
-            "description" : null,
-            "label" : "Problem",
-            "value" : "problem"
-          }, {
-            "description" : null,
-            "label" : "Incident",
-            "value" : "incident"
-          }, {
-            "description" : null,
-            "label" : "Question",
-            "value" : "question"
-          }, {
-            "description" : null,
-            "label" : "Task",
-            "value" : "task"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -11282,7 +10818,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Priority of the ticket.",
           "displayCondition" : null,
@@ -11295,23 +10831,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "priority",
-          "options" : [ {
-            "description" : null,
-            "label" : "Low",
-            "value" : "low"
-          }, {
-            "description" : null,
-            "label" : "Normal",
-            "value" : "normal"
-          }, {
-            "description" : null,
-            "label" : "High",
-            "value" : "high"
-          }, {
-            "description" : null,
-            "label" : "Urgent",
-            "value" : "urgent"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -11319,7 +10839,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Current status of the ticket.",
           "displayCondition" : null,
@@ -11332,31 +10852,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "status",
-          "options" : [ {
-            "description" : null,
-            "label" : "New",
-            "value" : "new"
-          }, {
-            "description" : null,
-            "label" : "Open",
-            "value" : "open"
-          }, {
-            "description" : null,
-            "label" : "Pending",
-            "value" : "pending"
-          }, {
-            "description" : null,
-            "label" : "Hold",
-            "value" : "hold"
-          }, {
-            "description" : null,
-            "label" : "Solved",
-            "value" : "solved"
-          }, {
-            "description" : null,
-            "label" : "Closed",
-            "value" : "closed"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -11491,7 +10987,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs who are collaborators on the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -11500,7 +10996,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -11531,7 +11027,7 @@
             "advancedOption" : null,
             "controlType" : "INTEGER",
             "defaultValue" : null,
-            "description" : "List of user IDs following the ticket.",
+            "description" : null,
             "displayCondition" : null,
             "exampleValue" : null,
             "expressionEnabled" : null,
@@ -11540,7 +11036,7 @@
             "maxValue" : null,
             "metadata" : { },
             "minValue" : null,
-            "name" : "id",
+            "name" : null,
             "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
@@ -11870,7 +11366,7 @@
             "type" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Score given in the satisfaction rating.",
             "displayCondition" : null,
@@ -11883,15 +11379,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "score",
-            "options" : [ {
-              "description" : null,
-              "label" : "Good",
-              "value" : "good"
-            }, {
-              "description" : null,
-              "label" : "Bad",
-              "value" : "bad"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -12759,7 +12247,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Priority of the ticket.",
             "displayCondition" : null,
@@ -12772,23 +12260,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "priority",
-            "options" : [ {
-              "description" : null,
-              "label" : "Low",
-              "value" : "low"
-            }, {
-              "description" : null,
-              "label" : "Normal",
-              "value" : "normal"
-            }, {
-              "description" : null,
-              "label" : "High",
-              "value" : "high"
-            }, {
-              "description" : null,
-              "label" : "Urgent",
-              "value" : "urgent"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -12817,7 +12289,7 @@
             "type" : "STRING"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Current status of the ticket.",
             "displayCondition" : null,
@@ -12830,31 +12302,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "status",
-            "options" : [ {
-              "description" : null,
-              "label" : "New",
-              "value" : "new"
-            }, {
-              "description" : null,
-              "label" : "Open",
-              "value" : "open"
-            }, {
-              "description" : null,
-              "label" : "Pending",
-              "value" : "pending"
-            }, {
-              "description" : null,
-              "label" : "Hold",
-              "value" : "hold"
-            }, {
-              "description" : null,
-              "label" : "Solved",
-              "value" : "solved"
-            }, {
-              "description" : null,
-              "label" : "Closed",
-              "value" : "closed"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -12946,7 +12394,7 @@
             "type" : "ARRAY"
           }, {
             "advancedOption" : null,
-            "controlType" : "SELECT",
+            "controlType" : "TEXT",
             "defaultValue" : null,
             "description" : "Type of the ticket.",
             "displayCondition" : null,
@@ -12959,23 +12407,7 @@
             "metadata" : { },
             "minLength" : null,
             "name" : "type",
-            "options" : [ {
-              "description" : null,
-              "label" : "Problem",
-              "value" : "problem"
-            }, {
-              "description" : null,
-              "label" : "Incident",
-              "value" : "incident"
-            }, {
-              "description" : null,
-              "label" : "Question",
-              "value" : "question"
-            }, {
-              "description" : null,
-              "label" : "Task",
-              "value" : "task"
-            } ],
+            "options" : null,
             "optionsDataSource" : null,
             "placeholder" : null,
             "regex" : null,
@@ -13402,7 +12834,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Priority of the ticket.",
           "displayCondition" : null,
@@ -13415,23 +12847,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "priority",
-          "options" : [ {
-            "description" : null,
-            "label" : "Low",
-            "value" : "low"
-          }, {
-            "description" : null,
-            "label" : "Normal",
-            "value" : "normal"
-          }, {
-            "description" : null,
-            "label" : "High",
-            "value" : "high"
-          }, {
-            "description" : null,
-            "label" : "Urgent",
-            "value" : "urgent"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -13460,7 +12876,7 @@
           "type" : "STRING"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Current status of the ticket.",
           "displayCondition" : null,
@@ -13473,31 +12889,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "status",
-          "options" : [ {
-            "description" : null,
-            "label" : "New",
-            "value" : "new"
-          }, {
-            "description" : null,
-            "label" : "Open",
-            "value" : "open"
-          }, {
-            "description" : null,
-            "label" : "Pending",
-            "value" : "pending"
-          }, {
-            "description" : null,
-            "label" : "Hold",
-            "value" : "hold"
-          }, {
-            "description" : null,
-            "label" : "Solved",
-            "value" : "solved"
-          }, {
-            "description" : null,
-            "label" : "Closed",
-            "value" : "closed"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
@@ -13589,7 +12981,7 @@
           "type" : "ARRAY"
         }, {
           "advancedOption" : null,
-          "controlType" : "SELECT",
+          "controlType" : "TEXT",
           "defaultValue" : null,
           "description" : "Type of the ticket.",
           "displayCondition" : null,
@@ -13602,23 +12994,7 @@
           "metadata" : { },
           "minLength" : null,
           "name" : "type",
-          "options" : [ {
-            "description" : null,
-            "label" : "Problem",
-            "value" : "problem"
-          }, {
-            "description" : null,
-            "label" : "Incident",
-            "value" : "incident"
-          }, {
-            "description" : null,
-            "label" : "Question",
-            "value" : "question"
-          }, {
-            "description" : null,
-            "label" : "Task",
-            "value" : "task"
-          } ],
+          "options" : null,
           "optionsDataSource" : null,
           "placeholder" : null,
           "regex" : null,
