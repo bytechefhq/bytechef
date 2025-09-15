@@ -64,8 +64,8 @@ public class ZendeskCommentTicketAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Map<String, Map<String, Object>> response = context.http(
-            http -> http.put("/tickets/%s".formatted(inputParameters.getRequiredInteger(TICKET_ID))))
+        Map<String, Map<String, Object>> response = context
+            .http(http -> http.put("/tickets/%s".formatted(inputParameters.getRequiredInteger(TICKET_ID))))
             .body(Body.of(TICKET, Map.of(COMMENT, Map.of(BODY, inputParameters.getRequiredString(COMMENT)))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
