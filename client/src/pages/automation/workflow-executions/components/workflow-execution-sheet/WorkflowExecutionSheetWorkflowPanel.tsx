@@ -3,6 +3,7 @@ import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
@@ -10,7 +11,7 @@ import {useEffect, useRef, useState} from 'react';
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
     const {project, projectDeployment, workflow} = workflowExecution;
-    const [canvasWidth, setCanvasWidth] = useState(670);
+    const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_WIDTH);
 
     const rootDivRef = useRef<HTMLDivElement>(null);
 

@@ -29,7 +29,7 @@ import {
     ParallelChildTasksType,
 } from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
-import {ComponentIcon} from 'lucide-react';
+import {ComponentIcon, PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
@@ -808,3 +808,37 @@ export function getTaskAncestry({
 
     return {isNested, nestingData};
 }
+
+export const createDefaultNodes = (canvasWidth: number): Node[] => [
+    {
+        data: {
+            componentName: 'manual',
+            icon: <PlayIcon className="size-9 text-gray-700" />,
+            id: 'manual',
+            label: 'Manual',
+            name: 'manual',
+            operationName: 'manual',
+            trigger: true,
+            type: 'manual/v1/manual',
+            workflowNodeName: 'trigger_1',
+        },
+        id: 'trigger_1',
+        position: {x: canvasWidth / 2 - 36, y: 50},
+        type: 'workflow',
+    },
+    {
+        data: {label: '+'},
+        id: FINAL_PLACEHOLDER_NODE_ID,
+        position: {x: canvasWidth / 2 - 36, y: 150},
+        type: 'placeholder',
+    },
+];
+
+export const createDefaultEdges = (): Edge[] => [
+    {
+        id: `trigger_1=>${FINAL_PLACEHOLDER_NODE_ID}`,
+        source: 'trigger_1',
+        target: FINAL_PLACEHOLDER_NODE_ID,
+        type: 'placeholder',
+    },
+];

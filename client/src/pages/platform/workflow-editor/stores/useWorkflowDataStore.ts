@@ -1,18 +1,17 @@
-import defaultEdges from '@/shared/defaultEdges';
-import defaultNodes from '@/shared/defaultNodes';
-
 /* eslint-disable sort-keys */
+import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType, WorkflowNodeType} from '@/shared/types';
 import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+import {createDefaultEdges, createDefaultNodes} from '../utils/layoutUtils';
+
 export type WorkflowDataType = {
     actionNames?: Array<string>;
     nodeNames: Array<string>;
 };
-
 interface WorkflowDataStateI {
     workflowNodes: Array<WorkflowNodeType>;
 
@@ -34,6 +33,7 @@ interface WorkflowDataStateI {
     onNodesChange: OnNodesChange;
 
     reset: () => void;
+    initializeWithCanvasWidth: (canvasWidth: number) => void;
 
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinition>) => void;
@@ -53,7 +53,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
 
-            edges: defaultEdges,
+            edges: createDefaultEdges(),
             setEdges: (edges) => {
                 set({edges});
             },
@@ -67,7 +67,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             setLatestComponentDefinition: (latestComponentDefinition) =>
                 set((state) => ({...state, latestComponentDefinition})),
 
-            nodes: defaultNodes,
+            nodes: createDefaultNodes(DEFAULT_CANVAS_WIDTH),
             setNodes: (nodes) => {
                 set({nodes});
             },
@@ -81,10 +81,17 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 set(() => ({
                     workflowNodes: [],
                     dataPills: [],
+                    edges: createDefaultEdges(),
+                    nodes: createDefaultNodes(DEFAULT_CANVAS_WIDTH),
                     workflow: {
                         actionNames: [],
                         nodeNames: ['trigger_1'],
                     },
+                })),
+
+            initializeWithCanvasWidth: (canvasWidth: number) =>
+                set(() => ({
+                    nodes: createDefaultNodes(canvasWidth),
                 })),
 
             taskDispatcherDefinitions: [],
@@ -97,7 +104,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             setWorkflow: (workflow) =>
                 set((state) => {
                     const workflowNodes: Array<{name: string; type: string}> = [
-                        workflow.triggers?.[0] || (defaultNodes[0].data as {name: string; type: string}),
+                        workflow.triggers?.[0] || (createDefaultNodes(1200)[0].data as {name: string; type: string}),
                         ...(workflow?.tasks || []),
                     ];
 
