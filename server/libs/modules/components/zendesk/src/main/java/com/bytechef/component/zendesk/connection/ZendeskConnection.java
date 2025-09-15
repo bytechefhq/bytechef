@@ -44,8 +44,8 @@ public class ZendeskConnection {
                     string(API_TOKEN)
                         .label("API Token")
                         .description(
-                            "API tokens are managed in the Admin Center interface at Apps and integrations > APIs" +
-                                " > API Tokens.")
+                            "API tokens are managed in the Admin Center interface at Apps and integrations > APIs > " +
+                                "API Tokens.")
                         .required(true),
                     string(EMAIL)
                         .label("Email")
@@ -60,11 +60,10 @@ public class ZendeskConnection {
                         connectionParameters.getRequiredString(EMAIL),
                         connectionParameters.getRequiredString(API_TOKEN));
 
-                    String base64EncodedToken = context.encoder(encoder -> encoder.base64EncodeToString(
-                        token.getBytes(StandardCharsets.UTF_8)));
+                    String base64EncodedToken = context.encoder(
+                        encoder -> encoder.base64EncodeToString(token.getBytes(StandardCharsets.UTF_8)));
 
-                    return ApplyResponse.ofHeaders(
-                        Map.of("Authorization", List.of("Basic " + base64EncodedToken)));
+                    return ApplyResponse.ofHeaders(Map.of("Authorization", List.of("Basic " + base64EncodedToken)));
                 }));
 
     private ZendeskConnection() {

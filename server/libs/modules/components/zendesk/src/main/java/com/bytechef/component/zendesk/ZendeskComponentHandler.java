@@ -38,8 +38,8 @@ public class ZendeskComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("zendesk")
         .title("Zendesk")
         .description(
-            "Zendesk is a customer service and sales platform that helps businesses manage customer interactions" +
-                " across various channels.")
+            "Zendesk is a customer service and sales platform that helps businesses manage customer interactions " +
+                "across various channels.")
         .icon("path:assets/zendesk.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(ZendeskConnection.CONNECTION_DEFINITION)

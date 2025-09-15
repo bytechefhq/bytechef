@@ -30,7 +30,6 @@ import static com.bytechef.component.zendesk.constant.ZendeskConstants.SUBJECT;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET_OBJECT_PROPERTY;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TYPE;
-import static com.bytechef.component.zendesk.util.ZendeskUtils.checkIfNull;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -43,6 +42,7 @@ import java.util.Map;
  * @author Nikolina Spehar
  */
 public class ZendeskCreateTicketAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTicket")
         .title("Create Ticket")
         .description("Creates a ticket.")
@@ -96,12 +96,14 @@ public class ZendeskCreateTicketAction {
         Map<String, Map<String, Object>> response = context.http(http -> http.post("/tickets"))
             .body(
                 Body.of(
-                    TICKET, Map.of(
+                    TICKET,
+                    new Object[] {
                         COMMENT, Map.of(BODY, inputParameters.getRequiredString(COMMENT)),
-                        PRIORITY, checkIfNull(inputParameters.getString(PRIORITY)),
-                        SUBJECT, checkIfNull(inputParameters.getString(SUBJECT)),
-                        TYPE, checkIfNull(inputParameters.getString(TYPE)),
-                        STATUS, checkIfNull(inputParameters.getString(STATUS)))))
+                        PRIORITY, inputParameters.getString(PRIORITY),
+                        SUBJECT, inputParameters.getString(SUBJECT),
+                        TYPE, inputParameters.getString(TYPE),
+                        STATUS, inputParameters.getString(STATUS)
+                    }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

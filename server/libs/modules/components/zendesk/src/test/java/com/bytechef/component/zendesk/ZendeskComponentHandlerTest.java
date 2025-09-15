@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Nikolina Spehar
  */
 public class ZendeskComponentHandlerTest {
+
     @Test
     public void testGetDefinition() {
         JsonFileAssert.assertEquals("definition/zendesk_v1.json", new ZendeskComponentHandler().getDefinition());
