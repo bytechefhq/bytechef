@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("warnings_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-12T06:20:36.565175+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-15T08:33:41.153486+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class WarningsInnerModel {
 
   private @Nullable String detail;
