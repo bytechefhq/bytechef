@@ -675,6 +675,26 @@ public interface Context {
                     ", mimeType='" + mimeType + '\'' +
                     '}';
             }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+
+                if (!(o instanceof Body that)) {
+                    return false;
+                }
+
+                return Objects.equals(content, that.content)
+                    && Objects.equals(contentType, that.contentType)
+                    && Objects.equals(mimeType, that.mimeType);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(content, contentType, mimeType);
+            }
         }
 
         class Configuration {
@@ -763,6 +783,33 @@ public interface Context {
                 private boolean disableAuthorization;
 
                 private ConfigurationBuilder() {
+                }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+
+                    if (!(o instanceof ConfigurationBuilder that)) {
+                        return false;
+                    }
+
+                    return Objects.equals(allowUnauthorizedCerts, that.allowUnauthorizedCerts) &&
+                        Objects.equals(followAllRedirects, that.followAllRedirects) &&
+                        Objects.equals(followRedirect, that.followRedirect) &&
+                        Objects.equals(disableAuthorization, that.disableAuthorization) &&
+                        Objects.equals(filename, that.filename) &&
+                        Objects.equals(proxy, that.proxy) &&
+                        Objects.equals(responseType, that.responseType) &&
+                        Objects.equals(timeout, that.timeout);
+                }
+
+                @Override
+                public int hashCode() {
+                    return Objects.hash(
+                        allowUnauthorizedCerts, filename, followAllRedirects, followRedirect, proxy, responseType,
+                        timeout, disableAuthorization);
                 }
 
                 public ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
