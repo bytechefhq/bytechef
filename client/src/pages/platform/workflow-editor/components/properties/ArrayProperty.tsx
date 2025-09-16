@@ -291,34 +291,36 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 };
 
                 if (parameterItemType === 'OBJECT') {
-                    const customSubProperties = Object.keys(parameterItemValue).map((key) => {
-                        const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
+                    if (parameterItemValue) {
+                        const customSubProperties = Object.keys(parameterItemValue).map((key) => {
+                            const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                        let subPropertyParameterItemType =
-                            currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${key}`];
+                            let subPropertyParameterItemType =
+                                currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${key}`];
 
-                        if (!subPropertyParameterItemType) {
-                            subPropertyParameterItemType = getParameterItemType(subPropertyParameterValue);
-                        }
+                            if (!subPropertyParameterItemType) {
+                                subPropertyParameterItemType = getParameterItemType(subPropertyParameterValue);
+                            }
+
+                            return {
+                                controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                                    subPropertyParameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                                ] as ControlType,
+                                custom: true,
+                                defaultValue: subPropertyParameterValue,
+                                expressionEnabled: true,
+                                label: key,
+                                name: key,
+                                path: `${subPropertyPath}.${key}`,
+                                type: subPropertyParameterItemType as PropertyType,
+                            };
+                        });
 
                         return {
-                            controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                                subPropertyParameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                            ] as ControlType,
-                            custom: true,
-                            defaultValue: subPropertyParameterValue,
-                            expressionEnabled: true,
-                            label: key,
-                            name: key,
-                            path: `${subPropertyPath}.${key}`,
-                            type: subPropertyParameterItemType as PropertyType,
+                            ...newSubProperty,
+                            properties: customSubProperties,
                         };
-                    });
-
-                    return {
-                        ...newSubProperty,
-                        properties: customSubProperties,
-                    };
+                    }
                 }
 
                 if (parameterItemType === 'BOOLEAN') {
