@@ -31,7 +31,7 @@ public class HttpClientHeadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("head")
         .title("HEAD")
-        .description("The request method to use.")
+        .description("The HEAD method asks for a response identical to a GET request, but without a response body.")
         .properties(HttpClientActionUtils.toArray(
             HttpClientConstants.COMMON_PROPERTIES,
             HttpClientActionUtils.options(false)))

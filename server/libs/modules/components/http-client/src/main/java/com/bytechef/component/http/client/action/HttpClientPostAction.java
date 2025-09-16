@@ -31,7 +31,8 @@ public class HttpClientPostAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("post")
         .title("POST")
-        .description("The request method to use.")
+        .description(
+            "The POST method submits an entity to the specified resource, often causing a change in state or side effects on the server.")
         .properties(
             HttpClientActionUtils.toArray(
                 HttpClientConstants.COMMON_PROPERTIES,
