@@ -116,7 +116,7 @@ Version: 1
 ### GET
 Name: get
 
-`The request method to use.`
+`Use GET method to retrieve information about the specified resource.`
 
 #### Properties
 
@@ -125,6 +125,7 @@ Name: get
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -144,6 +145,7 @@ Name: get
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
@@ -168,7 +170,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### POST
 Name: post
 
-`The request method to use.`
+`The POST method submits an entity to the specified resource, often causing a change in state or side effects on the server.`
 
 #### Properties
 
@@ -177,6 +179,7 @@ Name: post
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -197,6 +200,7 @@ Name: post
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
@@ -231,7 +235,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### PUT
 Name: put
 
-`The request method to use.`
+`The PUT method replaces all current representations of the target resource with the request content.`
 
 #### Properties
 
@@ -240,6 +244,7 @@ Name: put
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -260,6 +265,7 @@ Name: put
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
@@ -294,7 +300,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### PATCH
 Name: patch
 
-`The request method to use.`
+`The PATCH method applies partial modifications to a resource.`
 
 #### Properties
 
@@ -303,6 +309,7 @@ Name: patch
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -323,6 +330,7 @@ Name: patch
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
@@ -357,7 +365,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### DELETE
 Name: delete
 
-`The request method to use.`
+`The DELETE method deletes the specified resource.`
 
 #### Properties
 
@@ -366,6 +374,7 @@ Name: delete
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -385,6 +394,7 @@ Name: delete
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
@@ -409,7 +419,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### HEAD
 Name: head
 
-`The request method to use.`
+`The HEAD method asks for a response identical to a GET request, but without a response body.`
 
 #### Properties
 
@@ -418,6 +428,7 @@ Name: head
 | uri | URI | STRING | The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it. | true |
 | allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN <details> <summary> Options </summary> true, false </details> | Download the response even if SSL certificate validation is not possible. | false |
 | responseType | Response Format | STRING <details> <summary> Options </summary> JSON, XML, TEXT, BINARY </details> | The format in which the data gets returned from the URL. | false |
+| responseContentType | Content Type | STRING |  | true |
 | responseFilename | Response Filename | STRING | The name of the file if the response is returned as a file object. | false |
 | headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Headers to send. | false |
 | queryParameters | Query Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Query parameters to send. | false |
@@ -437,6 +448,7 @@ Name: head
     "uri" : "",
     "allowUnauthorizedCerts" : false,
     "responseType" : "",
+    "responseContentType" : "",
     "responseFilename" : "",
     "headers" : { },
     "queryParameters" : { },
