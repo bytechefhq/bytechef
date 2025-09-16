@@ -184,11 +184,11 @@ export const getLayoutedElements = async ({
         canvasWidth: number,
         mainRootDagreNode: {x: number; width: number; y: number}
     ) => {
-        const rootOffsetX =
-            graphWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2 - mainRootDagreNode.x - mainRootDagreNode.width / 2;
         const canvasCenterX = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM / 2;
-
         const graphCenterX = graphWidth / 2;
+        const mainRootCenterX = mainRootDagreNode.x + mainRootDagreNode.width / 2;
+
+        const rootOffsetX = graphCenterX - mainRootCenterX;
         const canvasOffsetX = canvasCenterX - graphCenterX;
 
         return {canvasOffsetX, rootOffsetX};
