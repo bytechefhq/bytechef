@@ -56,7 +56,7 @@ const WorkflowDialog = ({
             label: workflow?.label || '',
         } as Workflow,
     });
-    const labelRef = useRef<HTMLInputElement>(null);
+    const labelInputRef = useRef<HTMLInputElement>(null);
 
     const {control, getValues, handleSubmit, reset} = form;
 
@@ -157,7 +157,7 @@ const WorkflowDialog = ({
                 onInteractOutside={(event) => event.preventDefault()}
                 onOpenAutoFocus={(e) => {
                     e.preventDefault();
-                    labelRef.current?.focus();
+                    labelInputRef.current?.focus();
                 }}
             >
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
@@ -190,7 +190,7 @@ const WorkflowDialog = ({
                                                 handleSubmit(saveWorkflow)();
                                             }
                                         }}
-                                        ref={labelRef}
+                                        ref={labelInputRef}
                                     />
                                 </FormControl>
 
