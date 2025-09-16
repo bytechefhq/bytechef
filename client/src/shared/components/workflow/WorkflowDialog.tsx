@@ -18,7 +18,7 @@ import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationW
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface WorkflowDialogProps {
@@ -133,6 +133,12 @@ const WorkflowDialog = ({
         closeDialog();
     }
 
+    const handleOnKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            saveWorkflow();
+        }
+    };
+
     useEffect(() => {
         reset({
             description: workflow?.description || '',
@@ -183,15 +189,7 @@ const WorkflowDialog = ({
                                 <FormLabel>Label</FormLabel>
 
                                 <FormControl>
-                                    <Input
-                                        {...field}
-                                        onKeyDown={(event) => {
-                                            if (event.key === 'Enter') {
-                                                handleSubmit(saveWorkflow)();
-                                            }
-                                        }}
-                                        ref={labelInputRef}
-                                    />
+                                    <Input {...field} onKeyDown={handleOnKeyDown} ref={labelInputRef} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -211,11 +209,7 @@ const WorkflowDialog = ({
                                     <Textarea
                                         placeholder="Cute description of your project deployment"
                                         {...field}
-                                        onKeyDown={(event) => {
-                                            if (event.key === 'Enter' && event.shiftKey === false) {
-                                                handleSubmit(saveWorkflow)();
-                                            }
-                                        }}
+                                        onKeyDown={handleOnKeyDown}
                                     />
                                 </FormControl>
 
