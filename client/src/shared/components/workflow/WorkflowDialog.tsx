@@ -161,8 +161,8 @@ const WorkflowDialog = ({
 
             <DialogContent
                 onInteractOutside={(event) => event.preventDefault()}
-                onOpenAutoFocus={(e) => {
-                    e.preventDefault();
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
                     labelInputRef.current?.focus();
                 }}
             >
