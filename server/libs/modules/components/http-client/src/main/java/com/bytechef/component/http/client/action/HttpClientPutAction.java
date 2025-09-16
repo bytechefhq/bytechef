@@ -31,7 +31,8 @@ public class HttpClientPutAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("put")
         .title("PUT")
-        .description("The request method to use.")
+        .description(
+            "The PUT method replaces all current representations of the target resource with the request content.")
         .properties(
             HttpClientActionUtils.toArray(
                 HttpClientConstants.COMMON_PROPERTIES,

@@ -31,7 +31,7 @@ public class HttpClientGetAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("get")
         .title("GET")
-        .description("The request method to use.")
+        .description("Use GET method to retrieve information about the specified resource.")
         .properties(
             HttpClientActionUtils.toArray(
                 HttpClientConstants.COMMON_PROPERTIES,

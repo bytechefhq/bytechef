@@ -30,7 +30,7 @@ public class HttpClientDeleteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("delete")
         .title("DELETE")
-        .description("The request method to use.")
+        .description("The DELETE method deletes the specified resource.")
         .properties(
             HttpClientActionUtils.toArray(
                 HttpClientConstants.COMMON_PROPERTIES,

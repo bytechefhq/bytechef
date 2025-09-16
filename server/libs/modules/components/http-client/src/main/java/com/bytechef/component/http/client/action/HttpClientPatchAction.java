@@ -31,7 +31,7 @@ public class HttpClientPatchAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("patch")
         .title("PATCH")
-        .description("The request method to use.")
+        .description("The PATCH method applies partial modifications to a resource.")
         .properties(
             HttpClientActionUtils.toArray(
                 HttpClientConstants.COMMON_PROPERTIES,
