@@ -38,6 +38,7 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherD
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -88,7 +89,10 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
             }
         }
 
-        if (list.isEmpty()) {
+        boolean allNull = list.stream()
+            .allMatch(Objects::isNull);
+
+        if (list.isEmpty() || allNull) {
             outputResponse = OutputResponse.of(object());
         } else {
             ModifiableValueProperty<?, ?> itemProperty = (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
