@@ -400,12 +400,16 @@ const WorkflowNodeDetailsPanel = ({
         [currentNode, nodes]
     );
 
-    const hasOutputData = useMemo(
-        () =>
+    const hasOutputData = useMemo(() => {
+        if (currentNode?.clusterElementType) {
+            return false;
+        }
+
+        return (
             currentOperationDefinition?.outputDefined ||
-            (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
-        [currentOperationDefinition]
-    );
+            (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined
+        );
+    }, [currentNode?.clusterElementType, currentOperationDefinition]);
 
     const currentWorkflowTrigger = useMemo(
         () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
