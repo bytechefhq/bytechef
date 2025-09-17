@@ -1,5 +1,6 @@
 import {
     PATH_CLOSING_PARENTHESIS_REPLACEMENT,
+    PATH_COLON_REPLACEMENT,
     PATH_DASH_REPLACEMENT,
     PATH_DIGIT_PREFIX,
     PATH_HASH_REPLACEMENT,
@@ -110,6 +111,12 @@ export function encodeParameters(parameters: {[key: string]: unknown}): {[key: s
         replacement: PATH_SLASH_REPLACEMENT,
     });
 
+    encodedParameters = encodeParametersGeneric({
+        matchPattern: /:/g,
+        parameters: encodedParameters,
+        replacement: PATH_COLON_REPLACEMENT,
+    });
+
     return encodedParameters;
 }
 
@@ -147,6 +154,10 @@ export function decodePath(path: string): string {
         decodedPath = decodedPath.replace(new RegExp(PATH_SLASH_REPLACEMENT, 'g'), '/');
     }
 
+    if (decodedPath.includes(PATH_COLON_REPLACEMENT)) {
+        decodedPath = decodedPath.replace(new RegExp(PATH_COLON_REPLACEMENT, 'g'), ':');
+    }
+
     return decodedPath;
 }
 
@@ -166,6 +177,8 @@ export function encodePath(path: string): string {
     encodedPath = encodeNonAsciiCharacters(encodedPath);
 
     encodedPath = encodePathGeneric(encodedPath, /\//g, PATH_SLASH_REPLACEMENT);
+
+    encodedPath = encodePathGeneric(encodedPath, /:/g, PATH_COLON_REPLACEMENT);
 
     return encodedPath;
 }
