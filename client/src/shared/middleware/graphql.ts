@@ -467,13 +467,19 @@ export type ProjectInfo = {
 
 export type ProjectTemplate = {
   __typename?: 'ProjectTemplate';
-  components: Array<Maybe<ComponentDefinitionTuple>>;
+  authorEmail?: Maybe<Scalars['String']['output']>;
+  authorName?: Maybe<Scalars['String']['output']>;
+  authorRole?: Maybe<Scalars['String']['output']>;
+  authorSocialLinks: Array<Maybe<Scalars['String']['output']>>;
+  categories: Array<Scalars['String']['output']>;
+  components: Array<ComponentDefinitionTuple>;
   description?: Maybe<Scalars['String']['output']>;
-  exported: Scalars['Boolean']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
   project?: Maybe<ProjectInfo>;
   projectVersion?: Maybe<Scalars['Int']['output']>;
   publicUrl?: Maybe<Scalars['String']['output']>;
-  workflows: Array<Maybe<WorkflowInfo>>;
+  workflows: Array<WorkflowInfo>;
 };
 
 export type Query = {
@@ -501,6 +507,8 @@ export type Query = {
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  preBuiltProjectTemplates: Array<ProjectTemplate>;
+  preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
@@ -602,6 +610,18 @@ export type QueryMcpToolsByComponentIdArgs = {
 };
 
 
+export type QueryPreBuiltProjectTemplatesArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPreBuiltWorkflowTemplatesArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryProjectArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -682,9 +702,15 @@ export type WorkflowInfo = {
 
 export type WorkflowTemplate = {
   __typename?: 'WorkflowTemplate';
-  components: Array<Maybe<ComponentDefinition>>;
+  authorEmail?: Maybe<Scalars['String']['output']>;
+  authorName?: Maybe<Scalars['String']['output']>;
+  authorRole?: Maybe<Scalars['String']['output']>;
+  authorSocialLinks: Array<Maybe<Scalars['String']['output']>>;
+  categories: Array<Scalars['String']['output']>;
+  components: Array<ComponentDefinition>;
   description?: Maybe<Scalars['String']['output']>;
-  exported: Scalars['Boolean']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectVersion?: Maybe<Scalars['Int']['output']>;
   publicUrl?: Maybe<Scalars['String']['output']>;
   workflow?: Maybe<SharedWorkflowInfo>;
@@ -780,6 +806,22 @@ export type McpServersByWorkspaceQueryVariables = Exact<{
 
 export type McpServersByWorkspaceQuery = { __typename?: 'Query', mcpServersByWorkspace?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
+export type PreBuiltProjectTemplatesQueryVariables = Exact<{
+  query?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type PreBuiltProjectTemplatesQuery = { __typename?: 'Query', preBuiltProjectTemplates: Array<{ __typename?: 'ProjectTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string, description?: string | null } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> }> };
+
+export type PreBuiltWorkflowTemplatesQueryVariables = Exact<{
+  query?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow?: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } | null }> };
+
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -793,7 +835,7 @@ export type ProjectTemplateQueryVariables = Exact<{
 }>;
 
 
-export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> } | null>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string } | null> } | null };
+export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> } | null };
 
 export type SharedProjectQueryVariables = Exact<{
   projectUuid: Scalars['String']['input'];
@@ -831,7 +873,7 @@ export type WorkflowTemplateQueryVariables = Exact<{
 }>;
 
 
-export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null, workflow?: { __typename?: 'SharedWorkflowInfo', label: string } | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> } | null };
+export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow?: { __typename?: 'SharedWorkflowInfo', label: string } | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }> } | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -1231,6 +1273,97 @@ export const useMcpServersByWorkspaceQuery = <
   }
     )};
 
+export const PreBuiltProjectTemplatesDocument = `
+    query preBuiltProjectTemplates($query: String, $category: String) {
+  preBuiltProjectTemplates(query: $query, category: $category) {
+    authorName
+    categories
+    components {
+      key
+      value {
+        connection {
+          version
+        }
+        icon
+        name
+        title
+        version
+      }
+    }
+    description
+    id
+    project {
+      name
+      description
+    }
+    projectVersion
+    publicUrl
+    workflows {
+      id
+      label
+    }
+  }
+}
+    `;
+
+export const usePreBuiltProjectTemplatesQuery = <
+      TData = PreBuiltProjectTemplatesQuery,
+      TError = unknown
+    >(
+      variables?: PreBuiltProjectTemplatesQueryVariables,
+      options?: Omit<UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<PreBuiltProjectTemplatesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['preBuiltProjectTemplates'] : ['preBuiltProjectTemplates', variables],
+    queryFn: fetcher<PreBuiltProjectTemplatesQuery, PreBuiltProjectTemplatesQueryVariables>(PreBuiltProjectTemplatesDocument, variables),
+    ...options
+  }
+    )};
+
+export const PreBuiltWorkflowTemplatesDocument = `
+    query preBuiltWorkflowTemplates($query: String, $category: String) {
+  preBuiltWorkflowTemplates(query: $query, category: $category) {
+    authorName
+    categories
+    components {
+      connection {
+        version
+      }
+      icon
+      name
+      title
+      version
+    }
+    description
+    id
+    projectVersion
+    publicUrl
+    workflow {
+      label
+      description
+    }
+  }
+}
+    `;
+
+export const usePreBuiltWorkflowTemplatesQuery = <
+      TData = PreBuiltWorkflowTemplatesQuery,
+      TError = unknown
+    >(
+      variables?: PreBuiltWorkflowTemplatesQueryVariables,
+      options?: Omit<UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<PreBuiltWorkflowTemplatesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['preBuiltWorkflowTemplates'] : ['preBuiltWorkflowTemplates', variables],
+    queryFn: fetcher<PreBuiltWorkflowTemplatesQuery, PreBuiltWorkflowTemplatesQueryVariables>(PreBuiltWorkflowTemplatesDocument, variables),
+    ...options
+  }
+    )};
+
 export const ProjectByIdDocument = `
     query projectById($id: ID!) {
   project(id: $id) {
@@ -1272,7 +1405,6 @@ export const ProjectTemplateDocument = `
       }
     }
     description
-    exported
     project {
       name
     }
@@ -1404,7 +1536,6 @@ export const WorkflowTemplateDocument = `
     query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
   workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
     description
-    exported
     projectVersion
     publicUrl
     workflow {
