@@ -54,9 +54,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
@@ -195,7 +195,7 @@ public class GoogleCalendarCreateEventAction {
             .toList();
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-        String timezone = GoogleCalendarUtils.getCalendarTimezone(calendar);
+        String timezone = GoogleUtils.getCalendarTimezone(calendar);
 
         Event event = new Event()
             .setAttachments(eventAttachments)

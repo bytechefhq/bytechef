@@ -29,11 +29,11 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
@@ -44,8 +44,6 @@ import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
-import com.google.api.services.calendar.model.Setting;
-import com.google.api.services.calendar.model.Settings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -60,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -300,35 +297,6 @@ public class GoogleCalendarUtils {
             .events()
             .update(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID), event)
             .execute();
-    }
-
-    public static String getCalendarTimezone(Calendar calendar) throws IOException {
-        List<Setting> settings = fetchAllCalendarSettings(calendar);
-
-        return settings.stream()
-            .filter(setting -> Objects.equals(setting.getId(), "timezone"))
-            .findFirst()
-            .map(Setting::getValue)
-            .orElseThrow(() -> new ProviderException("Timezone setting not found."));
-    }
-
-    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) throws IOException {
-        List<Setting> allSettings = new ArrayList<>();
-
-        String nextPageToken = null;
-
-        do {
-            Settings settings = calendar.settings()
-                .list()
-                .setMaxResults(250)
-                .setPageToken(nextPageToken)
-                .execute();
-
-            allSettings.addAll(settings.getItems());
-            nextPageToken = settings.getNextPageToken();
-        } while (nextPageToken != null);
-
-        return allSettings;
     }
 
     @SuppressFBWarnings("EI")

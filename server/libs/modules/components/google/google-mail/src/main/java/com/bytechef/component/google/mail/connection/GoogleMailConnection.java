@@ -31,5 +31,6 @@ public class GoogleMailConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         (connection, context) -> List.of(
             "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly",
-            "https://www.googleapis.com/auth/gmail.compose", "email", "https://mail.google.com/"));
+            "https://www.googleapis.com/auth/gmail.compose", "email", "https://mail.google.com/",
+            "https://www.googleapis.com/auth/calendar.settings.readonly"));
 }

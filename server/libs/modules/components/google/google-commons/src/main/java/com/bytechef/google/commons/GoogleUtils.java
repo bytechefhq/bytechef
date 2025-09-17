@@ -25,12 +25,17 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -102,5 +107,34 @@ public class GoogleUtils {
             nextPageToken = fileList.getNextPageToken();
         } while (nextPageToken != null);
         return files;
+    }
+
+    public static String getCalendarTimezone(Calendar calendar) throws IOException {
+        List<Setting> settings = fetchAllCalendarSettings(calendar);
+
+        return settings.stream()
+            .filter(setting -> Objects.equals(setting.getId(), "timezone"))
+            .findFirst()
+            .map(Setting::getValue)
+            .orElseThrow(() -> new ProviderException("Timezone setting not found."));
+    }
+
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) throws IOException {
+        List<Setting> allSettings = new ArrayList<>();
+
+        String nextPageToken = null;
+
+        do {
+            Settings settings = calendar.settings()
+                .list()
+                .setMaxResults(250)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            allSettings.addAll(settings.getItems());
+            nextPageToken = settings.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allSettings;
     }
 }
