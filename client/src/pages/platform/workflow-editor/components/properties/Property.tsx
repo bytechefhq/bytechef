@@ -535,7 +535,45 @@ const Property = ({
             }
 
             if (value === 'null' || value === '') {
-                actualValue = null;
+                if (property.defaultValue !== undefined) {
+                    const defaultValueString = String(property.defaultValue);
+
+                    let actualValue: boolean | null | number | string =
+                        type === 'BOOLEAN' ? defaultValueString === 'true' : defaultValueString;
+
+                    if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+                        actualValue = parseInt(defaultValueString);
+                    } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+                        actualValue = parseFloat(defaultValueString);
+                    }
+
+                    if (actualValue === propertyParameterValue) {
+                        return;
+                    }
+
+                    setSelectValue(defaultValueString);
+                    setPropertyParameterValue(actualValue);
+
+                    saveProperty({
+                        includeInMetadata: custom,
+                        path,
+                        type,
+                        updateClusterElementParameterMutation,
+                        updateWorkflowNodeParameterMutation,
+                        value: actualValue,
+                        workflowId: workflow.id,
+                    });
+                } else {
+                    deleteProperty(
+                        custom,
+                        workflow.id,
+                        path,
+                        deleteWorkflowNodeParameterMutation!,
+                        deleteClusterElementParameterMutation
+                    );
+                }
+
+                return;
             }
 
             saveProperty({
@@ -551,8 +589,11 @@ const Property = ({
         [
             currentComponent,
             custom,
+            deleteClusterElementParameterMutation,
+            deleteWorkflowNodeParameterMutation,
             mentionInputValue,
             path,
+            property.defaultValue,
             propertyParameterValue,
             type,
             updateClusterElementParameterMutation,
