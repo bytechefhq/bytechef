@@ -26,7 +26,7 @@ if (project.hasProperty("prod")) {
         buildInfo {
             properties {
                 additional = mapOf(
-                    "description" to project.getDescription(),
+                    "description" to project.getDescription().toString(),
                     "java.version" to JavaVersion.current(),
                     "image.version" to project.properties["bytechefImageVersion"].toString()
                 )

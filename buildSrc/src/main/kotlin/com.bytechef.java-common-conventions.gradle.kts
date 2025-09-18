@@ -205,6 +205,7 @@ val check by tasks.existing {
 val test by tasks.existing(Test::class) {
     useJUnitPlatform()
     exclude("**/*IntTest*")
+    failOnNoDiscoveredTests.set(false)
     testLogging {
         events("standardOut", "skipped", "failed")
         showExceptions = true
@@ -238,7 +239,12 @@ val testIntegration by tasks.registering(Test::class) {
     useJUnitPlatform()
     description = "Execute integration tests."
     group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    dependsOn(tasks.testClasses)
+    failOnNoDiscoveredTests.set(false)
     include("**/*IntTest*")
+    mustRunAfter(tasks.test)
     testLogging {
         events("standardOut", "skipped", "failed")
         showExceptions = true
