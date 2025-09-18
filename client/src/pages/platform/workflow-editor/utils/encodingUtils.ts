@@ -194,6 +194,28 @@ function decodeNonAsciiCharacters(string: string): string {
     );
 }
 
+// Consolidate URL segments: "foo.bar.http://google.com.baz.foo2" → ["foo", "bar", "http://google.com.baz.foo2"]
+function consolidateUrlSegments(segments: string[]): string[] {
+    const consolidatedSegments: string[] = [];
+    let segmentIndex = 0;
+
+    while (segmentIndex < segments.length) {
+        const segment = segments[segmentIndex];
+
+        if (segment.startsWith('http://') || segment.startsWith('https://')) {
+            const urlSegments = segments.slice(segmentIndex);
+
+            consolidatedSegments.push(urlSegments.join('.'));
+        } else {
+            consolidatedSegments.push(segment);
+
+            segmentIndex++;
+        }
+    }
+
+    return consolidatedSegments;
+}
+
 // Transform: "user.first-name" → "user['first-name']"
 export function transformPathForObjectAccess(path: string): string {
     if (!path || !path.includes('.')) {
@@ -206,9 +228,20 @@ export function transformPathForObjectAccess(path: string): string {
         return path;
     }
 
-    const firstSegment = segments[0];
+    const consolidatedSegments = consolidateUrlSegments(segments);
 
-    const formattedSegments = segments.slice(1).map((segment) => {
+    console.log('consolidatedSegments: ', consolidatedSegments);
+
+    if (
+        consolidatedSegments.length === 1 &&
+        (consolidatedSegments[0].startsWith('http://') || consolidatedSegments[0].startsWith('https://'))
+    ) {
+        return `['${consolidatedSegments[0]}']`;
+    }
+
+    const firstSegment = consolidatedSegments[0];
+
+    const formattedSegments = consolidatedSegments.slice(1).map((segment) => {
         const hasArrayNotation = /\[\d+\]$/.test(segment);
 
         if (hasArrayNotation) {
