@@ -88,6 +88,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: client/package-lock.json
       - name: run npm commands
+        env:
+            NODE_OPTIONS: "--max_old_space_size=4096"
         working-directory: client
         run: |
           npm ci
