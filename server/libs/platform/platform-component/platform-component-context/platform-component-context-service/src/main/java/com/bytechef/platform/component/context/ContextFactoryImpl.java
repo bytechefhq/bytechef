@@ -42,6 +42,7 @@ public class ContextFactoryImpl implements ContextFactory {
     private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final DataStorage dataStorage;
+    private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final TempFileStorage tempFileStorage;
     private final String publicUrl;
@@ -56,6 +57,7 @@ public class ContextFactoryImpl implements ContextFactory {
         this.cacheManager = cacheManager;
         this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
+        this.editorTempFileStorage = new EditorTempFileStorage();
         this.eventPublisher = eventPublisher;
         this.tempFileStorage = tempFileStorage;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -71,7 +73,7 @@ public class ContextFactoryImpl implements ContextFactory {
             actionName, componentName, componentVersion, connection, this,
             getDataStorage(workflowId, editorEnvironment), editorEnvironment, eventPublisher,
             getHttpClientExecutor(editorEnvironment), jobId, jobPrincipalId, jobPrincipalWorkflowId, type, publicUrl,
-            getFilesFileStorage(editorEnvironment),
+            getTempFileStorage(editorEnvironment),
             workflowId);
     }
 
@@ -96,7 +98,7 @@ public class ContextFactoryImpl implements ContextFactory {
 
         return new TriggerContextImpl(
             componentName, componentVersion, connection, getDataStorage(workflowUuid, editorEnvironment),
-            editorEnvironment, getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
+            editorEnvironment, getTempFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
             jobPrincipalId, triggerName, type, workflowUuid);
     }
 
@@ -108,9 +110,9 @@ public class ContextFactoryImpl implements ContextFactory {
         return dataStorage;
     }
 
-    private TempFileStorage getFilesFileStorage(boolean editorEnvironment) {
+    private TempFileStorage getTempFileStorage(boolean editorEnvironment) {
         if (editorEnvironment) {
-            return new TempFileStorageImpl();
+            return editorTempFileStorage;
         }
 
         return tempFileStorage;
@@ -118,6 +120,6 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private HttpClientExecutor getHttpClientExecutor(boolean editorEnvironment) {
         return new HttpClientExecutor(
-            applicationContext, connectionDefinitionService, getFilesFileStorage(editorEnvironment));
+            applicationContext, connectionDefinitionService, getTempFileStorage(editorEnvironment));
     }
 }

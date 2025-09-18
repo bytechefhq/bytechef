@@ -30,15 +30,15 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-final class TempFileStorageImpl implements TempFileStorage {
+final class EditorTempFileStorage implements TempFileStorage {
 
     private final TempFileStorage tempFileStorage;
 
-    public TempFileStorageImpl() {
+    public EditorTempFileStorage() {
         Path tempDirPath;
 
         try {
-            tempDirPath = Files.createTempDirectory("files_file_storage");
+            tempDirPath = Files.createTempDirectory("temp_file_storage");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
