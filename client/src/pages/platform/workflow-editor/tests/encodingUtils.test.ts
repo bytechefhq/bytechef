@@ -10,7 +10,7 @@ import {
     PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
 
-import {decodePath, encodeParameters, encodePath} from '../utils/encodingUtils';
+import {decodePath, encodeParameters, encodePath, transformPathForObjectAccess} from '../utils/encodingUtils';
 
 describe('encodingUtils', () => {
     describe('encodePath and decodePath', () => {
@@ -115,6 +115,48 @@ describe('encodingUtils', () => {
             expect(Object.keys(encoded).some((k) => k.includes(PATH_SLASH_REPLACEMENT))).toBe(true);
             expect(Object.keys(encoded).some((k) => k.includes(PATH_COLON_REPLACEMENT))).toBe(true);
             expect(Object.keys(encoded).some((k) => k.includes(PATH_DIGIT_PREFIX))).toBe(true);
+        });
+    });
+
+    describe('should encode URLs as a single object key', () => {
+        it('should consolidate URL segments starting with http', () => {
+            const path = 'foo.bar.http://google.com.baz.foo2';
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("foo.bar['http://google.com.baz.foo2']");
+        });
+
+        it('should consolidate URL segments starting with https', () => {
+            const path = 'data.url.https://api.example.com/v1/users';
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("data.url['https://api.example.com/v1/users']");
+        });
+
+        it('should handle multiple URL segments correctly', () => {
+            const path = 'config.api.http://api1.com.endpoint.http://api2.com';
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("config.api['http://api1.com.endpoint.http://api2.com']");
+        });
+
+        it('should not affect paths without URLs', () => {
+            const path = 'user.name.email';
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe('user.name.email');
+        });
+
+        it('should handle URL at the beginning', () => {
+            const path = 'http://example.com.data.value';
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("['http://example.com.data.value']");
         });
     });
 });
