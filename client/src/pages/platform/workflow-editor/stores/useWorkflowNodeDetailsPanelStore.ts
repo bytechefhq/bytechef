@@ -12,7 +12,12 @@ interface WorkflowNodeDetailsPanelStoreI {
     setConnectionDialogAllowed: (connectionDialogAllowed: boolean) => void;
 
     currentComponent: ComponentType | undefined;
-    setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
+    setCurrentComponent: (
+        currentComponent:
+            | ComponentType
+            | undefined
+            | ((previousCurrentComponent: ComponentType | undefined) => ComponentType | undefined)
+    ) => void;
 
     currentNode: NodeDataType | undefined;
     setCurrentNode: (currentNode: NodeDataType | undefined) => void;
@@ -37,7 +42,14 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                 set((state) => ({...state, connectionDialogAllowed})),
 
             currentComponent: undefined,
-            setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
+            setCurrentComponent: (currentComponent) =>
+                set((state) => ({
+                    ...state,
+                    currentComponent:
+                        typeof currentComponent === 'function'
+                            ? currentComponent(state.currentComponent)
+                            : currentComponent,
+                })),
 
             currentNode: undefined,
             setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
