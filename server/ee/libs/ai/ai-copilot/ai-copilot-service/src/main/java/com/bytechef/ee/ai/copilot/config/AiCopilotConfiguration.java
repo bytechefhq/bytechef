@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
+import java.net.http.HttpClient;
 import java.time.Duration;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -17,7 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -50,15 +51,16 @@ public class AiCopilotConfiguration {
 
     @Bean
     OpenAiApi openAiApi() {
-        HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory =
-            new HttpComponentsClientHttpRequestFactory();
+        HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(60))
+            .build();
 
-        httpComponentsClientHttpRequestFactory.setConnectionRequestTimeout(Duration.ofSeconds(60));
-        httpComponentsClientHttpRequestFactory.setConnectTimeout(Duration.ofSeconds(60));
-        httpComponentsClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(60));
+        JdkClientHttpRequestFactory jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory(httpClient);
+
+        jdkClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(60));
 
         RestClient.Builder builder = RestClient.builder()
-            .requestFactory(httpComponentsClientHttpRequestFactory)
+            .requestFactory(jdkClientHttpRequestFactory)
             .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
                 throw new RestClientException(
                     "Error response: " + response.getStatusCode() + "; " + response.getStatusText());
