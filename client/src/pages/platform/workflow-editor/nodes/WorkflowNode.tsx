@@ -60,9 +60,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const nodeClickHandler = useNodeClickHandler(data, id);
 
-    const handleNodeClick = () => {
-        nodeClickHandler();
-    };
+    const handleNodeClick = () => nodeClickHandler();
 
     const isSelected = currentNode?.name === data.name;
 
