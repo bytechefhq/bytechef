@@ -1,5 +1,4 @@
 import '@/shared/styles/dropdownMenu.css';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,6 +18,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -106,34 +106,11 @@ const ProjectWorkflowListItem = ({
             >
                 <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 
-                <div className="flex">
-                    {filteredComponentNames?.map((name) => {
-                        const componentDefinition = workflowComponentDefinitions[name];
-                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
-
-                        return (
-                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <LazyLoadSVG
-                                            className="size-5 flex-none"
-                                            key={name}
-                                            src={
-                                                componentDefinition?.icon
-                                                    ? componentDefinition?.icon
-                                                    : (taskDispatcherDefinition?.icon ?? '')
-                                            }
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent side="top">
-                                        {componentDefinition?.title ?? taskDispatcherDefinition?.title}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        );
-                    })}
-                </div>
+                <WorkflowComponentsList
+                    filteredComponentNames={filteredComponentNames || []}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             </Link>
 
             <div className="flex justify-end gap-x-6">
