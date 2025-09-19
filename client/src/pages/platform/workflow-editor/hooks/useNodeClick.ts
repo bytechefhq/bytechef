@@ -55,10 +55,11 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setWorkflowNodeDetailsPanelOpen(true);
 
         if (data.type) {
-            setCurrentComponent({
+            setCurrentComponent((previousCurrentComponent) => ({
                 ...data,
+                displayConditions: previousCurrentComponent?.displayConditions,
                 workflowNodeName: data.name,
-            });
+            }));
         }
     }, [
         nodes,
@@ -71,7 +72,7 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         data,
         id,
         setClusterElementsCanvasOpen,
-        setWorkflowNodeDetailsPanelOpen,
         setCurrentComponent,
+        setWorkflowNodeDetailsPanelOpen,
     ]);
 }
