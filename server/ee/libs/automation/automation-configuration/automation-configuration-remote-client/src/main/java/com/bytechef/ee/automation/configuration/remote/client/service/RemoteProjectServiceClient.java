@@ -12,9 +12,11 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteProjectServiceClient implements ProjectService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
@@ -74,6 +77,11 @@ public class RemoteProjectServiceClient implements ProjectService {
                 .path(PROJECT_SERVICE + "/get-project/{id}")
                 .build(id),
             Project.class);
+    }
+
+    @Override
+    public Project getProject(UUID uuid) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

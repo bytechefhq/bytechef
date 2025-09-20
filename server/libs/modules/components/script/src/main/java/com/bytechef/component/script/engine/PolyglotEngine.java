@@ -81,7 +81,8 @@ public class PolyglotEngine {
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
-            Map<String, Object> inputMap = removeNotEvaluatedEntries(inputParameters.getMap(INPUT, Object.class));
+            Map<String, Object> inputMap = removeNotEvaluatedEntries(
+                inputParameters.getMap(INPUT, Object.class, Map.of()));
             ContextProxyObject contextProxyObject = new ContextProxyObject(
                 actionContext, applicationContext, languageId, componentConnections);
 

@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.lang.Nullable;
 
 /**
@@ -39,6 +40,8 @@ public interface ProjectService {
     Project getProjectDeploymentProject(long projectDeploymentId);
 
     Project getProject(long id);
+
+    Project getProject(UUID uuid);
 
     List<Project> getProjects();
 

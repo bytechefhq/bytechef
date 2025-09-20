@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.service;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteEnvironmentServiceClient implements EnvironmentService {
 
     @Override

@@ -26,7 +26,6 @@ public class TextHelperComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/text-helper_v1.json", new TextHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/text-helper_v1.json", new TextHelperComponentHandler().getDefinition());
     }
 }

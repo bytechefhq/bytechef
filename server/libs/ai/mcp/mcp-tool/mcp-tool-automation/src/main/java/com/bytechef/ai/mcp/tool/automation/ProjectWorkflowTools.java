@@ -18,7 +18,7 @@ package com.bytechef.ai.mcp.tool.automation;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
-import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,7 +42,7 @@ public class ProjectWorkflowTools {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
-    private final ProjectFacade projectFacade;
+    private final ProjectWorkflowFacade projectWorkflowFacade;
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -61,8 +61,8 @@ public class ProjectWorkflowTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowTools(ProjectFacade projectFacade) {
-        this.projectFacade = projectFacade;
+    public ProjectWorkflowTools(ProjectWorkflowFacade projectWorkflowFacade) {
+        this.projectWorkflowFacade = projectWorkflowFacade;
     }
 
     @Tool(
@@ -74,7 +74,7 @@ public class ProjectWorkflowTools {
                 + DEFAULT_DEFINITION) String definition) {
 
         try {
-            ProjectWorkflow projectWorkflow = projectFacade.addWorkflow(projectId, definition);
+            ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Created workflow {} for project {}", definition, projectId);
@@ -99,7 +99,7 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The ID of the project") long projectId) {
 
         try {
-            List<ProjectWorkflowDTO> workflows = projectFacade.getProjectWorkflows(projectId);
+            List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
 
             List<WorkflowInfo> workflowInfos = workflows.stream()
                 .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
@@ -127,7 +127,7 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The ID of the workflow to retrieve") long workflowId) {
 
         try {
-            ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
+            ProjectWorkflowDTO workflow = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Retrieved workflow {}", workflow.getProjectWorkflowId());
@@ -153,7 +153,8 @@ public class ProjectWorkflowTools {
 
         try {
             List<ProjectWorkflowDTO> allWorkflows =
-                projectId != null ? projectFacade.getProjectWorkflows(projectId) : projectFacade.getProjectWorkflows();
+                projectId != null ? projectWorkflowFacade.getProjectWorkflows(projectId)
+                    : projectWorkflowFacade.getProjectWorkflows();
 
             String lowerQuery = query.toLowerCase()
                 .trim();
@@ -193,10 +194,10 @@ public class ProjectWorkflowTools {
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId) {
         try {
-            ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
+            ProjectWorkflowDTO workflow = projectWorkflowFacade.getProjectWorkflow(workflowId);
             String workflowName = workflow.getLabel();
 
-            projectFacade.deleteWorkflow(workflow.getId());
+            projectWorkflowFacade.deleteWorkflow(workflow.getId());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Deleted workflow {} with name '{}'", workflowId, workflowName);
@@ -220,9 +221,9 @@ public class ProjectWorkflowTools {
                 + DEFAULT_DEFINITION) String definition) {
 
         try {
-            ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
+            ProjectWorkflowDTO workflow = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
-            projectFacade.updateWorkflow(workflow.getId(), definition, workflow.getVersion());
+            projectWorkflowFacade.updateWorkflow(workflow.getId(), definition, workflow.getVersion());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated workflow {} with name '{}'", workflow.getId(), workflow.getLabel());

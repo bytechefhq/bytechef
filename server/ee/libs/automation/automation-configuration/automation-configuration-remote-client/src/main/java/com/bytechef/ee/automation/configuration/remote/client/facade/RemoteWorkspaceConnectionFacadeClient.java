@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectionFacade {
 
     @Override

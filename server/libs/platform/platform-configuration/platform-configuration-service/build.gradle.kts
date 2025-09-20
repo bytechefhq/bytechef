@@ -1,4 +1,6 @@
 dependencies {
+    api(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+
     implementation("org.apache.commons:commons-lang3")
     implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework:spring-context")
@@ -10,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 

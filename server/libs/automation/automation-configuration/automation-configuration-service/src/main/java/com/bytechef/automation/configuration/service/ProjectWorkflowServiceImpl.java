@@ -40,17 +40,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
     @Override
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
-        return addWorkflow(projectId, projectVersion, workflowId, String.valueOf(UUID.randomUUID()));
-    }
-
-    @Override
-    public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, String workflowUuid) {
-        Assert.notNull(workflowId, "'workflowId' must not be null");
-
-        ProjectWorkflow project = new ProjectWorkflow(
-            projectId, projectVersion, workflowId, UUID.fromString(workflowUuid));
-
-        return projectWorkflowRepository.save(project);
+        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId));
     }
 
     @Override

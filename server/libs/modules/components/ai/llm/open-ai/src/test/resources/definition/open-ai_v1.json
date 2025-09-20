@@ -95,6 +95,22 @@
         "value" : "gpt-4o-search-preview"
       }, {
         "description" : null,
+        "label" : "gpt-5",
+        "value" : "gpt-5"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-chat-latest",
+        "value" : "gpt-5-chat-latest"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-mini",
+        "value" : "gpt-5-mini"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-nano",
+        "value" : "gpt-5-nano"
+      }, {
+        "description" : null,
         "label" : "o1",
         "value" : "o1"
       }, {
@@ -2280,6 +2296,22 @@
         "description" : null,
         "label" : "gpt-4o-search-preview",
         "value" : "gpt-4o-search-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-5",
+        "value" : "gpt-5"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-chat-latest",
+        "value" : "gpt-5-chat-latest"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-mini",
+        "value" : "gpt-5-mini"
+      }, {
+        "description" : null,
+        "label" : "gpt-5-nano",
+        "value" : "gpt-5-nano"
       }, {
         "description" : null,
         "label" : "o1",

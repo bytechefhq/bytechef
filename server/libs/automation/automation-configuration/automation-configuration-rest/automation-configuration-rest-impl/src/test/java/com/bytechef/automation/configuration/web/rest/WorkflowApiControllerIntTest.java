@@ -16,6 +16,9 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -23,8 +26,11 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
@@ -35,6 +41,7 @@ import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,13 +78,22 @@ public class WorkflowApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
+    private ProjectCategoryFacade projectCategoryFacade;
+
+    @MockitoBean
     private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
     private ProjectFacade projectFacade;
 
     @MockitoBean
+    private ProjectTagFacade projectTagFacade;
+
+    @MockitoBean
     private ProjectService projectService;
+
+    @MockitoBean
+    private ProjectWorkflowFacade projectWorkflowFacade;
 
     private WebTestClient webTestClient;
 
@@ -106,7 +122,7 @@ public class WorkflowApiControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(projectFacade.getProjectWorkflow("1"))
+            when(projectWorkflowFacade.getProjectWorkflow("1"))
                 .thenReturn(getWorkflowDTO());
 
             this.webTestClient
@@ -120,6 +136,77 @@ public class WorkflowApiControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        verify(projectWorkflowFacade).getProjectWorkflow("1");
+    }
+
+    @Test
+    public void testGetProjectWorkflows() {
+        try {
+            ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L, 1, "workflow1", UUID.randomUUID());
+            // Use reflection or create a method to set the ID since there's no setter
+            try {
+                java.lang.reflect.Field idField = ProjectWorkflow.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(projectWorkflow, 1L);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to set ID", e);
+            }
+
+            ProjectWorkflowDTO workflow = new ProjectWorkflowDTO(
+                new Workflow("workflow1", "{}", Workflow.Format.JSON), projectWorkflow);
+
+            when(projectWorkflowFacade.getProjectWorkflows(1L))
+                .thenReturn(List.of(workflow));
+
+            this.webTestClient
+                .get()
+                .uri("/internal/projects/1/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo("workflow1");
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        verify(projectWorkflowFacade).getProjectWorkflows(1L);
+    }
+
+    @Test
+    public void testPostProjectWorkflows() {
+        String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
+
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L, 1, "workflow1", UUID.randomUUID());
+        // Use reflection to set the ID since there's no setter
+        try {
+            java.lang.reflect.Field idField = ProjectWorkflow.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(projectWorkflow, 1L);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set ID", e);
+        }
+        WorkflowModel workflowModel = new WorkflowModel().definition(definition);
+
+        when(projectWorkflowFacade.addWorkflow(anyLong(), any()))
+            .thenReturn(projectWorkflow);
+
+        this.webTestClient
+            .post()
+            .uri("/internal/projects/1/workflows")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(workflowModel)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(1L);
+
+        verify(projectWorkflowFacade).addWorkflow(anyLong(), any());
     }
 
     @Test
@@ -141,6 +228,8 @@ public class WorkflowApiControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        verify(projectWorkflowFacade).updateWorkflow("1", DEFINITION, 0);
     }
 
     private ProjectWorkflowDTO getWorkflowDTO() {
@@ -148,9 +237,19 @@ public class WorkflowApiControllerIntTest {
 
         List<WorkflowTask> tasks = workflow.getTasks();
 
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L, 1, "1", UUID.randomUUID());
+        // Use reflection to set the ID since there's no setter
+        try {
+            java.lang.reflect.Field idField = ProjectWorkflow.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(projectWorkflow, 1L);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set ID", e);
+        }
+
         return new ProjectWorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), false, null, List.of())), List.of()),
-            new ProjectWorkflow(1));
+            projectWorkflow);
     }
 }

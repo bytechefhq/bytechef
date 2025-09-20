@@ -1,0 +1,36 @@
+# Base types and shared definitions for GraphQL schema within this module
+
+# Provide base Query/Mutation so that extensions in other files can merge correctly
+# Include a harmless placeholder field to satisfy SDL validators
+
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+# Minimal definitions for types referenced by this module's schemas but defined in other modules
+# We only define essential fields needed by tests. Add more fields later if needed.
+
+
+type Category {
+    id: ID
+    name: String
+}
+
+type ComponentDefinition {
+    name: String
+}
+
+type Environment {
+    id: ID
+    name: String
+}
+
+type Tag {
+    id: ID
+    name: String
+    color: String
+}
