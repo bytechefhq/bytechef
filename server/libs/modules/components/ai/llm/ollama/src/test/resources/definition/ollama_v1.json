@@ -43,6 +43,10 @@
         "value" : "gemma"
       }, {
         "description" : null,
+        "label" : "gemma3",
+        "value" : "gemma3"
+      }, {
+        "description" : null,
         "label" : "llama2",
         "value" : "llama2"
       }, {
@@ -121,6 +125,22 @@
         "description" : null,
         "label" : "qwen2.5",
         "value" : "qwen2.5"
+      }, {
+        "description" : null,
+        "label" : "qwen2.5:3b",
+        "value" : "qwen2.5:3b"
+      }, {
+        "description" : null,
+        "label" : "qwen2.5vl",
+        "value" : "qwen2.5vl"
+      }, {
+        "description" : null,
+        "label" : "qwen3:4b",
+        "value" : "qwen3:4b"
+      }, {
+        "description" : null,
+        "label" : "qwen3:7b",
+        "value" : "qwen3:7b"
       }, {
         "description" : null,
         "label" : "qwq",
@@ -1338,6 +1358,10 @@
         "value" : "gemma"
       }, {
         "description" : null,
+        "label" : "gemma3",
+        "value" : "gemma3"
+      }, {
+        "description" : null,
         "label" : "llama2",
         "value" : "llama2"
       }, {
@@ -1416,6 +1440,22 @@
         "description" : null,
         "label" : "qwen2.5",
         "value" : "qwen2.5"
+      }, {
+        "description" : null,
+        "label" : "qwen2.5:3b",
+        "value" : "qwen2.5:3b"
+      }, {
+        "description" : null,
+        "label" : "qwen2.5vl",
+        "value" : "qwen2.5vl"
+      }, {
+        "description" : null,
+        "label" : "qwen3:4b",
+        "value" : "qwen3:4b"
+      }, {
+        "description" : null,
+        "label" : "qwen3:7b",
+        "value" : "qwen3:7b"
       }, {
         "description" : null,
         "label" : "qwq",
