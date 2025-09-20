@@ -1,0 +1,3 @@
+mutation importProjectTemplate($id: String!, $workspaceId: ID!, $sharedProject: Boolean!) {
+    importProjectTemplate(id: $id, workspaceId: $workspaceId, sharedProject: $sharedProject)
+}

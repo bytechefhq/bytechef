@@ -10,27 +10,27 @@ import {
     GitBranchIcon,
     GitPullRequestArrowIcon,
     HistoryIcon,
+    Share2Icon,
     Trash2Icon,
-    UploadIcon,
 } from 'lucide-react';
-import {MouseEvent, RefObject} from 'react';
+import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
-    hiddenFileInputRef,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
     onDuplicateProjectClick,
     onPullProjectFromGitClick,
+    onShareProject,
     onShowEditProjectDialogClick,
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
     projectGitConfigurationEnabled,
     projectId,
 }: {
-    hiddenFileInputRef: RefObject<HTMLInputElement>;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
+    onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
     onPullProjectFromGitClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
@@ -39,6 +39,7 @@ const ProjectTabButtons = ({
     projectId: number;
 }) => {
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -57,25 +58,11 @@ const ProjectTabButtons = ({
                 <CopyIcon /> Duplicate
             </Button>
 
-            <Button
-                className="dropdown-menu-item"
-                onClick={() => {
-                    if (hiddenFileInputRef.current) {
-                        hiddenFileInputRef.current.click();
-                    }
-                }}
-                variant="ghost"
-            >
-                <DownloadIcon /> Import Workflow
-            </Button>
-
-            <Button
-                className="dropdown-menu-item"
-                onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
-                variant="ghost"
-            >
-                <UploadIcon /> Export Project
-            </Button>
+            {ff_1042 && (
+                <Button className="dropdown-menu-item" onClick={onShareProject} variant="ghost">
+                    <Share2Icon /> Share Project
+                </Button>
+            )}
 
             {ff_2482 && (
                 <Button

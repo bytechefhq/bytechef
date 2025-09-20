@@ -3,7 +3,9 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/componen
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
+import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
+import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
@@ -16,7 +18,7 @@ import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {SettingsIcon} from 'lucide-react';
-import {ChangeEvent, useState} from 'react';
+import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderSettingsMenuProps {
@@ -31,7 +33,9 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
+    const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
+    const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
     const {setShowEditWorkflowDialog, showEditWorkflowDialog} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -45,21 +49,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
         handleDeleteWorkflowAlertDialogClick,
         handleDuplicateProjectClick,
         handleDuplicateWorkflowClick,
-        handleImportProjectWorkflowClick,
         handlePullProjectFromGitClick,
         handleUpdateProjectGitConfigurationSubmit,
-        hiddenFileInputRef,
         projectGitConfiguration,
         projectVersions,
     } = useSettingsMenu({project, workflow});
-
-    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const definition = await e.target.files[0].text();
-
-            handleImportProjectWorkflowClick(definition);
-        }
-    };
 
     return (
         <>
@@ -108,6 +102,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                             <WorkflowTabButtons
                                 onCloseDropdownMenu={() => setOpenDropdownMenu(false)}
                                 onDuplicateWorkflow={handleDuplicateWorkflowClick}
+                                onShareWorkflow={() => setShowWorkflowShareDialog(true)}
                                 onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                                 onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
                                 workflowId={workflow.id!}
@@ -116,11 +111,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
 
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
-                                hiddenFileInputRef={hiddenFileInputRef}
                                 onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
                                 onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
                                 onPullProjectFromGitClick={handlePullProjectFromGitClick}
+                                onShareProject={() => setShowProjectShareDialog(true)}
                                 onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
                                 onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
                                 onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
@@ -173,6 +168,16 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                 />
             )}
 
+            {showProjectShareDialog && (
+                <ProjectShareDialog
+                    onOpenChange={() => setShowProjectShareDialog(false)}
+                    open={showProjectShareDialog}
+                    projectId={project.id!}
+                    projectUuid={project.uuid!}
+                    projectVersion={project.lastProjectVersion!}
+                />
+            )}
+
             {showProjectVersionHistorySheet && projectVersions && (
                 <ProjectVersionHistorySheet
                     onSheetOpenChange={setShowProjectVersionHistorySheet}
@@ -181,7 +186,15 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                 />
             )}
 
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+            {showWorkflowShareDialog && (
+                <WorkflowShareDialog
+                    onOpenChange={() => setShowWorkflowShareDialog(false)}
+                    open={showWorkflowShareDialog}
+                    projectVersion={project.lastProjectVersion!}
+                    workflowId={workflow.id!}
+                    workflowUuid={workflow.workflowUuid!}
+                />
+            )}
         </>
     );
 };
