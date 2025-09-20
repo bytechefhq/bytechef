@@ -20,7 +20,7 @@ import com.bytechef.ai.mcp.server.security.web.config.McpServerAuthorizeHttpRequ
 import com.bytechef.ai.mcp.server.security.web.config.McpServerCsrfContributor;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
-import com.bytechef.ai.mcp.tool.platform.GenericTools;
+import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -37,23 +37,20 @@ public class McpServerConfiguration {
 
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
-//    private final ComponentTools componentTools;
-//    private final FlowTools flowTools;
-    private final GenericTools genericTools;
+    private final TaskTools taskTools;
 
     @SuppressFBWarnings("EI")
-    public McpServerConfiguration(ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools,
-        GenericTools genericTools) {
+    public McpServerConfiguration(
+        ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools) {
+
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
-        this.genericTools = genericTools;
+        this.taskTools = taskTools;
     }
 
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
-        return ToolCallbackProvider.from(
-            ToolCallbacks.from(projectTools, projectWorkflowTools, genericTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, taskTools));
     }
 
     @Bean

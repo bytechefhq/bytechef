@@ -57,4 +57,15 @@ public class StringUtils {
 
         return sanitized;
     }
+
+    /**
+     * Appends a message with proper newline handling.
+     */
+    public static void appendWithNewline(StringBuilder buffer, String message) {
+        if (!buffer.isEmpty()) {
+            buffer.append("\n");
+        }
+
+        buffer.append(message);
+    }
 }

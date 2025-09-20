@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform.model;
+package com.bytechef.ai.mcp.tool.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;

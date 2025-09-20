@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform.validator;
+package com.bytechef.ai.mcp.tool.validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,32 +22,42 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.ai.mcp.tool.model.PropertyInfo;
+import com.bytechef.commons.util.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Marko Kriskovic
+ */
 class WorkflowValidatorTest {
-    private static final ToolUtils.PropertyInfo trigger1 =
-        new ToolUtils.PropertyInfo("propString", "STRING", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action1 =
-        new ToolUtils.PropertyInfo("propBool", "BOOLEAN", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action2 =
-        new ToolUtils.PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action3 =
-        new ToolUtils.PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo action4 =
-        new ToolUtils.PropertyInfo("propDateTime", "DATE_TIME", null, false, true, null, null);
-    private static final ToolUtils.PropertyInfo actionObj = new ToolUtils.PropertyInfo(
-        "element", "OBJECT", null, false, true, null, List.of(
-            action1, action2, action3));
-    private static final ToolUtils.PropertyInfo actionArr = new ToolUtils.PropertyInfo(
+
+    private static final PropertyInfo trigger1 =
+        new PropertyInfo("propString", "STRING", null, false, true, null, null);
+    private static final PropertyInfo action1 =
+        new PropertyInfo("propBool", "BOOLEAN", null, false, true, null, null);
+    private static final PropertyInfo action2 =
+        new PropertyInfo("propNumber", "NUMBER", null, false, true, null, null);
+    private static final PropertyInfo action3 =
+        new PropertyInfo("propInteger", "INTEGER", null, false, true, null, null);
+    private static final PropertyInfo action4 =
+        new PropertyInfo("propDateTime", "DATE_TIME", null, false, true, null, null);
+    private static final PropertyInfo actionObj = new PropertyInfo(
+        "element", "OBJECT", null, false, true, null, List.of(action1, action2, action3));
+    private static final PropertyInfo actionArr = new PropertyInfo(
         "elements", "ARRAY", null, false, true, null, List.of(
-            new ToolUtils.PropertyInfo(null, "OBJECT", null, false, true, null, List.of(
-                action1, action2, action3))));
+            new PropertyInfo(null, "OBJECT", null, false, true, null, List.of(action1, action2, action3))));
+
+    @BeforeAll
+    public static void beforeAll() {
+        JsonUtils.setObjectMapper(new ObjectMapper());
+    }
 
     @Test
     void validateWorkflowStructureValidWorkflowNoErrors() {
@@ -68,6 +78,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(validWorkflow, errors);
 
         assertEquals("", errors.toString());
@@ -91,6 +102,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Missing required field: label", errors.toString());
@@ -115,6 +127,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Field 'label' must be a string", errors.toString());
@@ -138,6 +151,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Missing required field: description", errors.toString());
@@ -162,6 +176,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Field 'description' must be a string", errors.toString());
@@ -179,6 +194,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Missing required field: triggers", errors.toString());
@@ -197,6 +213,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Field 'triggers' must be an array", errors.toString());
@@ -226,6 +243,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Field 'triggers' must contain one or less objects", errors.toString());
@@ -246,6 +264,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Trigger must be an object", errors.toString());
@@ -269,6 +288,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Missing required field: tasks", errors.toString());
@@ -293,6 +313,7 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
+
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
         assertEquals("Field 'tasks' must be an array", errors.toString());
@@ -316,8 +337,9 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
 
-        assertTrue(errors.toString()
-            .contains("Invalid JSON format:"), errors.toString());
+        String string = errors.toString();
+
+        assertTrue(string.contains("Invalid JSON format:"), string);
     }
 
     @Test
@@ -332,7 +354,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(validTask, errors);
+
+        TaskValidator.validateTask(validTask, errors);
 
         assertEquals("", errors.toString());
     }
@@ -348,7 +371,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Missing required field: label", errors.toString());
     }
@@ -365,7 +389,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Field 'label' must be a string", errors.toString());
     }
@@ -381,7 +406,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Missing required field: name", errors.toString());
     }
@@ -398,7 +424,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Field 'name' must be a string", errors.toString());
     }
@@ -414,7 +441,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Missing required field: type", errors.toString());
     }
@@ -431,7 +459,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Field 'type' must be a string", errors.toString());
     }
@@ -448,10 +477,12 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
 
-        assertTrue(errors.toString()
-            .contains("Field 'type' must match pattern:"), errors.toString());
+        TaskValidator.validateTask(invalidTask, errors);
+
+        String string = errors.toString();
+
+        assertTrue(string.contains("Field 'type' must match pattern:"), string);
     }
 
     @Test
@@ -473,7 +504,8 @@ class WorkflowValidatorTest {
                 type);
 
             StringBuilder errors = new StringBuilder();
-            WorkflowValidator.validateTaskStructure(validTask, errors);
+
+            TaskValidator.validateTask(validTask, errors);
 
             assertEquals("", errors.toString(), "Type should be valid: " + type);
         }
@@ -490,7 +522,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Missing required field: parameters", errors.toString());
     }
@@ -507,7 +540,8 @@ class WorkflowValidatorTest {
             """;
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Field 'parameters' must be an object", errors.toString());
     }
@@ -517,7 +551,8 @@ class WorkflowValidatorTest {
         String invalidTask = "\"not an object\"";
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
+
+        TaskValidator.validateTask(invalidTask, errors);
 
         assertEquals("Task must be an object", errors.toString());
     }
@@ -527,10 +562,12 @@ class WorkflowValidatorTest {
         String invalidTask = "{invalid json}";
 
         StringBuilder errors = new StringBuilder();
-        WorkflowValidator.validateTaskStructure(invalidTask, errors);
 
-        assertTrue(errors.toString()
-            .contains("Invalid JSON format:"), errors.toString());
+        TaskValidator.validateTask(invalidTask, errors);
+
+        String string = errors.toString();
+
+        assertTrue(string.contains("Invalid JSON format:"), errors.toString());
     }
 
     @Test
@@ -543,14 +580,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "NUMBER", null, false, true, null, null),
+            new PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -565,12 +603,13 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'extraField' is not defined in task definition", warnings.toString());
@@ -584,13 +623,14 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "NUMBER", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: name", errors.toString());
         assertEquals("", warnings.toString());
@@ -613,21 +653,22 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("string", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("integer", "INTEGER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("number", "NUMBER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("array", "ARRAY", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("object", "OBJECT", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("string", "STRING", null, true, true, null, null),
+            new PropertyInfo("integer", "INTEGER", null, true, true, null, null),
+            new PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo("number", "NUMBER", null, true, true, null, null),
+            new PropertyInfo("array", "ARRAY", null, true, true, null, null),
+            new PropertyInfo("object", "OBJECT", null, true, true, null, null),
+            new PropertyInfo("null", "NULL", null, true, true, null, null),
+            new PropertyInfo("date", "DATE", null, true, true, null, null),
+            new PropertyInfo("time", "TIME", null, true, true, null, null),
+            new PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -650,21 +691,22 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("string", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("integer", "INTEGER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("number", "NUMBER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("array", "ARRAY", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("object", "OBJECT", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("null", "NULL", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date", "DATE", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("time", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("string", "STRING", null, true, true, null, null),
+            new PropertyInfo("integer", "INTEGER", null, true, true, null, null),
+            new PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo("number", "NUMBER", null, true, true, null, null),
+            new PropertyInfo("array", "ARRAY", null, true, true, null, null),
+            new PropertyInfo("object", "OBJECT", null, true, true, null, null),
+            new PropertyInfo("null", "NULL", null, true, true, null, null),
+            new PropertyInfo("date", "DATE", null, true, true, null, null),
+            new PropertyInfo("time", "TIME", null, true, true, null, null),
+            new PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -680,14 +722,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "INTEGER", null, false, true, null, null),
+            new PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'name' has incorrect type. Expected: string, but got: integer
@@ -708,16 +751,17 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("day", "DATE", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("night", "DATE", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("from", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("to", "TIME", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("specific_date", "DATE_TIME", null, true, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("day", "DATE", null, true, true, null, null),
+            new PropertyInfo("night", "DATE", null, true, true, null, null),
+            new PropertyInfo("from", "TIME", null, true, true, null, null),
+            new PropertyInfo("to", "TIME", null, true, true, null, null),
+            new PropertyInfo("specific_date", "DATE_TIME", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'day' is in incorrect date format. Format should be in: 'yyyy-MM-dd'
@@ -742,17 +786,19 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("obj", "OBJECT", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "INTEGER", null, false, true, null, null))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("obj", "OBJECT", null, false, true, null, List.of(
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null),
+                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo(
+                    "items", "ARRAY", null, false, true, null,
+                    List.of(new PropertyInfo(null, "INTEGER", null, false, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'obj.name' has incorrect type. Expected: string, but got: integer
@@ -773,15 +819,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null))),
-            new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo(
+                "items", "ARRAY", null, false, true, null,
+                List.of(
+                    new PropertyInfo("name", "STRING", null, false, true, null, null),
+                    new PropertyInfo("age", "INTEGER", null, false, true, null, null))),
+            new PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -800,14 +849,17 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo(
+                "items", "ARRAY", null, false, true, null,
+                List.of(
+                    new PropertyInfo("name", "STRING", null, false, true, null, null),
+                    new PropertyInfo("age", "INTEGER", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -834,15 +886,19 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("ignoredName", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo(
+                "items", "ARRAY", null, false, true, null,
+                List.of(
+                    new PropertyInfo("ignoredName", "OBJECT", null, false, true, null,
+                        List.of(
+                            new PropertyInfo("name", "STRING", null, true, true, null, null),
+                            new PropertyInfo("age", "INTEGER", null, true, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: items[2].age", errors.toString());
         assertEquals("Property 'items[index].page' is not defined in task definition", warnings.toString());
@@ -871,15 +927,17 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("items", "ARRAY", null, false, true, null,
+                List.of(
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("age", "INTEGER", null, true, true, null, null),
+                    new PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: items[1].adult", errors.toString());
         assertEquals("Property 'items[2].adult' is not defined in task definition", warnings.toString());
@@ -896,13 +954,14 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("items", "ARRAY", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config", "OBJECT", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("items", "ARRAY", null, true, true, null, null),
+            new PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'config.key' is not defined in task definition", warnings.toString());
@@ -912,11 +971,12 @@ class WorkflowValidatorTest {
     void validateTaskParametersNonObjectCurrentParametersAddsError() {
         String currentTaskParameters = "\"not an object\"";
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of();
+        List<PropertyInfo> taskDefinition = List.of();
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Current task parameters must be an object", errors.toString());
         assertEquals("", warnings.toString());
@@ -930,12 +990,13 @@ class WorkflowValidatorTest {
             }
             """;
 
-        ToolUtils.PropertyInfo taskDefinition = new ToolUtils.PropertyInfo(
+        PropertyInfo taskDefinitionPropertyInfo = new PropertyInfo(
             "testTask", "STRING", null, false, true, null, null);
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinitionPropertyInfo, errors, warnings);
 
         assertEquals("Task definition must be an object", errors.toString());
         assertEquals("", warnings.toString());
@@ -945,11 +1006,12 @@ class WorkflowValidatorTest {
     void validateTaskParametersInvalidJsonCurrentParametersAddsError() {
         String currentTaskParameters = "{invalid json}";
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of();
+        List<PropertyInfo> taskDefinition = List.of();
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertTrue(errors.toString()
             .contains("Invalid JSON format:"), errors.toString());
@@ -964,12 +1026,13 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("nullable", "STRING", null, false, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("nullable", "STRING", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -985,14 +1048,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("validString", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("invalidNumber", "INTEGER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("missingRequired", "BOOLEAN", null, true, true, null, null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("validString", "STRING", null, true, true, null, null),
+            new PropertyInfo("invalidNumber", "INTEGER", null, true, true, null, null),
+            new PropertyInfo("missingRequired", "BOOLEAN", null, true, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'invalidNumber' has incorrect type. Expected: integer, but got: string
@@ -1008,11 +1072,12 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of();
+        List<PropertyInfo> taskDefinition = List.of();
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'anyProperty' is not defined in task definition", warnings.toString());
@@ -1030,15 +1095,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == true", List.of(
-                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "enableFeature == true",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1056,15 +1124,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "true == enableFeature", List.of(
-                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "true == enableFeature",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1082,15 +1153,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature == 'true'", List.of(
-                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "enableFeature == 'true'",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1108,16 +1182,19 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true,
-                "contains({'true','True','1'}, enableFeature)", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true,
+                "contains({'true','True','1'}, enableFeature)",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1135,16 +1212,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true,
-                "contains({'true','True','1'}, enableFeature)", List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "contains({'true','True','1'}, enableFeature)",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1165,16 +1244,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "gndfknskgn / sflakdjdkf 3",
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "gndfknskgn / sflakdjdkf 3",
                 List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1195,16 +1276,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "INTEGER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "enableFeature <= 5.87546",
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "INTEGER", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "enableFeature <= 5.87546",
                 List.of(
-                    new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
@@ -1221,15 +1304,18 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("enableFeature", "FLOAT", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("featureConfig", "OBJECT", null, false, true, "50 > enableFeature", List.of(
-                new ToolUtils.PropertyInfo("setting1", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("setting2", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("enableFeature", "FLOAT", null, true, true, null, null),
+            new PropertyInfo(
+                "featureConfig", "OBJECT", null, false, true, "50 > enableFeature",
+                List.of(
+                    new PropertyInfo("setting1", "STRING", null, true, true, null, null),
+                    new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
@@ -1246,17 +1332,20 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("mode", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("basicConfig", "OBJECT", null, false, true, "mode == 'basic'", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null))),
-            new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "mode == 'advanced'", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("extra", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("mode", "STRING", null, true, true, null, null),
+            new PropertyInfo("basicConfig", "OBJECT", null, false, true, "mode == 'basic'",
+                List.of(new PropertyInfo("name", "STRING", null, true, true, null, null))),
+            new PropertyInfo(
+                "advancedConfig", "OBJECT", null, false, true, "mode == 'advanced'",
+                List.of(
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("extra", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig.name", errors.toString());
         assertEquals("""
@@ -1278,19 +1367,22 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == true",
+                List.of(
+                    new PropertyInfo("extension", "STRING", null, true, true, null, null),
+                    new PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
                 List.of()));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1307,19 +1399,24 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
-                new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == true",
+                List.of(
+                    new PropertyInfo("extension", "STRING", null, true, true, null, null),
+                    new PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
+                List.of(
+                    new PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'bodyContent.extension' is not defined in task definition", warnings.toString());
@@ -1336,19 +1433,23 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == true", List.of(
-                new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
-            new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of(
-                new ToolUtils.PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("bodyContentType", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == true",
+                List.of(
+                    new PropertyInfo("extension", "STRING", null, true, true, null, null),
+                    new PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("url", "STRING", null, true, true, null, null))),
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
+                List.of(new PropertyInfo("simpleProperty", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Missing required property: bodyContent.mimeType
@@ -1371,16 +1472,21 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("parentEnabled", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("parent", "OBJECT", null, false, true, "parentEnabled == true", List.of(
-                new ToolUtils.PropertyInfo("childEnabled", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("child", "OBJECT", null, false, true, "childEnabled == true", List.of(
-                    new ToolUtils.PropertyInfo("value", "STRING", null, true, true, null, null))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("parentEnabled", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo(
+                "parent", "OBJECT", null, false, true, "parentEnabled == true",
+                List.of(
+                    new PropertyInfo("childEnabled", "BOOLEAN", null, true, true, null, null),
+                    new PropertyInfo(
+                        "child", "OBJECT", null, false, true, "childEnabled == true",
+                        List.of(
+                            new PropertyInfo("value", "STRING", null, true, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1397,16 +1503,17 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("format", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("jsonConfig", "OBJECT", null, false, true, "format == 'json'", List.of(
-                new ToolUtils.PropertyInfo("indent", "INTEGER", null, false, true, null, null))),
-            new ToolUtils.PropertyInfo("xmlConfig", "OBJECT", null, false, true, "format == 'xml'", List.of(
-                new ToolUtils.PropertyInfo("schema", "STRING", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("format", "STRING", null, true, true, null, null),
+            new PropertyInfo("jsonConfig", "OBJECT", null, false, true, "format == 'json'",
+                List.of(new PropertyInfo("indent", "INTEGER", null, false, true, null, null))),
+            new PropertyInfo("xmlConfig", "OBJECT", null, false, true, "format == 'xml'",
+                List.of(new PropertyInfo("schema", "STRING", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1420,14 +1527,16 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "OBJECT", null, false, true, "enableAdvanced == true", List.of(
-                new ToolUtils.PropertyInfo("setting", "STRING", null, true, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "advancedConfig", "OBJECT", null, false, true, "enableAdvanced == true",
+                List.of(new PropertyInfo("setting", "STRING", null, true, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1450,18 +1559,24 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, "level1 == 'enabled'", List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, "level1 == 'enabled'",
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, null, null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo(
+                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                List.of(new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1484,18 +1599,25 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, null, null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo(
+                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                List.of(
+                                    new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: config1.config2.config3.finalValue", errors.toString());
         assertEquals("Property 'config1.config2.config3.randomValue' is not defined in task definition",
@@ -1519,18 +1641,24 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", "", false, true, null, List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, "level2 == 'active'", List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, "level3 == true", List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", "", false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, null, null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo(
+                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                List.of(new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1547,14 +1675,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1570,14 +1699,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "true == enableAdvanced", null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true, "true == enableAdvanced", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1592,14 +1722,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "BOOLEAN", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced == true", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
@@ -1614,14 +1745,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "NUMBER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced >= 4", null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "NUMBER", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true, "enableAdvanced >= 4", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
@@ -1636,14 +1768,15 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "INTEGER", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true, "4.1 < enableAdvanced", null));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "INTEGER", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true, "4.1 < enableAdvanced", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1659,15 +1792,16 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("enableAdvanced", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("advancedConfig", "STRING", null, true, true,
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("enableAdvanced", "STRING", null, true, true, null, null),
+            new PropertyInfo("advancedConfig", "STRING", null, true, true,
                 "contains({'Donald_B2rbara','True','true'}, enableAdvanced)", null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1690,19 +1824,24 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == level2", null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level3 == true",
-                            null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, null,
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == level2", null),
+                            new PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
+                                new PropertyInfo(
+                                    "finalValue", "STRING", null, true, true, "level3 == true", null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1722,19 +1861,25 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'",
-                            null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, null,
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
+                            new PropertyInfo("config3", "OBJECT", null, false, true, null,
+                                List.of(
+                                    new PropertyInfo(
+                                        "finalValue", "STRING", null, true, true, "level1 == 'enabled'", null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Missing required property: config1.level2
@@ -1756,19 +1901,26 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("level1", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("config1", "OBJECT", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
-                new ToolUtils.PropertyInfo("config2", "OBJECT", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
-                    new ToolUtils.PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
-                        new ToolUtils.PropertyInfo("finalValue", "STRING", null, true, true, "level1 == 'enabled'",
-                            null))))))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("level1", "STRING", null, true, true, null, null),
+            new PropertyInfo(
+                "config1", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("level2", "STRING", null, true, true, "level1 == 'enabled'", null),
+                    new PropertyInfo(
+                        "config2", "OBJECT", null, false, true, null,
+                        List.of(
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, "'enabled' == level1", null),
+                            new PropertyInfo(
+                                "config3", "OBJECT", null, false, true, null,
+                                List.of(
+                                    new PropertyInfo(
+                                        "finalValue", "STRING", null, true, true, "level1 == 'enabled'", null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1802,46 +1954,48 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("uri", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("allowUnauthorizedCerts", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("responseType", "STRING", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("responseFilename", "STRING", null, false, true, "responseType == 'BINARY'",
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("uri", "STRING", null, true, true, null, null),
+            new PropertyInfo("allowUnauthorizedCerts", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("responseType", "STRING", null, false, true, null, null),
+            new PropertyInfo("responseFilename", "STRING", null, false, true, "responseType == 'BINARY'",
                 null),
-            new ToolUtils.PropertyInfo("headers", "OBJECT", "", false, true, null, null),
-            new ToolUtils.PropertyInfo("queryParameters", "OBJECT", "", false, true, null, null),
-            new ToolUtils.PropertyInfo("body", "OBJECT", "", false, true, null, List.of(
-                new ToolUtils.PropertyInfo("bodyContentType", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'JSON'",
-                    null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'XML'",
-                    null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
-                    "body.bodyContentType == 'FORM_DATA'", null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
-                    "body.bodyContentType == 'FORM_URL_ENCODED'", null),
-                new ToolUtils.PropertyInfo("bodyContent", "STRING", null, false, true, "body.bodyContentType == 'RAW'",
-                    null),
-                new ToolUtils.PropertyInfo("bodyContent", "OBJECT", null, false, true,
-                    "body.bodyContentType == 'BINARY'", List.of(
-                        new ToolUtils.PropertyInfo("extension", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("mimeType", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("url", "STRING", null, true, true, null, null))),
-                new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
-                    "'BINARY' == body.bodyContentType", null),
-                new ToolUtils.PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
-                    "'RAW' == body.bodyContentType", null))),
-            new ToolUtils.PropertyInfo("fullResponse", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("followAllRedirects", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("followRedirect", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("ignoreResponseCode", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("proxy", "STRING", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("timeout", "INTEGER", null, false, true, null, null));
+            new PropertyInfo("headers", "OBJECT", "", false, true, null, null),
+            new PropertyInfo("queryParameters", "OBJECT", "", false, true, null, null),
+            new PropertyInfo(
+                "body", "OBJECT", "", false, true, null,
+                List.of(
+                    new PropertyInfo("bodyContentType", "STRING", null, false, true, null, null),
+                    new PropertyInfo(
+                        "bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'JSON'", null),
+                    new PropertyInfo("bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'XML'", null),
+                    new PropertyInfo(
+                        "bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'FORM_DATA'", null),
+                    new PropertyInfo(
+                        "bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'FORM_URL_ENCODED'", null),
+                    new PropertyInfo("bodyContent", "STRING", null, false, true, "body.bodyContentType == 'RAW'", null),
+                    new PropertyInfo(
+                        "bodyContent", "OBJECT", null, false, true, "body.bodyContentType == 'BINARY'",
+                        List.of(
+                            new PropertyInfo("extension", "STRING", null, true, true, null, null),
+                            new PropertyInfo("mimeType", "STRING", null, true, true, null, null),
+                            new PropertyInfo("name", "STRING", null, true, true, null, null),
+                            new PropertyInfo("url", "STRING", null, true, true, null, null))),
+                    new PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
+                        "'BINARY' == body.bodyContentType", null),
+                    new PropertyInfo("bodyContentMimeType", "STRING", null, false, true,
+                        "'RAW' == body.bodyContentType", null))),
+            new PropertyInfo("fullResponse", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("followAllRedirects", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("followRedirect", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("ignoreResponseCode", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("proxy", "STRING", null, false, true, null, null),
+            new PropertyInfo("timeout", "INTEGER", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1861,41 +2015,56 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                    new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
-                            "conditions[index][index].operation != 'EMPTY'", null))),
-                    new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
-                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-            new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-            new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
-            new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "conditions", "ARRAY", null, false, true, "rawExpression == false",
+                List.of(
+                    new PropertyInfo(
+                        null, "ARRAY", null, false, false, null,
+                        List.of(
+                            new PropertyInfo(
+                                "boolean", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "dateTime", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "number", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "NUMBER", null, true, true,
+                                        "conditions[index][index].operation != 'EMPTY'", null))),
+                            new PropertyInfo(
+                                "string", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "STRING", null, true, true,
+                                        "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+            new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+            new PropertyInfo(
+                "caseTrue", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))),
+            new PropertyInfo(
+                "caseFalse", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1921,41 +2090,57 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                    new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
-                            "conditions[index][index].operation != 'EMPTY'", null))),
-                    new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
-                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-            new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-            new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
-            new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "conditions", "ARRAY", null, false, true, "rawExpression == false",
+                List.of(
+                    new PropertyInfo(
+                        null, "ARRAY", null, false, false, null,
+                        List.of(
+                            new PropertyInfo(
+                                "boolean", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "dateTime", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "number", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo(
+                                        "value2", "NUMBER", null, true, true,
+                                        "conditions[index][index].operation != 'EMPTY'", null))),
+                            new PropertyInfo(
+                                "string", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "STRING", null, true, true,
+                                        "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+            new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+            new PropertyInfo(
+                "caseTrue", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))),
+            new PropertyInfo(
+                "caseFalse", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1995,41 +2180,57 @@ class WorkflowValidatorTest {
             }
             """;
 
-        List<ToolUtils.PropertyInfo> taskDefinition = List.of(
-            new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-            new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                    new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                    new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
-                            "conditions[index][index].operation != 'EMPTY'", null))),
-                    new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                        new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                        new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
-                            "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-            new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-            new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))),
-            new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null))));
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo(
+                "conditions", "ARRAY", null, false, true, "rawExpression == false",
+                List.of(
+                    new PropertyInfo(
+                        null, "ARRAY", null, false, false, null,
+                        List.of(
+                            new PropertyInfo("boolean", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "dateTime", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                            new PropertyInfo(
+                                "number", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo(
+                                        "value2", "NUMBER", null, true, true,
+                                        "conditions[index][index].operation != 'EMPTY'",
+                                        null))),
+                            new PropertyInfo("string", "OBJECT", null, false, false, null,
+                                List.of(
+                                    new PropertyInfo("type", "STRING", null, false, true, null, null),
+                                    new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                                    new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                                    new PropertyInfo(
+                                        "value2", "STRING", null, true, true,
+                                        "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
+            new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+            new PropertyInfo(
+                "caseTrue", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))),
+            new PropertyInfo(
+                "caseFalse", "ARRAY", null, false, true, null,
+                List.of(new PropertyInfo(null, "TASK", null, false, true, null, null))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+
+        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -2060,27 +2261,29 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
+                new PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -2101,23 +2304,23 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of());
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1",
-            new ToolUtils.PropertyInfo("testTask1", "component/v1/action", "", true, true, null, null));
+            new PropertyInfo("testTask1", "component/v1/action", "", true, true, null, null));
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Missing required field: label", errors.toString());
             assertEquals("", warnings.toString());
@@ -2141,24 +2344,26 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)));
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("""
                 Property 'name' has incorrect type. Expected: string, but got: integer
@@ -2194,30 +2399,33 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
+                new PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskNode : tasksJsonNode) {
+                taskJsonNodes.add(taskNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
-            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
+            assertEquals(
+                "Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
@@ -2249,27 +2457,29 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
+                new PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals(
                 "Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
@@ -2314,30 +2524,32 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, true, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)),
+                new PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
+                new PropertyInfo("active", "BOOLEAN", null, true, true, null, null),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1, "component/v1/action2", action3, "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
                 errors.toString());
@@ -2360,27 +2572,30 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of());
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
-            assertTrue(errors.toString()
-                .contains("Missing required field: parameters") ||
-                errors.toString()
-                    .contains("Task definition must have a 'parameters' object"));
+            String string = errors.toString();
+
+            assertTrue(
+                string.contains("Missing required field: parameters") ||
+                    string.contains("Task definition must have a 'parameters' object"));
         } catch (Exception e) {
             fail("Should handle missing parameters field: " + e.getMessage());
         }
@@ -2408,26 +2623,28 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)),
+                new PropertyInfo("name", "STRING", null, true, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, true, true, null, null)));
+                new PropertyInfo("age", "INTEGER", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("""
                 Missing required field: label
@@ -2461,25 +2678,26 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, null)));
+                new PropertyInfo("items", "ARRAY", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -2520,27 +2738,29 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("date", "DATE_TIME", null, false, true, null, null)));
+                new PropertyInfo("name", "STRING", null, false, true, null, null),
+                new PropertyInfo("date", "DATE_TIME", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1,
             "component/v1/action1", action4);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             // this is an exception, every value can be converted to string
             assertEquals("", errors.toString());
@@ -2574,26 +2794,28 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null)));
+                new PropertyInfo("name", "STRING", null, false, true, null, null),
+                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskNode : tasksJsonNode) {
+                taskJsonNodes.add(taskNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Task 'invalidformat' doesn't exits.", errors.toString());
             assertEquals("", warnings.toString());
@@ -2625,24 +2847,26 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
+                new PropertyInfo("name", "STRING", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of();
+        Map<String, PropertyInfo> taskOutputMap = Map.of();
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
@@ -2687,31 +2911,33 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("height", "NUMBER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)),
+                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("height", "NUMBER", null, false, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("activeString", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("heightString", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("ageString", "STRING", null, false, true, null, null)));
+                new PropertyInfo("activeString", "STRING", null, false, true, null, null),
+                new PropertyInfo("heightString", "STRING", null, false, true, null, null),
+                new PropertyInfo("ageString", "STRING", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", actionObj);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -2745,27 +2971,29 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("height", "NUMBER", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null)));
+                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("height", "NUMBER", null, false, true, null, null),
+                new PropertyInfo("age", "INTEGER", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", actionArr);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -2806,30 +3034,33 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("configs", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo("setting", "STRING", null, true, true, null, null),
-                    new ToolUtils.PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)))));
+                new PropertyInfo("configs", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo("setting", "STRING", null, true, true, null, null),
+                    new PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)))));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
-            assertEquals("Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'",
+            assertEquals(
+                "Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -2861,27 +3092,29 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("value", "STRING", null, false, true, null, null)));
+                new PropertyInfo("name", "STRING", null, false, true, null, null),
+                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("value", "STRING", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Property 'active' has incorrect type. Expected: boolean, but got: string", errors.toString());
             assertEquals("", warnings.toString());
@@ -2938,33 +3171,35 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "loop/v1", List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
-                new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
+                new PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
+                new PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
+                new PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", actionArr,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("""
                 Property 'loop1.item[0]' in output of 'loop/v1' is of type string, not number
@@ -3017,35 +3252,38 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "loop/v1", List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
-                new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
+                new PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
+                new PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
+                new PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", actionArr,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
-            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
+            assertEquals(
+                "Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -3106,57 +3344,59 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
-                new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                    new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "NUMBER", null, true, true,
                                 "conditions[index][index].operation != 'EMPTY'", null))),
-                        new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                        new PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "STRING", null, true, true,
                                 "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-                new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-                new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
-                new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
+                new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)));
+                new PropertyInfo("name", "STRING", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
@@ -3224,57 +3464,59 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
-                new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                    new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "NUMBER", null, true, true,
                                 "conditions[index][index].operation != 'EMPTY'", null))),
-                        new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                        new PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "STRING", null, true, true,
                                 "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-                new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-                new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
-                new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
+                new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null)));
+                new PropertyInfo("name", "STRING", null, true, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
+
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Missing required property: name", errors.toString());
             assertEquals("""
@@ -3358,64 +3600,65 @@ class WorkflowValidatorTest {
             ]
             """;
 
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = Map.of(
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
             "component/v1/trigger1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
-                new ToolUtils.PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
-                    new ToolUtils.PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
-                        new ToolUtils.PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
-                        new ToolUtils.PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "NUMBER", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "NUMBER", null, true, true,
+                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
+                    new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "BOOLEAN", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "BOOLEAN", null, true, true, null, null))),
+                        new PropertyInfo("dateTime", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "DATE_TIME", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "DATE_TIME", null, true, true, null, null))),
+                        new PropertyInfo("number", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "NUMBER", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "NUMBER", null, true, true,
                                 "conditions[index][index].operation != 'EMPTY'", null))),
-                        new ToolUtils.PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
-                            new ToolUtils.PropertyInfo("type", "STRING", null, false, true, null, null),
-                            new ToolUtils.PropertyInfo("value1", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("operation", "STRING", null, true, true, null, null),
-                            new ToolUtils.PropertyInfo("value2", "STRING", null, true, true,
+                        new PropertyInfo("string", "OBJECT", null, false, false, null, List.of(
+                            new PropertyInfo("type", "STRING", null, false, true, null, null),
+                            new PropertyInfo("value1", "STRING", null, true, true, null, null),
+                            new PropertyInfo("operation", "STRING", null, true, true, null, null),
+                            new PropertyInfo("value2", "STRING", null, true, true,
                                 "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", null))))))),
-                new ToolUtils.PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
-                new ToolUtils.PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null))),
-                new ToolUtils.PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, false, null, null)))),
+                new PropertyInfo("expression", "STRING", null, false, true, "rawExpression == true", null),
+                new PropertyInfo("caseTrue", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null))),
+                new PropertyInfo("caseFalse", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, false, null, null)))),
             "loop/v1", List.of(
-                new ToolUtils.PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
-                new ToolUtils.PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
-                new ToolUtils.PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
-                    new ToolUtils.PropertyInfo(null, "TASK", null, false, true, null, null)))),
+                new PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
+                new PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, true, null, null)))),
             "component/v1/action1", List.of(
-                new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null)),
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action2", List.of(
-                new ToolUtils.PropertyInfo("age", "NUMBER", null, false, true, null, null)));
+                new PropertyInfo("age", "NUMBER", null, false, true, null, null)));
 
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = Map.of(
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", actionArr,
             "component/v1/action1", action1);
 
         try {
-            JsonNode tasksNode = WorkflowParser.parseJsonString(tasksJson);
-            List<JsonNode> tasks = new ArrayList<>();
-            for (JsonNode taskNode : tasksNode) {
-                tasks.add(taskNode);
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
             }
             StringBuilder errors = new StringBuilder();
             StringBuilder warnings = new StringBuilder();
 
-            WorkflowValidator.validateWorkflowTasks(tasks, taskDefinitions, taskOutputs, errors, warnings);
+            WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
             assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
@@ -3458,10 +3701,10 @@ class WorkflowValidatorTest {
 
         // Mock task definition and output providers
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, false, true, null, null));
+            new PropertyInfo("name", "STRING", null, false, true, null, null));
 
         WorkflowValidator.TaskOutputProvider taskOutputProvider =
-            (taskType, kind, warningsBuilder) -> new ToolUtils.PropertyInfo("result", "STRING", null, false, false,
+            (taskType, kind, warningsBuilder) -> new PropertyInfo("result", "STRING", null, false, false,
                 null, null);
 
         WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, new HashMap<>(),
@@ -3602,18 +3845,18 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
-            taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
+            taskOutputMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
         assertEquals("{component/v1/action1=[], component/v1/trigger1=[], condition/v1=[]}",
-            taskDefinitions.toString());
+            taskDefinitionMap.toString());
         assertEquals("{component/v1/action1=null, component/v1/trigger1=null, condition/v1=null}",
-            taskOutputs.toString());
+            taskOutputMap.toString());
     }
 
     @Test
@@ -3669,22 +3912,22 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
-            taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
+            taskOutputMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
         assertEquals("{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[]}",
-            taskDefinitions.toString());
+            taskDefinitionMap.toString());
         assertEquals("{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null}",
-            taskOutputs.toString());
+            taskOutputMap.toString());
     }
 
     @Test
-    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionsMultipleFlowsNoErrors() {
+    void validateWorkflowTasksAddsNestedTasksTotaskDefinitionMapMultipleFlowsNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -3774,20 +4017,20 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of();
         WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
-        Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions = new HashMap<>();
-        Map<String, ToolUtils.PropertyInfo> taskOutputs = new HashMap<>();
+        Map<String, List<PropertyInfo>> taskDefinitionMap = new HashMap<>();
+        Map<String, PropertyInfo> taskOutputMap = new HashMap<>();
 
-        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitions,
-            taskOutputs, errors, warnings);
+        WorkflowValidator.validateCompleteWorkflow(workflow, taskDefProvider, taskOutputProvider, taskDefinitionMap,
+            taskOutputMap, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
         assertEquals(
             "{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[], condition/v1=[]}",
-            taskDefinitions.toString());
+            taskDefinitionMap.toString());
         assertEquals(
             "{component/v1/action2=null, component/v1/action1=null, component/v1/trigger1=null, loop/v1=null, condition/v1=null}",
-            taskOutputs.toString());
+            taskOutputMap.toString());
     }
 
     @Test
@@ -3808,8 +4051,8 @@ class WorkflowValidatorTest {
         StringBuilder warnings = new StringBuilder();
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null));
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "INTEGER", null, false, true, null, null));
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
@@ -3855,8 +4098,8 @@ class WorkflowValidatorTest {
         StringBuilder warnings = new StringBuilder();
 
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
-            new ToolUtils.PropertyInfo("name", "STRING", null, true, true, null, null),
-            new ToolUtils.PropertyInfo("age", "INTEGER", null, false, true, null, null));
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "INTEGER", null, false, true, null, null));
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
@@ -3868,17 +4111,21 @@ class WorkflowValidatorTest {
     void taskDefinitionProviderFunctionalInterfaceWorksCorrectly() {
         WorkflowValidator.TaskDefinitionProvider provider = (taskType, kind) -> {
             if ("test/v1".equals(taskType)) {
-                return List.of(new ToolUtils.PropertyInfo("test", "STRING", null, false, true, null, null));
+                return List.of(new PropertyInfo("test", "STRING", null, false, true, null, null));
             }
             return List.of();
         };
 
-        List<ToolUtils.PropertyInfo> result = provider.getTaskProperties("test/v1", "action");
-        assertEquals(1, result.size());
-        assertEquals("test", result.get(0)
-            .name());
+        List<PropertyInfo> result = provider.getTaskProperties("test/v1", "action");
 
-        List<ToolUtils.PropertyInfo> emptyResult = provider.getTaskProperties("unknown/v1", "action");
+        assertEquals(1, result.size());
+
+        PropertyInfo propertyInfo = result.getFirst();
+
+        assertEquals("test", propertyInfo.name());
+
+        List<PropertyInfo> emptyResult = provider.getTaskProperties("unknown/v1", "action");
+
         assertTrue(emptyResult.isEmpty());
     }
 
@@ -3886,22 +4133,29 @@ class WorkflowValidatorTest {
     void taskOutputProviderFunctionalInterfaceWorksCorrectly() {
         WorkflowValidator.TaskOutputProvider provider = (taskType, kind, warnings) -> {
             if ("test/v1".equals(taskType)) {
-                return new ToolUtils.PropertyInfo("output", "STRING", null, false, false, null, null);
+                return new PropertyInfo("output", "STRING", null, false, false, null, null);
             }
-            warnings.append("Unknown task type: ")
-                .append(taskType);
+
+            warnings.append("Unknown task type: ");
+            warnings.append(taskType);
+
             return null;
         };
 
         StringBuilder warnings = new StringBuilder();
-        ToolUtils.PropertyInfo result = provider.getTaskOutputProperty("test/v1", "action", warnings);
-        assertNotNull(result);
-        assertEquals("output", result.name());
+
+        PropertyInfo resultPropertyInfo = provider.getTaskOutputProperty("test/v1", "action", warnings);
+
+        assertNotNull(resultPropertyInfo);
+        assertEquals("output", resultPropertyInfo.name());
         assertEquals("", warnings.toString());
 
-        ToolUtils.PropertyInfo nullResult = provider.getTaskOutputProperty("unknown/v1", "action", warnings);
-        assertNull(nullResult);
-        assertTrue(warnings.toString()
-            .contains("Unknown task type: unknown/v1"));
+        PropertyInfo nullResultPropertyInfo = provider.getTaskOutputProperty("unknown/v1", "action", warnings);
+
+        assertNull(nullResultPropertyInfo);
+
+        String warningsString = warnings.toString();
+
+        assertTrue(warningsString.contains("Unknown task type: unknown/v1"));
     }
 }
