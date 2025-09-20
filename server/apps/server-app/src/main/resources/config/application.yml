@@ -224,6 +224,9 @@ templates:
   owner: bytechefhq
   ref: master
   repo: bytechef-workflows
+  submission-form:
+    projects: https://forms.gle/W6zsUuwd7qPtoE836
+    workflows: https://forms.gle/xA8yyUSzKkHYajHx5
 
 ######################################################################
 

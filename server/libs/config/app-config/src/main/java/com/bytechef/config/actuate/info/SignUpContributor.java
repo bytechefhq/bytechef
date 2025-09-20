@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.featureflags.actuate.info;
+package com.bytechef.config.actuate.info;
 
 import com.bytechef.config.ApplicationProperties;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 
 /**
- * Feature flags info contributor.
- *
  * @author Ivica Cardic
  */
 @Component
-public class FeatureFlagsContributor implements InfoContributor {
+public class SignUpContributor implements InfoContributor {
 
-    private final List<String> featureFlags;
+    private final ApplicationProperties.SignUp signUp;
 
-    public FeatureFlagsContributor(ApplicationProperties applicationProperties) {
-        this.featureFlags = applicationProperties.getFeatureFlags();
+    public SignUpContributor(ApplicationProperties applicationProperties) {
+        this.signUp = applicationProperties.getSignUp();
     }
 
     @Override
     public void contribute(Info.Builder builder) {
-        if (featureFlags != null) {
-            builder.withDetail(
-                "featureFlags",
-                featureFlags.stream()
-                    .collect(Collectors.toMap(featureFlag -> featureFlag, featureFlag -> true)));
-        }
+        builder.withDetail("signUp", signUp);
     }
 }
