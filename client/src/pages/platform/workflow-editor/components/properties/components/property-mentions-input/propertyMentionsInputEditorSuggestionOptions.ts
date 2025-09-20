@@ -95,7 +95,7 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                     }
 
                     popup = tippy('body', {
-                        appendTo: () => document.body,
+                        appendTo: () => props.editor.view.dom.closest('.property-mentions-editor') || document.body,
                         content: component.element,
                         getReferenceClientRect: () => props.clientRect?.() ?? DOM_RECT_FALLBACK,
                         interactive: true,
