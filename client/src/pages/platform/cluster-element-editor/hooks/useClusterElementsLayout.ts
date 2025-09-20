@@ -121,7 +121,7 @@ const useClusterElementsLayout = () => {
 
         nodes.push(mainRootClusterElementNode);
 
-        const clusterElements = mainRootClusterElementTask.clusterElements || {};
+        const clusterElements = mainRootClusterElementTask?.clusterElements || {};
 
         const clusterElementNodes = createClusterElementsNodes({
             clusterElements,
@@ -204,7 +204,8 @@ const useClusterElementsLayout = () => {
             return;
         }
 
-        const clusterElements = mainRootClusterElementTask.clusterElements || {};
+        const clusterElements = mainRootClusterElementTask?.clusterElements || {};
+
         const clusterRoots = getClusterRootQueryParameters(clusterElements);
 
         const fetchAndUpdateDefinitions = async () => {
