@@ -104,7 +104,13 @@ const ProjectWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
-                <div className="w-80 text-sm font-semibold">{workflow.label}</div>
+                <div className="w-80 pr-1 text-sm font-semibold">
+                    <Tooltip>
+                        <TooltipTrigger className="line-clamp-1 text-start">{workflow.label}</TooltipTrigger>
+
+                        <TooltipContent>{workflow.label}</TooltipContent>
+                    </Tooltip>
+                </div>
 
                 <WorkflowComponentsList
                     filteredComponentNames={filteredComponentNames || []}
