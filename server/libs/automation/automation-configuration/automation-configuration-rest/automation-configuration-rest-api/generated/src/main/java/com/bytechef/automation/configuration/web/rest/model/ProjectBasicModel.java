@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-12T06:20:37.341403+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-15T19:36:10.115621+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectBasicModel {
 
   private @Nullable String createdBy;
@@ -51,6 +51,8 @@ public class ProjectBasicModel {
   private @Nullable ProjectStatusModel lastStatus;
 
   private @Nullable Integer lastProjectVersion;
+
+  private @Nullable String uuid;
 
   public ProjectBasicModel() {
     super();
@@ -263,6 +265,26 @@ public class ProjectBasicModel {
     this.lastProjectVersion = lastProjectVersion;
   }
 
+  public ProjectBasicModel uuid(@Nullable String uuid) {
+    this.uuid = uuid;
+    return this;
+  }
+
+  /**
+   * The uuid of a project.
+   * @return uuid
+   */
+  
+  @Schema(name = "uuid", description = "The uuid of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("uuid")
+  public @Nullable String getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(@Nullable String uuid) {
+    this.uuid = uuid;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -281,12 +303,13 @@ public class ProjectBasicModel {
         Objects.equals(this.name, projectBasic.name) &&
         Objects.equals(this.lastPublishedDate, projectBasic.lastPublishedDate) &&
         Objects.equals(this.lastStatus, projectBasic.lastStatus) &&
-        Objects.equals(this.lastProjectVersion, projectBasic.lastProjectVersion);
+        Objects.equals(this.lastProjectVersion, projectBasic.lastProjectVersion) &&
+        Objects.equals(this.uuid, projectBasic.uuid);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid);
   }
 
   @Override
@@ -303,6 +326,7 @@ public class ProjectBasicModel {
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
+    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
     sb.append("}");
     return sb.toString();
   }
