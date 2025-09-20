@@ -67,10 +67,6 @@
         "value" : "mistral-small-latest"
       }, {
         "description" : null,
-        "label" : "open-codestral-mamba",
-        "value" : "open-codestral-mamba"
-      }, {
-        "description" : null,
         "label" : "open-mistral-nemo",
         "value" : "open-mistral-nemo"
       }, {
@@ -1718,10 +1714,6 @@
         "description" : null,
         "label" : "mistral-small-latest",
         "value" : "mistral-small-latest"
-      }, {
-        "description" : null,
-        "label" : "open-codestral-mamba",
-        "value" : "open-codestral-mamba"
       }, {
         "description" : null,
         "label" : "open-mistral-nemo",
