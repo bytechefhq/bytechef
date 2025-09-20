@@ -44,6 +44,23 @@ export type Category = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type ComponentDefinition = {
+  __typename?: 'ComponentDefinition';
+  connection?: Maybe<ConnectionDefinition>;
+  description: Scalars['String']['output'];
+  icon: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ComponentDefinitionTuple = {
+  __typename?: 'ComponentDefinitionTuple';
+  key?: Maybe<Scalars['String']['output']>;
+  value: Array<Maybe<ComponentDefinition>>;
+};
+
 export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -96,6 +113,12 @@ export type ConnectedUserProjectWorkflow = {
   workflow: Workflow;
   workflowUuid: Scalars['ID']['output'];
   workflowVersion: Scalars['Int']['output'];
+};
+
+export type ConnectionDefinition = {
+  __typename?: 'ConnectionDefinition';
+  authorizationRequired: Scalars['Boolean']['output'];
+  version: Scalars['Int']['output'];
 };
 
 export type CreateMcpProjectWithWorkflowsInput = {
@@ -269,7 +292,7 @@ export enum ModeType {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  _empty?: Maybe<Scalars['String']['output']>;
+  _placeholder?: Maybe<Scalars['Boolean']['output']>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpProjectWithWorkflows?: Maybe<McpProject>;
@@ -282,6 +305,12 @@ export type Mutation = {
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServerFromWorkspace?: Maybe<Scalars['Boolean']['output']>;
+  deleteSharedProject: Scalars['Boolean']['output'];
+  deleteSharedWorkflow: Scalars['Boolean']['output'];
+  exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
+  exportSharedWorkflow: Scalars['Boolean']['output'];
+  importProjectTemplate: Scalars['ID']['output'];
+  importWorkflowTemplate: Scalars['ID']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
@@ -349,6 +378,42 @@ export type MutationDeleteMcpServerFromWorkspaceArgs = {
 };
 
 
+export type MutationDeleteSharedProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSharedWorkflowArgs = {
+  workflowId: Scalars['String']['input'];
+};
+
+
+export type MutationExportSharedProjectArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationExportSharedWorkflowArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  workflowId: Scalars['String']['input'];
+};
+
+
+export type MutationImportProjectTemplateArgs = {
+  id: Scalars['String']['input'];
+  sharedProject: Scalars['Boolean']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationImportWorkflowTemplateArgs = {
+  id: Scalars['String']['input'];
+  projectId: Scalars['ID']['input'];
+  sharedWorkflow: Scalars['Boolean']['input'];
+};
+
+
 export type MutationUpdateMcpComponentWithToolsArgs = {
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
@@ -394,9 +459,26 @@ export type ProjectDeploymentWorkflow = {
   workflowId: Scalars['String']['output'];
 };
 
+export type ProjectInfo = {
+  __typename?: 'ProjectInfo';
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+};
+
+export type ProjectTemplate = {
+  __typename?: 'ProjectTemplate';
+  components: Array<Maybe<ComponentDefinitionTuple>>;
+  description?: Maybe<Scalars['String']['output']>;
+  exported: Scalars['Boolean']['output'];
+  project?: Maybe<ProjectInfo>;
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+  publicUrl?: Maybe<Scalars['String']['output']>;
+  workflows: Array<Maybe<WorkflowInfo>>;
+};
+
 export type Query = {
   __typename?: 'Query';
-  _empty?: Maybe<Scalars['String']['output']>;
+  _placeholder?: Maybe<Scalars['Boolean']['output']>;
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
@@ -420,7 +502,11 @@ export type Query = {
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
   project?: Maybe<Project>;
+  projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  sharedProject?: Maybe<SharedProject>;
+  sharedWorkflow?: Maybe<SharedWorkflow>;
+  workflowTemplate?: Maybe<WorkflowTemplate>;
 };
 
 
@@ -520,6 +606,50 @@ export type QueryProjectArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
+
+export type QueryProjectTemplateArgs = {
+  id: Scalars['String']['input'];
+  sharedProject: Scalars['Boolean']['input'];
+};
+
+
+export type QuerySharedProjectArgs = {
+  projectUuid: Scalars['String']['input'];
+};
+
+
+export type QuerySharedWorkflowArgs = {
+  workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryWorkflowTemplateArgs = {
+  id: Scalars['String']['input'];
+  sharedWorkflow: Scalars['Boolean']['input'];
+};
+
+export type SharedProject = {
+  __typename?: 'SharedProject';
+  description?: Maybe<Scalars['String']['output']>;
+  exported: Scalars['Boolean']['output'];
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+  publicUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type SharedWorkflow = {
+  __typename?: 'SharedWorkflow';
+  description?: Maybe<Scalars['String']['output']>;
+  exported: Scalars['Boolean']['output'];
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+  publicUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type SharedWorkflowInfo = {
+  __typename?: 'SharedWorkflowInfo';
+  description?: Maybe<Scalars['String']['output']>;
+  label: Scalars['String']['output'];
+};
+
 export type Tag = {
   __typename?: 'Tag';
   id: Scalars['ID']['output'];
@@ -535,11 +665,29 @@ export type Workflow = {
   __typename?: 'Workflow';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   label: Scalars['String']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type WorkflowInfo = {
+  __typename?: 'WorkflowInfo';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+};
+
+export type WorkflowTemplate = {
+  __typename?: 'WorkflowTemplate';
+  components: Array<Maybe<ComponentDefinition>>;
+  description?: Maybe<Scalars['String']['output']>;
+  exported: Scalars['Boolean']['output'];
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+  publicUrl?: Maybe<Scalars['String']['output']>;
+  workflow?: Maybe<SharedWorkflowInfo>;
 };
 
 export type CreateMcpProjectWithWorkflowsMutationVariables = Exact<{
@@ -570,6 +718,54 @@ export type DeleteMcpServerMutationVariables = Exact<{
 
 export type DeleteMcpServerMutation = { __typename?: 'Mutation', deleteMcpServerFromWorkspace?: boolean | null };
 
+export type DeleteSharedProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteSharedProjectMutation = { __typename?: 'Mutation', deleteSharedProject: boolean };
+
+export type DeleteSharedWorkflowMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+}>;
+
+
+export type DeleteSharedWorkflowMutation = { __typename?: 'Mutation', deleteSharedWorkflow: boolean };
+
+export type ExportSharedProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ExportSharedProjectMutation = { __typename?: 'Mutation', exportSharedProject?: boolean | null };
+
+export type ExportSharedWorkflowMutationVariables = Exact<{
+  workflowId: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ExportSharedWorkflowMutation = { __typename?: 'Mutation', exportSharedWorkflow: boolean };
+
+export type ImportProjectTemplateMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+  sharedProject: Scalars['Boolean']['input'];
+}>;
+
+
+export type ImportProjectTemplateMutation = { __typename?: 'Mutation', importProjectTemplate: string };
+
+export type ImportWorkflowTemplateMutationVariables = Exact<{
+  workflowUuid: Scalars['String']['input'];
+  projectId: Scalars['ID']['input'];
+  sharedWorkflow: Scalars['Boolean']['input'];
+}>;
+
+
+export type ImportWorkflowTemplateMutation = { __typename?: 'Mutation', importWorkflowTemplate: string };
+
 export type McpProjectsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
@@ -591,6 +787,28 @@ export type ProjectByIdQueryVariables = Exact<{
 
 export type ProjectByIdQuery = { __typename?: 'Query', project?: { __typename?: 'Project', id: string, name: string } | null };
 
+export type ProjectTemplateQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+  sharedProject: Scalars['Boolean']['input'];
+}>;
+
+
+export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> } | null>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string } | null> } | null };
+
+export type SharedProjectQueryVariables = Exact<{
+  projectUuid: Scalars['String']['input'];
+}>;
+
+
+export type SharedProjectQuery = { __typename?: 'Query', sharedProject?: { __typename?: 'SharedProject', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+
+export type SharedWorkflowQueryVariables = Exact<{
+  workflowUuid: Scalars['String']['input'];
+}>;
+
+
+export type SharedWorkflowQuery = { __typename?: 'Query', sharedWorkflow?: { __typename?: 'SharedWorkflow', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+
 export type UpdateMcpServerMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   input: McpServerUpdateInput;
@@ -606,6 +824,14 @@ export type UpdateMcpServerTagsMutationVariables = Exact<{
 
 
 export type UpdateMcpServerTagsMutation = { __typename?: 'Mutation', updateMcpServerTags?: Array<{ __typename?: 'Tag', id: string } | null> | null };
+
+export type WorkflowTemplateQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+  sharedWorkflow: Scalars['Boolean']['input'];
+}>;
+
+
+export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null, workflow?: { __typename?: 'SharedWorkflowInfo', label: string } | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> } | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -708,7 +934,7 @@ export const useCreateMcpProjectWithWorkflowsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpProjectWithWorkflowsMutation, TError, CreateMcpProjectWithWorkflowsMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpProjectWithWorkflowsMutation, TError, CreateMcpProjectWithWorkflowsMutationVariables, TContext>(
       {
     mutationKey: ['createMcpProjectWithWorkflows'],
@@ -733,7 +959,7 @@ export const useCreateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['createMcpServer'],
@@ -752,7 +978,7 @@ export const useDeleteMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpProject'],
@@ -771,11 +997,133 @@ export const useDeleteMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpServer'],
     mutationFn: (variables?: DeleteMcpServerMutationVariables) => fetcher<DeleteMcpServerMutation, DeleteMcpServerMutationVariables>(DeleteMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteSharedProjectDocument = `
+    mutation deleteSharedProject($id: ID!) {
+  deleteSharedProject(id: $id)
+}
+    `;
+
+export const useDeleteSharedProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteSharedProject'],
+    mutationFn: (variables?: DeleteSharedProjectMutationVariables) => fetcher<DeleteSharedProjectMutation, DeleteSharedProjectMutationVariables>(DeleteSharedProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteSharedWorkflowDocument = `
+    mutation deleteSharedWorkflow($workflowId: String!) {
+  deleteSharedWorkflow(workflowId: $workflowId)
+}
+    `;
+
+export const useDeleteSharedWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteSharedWorkflow'],
+    mutationFn: (variables?: DeleteSharedWorkflowMutationVariables) => fetcher<DeleteSharedWorkflowMutation, DeleteSharedWorkflowMutationVariables>(DeleteSharedWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ExportSharedProjectDocument = `
+    mutation exportSharedProject($id: ID!, $description: String) {
+  exportSharedProject(id: $id, description: $description)
+}
+    `;
+
+export const useExportSharedProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>) => {
+    
+    return useMutation<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['exportSharedProject'],
+    mutationFn: (variables?: ExportSharedProjectMutationVariables) => fetcher<ExportSharedProjectMutation, ExportSharedProjectMutationVariables>(ExportSharedProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ExportSharedWorkflowDocument = `
+    mutation exportSharedWorkflow($workflowId: String!, $description: String) {
+  exportSharedWorkflow(workflowId: $workflowId, description: $description)
+}
+    `;
+
+export const useExportSharedWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['exportSharedWorkflow'],
+    mutationFn: (variables?: ExportSharedWorkflowMutationVariables) => fetcher<ExportSharedWorkflowMutation, ExportSharedWorkflowMutationVariables>(ExportSharedWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ImportProjectTemplateDocument = `
+    mutation importProjectTemplate($id: String!, $workspaceId: ID!, $sharedProject: Boolean!) {
+  importProjectTemplate(
+    id: $id
+    workspaceId: $workspaceId
+    sharedProject: $sharedProject
+  )
+}
+    `;
+
+export const useImportProjectTemplateMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>) => {
+    
+    return useMutation<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>(
+      {
+    mutationKey: ['importProjectTemplate'],
+    mutationFn: (variables?: ImportProjectTemplateMutationVariables) => fetcher<ImportProjectTemplateMutation, ImportProjectTemplateMutationVariables>(ImportProjectTemplateDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ImportWorkflowTemplateDocument = `
+    mutation importWorkflowTemplate($workflowUuid: String!, $projectId: ID!, $sharedWorkflow: Boolean!) {
+  importWorkflowTemplate(
+    id: $workflowUuid
+    projectId: $projectId
+    sharedWorkflow: $sharedWorkflow
+  )
+}
+    `;
+
+export const useImportWorkflowTemplateMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>) => {
+    
+    return useMutation<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>(
+      {
+    mutationKey: ['importWorkflowTemplate'],
+    mutationFn: (variables?: ImportWorkflowTemplateMutationVariables) => fetcher<ImportWorkflowTemplateMutation, ImportWorkflowTemplateMutationVariables>(ImportWorkflowTemplateDocument, variables)(),
     ...options
   }
     )};
@@ -835,7 +1183,7 @@ export const useMcpProjectsByServerIdQuery = <
       variables: McpProjectsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpProjectsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpProjectsByServerId', variables],
@@ -874,7 +1222,7 @@ export const useMcpServersByWorkspaceQuery = <
       variables: McpServersByWorkspaceQueryVariables,
       options?: Omit<UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServersByWorkspaceQuery, TError, TData>(
       {
     queryKey: ['mcpServersByWorkspace', variables],
@@ -899,11 +1247,111 @@ export const useProjectByIdQuery = <
       variables: ProjectByIdQueryVariables,
       options?: Omit<UseQueryOptions<ProjectByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ProjectByIdQuery, TError, TData>(
       {
     queryKey: ['projectById', variables],
     queryFn: fetcher<ProjectByIdQuery, ProjectByIdQueryVariables>(ProjectByIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const ProjectTemplateDocument = `
+    query projectTemplate($id: String!, $sharedProject: Boolean!) {
+  projectTemplate(id: $id, sharedProject: $sharedProject) {
+    components {
+      key
+      value {
+        connection {
+          version
+        }
+        icon
+        name
+        title
+        version
+      }
+    }
+    description
+    exported
+    project {
+      name
+    }
+    projectVersion
+    publicUrl
+    workflows {
+      id
+      label
+    }
+  }
+}
+    `;
+
+export const useProjectTemplateQuery = <
+      TData = ProjectTemplateQuery,
+      TError = unknown
+    >(
+      variables: ProjectTemplateQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectTemplateQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectTemplateQuery, TError, TData>(
+      {
+    queryKey: ['projectTemplate', variables],
+    queryFn: fetcher<ProjectTemplateQuery, ProjectTemplateQueryVariables>(ProjectTemplateDocument, variables),
+    ...options
+  }
+    )};
+
+export const SharedProjectDocument = `
+    query sharedProject($projectUuid: String!) {
+  sharedProject(projectUuid: $projectUuid) {
+    description
+    exported
+    projectVersion
+    publicUrl
+  }
+}
+    `;
+
+export const useSharedProjectQuery = <
+      TData = SharedProjectQuery,
+      TError = unknown
+    >(
+      variables: SharedProjectQueryVariables,
+      options?: Omit<UseQueryOptions<SharedProjectQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedProjectQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<SharedProjectQuery, TError, TData>(
+      {
+    queryKey: ['sharedProject', variables],
+    queryFn: fetcher<SharedProjectQuery, SharedProjectQueryVariables>(SharedProjectDocument, variables),
+    ...options
+  }
+    )};
+
+export const SharedWorkflowDocument = `
+    query sharedWorkflow($workflowUuid: String!) {
+  sharedWorkflow(workflowUuid: $workflowUuid) {
+    description
+    exported
+    projectVersion
+    publicUrl
+  }
+}
+    `;
+
+export const useSharedWorkflowQuery = <
+      TData = SharedWorkflowQuery,
+      TError = unknown
+    >(
+      variables: SharedWorkflowQueryVariables,
+      options?: Omit<UseQueryOptions<SharedWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedWorkflowQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<SharedWorkflowQuery, TError, TData>(
+      {
+    queryKey: ['sharedWorkflow', variables],
+    queryFn: fetcher<SharedWorkflowQuery, SharedWorkflowQueryVariables>(SharedWorkflowDocument, variables),
     ...options
   }
     )};
@@ -922,7 +1370,7 @@ export const useUpdateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServer'],
@@ -943,11 +1391,50 @@ export const useUpdateMcpServerTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerTags'],
     mutationFn: (variables?: UpdateMcpServerTagsMutationVariables) => fetcher<UpdateMcpServerTagsMutation, UpdateMcpServerTagsMutationVariables>(UpdateMcpServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkflowTemplateDocument = `
+    query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
+  workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
+    description
+    exported
+    projectVersion
+    publicUrl
+    workflow {
+      label
+    }
+    components {
+      connection {
+        version
+      }
+      icon
+      name
+      title
+      version
+    }
+  }
+}
+    `;
+
+export const useWorkflowTemplateQuery = <
+      TData = WorkflowTemplateQuery,
+      TError = unknown
+    >(
+      variables: WorkflowTemplateQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowTemplateQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowTemplateQuery, TError, TData>(
+      {
+    queryKey: ['workflowTemplate', variables],
+    queryFn: fetcher<WorkflowTemplateQuery, WorkflowTemplateQueryVariables>(WorkflowTemplateDocument, variables),
     ...options
   }
     )};
@@ -992,7 +1479,7 @@ export const useConnectedUserProjectsQuery = <
       variables?: ConnectedUserProjectsQueryVariables,
       options?: Omit<UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ConnectedUserProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['connectedUserProjects'] : ['connectedUserProjects', variables],
@@ -1017,7 +1504,7 @@ export const useIntegrationByIdQuery = <
       variables: IntegrationByIdQueryVariables,
       options?: Omit<UseQueryOptions<IntegrationByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IntegrationByIdQuery, TError, TData>(
       {
     queryKey: ['integrationById', variables],
@@ -1042,7 +1529,7 @@ export const useCreateMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponent'],
@@ -1072,7 +1559,7 @@ export const useCreateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponentWithTools'],
@@ -1096,7 +1583,7 @@ export const useCreateMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['createMcpTool'],
@@ -1115,7 +1602,7 @@ export const useDeleteMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpComponent'],
@@ -1140,7 +1627,7 @@ export const useEnvironmentsQuery = <
       variables?: EnvironmentsQueryVariables,
       options?: Omit<UseQueryOptions<EnvironmentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EnvironmentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['environments'] : ['environments', variables],
@@ -1174,7 +1661,7 @@ export const useMcpComponentsByServerIdQuery = <
       variables: McpComponentsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpComponentsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpComponentsByServerId', variables],
@@ -1199,7 +1686,7 @@ export const useMcpServerTagsQuery = <
       variables: McpServerTagsQueryVariables,
       options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServerTagsQuery, TError, TData>(
       {
     queryKey: ['mcpServerTags', variables],
@@ -1238,7 +1725,7 @@ export const useMcpServersQuery = <
       variables: McpServersQueryVariables,
       options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServersQuery, TError, TData>(
       {
     queryKey: ['mcpServers', variables],
@@ -1265,7 +1752,7 @@ export const useMcpToolsByComponentIdQuery = <
       variables: McpToolsByComponentIdQueryVariables,
       options?: Omit<UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpToolsByComponentIdQuery, TError, TData>(
       {
     queryKey: ['mcpToolsByComponentId', variables],
@@ -1295,7 +1782,7 @@ export const useUpdateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpComponentWithTools'],
