@@ -140,7 +140,6 @@ include("server:libs:platform:platform-data-storage:platform-data-storage-file-s
 include("server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service")
 include("server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-api")
 include("server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service")
-include("server:libs:platform:platform-feature-flags")
 include("server:libs:platform:platform-file-storage:platform-file-storage-api")
 include("server:libs:platform:platform-file-storage:platform-file-storage-impl")
 include("server:libs:platform:platform-github-proxy-client")

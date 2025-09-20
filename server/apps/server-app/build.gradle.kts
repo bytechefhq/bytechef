@@ -95,7 +95,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
-    implementation(project(":server:libs:platform:platform-feature-flags"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-graphql"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))

@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.actuate.info;
+package com.bytechef.config;
 
-import com.bytechef.config.ApplicationProperties;
-import org.springframework.boot.actuate.info.Info;
-import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * Feature flags info contributor.
- *
- * @author Ivica Cardic
- */
 @Component
-public class SignUpContributor implements InfoContributor {
+@ConfigurationProperties(prefix = "templates.submission-form")
+public class TemplatesSubmissionFormProperties {
 
-    private final ApplicationProperties.SignUp signUp;
+    private String projects;
+    private String workflows;
 
-    public SignUpContributor(ApplicationProperties applicationProperties) {
-        this.signUp = applicationProperties.getSignUp();
+    public String getProjects() {
+        return projects;
     }
 
-    @Override
-    public void contribute(Info.Builder builder) {
-        builder.withDetail("signUp", signUp);
+    public String getWorkflows() {
+        return workflows;
+    }
+
+    public void setProjects(String projects) {
+        this.projects = projects;
+    }
+
+    public void setWorkflows(String workflows) {
+        this.workflows = workflows;
     }
 }
