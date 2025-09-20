@@ -16,6 +16,9 @@
 
 package com.bytechef.ai.mcp.tool.automation;
 
+import com.bytechef.ai.mcp.tool.platform.GenericTools;
+import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.ai.mcp.tool.platform.validator.WorkflowValidator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -23,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,7 @@ public class ProjectWorkflowTools {
     private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
     private final ProjectFacade projectFacade;
+    private final GenericTools genericTools;
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -61,8 +66,9 @@ public class ProjectWorkflowTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowTools(ProjectFacade projectFacade) {
+    public ProjectWorkflowTools(ProjectFacade projectFacade, GenericTools genericTools) {
         this.projectFacade = projectFacade;
+        this.genericTools = genericTools;
     }
 
     @Tool(
@@ -240,6 +246,45 @@ public class ProjectWorkflowTools {
         }
     }
 
+    @Tool(
+        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
+    public WorkflowValidationResult validateWorkflow(
+        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
+
+        try {
+            StringBuilder errors = new StringBuilder("[");
+            StringBuilder warnings = new StringBuilder("[");
+
+            WorkflowValidator.validateCompleteWorkflow(
+                workflow,
+                genericTools::getTaskProperties,
+                genericTools::getTaskOutputProperty,
+                new HashMap<>(),
+                new HashMap<>(),
+                errors,
+                warnings);
+
+            String errorMessages = errors.append("]")
+                .toString()
+                .trim();
+            String warningMessages = warnings.append("]")
+                .toString()
+                .trim();
+            boolean isValid = errorMessages.equals("[]");
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Validated workflow. Valid: {}, Errors: {}, Warnings: {}",
+                    isValid, errorMessages, warningMessages);
+            }
+
+            return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
+
+        } catch (Exception e) {
+            logger.error("Failed to validate workflow", e);
+            throw ToolUtils.createOperationException("Failed to validate workflow", e);
+        }
+    }
+
     /**
      * Project workflow information record for the response.
      */
@@ -268,5 +313,15 @@ public class ProjectWorkflowTools {
         @JsonProperty("version") @JsonPropertyDescription("The version of the workflow") int version,
         @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
         @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
+    }
+
+    /**
+     * Workflow validation result record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record WorkflowValidationResult(
+        @JsonProperty("valid") @JsonPropertyDescription("Whether the workflow is valid") boolean valid,
+        @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the workflow can be valid") String errors,
+        @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
     }
 }
