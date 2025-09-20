@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-12T06:20:37.341403+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-15T19:36:10.115621+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;
@@ -56,6 +56,8 @@ public class ProjectModel {
   private @Nullable ProjectStatusModel lastStatus;
 
   private @Nullable Integer lastProjectVersion;
+
+  private @Nullable String uuid;
 
   private @Nullable CategoryModel category;
 
@@ -281,6 +283,26 @@ public class ProjectModel {
     this.lastProjectVersion = lastProjectVersion;
   }
 
+  public ProjectModel uuid(@Nullable String uuid) {
+    this.uuid = uuid;
+    return this;
+  }
+
+  /**
+   * The uuid of a project.
+   * @return uuid
+   */
+  
+  @Schema(name = "uuid", description = "The uuid of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("uuid")
+  public @Nullable String getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(@Nullable String uuid) {
+    this.uuid = uuid;
+  }
+
   public ProjectModel category(@Nullable CategoryModel category) {
     this.category = category;
     return this;
@@ -416,6 +438,7 @@ public class ProjectModel {
         Objects.equals(this.lastPublishedDate, project.lastPublishedDate) &&
         Objects.equals(this.lastStatus, project.lastStatus) &&
         Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
+        Objects.equals(this.uuid, project.uuid) &&
         Objects.equals(this.category, project.category) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
@@ -425,7 +448,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, category, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -442,6 +465,7 @@ public class ProjectModel {
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
+    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
