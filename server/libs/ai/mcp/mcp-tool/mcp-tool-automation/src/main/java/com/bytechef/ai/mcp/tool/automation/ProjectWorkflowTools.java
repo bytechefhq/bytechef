@@ -16,9 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.automation;
 
-import com.bytechef.ai.mcp.tool.platform.GenericTools;
-import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
-import com.bytechef.ai.mcp.tool.platform.validator.WorkflowValidator;
+import com.bytechef.ai.mcp.tool.platform.TaskTools;
+import com.bytechef.ai.mcp.tool.validator.WorkflowValidator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -28,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -47,7 +47,7 @@ public class ProjectWorkflowTools {
     private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
     private final ProjectFacade projectFacade;
-    private final GenericTools genericTools;
+    private final TaskTools taskTools;
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -66,9 +66,9 @@ public class ProjectWorkflowTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowTools(ProjectFacade projectFacade, GenericTools genericTools) {
+    public ProjectWorkflowTools(ProjectFacade projectFacade, TaskTools taskTools) {
         this.projectFacade = projectFacade;
-        this.genericTools = genericTools;
+        this.taskTools = taskTools;
     }
 
     @Tool(
@@ -161,8 +161,7 @@ public class ProjectWorkflowTools {
             List<ProjectWorkflowDTO> allWorkflows =
                 projectId != null ? projectFacade.getProjectWorkflows(projectId) : projectFacade.getProjectWorkflows();
 
-            String lowerQuery = query.toLowerCase()
-                .trim();
+            String lowerQuery = StringUtils.trim(query.toLowerCase());
 
             List<WorkflowInfo> matchingWorkflow = allWorkflows.stream()
                 .filter(workflow -> {
@@ -194,12 +193,12 @@ public class ProjectWorkflowTools {
         }
     }
 
-    @Tool(
-        description = "Delete a workflow. Returns a confirmation message.")
+    @Tool(description = "Delete a workflow. Returns a confirmation message.")
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId) {
         try {
             ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
+
             String workflowName = workflow.getLabel();
 
             projectFacade.deleteWorkflow(workflow.getId());
@@ -208,8 +207,7 @@ public class ProjectWorkflowTools {
                 logger.debug("Deleted workflow {} with name '{}'", workflowId, workflowName);
             }
 
-            return "Workflow '" + workflowName + "' (ID: " + workflowId +
-                ") has been successfully deleted.";
+            return "Workflow '" + workflowName + "' (ID: " + workflowId + ") has been successfully deleted.";
         } catch (Exception e) {
             logger.error("Failed to delete workflow {}", workflowId, e);
 
@@ -222,8 +220,8 @@ public class ProjectWorkflowTools {
     public WorkflowInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") long workflowId,
         @ToolParam(
-            description = "The new definition of the workflow. Needs to be in JSON format similar to "
-                + DEFAULT_DEFINITION) String definition) {
+            description = "The new definition of the workflow. Needs to be in JSON format similar to " +
+                DEFAULT_DEFINITION) String definition) {
 
         try {
             ProjectWorkflowDTO workflow = projectFacade.getProjectWorkflow(workflowId);
@@ -256,32 +254,29 @@ public class ProjectWorkflowTools {
             StringBuilder warnings = new StringBuilder("[");
 
             WorkflowValidator.validateCompleteWorkflow(
-                workflow,
-                genericTools::getTaskProperties,
-                genericTools::getTaskOutputProperty,
-                new HashMap<>(),
-                new HashMap<>(),
-                errors,
-                warnings);
+                workflow, taskTools::getTaskProperties, taskTools::getTaskOutputProperty, new HashMap<>(),
+                new HashMap<>(), errors, warnings);
 
-            String errorMessages = errors.append("]")
-                .toString()
-                .trim();
-            String warningMessages = warnings.append("]")
-                .toString()
-                .trim();
+            errors.append("]");
+
+            String errorMessages = StringUtils.trim(errors.toString());
+
             boolean isValid = errorMessages.equals("[]");
 
+            warnings.append("]");
+
+            String warningMessages = StringUtils.trim(warnings.toString());
+
             if (logger.isDebugEnabled()) {
-                logger.debug("Validated workflow. Valid: {}, Errors: {}, Warnings: {}",
-                    isValid, errorMessages, warningMessages);
+                logger.debug(
+                    "Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid, errorMessages, warningMessages);
             }
 
             return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
-
         } catch (Exception e) {
             logger.error("Failed to validate workflow", e);
-            throw ToolUtils.createOperationException("Failed to validate workflow", e);
+
+            throw new RuntimeException("Failed to validate workflow", e);
         }
     }
 

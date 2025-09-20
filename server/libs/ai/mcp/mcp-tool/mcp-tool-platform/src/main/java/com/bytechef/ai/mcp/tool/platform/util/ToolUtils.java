@@ -16,14 +16,13 @@
 
 package com.bytechef.ai.mcp.tool.platform.util;
 
+import com.bytechef.ai.mcp.tool.model.PropertyInfo;
 import com.bytechef.platform.domain.BaseProperty;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class containing common helper methods for MCP tools.
@@ -33,82 +32,12 @@ import java.util.Map;
 public final class ToolUtils {
 
     private ToolUtils() {
-        // Utility class
-    }
-
-    /**
-     * Creates a RuntimeException with formatted message using the provided arguments.
-     *
-     * @param message the message template
-     * @param args    the arguments to format the message
-     * @return a new RuntimeException with the formatted message
-     */
-    public static RuntimeException createNotFoundException(String message, String... args) {
-        return new RuntimeException(String.format(message, (Object[]) args));
-    }
-
-    /**
-     * Creates a RuntimeException that wraps another exception with additional context.
-     *
-     * @param message the context message
-     * @param cause   the underlying cause
-     * @return a new RuntimeException with the combined message and cause
-     */
-    public static RuntimeException createOperationException(String message, Exception cause) {
-        return new RuntimeException(message + ": " + cause.getMessage(), cause);
-    }
-
-    /**
-     * Safely converts a string to lowercase, returning empty string if null.
-     *
-     * @param value the string to convert
-     * @return lowercase string or empty string if null
-     */
-    public static String safeToLowerCase(String value) {
-        return value != null ? value.toLowerCase() : "";
-    }
-
-    /**
-     * Checks if the given name or description matches the search query. Splits the query into individual words and
-     * matches if any word is found.
-     *
-     * @param name                 the name to search in
-     * @param description          the description to search in
-     * @param componentName        the component name to search in
-     * @param componentDescription the component description to search in
-     * @param query                the search query (should be lowercase)
-     * @return true if any word from the query is found in any of the fields
-     */
-    public static boolean
-        matchesQuery(String name, String description, String componentName, String componentDescription, String query) {
-        String lowerName = safeToLowerCase(name);
-        String lowerDescription = safeToLowerCase(description);
-        String lowerComponentName = safeToLowerCase(componentName);
-        String lowerComponentDescription = safeToLowerCase(componentDescription);
-
-        String[] queryWords = query.toLowerCase()
-            .trim()
-            .split("\\s+");
-
-        for (String word : queryWords) {
-            if (word.isEmpty())
-                continue;
-
-            if (lowerName.contains(word) ||
-                lowerDescription.contains(word) ||
-                lowerComponentName.contains(word) ||
-                lowerComponentDescription.contains(word)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
      * Compares two tasks for sorting based on search query relevance. First compares by total word match count, then by
      * priority of where matches are found: 1. Name matches (highest priority) 2. Component name matches 3. Description
-     * matches (lowest priority)
+     * matches (the lowest priority)
      *
      * @param name1          first task name
      * @param description1   first task description
@@ -122,6 +51,7 @@ public final class ToolUtils {
     public static int compareTasks(
         String name1, String description1, String componentName1, String name2, String description2,
         String componentName2, String lowerQuery) {
+
         String lowerName1 = safeToLowerCase(name1);
         String lowerDescription1 = safeToLowerCase(description1);
         String lowerComponentName1 = safeToLowerCase(componentName1);
@@ -129,8 +59,9 @@ public final class ToolUtils {
         String lowerDescription2 = safeToLowerCase(description2);
         String lowerComponentName2 = safeToLowerCase(componentName2);
 
-        String[] queryWords = lowerQuery.trim()
-            .split("\\s+");
+        String trim = lowerQuery.trim();
+
+        String[] queryWords = trim.split("\\s+");
 
         // Count matches for task 1
         TaskMatchInfo match1 = countMatches(lowerName1, lowerDescription1, lowerComponentName1, queryWords);
@@ -140,6 +71,7 @@ public final class ToolUtils {
 
         // First compare by total match count (more matches = better)
         int totalMatchComparison = Integer.compare(match2.totalMatches(), match1.totalMatches());
+
         if (totalMatchComparison != 0) {
             return totalMatchComparison;
         }
@@ -150,6 +82,7 @@ public final class ToolUtils {
         int priority2 = calculatePriority(match2);
 
         int priorityComparison = Integer.compare(priority2, priority1);
+
         if (priorityComparison != 0) {
             return priorityComparison;
         }
@@ -159,44 +92,41 @@ public final class ToolUtils {
     }
 
     /**
-     * Counts matches for each field and returns match information.
+     * Converts a single BaseProperty to PropertyInfo with nested properties support.
+     *
+     * @param property the property to convert
+     * @return PropertyInfo object
      */
-    private static TaskMatchInfo
-        countMatches(String name, String description, String componentName, String[] queryWords) {
-        int nameMatches = 0;
-        int componentMatches = 0;
-        int descriptionMatches = 0;
+    public static PropertyInfo convertToPropertyInfo(BaseProperty property) {
+        PropertyDecorator decorator = new PropertyDecorator(property);
 
-        for (String word : queryWords) {
-            if (word.isEmpty())
-                continue;
+        List<PropertyInfo> nestedPropertyInfos = null;
 
-            if (name.contains(word))
-                nameMatches++;
-            if (componentName.contains(word))
-                componentMatches++;
-            if (description.contains(word))
-                descriptionMatches++;
+        PropertyDecorator.Type type = decorator.getType();
+
+        if (type == PropertyDecorator.Type.OBJECT) {
+            nestedPropertyInfos = convertToPropertyInfoList(
+                decorator.getObjectProperties()
+                    .stream()
+                    .map(pd -> pd.property)
+                    .toList());
+        } else if (type == PropertyDecorator.Type.ARRAY) {
+            nestedPropertyInfos = convertToPropertyInfoList(
+                decorator.getItems()
+                    .stream()
+                    .map(pd -> pd.property)
+                    .toList());
+        } else if (type == PropertyDecorator.Type.FILE_ENTRY) {
+            nestedPropertyInfos = convertToPropertyInfoList(
+                decorator.getFileEntryProperties()
+                    .stream()
+                    .map(pd -> pd.property)
+                    .toList());
         }
 
-        return new TaskMatchInfo(nameMatches, componentMatches, descriptionMatches);
-    }
-
-    /**
-     * Calculates priority score based on where matches are found. Name matches get highest weight, followed by
-     * component, then description.
-     */
-    private static int calculatePriority(TaskMatchInfo matchInfo) {
-        return matchInfo.nameMatches * 3 + matchInfo.componentMatches * 2 + matchInfo.descriptionMatches;
-    }
-
-    /**
-     * Record to hold match information for a task.
-     */
-    private record TaskMatchInfo(int nameMatches, int componentMatches, int descriptionMatches) {
-        int totalMatches() {
-            return nameMatches + componentMatches + descriptionMatches;
-        }
+        return new PropertyInfo(
+            property.getName(), type.name(), property.getDescription(), property.getRequired(),
+            property.getExpressionEnabled(), property.getDisplayCondition(), nestedPropertyInfos);
     }
 
     /**
@@ -212,59 +142,252 @@ public final class ToolUtils {
     }
 
     /**
-     * Converts a single BaseProperty to PropertyInfo with nested properties support.
+     * Generates a JSON representation of output properties from a BaseProperty schema.
      *
-     * @param property the property to convert
-     * @return PropertyInfo object
+     * @param outputSchema the output schema property
+     * @return JSON string representation of the output properties
      */
-    public static PropertyInfo convertToPropertyInfo(BaseProperty property) {
-        PropertyDecorator decorator = new PropertyDecorator(property);
-
-        List<PropertyInfo> nestedProperties = null;
-
-        if (decorator.getType() == PropertyDecorator.Type.OBJECT) {
-            nestedProperties = convertToPropertyInfoList(decorator.getObjectProperties()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
-        } else if (decorator.getType() == PropertyDecorator.Type.ARRAY) {
-            nestedProperties = convertToPropertyInfoList(decorator.getItems()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
-        } else if (decorator.getType() == PropertyDecorator.Type.FILE_ENTRY) {
-            nestedProperties = convertToPropertyInfoList(decorator.getFileEntryProperties()
-                .stream()
-                .map(pd -> pd.property)
-                .toList());
+    public static String generateOutputPropertiesJson(BaseProperty outputSchema) {
+        if (outputSchema == null) {
+            return "{}";
         }
 
-        return new PropertyInfo(
-            property.getName(),
-            decorator.getType()
-                .name(),
-            property.getDescription(),
-            property.getRequired(),
-            property.getExpressionEnabled(),
-            property.getDisplayCondition(),
-            nestedProperties);
+        PropertyDecorator propertyDecorator = new PropertyDecorator(outputSchema);
+
+        return generateSampleValue(propertyDecorator);
     }
 
     /**
-     * Property information record for the response.
+     * Generates a JSON representation of properties using PropertyDecorator for detailed type information.
+     *
+     * @param properties the list of properties to convert to JSON
+     * @return JSON string representation of the properties
      */
-    @SuppressFBWarnings("EI")
-    public record PropertyInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the property") String name,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the property") String type,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the property") String description,
-        @JsonProperty("required") @JsonPropertyDescription("Whether the property is required") boolean required,
-        @JsonProperty("expressionEnabled") @JsonPropertyDescription("Whether expressions are enabled for this property") boolean expressionEnabled,
-        @JsonProperty("displayCondition") @JsonPropertyDescription("The display condition for the property") String displayCondition,
-        @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties) {
+    public static String generateParametersJson(List<? extends BaseProperty> properties) {
+        if (properties.isEmpty()) {
+            return "{}";
+        }
+
+        List<PropertyDecorator> propertyDecorators = PropertyDecorator.toPropertyDecorators(properties);
+
+        return generateObjectValue(propertyDecorators, "", "\"");
     }
 
-    public static class PropertyDecorator {
+    /**
+     * Checks if the given name or description matches the search query. Splits the query into individual words and
+     * matches if any word is found.
+     *
+     * @param name                 the name to search in
+     * @param description          the description to search in
+     * @param componentName        the component name to search in
+     * @param componentDescription the component description to search in
+     * @param query                the search query (should be lowercase)
+     * @return true if any word from the query is found in any of the fields
+     */
+    public static boolean matchesQuery(
+        String name, String description, String componentName, String componentDescription, String query) {
+
+        String lowerName = safeToLowerCase(name);
+        String lowerDescription = safeToLowerCase(description);
+        String lowerComponentName = safeToLowerCase(componentName);
+        String lowerComponentDescription = safeToLowerCase(componentDescription);
+
+        String lowerCase = query.toLowerCase();
+
+        String trim = lowerCase.trim();
+
+        String[] queryWords = trim.split("\\s+");
+
+        for (String word : queryWords) {
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            if (lowerName.contains(word) || lowerDescription.contains(word) || lowerComponentName.contains(word) ||
+                lowerComponentDescription.contains(word)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a map of display conditions to property names that have those conditions. Recursively searches through
+     * nested properties (objects, arrays, file entries).
+     *
+     * @param properties the list of properties to analyze
+     * @return map where key is display condition and value is list of property names with that condition
+     */
+    static Map<String, List<String>> getDisplayConditions(List<PropertyDecorator> properties) {
+        Map<String, List<String>> displayConditionsMap = new HashMap<>();
+
+        collectDisplayConditions(properties, displayConditionsMap, "");
+
+        return displayConditionsMap;
+    }
+
+    /**
+     * Generates a JSON array representation from a list of property decorators.
+     *
+     * @param properties the list of property decorators
+     * @return JSON array string representation
+     */
+    static String generateArrayValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("[ ");
+
+        for (var property : properties) {
+            parameters.append(generateSampleValue(property))
+                .append(", ");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        parameters.append(" ]");
+
+        return parameters.toString();
+    }
+
+    /**
+     * Generates a JSON object representation from a list of property decorators.
+     *
+     * @param properties the list of property decorators
+     * @return JSON object string representation
+     */
+    static String generateObjectValue(
+        List<PropertyDecorator> properties, String displayCondition, String required) {
+
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("{ ")
+            .append("\"metadata\": \"")
+            .append(displayCondition.trim())
+            .append(required)
+            .append(", ");
+
+        for (var property : properties) {
+            parameters.append("\"")
+                .append(property.getName())
+                .append("\": ")
+                .append(generateSampleValue(property))
+                .append(", ");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        parameters.append(" }");
+
+        return parameters.toString();
+    }
+
+    /**
+     * Generates a sample value representation for a property decorator.
+     *
+     * @param property the property decorator
+     * @return string representation of the sample value
+     */
+    static String generateSampleValue(PropertyDecorator property) {
+        String required = property.getRequired() ? " (required)\"" : "\"";
+        String displayCondition = property.getDisplayCondition() == null ? "" : " @" + property.displayCondition + "@";
+
+        return switch (property.getType()) {
+            case PropertyDecorator.Type.ARRAY -> generateArrayValue(property.getItems());
+            case PropertyDecorator.Type.BOOLEAN -> "\"boolean" + displayCondition + required;
+            case PropertyDecorator.Type.DATE -> "\"date" + displayCondition + required;
+            case PropertyDecorator.Type.DATE_TIME -> "\"datetime" + displayCondition + required;
+            case PropertyDecorator.Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
+            case PropertyDecorator.Type.INTEGER -> "\"integer" + displayCondition + required;
+            case PropertyDecorator.Type.NUMBER -> "\"float" + displayCondition + required;
+            case PropertyDecorator.Type.OBJECT ->
+                generateObjectValue(property.getObjectProperties(), displayCondition, required);
+            case PropertyDecorator.Type.FILE_ENTRY ->
+                generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
+            case PropertyDecorator.Type.TIME -> "\"time" + displayCondition + required;
+            case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
+            default -> "\"string" + displayCondition + required;
+        };
+    }
+
+    /**
+     * Calculates priority score based on where matches are found. Name matches get highest weight, followed by
+     * component, then description.
+     */
+    private static int calculatePriority(TaskMatchInfo matchInfo) {
+        return matchInfo.nameMatches * 3 + matchInfo.componentMatches * 2 + matchInfo.descriptionMatches;
+    }
+
+    private static void collectDisplayConditions(
+        List<PropertyDecorator> properties, Map<String, List<String>> displayConditionsMap, String parentPath) {
+
+        for (PropertyDecorator property : properties) {
+            String propertyPath = parentPath.isEmpty() ? property.getName() : parentPath + "." + property.getName();
+            String displayCondition = property.property.getDisplayCondition();
+
+            if (displayCondition != null && !StringUtils.isBlank(displayCondition)) {
+                List<String> propertyPaths =
+                    displayConditionsMap.computeIfAbsent(displayCondition, k -> new ArrayList<>());
+
+                propertyPaths.add(propertyPath);
+            }
+
+            switch (property.getType()) {
+                case OBJECT ->
+                    collectDisplayConditions(property.getObjectProperties(), displayConditionsMap, propertyPath);
+                case ARRAY -> collectDisplayConditions(property.getItems(), displayConditionsMap, propertyPath);
+                case FILE_ENTRY ->
+                    collectDisplayConditions(property.getFileEntryProperties(), displayConditionsMap, propertyPath);
+                default -> {
+                }
+            }
+        }
+    }
+
+    /**
+     * Counts matches for each field and returns match information.
+     */
+    private static TaskMatchInfo countMatches(
+        String name, String description, String componentName, String[] queryWords) {
+
+        int nameMatches = 0;
+        int componentMatches = 0;
+        int descriptionMatches = 0;
+
+        for (String word : queryWords) {
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            if (name.contains(word)) {
+                nameMatches++;
+            }
+
+            if (componentName.contains(word)) {
+                componentMatches++;
+            }
+
+            if (description.contains(word)) {
+                descriptionMatches++;
+            }
+        }
+
+        return new TaskMatchInfo(nameMatches, componentMatches, descriptionMatches);
+    }
+
+    private static String safeToLowerCase(String value) {
+        return value != null ? value.toLowerCase() : "";
+    }
+
+    /**
+     * Record to hold match information for a task.
+     */
+    static class PropertyDecorator {
 
         public enum Location {
             COMPONENT,
@@ -449,156 +572,10 @@ public final class ToolUtils {
         }
     }
 
-    /**
-     * Generates a JSON representation of properties using PropertyDecorator for detailed type information.
-     *
-     * @param properties the list of properties to convert to JSON
-     * @return JSON string representation of the properties
-     */
-    public static String generateParametersJson(List<? extends BaseProperty> properties) {
-        if (properties.isEmpty()) {
-            return "{}";
-        }
+    private record TaskMatchInfo(int nameMatches, int componentMatches, int descriptionMatches) {
 
-        List<PropertyDecorator> propertyDecorators = PropertyDecorator.toPropertyDecorators(properties);
-        return generateObjectValue(propertyDecorators, "", "\"");
-    }
-
-    /**
-     * Generates a JSON representation of output properties from a BaseProperty schema.
-     *
-     * @param outputSchema the output schema property
-     * @return JSON string representation of the output properties
-     */
-    public static String generateOutputPropertiesJson(BaseProperty outputSchema) {
-        if (outputSchema == null) {
-            return "{}";
-        }
-
-        PropertyDecorator propertyDecorator = new PropertyDecorator(outputSchema);
-        return generateSampleValue(propertyDecorator);
-    }
-
-    /**
-     * Generates a sample value representation for a property decorator.
-     *
-     * @param property the property decorator
-     * @return string representation of the sample value
-     */
-    public static String generateSampleValue(PropertyDecorator property) {
-        String required = property.getRequired() ? " (required)\"" : "\"";
-        String displayCondition = property.getDisplayCondition() == null ? "" : " @" + property.displayCondition + "@";
-
-        return switch (property.getType()) {
-            case PropertyDecorator.Type.ARRAY -> generateArrayValue(property.getItems());
-            case PropertyDecorator.Type.BOOLEAN -> "\"boolean" + displayCondition + required;
-            case PropertyDecorator.Type.DATE -> "\"date" + displayCondition + required;
-            case PropertyDecorator.Type.DATE_TIME -> "\"datetime" + displayCondition + required;
-            case PropertyDecorator.Type.DYNAMIC_PROPERTIES -> "{}" + displayCondition + required;
-            case PropertyDecorator.Type.INTEGER -> "\"integer" + displayCondition + required;
-            case PropertyDecorator.Type.NUMBER -> "\"float" + displayCondition + required;
-            case PropertyDecorator.Type.OBJECT ->
-                generateObjectValue(property.getObjectProperties(), displayCondition, required);
-            case PropertyDecorator.Type.FILE_ENTRY ->
-                generateObjectValue(property.getFileEntryProperties(), displayCondition, required);
-            case PropertyDecorator.Type.TIME -> "\"time" + displayCondition + required;
-            case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
-            default -> "\"string" + displayCondition + required;
-        };
-    }
-
-    /**
-     * Generates a JSON array representation from a list of property decorators.
-     *
-     * @param properties the list of property decorators
-     * @return JSON array string representation
-     */
-    public static String generateArrayValue(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[ ");
-
-        for (var property : properties) {
-            parameters.append(generateSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append(" ]")
-            .toString();
-    }
-
-    /**
-     * Generates a JSON object representation from a list of property decorators.
-     *
-     * @param properties the list of property decorators
-     * @return JSON object string representation
-     */
-    public static String
-        generateObjectValue(List<PropertyDecorator> properties, String displayCondition, String required) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("{ ")
-            .append("\"metadata\": \"")
-            .append(displayCondition.trim())
-            .append(required)
-            .append(", ");
-
-        for (var property : properties) {
-            parameters.append("\"")
-                .append(property.getName())
-                .append("\": ")
-                .append(generateSampleValue(property))
-                .append(", ");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append(" }")
-            .toString();
-    }
-
-    /**
-     * Creates a map of display conditions to property names that have those conditions. Recursively searches through
-     * nested properties (objects, arrays, file entries).
-     *
-     * @param properties the list of properties to analyze
-     * @return map where key is display condition and value is list of property names with that condition
-     */
-    public static Map<String, List<String>> listDisplayConditions(List<PropertyDecorator> properties) {
-        Map<String, List<String>> displayConditionsMap = new HashMap<>();
-        collectDisplayConditions(properties, displayConditionsMap, "");
-        return displayConditionsMap;
-    }
-
-    private static void collectDisplayConditions(
-        List<PropertyDecorator> properties,
-        Map<String, List<String>> displayConditionsMap,
-        String parentPath) {
-        for (PropertyDecorator property : properties) {
-            String propertyPath = parentPath.isEmpty() ? property.getName() : parentPath + "." + property.getName();
-            String displayCondition = property.property.getDisplayCondition();
-
-            if (displayCondition != null && !displayCondition.trim()
-                .isEmpty()) {
-                displayConditionsMap.computeIfAbsent(displayCondition, k -> new ArrayList<>())
-                    .add(propertyPath);
-            }
-
-            switch (property.getType()) {
-                case OBJECT ->
-                    collectDisplayConditions(property.getObjectProperties(), displayConditionsMap, propertyPath);
-                case ARRAY -> collectDisplayConditions(property.getItems(), displayConditionsMap, propertyPath);
-                case FILE_ENTRY ->
-                    collectDisplayConditions(property.getFileEntryProperties(), displayConditionsMap, propertyPath);
-                default -> {
-                }
-            }
+        int totalMatches() {
+            return nameMatches + componentMatches + descriptionMatches;
         }
     }
 }

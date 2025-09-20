@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.platform.validator;
+package com.bytechef.ai.mcp.tool.validator;
 
-import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
+import com.bytechef.ai.mcp.tool.model.PropertyInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -27,12 +27,14 @@ import java.util.Map;
 /**
  * Builder pattern for managing validation context and parameters. Reduces parameter passing complexity and improves
  * code maintainability.
+ *
+ * @author Marko Kriskovic
  */
-public class ValidationContext {
+class ValidationContext {
 
     private final List<JsonNode> tasks;
-    private final Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions;
-    private final Map<String, ToolUtils.PropertyInfo> taskOutputs;
+    private final Map<String, List<PropertyInfo>> taskDefinitionMap;
+    private final Map<String, PropertyInfo> taskOutputMap;
     private final StringBuilder errors;
     private final StringBuilder warnings;
     private final List<String> taskNames;
@@ -41,8 +43,8 @@ public class ValidationContext {
 
     private ValidationContext(Builder builder) {
         this.tasks = builder.tasks;
-        this.taskDefinitions = builder.taskDefinitions;
-        this.taskOutputs = builder.taskOutputs;
+        this.taskDefinitionMap = builder.taskDefinitionMap;
+        this.taskOutputMap = builder.taskOutputMap;
         this.errors = builder.errors;
         this.warnings = builder.warnings;
         this.taskNames = new ArrayList<>();
@@ -75,12 +77,12 @@ public class ValidationContext {
         return new ArrayList<>(tasks);
     }
 
-    public Map<String, List<ToolUtils.PropertyInfo>> getTaskDefinitions() {
-        return new HashMap<>(taskDefinitions);
+    public Map<String, List<PropertyInfo>> getTaskDefinitions() {
+        return new HashMap<>(taskDefinitionMap);
     }
 
-    public Map<String, ToolUtils.PropertyInfo> getTaskOutputs() {
-        return new HashMap<>(taskOutputs);
+    public Map<String, PropertyInfo> getTaskOutputs() {
+        return new HashMap<>(taskOutputMap);
     }
 
     @SuppressFBWarnings("EI")
@@ -109,8 +111,8 @@ public class ValidationContext {
 
     public static class Builder {
         private List<JsonNode> tasks;
-        private Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions;
-        private Map<String, ToolUtils.PropertyInfo> taskOutputs;
+        private Map<String, List<PropertyInfo>> taskDefinitionMap;
+        private Map<String, PropertyInfo> taskOutputMap;
         private StringBuilder errors;
         private StringBuilder warnings;
 
@@ -119,13 +121,13 @@ public class ValidationContext {
             return this;
         }
 
-        public Builder withTaskDefinitions(Map<String, List<ToolUtils.PropertyInfo>> taskDefinitions) {
-            this.taskDefinitions = new HashMap<>(taskDefinitions);
+        public Builder withTaskDefinitionMap(Map<String, List<PropertyInfo>> taskDefinitionMap) {
+            this.taskDefinitionMap = new HashMap<>(taskDefinitionMap);
             return this;
         }
 
-        public Builder withTaskOutputs(Map<String, ToolUtils.PropertyInfo> taskOutputs) {
-            this.taskOutputs = new HashMap<>(taskOutputs);
+        public Builder withTaskOutputMap(Map<String, PropertyInfo> taskOutputMap) {
+            this.taskOutputMap = new HashMap<>(taskOutputMap);
             return this;
         }
 
