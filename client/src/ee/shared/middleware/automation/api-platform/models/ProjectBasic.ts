@@ -87,6 +87,12 @@ export interface ProjectBasic {
      * @memberof ProjectBasic
      */
     readonly lastProjectVersion?: number;
+    /**
+     * The uuid of a project.
+     * @type {string}
+     * @memberof ProjectBasic
+     */
+    uuid?: string;
 }
 
 
@@ -119,6 +125,7 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
+        'uuid': json['uuid'] == null ? undefined : json['uuid'],
     };
 }
 
@@ -136,6 +143,7 @@ export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'
         'description': value['description'],
         'name': value['name'],
         'lastStatus': ProjectStatusToJSON(value['lastStatus']),
+        'uuid': value['uuid'],
     };
 }
 

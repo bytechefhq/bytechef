@@ -102,6 +102,12 @@ export interface Project {
      */
     readonly lastProjectVersion?: number;
     /**
+     * The uuid of a project.
+     * @type {string}
+     * @memberof Project
+     */
+    uuid?: string;
+    /**
      * 
      * @type {Category}
      * @memberof Project
@@ -164,6 +170,7 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
+        'uuid': json['uuid'] == null ? undefined : json['uuid'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
@@ -186,6 +193,7 @@ export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDat
         'description': value['description'],
         'name': value['name'],
         'lastStatus': ProjectStatusToJSON(value['lastStatus']),
+        'uuid': value['uuid'],
         'category': CategoryToJSON(value['category']),
         'projectWorkflowIds': value['projectWorkflowIds'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
