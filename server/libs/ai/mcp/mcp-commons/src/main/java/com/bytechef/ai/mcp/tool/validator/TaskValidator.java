@@ -152,25 +152,25 @@ class TaskValidator {
         if (nestedTaskJsonNode.has("name")) {
             JsonNode nameJsonNode = nestedTaskJsonNode.get("name");
 
-            String nestedTaskName = nameJsonNode.asText();
+            String name = nameJsonNode.asText();
 
             JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
 
-            String nestedTaskType = typeJsonNode.asText();
+            String type = typeJsonNode.asText();
 
             List<String> taskNames = context.getTaskNames();
 
-            if (!taskNames.contains(nestedTaskName)) {
-                taskNames.add(nestedTaskName);
+            if (!taskNames.contains(name)) {
+                taskNames.add(name);
             }
 
             Map<String, JsonNode> allTasksMap = context.getAllTasksMap();
 
-            allTasksMap.put(nestedTaskName, nestedTaskJsonNode);
+            allTasksMap.put(name, nestedTaskJsonNode);
 
             Map<String, String> taskNameToTypeMap = context.getTaskNameToTypeMap();
 
-            taskNameToTypeMap.put(nestedTaskName, nestedTaskType);
+            taskNameToTypeMap.put(name, type);
         }
     }
 
@@ -360,8 +360,8 @@ class TaskValidator {
     /**
      * Validates the structure of a nested task.
      */
-    private static void validateNestedTaskStructure(JsonNode nestedTask, ValidationContext context) {
-        validateTask(nestedTask.toString(), context.getErrors());
+    private static void validateNestedTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
+        validateTask(nestedTaskJsonNode.toString(), context.getErrors());
     }
 
     /**
@@ -370,18 +370,18 @@ class TaskValidator {
     private static void validateNestedTaskParameters(JsonNode nestedTaskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
 
-        String nestedTaskType = typeJsonNode.asText();
+        String type = typeJsonNode.asText();
 
         Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
 
-        List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(nestedTaskType);
+        List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(type);
 
         if (nestedTaskDefinition != null) {
             String nestedTaskParameters = "{}";
-            JsonNode jsonNode = nestedTaskJsonNode.get("parameters");
+            JsonNode parametersJsonNode = nestedTaskJsonNode.get("parameters");
 
-            if (jsonNode != null && jsonNode.isObject()) {
-                nestedTaskParameters = jsonNode.toString();
+            if (parametersJsonNode != null && parametersJsonNode.isObject()) {
+                nestedTaskParameters = parametersJsonNode.toString();
             }
 
             validateTaskParameters(
@@ -395,11 +395,11 @@ class TaskValidator {
     private static void validateNestedTaskDataPills(JsonNode nestedTaskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
 
-        String nestedTaskType = typeJsonNode.asText();
+        String type = typeJsonNode.asText();
 
         Map<String, List<PropertyInfo>> taskDefinitionsMap = context.getTaskDefinitions();
 
-        List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(nestedTaskType);
+        List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(type);
 
         // Skip task order validation for nested tasks
         DataPillValidator.validateTaskDataPills(
