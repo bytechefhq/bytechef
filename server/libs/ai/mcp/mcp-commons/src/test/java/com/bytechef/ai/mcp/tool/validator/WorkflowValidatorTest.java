@@ -787,13 +787,15 @@ class WorkflowValidatorTest {
             """;
 
         List<PropertyInfo> taskDefinition = List.of(
-            new PropertyInfo("obj", "OBJECT", null, false, true, null, List.of(
-                new PropertyInfo("name", "STRING", null, true, true, null, null),
-                new PropertyInfo("age", "INTEGER", null, false, true, null, null),
-                new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
-                new PropertyInfo(
-                    "items", "ARRAY", null, false, true, null,
-                    List.of(new PropertyInfo(null, "INTEGER", null, false, true, null, null))))));
+            new PropertyInfo(
+                "obj", "OBJECT", null, false, true, null,
+                List.of(
+                    new PropertyInfo("name", "STRING", null, true, true, null, null),
+                    new PropertyInfo("age", "INTEGER", null, false, true, null, null),
+                    new PropertyInfo("active", "BOOLEAN", null, false, true, null, null),
+                    new PropertyInfo(
+                        "items", "ARRAY", null, false, true, null,
+                        List.of(new PropertyInfo(null, "INTEGER", null, false, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 /**
  * Template Method pattern for task validation. Defines the skeleton of a task validation algorithm while letting
@@ -78,7 +79,6 @@ class TaskValidator {
         FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
         validateTaskTypeField(taskJsonNode, errors);
         validateRequiredObjectField(taskJsonNode, "parameters", errors);
-
     }
 
     /**
@@ -123,20 +123,20 @@ class TaskValidator {
      * @param warnings              StringBuilder to collect validation warnings
      */
     public static void validateTaskParameters(
-        String currentTaskParameters, List<PropertyInfo> taskDefinition,
-        StringBuilder errors, StringBuilder warnings) {
-        JsonNode currentPropsNode = JsonUtils.parseJsonWithErrorHandling(currentTaskParameters, errors);
+        String currentTaskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors, StringBuilder warnings) {
 
-        if (!JsonUtils.validateNodeIsObject(currentPropsNode, "Current task parameters", errors)) {
+        JsonNode currentTaskParametersJsonNode = JsonUtils.parseJsonWithErrorHandling(currentTaskParameters, errors);
+
+        if (!JsonUtils.validateNodeIsObject(currentTaskParametersJsonNode, "Current task parameters", errors)) {
             return;
         }
 
         try {
             String originalTaskDefinition = WorkflowUtils.convertPropertyInfoToJson(taskDefinition);
-            String processedTaskDefinition =
-                WorkflowUtils.processDisplayConditions(taskDefinition, currentTaskParameters);
+            String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
+                taskDefinition, currentTaskParameters);
             validateProcessedTaskDefinition(
-                currentPropsNode, processedTaskDefinition, originalTaskDefinition, errors, warnings,
+                currentTaskParametersJsonNode, processedTaskDefinition, originalTaskDefinition, errors, warnings,
                 currentTaskParameters);
 
         } catch (RuntimeException e) {
@@ -226,9 +226,9 @@ class TaskValidator {
         if (exception.getMessage() != null && json.contains("\"type\":") && json.contains("triggers")) {
             errors.append("Trigger must be an object\n");
         } else {
-            errors.append("Invalid JSON format: ")
-                .append(exception.getMessage())
-                .append("\n");
+            errors.append("Invalid JSON format: ");
+            errors.append(exception.getMessage());
+            errors.append("\n");
         }
     }
 
@@ -346,7 +346,7 @@ class TaskValidator {
     }
 
     private static void validateDataPills(
-        JsonNode task, List<PropertyInfo> taskDefinition, ValidationContext context) {
+        JsonNode task, @Nullable List<PropertyInfo> taskDefinition, ValidationContext context) {
 
         if (taskDefinition != null && !taskDefinition.isEmpty()) {
             DataPillValidator.validateTaskDataPills(
@@ -406,26 +406,30 @@ class TaskValidator {
     }
 
     private static void validateProcessedTaskDefinition(
-        JsonNode currentPropsNode, String processedTaskDefinition, String originalTaskDefinition,
+        JsonNode currentTaskParametersJsonNode, String processedTaskDefinition, String originalTaskDefinition,
         StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
+
         try {
-            JsonNode taskDefNode = com.bytechef.commons.util.JsonUtils.readTree(processedTaskDefinition);
-            if (!JsonUtils.validateNodeIsObject(taskDefNode, "Task definition", errors)) {
+            JsonNode taskDefinitionJsonNode = com.bytechef.commons.util.JsonUtils.readTree(processedTaskDefinition);
+
+            if (!JsonUtils.validateNodeIsObject(taskDefinitionJsonNode, "Task definition", errors)) {
                 return;
             }
 
-            JsonNode parametersNode = taskDefNode.get("parameters");
-            if (parametersNode == null || !parametersNode.isObject()) {
+            JsonNode parametersDefinitionJsonNode = taskDefinitionJsonNode.get("parameters");
+
+            if (parametersDefinitionJsonNode == null || !parametersDefinitionJsonNode.isObject()) {
                 errors.append("Task definition must have a 'parameters' object");
+
                 return;
             }
 
-            // For array validation with display conditions, use original definition
-            PropertyValidator.validatePropertiesRecursively(currentPropsNode, parametersNode, "",
-                errors, warnings, processedTaskDefinition, originalTaskDefinition, currentTaskParameters);
+            // For array validation with display conditions, use the original definition
+            PropertyValidator.validatePropertiesRecursively(
+                currentTaskParametersJsonNode, parametersDefinitionJsonNode, "", errors, warnings,
+                processedTaskDefinition, originalTaskDefinition, currentTaskParameters);
         } catch (Exception e) {
-            handleJsonProcessingException(
-                (JsonProcessingException) e.getCause(), processedTaskDefinition, errors);
+            handleJsonProcessingException((JsonProcessingException) e.getCause(), processedTaskDefinition, errors);
 
         }
     }
@@ -433,7 +437,8 @@ class TaskValidator {
     /**
      * Validates that a required object field exists and is of correct type.
      */
-    private static void validateRequiredObjectField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
+    private static void
+        validateRequiredObjectField(JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
             StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
@@ -446,6 +451,7 @@ class TaskValidator {
         }
     }
 
+    @Nullable
     private static List<PropertyInfo> validateTaskParameters(JsonNode taskJsonNode, ValidationContext context) {
         JsonNode typeJsonNode = taskJsonNode.get("type");
 
@@ -463,9 +469,9 @@ class TaskValidator {
                 taskParameters = jsonNode.toString();
             }
 
-            validateTaskParameters(
-                taskParameters, taskDefinition, context.getErrors(), context.getWarnings());
+            validateTaskParameters(taskParameters, taskDefinition, context.getErrors(), context.getWarnings());
         }
+
         return taskDefinition;
     }
 

@@ -32,49 +32,56 @@ import java.util.Map;
  */
 class ValidationContext {
 
-    private final List<JsonNode> tasks;
+    private final List<JsonNode> taskJsonNodes;
     private final Map<String, List<PropertyInfo>> taskDefinitionMap;
     private final Map<String, PropertyInfo> taskOutputMap;
     private final StringBuilder errors;
     private final StringBuilder warnings;
-    private final List<String> taskNames;
-    private final Map<String, String> taskNameToTypeMap;
-    private final Map<String, JsonNode> allTasksMap;
+    private final List<String> taskNames = new ArrayList<>();
+    private final Map<String, String> taskNameToTypeMap = new HashMap<>();
+    private final Map<String, JsonNode> allTasksMap = new HashMap<>();
 
-    private ValidationContext(Builder builder) {
-        this.tasks = builder.tasks;
-        this.taskDefinitionMap = builder.taskDefinitionMap;
-        this.taskOutputMap = builder.taskOutputMap;
-        this.errors = builder.errors;
-        this.warnings = builder.warnings;
-        this.taskNames = new ArrayList<>();
-        this.taskNameToTypeMap = new HashMap<>();
-        this.allTasksMap = new HashMap<>();
+    private ValidationContext(
+        List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings) {
+
+        this.taskJsonNodes = taskJsonNodes;
+        this.taskDefinitionMap = taskDefinitionMap;
+        this.taskOutputMap = taskOutputMap;
+        this.errors = errors;
+        this.warnings = warnings;
 
         buildTaskMaps();
     }
 
+    public static ValidationContext of(
+        List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings) {
+
+        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
+    }
+
     private void buildTaskMaps() {
-        for (JsonNode task : tasks) {
-            if (task.has("name")) {
-                String taskName = task.get("name")
-                    .asText();
+        for (JsonNode taskJsonNode : taskJsonNodes) {
+            if (taskJsonNode.has("name")) {
+                JsonNode nameJsonNode = taskJsonNode.get("name");
+
+                String taskName = nameJsonNode.asText();
+
                 taskNames.add(taskName);
-                allTasksMap.put(taskName, task);
-                if (task.has("type")) {
-                    taskNameToTypeMap.put(taskName, task.get("type")
-                        .asText());
+                allTasksMap.put(taskName, taskJsonNode);
+
+                if (taskJsonNode.has("type")) {
+                    JsonNode typeJsonNode = taskJsonNode.get("type");
+
+                    taskNameToTypeMap.put(taskName, typeJsonNode.asText());
                 }
             }
         }
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public List<JsonNode> getTasks() {
-        return new ArrayList<>(tasks);
+        return new ArrayList<>(taskJsonNodes);
     }
 
     public Map<String, List<PropertyInfo>> getTaskDefinitions() {
@@ -107,44 +114,5 @@ class ValidationContext {
     @SuppressFBWarnings("EI")
     public Map<String, JsonNode> getAllTasksMap() {
         return allTasksMap;
-    }
-
-    public static class Builder {
-        private List<JsonNode> tasks;
-        private Map<String, List<PropertyInfo>> taskDefinitionMap;
-        private Map<String, PropertyInfo> taskOutputMap;
-        private StringBuilder errors;
-        private StringBuilder warnings;
-
-        public Builder withTasks(List<JsonNode> tasks) {
-            this.tasks = new ArrayList<>(tasks);
-            return this;
-        }
-
-        public Builder withTaskDefinitionMap(Map<String, List<PropertyInfo>> taskDefinitionMap) {
-            this.taskDefinitionMap = new HashMap<>(taskDefinitionMap);
-            return this;
-        }
-
-        public Builder withTaskOutputMap(Map<String, PropertyInfo> taskOutputMap) {
-            this.taskOutputMap = new HashMap<>(taskOutputMap);
-            return this;
-        }
-
-        @SuppressFBWarnings("EI2")
-        public Builder withErrors(StringBuilder errors) {
-            this.errors = errors;
-            return this;
-        }
-
-        @SuppressFBWarnings("EI2")
-        public Builder withWarnings(StringBuilder warnings) {
-            this.warnings = warnings;
-            return this;
-        }
-
-        public ValidationContext build() {
-            return new ValidationContext(this);
-        }
     }
 }

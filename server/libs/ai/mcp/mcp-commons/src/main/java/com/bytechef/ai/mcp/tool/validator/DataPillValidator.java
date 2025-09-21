@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 /**
  * Handles validation of data pill expressions in workflow task parameters. Data pills allow tasks to reference outputs
@@ -135,7 +136,10 @@ class DataPillValidator {
     /**
      * Gets the expected type for a field path from the task definition.
      */
-    private static String getExpectedTypeFromDefinition(String fieldPath, List<PropertyInfo> taskDefinition) {
+    @Nullable
+    private static String getExpectedTypeFromDefinition(
+        @Nullable String fieldPath, @Nullable List<PropertyInfo> taskDefinition) {
+
         if (taskDefinition == null || fieldPath == null || fieldPath.isEmpty()) {
             return null;
         }
@@ -199,7 +203,7 @@ class DataPillValidator {
     /**
      * Checks if the given path corresponds to an array that contains TASK type elements.
      */
-    private static boolean isTaskTypeArray(String currentPath, List<PropertyInfo> taskDefinition) {
+    private static boolean isTaskTypeArray(@Nullable String currentPath, @Nullable List<PropertyInfo> taskDefinition) {
         if (taskDefinition == null || currentPath == null || currentPath.isEmpty()) {
             return false;
         }
@@ -250,7 +254,7 @@ class DataPillValidator {
     /**
      * Checks if two types are compatible for data pill assignments.
      */
-    private static boolean isTypeCompatible(String expectedType, String actualType) {
+    private static boolean isTypeCompatible(String expectedType, @Nullable String actualType) {
         if (actualType == null) {
             return true;
         }
@@ -273,7 +277,7 @@ class DataPillValidator {
     /**
      * Maps PropertyInfo type strings to standardized lowercase format.
      */
-    private static String mapTypeToString(String propertyType) {
+    private static String mapTypeToString(@Nullable String propertyType) {
         if (propertyType == null) {
             return "unknown";
         }
@@ -306,7 +310,8 @@ class DataPillValidator {
     }
 
     private static void validateLoopItemTypes(
-        String dataPillExpression, String loopTaskName, String expectedType, Map<String, JsonNode> allTasksMap,
+        String dataPillExpression, String loopTaskName, @Nullable String expectedType,
+        Map<String, JsonNode> allTasksMap,
         StringBuilder errors, String text, Map<String, PropertyInfo> taskOutput) {
 
         JsonNode loopTaskJsonNode = allTasksMap.get(loopTaskName);

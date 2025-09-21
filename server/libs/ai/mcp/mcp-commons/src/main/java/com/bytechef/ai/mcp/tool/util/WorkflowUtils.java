@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -38,7 +39,9 @@ public class WorkflowUtils {
     private static final Pattern COMBINED_PATTERN = Pattern.compile(
         "\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
 
-    public static String processDisplayConditions(List<PropertyInfo> taskDefinition, String taskParameters) {
+    public static String processDisplayConditions(
+        @Nullable List<PropertyInfo> taskDefinition, @Nullable String taskParameters) {
+
         if (taskDefinition == null || taskParameters == null) {
             return convertPropertyInfoToJson(taskDefinition);
         }
@@ -48,7 +51,7 @@ public class WorkflowUtils {
         return processDisplayConditions(jsonTaskDefinition, taskParameters);
     }
 
-    public static String convertPropertyInfoToJson(List<PropertyInfo> propertyInfos) {
+    public static String convertPropertyInfoToJson(@Nullable List<PropertyInfo> propertyInfos) {
         if (propertyInfos == null || propertyInfos.isEmpty()) {
             return "{ \"parameters\": {} }";
         }
@@ -94,7 +97,8 @@ public class WorkflowUtils {
         }
     }
 
-    public static JsonNode getNestedField(JsonNode jsonNode, String fieldPath) {
+    @Nullable
+    public static JsonNode getNestedField(@Nullable JsonNode jsonNode, @Nullable String fieldPath) {
         if (jsonNode == null || fieldPath == null) {
             return null;
         }
@@ -455,6 +459,7 @@ public class WorkflowUtils {
         return false;
     }
 
+    @Nullable
     private static JsonNode findField(JsonNode parameters, String fieldName) {
         JsonNode fieldJsonNode = getNestedField(parameters, fieldName);
 
@@ -465,20 +470,22 @@ public class WorkflowUtils {
         return fieldJsonNode;
     }
 
-    private static JsonNode findFieldRecursively(JsonNode node, String fieldName) {
-        if (node == null || !node.isObject()) {
+    @Nullable
+    private static JsonNode findFieldRecursively(@Nullable JsonNode jsonNode, String fieldName) {
+        if (jsonNode == null || !jsonNode.isObject()) {
             return null;
         }
 
-        if (node.has(fieldName)) {
-            return node.get(fieldName);
+        if (jsonNode.has(fieldName)) {
+            return jsonNode.get(fieldName);
         }
 
-        for (JsonNode child : node) {
+        for (JsonNode child : jsonNode) {
             if (child.isObject()) {
-                JsonNode found = findFieldRecursively(child, fieldName);
-                if (found != null) {
-                    return found;
+                JsonNode resultJsonNode = findFieldRecursively(child, fieldName);
+
+                if (resultJsonNode != null) {
+                    return resultJsonNode;
                 }
             }
         }
@@ -646,8 +653,8 @@ public class WorkflowUtils {
         }
     }
 
-    private static String processDisplayConditions(String taskDefinition, String taskParameters) {
-        if (taskDefinition == null || taskParameters == null) {
+    private static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
+        if (taskParameters == null) {
             return taskDefinition;
         }
 
@@ -754,6 +761,7 @@ public class WorkflowUtils {
             .replaceAll("\\{\\s*}", "{}");
     }
 
+    @Nullable
     private static PropertyMatch selectBestMatch(List<PropertyMatch> duplicates, JsonNode actualParameters) {
         for (PropertyMatch propertyMatch : duplicates) {
             boolean shouldInclude;

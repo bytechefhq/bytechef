@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.tool.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.lang.Nullable;
 
 /**
  * Centralized utility class for JSON operations and type utilities. Consolidates common JSON operations that were
@@ -42,7 +43,7 @@ public class JsonUtils {
      * Gets the type of JsonNode as a lowercase string. Centralized implementation to replace duplicated getJsonNodeType
      * methods.
      */
-    public static String getJsonNodeType(JsonNode jsonNode) {
+    public static String getJsonNodeType(@Nullable JsonNode jsonNode) {
         if (jsonNode == null) {
             return "null";
         } else if (jsonNode.isTextual()) {
@@ -69,6 +70,7 @@ public class JsonUtils {
     /**
      * Parses JSON string with error handling.
      */
+    @Nullable
     public static JsonNode parseJsonWithErrorHandling(String json, StringBuilder errors) {
         try {
             return com.bytechef.commons.util.JsonUtils.readTree(json);
@@ -84,14 +86,14 @@ public class JsonUtils {
     /**
      * Validates that a JsonNode is an object.
      */
-    public static boolean validateNodeIsObject(JsonNode jsonNode, String nodeType, StringBuilder errors) {
+    public static boolean validateNodeIsObject(@Nullable JsonNode jsonNode, String nodeType, StringBuilder errors) {
         if (jsonNode == null) {
             return false;
         }
 
         if (!jsonNode.isObject()) {
-            errors.append(nodeType)
-                .append(" must be an object");
+            errors.append(nodeType);
+            errors.append(" must be an object");
 
             return false;
         }

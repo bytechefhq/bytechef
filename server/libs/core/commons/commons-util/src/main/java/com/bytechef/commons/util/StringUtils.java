@@ -61,11 +61,11 @@ public class StringUtils {
     /**
      * Appends a string with proper newline handling.
      */
-    public static void appendWithNewline(String string, StringBuilder buffer) {
-        if (!buffer.isEmpty()) {
-            buffer.append("\n");
+    public static void appendWithNewline(String string, StringBuilder sb) {
+        if (!sb.isEmpty()) {
+            sb.append("\n");
         }
 
-        buffer.append(string);
+        sb.append(string);
     }
 }

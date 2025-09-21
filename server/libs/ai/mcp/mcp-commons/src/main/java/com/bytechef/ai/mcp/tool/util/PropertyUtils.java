@@ -18,6 +18,7 @@ package com.bytechef.ai.mcp.tool.util;
 
 import com.bytechef.ai.mcp.tool.model.PropertyInfo;
 import java.util.List;
+import org.springframework.lang.Nullable;
 
 /**
  * Centralized utility class for property navigation, finding, and path operations. Consolidates property-related
@@ -33,7 +34,7 @@ public class PropertyUtils {
     /**
      * Builds a property path by combining parent path and property name.
      */
-    public static String buildPropertyPath(String parentPath, String propertyName) {
+    public static String buildPropertyPath(@Nullable String parentPath, String propertyName) {
         if (parentPath == null || parentPath.isEmpty()) {
             return propertyName;
         }
@@ -57,7 +58,8 @@ public class PropertyUtils {
     /**
      * Finds a property by name in a PropertyInfo structure.
      */
-    public static PropertyInfo findPropertyByName(PropertyInfo parentProperty, String targetName) {
+    @Nullable
+    public static PropertyInfo findPropertyByName(@Nullable PropertyInfo parentProperty, String targetName) {
         if (parentProperty == null || parentProperty.nestedProperties() == null) {
             return null;
         }
@@ -87,6 +89,7 @@ public class PropertyUtils {
     /**
      * Gets the type of a property from the given PropertyInfo structure.
      */
+    @Nullable
     public static String getPropertyType(PropertyInfo outputInfo, String propertyName) {
         return getPropertyTypeRecursive(outputInfo, propertyName.split("\\."));
     }
@@ -150,6 +153,7 @@ public class PropertyUtils {
         return false;
     }
 
+    @Nullable
     private static PropertyInfo findArrayProperty(PropertyInfo outputInfo, String arrayName) {
         if (arrayName.equals(outputInfo.name())) {
             return outputInfo;
@@ -209,6 +213,7 @@ public class PropertyUtils {
         return false;
     }
 
+    @Nullable
     private static String getPropertyTypeRecursive(PropertyInfo outputInfo, String[] propertyPath) {
         if (propertyPath.length == 0) {
             return outputInfo.type();
@@ -230,6 +235,7 @@ public class PropertyUtils {
         return getNestedPropertyType(outputInfo, currentProperty, propertyPath);
     }
 
+    @Nullable
     private static String getArrayPropertyType(
         PropertyInfo outputPropertyInfo, String currentProperty, String[] propertyPath) {
 
@@ -261,9 +267,11 @@ public class PropertyUtils {
                 }
             }
         }
+
         return null;
     }
 
+    @Nullable
     private static String getCurrentPropertyType(PropertyInfo outputPropertyInfo, String[] propertyPath) {
         if (propertyPath.length == 1) {
             return outputPropertyInfo.type();
@@ -284,6 +292,7 @@ public class PropertyUtils {
         return null;
     }
 
+    @Nullable
     private static String getNestedPropertyType(
         PropertyInfo outputPropertyInfo, String currentProperty, String[] propertyPath) {
 

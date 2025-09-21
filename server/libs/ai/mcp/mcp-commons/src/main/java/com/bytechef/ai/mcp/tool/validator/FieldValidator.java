@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.mcp.tool.validator;
 
+import com.bytechef.commons.util.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -34,13 +35,12 @@ class FieldValidator {
      */
     public static void validateRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
-            com.bytechef.commons.util.StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
+            StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
             JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
             if (!fieldJsonNode.isTextual()) {
-                com.bytechef.commons.util.StringUtils.appendWithNewline(
-                    "Field '" + fieldName + "' must be a string", errors);
+                StringUtils.appendWithNewline("Field '" + fieldName + "' must be a string", errors);
             }
         }
     }

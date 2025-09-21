@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,14 +50,8 @@ public class WorkflowValidator {
         List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
         Map<String, PropertyInfo> taskOutput, StringBuilder errors, StringBuilder warnings) {
 
-        // Use the existing Template Method Pattern implementation to maintain exact backward compatibility
-        ValidationContext context = ValidationContext.builder()
-            .withTasks(taskJsonNodes)
-            .withTaskDefinitionMap(taskDefinitionMap)
-            .withTaskOutputMap(taskOutput)
-            .withErrors(errors)
-            .withWarnings(warnings)
-            .build();
+        ValidationContext context = ValidationContext.of(
+            taskJsonNodes, taskDefinitionMap, taskOutput, errors, warnings);
 
         TaskValidator.validateAllTasks(context);
     }
@@ -70,7 +65,7 @@ public class WorkflowValidator {
      * @param warnings                   StringBuilder to collect validation warnings
      */
     public static void validateTaskParameters(
-        String currentTaskParameters, PropertyInfo taskDefinitionPropertyInfo, StringBuilder errors,
+        String currentTaskParameters, @Nullable PropertyInfo taskDefinitionPropertyInfo, StringBuilder errors,
         StringBuilder warnings) {
 
         if (taskDefinitionPropertyInfo == null) {
@@ -316,8 +311,7 @@ public class WorkflowValidator {
                                 List<PropertyInfo> nestedTaskDefinition = taskDefinitionProvider.getTaskProperties(
                                     nestedTaskType, "");
 
-                                allTaskDefinitionMap.put(
-                                    nestedTaskType, nestedTaskDefinition != null ? nestedTaskDefinition : List.of());
+                                allTaskDefinitionMap.put(nestedTaskType, nestedTaskDefinition);
                             }
 
                             // Add task output for the nested task if not already present
@@ -395,8 +389,7 @@ public class WorkflowValidator {
 
                                 // Always add the nested task type to the map, even if the provider returns null or
                                 // empty
-                                allTaskDefinitionMap.put(
-                                    nestedTaskType, nestedTaskProperties != null ? nestedTaskProperties : List.of());
+                                allTaskDefinitionMap.put(nestedTaskType, nestedTaskProperties);
                             }
 
                             // Add task output for the nested task if not already present
