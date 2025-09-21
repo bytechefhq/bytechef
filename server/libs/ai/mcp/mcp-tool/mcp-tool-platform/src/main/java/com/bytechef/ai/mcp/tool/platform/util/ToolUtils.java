@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.platform.util;
 
-import com.bytechef.ai.mcp.tool.model.PropertyInfo;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

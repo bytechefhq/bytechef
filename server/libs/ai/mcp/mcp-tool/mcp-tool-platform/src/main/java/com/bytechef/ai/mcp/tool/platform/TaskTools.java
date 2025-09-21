@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
-import com.bytechef.ai.mcp.tool.model.PropertyInfo;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools.ActionDetailedInfo;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools.ActionMinimalInfo;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerDetailedInfo;
@@ -24,7 +23,8 @@ import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerMinimalInfo;
 import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools.TaskDispatcherInfo;
 import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools.TaskDispatcherMinimalInfo;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
-import com.bytechef.ai.mcp.tool.validator.WorkflowValidator;
+import com.bytechef.platform.workflow.validator.WorkflowValidator;
+import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -31,7 +31,6 @@ include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
-include("server:libs:ai:mcp:mcp-commons")
 include("server:libs:ai:mcp:mcp-server")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-automation")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-platform")
@@ -175,6 +174,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-task-dispatche
 include("server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api")
 include("server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest")
 include("server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service")
+include("server:libs:platform:platform-workflow:platform-workflow-validator")
 include("server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api")
 include("server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl")
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api")

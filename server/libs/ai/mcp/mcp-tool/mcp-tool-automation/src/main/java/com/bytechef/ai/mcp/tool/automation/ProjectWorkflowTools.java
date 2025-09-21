@@ -17,10 +17,10 @@
 package com.bytechef.ai.mcp.tool.automation;
 
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
-import com.bytechef.ai.mcp.tool.validator.WorkflowValidator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -253,7 +253,7 @@ public class ProjectWorkflowTools {
             StringBuilder errors = new StringBuilder("[");
             StringBuilder warnings = new StringBuilder("[");
 
-            WorkflowValidator.validateCompleteWorkflow(
+            WorkflowValidator.validateWorkflow(
                 workflow, taskTools::getTaskProperties, taskTools::getTaskOutputProperty, new HashMap<>(),
                 new HashMap<>(), errors, warnings);
 
