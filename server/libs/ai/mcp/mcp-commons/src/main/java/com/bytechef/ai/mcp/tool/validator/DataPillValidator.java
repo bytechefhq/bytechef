@@ -349,7 +349,7 @@ class DataPillValidator {
                     String string = errors.toString();
 
                     if (!string.contains(errorMessage)) {
-                        StringUtils.appendWithNewline(errors, errorMessage);
+                        StringUtils.appendWithNewline(errorMessage, errors);
                     }
                 }
             }
@@ -434,7 +434,7 @@ class DataPillValidator {
                                                     "not %s",
                                                 i, propertyName, actualType, expectedType.toLowerCase());
 
-                                            StringUtils.appendWithNewline(errors, errorMessage);
+                                            StringUtils.appendWithNewline(errorMessage, errors);
                                         }
                                     }
                                 }
@@ -458,7 +458,7 @@ class DataPillValidator {
                                     "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
                                     actualType, expectedType.toLowerCase());
 
-                                StringUtils.appendWithNewline(errors, errorMessage);
+                                StringUtils.appendWithNewline(errorMessage, errors);
                             }
                         } else {
                             // For arrays of primitive types, use the array element type directly
@@ -469,7 +469,7 @@ class DataPillValidator {
                                     "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
                                     actualType, expectedType.toLowerCase());
 
-                                StringUtils.appendWithNewline(errors, errorMessage);
+                                StringUtils.appendWithNewline(errorMessage, errors);
                             }
                         }
                     }
@@ -501,7 +501,7 @@ class DataPillValidator {
 
             if (referencedTaskIndex == -1 || (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference)) {
                 StringUtils.appendWithNewline(
-                    errors, "Wrong task order: You can't reference '" + dataPillExpression + "' in " + currentTaskName);
+                    "Wrong task order: You can't reference '" + dataPillExpression + "' in " + currentTaskName, errors);
                 context.stopProcessing = true;
 
                 return;
@@ -539,9 +539,9 @@ class DataPillValidator {
 
             if (!propertyExists) {
                 StringUtils.appendWithNewline(
-                    warnings,
                     "Property '" + dataPillExpression + "' might not exist in the output of '" + referencedTaskType +
-                        "'");
+                        "'",
+                    warnings);
 
                 return;
             }
@@ -551,14 +551,14 @@ class DataPillValidator {
                 taskDefinition);
         } else {
             StringUtils.appendWithNewline(
-                warnings,
-                "Property '" + dataPillExpression + "' might not exist in the output of '" + referencedTaskType + "'");
+                "Property '" + dataPillExpression + "' might not exist in the output of '" + referencedTaskType + "'",
+                warnings);
         }
     }
 
     private static void validateTaskReference(String dataPillExpression, List<String> taskNames, StringBuilder errors) {
         if (!taskNames.contains(dataPillExpression)) {
-            StringUtils.appendWithNewline(errors, "Task '" + dataPillExpression + "' doesn't exits.");
+            StringUtils.appendWithNewline("Task '" + dataPillExpression + "' doesn't exits.", errors);
         }
     }
 
@@ -580,9 +580,9 @@ class DataPillValidator {
             }
 
             StringUtils.appendWithNewline(
-                errors,
                 "Property '" + dataPillExpression + "' in output of '" + referencedTaskType +
-                    "' is of type " + actualType.toLowerCase() + ", not " + expectedType.toLowerCase());
+                    "' is of type " + actualType.toLowerCase() + ", not " + expectedType.toLowerCase(),
+                errors);
         }
     }
 

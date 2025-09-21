@@ -59,13 +59,13 @@ public class StringUtils {
     }
 
     /**
-     * Appends a message with proper newline handling.
+     * Appends a string with proper newline handling.
      */
-    public static void appendWithNewline(StringBuilder buffer, String message) {
+    public static void appendWithNewline(String string, StringBuilder buffer) {
         if (!buffer.isEmpty()) {
             buffer.append("\n");
         }
 
-        buffer.append(message);
+        buffer.append(string);
     }
 }

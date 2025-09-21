@@ -34,13 +34,13 @@ class FieldValidator {
      */
     public static void validateRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
-            com.bytechef.commons.util.StringUtils.appendWithNewline(errors, "Missing required field: " + fieldName);
+            com.bytechef.commons.util.StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
             JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
             if (!fieldJsonNode.isTextual()) {
                 com.bytechef.commons.util.StringUtils.appendWithNewline(
-                    errors, "Field '" + fieldName + "' must be a string");
+                    "Field '" + fieldName + "' must be a string", errors);
             }
         }
     }

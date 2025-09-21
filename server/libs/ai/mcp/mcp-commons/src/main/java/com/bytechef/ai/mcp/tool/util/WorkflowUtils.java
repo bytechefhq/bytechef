@@ -128,6 +128,7 @@ public class WorkflowUtils {
                         if (!currentJsonNode.isObject() || !currentJsonNode.has(fieldName)) {
                             return null;
                         }
+
                         currentJsonNode = currentJsonNode.get(fieldName);
                     }
 
@@ -168,6 +169,7 @@ public class WorkflowUtils {
                 if (!currentJsonNode.isObject() || !currentJsonNode.has(part)) {
                     return null;
                 }
+
                 currentJsonNode = currentJsonNode.get(part);
             }
         }

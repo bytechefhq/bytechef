@@ -433,19 +433,19 @@ public class WorkflowValidator {
      */
     private static void validateWorkflowTriggerFields(JsonNode workflowJsonNode, StringBuilder errors) {
         if (!workflowJsonNode.has("triggers")) {
-            StringUtils.appendWithNewline(errors, "Missing required field: triggers");
+            StringUtils.appendWithNewline("Missing required field: triggers", errors);
         } else {
             JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
 
             if (!triggersJsonNode.isArray()) {
-                StringUtils.appendWithNewline(errors, "Field 'triggers' must be an array");
+                StringUtils.appendWithNewline("Field 'triggers' must be an array", errors);
             } else if (triggersJsonNode.size() > 1) {
-                StringUtils.appendWithNewline(errors, "Field 'triggers' must contain one or less objects");
+                StringUtils.appendWithNewline("Field 'triggers' must contain one or less objects", errors);
             } else {
                 JsonNode jsonNode = triggersJsonNode.get(0);
 
                 if (triggersJsonNode.size() == 1 && !jsonNode.isObject()) {
-                    StringUtils.appendWithNewline(errors, "Trigger must be an object");
+                    StringUtils.appendWithNewline("Trigger must be an object", errors);
                 }
             }
         }
@@ -456,12 +456,12 @@ public class WorkflowValidator {
      */
     private static void validateRequiredArrayField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
-            StringUtils.appendWithNewline(errors, "Missing required field: " + fieldName);
+            StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
             JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
             if (!fieldJsonNode.isArray()) {
-                StringUtils.appendWithNewline(errors, "Field '" + fieldName + "' must be an array");
+                StringUtils.appendWithNewline("Field '" + fieldName + "' must be an array", errors);
             }
         }
     }

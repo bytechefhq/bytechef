@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  * Utility class for orchestrating property-level validation. Handles recursive property validation, extra property
  * detection, and defined property validation.
@@ -65,7 +67,7 @@ class PropertyValidator {
                     String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
                     JsonNode valueJsonNode = currentJsonNode.get(fieldName);
 
-                    StringUtils.appendWithNewline(warnings, ValidationErrorUtils.notDefined(propertyPath));
+                    StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
 
                     if (valueJsonNode.isObject()) {
                         generateWarningsForAllProperties(valueJsonNode, propertyPath, warnings);
@@ -100,7 +102,7 @@ class PropertyValidator {
      */
     public static void validatePropertiesRecursively(
         JsonNode currentJsonNode, JsonNode definitionValueJsonNode, String path, StringBuilder errors,
-        StringBuilder warnings, String originalTaskDefinition, String originalTaskDefinitionForArrays,
+        StringBuilder warnings, String originalTaskDefinition, @Nullable  String originalTaskDefinitionForArrays,
         String originalCurrentParams) {
 
         // Check for extra properties (generate warnings)
@@ -114,7 +116,7 @@ class PropertyValidator {
                     String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
                     JsonNode currentValueJsonNode = currentJsonNode.get(fieldName);
 
-                    StringUtils.appendWithNewline(warnings, ValidationErrorUtils.notDefined(propertyPath));
+                    StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
 
                     if (currentValueJsonNode.isObject()) {
                         generateWarningsForAllProperties(currentValueJsonNode, propertyPath, warnings);
@@ -194,7 +196,7 @@ class PropertyValidator {
             String propertyPath = buildPropertyPath(path, fieldName);
             JsonNode valueJsonNode = currentJsonNode.get(fieldName);
 
-            StringUtils.appendWithNewline(warnings, ValidationErrorUtils.notDefined(propertyPath));
+            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
 
             if (valueJsonNode.isObject()) {
                 generateWarningsForAllProperties(valueJsonNode, propertyPath, warnings);
@@ -227,7 +229,7 @@ class PropertyValidator {
 
                 stringIterator.forEachRemaining(fieldName -> {
                     String fieldPath = buildPropertyPath(propertyPath, fieldName);
-                    StringUtils.appendWithNewline(warnings, ValidationErrorUtils.notDefined(fieldPath));
+                    StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(fieldPath), warnings);
                 });
 
                 return;
@@ -309,7 +311,7 @@ class PropertyValidator {
 
         if (!currentValueJsonNode.isArray()) {
             String actualType = JsonUtils.getJsonNodeType(currentValueJsonNode);
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(propertyPath, "array", actualType));
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
 
             return;
         }
@@ -337,6 +339,7 @@ class PropertyValidator {
         } else {
             // Array of objects - use new validation with warnings
             JsonNode arrayElementDefinitionJsonNode = definitionValueJsonNode.get(0);
+
             validateObjectArrayElementsWithWarnings(
                 currentValueJsonNode, arrayElementDefinitionJsonNode, propertyPath, errors, warnings);
         }
@@ -357,7 +360,7 @@ class PropertyValidator {
         if (!currentValue.isArray()) {
             String actualType = JsonUtils.getJsonNodeType(currentValue);
 
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(propertyPath, "array", actualType));
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
 
             return;
         }
@@ -409,7 +412,7 @@ class PropertyValidator {
         if (!valueJsonNode.isArray()) {
             String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
 
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(propertyPath, "array", actualType));
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
 
             return;
         }
@@ -472,7 +475,7 @@ class PropertyValidator {
                         String actualType = JsonUtils.getJsonNodeType(subArrayJsonNode);
 
                         StringUtils.appendWithNewline(
-                            errors, ValidationErrorUtils.typeError(subArrayPath, "array", actualType));
+                            ValidationErrorUtils.typeError(subArrayPath, "array", actualType), errors);
 
                         continue;
                     }
@@ -664,7 +667,7 @@ class PropertyValidator {
                 String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
 
                 StringUtils.appendWithNewline(
-                    errors, ValidationErrorUtils.typeError(elementPath, "object", actualType));
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
 
                 continue;
             }
@@ -711,7 +714,7 @@ class PropertyValidator {
 
             if (valueJsonNode.isTextual() && text.contains(REQUIRED_MARKER)) {
                 StringUtils.appendWithNewline(
-                    errors, ValidationErrorUtils.missingProperty(fullFieldPath));
+                    ValidationErrorUtils.missingProperty(fullFieldPath), errors);
             } else if (valueJsonNode.isObject()) {
                 validateMissingObjectWithRequiredFields(valueJsonNode, fullFieldPath, errors);
             }
@@ -739,7 +742,7 @@ class PropertyValidator {
         } else {
             String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
 
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(propertyPath, "object", actualType));
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "object", actualType), errors);
         }
     }
 
@@ -758,6 +761,7 @@ class PropertyValidator {
         }
 
         JsonNode currentValueJsonNode = currentJsonNode.get(propertyName);
+
         if (currentValueJsonNode.isObject()) {
             validatePropertiesRecursively(
                 currentValueJsonNode, definitionValueJsonNode, propertyPath, errors, warnings, originalTaskDefinition,
@@ -765,7 +769,7 @@ class PropertyValidator {
         } else {
             String actualType = JsonUtils.getJsonNodeType(currentValueJsonNode);
 
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(propertyPath, "object", actualType));
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "object", actualType), errors);
         }
     }
 
@@ -784,7 +788,7 @@ class PropertyValidator {
                 String actualType = JsonUtils.getJsonNodeType(jsonNode);
 
                 StringUtils.appendWithNewline(
-                    errors, ValidationErrorUtils.typeError(elementPath, "object", actualType));
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
 
                 continue;
             }
@@ -802,7 +806,7 @@ class PropertyValidator {
                     boolean isRequired = fieldDefText.contains("(required)");
 
                     if (isRequired && !jsonNode.has(fieldName)) {
-                        StringUtils.appendWithNewline(errors, "Missing required property: " + fieldPath);
+                        StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
                     } else if (jsonNode.has(fieldName)) {
                         JsonNode actualValue = jsonNode.get(fieldName);
                         String expectedType = org.apache.commons.lang3.StringUtils.trim(
@@ -812,7 +816,7 @@ class PropertyValidator {
                             String actualType = JsonUtils.getJsonNodeType(actualValue);
 
                             StringUtils.appendWithNewline(
-                                errors, ValidationErrorUtils.typeError(fieldPath, expectedType, actualType));
+                                ValidationErrorUtils.typeError(fieldPath, expectedType, actualType), errors);
                         }
                     }
                 }
@@ -839,7 +843,7 @@ class PropertyValidator {
                 String actualType = JsonUtils.getJsonNodeType(jsonNode);
 
                 StringUtils.appendWithNewline(
-                    errors, ValidationErrorUtils.typeError(elementPath, "object", actualType));
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
 
                 continue;
             }
@@ -854,8 +858,8 @@ class PropertyValidator {
                 if (fieldDefinitionJsonNode == null) {
                     // Property is not defined in a schema at all
                     StringUtils.appendWithNewline(
-                        warnings,
-                        "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition");
+                        "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition",
+                        warnings);
                 } else if (fieldDefinitionJsonNode.isTextual()) {
                     // Property is defined but check if it should be visible based on a display condition
                     String fieldDefinitionText = fieldDefinitionJsonNode.asText();
@@ -870,9 +874,9 @@ class PropertyValidator {
                         if (!shouldShowProperty) {
                             // Property exists but display condition is false - generate warning
                             StringUtils.appendWithNewline(
-                                warnings,
                                 "Property '" + propertyPath + "[" + currentIndex + "]." + fieldName +
-                                    "' is not defined in task definition");
+                                    "' is not defined in task definition",
+                                warnings);
                         }
                     }
                 }
@@ -910,7 +914,7 @@ class PropertyValidator {
                     if (shouldValidateProperty) {
                         // Property should be validated based on the display condition
                         if (isRequired && !jsonNode.has(fieldName)) {
-                            StringUtils.appendWithNewline(errors, "Missing required property: " + fieldPath);
+                            StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
                         } else if (jsonNode.has(fieldName)) {
                             fieldDefinitionText = fieldDefinitionText.replaceAll("@[^@]*@", "");
 
@@ -922,8 +926,7 @@ class PropertyValidator {
                                 String actualType = JsonUtils.getJsonNodeType(actualValueJsonNode);
 
                                 StringUtils.appendWithNewline(
-                                    errors,
-                                    ValidationErrorUtils.typeError(fieldPath, expectedType, actualType));
+                                    ValidationErrorUtils.typeError(fieldPath, expectedType, actualType), errors);
                             }
                         }
                     }
@@ -960,7 +963,7 @@ class PropertyValidator {
         expectedType = org.apache.commons.lang3.StringUtils.trim(expectedType.replaceAll("@[^@]+@", ""));
 
         if (isRequired && !currentNode.has(propertyName)) {
-            StringUtils.appendWithNewline(errors, ValidationErrorUtils.missingProperty(propertyPath));
+            StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
         } else if (currentNode.has(propertyName)) {
             JsonNode currentValueJsonNode = currentNode.get(propertyName);
 
@@ -981,13 +984,13 @@ class PropertyValidator {
                     currentValueJsonNode.asText(), expectedType, propertyPath);
 
                 if (formatError != null) {
-                    StringUtils.appendWithNewline(errors, formatError);
+                    StringUtils.appendWithNewline(formatError, errors);
                 }
             } else if (!isTypeValid(currentValueJsonNode, expectedType)) {
                 String actualType = JsonUtils.getJsonNodeType(currentValueJsonNode);
 
                 StringUtils.appendWithNewline(
-                    errors, ValidationErrorUtils.typeError(propertyPath, expectedType, actualType));
+                    ValidationErrorUtils.typeError(propertyPath, expectedType, actualType), errors);
             }
         }
     }
@@ -1061,9 +1064,9 @@ class PropertyValidator {
                 }
 
                 StringUtils.appendWithNewline(
-                    errors,
                     ValidationErrorUtils.arrayElementError(
-                        elementValue, propertyName, expectedTypes.toString(), actualType));
+                        elementValue, propertyName, expectedTypes.toString(), actualType),
+                    errors);
             }
         }
     }

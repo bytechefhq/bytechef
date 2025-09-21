@@ -92,7 +92,7 @@ class TaskValidator {
             if (!taskJsonNode.isObject()) {
                 String actualType = JsonUtils.getJsonNodeType(taskJsonNode);
 
-                StringUtils.appendWithNewline(errors, ValidationErrorUtils.typeError(path, "object", actualType));
+                StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
 
                 continue;
             }
@@ -108,7 +108,7 @@ class TaskValidator {
                     String actualType = JsonUtils.getJsonNodeType(parametersJsonNode);
 
                     StringUtils.appendWithNewline(
-                        errors, ValidationErrorUtils.typeError(path + ".parameters", "object", actualType));
+                        ValidationErrorUtils.typeError(path + ".parameters", "object", actualType), errors);
                 }
             }
         }
@@ -208,9 +208,9 @@ class TaskValidator {
                         currentTaskParameters);
                 }
 
-                StringUtils.appendWithNewline(warnings, message);
+                StringUtils.appendWithNewline(message, warnings);
             } catch (Exception ignored) {
-                StringUtils.appendWithNewline(warnings, message);
+                StringUtils.appendWithNewline(message, warnings);
             }
         } else {
             throw exception;
@@ -435,13 +435,13 @@ class TaskValidator {
      */
     private static void validateRequiredObjectField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
-            StringUtils.appendWithNewline(errors, "Missing required field: " + fieldName);
+            StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
             JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
             if (!fieldJsonNode.isObject()) {
                 StringUtils.appendWithNewline(
-                    errors, "Field '" + fieldName + "' must be an object");
+                    "Field '" + fieldName + "' must be an object", errors);
             }
         }
     }
@@ -474,12 +474,12 @@ class TaskValidator {
      */
     private static void validateTaskTypeField(JsonNode taskJsonNode, StringBuilder errors) {
         if (!taskJsonNode.has("type")) {
-            StringUtils.appendWithNewline(errors, "Missing required field: type");
+            StringUtils.appendWithNewline("Missing required field: type", errors);
         } else {
             JsonNode typeJsonNode = taskJsonNode.get("type");
 
             if (!typeJsonNode.isTextual()) {
-                StringUtils.appendWithNewline(errors, "Field 'type' must be a string");
+                StringUtils.appendWithNewline("Field 'type' must be a string", errors);
             } else {
                 String typeValue = typeJsonNode.asText();
 
@@ -487,8 +487,7 @@ class TaskValidator {
 
                 if (!matcher.matches()) {
                     StringUtils.appendWithNewline(
-                        errors,
-                        "Field 'type' must match pattern: (alphanumeric)+/v(numeric)+(/(alphanumeric)+)?");
+                        "Field 'type' must match pattern: (alphanumeric)+/v(numeric)+(/(alphanumeric)+)?", errors);
                 }
             }
         }
