@@ -106,28 +106,6 @@ spring:
         sse-endpoint: /api/sse
         sse-message-endpoint: /api/v1/mcp/message
         request-timeout: 300000
-    openai:
-      api-key: ${bytechef.ai.copilot.openai.api-key}
-      chat:
-        options:
-          model: ${bytechef.ai.copilot.openai.chat.options.model}
-          temperature: ${bytechef.ai.copilot.openai.chat.options.temperature}
-    vectorstore:
-      pgvector:
-        dimensions: 1536
-  autoconfigure:
-    exclude:
-      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
-      org.springframework.ai.model.mistralai.autoconfigure.MistralAiChatAutoConfiguration,
-      org.springframework.ai.model.mistralai.autoconfigure.MistralAiEmbeddingAutoConfiguration,
-      org.springframework.ai.model.mistralai.autoconfigure.MistralAiModerationAutoConfiguration,
-      org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration,
-      org.springframework.ai.model.ollama.autoconfigure.OllamaEmbeddingAutoConfiguration,
-      org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration,
-      org.springframework.ai.vectorstore.pinecone.autoconfigure.PineconeVectorStoreAutoConfiguration,
-      org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration,
-      org.springframework.ai.vectorstore.typesense.autoconfigure.TypesenseVectorStoreAutoConfiguration,
-      org.springframework.ai.vectorstore.weaviate.autoconfigure.WeaviateVectorStoreAutoConfiguration
   application:
     name: server-app
   cache:
@@ -234,12 +212,6 @@ templates:
 bytechef:
   ai:
     copilot:
-      provider: openai
-      openai:
-        chat:
-          options:
-            model: gpt-4.1
-            temperature: 0.5
       enabled: false
   analytics:
     enabled: false

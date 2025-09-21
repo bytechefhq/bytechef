@@ -28,10 +28,6 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
@@ -71,10 +67,6 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
-            new MapToPGObjectConverter(objectMapper),
-            new PGobjectToMapConverter(objectMapper),
-            new ListDoubleToPGObjectConverter(),
-            new PGObjectToListDoubleConverter(),
             new FileEntryToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new StringToDataEntryValueWrapperConverter(),

@@ -30,6 +30,6 @@ public class PostgreSQLContainerConfiguration {
     @Bean
     @ServiceConnection
     public PostgreSQLContainer<?> postgreSQLContainer() {
-        return new PostgreSQLContainer<>("pgvector/pgvector:pg16");
+        return new PostgreSQLContainer<>("postgres:16-alpine");
     }
 }
