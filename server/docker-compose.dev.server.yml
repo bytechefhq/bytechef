@@ -6,7 +6,7 @@ services:
       - "1025:1025"
       - "8025:8025"
   postgres:
-    image: pgvector/pgvector:pg16
+    image: postgres:16-alpine
     platform: linux/amd64
     ports:
       - "5432:5432"
