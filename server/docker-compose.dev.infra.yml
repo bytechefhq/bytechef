@@ -3,7 +3,6 @@ services:
   mailpit:
     image: axllent/mailpit
     platform: linux/amd64
-    container_name: mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
