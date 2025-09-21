@@ -18,8 +18,6 @@ services:
     - "POSTGRES_PASSWORD=postgres"
     - "POSTGRES_USER=postgres"
     - "POSTGRES_DB=bytechef"
-    - "5672:5672"
-    - "15672:15672"
   redis:
     image: redis:7-alpine
     platform: linux/amd64
