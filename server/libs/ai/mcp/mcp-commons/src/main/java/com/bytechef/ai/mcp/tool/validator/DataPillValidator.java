@@ -65,22 +65,22 @@ class DataPillValidator {
         Map<String, JsonNode> allTaskMap, List<PropertyInfo> taskDefinition, boolean skipTaskOrderValidation,
         boolean skipNestedTaskValidation) {
 
-        JsonNode parameters = taskJsonNode.get("parameters");
+        JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
-        if (parameters == null || !parameters.isObject()) {
+        if (parametersJsonNode == null || !parametersJsonNode.isObject()) {
             return;
         }
 
         JsonNode nameJsonNode = taskJsonNode.get("name");
 
-        String currentTaskName = nameJsonNode.asText();
+        String name = nameJsonNode.asText();
 
         TaskValidationContext context = new TaskValidationContext();
         context.skipTaskOrderValidation = skipTaskOrderValidation;
         context.skipNestedTaskValidation = skipNestedTaskValidation;
 
         findDataPillsInNode(
-            parameters, "", currentTaskName, taskOutputMap, taskNames, taskNameToTypeMap, errors, warnings, context,
+            parametersJsonNode, "", name, taskOutputMap, taskNames, taskNameToTypeMap, errors, warnings, context,
             allTaskMap, taskDefinition);
 
     }
@@ -161,7 +161,7 @@ class DataPillValidator {
             }
 
             if (foundProperty == null) {
-                return null; // Property not found in definition
+                return null; // Property is not found in definition
             }
 
             // If this is the last part of the path, return its type
@@ -311,8 +311,7 @@ class DataPillValidator {
 
     private static void validateLoopItemTypes(
         String dataPillExpression, String loopTaskName, @Nullable String expectedType,
-        Map<String, JsonNode> allTasksMap,
-        StringBuilder errors, String text, Map<String, PropertyInfo> taskOutput) {
+        Map<String, JsonNode> allTasksMap, StringBuilder errors, String text, Map<String, PropertyInfo> taskOutput) {
 
         JsonNode loopTaskJsonNode = allTasksMap.get(loopTaskName);
 
@@ -321,6 +320,7 @@ class DataPillValidator {
         }
 
         JsonNode parametersJsonNode = loopTaskJsonNode.get("parameters");
+
         if (!parametersJsonNode.has("items")) {
             return;
         }
@@ -335,9 +335,9 @@ class DataPillValidator {
         if (itemsJsonNode.isArray()) {
             // Check each item in the loop against the expected type
             for (int i = 0; i < itemsJsonNode.size(); i++) {
-                JsonNode item = itemsJsonNode.get(i);
+                JsonNode itemJsonNode = itemsJsonNode.get(i);
 
-                String actualType = JsonUtils.getJsonNodeType(item);
+                String actualType = JsonUtils.getJsonNodeType(itemJsonNode);
 
                 if (!isTypeCompatible(expectedType, actualType)) {
                     // Allow any type to be converted to string in interpolation
@@ -347,13 +347,13 @@ class DataPillValidator {
 
                     String indexedExpression = dataPillExpression.replace(".item", ".item[" + i + "]");
 
-                    String errorMessage = "Property '" + indexedExpression + "' in output of 'loop/v1' is of type "
-                        + actualType.toLowerCase() + ", not " + expectedType.toLowerCase();
+                    String errorMessage = "Property '" + indexedExpression + "' in output of 'loop/v1' is of type " +
+                        actualType.toLowerCase() + ", not " + expectedType.toLowerCase();
 
                     // Avoid duplicate errors
-                    String string = errors.toString();
+                    String errorsString = errors.toString();
 
-                    if (!string.contains(errorMessage)) {
+                    if (!errorsString.contains(errorMessage)) {
                         StringUtils.appendWithNewline(errorMessage, errors);
                     }
                 }
@@ -395,9 +395,7 @@ class DataPillValidator {
         // Get the source task's type and find its output definition
         JsonNode typeJsonNode = sourceTaskJsonNode.get("type");
 
-        String sourceTaskType = typeJsonNode.asText();
-
-        PropertyInfo sourceTaskOutput = taskOutput.get(sourceTaskType);
+        PropertyInfo sourceTaskOutput = taskOutput.get(typeJsonNode.asText());
 
         if (sourceTaskOutput == null) {
             return;
@@ -417,8 +415,8 @@ class DataPillValidator {
                     // Extract the property name from the data pill expression
                     // For example, from "loop1.item.propBool" we want "propBool"
                     if (dataPillExpression.contains(".item.")) {
-
                         String[] itemParts = dataPillExpression.split("\\.item\\.");
+
                         if (itemParts.length > 1) {
                             String propertyName = itemParts[1];
 
@@ -529,7 +527,7 @@ class DataPillValidator {
 
         // Special handling for loop tasks - they auto-generate 'item' output based on 'items' parameter
         if (referencedTaskType.startsWith("loop/") && propertyName.startsWith("item")) {
-            // Get expected type from task definition if available
+            // Get the expected type from task definition if available
             String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
 
             validateLoopItemTypes(
@@ -573,7 +571,7 @@ class DataPillValidator {
 
         String actualType = PropertyUtils.getPropertyType(outputInfo, propertyName);
 
-        // Get expected type from task definition if available
+        // Get the expected type from task definition if available
         String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition);
 
         if (expectedType != null && actualType != null &&

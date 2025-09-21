@@ -59,13 +59,13 @@ public class WorkflowValidator {
     /**
      * Validates task parameters against a single PropertyInfo task definition.
      *
-     * @param currentTaskParameters      the current task parameters JSON
+     * @param taskParameters             the current task parameters JSON
      * @param taskDefinitionPropertyInfo the PropertyInfo representing the task definition
      * @param errors                     StringBuilder to collect validation errors
      * @param warnings                   StringBuilder to collect validation warnings
      */
     public static void validateTaskParameters(
-        String currentTaskParameters, @Nullable PropertyInfo taskDefinitionPropertyInfo, StringBuilder errors,
+        String taskParameters, @Nullable PropertyInfo taskDefinitionPropertyInfo, StringBuilder errors,
         StringBuilder warnings) {
 
         if (taskDefinitionPropertyInfo == null) {
@@ -81,7 +81,7 @@ public class WorkflowValidator {
         }
 
         List<PropertyInfo> taskDefinitionList = List.of(taskDefinitionPropertyInfo);
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinitionList, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinitionList, errors, warnings);
     }
 
     /**

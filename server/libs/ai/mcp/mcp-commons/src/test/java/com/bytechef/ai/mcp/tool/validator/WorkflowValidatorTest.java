@@ -572,7 +572,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersValidParametersNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "John",
                 "age": 30,
@@ -588,7 +588,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -596,7 +596,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersExtraPropertyAddsWarning() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "John",
                 "extraField": "not allowed"
@@ -609,7 +609,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'extraField' is not defined in task definition", warnings.toString());
@@ -617,7 +617,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersMissingRequiredPropertyAddsError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "age": 30
             }
@@ -630,7 +630,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: name", errors.toString());
         assertEquals("", warnings.toString());
@@ -638,7 +638,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersTypeMatching() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "string": "test",
                 "integer": 123,
@@ -668,7 +668,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -676,7 +676,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNullTypeMatching() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "string": null,
                 "integer": null,
@@ -706,7 +706,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -714,7 +714,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersWrongTypeAddsError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": 123,
                 "age": "thirty",
@@ -730,7 +730,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'name' has incorrect type. Expected: string, but got: integer
@@ -741,7 +741,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersWrongTypeFormatAddsError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "day": "2025-1-1",
                 "night": "2025-02-30",
@@ -761,7 +761,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'day' is in incorrect date format. Format should be in: 'yyyy-MM-dd'
@@ -775,7 +775,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersWrongTypeInArrayAndObjectAddsError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "obj": {
                     "name": 123,
@@ -800,7 +800,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'obj.name' has incorrect type. Expected: string, but got: integer
@@ -814,7 +814,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersArrayAndObjectTypesNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "items": [],
                 "config": {}
@@ -832,7 +832,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -840,7 +840,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersArrayMultipleValuesNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "items": [
                     "John",
@@ -861,7 +861,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -869,7 +869,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersArrayMultipleValuesObjectWrongAttribute() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "items": [
                     {
@@ -900,7 +900,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: items[2].age", errors.toString());
         assertEquals("Property 'items[index].page' is not defined in task definition", warnings.toString());
@@ -908,7 +908,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersArrayMultipleValuesIndexDisplayCondition() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "items": [
                     {
@@ -939,7 +939,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: items[1].adult", errors.toString());
         assertEquals("Property 'items[2].adult' is not defined in task definition", warnings.toString());
@@ -947,7 +947,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersTypesInArrayAndObjectNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "items": ["string"],
                 "config": {
@@ -963,7 +963,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'config.key' is not defined in task definition", warnings.toString());
@@ -971,14 +971,14 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNonObjectCurrentParametersAddsError() {
-        String currentTaskParameters = "\"not an object\"";
+        String taskParameters = "\"not an object\"";
 
         List<PropertyInfo> taskDefinition = List.of();
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Current task parameters must be an object", errors.toString());
         assertEquals("", warnings.toString());
@@ -986,7 +986,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNonObjectTaskDefinitionAddsError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "John"
             }
@@ -998,7 +998,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        WorkflowValidator.validateTaskParameters(currentTaskParameters, taskDefinitionPropertyInfo, errors, warnings);
+        WorkflowValidator.validateTaskParameters(taskParameters, taskDefinitionPropertyInfo, errors, warnings);
 
         assertEquals("Task definition must be an object", errors.toString());
         assertEquals("", warnings.toString());
@@ -1006,14 +1006,14 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInvalidJsonCurrentParametersAddsError() {
-        String currentTaskParameters = "{invalid json}";
+        String taskParameters = "{invalid json}";
 
         List<PropertyInfo> taskDefinition = List.of();
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertTrue(errors.toString()
             .contains("Invalid JSON format:"), errors.toString());
@@ -1022,7 +1022,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNullValueCorrectType() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "nullable": null
             }
@@ -1034,7 +1034,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1042,7 +1042,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersMixedValidationScenario() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "validString": "hello",
                 "invalidNumber": "not an integer",
@@ -1058,7 +1058,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Property 'invalidNumber' has incorrect type. Expected: integer, but got: string
@@ -1068,7 +1068,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersEmptyParametersDefinitionAllowsAnyParameters() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "anyProperty": "any value"
             }
@@ -1079,7 +1079,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'anyProperty' is not defined in task definition", warnings.toString());
@@ -1087,7 +1087,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueIncludesConditionalProperty() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": true,
                 "featureConfig": {
@@ -1108,7 +1108,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1116,7 +1116,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyReverseOrder() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": true,
                 "featureConfig": {
@@ -1137,7 +1137,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1145,7 +1145,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyString() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": "true",
                 "featureConfig": {
@@ -1166,7 +1166,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1174,7 +1174,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueIncludesConditionalPropertyContains() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": "true",
                 "featureConfig": {
@@ -1196,7 +1196,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1204,7 +1204,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionFalseIncludesConditionalPropertyContains() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": "false",
                 "featureConfig": {
@@ -1225,7 +1225,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1236,7 +1236,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueInvalidDisplayConditionOperation() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": "true",
                 "featureConfig": {
@@ -1257,7 +1257,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1269,7 +1269,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionFalseFloatErrorWhenConditionalPropertyProvided() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": 4,
                 "featureConfig": {
@@ -1289,7 +1289,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
@@ -1297,7 +1297,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDisplayConditionTrueIntegerInvertedErrorWhenConditionalPropertyProvided() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "enableFeature": 4.1,
                 "featureConfig": {
@@ -1317,7 +1317,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
@@ -1325,7 +1325,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersMultipleDisplayConditionsFiltersByConditionIncorrectCondition() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "mode": "advanced",
                 "basicConfig": {
@@ -1347,7 +1347,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig.name", errors.toString());
         assertEquals("""
@@ -1357,7 +1357,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDuplicatePropertiesWithDifferentConditionsIncludesCorrectOne() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "bodyContentType": true,
                 "bodyContent": {
@@ -1384,7 +1384,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1392,7 +1392,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDuplicatePropertiesWithDifferentConditionsExcludesIncorrectOne() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "bodyContentType": false,
                 "bodyContent": {
@@ -1418,7 +1418,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("Property 'bodyContent.extension' is not defined in task definition", warnings.toString());
@@ -1426,7 +1426,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersDuplicatePropertiesWithDifferentConditionsIncludesIncorrect() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "bodyContentType": true,
                 "bodyContent": {
@@ -1451,7 +1451,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Missing required property: bodyContent.mimeType
@@ -1462,7 +1462,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNestedDisplayConditionsValidatesCorrectly() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "parentEnabled": true,
                 "parent": {
@@ -1488,7 +1488,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1496,7 +1496,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersStringValueConditionWorksCorrectly() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "format": "json",
                 "jsonConfig": {
@@ -1515,7 +1515,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1523,7 +1523,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersMissingFieldForConditionExcludesConditionalProperty() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test"
             }
@@ -1538,7 +1538,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1546,7 +1546,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersComplexNestedConditionsValidatesAllLevels() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "enabled",
                 "config1": {
@@ -1578,7 +1578,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1586,7 +1586,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersComplexNestedConditionsDeepMissingError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "enabled",
                 "config1": {
@@ -1619,7 +1619,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: config1.config2.config3.finalValue", errors.toString());
         assertEquals("Property 'config1.config2.config3.randomValue' is not defined in task definition",
@@ -1628,7 +1628,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersComplexNestedConditionsDeepWarning() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "enabled",
                 "config1": {
@@ -1660,7 +1660,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -1670,7 +1670,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionExcludesRequiredProperty() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": false
@@ -1685,7 +1685,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1693,7 +1693,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionReversedExcludesRequiredProperty() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": true,
@@ -1709,7 +1709,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1717,7 +1717,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyMissingError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": true
@@ -1732,7 +1732,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
@@ -1740,7 +1740,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyIntegerMissingError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": 4.0
@@ -1755,7 +1755,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
@@ -1763,7 +1763,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyReversedFloatNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": 4
@@ -1778,7 +1778,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1786,7 +1786,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersInlineConditionDoesntIncludeRequiredPropertyContainsNoErrors() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "name": "test",
                 "enableAdvanced": "true",
@@ -1803,7 +1803,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1811,7 +1811,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersComplexNestedInlineConditionsValidatesAllLevels() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "enabled",
                 "config1": {
@@ -1843,7 +1843,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1851,7 +1851,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNestedInlineConditionMissingError() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "enabled",
                 "config1": {
@@ -1881,7 +1881,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
             Missing required property: config1.level2
@@ -1892,7 +1892,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersNestedInlineConditionNotMatchingCondition() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "level1": "not_enabled",
                 "config1": {
@@ -1922,7 +1922,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -1930,7 +1930,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersHttpClientPost() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "uri": "https://api.example.com/v1/users",
                 "allowUnauthorizedCerts": false,
@@ -1997,7 +1997,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
@@ -2008,7 +2008,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersConditionFlowRawExpressionTrue() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "rawExpression": true,
                 "expression": "TODO",
@@ -2066,7 +2066,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -2074,7 +2074,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersConditionFlowRawExpressionTrueWithTask() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "rawExpression": true,
                 "expression": "TODO",
@@ -2142,7 +2142,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
@@ -2150,7 +2150,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersConditionFlowRawExpressionFalse() {
-        String currentTaskParameters = """
+        String taskParameters = """
             {
                 "rawExpression": false,
                 "conditions": [
@@ -2232,7 +2232,7 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(currentTaskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());

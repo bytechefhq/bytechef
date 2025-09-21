@@ -117,31 +117,31 @@ class TaskValidator {
     /**
      * Validates task parameters against a list of PropertyInfo definitions with display condition processing.
      *
-     * @param currentTaskParameters the current task parameters JSON
-     * @param taskDefinition        list of PropertyInfo representing the task definition
-     * @param errors                StringBuilder to collect validation errors
-     * @param warnings              StringBuilder to collect validation warnings
+     * @param taskParameters the task parameters JSON
+     * @param taskDefinition list of PropertyInfo representing the task definition
+     * @param errors         StringBuilder to collect validation errors
+     * @param warnings       StringBuilder to collect validation warnings
      */
     public static void validateTaskParameters(
-        String currentTaskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors, StringBuilder warnings) {
+        String taskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors, StringBuilder warnings) {
 
-        JsonNode currentTaskParametersJsonNode = JsonUtils.parseJsonWithErrorHandling(currentTaskParameters, errors);
+        JsonNode taskParametersJsonNode = JsonUtils.parseJsonWithErrorHandling(taskParameters, errors);
 
-        if (!JsonUtils.validateNodeIsObject(currentTaskParametersJsonNode, "Current task parameters", errors)) {
+        if (!JsonUtils.validateNodeIsObject(taskParametersJsonNode, "Current task parameters", errors)) {
             return;
         }
 
         try {
             String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
-                taskDefinition, currentTaskParameters);
+                taskDefinition, taskParameters);
             String originalTaskDefinition = WorkflowUtils.convertPropertyInfoToJson(taskDefinition);
 
             validateProcessedTaskDefinition(
-                currentTaskParametersJsonNode, processedTaskDefinition, originalTaskDefinition, errors, warnings,
-                currentTaskParameters);
+                taskParametersJsonNode, taskParameters, processedTaskDefinition, originalTaskDefinition, errors,
+                warnings);
 
         } catch (RuntimeException e) {
-            handleDisplayConditionError(e, taskDefinition, currentTaskParameters, errors, warnings);
+            handleDisplayConditionError(e, taskDefinition, taskParameters, errors, warnings);
         }
     }
 
@@ -187,8 +187,8 @@ class TaskValidator {
     }
 
     private static void handleDisplayConditionError(
-        RuntimeException exception, List<PropertyInfo> taskDefinition, String currentTaskParameters,
-        StringBuilder errors, StringBuilder warnings) {
+        RuntimeException exception, List<PropertyInfo> taskDefinition, String taskParameters, StringBuilder errors,
+        StringBuilder warnings) {
 
         String message = exception.getMessage();
 
@@ -202,12 +202,11 @@ class TaskValidator {
                 JsonNode parametersDefinitionJsonNode = taskDefinitionJsonNode.get("parameters");
 
                 if (parametersDefinitionJsonNode != null && parametersDefinitionJsonNode.isObject()) {
-                    JsonNode currentTaskParametersJsonNode = com.bytechef.commons.util.JsonUtils.readTree(
-                        currentTaskParameters);
+                    JsonNode taskParametersJsonNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
 
                     PropertyValidator.validatePropertiesRecursively(
-                        currentTaskParametersJsonNode, parametersDefinitionJsonNode, "", errors, warnings,
-                        cleanedTaskDefinition, currentTaskParameters);
+                        taskParametersJsonNode, parametersDefinitionJsonNode, "", cleanedTaskDefinition, taskParameters,
+                        errors, warnings);
                 }
 
                 StringUtils.appendWithNewline(message, warnings);
@@ -408,8 +407,8 @@ class TaskValidator {
     }
 
     private static void validateProcessedTaskDefinition(
-        JsonNode currentTaskParametersJsonNode, String processedTaskDefinition, String originalTaskDefinition,
-        StringBuilder errors, StringBuilder warnings, String currentTaskParameters) {
+        JsonNode taskParametersJsonNode, String taskParameters, String processedTaskDefinition,
+        String originalTaskDefinition, StringBuilder errors, StringBuilder warnings) {
 
         try {
             JsonNode taskDefinitionJsonNode = com.bytechef.commons.util.JsonUtils.readTree(processedTaskDefinition);
@@ -428,8 +427,8 @@ class TaskValidator {
 
             // For array validation with display conditions, use the original definition
             PropertyValidator.validatePropertiesRecursively(
-                currentTaskParametersJsonNode, parametersDefinitionJsonNode, "", errors, warnings,
-                processedTaskDefinition, originalTaskDefinition, currentTaskParameters);
+                taskParametersJsonNode, parametersDefinitionJsonNode, "", processedTaskDefinition,
+                originalTaskDefinition, taskParameters, errors, warnings);
         } catch (Exception e) {
             handleJsonProcessingException((JsonProcessingException) e.getCause(), processedTaskDefinition, errors);
 
