@@ -30,7 +30,7 @@ const WorkflowTaskExecutionItem = ({
                 <div className="flex items-center gap-x-1">
                     {icon && <LazyLoadSVG className="size-4" src={icon} />}
 
-                    <div className="flex flex-col">
+                    <div className="flex flex-col items-start">
                         <span>{title}</span>
 
                         <span className="text-xs text-muted-foreground">
