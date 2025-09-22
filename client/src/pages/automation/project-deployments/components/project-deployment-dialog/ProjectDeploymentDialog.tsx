@@ -213,59 +213,49 @@ const ProjectDeploymentDialog = ({
     };
 
     useEffect(() => {
-        if (workflows) {
-            let projectDeploymentWorkflows: ProjectDeploymentWorkflow[] = [];
+        if (!workflows?.length) {
+            return;
+        }
 
-            for (let i = 0; i < workflows.length; i++) {
-                const workflow = workflows[i];
+        const projectDeploymentWorkflows: ProjectDeploymentWorkflow[] = workflows.map((workflow) => {
+            const projectDeploymentWorkflow = projectDeployment?.projectDeploymentWorkflows?.find(
+                (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowUuid === workflow.workflowUuid
+            );
 
-                const projectDeploymentWorkflow = projectDeployment?.projectDeploymentWorkflows?.find(
-                    (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowUuid === workflow.workflowUuid
-                );
+            setWorkflowEnabled(workflow.id!, !!(projectDeploymentWorkflow && projectDeploymentWorkflow.enabled));
 
-                if (projectDeploymentWorkflow && projectDeploymentWorkflow.enabled) {
-                    setWorkflowEnabled(workflow.id!, true);
-                } else {
-                    setWorkflowEnabled(workflow.id!, false);
-                }
+            const componentConnections: ComponentConnection[] = [
+                ...(workflow?.tasks ?? []).flatMap((task) => task.connections ?? []),
+                ...(workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []),
+            ];
 
-                let newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] = [];
-
-                const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
-                    .flatMap((task) => task.connections ?? [])
-                    .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
-
-                for (const componentConnection of componentConnections) {
-                    const projectDeploymentWorkflowConnection = projectDeploymentWorkflow?.connections?.find(
+            const newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] =
+                componentConnections.map((componentConnection) => {
+                    const existingConnection = projectDeploymentWorkflow?.connections?.find(
                         (projectDeploymentWorkflowConnection) =>
                             projectDeploymentWorkflowConnection.workflowNodeName ===
                                 componentConnection.workflowNodeName &&
                             projectDeploymentWorkflowConnection.workflowConnectionKey === componentConnection.key
                     );
 
-                    newProjectDeploymentWorkflowConnections = [
-                        ...newProjectDeploymentWorkflowConnections,
-                        projectDeploymentWorkflowConnection ??
-                            ({
-                                workflowConnectionKey: componentConnection.key,
-                                workflowNodeName: componentConnection.workflowNodeName,
-                            } as ProjectDeploymentWorkflowConnection),
-                    ];
-                }
+                    return (
+                        existingConnection ??
+                        ({
+                            workflowConnectionKey: componentConnection.key,
+                            workflowNodeName: componentConnection.workflowNodeName,
+                        } as ProjectDeploymentWorkflowConnection)
+                    );
+                });
 
-                projectDeploymentWorkflows = [
-                    ...projectDeploymentWorkflows,
-                    {
-                        ...(projectDeploymentWorkflow ?? {}),
-                        connections: newProjectDeploymentWorkflowConnections,
-                        version: undefined,
-                        workflowId: workflow.id!,
-                    },
-                ];
-            }
+            return {
+                ...(projectDeploymentWorkflow ?? {}),
+                connections: newProjectDeploymentWorkflowConnections,
+                version: undefined,
+                workflowId: workflow.id!,
+            };
+        });
 
-            setValue('projectDeploymentWorkflows', projectDeploymentWorkflows);
-        }
+        setValue('projectDeploymentWorkflows', projectDeploymentWorkflows);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getValues().projectId, getValues().projectVersion, workflows]);

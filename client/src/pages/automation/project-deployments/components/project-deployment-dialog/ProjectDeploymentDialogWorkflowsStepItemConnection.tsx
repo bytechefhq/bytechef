@@ -15,8 +15,6 @@ import {
 } from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {PlusIcon} from '@radix-ui/react-icons';
-import * as Portal from '@radix-ui/react-portal';
-import {useState} from 'react';
 import {Control} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
@@ -33,8 +31,6 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     control,
     workflowIndex,
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
-    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
-
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -79,15 +75,27 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                         <SelectValue placeholder="Choose Connection..." />
                                     </SelectTrigger>
 
-                                    <Button
-                                        className="mt-auto p-2"
-                                        onClick={() => setShowNewConnectionDialog(true)}
-                                        title="Create a new connection"
-                                        type="button"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon className="size-5" />
-                                    </Button>
+                                    {componentDefinitions && (
+                                        <ConnectionDialog
+                                            componentDefinition={componentDefinition}
+                                            componentDefinitions={componentDefinitions!}
+                                            connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                            connectionsQueryKey={ConnectionKeys.connections}
+                                            onClose={() => {}}
+                                            triggerNode={
+                                                <Button
+                                                    className="mt-auto p-2"
+                                                    title="Create a new connection"
+                                                    type="button"
+                                                    variant="outline"
+                                                >
+                                                    <PlusIcon className="size-5" />
+                                                </Button>
+                                            }
+                                            useCreateConnectionMutation={useCreateConnectionMutation}
+                                            useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                        />
+                                    )}
                                 </div>
                             </FormControl>
 
@@ -122,20 +130,6 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                 )}
                 rules={{required: componentConnection.required}}
             />
-
-            {showNewConnectionDialog && componentDefinitions && (
-                <Portal.Root>
-                    <ConnectionDialog
-                        componentDefinition={componentDefinition}
-                        componentDefinitions={componentDefinitions}
-                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                        connectionsQueryKey={ConnectionKeys.connections}
-                        onClose={() => setShowNewConnectionDialog(false)}
-                        useCreateConnectionMutation={useCreateConnectionMutation}
-                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    />
-                </Portal.Root>
-            )}
         </>
     );
 };
