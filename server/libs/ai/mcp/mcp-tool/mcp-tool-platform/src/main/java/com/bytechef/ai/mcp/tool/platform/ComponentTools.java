@@ -532,6 +532,7 @@ public class ComponentTools {
                             outputResponse = actionDefinition.getOutputResponse();
                         } else if (actionDefinition.isOutputFunctionDefined()) {
                             try {
+
                                 outputResponse = actionDefinitionFacade.executeOutput(
                                     componentDefinition.getName(), componentDefinition.getVersion(),
                                     actionDefinition.getName(), Map.of(), null);
@@ -547,7 +548,7 @@ public class ComponentTools {
                                     }
                                 } catch (Exception e2) {
                                     throw new Exception(
-                                        "Please make a " + componentDefinition.getName() + " connector");
+                                        "Please make a " + componentDefinition.getName() + " connection");
                                 }
                             }
                         }
