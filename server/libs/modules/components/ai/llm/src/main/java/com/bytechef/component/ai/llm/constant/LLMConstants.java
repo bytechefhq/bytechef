@@ -222,14 +222,14 @@ public class LLMConstants {
                         "Structured data", ChatModel.ResponseFormat.JSON.name(),
                         "Response as data in a simple format using keys and values"))
                 .defaultValue(ChatModel.ResponseFormat.TEXT.name())
-                .required(false),
+                .required(true),
             string(RESPONSE_SCHEMA)
                 .label("Response Schema")
                 .description("Define desired structure for the structured data response.")
                 .controlType(JSON_SCHEMA_BUILDER)
                 .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.JSON.name()))
-                .required(false))
-        .required(false);
+                .required(true))
+        .required(true);
 
     public static final ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
         .label("Seed")
