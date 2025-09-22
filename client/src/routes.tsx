@@ -2,6 +2,7 @@ import App from '@/App';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {Connections} from '@/pages/automation/connections/Connections';
+import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
@@ -58,7 +59,6 @@ const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
-const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
@@ -385,9 +385,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <ProjectDeployments />
-                                            </LazyLoadWrapper>
+                                            <ProjectDeployments />
                                         </PrivateRoute>
                                     ),
                                     path: 'deployments',
