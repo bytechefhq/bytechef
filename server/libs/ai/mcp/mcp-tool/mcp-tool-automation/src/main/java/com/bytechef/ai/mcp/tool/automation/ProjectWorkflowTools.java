@@ -281,6 +281,27 @@ public class ProjectWorkflowTools {
         }
     }
 
+    @Tool(
+        description = "Instructions for building workflows")
+    public String buildingInstructions() {
+        StringBuilder instructions = new StringBuilder("The workflow needs to be in JSON format similar to:\n")
+            .append(DEFAULT_DEFINITION)
+            .append("\n")
+            .append(
+                """
+                    - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
+
+                    Output properties:
+                    Some tasks have output properties that you get with getTaskOutputProperty() tool. Output property is a response to the task.
+                    For example: the action getMail will probably have the mail parameters as an output.
+                    You can reference the output property in a format similar to:
+                    ${taskName.property}
+                    ${taskName.arrayProperty[1]}
+                    ${taskName.objectProperty.property}}
+                    """);
+        return instructions.toString();
+    }
+
     /**
      * Project workflow information record for the response.
      */
