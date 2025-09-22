@@ -125,7 +125,7 @@ public class TaskTools {
 
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
-            boolean includeTaskDispatchers = normalizedType == null || "taskDispatcher".equals(normalizedType);
+            boolean includeTaskDispatchers = normalizedType == null || "taskdispatcher".equals(normalizedType);
 
             int actionsCount = 0;
             int triggersCount = 0;
@@ -201,7 +201,7 @@ public class TaskTools {
 
             boolean includeActions = normalizedType == null || "action".equals(normalizedType);
             boolean includeTriggers = normalizedType == null || "trigger".equals(normalizedType);
-            boolean includeTaskDispatchers = normalizedType == null || "taskDispatcher".equals(normalizedType);
+            boolean includeTaskDispatchers = normalizedType == null || "taskdispatcher".equals(normalizedType);
 
             int effectiveLimit = limit != null ? limit : 30;
             int actionsCount = 0;
@@ -397,6 +397,26 @@ public class TaskTools {
 
             throw new RuntimeException("Failed to validate task", e);
         }
+    }
+
+    @Tool(
+        description = "Instructions for building with task dispatchers")
+    public String getTaskDispatcherInstructions(
+        @ToolParam(description = "The name of the task dispatcher you want instructions for") String taskDispatcher) {
+        StringBuilder builder = new StringBuilder();
+        String taskAttributeString = """
+            Whenever you see an array with 'task' type, you can put as may tasks in that array.
+            """;
+        String flowString = taskDispatcherTools.getTaskDispatcherInstructions(taskDispatcher);
+
+        if (flowString != null) {
+            builder.append(taskAttributeString)
+                .append("\n")
+                .append(flowString);
+        } else {
+            builder.append("Task dispatcher with that name does not exist.");
+        }
+        return builder.toString();
     }
 
     /**

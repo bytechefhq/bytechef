@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.tool.platform;
 import com.bytechef.ai.mcp.tool.platform.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
@@ -99,9 +100,11 @@ public class TaskDispatcherTools {
                 logger.debug("Retrieved task dispatcher {}", name);
             }
 
+            List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
+            properties.addAll(taskDispatcherDefinition.getTaskProperties());
+
+            String propertiesJSON = ToolUtils.generateParametersJson(properties);
             String type = taskDispatcherDefinition.getName() + "/v" + taskDispatcherDefinition.getVersion();
-            String properties = ToolUtils.generateParametersJson(taskDispatcherDefinition.getProperties());
-            String taskProperties = ToolUtils.generateParametersJson(taskDispatcherDefinition.getTaskProperties());
 
             String outputPropertiesJson = null;
             OutputResponse outputResponse =
@@ -113,7 +116,7 @@ public class TaskDispatcherTools {
 
             return new TaskDispatcherInfo(
                 taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(),
-                taskDispatcherDefinition.getTitle(), type, properties, taskProperties, outputPropertiesJson);
+                taskDispatcherDefinition.getTitle(), type, propertiesJSON, outputPropertiesJson);
         } catch (Exception e) {
             logger.error("Failed to get task dispatcher {}", name, e);
 
@@ -234,8 +237,11 @@ public class TaskDispatcherTools {
             TaskDispatcherDefinition taskDispatcherDefinition =
                 taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
 
+            List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
+            properties.addAll(taskDispatcherDefinition.getTaskProperties());
+
             // Extract properties for the task dispatche definition
-            String parametersJson = ToolUtils.generateParametersJson(taskDispatcherDefinition.getProperties());
+            String parametersJson = ToolUtils.generateParametersJson(properties);
 
             // Generate the task dispatche definition using the template with actual parameters
             String taskDispatcherDefinitionString = DEFAULT_TASK_DISPATCHER_DEFINITION
@@ -244,15 +250,77 @@ public class TaskDispatcherTools {
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Generated task dispatche definition for {}", name);
+                logger.debug("Generated task dispatcher definition for {}", name);
             }
 
             return taskDispatcherDefinitionString;
         } catch (Exception e) {
             logger.error("Failed to generate task dispatcher definition for '{}'", name, e);
 
-            throw new RuntimeException("Failed to generate task dispatche definition", e);
+            throw new RuntimeException("Failed to generate task dispatcher definition", e);
         }
+    }
+
+    public String getTaskDispatcherInstructions(String taskDispatcher) {
+        return switch (taskDispatcher) {
+            case "condition" ->
+                """
+                    If 'rawExpression' is true, then fill out 'expression', if false fill out 'conditions'.
+                    'expression' is the raw expression that will be evaluated.
+                    Example:
+                    "expression": "${taskName.numberProperty} >= 7 && !contains({'EMPTY','REGEX'}, ${taskName.stringProperty}) || ${taskName.booleanProperty} != false"
+
+                    'conditions' have 2 nested arrays:
+                    - the first array is for OR conditions
+                    - the second array is for AND conditions
+                    Example:
+                    "conditions": [
+                      [
+                        {
+                          "type": "number",
+                          "value1": "${taskName.numberProperty}",
+                          "operation": "GREATER_EQUALS",
+                          "value2": "7"
+                        },
+                        {
+                          "type": "string",
+                          "value1": "${taskName.stringProperty}",
+                          "operation": "NOT_CONTAINS",
+                          "value2": "EMPTY"
+                        },
+                        {
+                          "type": "string",
+                          "value1": "${taskName.stringProperty}",
+                          "operation": "NOT_CONTAINS",
+                          "value2": "REGEX"
+                        }
+                      ],
+                      [
+                        {
+                          "type": "boolean",
+                          "value1": "${taskName.booleanProperty}",
+                          "operation": "NOT_EQUALS",
+                          "value2": "false"
+                        }
+                      ]
+                    ]
+
+                    There are 2 arrays with 'task' type:
+                    - 'caseTrue' - tasks when the conditions evaluate to true
+                    - 'caseFalse' - tasks when the conditions evaluate to false
+                    """;
+            case "loop" ->
+                """
+                    'items' is an array that contains the items to loop over.
+                    'iteratee' is an array that contains the tasks to execute for each item.
+                    There is a secret output parameter that can only be used inside iteratee and it represents the item
+                    Example:
+                    ${taskName.item}
+                    ${taskName.item.stringParameter}
+                    ${taskName.item[0].numberParameter}
+                    """;
+            default -> null;
+        };
     }
 
     /**
@@ -275,7 +343,6 @@ public class TaskDispatcherTools {
         @JsonProperty("title") @JsonPropertyDescription("The title of the task dispatcher") String title,
         @JsonProperty("type") @JsonPropertyDescription("The type of the task dispatcher in format {name}/v{version}") String type,
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task dispatcher as JSON string") String properties,
-        @JsonProperty("taskProperties") @JsonPropertyDescription("The task properties of the task dispatcher as JSON string") String taskProperties,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task dispatcher as JSON string") String outputProperties) {
     }
 }
