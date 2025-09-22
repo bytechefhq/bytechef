@@ -26,7 +26,7 @@
       "value" : true
     } ],
     "placeholder" : null,
-    "required" : null,
+    "required" : true,
     "type" : "BOOLEAN"
   }, {
     "advancedOption" : null,
