@@ -105,6 +105,7 @@ spring:
         name: bytechef-mcp-server
         sse-endpoint: /api/sse
         sse-message-endpoint: /api/v1/mcp/message
+        request-timeout: 300000
     openai:
       api-key: ${bytechef.ai.copilot.openai.api-key}
       chat:
