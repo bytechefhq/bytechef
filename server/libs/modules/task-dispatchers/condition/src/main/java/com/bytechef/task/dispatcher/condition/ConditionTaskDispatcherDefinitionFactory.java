@@ -61,6 +61,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .label("Raw expression")
                 .description("Set condition as raw expression or list of conditions.")
                 .expressionEnabled(false)
+                .required(true)
                 .defaultValue(false),
             array(CONDITIONS)
                 .label("OR Conditions")
