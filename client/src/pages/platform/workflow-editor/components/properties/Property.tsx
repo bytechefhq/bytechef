@@ -19,6 +19,7 @@ import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,
 } from '@/shared/middleware/platform/configuration';
+import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ArrayPropertyType, ClusterElementItemType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
@@ -28,7 +29,6 @@ import {usePrevious} from '@uidotdev/usehooks';
 import resolvePath from 'object-resolve-path';
 import {ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
-import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';

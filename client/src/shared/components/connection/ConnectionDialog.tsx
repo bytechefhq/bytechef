@@ -1,4 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
@@ -43,7 +44,6 @@ import {
 import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ClipboardIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';

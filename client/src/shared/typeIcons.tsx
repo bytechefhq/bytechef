@@ -1,18 +1,18 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import AnyIcon from 'assets/any.svg?react';
-import ArrayIcon from 'assets/array.svg?react';
-import BooleanIcon from 'assets/boolean.svg?react';
-import DateIcon from 'assets/date.svg?react';
-import DateTimeIcon from 'assets/datetime.svg?react';
-import DynamicIcon from 'assets/dynamic.svg?react';
-import FileEntryIcon from 'assets/file-entry.svg?react';
-import IntegerIcon from 'assets/integer.svg?react';
-import NullIcon from 'assets/null.svg?react';
-import NumberIcon from 'assets/number.svg?react';
-import ObjectIcon from 'assets/object.svg?react';
-import StringIcon from 'assets/string.svg?react';
-import TimeIcon from 'assets/time.svg?react';
+import AnyIcon from '@/assets/any.svg?react';
+import ArrayIcon from '@/assets/array.svg?react';
+import BooleanIcon from '@/assets/boolean.svg?react';
+import DateIcon from '@/assets/date.svg?react';
+import DateTimeIcon from '@/assets/datetime.svg?react';
+import DynamicIcon from '@/assets/dynamic.svg?react';
+import FileEntryIcon from '@/assets/file-entry.svg?react';
+import IntegerIcon from '@/assets/integer.svg?react';
+import NullIcon from '@/assets/null.svg?react';
+import NumberIcon from '@/assets/number.svg?react';
+import ObjectIcon from '@/assets/object.svg?react';
+import StringIcon from '@/assets/string.svg?react';
+import TimeIcon from '@/assets/time.svg?react';
 
 export const TYPE_ICONS = {
     ANY: <AnyIcon className="size-4 text-gray-600" />,
