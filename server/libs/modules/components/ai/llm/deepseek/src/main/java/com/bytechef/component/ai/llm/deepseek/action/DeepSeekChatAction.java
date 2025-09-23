@@ -21,17 +21,15 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PR
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -40,8 +38,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.ai.llm.deepseek.constant.DeepSeekConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -52,12 +48,14 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
+import org.springframework.ai.deepseek.api.ResponseFormat;
+import org.springframework.ai.deepseek.api.ResponseFormat.Type;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public class DeepSeekChatAction {
@@ -74,38 +72,44 @@ public class DeepSeekChatAction {
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
-            N_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
-            LOGIT_BIAS_PROPERTY,
-            STOP_PROPERTY,
-            USER_PROPERTY)
+            STOP_PROPERTY)
         .output(ModelUtils::output)
         .perform(DeepSeekChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
-        .openAiApi(
-            OpenAiApi.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .baseUrl("https://api.deepseek.com")
-                .restClientBuilder(ModelUtils.getRestClientBuilder())
-                .build())
-        .defaultOptions(
-            OpenAiChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .N(inputParameters.getInteger(N))
-                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .topP(inputParameters.getDouble(TOP_P))
-                .user(inputParameters.getString(USER))
-                .build())
-        .build();
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+
+        Type type = responseFormat == ChatModel.ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+
+        ResponseFormat format = ResponseFormat.builder()
+            .type(type)
+            .build();
+
+        return DeepSeekChatModel.builder()
+            .deepSeekApi(
+                DeepSeekApi.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .baseUrl("https://api.deepseek.com")
+                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .build())
+            .defaultOptions(
+                DeepSeekChatOptions.builder()
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .responseFormat(format)
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .build())
+            .build();
+    };
 
     private DeepSeekChatAction() {
     }
