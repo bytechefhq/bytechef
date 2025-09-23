@@ -1,12 +1,23 @@
 /* eslint-disable sort-keys */
+import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {NodeDataType} from '@/shared/types';
+import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
+
+    mainClusterRootComponentDefinition: ComponentDefinition | undefined;
+    setMainClusterRootComponentDefinition: (
+        mainClusterRootComponentDefinition: ComponentDefinition | undefined
+    ) => void;
+
+    nestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
+    setNestedClusterRootsComponentDefinitions: (
+        setNestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>
+    ) => void;
 
     rootClusterElementNodeData: NodeDataType | undefined;
     setRootClusterElementNodeData: (rootClusterElementNodeData: NodeDataType | undefined) => void;
@@ -43,6 +54,18 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setClusterElementsCanvasOpen: (clusterElementsCanvasOpen) =>
                 set(() => ({
                     clusterElementsCanvasOpen,
+                })),
+
+            mainClusterRootComponentDefinition: undefined,
+            setMainClusterRootComponentDefinition: (mainClusterRootComponentDefinition) =>
+                set(() => ({
+                    mainClusterRootComponentDefinition,
+                })),
+
+            nestedClusterRootsComponentDefinitions: {},
+            setNestedClusterRootsComponentDefinitions: (nestedClusterRootsComponentDefinitions) =>
+                set(() => ({
+                    nestedClusterRootsComponentDefinitions,
                 })),
 
             rootClusterElementNodeData: undefined,
