@@ -1,4 +1,3 @@
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
