@@ -546,7 +546,7 @@
         "optionsDataSource" : null,
         "placeholder" : null,
         "regex" : null,
-        "required" : false,
+        "required" : true,
         "type" : "STRING"
       }, {
         "advancedOption" : null,
@@ -567,10 +567,10 @@
         "optionsDataSource" : null,
         "placeholder" : null,
         "regex" : null,
-        "required" : false,
+        "required" : true,
         "type" : "STRING"
       } ],
-      "required" : false,
+      "required" : true,
       "type" : "OBJECT"
     }, {
       "advancedOption" : true,
