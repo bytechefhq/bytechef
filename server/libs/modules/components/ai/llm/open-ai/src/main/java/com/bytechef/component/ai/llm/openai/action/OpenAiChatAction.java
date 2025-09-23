@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.openai.action;
 
+import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
@@ -32,6 +33,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -55,9 +58,11 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.ResponseFormat;
+import org.springframework.ai.openai.api.ResponseFormat.Type;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public class OpenAiChatAction {
@@ -85,26 +90,38 @@ public class OpenAiChatAction {
         .output(ModelUtils::output)
         .perform(OpenAiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
-        .openAiApi(
-            OpenAiApi.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(ModelUtils.getRestClientBuilder())
-                .build())
-        .defaultOptions(
-            OpenAiChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .N(inputParameters.getInteger(N))
-                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .topP(inputParameters.getDouble(TOP_P))
-                .user(inputParameters.getString(USER))
-                .build())
-        .build();
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+
+        Type type = responseFormat.equals(TEXT) ? Type.TEXT : Type.JSON_OBJECT;
+
+        ResponseFormat format = ResponseFormat.builder()
+            .type(type)
+            .build();
+
+        return OpenAiChatModel.builder()
+            .openAiApi(
+                OpenAiApi.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .build())
+            .defaultOptions(
+                OpenAiChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .N(inputParameters.getInteger(N))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .responseFormat(format)
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .user(inputParameters.getString(USER))
+                    .build())
+            .build();
+    };
 
     private OpenAiChatAction() {
     }

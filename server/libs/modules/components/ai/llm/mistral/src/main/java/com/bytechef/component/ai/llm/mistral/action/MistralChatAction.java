@@ -24,6 +24,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PRO
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
@@ -49,10 +51,12 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
+import org.springframework.ai.mistralai.api.MistralAiApi.ChatCompletionRequest.ResponseFormat;
 import org.springframework.ai.retry.RetryUtils;
 
 /**
  * @author Marko Kriskovic
+ * @author Monika Kušter
  */
 public class MistralChatAction {
 
@@ -76,23 +80,32 @@ public class MistralChatAction {
         .output(ModelUtils::output)
         .perform(MistralChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> MistralAiChatModel.builder()
-        .mistralAiApi(
-            new MistralAiApi("https://api.mistral.ai",
-                connectionParameters.getString(TOKEN),
-                ModelUtils.getRestClientBuilder(),
-                RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER))
-        .defaultOptions(
-            MistralAiChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .topP(inputParameters.getDouble(TOP_P))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
-                .randomSeed(inputParameters.getInteger(SEED))
-                .build())
-        .build();
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+
+        String type = responseFormat.equals(ChatModel.ResponseFormat.TEXT) ? "text" : "json_object";
+
+        return MistralAiChatModel.builder()
+            .mistralAiApi(
+                new MistralAiApi(
+                    "https://api.mistral.ai",
+                    connectionParameters.getString(TOKEN),
+                    ModelUtils.getRestClientBuilder(),
+                    RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER))
+            .defaultOptions(
+                MistralAiChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
+                    .randomSeed(inputParameters.getInteger(SEED))
+                    .responseFormat(new ResponseFormat(type))
+                    .build())
+            .build();
+    };
 
     private MistralChatAction() {
     }
