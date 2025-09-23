@@ -23,16 +23,15 @@ import org.springframework.web.util.UriBuilder;
  */
 public class AbstractRestClient {
 
-    private final RestClient.Builder restClientBuilder;
+    private final RestClient restClient;
 
     public AbstractRestClient(RestClient.Builder restClientBuilder) {
-        this.restClientBuilder = restClientBuilder;
+        this.restClient = restClientBuilder.build();
     }
 
     @Retryable
     public void delete(Function<UriBuilder, URI> uriFunction) {
-        restClientBuilder
-            .build()
+        restClient
             .delete()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
@@ -42,8 +41,7 @@ public class AbstractRestClient {
 
     @Retryable
     public void get(Function<UriBuilder, URI> uriFunction) {
-        restClientBuilder
-            .build()
+        restClient
             .get()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
@@ -53,8 +51,7 @@ public class AbstractRestClient {
 
     @Retryable
     public <T> T get(Function<UriBuilder, URI> uriFunction, Class<T> responseClass) {
-        return restClientBuilder
-            .build()
+        return restClient
             .get()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
@@ -64,8 +61,7 @@ public class AbstractRestClient {
 
     @Retryable
     public <T> T get(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> responseTypeRef) {
-        return restClientBuilder
-            .build()
+        return restClient
             .get()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
@@ -75,8 +71,7 @@ public class AbstractRestClient {
 
     @Retryable
     public void post(Function<UriBuilder, URI> uriFunction, Object bodyValue) {
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
@@ -91,8 +86,7 @@ public class AbstractRestClient {
 
     @Retryable
     public <T> T post(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
@@ -109,8 +103,7 @@ public class AbstractRestClient {
     public <T> T post(
         Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
@@ -125,8 +118,7 @@ public class AbstractRestClient {
 
     @Retryable
     public void put(Function<UriBuilder, URI> uriFunction, Object bodyValue) {
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
@@ -141,8 +133,7 @@ public class AbstractRestClient {
 
     @Retryable
     public <T> T put(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
@@ -159,8 +150,7 @@ public class AbstractRestClient {
     public <T> T put(
         Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
-        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
-            .build()
+        RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
             .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
