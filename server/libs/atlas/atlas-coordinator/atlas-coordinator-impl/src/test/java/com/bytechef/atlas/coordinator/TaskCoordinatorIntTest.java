@@ -72,6 +72,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.lang.Nullable;
@@ -92,6 +93,9 @@ public class TaskCoordinatorIntTest {
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
 
     private final Evaluator evaluator = SpelEvaluator.create();
+
+    @Autowired
+    private Environment environment;
 
     @Autowired
     @Nullable
@@ -129,8 +133,8 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            Objects.requireNonNull(contextService), evaluator, Objects.requireNonNull(jobService), List.of(),
-            Objects.requireNonNull(taskExecutionService), taskHandlerMap::get, TASK_FILE_STORAGE,
+            Objects.requireNonNull(contextService), environment, evaluator, Objects.requireNonNull(jobService),
+            List.of(), Objects.requireNonNull(taskExecutionService), taskHandlerMap::get, TASK_FILE_STORAGE,
             Objects.requireNonNull(workflowService));
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")));

@@ -19,8 +19,8 @@ package com.bytechef.tenant.concurrent;
 import com.bytechef.tenant.TenantContext;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.concurrent.ListenableFuture;
 
 /**
  * @author Ivica Cardic
@@ -28,28 +28,20 @@ import org.springframework.util.concurrent.ListenableFuture;
 public class TenantThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
 
     @Override
-    public void execute(Runnable task) {
+    public void execute(@NonNull Runnable task) {
         super.execute(getTenantRunnable(task));
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
+    @NonNull
+    public Future<?> submit(@NonNull Runnable task) {
         return super.submit(getTenantRunnable(task));
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
+    @NonNull
+    public <T> Future<T> submit(@NonNull Callable<T> task) {
         return super.submit(getTenantCallable(task));
-    }
-
-    @Override
-    public ListenableFuture<?> submitListenable(Runnable task) {
-        return super.submitListenable(getTenantRunnable(task));
-    }
-
-    @Override
-    public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
-        return super.submitListenable(getTenantCallable(task));
     }
 
     private Runnable getTenantRunnable(Runnable task) {

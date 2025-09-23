@@ -35,6 +35,7 @@ import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
@@ -42,6 +43,7 @@ import java.util.Map;
 public class ComponentJobTestExecutor {
 
     private final ContextService contextService;
+    private final Environment environment;
     private final Evaluator evaluator;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -51,11 +53,12 @@ public class ComponentJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, Evaluator evaluator, JobService jobService,
+        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
         WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.environment = environment;
         this.evaluator = evaluator;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
@@ -70,7 +73,7 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, getTaskDispatcherPreSendProcessors(),
+            contextService, environment, evaluator, jobService, getTaskDispatcherPreSendProcessors(),
             taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage,
             workflowService);
 

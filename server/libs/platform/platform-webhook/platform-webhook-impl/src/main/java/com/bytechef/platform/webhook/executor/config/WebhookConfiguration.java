@@ -61,6 +61,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
@@ -70,12 +71,13 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        CacheManager cacheManager, ContextService contextService, CounterService counterService, Evaluator evaluator,
-        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        PrincipalJobFacade principalJobFacade, JobService jobService,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, WebhookWorkflowSyncExecutor triggerSyncExecutor,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        CacheManager cacheManager, ContextService contextService, CounterService counterService,
+        Environment environment, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
@@ -83,7 +85,7 @@ public class WebhookConfiguration {
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, syncMessageBroker,
+                contextService, environment, evaluator, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
