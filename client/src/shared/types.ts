@@ -3,6 +3,7 @@ import {
     ArrayProperty,
     BooleanProperty,
     ClusterElementDefinitionBasic,
+    ClusterElementType,
     ComponentConnection,
     ComponentDefinition,
     ComponentDefinitionBasic,
@@ -141,6 +142,12 @@ export type TaskDispatcherDataType = BranchDataType &
     ConditionDataType &
     ParallelDataType &
     ForkJoinDataType;
+
+export type NestedClusterRootComponentDefinitionType = {
+    actionClusterElementTypes: {[key: string]: Array<string>};
+    clusterElementClusterElementTypes: {[key: string]: Array<string>};
+    clusterElementTypes: Array<ClusterElementType>;
+};
 
 export type ClusterElementItemType = {
     clusterElements?: ClusterElementsType;
