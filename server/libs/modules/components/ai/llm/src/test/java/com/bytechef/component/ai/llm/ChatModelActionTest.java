@@ -18,6 +18,8 @@ package com.bytechef.component.ai.llm;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -37,17 +39,17 @@ import org.springframework.ai.chat.prompt.Prompt;
 /**
  * @author Marko Kriskovic
  */
-public class ChatModelActionTest extends AbstractActionTest {
+class ChatModelActionTest extends AbstractActionTest {
 
     private static final String ANSWER = "ANSWER";
 
     @Test
-    public void testGetResponse() {
+    void testGetResponse() {
         when(mockedParameters.getRequiredString(FORMAT))
             .thenReturn(ChatModel.Format.ADVANCED.name());
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new ChatModel.Message("QUESTION", List.of(), ChatModel.Role.USER)));
-        when(mockedParameters.getFromPath(any(), eq(ChatModel.ResponseFormat.class), eq(ChatModel.ResponseFormat.TEXT)))
+        when(mockedParameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class))
             .thenReturn(ChatModel.ResponseFormat.TEXT);
 
         ChatModel mockedChat = spy(new MockChatModel());
