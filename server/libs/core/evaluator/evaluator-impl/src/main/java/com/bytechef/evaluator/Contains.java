@@ -26,6 +26,7 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
+ * @author Monika Kušter
  * @since Feb, 19 2020
  */
 class Contains implements MethodExecutor {
@@ -34,6 +35,10 @@ class Contains implements MethodExecutor {
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
         List<?> l1 = (List<?>) arguments[0];
         Object value = arguments[1];
+
+        if (l1 == null) {
+            return new TypedValue(false);
+        }
 
         return new TypedValue(l1.contains(value));
     }
