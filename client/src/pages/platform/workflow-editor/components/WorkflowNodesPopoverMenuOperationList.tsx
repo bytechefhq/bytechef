@@ -42,7 +42,6 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     edgeId?: string;
     invalidateWorkflowQueries: () => void;
     multipleClusterElementsNode?: boolean;
-    rootClusterElementDefinition?: ComponentDefinition;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
@@ -54,7 +53,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     edgeId,
     invalidateWorkflowQueries,
     multipleClusterElementsNode,
-    rootClusterElementDefinition,
     setPopoverOpen,
     sourceNodeId,
     trigger,
@@ -72,14 +70,19 @@ const WorkflowNodesPopoverMenuOperationList = ({
         }))
     );
 
-    const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
-        useWorkflowEditorStore(
-            useShallow((state) => ({
-                clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-                rootClusterElementNodeData: state.rootClusterElementNodeData,
-                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-            }))
-        );
+    const {
+        clusterElementsCanvasOpen,
+        mainClusterRootComponentDefinition,
+        rootClusterElementNodeData,
+        setRootClusterElementNodeData,
+    } = useWorkflowEditorStore(
+        useShallow((state) => ({
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+        }))
+    );
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
@@ -176,7 +179,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
             isMultipleElements?: boolean;
             sourceNodeId: string;
         }) => {
-            if (!workflow.definition || !rootClusterElementDefinition) {
+            if (!workflow.definition || !mainClusterRootComponentDefinition) {
                 return;
             }
 
@@ -192,8 +195,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             const clusterElements = initializeClusterElementsObject({
                 clusterElementsData: mainClusterRootTask?.clusterElements || {},
+                mainClusterRootComponentDefinition,
                 mainClusterRootTask,
-                rootClusterElementDefinition,
             });
 
             const updatedClusterElements = processClusterElementsHierarchy({
@@ -237,7 +240,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
         },
         [
             workflow,
-            rootClusterElementDefinition,
+            mainClusterRootComponentDefinition,
             rootClusterElementNodeData,
             setRootClusterElementNodeData,
             currentNode,

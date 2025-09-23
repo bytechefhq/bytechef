@@ -1,9 +1,6 @@
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
-import {
-    ComponentDefinitionKeys,
-    useGetComponentDefinitionQuery,
-} from '@/shared/queries/platform/componentDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
@@ -12,7 +9,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
@@ -56,7 +52,6 @@ const WorkflowNodesPopoverMenu = ({
             nodes: state.nodes,
         }))
     );
-    const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 
@@ -69,24 +64,6 @@ const WorkflowNodesPopoverMenu = ({
 
         setComponentDefinitionToBeAdded(null);
     }, []);
-
-    const rootClusterElementComponentVersion =
-        Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
-
-    const rootClusterElementComponentName = rootClusterElementNodeData?.componentName || '';
-
-    const componentDefinitionKey = useMemo(
-        () => ({
-            componentName: rootClusterElementComponentName,
-            componentVersion: rootClusterElementComponentVersion,
-        }),
-        [rootClusterElementComponentName, rootClusterElementComponentVersion]
-    );
-
-    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
-        componentDefinitionKey,
-        !!rootClusterElementNodeData?.workflowNodeName
-    );
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
@@ -207,7 +184,6 @@ const WorkflowNodesPopoverMenu = ({
                             edgeId={edgeId}
                             invalidateWorkflowQueries={invalidateWorkflowQueries!}
                             multipleClusterElementsNode={multipleClusterElementsNode}
-                            rootClusterElementDefinition={rootClusterElementDefinition}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
                             trigger={trigger}
