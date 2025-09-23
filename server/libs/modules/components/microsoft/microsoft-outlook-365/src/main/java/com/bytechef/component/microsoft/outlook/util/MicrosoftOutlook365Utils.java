@@ -75,6 +75,7 @@ public class MicrosoftOutlook365Utils {
 
         return new SimpleMessage(
             (String) messageBody.get(ID),
+            (String) messageBody.get("conversationId"),
             (String) messageBody.get(SUBJECT),
             from,
             getRecipients(messageBody, TO_RECIPIENTS),
@@ -163,7 +164,7 @@ public class MicrosoftOutlook365Utils {
 
     @SuppressFBWarnings("EI")
     public record SimpleMessage(
-        String id, String subject, String from, List<String> to, List<String> cc, List<String> bcc, String bodyPlain,
-        String bodyHtml, List<FileEntry> attachments, String webLink) {
+        String id, String conversationId, String subject, String from, List<String> to, List<String> cc,
+        List<String> bcc, String bodyPlain, String bodyHtml, List<FileEntry> attachments, String webLink) {
     }
 }
