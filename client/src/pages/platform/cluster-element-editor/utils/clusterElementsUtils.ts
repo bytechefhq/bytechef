@@ -1,21 +1,26 @@
 import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {ClusterElementType, ComponentDefinition, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {ClusterElementItemType, ClusterElementsType, WorkflowNodeType} from '@/shared/types';
+import {
+    ClusterElementItemType,
+    ClusterElementsType,
+    NestedClusterRootComponentDefinitionType,
+    WorkflowNodeType,
+} from '@/shared/types';
 
 interface InitializeClusterElementsObjectProps {
     clusterElementsData: ClusterElementsType;
     mainClusterRootTask: WorkflowTask;
-    rootClusterElementDefinition: ComponentDefinition;
+    mainClusterRootComponentDefinition: ComponentDefinition;
 }
 
 export function initializeClusterElementsObject({
     clusterElementsData,
+    mainClusterRootComponentDefinition,
     mainClusterRootTask,
-    rootClusterElementDefinition,
 }: InitializeClusterElementsObjectProps) {
     const clusterElements: ClusterElementsType = {};
 
-    if (!rootClusterElementDefinition.clusterElementTypes) {
+    if (!mainClusterRootComponentDefinition.clusterElementTypes) {
         return clusterElements;
     }
 
@@ -23,17 +28,17 @@ export function initializeClusterElementsObject({
 
     const filteredClusterElementTypes = (() => {
         if (
-            rootClusterElementDefinition.actionClusterElementTypes &&
-            Object.keys(rootClusterElementDefinition.actionClusterElementTypes).length > 0 &&
+            mainClusterRootComponentDefinition.actionClusterElementTypes &&
+            Object.keys(mainClusterRootComponentDefinition.actionClusterElementTypes).length > 0 &&
             mainClusterRootType
         ) {
-            return rootClusterElementDefinition.actionClusterElementTypes[mainClusterRootType] || [];
+            return mainClusterRootComponentDefinition.actionClusterElementTypes[mainClusterRootType] || [];
         } else {
-            return rootClusterElementDefinition.clusterElementTypes.map((type) => type.name);
+            return mainClusterRootComponentDefinition.clusterElementTypes.map((type) => type.name);
         }
     })();
 
-    rootClusterElementDefinition.clusterElementTypes.forEach((elementType) => {
+    mainClusterRootComponentDefinition.clusterElementTypes.forEach((elementType) => {
         const matchingType = filteredClusterElementTypes.some((type) => {
             return type === elementType.name;
         });
@@ -265,7 +270,7 @@ export function getClusterElementByName(clusterElements: ClusterElementsType, el
 }
 
 interface GetFilteredClusterElementTypesProps {
-    clusterRootComponentDefinition: ComponentDefinition;
+    clusterRootComponentDefinition: ComponentDefinition | NestedClusterRootComponentDefinitionType;
     currentClusterElementsType?: string;
     isNestedClusterRoot?: boolean;
     operationName?: string;

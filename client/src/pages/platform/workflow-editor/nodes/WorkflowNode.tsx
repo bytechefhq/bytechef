@@ -5,7 +5,6 @@ import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/component
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
@@ -47,14 +46,21 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             workflow: state.workflow,
         }))
     );
-    const {clusterElementsCanvasOpen, rootClusterElementNodeData, setRootClusterElementNodeData} =
-        useWorkflowEditorStore(
-            useShallow((state) => ({
-                clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-                rootClusterElementNodeData: state.rootClusterElementNodeData,
-                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-            }))
-        );
+    const {
+        clusterElementsCanvasOpen,
+        mainClusterRootComponentDefinition,
+        nestedClusterRootsComponentDefinitions,
+        rootClusterElementNodeData,
+        setRootClusterElementNodeData,
+    } = useWorkflowEditorStore(
+        useShallow((state) => ({
+            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
+            nestedClusterRootsComponentDefinitions: state.nestedClusterRootsComponentDefinitions,
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+        }))
+    );
 
     const {invalidateWorkflowQueries} = useWorkflowEditor();
 
@@ -88,33 +94,20 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         hoveredNodeName !== undefined && !!data.clusterElementType
     );
 
-    const rootClusterElementComponentVersion =
-        Number(rootClusterElementNodeData?.type?.split('/')[1].replace(/^v/, '')) || 1;
-
-    const componentDefinitionKey = useMemo(() => {
-        return {
-            componentName: data.componentName,
-            componentVersion: (data.version as number) || rootClusterElementComponentVersion,
-        };
-    }, [data.componentName, data.version, rootClusterElementComponentVersion]);
-
-    const {data: rootClusterElementDefinition} = useGetComponentDefinitionQuery(
-        componentDefinitionKey,
-        clusterElementsCanvasOpen && (!!isMainRootClusterElement || isNestedClusterRoot)
-    );
-
     const filteredClusterElementTypes = useMemo(() => {
         const clusterRootRequirementMet =
             clusterElementsCanvasOpen &&
             (isMainRootClusterElement || isNestedClusterRoot) &&
-            rootClusterElementDefinition;
+            mainClusterRootComponentDefinition;
 
-        if (!rootClusterElementDefinition || !clusterRootRequirementMet) {
+        if (!clusterRootRequirementMet) {
             return [];
         }
 
+        const nestedClusterRootDefinition = nestedClusterRootsComponentDefinitions[data.componentName];
+
         return getFilteredClusterElementTypes({
-            clusterRootComponentDefinition: rootClusterElementDefinition,
+            clusterRootComponentDefinition: nestedClusterRootDefinition || mainClusterRootComponentDefinition,
             currentClusterElementsType: data.clusterElementType,
             isNestedClusterRoot,
             operationName: data.operationName,
@@ -123,7 +116,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         clusterElementsCanvasOpen,
         isMainRootClusterElement,
         isNestedClusterRoot,
-        rootClusterElementDefinition,
+        mainClusterRootComponentDefinition,
+        nestedClusterRootsComponentDefinitions,
+        data.componentName,
         data.clusterElementType,
         data.operationName,
     ]);
