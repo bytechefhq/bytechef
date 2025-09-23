@@ -145,6 +145,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:ai:universal:universal-image"))
     implementation(project(":server:libs:modules:components:ai:universal:universal-text"))
+    implementation(project(":server:libs:modules:components:ai:vectorstore:couchbase"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:milvus"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:pinecone"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:qdrant"))
