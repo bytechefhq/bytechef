@@ -1,5 +1,5 @@
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
-import {ClusterElementsType} from '@/shared/types';
+import {ClusterElementsType, NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {createMultipleElementsNode, createPlaceholderNode, createSingleElementsNode} from './clusterElementsNodesUtils';
@@ -8,9 +8,9 @@ import {convertNameToCamelCase, getFilteredClusterElementTypes, isPlainObject} f
 interface CreateClusterElementNodesProps {
     clusterElements: ClusterElementsType;
     clusterRootId: string;
-    currentRootComponentDefinition: ComponentDefinition;
+    currentRootComponentDefinition: ComponentDefinition | NestedClusterRootComponentDefinitionType;
     nestedClusterRootElementType?: string;
-    nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
+    nestedClusterRootsDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     operationName?: string;
 }
 

@@ -1,4 +1,5 @@
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
+import {NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 import {
@@ -9,9 +10,9 @@ import {
 import {convertNameToCamelCase} from './clusterElementsUtils';
 
 interface CreateClusterElementsEdgesProps {
-    clusterRootComponentDefinition: ComponentDefinition;
+    clusterRootComponentDefinition: ComponentDefinition | NestedClusterRootComponentDefinitionType;
     clusterRootId: string;
-    nestedClusterRootsDefinitions: Record<string, ComponentDefinition>;
+    nestedClusterRootsDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     nodes: Node[];
 }
 
