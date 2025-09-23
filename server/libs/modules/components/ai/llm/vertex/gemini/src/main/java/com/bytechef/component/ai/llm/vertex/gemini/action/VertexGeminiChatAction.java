@@ -25,6 +25,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -42,6 +44,7 @@ import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiC
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -76,21 +79,27 @@ public class VertexGeminiChatAction {
         .output(ModelUtils::output)
         .perform(VertexGeminiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> VertexAiGeminiChatModel
-        .builder()
-        .vertexAI(new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)))
-        .defaultOptions(
-            VertexAiGeminiChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
-                .topP(inputParameters.getDouble(TOP_P))
-                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .topK(inputParameters.getInteger(TOP_K))
-                .candidateCount(inputParameters.getInteger(N))
-                // .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
-                .build())
-        .build();
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+        return VertexAiGeminiChatModel
+            .builder()
+            .vertexAI(
+                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)))
+            .defaultOptions(
+                VertexAiGeminiChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .topK(inputParameters.getInteger(TOP_K))
+                    .candidateCount(inputParameters.getInteger(N))
+                    .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
+                    .build())
+            .build();
+    };
 
     private VertexGeminiChatAction() {
     }
