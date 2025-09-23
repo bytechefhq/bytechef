@@ -223,13 +223,20 @@ const useClusterElementsLayout = () => {
     );
 
     useEffect(() => {
-        if (rootClusterElementDefinition && rootClusterElementNodeData?.workflowNodeName) {
+        if (
+            rootClusterElementDefinition &&
+            rootClusterElementNodeData?.workflowNodeName &&
+            !isNodeDragging &&
+            !isPositionSaving
+        ) {
             setMainClusterRootComponentDefinition(rootClusterElementDefinition);
         }
     }, [
         rootClusterElementDefinition,
         rootClusterElementNodeData?.workflowNodeName,
         setMainClusterRootComponentDefinition,
+        isNodeDragging,
+        isPositionSaving,
     ]);
 
     useEffect(() => {
@@ -273,10 +280,10 @@ const useClusterElementsLayout = () => {
         };
 
         getNestedClusterRootsComponentDefinitions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         clusterElements,
         queryClient,
-        rootClusterElementNodeData,
         workflow.definition,
         clusterRootQueryParameters,
         getClusterRootDefinitionQuery,
