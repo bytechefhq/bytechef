@@ -37,7 +37,7 @@ import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,11 +71,16 @@ public class MicrosoftOutlook365NewEmailTrigger {
         LocalDateTime startDate = closureParameters.getLocalDateTime(
             LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
 
-        List<Map<?, ?>> maps = new ArrayList<>();
+        List<Map<?, ?>> emails = new ArrayList<>();
+
+        String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(zoneId));
 
         Map<String, Object> body = context
             .http(http -> http.get("/me/mailFolders/Inbox/messages"))
-            .queryParameters("$filter", "isRead eq false", "$orderby", "receivedDateTime desc")
+            .queryParameters(
+                "$filter", "isRead eq false and receivedDateTime ge " + formattedStartDate,
+                "$orderby", "receivedDateTime desc")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -83,41 +88,25 @@ public class MicrosoftOutlook365NewEmailTrigger {
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    addValidEmail(map, startDate, now, maps, zoneId);
+                    emails.add(map);
                 }
             }
         }
 
-        List<Map<?, ?>> otherItems = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
-
-        for (Map<?, ?> map : otherItems) {
-            addValidEmail(map, startDate, now, maps, zoneId);
-        }
+        emails.addAll(getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context));
 
         Format format = inputParameters.getRequired(FORMAT, Format.class);
 
         if (format.equals(SIMPLE)) {
             List<MicrosoftOutlook365Utils.SimpleMessage> simpleMessages = new ArrayList<>();
 
-            for (Map<?, ?> map : maps) {
-                simpleMessages.add(createSimpleMessage(context, map, (String) map.get(ID)));
+            for (Map<?, ?> email : emails) {
+                simpleMessages.add(createSimpleMessage(context, email, (String) email.get(ID)));
             }
 
             return new PollOutput(simpleMessages, Map.of(LAST_TIME_CHECKED, now), false);
         } else {
-            return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
-        }
-    }
-
-    private static void addValidEmail(
-        Map<?, ?> map, LocalDateTime startDate, LocalDateTime endDate, List<Map<?, ?>> maps, ZoneId zoneId) {
-
-        ZonedDateTime receivedDateTime = ZonedDateTime.parse((String) map.get("receivedDateTime"));
-
-        LocalDateTime createdDateTime = LocalDateTime.ofInstant(receivedDateTime.toInstant(), zoneId);
-
-        if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(endDate)) {
-            maps.add(map);
+            return new PollOutput(emails, Map.of(LAST_TIME_CHECKED, now), false);
         }
     }
 }
