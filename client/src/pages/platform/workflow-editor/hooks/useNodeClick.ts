@@ -49,6 +49,8 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
 
             setCurrentComponent(undefined);
 
+            setWorkflowNodeDetailsPanelOpen(false);
+
             return;
         }
 
