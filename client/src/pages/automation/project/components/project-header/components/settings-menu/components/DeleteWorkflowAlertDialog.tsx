@@ -8,14 +8,19 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {KeyboardKey, useKeyDown} from '@/shared/hooks/useKeyDown';
+import {useRef} from 'react';
 
 const DeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
-    useKeyDown(onDelete, [KeyboardKey.enter]);
+    const deleteButtonRef = useRef<HTMLButtonElement>(null);
 
     return (
         <AlertDialog open={true}>
-            <AlertDialogContent>
+            <AlertDialogContent
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+                    deleteButtonRef.current?.focus();
+                }}
+            >
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
@@ -27,7 +32,7 @@ const DeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; on
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-destructive" onClick={() => onDelete()}>
+                    <AlertDialogAction className="bg-destructive" onClick={() => onDelete()} ref={deleteButtonRef}>
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>
