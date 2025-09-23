@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationVersionHistorySheet from '@/ee/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeaderDeleteIntegrationAlertDialog from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteIntegrationAlertDialog';
-import IntegrationHeaderDeleteWorkflowAlertDialog from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteWorkflowAlertDialog';
 import IntegrationHeaderHistoryButton from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderHistoryButton';
 import IntegrationHeaderIntegrationDropDownMenu from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderIntegrationDropDownMenu';
 import IntegrationHeaderOutputButton from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeaderOutputButton';
@@ -38,6 +37,8 @@ import {RefObject, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
+
+import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -277,7 +278,7 @@ const IntegrationHeader = ({
             )}
 
             {showDeleteWorkflowAlertDialog && (
-                <IntegrationHeaderDeleteWorkflowAlertDialog
+                <DeleteWorkflowAlertDialog
                     onClose={() => setShowDeleteWorkflowAlertDialog(false)}
                     onDelete={handleDeleteWorkflowAlertDialogClick}
                 />
