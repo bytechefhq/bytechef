@@ -38,6 +38,7 @@ import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -93,16 +94,21 @@ class MicrosoftOutlook365NewEmailTriggerTest {
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(Map.of(VALUE, List.of(firstMail), ODATA_NEXT_LINK, "link"));
 
-            PollOutput pollOutput =
-                MicrosoftOutlook365NewEmailTrigger.poll(mockedParameters, mockedParameters, mockedParameters,
-                    mockedTriggerContext);
+            PollOutput pollOutput = MicrosoftOutlook365NewEmailTrigger.poll(
+                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
             assertEquals(List.of(firstMail, secondMail), pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
             Object[] query = queryArgumentCaptor.getValue();
 
-            assertEquals(List.of("$filter", "isRead eq false", "$orderby", "receivedDateTime desc"),
+            String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneId.systemDefault()));
+
+            assertEquals(
+                List.of(
+                    "$filter", "isRead eq false and receivedDateTime ge " + formattedStartDate,
+                    "$orderby", "receivedDateTime desc"),
                 Arrays.asList(query));
         }
     }
