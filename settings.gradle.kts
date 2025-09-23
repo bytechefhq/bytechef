@@ -528,7 +528,6 @@ include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-cl
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-aws")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest")
 include("server:ee:libs:platform:platform-security-web:platform-security-web-impl")
-include("server:ee:libs:platform:platform-user:platform-user-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
