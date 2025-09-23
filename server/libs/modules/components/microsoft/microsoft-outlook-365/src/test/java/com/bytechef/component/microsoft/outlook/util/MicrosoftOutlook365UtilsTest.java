@@ -41,6 +41,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -81,17 +82,20 @@ class MicrosoftOutlook365UtilsTest {
             .thenReturn(Map.of(VALUE, List.of(Map.of(
                 CONTENT_BYTES, "encode"))));
 
-        Map<String, Object> messageBody = Map.of(
-            ID, "messageId",
-            SUBJECT, "Test Subject",
-            FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "test@mail.com")),
-            BODY, Map.of(CONTENT, "Hello World!"),
-            "hasAttachments", true,
-            TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
-            CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
-            BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
-            "bodyPreview", "Hello World!",
-            "webLink", "https://example.com");
+        Map<String, Object> messageBody = new HashMap<>(
+            Map.of(
+                ID, "messageId",
+                SUBJECT, "Test Subject",
+                FROM, Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "test@mail.com")),
+                BODY, Map.of(CONTENT, "Hello World!"),
+                "hasAttachments", true,
+                TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
+                CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
+                BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
+                "bodyPreview", "Hello World!",
+                "webLink", "https://example.com"));
+
+        messageBody.put("conversationId", "conversationId");
 
         MicrosoftOutlook365Utils.SimpleMessage result = MicrosoftOutlook365Utils.createSimpleMessage(
             mockedContext, messageBody, "messageId");
@@ -99,6 +103,7 @@ class MicrosoftOutlook365UtilsTest {
         assertEquals(
             new MicrosoftOutlook365Utils.SimpleMessage(
                 "messageId",
+                "conversationId",
                 "Test Subject",
                 "test@mail.com",
                 List.of("address1"),
