@@ -122,7 +122,7 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 
 configure<com.google.cloud.tools.jib.gradle.JibExtension> {
     from {
-        image = "ghcr.io/graalvm/graalvm-community:21.0.2"
+        image = "ghcr.io/graalvm/graalvm-community:25.0.0"
     }
     to {
         image = "bytechef/bytechef-" + project.name + ":latest"

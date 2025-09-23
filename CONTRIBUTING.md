@@ -95,7 +95,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 ## How to run the platform
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/)
-- [Java - GraalVM for JDK 21.0.2+](https://www.graalvm.org/downloads/)
+- [Java - GraalVM for JDK 25.0.0+](https://www.graalvm.org/downloads/)
 - Gradle - V8.5+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
 - [Node v20+](https://nodejs.org/en/download/)
 
@@ -116,7 +116,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
     ```bash
     docker compose -f docker-compose.dev.infra.yml up -d
     ```
-5. Make sure `java -version` and `JAVA_HOME` references Java JDK 21+
+5. Make sure `java -version` and `JAVA_HOME` references Java JDK 25+
 6. Compile codebase:
 
     ```bash
