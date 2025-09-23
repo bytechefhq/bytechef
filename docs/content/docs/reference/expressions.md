@@ -332,6 +332,7 @@ Usage example:
 | `add(list, element)` | Adds an element to a list and returns a new list. |
 | `addAll(list1, list2)` | Adds all elements from list2 to list1 and returns a new list. |
 | `concat(list1, list2)` | Concatenates two lists. |
+| `contains(list, element)` | Returns true if list contains the specified element. |
 | `flatten(list)` | Flattens a nested list into a single list. |
 | `range(start, end)` | Creates a list of integers from start to end (inclusive). |
 | `remove(list, element)` | Removes an element from a list and returns the modified list. |
