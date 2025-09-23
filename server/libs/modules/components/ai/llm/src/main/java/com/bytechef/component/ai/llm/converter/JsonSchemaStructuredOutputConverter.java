@@ -43,14 +43,12 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
 
         jsonSchemaMap.put("additionalProperties", false);
 
-        if (jsonSchemaMap.get("properties") instanceof Map<?, ?> properties) {
-            if (!jsonSchemaMap.containsKey("required")) {
-                List<?> keys = properties.keySet()
-                    .stream()
-                    .toList();
+        if (jsonSchemaMap.get("properties") instanceof Map<?, ?> properties && !jsonSchemaMap.containsKey("required")) {
+            List<?> keys = properties.keySet()
+                .stream()
+                .toList();
 
-                jsonSchemaMap.put("required", keys);
-            }
+            jsonSchemaMap.put("required", keys);
         }
 
         this.jsonSchema = context.json(json -> json.write(jsonSchemaMap));
