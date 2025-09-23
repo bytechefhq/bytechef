@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.config.TemplatesProperties;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,7 @@ public class PreBuiltTemplateService {
     private final GitHubProxyClient gitHubProxyClient;
     private final TemplatesProperties templatesProperties;
 
+    @SuppressFBWarnings("EI")
     public PreBuiltTemplateService(
         GitHubProxyClient gitHubProxyClient, TemplatesProperties templatesProperties) {
 
