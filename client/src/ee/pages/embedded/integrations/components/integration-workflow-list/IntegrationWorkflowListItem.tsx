@@ -1,14 +1,4 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -31,6 +21,8 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
+
+import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
 
 const IntegrationWorkflowListItem = ({
     filteredComponentNames,
@@ -167,34 +159,18 @@ const IntegrationWorkflowListItem = ({
                 </DropdownMenu>
             </div>
 
-            <AlertDialog open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the workflow.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                        <AlertDialogAction
-                            className="bg-destructive"
-                            onClick={() => {
-                                if (workflow?.id) {
-                                    deleteWorkflowMutation.mutate({
-                                        id: workflow?.id,
-                                    });
-                                }
-                            }}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {showDeleteDialog && (
+                <DeleteWorkflowAlertDialog
+                    onClose={() => setShowDeleteDialog(false)}
+                    onDelete={() => {
+                        if (workflow?.id) {
+                            deleteWorkflowMutation.mutate({
+                                id: workflow?.id,
+                            });
+                        }
+                    }}
+                />
+            )}
 
             {showEditDialog && workflow && (
                 <WorkflowDialog
