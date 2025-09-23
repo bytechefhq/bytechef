@@ -16,6 +16,11 @@
 
 package com.bytechef.component.ai.llm;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
+
+import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
@@ -28,6 +33,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Marko Kriskovic
+ * @author Monika Kušter
  */
 @FunctionalInterface
 public interface ChatModel {
@@ -56,8 +62,10 @@ public interface ChatModel {
         List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
             inputParameters, actionContext);
 
-        ChatClient.CallResponseSpec callResponseSpec = ChatClient.create(chatModel)
-            .prompt()
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
+            inputParameters, actionContext, chatModel);
+
+        ChatClient.CallResponseSpec callResponseSpec = chatClientRequestSpec
             .messages(messages)
             .advisors(
                 SimpleLoggerAdvisor.builder()
@@ -65,6 +73,25 @@ public interface ChatModel {
             .call();
 
         return ModelUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);
+    }
+
+    private ChatClient.ChatClientRequestSpec createPrompt(
+        Parameters inputParameters, ActionContext actionContext,
+        org.springframework.ai.chat.model.ChatModel chatModel) {
+
+        ChatClient chatClient = ChatClient.create(chatModel);
+
+        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+        if (responseFormat.equals(ResponseFormat.TEXT)) {
+            return chatClient.prompt();
+        } else {
+            JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+                inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), actionContext);
+
+            return chatClient.prompt(converter.getFormat());
+        }
     }
 
     @SuppressFBWarnings("EI")

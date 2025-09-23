@@ -80,8 +80,8 @@ public class ModelUtils {
         ChatClient.CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
 
         Object response = null;
-        ResponseFormat responseFormat = parameters.getFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, TEXT);
+        ResponseFormat responseFormat = parameters.getRequiredFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
 
         if (responseFormat == TEXT) {
             try {
