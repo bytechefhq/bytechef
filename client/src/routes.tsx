@@ -244,6 +244,17 @@ const platformSettingsRoutes = {
     ],
 };
 
+export const loadEnvironments = async (queryClient: QueryClient) => {
+    if (authenticationStore.getState().authenticated) {
+        const environments = await queryClient.fetchQuery({
+            queryFn: () => new EnvironmentApi().getEnvironments(),
+            queryKey: EnvironmentKeys,
+        });
+
+        environmentStore.getState().setEnvironments(environments);
+    }
+};
+
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         // {
@@ -653,14 +664,7 @@ export const getRouter = (queryClient: QueryClient) =>
             element: <App />,
             errorElement: <ErrorPage />,
             loader: async () => {
-                if (authenticationStore.getState().authenticated) {
-                    const environments = await queryClient.fetchQuery({
-                        queryFn: () => new EnvironmentApi().getEnvironments(),
-                        queryKey: EnvironmentKeys,
-                    });
-
-                    environmentStore.getState().setEnvironments(environments);
-                }
+                await loadEnvironments(queryClient);
             },
             path: '/',
         },
