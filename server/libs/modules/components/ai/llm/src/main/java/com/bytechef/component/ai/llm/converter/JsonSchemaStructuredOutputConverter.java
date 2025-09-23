@@ -38,9 +38,22 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
 
     public JsonSchemaStructuredOutputConverter(String jsonSchema, Context context) {
         this.context = context;
-        this.jsonSchema = jsonSchema;
 
-        Map<String, ?> jsonSchemaMap = context.json(json -> json.readMap(jsonSchema));
+        Map<String, Object> jsonSchemaMap = context.json(json -> json.readMap(jsonSchema, Object.class));
+
+        jsonSchemaMap.put("additionalProperties", false);
+
+        if (jsonSchemaMap.get("properties") instanceof Map<?, ?> properties) {
+            if (!jsonSchemaMap.containsKey("required")) {
+                List<?> keys = properties.keySet()
+                    .stream()
+                    .toList();
+
+                jsonSchemaMap.put("required", keys);
+            }
+        }
+
+        this.jsonSchema = context.json(json -> json.write(jsonSchemaMap));
 
         String jsonSchemaType = (String) jsonSchemaMap.get("type");
 
