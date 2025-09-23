@@ -13,6 +13,7 @@ import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
+import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
@@ -21,8 +22,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-
-import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
 
 const IntegrationWorkflowListItem = ({
     filteredComponentNames,
