@@ -25,6 +25,7 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -123,7 +124,10 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     @SuppressFBWarnings("EI")
     public AiCopilotFacadeImpl(
-        ChatClient.Builder chatClientBuilder, VectorStore vectorStore, WorkflowService workflowService) {
+        ChatClient.Builder chatClientBuilder, VectorStore vectorStore,
+        // TODO Remove dependency on WorkflowService, send the workflow definition and return the updated workflow in
+        // the response
+        @Autowired(required = false) WorkflowService workflowService) {
 
         this.workflowService = workflowService;
 
