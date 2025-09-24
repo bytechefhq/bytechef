@@ -35,11 +35,8 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -66,7 +63,6 @@ public class VectorStoreConfiguration {
     private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
-    @Autowired
     public VectorStoreConfiguration(
         VectorStore vectorStore, VectorStoreService vectorStoreService,
         ComponentDefinitionService componentDefinitionService) {

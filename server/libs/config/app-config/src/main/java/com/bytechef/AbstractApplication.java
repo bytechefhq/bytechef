@@ -54,6 +54,10 @@ public abstract class AbstractApplication implements InitializingBean {
         logApplicationStartup(applicationContext.getEnvironment());
     }
 
+    private String checkNull(String mode) {
+        return mode == null ? "-" : mode;
+    }
+
     private void logApplicationStartup(Environment environment) {
         String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
             .map(key -> "https")
@@ -86,7 +90,7 @@ public abstract class AbstractApplication implements InitializingBean {
             serverPort,
             contextPath,
             StringUtils.upperCase(environment.getProperty("bytechef.edition")),
-            environment.getProperty("bytechef.tenant.mode"),
+            checkNull(environment.getProperty("bytechef.tenant.mode")),
             activeProfiles,
             getSwaggerUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath));
     }

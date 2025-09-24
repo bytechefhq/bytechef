@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.copilot;
+package com.bytechef.ee.ai.copilot.facade;
 
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import java.util.Map;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Flux;
  *
  * @author Ivica Cardic
  */
-public interface AiCopilot {
+public interface AiCopilotFacade {
 
-    Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId);
+    Flux<Map<String, ?>> chat(String message, String conversationId, ContextDTO context);
 }
