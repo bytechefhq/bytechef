@@ -22,7 +22,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
-import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {useState} from 'react';
