@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
@@ -66,7 +66,7 @@ public class MicrosoftOutlook365SearchEmailAction {
                 .description("Messages in a certain category")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
-        .output(outputSchema(array().items(MESSAGE_OUTPUT_PROPERTY)))
+        .output(outputSchema(array().items(FULL_MESSAGE_OUTPUT_PROPERTY)))
         .perform(MicrosoftOutlook365SearchEmailAction::perform);
 
     private MicrosoftOutlook365SearchEmailAction() {

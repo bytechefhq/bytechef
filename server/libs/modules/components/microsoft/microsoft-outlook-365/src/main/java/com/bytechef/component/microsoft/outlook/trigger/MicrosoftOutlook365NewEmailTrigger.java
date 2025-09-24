@@ -52,7 +52,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
         .description("Triggers when new mail is received.")
         .type(TriggerType.POLLING)
         .properties(FORMAT_PROPERTY)
-        .output()
+        .output(MicrosoftOutlook365Utils::getMessageOutput)
         .poll(MicrosoftOutlook365NewEmailTrigger::poll);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
