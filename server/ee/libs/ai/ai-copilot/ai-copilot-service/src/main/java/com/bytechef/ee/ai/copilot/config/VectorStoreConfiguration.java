@@ -74,7 +74,8 @@ public class VectorStoreConfiguration {
         this.componentDefinitionService = componentDefinitionService;
     }
 
-    @EventListener(ApplicationStartedEvent.class)
+    // TODO Enable vector store initialization on startup
+    // @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
         Resource resource = new ClassPathResource(WORKFLOWS);
 
