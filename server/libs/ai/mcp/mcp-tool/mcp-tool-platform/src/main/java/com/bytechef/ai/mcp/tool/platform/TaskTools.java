@@ -113,6 +113,114 @@ public class TaskTools {
     }
 
     @Tool(
+        description = "Get all properties of a specific task (action, trigger, or taskDispatcher). Returns a hierarchical list of properties including nested properties")
+    public List<PropertyInfo> getTaskProperties(
+        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
+        @ToolParam(description = "The name of the task to retrieve properties for") String name,
+        @ToolParam(
+            description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
+        @ToolParam(description = "The version (optional)") Integer version) {
+
+        try {
+            return switch (StringUtils.trim(type.toLowerCase())) {
+                case "action", "trigger" -> {
+                    if (componentName == null || StringUtils.isBlank(componentName)) {
+                        throw new IllegalArgumentException("componentName is required for " + type + " type");
+                    }
+                    yield componentTools.getProperties(componentName, name, version);
+                }
+                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherProperties(name, version);
+                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
+            };
+        } catch (Exception e) {
+            logger.error("Failed to get properties for task '{}' of type '{}'", name, type, e);
+
+            throw new RuntimeException("Failed to get properties", e);
+        }
+    }
+
+    @Tool(
+        description = "Get the output property of a specific task (action, trigger, or taskDispatcher). Returns the structure of the output property")
+    public PropertyInfo getTaskOutputProperty(
+        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
+        @ToolParam(description = "The name of the task to retrieve output properties for") String name,
+        @ToolParam(
+            description = "For actions/triggers: the component name. Not used for taskDispatchers (optional)") String componentName,
+        @ToolParam(description = "The version (optional)") Integer version) {
+
+        try {
+            return switch (StringUtils.trim(type.toLowerCase())) {
+                case "action", "trigger" -> {
+                    if (componentName == null || StringUtils.isBlank(componentName)) {
+                        throw new IllegalArgumentException("componentName is required for " + type + " type");
+                    }
+                    yield componentTools.getOutputProperty(componentName, name, version);
+                }
+                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherOutput(name, version);
+                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
+            };
+        } catch (Exception e) {
+            logger.error("Failed to get output property for task '{}' of type '{}'", name, type, e);
+            throw e;
+        }
+    }
+
+    @Tool(
+        description = "Get the task definition template for a specific task (action, trigger, or taskDispatcher). Returns a JSON template that can be used to configure the task in workflows")
+    public String getTaskDefinition(
+        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
+        @ToolParam(description = "The name of the task to generate definition for") String name,
+        @ToolParam(
+            description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
+        @ToolParam(description = "The version (optional)") Integer version) {
+
+        try {
+            return switch (StringUtils.trim(type.toLowerCase())) {
+                case "action" -> {
+                    if (componentName == null || StringUtils.isBlank(componentName)) {
+                        throw new IllegalArgumentException("componentName is required for action type");
+                    }
+                    yield componentTools.getActionDefinition(componentName, name, version);
+                }
+                case "trigger" -> {
+                    if (componentName == null || StringUtils.isBlank(componentName)) {
+                        throw new IllegalArgumentException("componentName is required for trigger type");
+                    }
+                    yield componentTools.getTriggerDefinition(componentName, name, version);
+                }
+                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherDefinition(name, version);
+                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
+            };
+        } catch (Exception e) {
+            logger.error("Failed to get definition for task '{}' of type '{}'", name, type, e);
+
+            throw new RuntimeException("Failed to get task definition", e);
+        }
+    }
+
+    @Tool(
+        description = "Instructions for building with task dispatchers")
+    public String getTaskDispatcherBuildInstructions(
+        @ToolParam(description = "The name of the task dispatcher you want instructions for") String taskDispatcher) {
+
+        StringBuilder builder = new StringBuilder();
+
+        String flowString = taskDispatcherTools.getTaskDispatcherInstructions(taskDispatcher);
+
+        if (flowString != null) {
+            builder.append("""
+                Whenever you see an array with 'task' type, you can put as may tasks in that array.
+                """);
+            builder.append("\n");
+            builder.append(flowString);
+        } else {
+            builder.append("Task dispatcher with that name does not exist.");
+        }
+
+        return builder.toString();
+    }
+
+    @Tool(
         description = "List tasks in the project. Returns a list with their basic information. Can filter by type and limit results")
     public List<TaskMinimalInfo> listTasks(
         @ToolParam(
@@ -271,92 +379,6 @@ public class TaskTools {
     }
 
     @Tool(
-        description = "Get all properties of a specific task (action, trigger, or taskDispatcher). Returns a hierarchical list of properties including nested properties")
-    public List<PropertyInfo> getTaskProperties(
-        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
-        @ToolParam(description = "The name of the task to retrieve properties for") String name,
-        @ToolParam(
-            description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
-
-        try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
-                case "action", "trigger" -> {
-                    if (componentName == null || StringUtils.isBlank(componentName)) {
-                        throw new IllegalArgumentException("componentName is required for " + type + " type");
-                    }
-                    yield componentTools.getProperties(componentName, name, version);
-                }
-                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherProperties(name, version);
-                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
-            };
-        } catch (Exception e) {
-            logger.error("Failed to get properties for task '{}' of type '{}'", name, type, e);
-
-            throw new RuntimeException("Failed to get properties", e);
-        }
-    }
-
-    @Tool(
-        description = "Get the output property of a specific task (action, trigger, or taskDispatcher). Returns the structure of the output property")
-    public PropertyInfo getTaskOutputProperty(
-        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
-        @ToolParam(description = "The name of the task to retrieve output properties for") String name,
-        @ToolParam(
-            description = "For actions/triggers: the component name. Not used for taskDispatchers (optional)") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
-
-        try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
-                case "action", "trigger" -> {
-                    if (componentName == null || StringUtils.isBlank(componentName)) {
-                        throw new IllegalArgumentException("componentName is required for " + type + " type");
-                    }
-                    yield componentTools.getOutputProperty(componentName, name, version);
-                }
-                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherOutput(name, version);
-                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
-            };
-        } catch (Exception e) {
-            logger.error("Failed to get output property for task '{}' of type '{}'", name, type, e);
-            throw e;
-        }
-    }
-
-    @Tool(
-        description = "Get the task definition template for a specific task (action, trigger, or taskDispatcher). Returns a JSON template that can be used to configure the task in workflows")
-    public String getTaskDefinition(
-        @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
-        @ToolParam(description = "The name of the task to generate definition for") String name,
-        @ToolParam(
-            description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
-
-        try {
-            return switch (StringUtils.trim(type.toLowerCase())) {
-                case "action" -> {
-                    if (componentName == null || StringUtils.isBlank(componentName)) {
-                        throw new IllegalArgumentException("componentName is required for action type");
-                    }
-                    yield componentTools.getActionDefinition(componentName, name, version);
-                }
-                case "trigger" -> {
-                    if (componentName == null || StringUtils.isBlank(componentName)) {
-                        throw new IllegalArgumentException("componentName is required for trigger type");
-                    }
-                    yield componentTools.getTriggerDefinition(componentName, name, version);
-                }
-                case "taskdispatcher" -> taskDispatcherTools.getTaskDispatcherDefinition(name, version);
-                default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
-            };
-        } catch (Exception e) {
-            logger.error("Failed to get definition for task '{}' of type '{}'", name, type, e);
-
-            throw new RuntimeException("Failed to get task definition", e);
-        }
-    }
-
-    @Tool(
         description = "Validate a task configuration by checking both its structure and properties against the task definition. Returns validation results with any errors found")
     public TaskValidationResult validateTask(
         @ToolParam(description = "The JSON string of the task to validate") String task,
@@ -399,37 +421,6 @@ public class TaskTools {
         }
     }
 
-    @Tool(
-        description = "Instructions for building with task dispatchers")
-    public String getTaskDispatcherInstructions(
-        @ToolParam(description = "The name of the task dispatcher you want instructions for") String taskDispatcher) {
-        StringBuilder builder = new StringBuilder();
-        String taskAttributeString = """
-            Whenever you see an array with 'task' type, you can put as may tasks in that array.
-            """;
-        String flowString = taskDispatcherTools.getTaskDispatcherInstructions(taskDispatcher);
-
-        if (flowString != null) {
-            builder.append(taskAttributeString)
-                .append("\n")
-                .append(flowString);
-        } else {
-            builder.append("Task dispatcher with that name does not exist.");
-        }
-        return builder.toString();
-    }
-
-    /**
-     * Minimal task information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record TaskMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the task") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the task") String description,
-        @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName) {
-    }
-
     /**
      * Detailed task information record for the response.
      */
@@ -445,6 +436,18 @@ public class TaskTools {
     }
 
     /**
+     * Minimal task information record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record TaskMinimalInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the task") String name,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the task") String description,
+        @JsonProperty("type") @JsonPropertyDescription("The type of the task: action, trigger, or taskDispatcher") String type,
+        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component (null for taskDispatchers)") String componentName) {
+
+    }
+
+    /**
      * Task validation result record for the response.
      */
     @SuppressFBWarnings("EI")
@@ -452,38 +455,5 @@ public class TaskTools {
         @JsonProperty("valid") @JsonPropertyDescription("Whether the task is valid") boolean valid,
         @JsonProperty("errors") @JsonPropertyDescription("Error details, which need to be fixed before the task can be valid") String errors,
         @JsonProperty("warnings") @JsonPropertyDescription("Warning details that give additional information") String warnings) {
-    }
-
-    public List<PropertyInfo> getTaskProperties(String type, String taskType) {
-        String[] split = type.split("/");
-
-        int version = Integer.parseInt(split[1].substring(1));
-
-        if (split.length == 2) {
-            return getTaskProperties("taskDispatcher", split[0], split[0], version);
-        } else if (taskType.equals("trigger")) {
-            return getTaskProperties(taskType, split[2], split[0], version);
-        } else {
-            return getTaskProperties("action", split[2], split[0], version);
-        }
-    }
-
-    public PropertyInfo getTaskOutputProperty(String type, String taskType, StringBuilder warnings) {
-        String[] split = type.split("/");
-
-        int version = Integer.parseInt(split[1].substring(1));
-
-        try {
-            if (split.length == 2) {
-                return getTaskOutputProperty("taskDispatcher", split[0], split[0], version);
-            } else if (taskType.equals("trigger")) {
-                return getTaskOutputProperty(taskType, split[2], split[0], version);
-            } else {
-                return getTaskOutputProperty("action", split[2], split[0], version);
-            }
-        } catch (Exception e) {
-            warnings.append(e.getMessage());
-            return null;
-        }
     }
 }
