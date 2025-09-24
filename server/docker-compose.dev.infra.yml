@@ -17,6 +17,15 @@ services:
     - "POSTGRES_PASSWORD=postgres"
     - "POSTGRES_USER=postgres"
     - "POSTGRES_DB=bytechef"
+  rabbitmq:
+    image: rabbitmq:4.1.4-management-alpine
+    platform: linux/amd64
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
   redis:
     image: redis:7-alpine
     platform: linux/amd64
@@ -31,3 +40,7 @@ volumes:
     driver: "local"
   db:
     driver: "local"
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
