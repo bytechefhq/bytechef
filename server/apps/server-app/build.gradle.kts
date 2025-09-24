@@ -330,8 +330,8 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-remote-client"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
-    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-security-web:automation-api-platform-handler-security-web-impl"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service"))

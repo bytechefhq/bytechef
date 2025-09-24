@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.copilot;
+package com.bytechef.ee.ai.copilot.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -14,6 +14,7 @@ import com.bytechef.ee.ai.copilot.workflow.OrchestratorWorkersWorkflow;
 import com.bytechef.ee.ai.copilot.workflow.RoutingWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -35,7 +36,7 @@ import reactor.core.publisher.Flux;
  */
 @Service
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class AiCopilotImpl implements AiCopilot {
+public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     private static final String MESSAGE_ROUTE = "other";
     private static final Map<String, String> ROUTES = Map.of(
@@ -121,7 +122,7 @@ public class AiCopilotImpl implements AiCopilot {
     private final OrchestratorWorkersWorkflow orchestratorWorkersWorkflow;
 
     @SuppressFBWarnings("EI")
-    public AiCopilotImpl(
+    public AiCopilotFacadeImpl(
         ChatClient.Builder chatClientBuilder, VectorStore vectorStore, WorkflowService workflowService) {
 
         this.workflowService = workflowService;
@@ -195,15 +196,23 @@ public class AiCopilotImpl implements AiCopilot {
     }
 
     @Override
-    public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
-        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
+    public Flux<Map<String, ?>> chat(String message, String conversationId, ContextDTO context) {
+        Workflow workflow;
+        String currentWorkflow;
 
-        String currentWorkflow = workflow.getDefinition();
+        if (workflowService != null) {
+            workflow = workflowService.getWorkflow(context.workflowId());
+
+            currentWorkflow = workflow.getDefinition();
+        } else {
+            currentWorkflow = null;
+            workflow = null;
+        }
 
         String route = routingWorkflow.route(message, ROUTES);
 
         return switch (route) {
-            case WORKFLOW_ROUTE -> switch (contextDTO.source()) {
+            case WORKFLOW_ROUTE -> switch (context.source()) {
                 case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
                     OrchestratorWorkersWorkflow.WorkerResponse process =
                         orchestratorWorkersWorkflow.process(message, currentWorkflow);
@@ -215,7 +224,9 @@ public class AiCopilotImpl implements AiCopilot {
                             .param("task_analysis", process.analysis())
                             .param("task_list", process.workerResponses()))
                         .advisors(advisor -> advisor.param(
-                            ChatMemory.CONVERSATION_ID, workflow.getId())) // conversationId
+                            ChatMemory.CONVERSATION_ID,
+                            Objects.requireNonNull(Objects.requireNonNull(workflow)
+                                .getId()))) // conversationId
                         .call()
                         .content();
 
@@ -241,7 +252,11 @@ public class AiCopilotImpl implements AiCopilot {
                             .call()
                             .content();
 
-                        workflowService.update(workflow.getId(), definition, workflow.getVersion());
+                        Objects.requireNonNull(workflowService)
+                            .update(
+                                Objects.requireNonNull(workflow)
+                                    .getId(),
+                                definition, workflow.getVersion());
 
                         result = Map.of(
                             "workflowUpdated", true,
@@ -251,13 +266,13 @@ public class AiCopilotImpl implements AiCopilot {
                     yield Flux.just(result);
                 }
                 case CODE_EDITOR -> {
-                    Map<String, ?> parameters = contextDTO.parameters();
+                    Map<String, ?> parameters = context.parameters();
 
                     yield switch ((String) parameters.get("language")) {
                         case "javascript" -> chatClientScript.prompt()
                             .system("You are a javascript code generator, answer only with code.")
                             .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, currentWorkflow)
+                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
                                 .param(MESSAGE_ROUTE, message))
                             .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                             .stream()
@@ -266,7 +281,7 @@ public class AiCopilotImpl implements AiCopilot {
                         case "python" -> chatClientScript.prompt()
                             .system("You are a python code generator, answer only with code.")
                             .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, currentWorkflow)
+                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
                                 .param(MESSAGE_ROUTE, message))
                             .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                             .stream()
@@ -275,7 +290,7 @@ public class AiCopilotImpl implements AiCopilot {
                         case "ruby" -> chatClientScript.prompt()
                             .system("You are a ruby code generator, answer only with code.")
                             .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, currentWorkflow)
+                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
                                 .param(MESSAGE_ROUTE, message))
                             .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                             .stream()
