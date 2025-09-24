@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import java.util.Map;
 
 /**
@@ -49,7 +50,7 @@ public class MicrosoftOutlook365GetMailAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY)
-        .output()
+        .output(MicrosoftOutlook365Utils::getMessageOutput)
         .perform(MicrosoftOutlook365GetMailAction::perform);
 
     private MicrosoftOutlook365GetMailAction() {

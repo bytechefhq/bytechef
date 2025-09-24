@@ -19,6 +19,7 @@ package com.bytechef.component.microsoft.outlook.constant;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -48,6 +49,7 @@ public class MicrosoftOutlook365Constants {
     public static final String CONTENT = "content";
     public static final String CONTENT_BYTES = "contentBytes";
     public static final String CONTENT_TYPE = "contentType";
+    public static final String CONVERSATION_ID = "conversationId";
     public static final String DATE_RANGE = "dateRange";
     public static final String DATE_TIME = "dateTime";
     public static final String DISPLAY_NAME = "displayName";
@@ -107,14 +109,19 @@ public class MicrosoftOutlook365Constants {
         .defaultValue(SIMPLE.name())
         .required(true);
 
-    public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
+    public static final ModifiableObjectProperty FULL_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID)
-                .description("ID of the message."),
-            string(SUBJECT)
-                .description("Subject of the message."),
-            string("bodyPreview")
-                .description("The first 255 characters of the message body."),
+            array(BCC_RECIPIENTS)
+                .description("The Bcc: recipients for the message.")
+                .items(object()
+                    .properties(
+                        object(EMAIL_ADDRESS)
+                            .description("The recipient's email address.")
+                            .properties(
+                                string(NAME)
+                                    .description("The display name of the recipient."),
+                                string(ADDRESS)
+                                    .description("The email address of the recipient.")))),
             object(BODY)
                 .description("The body of the message. It can be in HTML or text format.")
                 .properties(
@@ -122,6 +129,26 @@ public class MicrosoftOutlook365Constants {
                         .description("The content type of the message body."),
                     string(CONTENT)
                         .description("The content of the message body.")),
+            string("bodyPreview")
+                .description("The first 255 characters of the message body. It is in text format."),
+            array(CC_RECIPIENTS)
+                .description("The Cc: recipients for the message.")
+                .items(
+                    object()
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .description("The recipient's email address.")
+                                .properties(
+                                    string(NAME)
+                                        .description("The display name of the recipient."),
+                                    string(ADDRESS)
+                                        .description("The email address of the recipient.")))),
+            string(CONVERSATION_ID)
+                .description("ID of the conversation the email belongs to."),
+            string("conversationIndex")
+                .description("Indicates the position of the message within the conversation."),
+            string("createdDateTime")
+                .description("The date and time the message was created."),
             object(FROM)
                 .description("The owner of the mailbox from which the message is sent.")
                 .properties(
@@ -131,7 +158,98 @@ public class MicrosoftOutlook365Constants {
                             string(NAME)
                                 .description("The display name of the sender."),
                             string(ADDRESS)
-                                .description("The email address of the sender."))));
+                                .description("The email address of the sender."))),
+            bool("hasAttachments")
+                .description("Indicates whether the message has attachments."),
+            string(ID)
+                .description("ID of the message."),
+            string("importance")
+                .description("The importance of the message: low, normal, high."),
+            bool("isDeliveryReceiptRequested")
+                .description("Indicates whether a delivery receipt is requested for the message."),
+            bool("isDraft")
+                .description(
+                    "Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet."),
+            bool("isReadReceiptRequested")
+                .description("Indicates whether a read receipt is requested for the message."),
+            string("lastModifiedDateTime")
+                .description("The date and time the message was last changed."),
+            string("parentFolderId")
+                .description("The unique identifier for the message's parent mailFolder."),
+            string("receivedDateTime")
+                .description("The date and time the message was received."),
+            array(REPLY_TO)
+                .description("The email addresses to use when replying.")
+                .items(
+                    object()
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .description("The recipient's email address.")
+                                .properties(
+                                    string(NAME)
+                                        .description("The display name of the recipient."),
+                                    string(ADDRESS)
+                                        .description("The email address of the recipient.")))),
+            object("sender")
+                .description(
+                    "The account that is used to generate the message. In most cases, this value is the same as " +
+                        "the from property.")
+                .properties(
+                    object(EMAIL_ADDRESS)
+                        .description("The recipient's email address.")
+                        .properties(
+                            string(NAME)
+                                .description("The display name of the sender."),
+                            string(ADDRESS)
+                                .description("The email address of the sender."))),
+            string("sendDateTime")
+                .description("The date and time the message was sent."),
+            string(SUBJECT)
+                .description("Subject of the message."),
+            array(TO_RECIPIENTS)
+                .description("The Cc: recipients for the message.")
+                .items(
+                    object()
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .description("The recipient's email address.")
+                                .properties(
+                                    string(NAME)
+                                        .description("The display name of the recipient."),
+                                    string(ADDRESS)
+                                        .description("The email address of the recipient.")))),
+            string("webLink")
+                .description("The URL to open the message in Outlook on the web."));
+
+    public static final ModifiableObjectProperty SIMPLE_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(ID)
+                .description("ID of the message."),
+            string(CONVERSATION_ID)
+                .description("ID of the conversation the email belongs to."),
+            string(SUBJECT)
+                .description("Subject of the message."),
+            string(FROM)
+                .description("The email address of the sender."),
+            string("bodyPreview")
+                .description("The first 255 characters of the message body."),
+            array(TO)
+                .description("The email addresses of the recipients.")
+                .items(string()),
+            array("cc")
+                .description("The email addresses of the cc recipients.")
+                .items(string()),
+            array("bcc")
+                .description("The email addresses of the bcc recipients.")
+                .items(string()),
+            string("bodyPlain")
+                .description("The plain text content of the message body."),
+            string("bodyHtml")
+                .description("The HTML content of the message body."),
+            array(ATTACHMENTS)
+                .items(fileEntry()),
+            string("webLink")
+                .description("The URL to open the message in Outlook on the web."));
 
     private MicrosoftOutlook365Constants() {
     }
