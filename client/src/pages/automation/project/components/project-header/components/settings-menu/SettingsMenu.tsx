@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
-import DeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteWorkflowAlertDialog';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
 import WorkflowTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
