@@ -907,7 +907,7 @@
         "maxLength" : null,
         "metadata" : { },
         "minLength" : null,
-        "name" : "apiKey",
+        "name" : "value",
         "options" : null,
         "optionsDataSource" : null,
         "placeholder" : null,
