@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.github.mizosoft.methanol.Methanol;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import org.springframework.ai.chat.client.ChatClient;
@@ -17,10 +18,8 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 
 /**
  * @version ee
@@ -51,21 +50,19 @@ public class AiCopilotConfiguration {
 
     @Bean
     OpenAiApi openAiApi() {
-        HttpClient httpClient = HttpClient.newBuilder()
+        HttpClient httpClient = Methanol.newBuilder()
+            .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofSeconds(60))
+            .defaultHeaders(httpHeaders -> httpHeaders.setHeader("Accept-Encoding", "gzip, deflate"))
+            .headersTimeout(Duration.ofSeconds(60))
+            .readTimeout(Duration.ofSeconds(60))
+            .requestTimeout(Duration.ofSeconds(60))
             .build();
 
         JdkClientHttpRequestFactory jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory(httpClient);
 
-        jdkClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(60));
-
         RestClient.Builder builder = RestClient.builder()
-            .requestFactory(jdkClientHttpRequestFactory)
-            .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
-                throw new RestClientException(
-                    "Error response: " + response.getStatusCode() + "; " + response.getStatusText());
-            })
-            .defaultHeaders(httpHeaders -> httpHeaders.set("Accept-Encoding", "gzip, deflate"));
+            .requestFactory(jdkClientHttpRequestFactory);
 
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
