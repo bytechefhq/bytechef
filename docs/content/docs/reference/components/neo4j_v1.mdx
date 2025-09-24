@@ -1,0 +1,101 @@
+---
+title: "Neo4j"
+description: "Neo4j is an open-source NoSQL graph database. It is a fully transactional database (ACID) that stores data structured as graphs consisting of nodes, connected by relationships."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: neo4j/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| uri | URI | STRING | URI for connecting to the Neo4j instance. | true |
+| username | Username | STRING | Username for authentication with Neo4j. | true |
+| password | Password | STRING | Password for authentication with Neo4j. | true |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the required schema | false |
+| databaseName | Database Name | STRING | The name of the Neo4j database to use. | false |
+| indexName | Index Name | STRING | The name of the index to store the vectors. | false |
+| embeddingDimension | Embedding Dimension | INTEGER | The number of dimensions in the vector. | false |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> COSINE, EUCLIDEAN </details> | The distance function to use. | false |
+| label | Label | STRING | The label used for document nodes. | false |
+| embeddingProperty | Embedding Property | STRING | The property name used to store embeddings. | false |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Load Data
+Name: load
+
+`Loads data into the vector store using LLM embeddings.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "type" : "neo4j/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Search Data
+Name: search
+
+`Query data from the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Data",
+  "name" : "search",
+  "parameters" : {
+    "query" : ""
+  },
+  "type" : "neo4j/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
