@@ -19,7 +19,7 @@ package com.bytechef.component.zenrows.connection;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.zenrows.constant.ZenRowsConstants.API_KEY;
+import static com.bytechef.component.zenrows.constant.ZenRowsConstants.VALUE;
 
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -27,6 +27,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class ZenRowsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
@@ -34,12 +37,12 @@ public class ZenRowsConnection {
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .properties(
-                    string(API_KEY)
+                    string(VALUE)
                         .label("API Key")
                         .description("API key can be found in Settings -> API Key.")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
-                    Map.of("apikey", List.of(connectionParameters.getRequiredString(API_KEY))))));
+                    Map.of("apikey", List.of(connectionParameters.getRequiredString(VALUE))))));
 
     private ZenRowsConnection() {
     }

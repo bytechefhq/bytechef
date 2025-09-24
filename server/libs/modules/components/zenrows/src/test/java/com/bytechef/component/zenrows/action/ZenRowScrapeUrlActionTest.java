@@ -46,7 +46,6 @@ class ZenRowScrapeUrlActionTest {
         URL, "mockUrl", ORIGINAL_STATUS, false, JS_RENDER, false));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private static final String stringResponse = "scrapedUrl";
 
     @Test
     void testPerform() {
@@ -61,14 +60,13 @@ class ZenRowScrapeUrlActionTest {
                 .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+        String stringResponse = "scrapedUrl";
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(stringResponse);
 
-        String result = ZenRowScrapeUrlAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        String result = ZenRowScrapeUrlAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
-
         assertEquals(List.of(URL, "mockUrl", ORIGINAL_STATUS, JS_RENDER), stringArgumentCaptor.getAllValues());
         assertEquals(List.of(false, false), booleanArgumentCaptor.getAllValues());
     }

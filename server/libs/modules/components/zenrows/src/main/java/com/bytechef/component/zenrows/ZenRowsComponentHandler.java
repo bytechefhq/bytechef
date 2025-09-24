@@ -28,6 +28,9 @@ import com.bytechef.component.zenrows.action.ZenRowsScrapeUrlWithCssSelectorActi
 import com.bytechef.component.zenrows.connection.ZenRowsConnection;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Nikolina Spehar
+ */
 @AutoService(ComponentHandler.class)
 public class ZenRowsComponentHandler implements ComponentHandler {
 

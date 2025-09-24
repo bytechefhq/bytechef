@@ -19,11 +19,13 @@ package com.bytechef.component.zenrows;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Nikolina Spehar
+ */
 class ZenRowsComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/zenrows_v1.json", new ZenRowsComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/zenrows_v1.json", new ZenRowsComponentHandler().getDefinition());
     }
 }

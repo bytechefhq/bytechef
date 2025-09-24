@@ -33,6 +33,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Nikolina Spehar
+ */
 class ZenRowsScrapeUrlWithCssSelectorActionTest {
 
     private final Context mockedContext = mock(Context.class);
@@ -40,12 +43,13 @@ class ZenRowsScrapeUrlWithCssSelectorActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(URL, "mockUrl", CSS_EXTRACTOR, List.of(Map.of("key", "value"))));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    public static final String mockedJson = "json";
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private static final String stringResponse = "scrapedUrl";
 
     @Test
     void testPerform() {
+        String stringResponse = "scrapedUrl";
+        String mockedJson = "json";
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -66,7 +70,6 @@ class ZenRowsScrapeUrlWithCssSelectorActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
-
         assertEquals(List.of(URL, "mockUrl", CSS_EXTRACTOR, mockedJson), stringArgumentCaptor.getAllValues());
     }
 }
