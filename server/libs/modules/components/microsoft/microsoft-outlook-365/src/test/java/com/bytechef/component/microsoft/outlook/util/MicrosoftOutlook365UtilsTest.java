@@ -25,8 +25,10 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SIMPLE_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
@@ -37,10 +39,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.definition.Format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,5 +165,20 @@ class MicrosoftOutlook365UtilsTest {
         String result = MicrosoftOutlook365Utils.getMailboxTimeZone(mockedActionContext);
 
         assertEquals("zone", result);
+    }
+
+    @Test
+    void tesGetMessageOutputForSimpleFormat() {
+        ModifiableObjectProperty messageOutputProperty = MicrosoftOutlook365Utils.getMessageOutputProperty(
+            Format.SIMPLE);
+
+        assertEquals(SIMPLE_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
+    }
+
+    @Test
+    void testGetMessageOutputForFullFormat() {
+        ModifiableObjectProperty messageOutputProperty = MicrosoftOutlook365Utils.getMessageOutputProperty(Format.FULL);
+
+        assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 }
