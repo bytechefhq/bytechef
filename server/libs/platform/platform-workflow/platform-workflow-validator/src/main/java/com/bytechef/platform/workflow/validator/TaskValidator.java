@@ -129,9 +129,9 @@ class TaskValidator {
         }
 
         try {
-            String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
-                taskDefinition, taskParameters);
             String originalTaskDefinition = WorkflowUtils.convertPropertyInfoToJson(taskDefinition);
+            String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
+                originalTaskDefinition, taskParameters);
 
             validateProcessedTaskDefinition(
                 taskParametersJsonNode, taskParameters, processedTaskDefinition, originalTaskDefinition, errors,
@@ -190,6 +190,10 @@ class TaskValidator {
         String message = exception.getMessage();
 
         if (message != null && message.startsWith("Invalid logic for display condition:")) {
+            // Extract the condition from the error message to check if it's truly malformed
+            String condition = extractConditionFromMessage(message);
+            boolean isActuallyMalformed = isMalformedCondition(condition);
+
             try {
                 String cleanedTaskDefinition = removeObjectsWithInvalidConditions(
                     WorkflowUtils.convertPropertyInfoToJson(taskDefinition));
@@ -206,13 +210,87 @@ class TaskValidator {
                         errors, warnings);
                 }
 
-                StringUtils.appendWithNewline(message, warnings);
+                // Add warning for truly malformed conditions even if cleanup succeeded
+                if (isActuallyMalformed) {
+                    StringUtils.appendWithNewline(message, warnings);
+                }
             } catch (Exception ignored) {
-                StringUtils.appendWithNewline(message, warnings);
+                // Add warning for truly malformed conditions when cleanup fails
+                if (isActuallyMalformed) {
+                    StringUtils.appendWithNewline(message, warnings);
+                }
             }
         } else {
             throw exception;
         }
+    }
+
+    /**
+     * Extracts the condition from the error message.
+     */
+    private static String extractConditionFromMessage(String message) {
+        if (message == null || !message.startsWith("Invalid logic for display condition:")) {
+            return "";
+        }
+
+        int startQuote = message.indexOf('\'');
+        if (startQuote == -1) {
+            return "";
+        }
+
+        int endQuote = message.lastIndexOf('\'');
+        if (endQuote == startQuote) {
+            return "";
+        }
+
+        return message.substring(startQuote + 1, endQuote);
+    }
+
+    /**
+     * Determines if a condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
+     */
+    private static boolean isMalformedCondition(String condition) {
+        if (condition == null || condition.trim().isEmpty()) {
+            return false;
+        }
+
+        // Clean the condition by removing @ markers if present
+        String cleanCondition = condition.trim();
+        if (cleanCondition.startsWith("@") && cleanCondition.endsWith("@")) {
+            cleanCondition = cleanCondition.substring(1, cleanCondition.length() - 1);
+        }
+
+        // Basic syntax validation patterns for common expression types
+        // Valid patterns include: field comparisons, function calls, boolean operations
+
+        // Pattern 1: Simple field comparisons (field == value, field != value, field >= value, etc.)
+        // Supports field names with dots, brackets, and 'index' placeholder
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*(==|!=|<=|>=|<|>)\\s*.*")) {
+            return false; // Valid comparison syntax
+        }
+
+        // Pattern 2: Function calls like contains({...}, field)
+        if (cleanCondition.matches("\\s*\\w+\\s*\\([^)]*\\).*")) {
+            return false; // Valid function call syntax
+        }
+
+        // Pattern 3: Boolean operations with AND/OR
+        if (cleanCondition.matches(".*\\s+(&&|\\|\\||and|or)\\s+.*")) {
+            return false; // Valid boolean operation syntax
+        }
+
+        // Pattern 4: Simple field references (including those with [index] placeholders)
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*")) {
+            return false; // Valid field reference
+        }
+
+        // Pattern 5: Literal values (true, false, numbers, strings)
+        if (cleanCondition.matches("\\s*(true|false|\\d+(\\.\\d+)?|'[^']*')\\s*")) {
+            return false; // Valid literal
+        }
+
+        // If none of the valid patterns match, it's likely malformed
+        return true;
     }
 
     /**

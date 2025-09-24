@@ -1666,7 +1666,7 @@ class WorkflowValidatorTest {
                 List.of(
                     new PropertyInfo("childEnabled", "BOOLEAN", null, true, true, null, null),
                     new PropertyInfo(
-                        "child", "OBJECT", null, false, true, "childEnabled == true",
+                        "child", "OBJECT", null, false, true, "parent.childEnabled == true",
                         List.of(
                             new PropertyInfo("value", "STRING", null, true, true, null, null))))));
 
@@ -1753,11 +1753,11 @@ class WorkflowValidatorTest {
                 List.of(
                     new PropertyInfo("level2", "STRING", null, true, true, null, null),
                     new PropertyInfo(
-                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        "config2", "OBJECT", null, false, true, "config1.level2 == 'active'",
                         List.of(
                             new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
                             new PropertyInfo(
-                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                "config3", "OBJECT", null, false, true, "config1.config2.level3 == true",
                                 List.of(new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
@@ -1793,11 +1793,11 @@ class WorkflowValidatorTest {
                 List.of(
                     new PropertyInfo("level2", "STRING", null, true, true, null, null),
                     new PropertyInfo(
-                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        "config2", "OBJECT", null, false, true, "config1.level2 == 'active'",
                         List.of(
                             new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
                             new PropertyInfo(
-                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                "config3", "OBJECT", null, false, true, "config1.config2.level3 == true",
                                 List.of(
                                     new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
@@ -1835,11 +1835,11 @@ class WorkflowValidatorTest {
                 List.of(
                     new PropertyInfo("level2", "STRING", null, true, true, null, null),
                     new PropertyInfo(
-                        "config2", "OBJECT", null, false, true, "level2 == 'active'",
+                        "config2", "OBJECT", null, false, true, "config1.level2 == 'active'",
                         List.of(
                             new PropertyInfo("level3", "BOOLEAN", null, true, true, null, null),
                             new PropertyInfo(
-                                "config3", "OBJECT", null, false, true, "level3 == true",
+                                "config3", "OBJECT", null, false, true, "config1.config2.level3 == true",
                                 List.of(new PropertyInfo("finalValue", "STRING", null, true, true, null, null))))))));
 
         StringBuilder errors = new StringBuilder();
@@ -2020,10 +2020,10 @@ class WorkflowValidatorTest {
                     new PropertyInfo(
                         "config2", "OBJECT", null, false, true, null,
                         List.of(
-                            new PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == level2", null),
+                            new PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == config1.level2", null),
                             new PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
                                 new PropertyInfo(
-                                    "finalValue", "STRING", null, true, true, "level3 == true", null))))))));
+                                    "finalValue", "STRING", null, true, true, "config1.config2.level3 == true", null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();

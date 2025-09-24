@@ -62,7 +62,7 @@ class PropertyValidator {
     public static void validatePropertiesRecursively(
         JsonNode taskParametersJsonNode, JsonNode definitionJsonNode, String path, String originalTaskDefinition,
         @Nullable String originalTaskDefinitionForArrays, String originalCurrentParameters, StringBuilder errors,
-        StringBuilder warnings) {
+        StringBuilder warnings){
 
         // Check for extra properties (generate warnings)
         if (isEmptyContainer(definitionJsonNode)) {
@@ -174,19 +174,19 @@ class PropertyValidator {
         JsonNode taskParametersJsonNode, String fieldName, JsonNode definitionJsonNode, String propertyPath,
         String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
 
-        String text = definitionJsonNode.asText();
+        String setting = definitionJsonNode.asText();
 
-        String definitionText = org.apache.commons.lang3.StringUtils.trim(text.replace("(required)", ""));
+        String type = org.apache.commons.lang3.StringUtils.trim(setting.replace("(required)", ""));
 
-        if (("object".equalsIgnoreCase(definitionText) || "array".equalsIgnoreCase(definitionText)) &&
+        if (("object".equalsIgnoreCase(type) || "array".equalsIgnoreCase(type)) &&
             taskParametersJsonNode.has(fieldName)) {
 
             JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
 
-            boolean correctType = ("object".equalsIgnoreCase(definitionText) && valueJsonNode.isObject()) ||
-                ("array".equalsIgnoreCase(definitionText) && valueJsonNode.isArray());
+            boolean correctType = ("object".equalsIgnoreCase(type) && valueJsonNode.isObject()) ||
+                ("array".equalsIgnoreCase(type) && valueJsonNode.isArray());
 
-            if (correctType && "object".equalsIgnoreCase(definitionText)) {
+            if (correctType && "object".equalsIgnoreCase(type)) {
                 // Generate warnings for all nested properties since they're not defined
                 Iterator<String> fieldNamesIterator = valueJsonNode.fieldNames();
 
@@ -200,7 +200,7 @@ class PropertyValidator {
             }
         }
 
-        validateStringTypeDefinition(taskParametersJsonNode, fieldName, text, propertyPath, originalCurrentParameters,
+        validateStringTypeDefinition(taskParametersJsonNode, fieldName, setting, propertyPath, originalCurrentParameters,
             errors);
     }
 
@@ -760,6 +760,13 @@ class PropertyValidator {
             JsonNode jsonNode = arrayValueJsonNode.get(i);
 
             String elementPath = propertyPath + "[" + i + "]";
+
+            // Handle array elements (for nested arrays like conditions[[{}]])
+            if (jsonNode.isArray() && objectDefinitionJsonNode.isArray()) {
+                // This is an array element, recursively validate it using the object definition as the array definition
+                validateDiscriminatedUnionArray(jsonNode, objectDefinitionJsonNode, elementPath, errors, warnings);
+                continue;
+            }
 
             if (!jsonNode.isObject()) {
                 String actualType = JsonUtils.getJsonNodeType(jsonNode);

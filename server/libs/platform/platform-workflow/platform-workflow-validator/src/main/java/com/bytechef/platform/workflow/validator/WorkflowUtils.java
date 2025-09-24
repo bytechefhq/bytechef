@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
@@ -38,17 +41,7 @@ class WorkflowUtils {
     private static final Pattern COMBINED_PATTERN = Pattern.compile(
         "\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
 
-    public static String processDisplayConditions(
-        @Nullable List<PropertyInfo> taskDefinition, @Nullable String taskParameters) {
-
-        if (taskDefinition == null || taskParameters == null) {
-            return convertPropertyInfoToJson(taskDefinition);
-        }
-
-        String jsonTaskDefinition = convertPropertyInfoToJson(taskDefinition);
-
-        return processDisplayConditions(jsonTaskDefinition, taskParameters);
-    }
+    public static Evaluator evaluator = SpelEvaluator.builder().build();
 
     public static String convertPropertyInfoToJson(@Nullable List<PropertyInfo> propertyInfos) {
         if (propertyInfos == null || propertyInfos.isEmpty()) {
@@ -282,10 +275,6 @@ class WorkflowUtils {
         return typeString.toString();
     }
 
-    private static String cleanQuotes(String value) {
-        return (value.startsWith("'") && value.endsWith("'")) ? value.substring(1, value.length() - 1) : value;
-    }
-
     private static String convertArrayPropertyToJson(PropertyInfo propertyInfo) {
         if (isTaskTypeArray(propertyInfo)) {
             return "[ \"object\" ]";
@@ -361,135 +350,37 @@ class WorkflowUtils {
     }
 
     private static boolean evaluateCondition(String condition, JsonNode actualParameters) {
-        try {
-            // Check for contains function first
-            if (condition.contains("contains(")) {
-                return evaluateContainsFunction(condition, actualParameters);
-            }
+        Map<String, String> map = new HashMap<>();
+        // convert condition to SpEL condition
+        map.put("convertedExpression", "="+condition);
 
-            String[] operatorChecks = {
-                "<=", ">=", "==", "!=", "<", ">"
-            };
-            String operator = null;
-            String[] parts = null;
+        Map<String, Object> actualParametersMap = actualParameters != null ?
+            com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new com.fasterxml.jackson.core.type.TypeReference<>() {}) :
+            new java.util.HashMap<>();
 
-            for (String operatorCheck : operatorChecks) {
-                if (condition.contains(operatorCheck)) {
-                    parts = condition.split("\\s*" + Pattern.quote(operatorCheck) + "\\s*");
-                    operator = operatorCheck;
-
-                    break;
-                }
-            }
-
-            if (parts == null || parts.length != 2) {
-                // If a condition is not empty and doesn't have valid operators, it's likely invalid
-                if (StringUtils.isNotBlank(condition)) {
-                    throw new IllegalArgumentException("Invalid condition syntax");
-                }
-                return true;
-            }
-
-            String leftSide = parts[0].trim();
-
-            String cleanLeftSide = cleanQuotes(leftSide);
-
-            String rightSide = parts[1].trim();
-
-            String cleanRightSide = cleanQuotes(rightSide);
-
-            JsonNode fieldJsonNode = findField(actualParameters, leftSide);
-
-            if (fieldJsonNode != null && !fieldJsonNode.isNull()) {
-                return performComparison(fieldJsonNode, cleanRightSide, operator, true);
-            }
-
-            fieldJsonNode = findField(actualParameters, rightSide);
-
-            if (fieldJsonNode != null && !fieldJsonNode.isNull()) {
-                return performComparison(fieldJsonNode, cleanLeftSide, operator, false);
-            }
-
-            return performLiteralComparison(cleanLeftSide, cleanRightSide, operator);
-        } catch (IllegalArgumentException e) {
-            throw e; // Re-throw IllegalArgumentException to be caught by caller
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid condition syntax");
+        try{
+            Map<String, Object> evaluated = evaluator.evaluate(map, actualParametersMap);
+            return parseBoolean(evaluated.get("convertedExpression").toString());
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
-    private static boolean evaluateContainsFunction(String condition, JsonNode actualParameters) {
-        // Pattern to match contains({'val1','val2'}, fieldName) or contains({'val1','val2'}, 'literal')
-        Pattern containsPattern = Pattern.compile("contains\\s*\\(\\s*\\{([^}]+)}\\s*,\\s*([^)]+)\\s*\\)");
-
-        Matcher matcher = containsPattern.matcher(condition);
-
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid contains function syntax");
+    public static boolean parseBoolean(String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("String cannot be null");
         }
 
-        String arrayValues = StringUtils.trim(matcher.group(1));
-        String checkValue = StringUtils.trim(matcher.group(2));
-
-        // Parse the array values
-        String[] values = arrayValues.split(",");
-
-        for (int i = 0; i < values.length; i++) {
-            values[i] = cleanQuotes(values[i].trim());
-        }
-
-        // Get the value to check
-        String valueToCheck;
-        JsonNode fieldJsonNode = findField(actualParameters, checkValue);
-
-        if (fieldJsonNode != null && !fieldJsonNode.isNull()) {
-            valueToCheck = fieldJsonNode.asText();
+        if ("true".equalsIgnoreCase(s)) {
+            return true;
+        } else if ("false".equalsIgnoreCase(s)) {
+            return false;
         } else {
-            valueToCheck = cleanQuotes(checkValue);
+            throw new IllegalArgumentException(
+                "Invalid boolean value: '" + s + "'. Expected 'true' or 'false'"
+            );
         }
-
-        // Check if valueToCheck is in the array
-        for (String value : values) {
-            if (value.equals(valueToCheck)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Nullable
-    private static JsonNode findField(JsonNode parameters, String fieldName) {
-        JsonNode fieldJsonNode = getNestedField(parameters, fieldName);
-
-        if ((fieldJsonNode == null || fieldJsonNode.isNull()) && !fieldName.contains(".")) {
-            fieldJsonNode = findFieldRecursively(parameters, fieldName);
-        }
-
-        return fieldJsonNode;
-    }
-
-    @Nullable
-    private static JsonNode findFieldRecursively(@Nullable JsonNode jsonNode, String fieldName) {
-        if (jsonNode == null || !jsonNode.isObject()) {
-            return null;
-        }
-
-        if (jsonNode.has(fieldName)) {
-            return jsonNode.get(fieldName);
-        }
-
-        for (JsonNode child : jsonNode) {
-            if (child.isObject()) {
-                JsonNode resultJsonNode = findFieldRecursively(child, fieldName);
-
-                if (resultJsonNode != null) {
-                    return resultJsonNode;
-                }
-            }
-        }
-
-        return null;
     }
 
     private static int getLastEndOfDuplicates(List<PropertyMatch> duplicates) {
@@ -499,7 +390,7 @@ class WorkflowUtils {
             .orElse(0);
     }
 
-    private static Map<String, List<PropertyMatch>> getPropertyMatchesMap(String json) {
+    private static Map<String, List<PropertyMatch>> getPropertyWithCondition(String json) {
         Matcher matcher = COMBINED_PATTERN.matcher(json);
 
         Map<String, List<PropertyMatch>> propertyMatchesMap = new HashMap<>();
@@ -577,82 +468,7 @@ class WorkflowUtils {
         }
     }
 
-    private static boolean performComparison(
-        JsonNode fieldJsonNode, String expectedValue, String operator, boolean fieldOnLeft) {
-
-        try {
-            if ("==".equals(operator)
-                && ("true".equalsIgnoreCase(expectedValue) || "false".equalsIgnoreCase(expectedValue))) {
-                boolean expectedBool = Boolean.parseBoolean(expectedValue);
-                boolean actualBool =
-                    fieldJsonNode.isBoolean()
-                        ? fieldJsonNode.asBoolean() : Boolean.parseBoolean(fieldJsonNode.asText());
-
-                return expectedBool == actualBool;
-            }
-
-            if (isNumeric(expectedValue) && fieldJsonNode.isNumber()) {
-                double actualNum = fieldJsonNode.asDouble();
-                double expectedNum = Double.parseDouble(expectedValue);
-
-                return switch (operator) {
-                    case "==" -> actualNum == expectedNum;
-                    case "!=" -> actualNum != expectedNum;
-                    case "<=" -> fieldOnLeft ? actualNum <= expectedNum : expectedNum <= actualNum;
-                    case ">=" -> fieldOnLeft ? actualNum >= expectedNum : expectedNum >= actualNum;
-                    case "<" -> fieldOnLeft ? actualNum < expectedNum : expectedNum < actualNum;
-                    case ">" -> fieldOnLeft ? actualNum > expectedNum : expectedNum > actualNum;
-                    default -> false;
-                };
-            }
-
-            String actualValue = fieldJsonNode.asText();
-            if ("==".equals(operator)) {
-                return expectedValue.equals(actualValue);
-            } else if ("!=".equals(operator)) {
-                return !expectedValue.equals(actualValue);
-            }
-
-            return false;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private static boolean performLiteralComparison(String leftValue, String rightValue, String operator) {
-        try {
-            if (isNumeric(leftValue) && isNumeric(rightValue)) {
-                double leftNum = Double.parseDouble(leftValue);
-                double rightNum = Double.parseDouble(rightValue);
-
-                return switch (operator) {
-                    case "==" -> leftNum == rightNum;
-                    case "!=" -> leftNum != rightNum;
-                    case "<=" -> leftNum <= rightNum;
-                    case ">=" -> leftNum >= rightNum;
-                    case "<" -> leftNum < rightNum;
-                    case ">" -> leftNum > rightNum;
-                    default -> false;
-                };
-            }
-
-            if ("==".equals(operator)) {
-                return leftValue.equals(rightValue);
-            } else if ("!=".equals(operator)) {
-                return !leftValue.equals(rightValue);
-            }
-
-            return false;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
+    public static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
         if (taskParameters == null) {
             return taskDefinition;
         }
@@ -660,7 +476,8 @@ class WorkflowUtils {
         try {
             JsonNode parametersNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
 
-            return processMetadataObjectsRecursively(taskDefinition, parametersNode);
+            return processMetadataObjectsRecursively(taskDefinition,
+                parametersNode != null ? parametersNode : com.bytechef.commons.util.JsonUtils.readTree("{}"));
         } catch (RuntimeException e) {
             // Re-throw runtime exceptions from invalid display conditions
             String message = e.getMessage();
@@ -676,15 +493,15 @@ class WorkflowUtils {
     }
 
     private static String processMetadataObjectsRecursively(String json, JsonNode actualParameters) {
-        Map<String, List<PropertyMatch>> propertyMatchesMap = getPropertyMatchesMap(json);
+        Map<String, List<PropertyMatch>> propertyWithCondition = getPropertyWithCondition(json);
 
-        if (propertyMatchesMap.isEmpty()) {
+        if (propertyWithCondition.isEmpty()) {
             return json;
         }
 
         List<PropertyMatch> allPropertyMatches = new ArrayList<>();
 
-        for (List<PropertyMatch> propertyMatches : propertyMatchesMap.values()) {
+        for (List<PropertyMatch> propertyMatches : propertyWithCondition.values()) {
             allPropertyMatches.addAll(propertyMatches);
         }
 
@@ -701,7 +518,7 @@ class WorkflowUtils {
 
             result.append(json, lastEnd, match.start);
 
-            List<PropertyMatch> duplicatePropertyMatches = propertyMatchesMap.get(match.propertyName);
+            List<PropertyMatch> duplicatePropertyMatches = propertyWithCondition.get(match.propertyName);
             PropertyMatch selectedPropertyMatch;
 
             selectedPropertyMatch = selectBestMatch(duplicatePropertyMatches, actualParameters);
