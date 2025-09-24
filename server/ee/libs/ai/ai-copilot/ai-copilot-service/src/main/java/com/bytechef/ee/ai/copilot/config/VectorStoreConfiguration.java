@@ -35,6 +35,7 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -65,7 +66,9 @@ public class VectorStoreConfiguration {
     @SuppressFBWarnings("EI")
     public VectorStoreConfiguration(
         VectorStore vectorStore, VectorStoreService vectorStoreService,
-        ComponentDefinitionService componentDefinitionService) {
+        // TODO Add dependency on ComponentDefinitionService, implement local ComponentDefinitionRegistry, that will
+        // read generated component json definitions
+        @Autowired(required = false) ComponentDefinitionService componentDefinitionService) {
 
         this.vectorStore = vectorStore;
         this.vectorStoreService = vectorStoreService;
