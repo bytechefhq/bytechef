@@ -31,6 +31,9 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class ZenRowScrapeUrlAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("scrapeUrl")
@@ -63,7 +66,6 @@ public class ZenRowScrapeUrlAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context.http(http -> http.get(""))
             .configuration(responseType(ResponseType.TEXT))
             .queryParameters(

@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class ZenRowsScrapeUrlWithCssSelectorAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("scrapeUrlWithCssSelectors")
@@ -72,21 +75,9 @@ public class ZenRowsScrapeUrlWithCssSelectorAction {
     private ZenRowsScrapeUrlWithCssSelectorAction() {
     }
 
-    private static Map<String, String> getCssExtractor(List<Object> cssExtractorList) {
-        Map<String, String> cssExtractor = new HashMap<>();
-
-        for (Object listElement : cssExtractorList) {
-            if (listElement instanceof Map<?, ?> elementMap) {
-                cssExtractor.put((String) elementMap.get(KEY), (String) elementMap.get(VALUE));
-            }
-        }
-
-        return cssExtractor;
-    }
-
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, String> cssExtractor =
-            getCssExtractor(inputParameters.getRequiredList(CSS_EXTRACTOR, Object.class));
+        Map<String, String> cssExtractor = getCssExtractor(
+            inputParameters.getRequiredList(CSS_EXTRACTOR, new TypeReference<>() {}));
 
         return context.http(http -> http.get(""))
             .configuration(responseType(ResponseType.TEXT))
@@ -95,5 +86,15 @@ public class ZenRowsScrapeUrlWithCssSelectorAction {
                 CSS_EXTRACTOR, context.json(json -> json.write(cssExtractor)))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static Map<String, String> getCssExtractor(List<Map<String, String>> cssExtractorList) {
+        Map<String, String> cssExtractor = new HashMap<>();
+
+        for (Map<String, String> listElement : cssExtractorList) {
+            cssExtractor.put(listElement.get(KEY), listElement.get(VALUE));
+        }
+
+        return cssExtractor;
     }
 }

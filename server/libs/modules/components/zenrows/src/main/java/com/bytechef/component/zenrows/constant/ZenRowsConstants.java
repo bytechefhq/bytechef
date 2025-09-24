@@ -16,9 +16,11 @@
 
 package com.bytechef.component.zenrows.constant;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class ZenRowsConstants {
 
-    public static final String API_KEY = "apiKey";
     public static final String AUTOPARSE = "autoparse";
     public static final String CSS_EXTRACTOR = "css_extractor";
     public static final String JS_RENDER = "js_render";
