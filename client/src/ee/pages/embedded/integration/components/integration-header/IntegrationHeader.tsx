@@ -23,11 +23,11 @@ import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.q
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
