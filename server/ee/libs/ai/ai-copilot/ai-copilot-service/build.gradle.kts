@@ -1,4 +1,5 @@
 dependencies {
+    implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.ai:spring-ai-commons")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
