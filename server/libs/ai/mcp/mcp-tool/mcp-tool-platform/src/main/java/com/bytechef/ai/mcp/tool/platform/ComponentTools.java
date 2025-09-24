@@ -99,27 +99,6 @@ public class ComponentTools {
 
     // Helper methods
     @Tool(
-        description = "List all components in a project. Returns a list of components with their basic information including name and description")
-    public List<ComponentMinimalInfo> listComponents() {
-        try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} components", componentDefinitions.size());
-            }
-
-            return componentDefinitions.stream()
-                .map(component -> new ComponentMinimalInfo(
-                    component.getName(), component.getDescription(), component.getVersion()))
-                .toList();
-        } catch (Exception e) {
-            logger.error(FAILED_TO_LIST_COMPONENTS, e);
-
-            throw new RuntimeException(FAILED_TO_LIST_COMPONENTS, e);
-        }
-    }
-
-    @Tool(
         description = "Get comprehensive information about a specific component. Returns detailed project information including: name, description, triggers and actions")
     public ComponentInfo getComponent(
         @ToolParam(description = "The name of the component to retrieve in camel case") String componentName,
@@ -151,63 +130,6 @@ public class ComponentTools {
             logger.error("Failed to get component {}", componentName, e);
 
             throw new RuntimeException(FAILED_TO_GET_COMPONENT, e);
-        }
-    }
-
-    @Tool(
-        description = "Full-text search across components. Returns a list of components matching the search query in name or description.")
-    public List<ComponentMinimalInfo> searchComponents(
-        @ToolParam(description = "The search query to match against component names and descriptions") String query) {
-
-        try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
-            String lowerQuery = query.toLowerCase()
-                .trim();
-
-            List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
-                .filter(component -> ToolUtils.matchesQuery(
-                    component.getName(), component.getDescription(), null, null, lowerQuery))
-                .map(component -> new ComponentMinimalInfo(
-                    component.getName(), component.getDescription(), component.getVersion()))
-                .sorted((component1, component2) -> ToolUtils.compareTasks(
-                    component1.name(), component1.description(), null, component2.name(), component2.description(),
-                    null, lowerQuery))
-                .toList();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} components matching query '{}'", matchingComponents.size(), query);
-            }
-
-            return matchingComponents;
-        } catch (Exception e) {
-            logger.error("Failed to search components with query '{}'", query, e);
-
-            throw new RuntimeException(FAILED_TO_SEARCH_COMPONENTS, e);
-        }
-    }
-
-    @Tool(
-        description = "List all triggers from all components. Returns a list of triggers with their basic information including name, description, component, and type")
-    public List<TriggerMinimalInfo> listTriggers() {
-        try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
-
-            List<TriggerMinimalInfo> triggers = componentDefinitions.stream()
-                .flatMap(component -> component.getTriggers()
-                    .stream()
-                    .map(trigger -> new TriggerMinimalInfo(
-                        trigger.getName(), trigger.getDescription(), component.getName())))
-                .toList();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} triggers across all components", triggers.size());
-            }
-
-            return triggers;
-        } catch (Exception e) {
-            logger.error(FAILED_TO_LIST_TRIGGERS, e);
-
-            throw new RuntimeException(FAILED_TO_LIST_TRIGGERS, e);
         }
     }
 
@@ -247,42 +169,6 @@ public class ComponentTools {
             logger.error("Failed to get trigger '{}' from component '{}'", triggerName, componentName, e);
 
             throw new RuntimeException(FAILED_TO_GET_TRIGGER, e);
-        }
-    }
-
-    @Tool(
-        description = "Search triggers across all components. Returns a list of triggers matching the search query in name or description")
-    public List<TriggerMinimalInfo> searchTriggers(
-        @ToolParam(description = "The search query to match against trigger names and descriptions") String query) {
-
-        try {
-            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
-
-            String lowerQuery = query.toLowerCase()
-                .trim();
-
-            List<TriggerMinimalInfo> matchingTriggers = componentDefinitions.stream()
-                .flatMap(component -> component.getTriggers()
-                    .stream()
-                    .filter(trigger -> ToolUtils.matchesQuery(
-                        trigger.getName(), trigger.getDescription(), component.getName(), component.getDescription(),
-                        lowerQuery))
-                    .map(trigger -> new TriggerMinimalInfo(
-                        trigger.getName(), trigger.getDescription(), component.getName())))
-                .sorted((trigger1, trigger2) -> ToolUtils.compareTasks(
-                    trigger1.name(), trigger1.description(), trigger1.componentName(), trigger2.name(),
-                    trigger2.description(), trigger2.componentName(), lowerQuery))
-                .toList();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} triggers matching query '{}'", matchingTriggers.size(), query);
-            }
-
-            return matchingTriggers;
-        } catch (Exception e) {
-            logger.error("Failed to search triggers with query '{}'", query, e);
-
-            throw new RuntimeException(FAILED_TO_SEARCH_TRIGGERS, e);
         }
     }
 
@@ -350,6 +236,120 @@ public class ComponentTools {
             logger.error(FAILED_TO_LIST_ACTIONS, e);
 
             throw new RuntimeException(FAILED_TO_LIST_ACTIONS, e);
+        }
+    }
+
+    @Tool(
+        description = "List all components in a project. Returns a list of components with their basic information including name and description")
+    public List<ComponentMinimalInfo> listComponents() {
+        try {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} components", componentDefinitions.size());
+            }
+
+            return componentDefinitions.stream()
+                .map(component -> new ComponentMinimalInfo(
+                    component.getName(), component.getDescription(), component.getVersion()))
+                .toList();
+        } catch (Exception e) {
+            logger.error(FAILED_TO_LIST_COMPONENTS, e);
+
+            throw new RuntimeException(FAILED_TO_LIST_COMPONENTS, e);
+        }
+    }
+
+    @Tool(
+        description = "List all triggers from all components. Returns a list of triggers with their basic information including name, description, component, and type")
+    public List<TriggerMinimalInfo> listTriggers() {
+        try {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+
+            List<TriggerMinimalInfo> triggers = componentDefinitions.stream()
+                .flatMap(component -> component.getTriggers()
+                    .stream()
+                    .map(trigger -> new TriggerMinimalInfo(
+                        trigger.getName(), trigger.getDescription(), component.getName())))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} triggers across all components", triggers.size());
+            }
+
+            return triggers;
+        } catch (Exception e) {
+            logger.error(FAILED_TO_LIST_TRIGGERS, e);
+
+            throw new RuntimeException(FAILED_TO_LIST_TRIGGERS, e);
+        }
+    }
+
+    @Tool(
+        description = "Full-text search across components. Returns a list of components matching the search query in name or description.")
+    public List<ComponentMinimalInfo> searchComponents(
+        @ToolParam(description = "The search query to match against component names and descriptions") String query) {
+
+        try {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+            String lowerQuery = query.toLowerCase()
+                .trim();
+
+            List<ComponentMinimalInfo> matchingComponents = componentDefinitions.stream()
+                .filter(component -> ToolUtils.matchesQuery(
+                    component.getName(), component.getDescription(), null, null, lowerQuery))
+                .map(component -> new ComponentMinimalInfo(
+                    component.getName(), component.getDescription(), component.getVersion()))
+                .sorted((component1, component2) -> ToolUtils.compareTasks(
+                    component1.name(), component1.description(), null, component2.name(), component2.description(),
+                    null, lowerQuery))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} components matching query '{}'", matchingComponents.size(), query);
+            }
+
+            return matchingComponents;
+        } catch (Exception e) {
+            logger.error("Failed to search components with query '{}'", query, e);
+
+            throw new RuntimeException(FAILED_TO_SEARCH_COMPONENTS, e);
+        }
+    }
+
+    @Tool(
+        description = "Search triggers across all components. Returns a list of triggers matching the search query in name or description")
+    public List<TriggerMinimalInfo> searchTriggers(
+        @ToolParam(description = "The search query to match against trigger names and descriptions") String query) {
+
+        try {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+
+            String lowerQuery = query.toLowerCase()
+                .trim();
+
+            List<TriggerMinimalInfo> matchingTriggers = componentDefinitions.stream()
+                .flatMap(component -> component.getTriggers()
+                    .stream()
+                    .filter(trigger -> ToolUtils.matchesQuery(
+                        trigger.getName(), trigger.getDescription(), component.getName(), component.getDescription(),
+                        lowerQuery))
+                    .map(trigger -> new TriggerMinimalInfo(
+                        trigger.getName(), trigger.getDescription(), component.getName())))
+                .sorted((trigger1, trigger2) -> ToolUtils.compareTasks(
+                    trigger1.name(), trigger1.description(), trigger1.componentName(), trigger2.name(),
+                    trigger2.description(), trigger2.componentName(), lowerQuery))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} triggers matching query '{}'", matchingTriggers.size(), query);
+            }
+
+            return matchingTriggers;
+        } catch (Exception e) {
+            logger.error("Failed to search triggers with query '{}'", query, e);
+
+            throw new RuntimeException(FAILED_TO_SEARCH_TRIGGERS, e);
         }
     }
 
@@ -644,14 +644,26 @@ public class ComponentTools {
     }
 
     /**
-     * Minimal component information record for the response.
+     * Detailed action information record for the response.
      */
     @SuppressFBWarnings("EI")
-    public record ComponentMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the component") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
-        @JsonProperty("version") @JsonPropertyDescription("The version of the component") int version) {
+    public record ActionDetailedInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the action") String name,
+        @JsonProperty("title") @JsonPropertyDescription("The title of the action") String title,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
+        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName,
+        @JsonProperty("properties") @JsonPropertyDescription("The properties defined in the action") String properties,
+        @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the action (if output is defined)") String outputProperties) {
+    }
 
+    /**
+     * Action information record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record ActionMinimalInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the action") String name,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
+        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName) {
     }
 
     @SuppressFBWarnings("EI")
@@ -665,13 +677,14 @@ public class ComponentTools {
     }
 
     /**
-     * Trigger information record for the response.
+     * Minimal component information record for the response.
      */
     @SuppressFBWarnings("EI")
-    public record TriggerMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the trigger") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the trigger") String description,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this trigger") String componentName) {
+    public record ComponentMinimalInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the component") String name,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
+        @JsonProperty("version") @JsonPropertyDescription("The version of the component") int version) {
+
     }
 
     /**
@@ -689,26 +702,12 @@ public class ComponentTools {
     }
 
     /**
-     * Action information record for the response.
+     * Trigger information record for the response.
      */
     @SuppressFBWarnings("EI")
-    public record ActionMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the action") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName) {
+    public record TriggerMinimalInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the trigger") String name,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the trigger") String description,
+        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this trigger") String componentName) {
     }
-
-    /**
-     * Detailed action information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record ActionDetailedInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the action") String name,
-        @JsonProperty("title") @JsonPropertyDescription("The title of the action") String title,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the action") String description,
-        @JsonProperty("componentName") @JsonPropertyDescription("The name of the component that contains this action") String componentName,
-        @JsonProperty("properties") @JsonPropertyDescription("The properties defined in the action") String properties,
-        @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the action (if output is defined)") String outputProperties) {
-    }
-
 }

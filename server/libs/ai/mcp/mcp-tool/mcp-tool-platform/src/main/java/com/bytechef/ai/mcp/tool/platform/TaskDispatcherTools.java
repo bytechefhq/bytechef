@@ -101,6 +101,7 @@ public class TaskDispatcherTools {
             }
 
             List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
+
             properties.addAll(taskDispatcherDefinition.getTaskProperties());
 
             String propertiesJSON = ToolUtils.generateParametersJson(properties);
@@ -238,6 +239,7 @@ public class TaskDispatcherTools {
                 taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
 
             List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
+
             properties.addAll(taskDispatcherDefinition.getTaskProperties());
 
             // Extract properties for the task dispatche definition
@@ -324,16 +326,6 @@ public class TaskDispatcherTools {
     }
 
     /**
-     * Minimal task dispatcher information record for the response.
-     */
-    @SuppressFBWarnings("EI")
-    public record TaskDispatcherMinimalInfo(
-        @JsonProperty("name") @JsonPropertyDescription("The name of the task dispatcher") String name,
-        @JsonProperty("description") @JsonPropertyDescription("The description of the task dispatcher") String description,
-        @JsonProperty("version") @JsonPropertyDescription("The version of the task dispatcher") int version) {
-    }
-
-    /**
      * Comprehensive task dispatcher information record for the response.
      */
     @SuppressFBWarnings("EI")
@@ -344,5 +336,15 @@ public class TaskDispatcherTools {
         @JsonProperty("type") @JsonPropertyDescription("The type of the task dispatcher in format {name}/v{version}") String type,
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task dispatcher as JSON string") String properties,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task dispatcher as JSON string") String outputProperties) {
+    }
+
+    /**
+     * Minimal task dispatcher information record for the response.
+     */
+    @SuppressFBWarnings("EI")
+    public record TaskDispatcherMinimalInfo(
+        @JsonProperty("name") @JsonPropertyDescription("The name of the task dispatcher") String name,
+        @JsonProperty("description") @JsonPropertyDescription("The description of the task dispatcher") String description,
+        @JsonProperty("version") @JsonPropertyDescription("The version of the task dispatcher") int version) {
     }
 }
