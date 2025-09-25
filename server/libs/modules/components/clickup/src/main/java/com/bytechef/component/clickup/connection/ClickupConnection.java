@@ -43,7 +43,7 @@ public class ClickupConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://app.clickup.com/api")
-            .tokenUrl((connectionParameters, context) -> "https://app.clickup.com/api/v2/oauth/token"));
+            .tokenUrl((connectionParameters, context) -> "https://api.clickup.com/api/v2/oauth/token"));
 
     private ClickupConnection() {
     }
