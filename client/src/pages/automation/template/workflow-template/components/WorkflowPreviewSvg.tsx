@@ -12,8 +12,6 @@ const WorkflowPreviewSvg = ({className, ...props}: HTMLAttributes<SVGSVGElement>
         <title id="workflowPreviewTitle">Workflow preview</title>
 
         <defs>
-            {/* Dotted background grid */}
-
             <pattern height="20" id="dotGrid" patternUnits="userSpaceOnUse" width="20">
                 <circle cx="2" cy="2" fill="#E5E7EB" r="1.2" />
             </pattern>
