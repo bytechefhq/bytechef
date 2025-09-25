@@ -21,58 +21,53 @@ import {QueryClient} from '@tanstack/react-query';
 import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
-const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
-const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
-
-const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
-const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
-const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
-const EmbeddedConnections = lazy(() =>
-    import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
-);
-const IntegrationInstanceConfigurations = lazy(
-    () => import('@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations')
-);
-const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
-const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
-const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
-    import('@/ee/pages/embedded/workflow-executions/WorkflowExecutions').then((module) => ({
-        default: module.WorkflowExecutions,
-    }))
-);
-
-const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
-const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
-const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
-
 const AccountErrorPage = lazy(() => import('@/pages/account/public/AccountErrorPage'));
-const Login = lazy(() => import('@/pages/account/public/Login'));
-const PasswordResetEmailSent = lazy(() => import('@/pages/account/public/PasswordResetEmailSent'));
-const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordResetFinish'));
-const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
-const Register = lazy(() => import('@/pages/account/public/Register'));
-const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
-const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
-
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
-const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
-
-const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
-const Project = lazy(() => import('@/pages/automation/project/Project'));
-const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
-const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+const ApiKeys = lazy(() => import('@/pages/settings/platform/api-keys/ApiKeys'));
 const AutomationWorkflowExecutions = lazy(() =>
     import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
     }))
 );
-
 const Home = lazy(() => import('@/pages/home/Home'));
-const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
-const ApiKeys = lazy(() => import('@/pages/settings/platform/api-keys/ApiKeys'));
-const GitConfiguration = lazy(() => import('@/ee/pages/settings/platform/git-configuration/GitConfiguration'));
+const Login = lazy(() => import('@/pages/account/public/Login'));
+const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
+const PasswordResetEmailSent = lazy(() => import('@/pages/account/public/PasswordResetEmailSent'));
+const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordResetFinish'));
+const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
+const Project = lazy(() => import('@/pages/automation/project/Project'));
+const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
+const Register = lazy(() => import('@/pages/account/public/Register'));
+const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
+const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
+const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
+const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+
+const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
+const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
+const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
+const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
+const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
+const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
+const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
+const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
+const EmbeddedConnections = lazy(() =>
+    import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
+);
+const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
+    import('@/ee/pages/embedded/workflow-executions/WorkflowExecutions').then((module) => ({
+        default: module.WorkflowExecutions,
+    }))
+);
+const GitConfiguration = lazy(() => import('@/ee/pages/settings/platform/git-configuration/GitConfiguration'));
+const IntegrationInstanceConfigurations = lazy(
+    () => import('@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations')
+);
+const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
+const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
+const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 
 const getAccountRoutes = (path: string) => ({
