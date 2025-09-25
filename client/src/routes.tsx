@@ -38,12 +38,14 @@ const PasswordResetEmailSent = lazy(() => import('@/pages/account/public/Passwor
 const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordResetFinish'));
 const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
+const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Register = lazy(() => import('@/pages/account/public/Register'));
 const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
@@ -332,6 +334,51 @@ export const getRouter = (queryClient: QueryClient) =>
             children: [
                 {
                     element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <LazyLoadWrapper>
+                                <ProjectTemplate sharedProject />
+                            </LazyLoadWrapper>
+                        </PrivateRoute>
+                    ),
+                    path: 'shared/projects/:id',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <LazyLoadWrapper>
+                                <WorkflowTemplate sharedWorkflow />
+                            </LazyLoadWrapper>
+                        </PrivateRoute>
+                    ),
+                    path: 'shared/workflows/:id',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <LazyLoadWrapper>
+                                <ProjectTemplate />
+                            </LazyLoadWrapper>
+                        </PrivateRoute>
+                    ),
+                    path: 'template/projects/:id',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <LazyLoadWrapper>
+                                <WorkflowTemplate />
+                            </LazyLoadWrapper>
+                        </PrivateRoute>
+                    ),
+                    path: 'template/workflows/:id',
+                },
+            ],
+            path: 'import',
+        },
+        {
+            children: [
+                {
+                    element: (
                         <AccessControl requiresFlow>
                             <LazyLoadWrapper>
                                 <AccountErrorPage />
@@ -386,6 +433,26 @@ export const getRouter = (queryClient: QueryClient) =>
                                             queryKey: ProjectKeys.project(parseInt(params.projectId!)),
                                         }),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <ProjectTemplate fromInternalFlow />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'projects/templates/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <WorkflowTemplate fromInternalFlow />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'projects/:projectId/templates/:id',
                                 },
                                 {
                                     element: (
