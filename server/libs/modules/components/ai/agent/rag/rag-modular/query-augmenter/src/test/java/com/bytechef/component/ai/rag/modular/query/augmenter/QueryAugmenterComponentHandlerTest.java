@@ -24,6 +24,6 @@ public class QueryAugmenterComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/query-augmenter.json", new QueryAugmenterComponentHandler().getDefinition());
+            "definition/query-augmenter_v1.json", new QueryAugmenterComponentHandler().getDefinition());
     }
 }

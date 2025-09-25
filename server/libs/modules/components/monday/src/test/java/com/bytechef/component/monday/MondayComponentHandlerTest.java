@@ -26,6 +26,6 @@ class MondayComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/monday.json", new MondayComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/monday_v1.json", new MondayComponentHandler().getDefinition());
     }
 }
