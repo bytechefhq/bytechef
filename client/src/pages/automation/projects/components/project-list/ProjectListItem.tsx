@@ -28,6 +28,7 @@ import {
 import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
+import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -52,6 +53,7 @@ import {
     GitPullRequestArrowIcon,
     PlusIcon,
     SendIcon,
+    Share2Icon,
     Trash2Icon,
     UploadIcon,
     WorkflowIcon,
@@ -72,6 +74,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
+    const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
@@ -83,6 +86,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const {toast} = useToast();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const queryClient = useQueryClient();
@@ -344,19 +348,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <CopyIcon /> Duplicate
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator className="m-0" />
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() => {
-                                        if (hiddenFileInputRef.current) {
-                                            hiddenFileInputRef.current.click();
-                                        }
-                                    }}
-                                >
-                                    <UploadIcon /> Import Workflow
-                                </DropdownMenuItem>
-
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
                                         className="dropdown-menu-item"
@@ -370,12 +361,14 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     </DropdownMenuItem>
                                 )}
 
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() => setShowWorkflowDialog(true)}
-                                >
-                                    <PlusIcon /> New Workflow
-                                </DropdownMenuItem>
+                                {ff_1042 && (
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item"
+                                        onClick={() => setShowProjectShareDialog(true)}
+                                    >
+                                        <Share2Icon /> Share Project
+                                    </DropdownMenuItem>
+                                )}
 
                                 {ff_2482 && (
                                     <DropdownMenuItem
@@ -387,6 +380,26 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         <DownloadIcon /> Export Project
                                     </DropdownMenuItem>
                                 )}
+
+                                <DropdownMenuSeparator className="m-0" />
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowWorkflowDialog(true)}
+                                >
+                                    <PlusIcon /> New Workflow
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => {
+                                        if (hiddenFileInputRef.current) {
+                                            hiddenFileInputRef.current.click();
+                                        }
+                                    }}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
 
                                 <DropdownMenuSeparator className="m-0" />
 
@@ -461,6 +474,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                     onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
                     projectGitConfiguration={projectGitConfiguration}
                     projectId={project.id!}
+                />
+            )}
+
+            {showProjectShareDialog && (
+                <ProjectShareDialog
+                    onOpenChange={() => setShowProjectShareDialog(false)}
+                    open={showProjectShareDialog}
+                    projectId={project.id!}
+                    projectUuid={project.uuid!}
+                    projectVersion={project.lastProjectVersion!}
                 />
             )}
 

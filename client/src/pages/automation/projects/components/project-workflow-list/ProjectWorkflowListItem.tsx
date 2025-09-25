@@ -7,6 +7,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
@@ -23,8 +24,9 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 
 import '@/shared/styles/dropdownMenu.css';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon, UploadIcon} from 'lucide-react';
+import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 
@@ -47,8 +49,11 @@ const ProjectWorkflowListItem = ({
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
     const [searchParams] = useSearchParams();
+
+    const ff_1042 = useFeatureFlagsStore()('ff-1042');
 
     const queryClient = useQueryClient();
 
@@ -153,13 +158,22 @@ const ProjectWorkflowListItem = ({
                             </DropdownMenuItem>
                         )}
 
+                        {ff_1042 && (
+                            <DropdownMenuItem
+                                className="dropdown-menu-item"
+                                onClick={() => setShowWorkflowShareDialog(true)}
+                            >
+                                <Share2Icon /> Share
+                            </DropdownMenuItem>
+                        )}
+
                         <DropdownMenuItem
                             className="dropdown-menu-item"
                             onClick={() =>
                                 (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
                             }
                         >
-                            <UploadIcon /> Export
+                            <DownloadIcon /> Export
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator className="m-0" />
@@ -196,6 +210,16 @@ const ProjectWorkflowListItem = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showWorkflowShareDialog && (
+                <WorkflowShareDialog
+                    onOpenChange={() => setShowWorkflowShareDialog(false)}
+                    open={showWorkflowShareDialog}
+                    projectVersion={project.lastProjectVersion!}
+                    workflowId={workflow.id!}
+                    workflowUuid={workflow.workflowUuid!}
                 />
             )}
         </li>

@@ -10,6 +10,7 @@ import {
     GitBranchIcon,
     GitPullRequestArrowIcon,
     HistoryIcon,
+    Share2Icon,
     Trash2Icon,
     UploadIcon,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const ProjectTabButtons = ({
     onDeleteProjectClick,
     onDuplicateProjectClick,
     onPullProjectFromGitClick,
+    onShareProject,
     onShowEditProjectDialogClick,
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
@@ -31,6 +33,7 @@ const ProjectTabButtons = ({
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
+    onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
     onPullProjectFromGitClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
@@ -39,6 +42,7 @@ const ProjectTabButtons = ({
     projectId: number;
 }) => {
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -76,6 +80,12 @@ const ProjectTabButtons = ({
             >
                 <UploadIcon /> Export Project
             </Button>
+
+            {ff_1042 && (
+                <Button className="dropdown-menu-item" onClick={onShareProject} variant="ghost">
+                    <Share2Icon /> Share Project
+                </Button>
+            )}
 
             {ff_2482 && (
                 <Button
