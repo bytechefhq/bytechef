@@ -262,6 +262,70 @@ export const getRouter = (queryClient: QueryClient) =>
         //     path: '/oauth',
         // },
         {
+            element: (
+                <LazyLoadWrapper>
+                    <Login />
+                </LazyLoadWrapper>
+            ),
+            path: '/login',
+        },
+        {
+            element: (
+                <LazyLoadWrapper>
+                    <Register />
+                </LazyLoadWrapper>
+            ),
+            path: '/register',
+        },
+        {
+            element: (
+                <LazyLoadWrapper>
+                    <PasswordResetInit />
+                </LazyLoadWrapper>
+            ),
+            path: '/password-reset/init',
+        },
+        {
+            element: (
+                <AccessControl requiresFlow requiresKey>
+                    <LazyLoadWrapper>
+                        <RegisterSuccess />
+                    </LazyLoadWrapper>
+                </AccessControl>
+            ),
+            path: '/activate',
+        },
+        {
+            element: (
+                <AccessControl requiresKey>
+                    <LazyLoadWrapper>
+                        <PasswordResetFinish />
+                    </LazyLoadWrapper>
+                </AccessControl>
+            ),
+            path: '/password-reset/finish',
+        },
+        {
+            element: (
+                <AccessControl requiresFlow>
+                    <LazyLoadWrapper>
+                        <PasswordResetEmailSent />
+                    </LazyLoadWrapper>
+                </AccessControl>
+            ),
+            path: '/password-reset/email',
+        },
+        {
+            element: (
+                <AccessControl requiresFlow>
+                    <LazyLoadWrapper>
+                        <VerifyEmail />
+                    </LazyLoadWrapper>
+                </AccessControl>
+            ),
+            path: '/verify-email',
+        },
+        {
             element: <WorkflowChat />,
             path: 'chat/:workflowExecutionId',
         },
@@ -271,70 +335,6 @@ export const getRouter = (queryClient: QueryClient) =>
         },
         {
             children: [
-                {
-                    element: (
-                        <LazyLoadWrapper>
-                            <Login />
-                        </LazyLoadWrapper>
-                    ),
-                    path: '/login',
-                },
-                {
-                    element: (
-                        <LazyLoadWrapper>
-                            <Register />
-                        </LazyLoadWrapper>
-                    ),
-                    path: '/register',
-                },
-                {
-                    element: (
-                        <LazyLoadWrapper>
-                            <PasswordResetInit />
-                        </LazyLoadWrapper>
-                    ),
-                    path: '/password-reset/init',
-                },
-                {
-                    element: (
-                        <AccessControl requiresFlow requiresKey>
-                            <LazyLoadWrapper>
-                                <RegisterSuccess />
-                            </LazyLoadWrapper>
-                        </AccessControl>
-                    ),
-                    path: '/activate',
-                },
-                {
-                    element: (
-                        <AccessControl requiresKey>
-                            <LazyLoadWrapper>
-                                <PasswordResetFinish />
-                            </LazyLoadWrapper>
-                        </AccessControl>
-                    ),
-                    path: '/password-reset/finish',
-                },
-                {
-                    element: (
-                        <AccessControl requiresFlow>
-                            <LazyLoadWrapper>
-                                <PasswordResetEmailSent />
-                            </LazyLoadWrapper>
-                        </AccessControl>
-                    ),
-                    path: '/password-reset/email',
-                },
-                {
-                    element: (
-                        <AccessControl requiresFlow>
-                            <LazyLoadWrapper>
-                                <VerifyEmail />
-                            </LazyLoadWrapper>
-                        </AccessControl>
-                    ),
-                    path: '/verify-email',
-                },
                 {
                     element: (
                         <AccessControl requiresFlow>
