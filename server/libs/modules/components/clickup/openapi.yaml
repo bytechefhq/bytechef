@@ -203,4 +203,4 @@ components:
       flows:
         authorizationCode:
           authorizationUrl: "https://app.clickup.com/api"
-          tokenUrl: "https://app.clickup.com/api/v2/oauth/token"
+          tokenUrl: "https://api.clickup.com/api/v2/oauth/token"
