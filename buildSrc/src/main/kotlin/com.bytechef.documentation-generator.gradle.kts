@@ -11,7 +11,7 @@ plugins {
 open class FindJsonFilesTask : DefaultTask() {
     init {
         group = "documentation"
-        description = "Finds all component JSON files in the project and creates .md files."
+        description = "Finds all component JSON files in the project and creates .mdx files."
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -560,6 +560,7 @@ ${authorizations?.joinToString("\n")}
         var title: String? = null
         var triggers: Array<Trigger>? = null
         var version: Int? = null
+        var properties: Array<Properties>? = null
 
         private fun getCategoriesString(): String {
             if (componentCategories == null) {
@@ -622,6 +623,19 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
             }
         }
 
+        private fun getPropertiesString(): String {
+            if (!properties.isNullOrEmpty()) {
+                return """
+## Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+${properties?.joinToString("\n")}
+"""
+            }
+            return ""
+        }
+
         override fun toString(): String {
             actions?.forEach { action ->
                 action.componentName = name
@@ -643,6 +657,7 @@ Type: $name/v$version
 
 <hr />
 
+${getPropertiesString()}
 ${getConnectionString()}
 ${getActionsString()}
 ${getTriggerString()}
