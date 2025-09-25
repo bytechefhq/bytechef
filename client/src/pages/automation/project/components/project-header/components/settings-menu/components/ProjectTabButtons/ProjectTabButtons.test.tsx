@@ -35,6 +35,7 @@ const mockProps = {
     onDeleteProjectClick: vi.fn(),
     onDuplicateProjectClick: vi.fn(),
     onPullProjectFromGitClick: vi.fn(),
+    onShareProject: vi.fn(),
     onShowEditProjectDialogClick: vi.fn(),
     onShowProjectGitConfigurationDialog: vi.fn(),
     onShowProjectVersionHistorySheet: vi.fn(),
