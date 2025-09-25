@@ -1,0 +1,211 @@
+---
+title: "Math Helper"
+description: "Helper component to perform mathematical operations."
+---
+
+
+Categories: Helpers
+
+
+Type: mathHelper/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Addition
+Name: addition
+
+`Add two numbers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Addition",
+  "name" : "addition",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/addition"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Division
+Name: division
+
+`Divide two numbers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | Number to divide by. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Division",
+  "name" : "division",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/division"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Modulo
+Name: modulo
+
+`Get the remainder of the division of two numbers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | Number to divide by. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Modulo",
+  "name" : "modulo",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/modulo"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Multiplication
+Name: multiplication
+
+`Multiply two numbers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Multiplication",
+  "name" : "multiplication",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/multiplication"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Subtraction
+Name: subtraction
+
+`Subtract two numbers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to subtract from. | true |
+| secondNumber | Second Number | NUMBER | Number to subtract. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Subtraction",
+  "name" : "subtraction",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/subtraction"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+
+

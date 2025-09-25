@@ -1,0 +1,171 @@
+---
+title: "Amplitude"
+description: "Build better products by turning your user data into meaningful insights, using Amplitude's digital analytics platform and experimentation tools."
+---
+
+
+Categories: Analytics
+
+
+Type: amplitude/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_key | API Key | STRING | The API key for the Amplitude project | true |
+| region | Region | STRING <details> <summary> Options </summary> api2, api.eu </details> | Environment region you wish to access the API in. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Attribution Event
+Name: createAttributionEvent
+
+`Creates attribution event using Attribution API.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| event_type | Event Type | STRING | The event info. Prefix with brackets [YOUR COMPANY]. | true |
+| platform | Platform | STRING <details> <summary> Options </summary> ios, android </details> | Platform which the event  will occur on. | true |
+| identifier | Identifier | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key), STRING\(value)&#125; </details> | Identifier of the platform. | true |
+| user_properties | User Properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($property)] </details> | A dictionary of attribution properties prefixed with brackets [YOUR COMPANY]. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Attribution Event",
+  "name" : "createAttributionEvent",
+  "parameters" : {
+    "event_type" : "",
+    "platform" : "",
+    "identifier" : {
+      "key" : "",
+      "value" : ""
+    },
+    "user_properties" : [ {
+      "key" : "",
+      "value" : ""
+    } ]
+  },
+  "type" : "amplitude/v1/createAttributionEvent"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Create or Update User
+Name: createOrUpdateUser
+
+`Creates or updates user without sending an event.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | ID | STRING <details> <summary> Options </summary> user_id, device_id </details> | Choose to create or update a user or a device. | true |
+| device_id | Device ID | STRING | A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. | true |
+| user_id | User ID | STRING | Unique user ID specified by you. If you send a request with a user ID that's not in the Amplitude system, new user will be created (e.g. email address). | true |
+| user_properties | User Properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($property)] </details> | A dictionary of attribution properties prefixed with brackets [YOUR COMPANY]. | false |
+| platform | Platform | STRING | The platform that's sending the data. | false |
+| os_name | Operating System Name | STRING | The mobile operating system or browser the user is on. | false |
+| device_brand | Device Brand | STRING | The device brand the user is on. | false |
+| carrier | Carrier | STRING | The carrier of the device the user is on. | false |
+| country | Country | STRING | The country the user is in. | false |
+| city | City | STRING | The city the user is in. | false |
+| dma | Designated Market Area  | STRING | The Designated Market Area of the user. | false |
+| language | Language | STRING | The language the user has set. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create or Update User",
+  "name" : "createOrUpdateUser",
+  "parameters" : {
+    "id" : "",
+    "device_id" : "",
+    "user_id" : "",
+    "user_properties" : [ {
+      "key" : "",
+      "value" : ""
+    } ],
+    "platform" : "",
+    "os_name" : "",
+    "device_brand" : "",
+    "carrier" : "",
+    "country" : "",
+    "city" : "",
+    "dma" : "",
+    "language" : ""
+  },
+  "type" : "amplitude/v1/createOrUpdateUser"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find API Key
+
+1. Navigate to your dashboard.
+2. Click on **Settings**.
+3. Click on **Organization settings**.
+4. Click on **Projects**.
+5. Select project you wish to connect to.
+6. Click on **Show**.
+7. Here you can see API key.
+
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/5d7e0912-a448-4413-ba45-42a94acf7d05?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

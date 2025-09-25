@@ -1,0 +1,344 @@
+---
+title: "Slack"
+description: "Slack is a messaging platform for teams to communicate and collaborate."
+---
+
+
+Categories: Communication, Developer Tools
+
+
+Type: slack/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Send Approval Message
+Name: sendApprovalMessage
+
+`Sends approval message to a channel.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | Channel | STRING | Channel, private group, or IM channel to send message to. | true |
+| text | Message | STRING | The text of your message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Approval Message",
+  "name" : "sendApprovalMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendApprovalMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)&#125; </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(messages)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
+  },
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
+}
+```
+
+
+### Send message
+Name: sendMessage
+
+`Sends a message to a public channel, private channel, or existing direct message conversation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | Channel ID | STRING | ID of the channel, private group, or IM channel to send message to. | true |
+| text | Message | STRING | The text of your message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)&#125; </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(messages)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
+  },
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
+}
+```
+
+
+### Send Direct Message
+Name: sendDirectMessage
+
+`Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | User ID | STRING | ID of the user to send the direct message to. | true |
+| text | Message | STRING | The text of your message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendDirectMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)&#125; </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(messages)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
+  },
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
+}
+```
+
+
+
+## Triggers
+
+
+### Any Event
+Name: anyEvent
+
+`Triggers when any user subscribed event happens.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Any Event",
+  "name" : "anyEvent",
+  "type" : "slack/v1/anyEvent"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 App
+
+1. Navigate to [Slack App](https://api.slack.com/apps).
+2. Click on **Create New App**.
+3. Click on **From scratch**.
+4. Enter name of your app and select workspace where it will be installed.
+5. Click on **Create App**.
+6. Click on **Basic Information**
+7. Click on **OAuth & Permissions**.
+8. Click on **Add New Redirect URL**. ByteChef redirect URL: https://127.0.0.1:5173/callback or https://app.bytechef.io/callback.
+9. Click on **Add**.
+10. Click on **Save URLs**.
+11. Click on **Add an OAuth Scope**.
+    - channels:read
+    - channels:write
+    - channels:history
+    - chat:write:bot
+    - groups:read
+    - reactions:read
+    - mpim:read
+    - users:read
+    - incoming-webhook
+12. Under OAuth tokens click on **Install to ...**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/893e27e9-f6f7-4a07-bae8-b08169858c43?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+## Trigger Setup
+
+### Enable Event Subscription
+
+1. Create workflow with Slack trigger.
+2. Publish the workflow.
+3. Click on **Publish**.
+4. Go to **Project Deployments**.
+5. Click on **Create Deployment**.
+6. Select Slack Project.
+7. Select Version.
+8. Click on **Next**.
+9. Enable workflow.
+10. Select Connection.
+11. Click on **Save**.
+12. Enable deployment.
+13. Click on here to expand deployment.
+14. Click this icon to get webhook URL.
+15. Navigate to link and select your app.
+16. Click on **Event Subscriptions**.
+17. Enable Events.
+18. Click on **Enable**.
+19. Click on **Change**.
+20. Enter copied webhook URL to verify it.
+21. Click on **Subscribe to bot events**.
+22. Click on **Add Bot User Event**.
+23. You can select any event you want to trigger your workflow.
+24. Click on **Save Changes**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/c766204a-48a4-4793-b433-7bf10e703b03?type=1&controls=on " width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>

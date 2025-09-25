@@ -1,0 +1,166 @@
+---
+title: "Capsule CRM"
+description: "Capsule CRM is a cloud-based customer relationship management platform designed to help businesses manage contacts, track sales opportunities, and collaborate with their teams efficiently."
+---
+
+
+Categories: CRM
+
+
+Type: capsuleCRM/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new Person or Organization`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> person, organization </details> | Represents if this party is a person or an organisation. | true |
+| firstName | First Name | STRING | The first name of the person. | true |
+| lastName | Last Name | STRING | The last name of the person. | true |
+| name | Name | STRING | The name of the organisation. | true |
+| about | About | STRING | A short description of the party. | false |
+| emailAddresses | Email Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(address), STRING\(type)&#125;] </details> | An array of all the email addresses associated with this party. | false |
+| addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(street), STRING\(city), STRING\(state), STRING\(country), STRING\(zip)&#125;] </details> | An array of all the addresses associated with this party. | false |
+| phoneNumbers | Phone Numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(number)&#125;] </details> | An array of all the phone numbers associated with this party. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "type" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "name" : "",
+    "about" : "",
+    "emailAddresses" : [ {
+      "address" : "",
+      "type" : ""
+    } ],
+    "addresses" : [ {
+      "type" : "",
+      "street" : "",
+      "city" : "",
+      "state" : "",
+      "country" : "",
+      "zip" : ""
+    } ],
+    "phoneNumbers" : [ {
+      "type" : "",
+      "number" : ""
+    } ]
+  },
+  "type" : "capsuleCRM/v1/createContact"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Create Task
+Name: createTask
+
+`Creates a new Task`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| description | Description | STRING | A short description of the task. | true |
+| dueOn | Due Date | DATE | The date when this task is due. | true |
+| detail | Detail | STRING | More details about the task. | false |
+| category | Category | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(colour)&#125; </details> | The category of this task. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "description" : "",
+    "dueOn" : "2021-01-01",
+    "detail" : "",
+    "category" : {
+      "name" : "",
+      "colour" : ""
+    }
+  },
+  "type" : "capsuleCRM/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the new task. |
+| description | STRING | The description of the task. |
+| dueOn | DATE | The due date of the task. |
+| detail | STRING | Details of the new task. |
+| category | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(colour)&#125; </details> | The category of the new task. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "description" : "",
+  "dueOn" : "2021-01-01",
+  "detail" : "",
+  "category" : {
+    "id" : "",
+    "name" : "",
+    "colour" : ""
+  }
+}
+```
+
+
+
+

@@ -1,0 +1,99 @@
+---
+title: "Wolfram Alpha Short Answers"
+description: "Wolfram Alpha Short Answers returns a single plain text result as an answer to your query."
+---
+
+
+Categories: Helpers
+
+
+Type: wolfram-alpha-shortanswers/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | App ID | STRING |  | true |
+| addTo | Add to | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Short Answer
+Name: getShortAnswer
+
+`Returns a short answer for your query.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| i | Query | STRING | Query that will be answered. | true |
+| units | Units | STRING <details> <summary> Options </summary> metric, imperial </details> | What system of units to use for measurements and quantities. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Short Answer",
+  "name" : "getShortAnswer",
+  "parameters" : {
+    "i" : "",
+    "units" : ""
+  },
+  "type" : "wolfram-alpha-shortanswers/v1/getShortAnswer"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find App ID
+
+1. Navigate to your dashboard.
+2. Click this icon.
+3. Click on **Developer (API)**.
+4. Click on **Get an App ID**.
+5. Enter name, description and API. Select **DullResults API** or **Short Answers API** depending on which API you want to use.
+6. Click on **Submit**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/d97ef559-0f4e-41e9-9fb1-26886d731a32?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

@@ -1,0 +1,251 @@
+---
+title: "Trello"
+description: "Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: trello/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Board
+Name: createBoard
+
+`Creates a new board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The new name for the board. | true |
+| desc | Description | STRING | A new description for the board. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Board",
+  "name" : "createBoard",
+  "parameters" : {
+    "name" : "",
+    "desc" : ""
+  },
+  "type" : "trello/v1/createBoard"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Card
+Name: createCard
+
+`Creates a new card.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING | ID of the board. | true |
+| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | ID of the list where the card should be created in. | true |
+| name | Name | STRING | The name for the card. | false |
+| desc | Description | STRING | The description for the card. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Card",
+  "name" : "createCard",
+  "parameters" : {
+    "idBoard" : "",
+    "idList" : "",
+    "name" : "",
+    "desc" : ""
+  },
+  "type" : "trello/v1/createCard"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "desc" : "",
+  "idBoard" : "",
+  "idList" : "",
+  "name" : ""
+}
+```
+
+
+### Get Card
+Name: getCard
+
+`Gets a card details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING | ID of the board where card is located. | true |
+| id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Card",
+  "name" : "getCard",
+  "parameters" : {
+    "idBoard" : "",
+    "id" : ""
+  },
+  "type" : "trello/v1/getCard"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "desc" : "",
+  "idBoard" : "",
+  "idList" : "",
+  "name" : ""
+}
+```
+
+
+
+## Triggers
+
+
+### New Card
+Name: newCard
+
+`Triggers when a new card is created on specified board or list.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING |  | true |
+| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Card",
+  "name" : "newCard",
+  "parameters" : {
+    "idBoard" : "",
+    "idList" : ""
+  },
+  "type" : "trello/v1/newCard"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

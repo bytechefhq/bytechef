@@ -1,0 +1,333 @@
+---
+title: "monday.com"
+description: "Monday.com is a work operating system that powers teams to run projects and workflows with confidence."
+---
+
+
+
+Type: monday/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Board
+Name: createBoard
+
+`Create a new board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| board_name | Board Name | STRING | Name of the new board. | true |
+| board_kind | Board Kind | STRING <details> <summary> Options </summary> private, public, share </details> | The type of board to create. | true |
+| description | Description | STRING | Detailed description of the new board. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Board",
+  "name" : "createBoard",
+  "parameters" : {
+    "board_name" : "",
+    "board_kind" : "",
+    "description" : ""
+  },
+  "type" : "monday/v1/createBoard"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| create_board | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(board_name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "create_board" : {
+    "id" : "",
+    "board_name" : ""
+  }
+}
+```
+
+
+### Create Column
+Name: createColumn
+
+`Create a new column in board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING |  | true |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where the new column should be created. | true |
+| title | Title | STRING | The new column's title. | true |
+| column_type | Column Type | STRING <details> <summary> Options </summary> auto_number, board_relation, button, checkbox, color_picker, country, creation_log, date, dependency, doc, dropdown, email, file, formula, hour, item_assignees, item_id, last_updated, link, location, long_text, mirror, name, numbers, people, phone, progress, rating, status, subtasks, tags, team, text, timeline, time_tracking, vote, week, world_clock, unsupported </details> | The type of column to create. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Column",
+  "name" : "createColumn",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "title" : "",
+    "column_type" : ""
+  },
+  "type" : "monday/v1/createColumn"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| create_column | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(title)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "create_column" : {
+    "id" : "",
+    "title" : ""
+  }
+}
+```
+
+
+### Create Group
+Name: createGroup
+
+`Creates a new group in board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING |  | true |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where new item will be created. | true |
+| group_name | Group Name | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Group",
+  "name" : "createGroup",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "group_name" : ""
+  },
+  "type" : "monday/v1/createGroup"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| create_group | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "create_group" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+### Create Item
+Name: createItem
+
+`Create a new item in a board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING |  | true |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where new item will be created. | true |
+| group_id | Group ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | The item's group. | false |
+| item_name | Item Name | STRING | The item's name. | true |
+| columnValues | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> workspace_id, board_id, group_id </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Item",
+  "name" : "createItem",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "group_id" : "",
+    "item_name" : "",
+    "columnValues" : { }
+  },
+  "type" : "monday/v1/createItem"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| create_item | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "create_item" : {
+    "id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+### Delete Item
+Name: deleteItem
+
+`Deletes an item from a board.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING |  | true |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. | true |
+| item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Item",
+  "name" : "deleteItem",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : "",
+    "item_id" : ""
+  },
+  "type" : "monday/v1/deleteItem"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+## Triggers
+
+
+### New Item in Board
+Name: newItemInBoard
+
+`Triggers when an item is created in board.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspace_id | Workspace ID | STRING |  | true |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Item in Board",
+  "name" : "newItemInBoard",
+  "parameters" : {
+    "workspace_id" : "",
+    "board_id" : ""
+  },
+  "type" : "monday/v1/newItemInBoard"
+}
+```
+
+
+
+

@@ -1,0 +1,156 @@
+---
+title: "Reddit"
+description: "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits."
+---
+
+
+Categories: Social Media
+
+
+Type: reddit/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Comment
+Name: createComment
+
+`Creates comment on a Reddit post or replies to a comment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| thing_id | Parent ID | STRING | Post ID (t3_*) or comment ID (t1_*) to reply to. | true |
+| text | Comment Text | STRING | Comment text. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment",
+  "name" : "createComment",
+  "parameters" : {
+    "thing_id" : "",
+    "text" : ""
+  },
+  "type" : "reddit/v1/createComment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| jquery | ARRAY <details> <summary> Items </summary> [] </details> | An array with response data. |
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | Boolean value that indicates the success or failure of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "jquery" : [ ],
+  "success" : false
+}
+```
+
+
+### Create Post
+Name: createPost
+
+`Creates a new reddit post.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sr | Subreddit Name | STRING | Subreddit name. | true |
+| title | Title | STRING | Post title. | true |
+| kind | Kind | STRING <details> <summary> Options </summary> link, self </details> | Type of post. | true |
+| url | URL | STRING | Link URL. | true |
+| text | Text | STRING | Post text. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "sr" : "",
+    "title" : "",
+    "kind" : "",
+    "url" : "",
+    "text" : ""
+  },
+  "type" : "reddit/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| jquery | ARRAY <details> <summary> Items </summary> [] </details> | An array with response data. |
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | Boolean value that indicates the success or failure of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "jquery" : [ ],
+  "success" : false
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
