@@ -1,0 +1,26 @@
+query projectTemplate($id: String!, $sharedProject: Boolean!) {
+    projectTemplate(id: $id, sharedProject: $sharedProject) {
+        components {
+            key
+            value {
+                connection {
+                    version
+                }
+                icon
+                name
+                title
+                version
+            }
+        }
+        description
+        project {
+            name
+        }
+        projectVersion
+        publicUrl
+        workflows {
+            id
+            label
+        }
+    }
+}

@@ -1,0 +1,3 @@
+mutation importWorkflowTemplate($workflowUuid: String!, $projectId: ID!, $sharedWorkflow: Boolean!) {
+    importWorkflowTemplate(id: $workflowUuid, projectId: $projectId, sharedWorkflow: $sharedWorkflow)
+}
