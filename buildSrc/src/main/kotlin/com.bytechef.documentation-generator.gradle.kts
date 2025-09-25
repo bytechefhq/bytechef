@@ -659,32 +659,46 @@ ${getCustomActionString()}
         val currentPath = project.projectDir.path
 
         if (currentPath.contains(Regex("/modules/.+/"))) {
-            val name = currentPath.substringAfterLast("/")
-            val jsonFile = File("$currentPath/src/test/resources/definition/${name}_v1.json")
+            val definitionDir = File("$currentPath/src/test/resources/definition")
             val readmeFile = File("$currentPath/src/main/resources/README.mdx")
 
-            if (jsonFile.exists()) {
+            if (definitionDir.exists() && definitionDir.isDirectory) {
                 val mapper = ObjectMapper()
-                val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
-                val json = jsonObject.toString()
 
-                val path = when (currentPath.contains("components")) {
-                    true -> componentsPath
-                    false -> taskDispatchersPath
+                val isComponentsDir = currentPath.contains("components")
+                val moduleDocsDir = if (isComponentsDir) {
+                    File(componentsPath)
+                } else {
+                    File(taskDispatchersPath)
                 }
 
-                val docsDir = File(path)
-                if (!docsDir.exists()) {
-                    docsDir.mkdirs()
+                if (!moduleDocsDir.exists()) {
+                    moduleDocsDir.mkdirs()
                 }
 
-                val mdFile = File(path, "$name.mdx")
-                mdFile.writeText(json)
+                definitionDir.listFiles { file -> file.isFile && file.extension.equals("json", ignoreCase = true) }
+                    ?.forEach { jsonFile ->
+                        val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
+                        val json = jsonObject.toString()
 
-                if (readmeFile.exists()) {
-                    mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
-                    mdFile.appendText(readmeFile.readText())
-                }
+                        val path = when (isComponentsDir) {
+                            true -> componentsPath
+                            false -> taskDispatchersPath
+                        }
+
+                        val docsDir = File(path)
+                        if (!docsDir.exists()) {
+                            docsDir.mkdirs()
+                        }
+
+                        val mdFile = File(path, "${jsonFile.nameWithoutExtension}.mdx")
+                        mdFile.writeText(json)
+
+                        if (readmeFile.exists()) {
+                            mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
+                            mdFile.appendText(readmeFile.readText())
+                        }
+                    }
             }
         }
     }
