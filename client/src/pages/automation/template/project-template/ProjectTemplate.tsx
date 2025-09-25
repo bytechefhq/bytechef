@@ -52,8 +52,6 @@ const ProjectTemplate = ({
                 </div>
 
                 <div className="relative flex-1 space-y-4">
-                    {/*TODO <div>To import this template, connect these apps:</h2>*/}
-
                     <span>This template contains the following components:</span>
 
                     <div className="absolute bottom-0 top-5 w-full space-y-3 overflow-y-auto">
@@ -84,7 +82,7 @@ const ProjectTemplate = ({
                 </div>
 
                 <div className="flex justify-start">
-                    <Button onClick={handleClick}>{/*TODO Skip and import now*/} Import now</Button>
+                    <Button onClick={handleClick}>Import now</Button>
                 </div>
             </div>
 
