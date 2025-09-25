@@ -62,7 +62,7 @@ class PropertyValidator {
     public static void validatePropertiesRecursively(
         JsonNode taskParametersJsonNode, JsonNode definitionJsonNode, String path, String originalTaskDefinition,
         @Nullable String originalTaskDefinitionForArrays, String originalCurrentParameters, StringBuilder errors,
-        StringBuilder warnings){
+        StringBuilder warnings) {
 
         // Check for extra properties (generate warnings)
         if (isEmptyContainer(definitionJsonNode)) {
@@ -200,7 +200,8 @@ class PropertyValidator {
             }
         }
 
-        validateStringTypeDefinition(taskParametersJsonNode, fieldName, setting, propertyPath, originalCurrentParameters,
+        validateStringTypeDefinition(taskParametersJsonNode, fieldName, setting, propertyPath,
+            originalCurrentParameters,
             errors);
     }
 
@@ -765,6 +766,7 @@ class PropertyValidator {
             if (jsonNode.isArray() && objectDefinitionJsonNode.isArray()) {
                 // This is an array element, recursively validate it using the object definition as the array definition
                 validateDiscriminatedUnionArray(jsonNode, objectDefinitionJsonNode, elementPath, errors, warnings);
+
                 continue;
             }
 

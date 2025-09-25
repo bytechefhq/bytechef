@@ -2023,7 +2023,8 @@ class WorkflowValidatorTest {
                             new PropertyInfo("level3", "BOOLEAN", null, true, true, "'active' == config1.level2", null),
                             new PropertyInfo("config3", "OBJECT", null, false, true, null, List.of(
                                 new PropertyInfo(
-                                    "finalValue", "STRING", null, true, true, "config1.config2.level3 == true", null))))))));
+                                    "finalValue", "STRING", null, true, true, "config1.config2.level3 == true",
+                                    null))))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
