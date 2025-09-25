@@ -360,7 +360,6 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 getAccountRoutes('/automation'),
                                 {
-                                    children: [],
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <LazyLoadWrapper hasLeftSidebar>
