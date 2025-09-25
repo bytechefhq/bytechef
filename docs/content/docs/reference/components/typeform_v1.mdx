@@ -1,0 +1,123 @@
+---
+title: "Typeform"
+description: "Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback."
+---
+
+
+Categories: Surveys and Feedback
+
+
+Type: typeform/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Form
+Name: createForm
+
+`Creates a new form`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | Title to use for the form. | true |
+| type | Type | STRING <details> <summary> Options </summary> quiz, classification, score, branching, classification_branching, score_branching </details> | Form type for the typeform. | false |
+| workspace | Workspace | STRING | Workspace where the form will be created. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Form",
+  "name" : "createForm",
+  "parameters" : {
+    "title" : "",
+    "type" : "",
+    "workspace" : ""
+  },
+  "type" : "typeform/v1/createForm"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+
+
+
+
+## Triggers
+
+
+### New Submission
+Name: newSubmission
+
+`Triggers when form is submitted.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| form | Form Name | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Submission",
+  "name" : "newSubmission",
+  "parameters" : {
+    "form" : ""
+  },
+  "type" : "typeform/v1/newSubmission"
+}
+```
+
+
+
+

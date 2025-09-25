@@ -1,0 +1,312 @@
+---
+title: "Reckon"
+description: "Reckon is an accounting software used for financial management and bookkeeping tasks."
+---
+
+
+Categories: Accounting
+
+
+Type: reckon/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new contact will be created. | true |
+| name | Name | STRING | The name of the contact. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "bookId" : "",
+    "name" : ""
+  },
+  "type" : "reckon/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+### Create Invoice
+Name: createInvoice
+
+`Creates a new invoice.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new invoice will be created. | true |
+| customer | Customer | STRING | The customer that is being invoiced. | true |
+| invoiceDate | Invoice Date | DATE | The date of the invoice. | true |
+| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | The amount tax status of the amounts in the invoice. | true |
+| lineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(lineNumber)&#125;] </details> | The individual items that make up the invoice. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createInvoice",
+  "parameters" : {
+    "bookId" : "",
+    "customer" : "",
+    "invoiceDate" : "2021-01-01",
+    "amountTaxStatus" : "",
+    "lineItems" : [ {
+      "lineNumber" : 1
+    } ]
+  },
+  "type" : "reckon/v1/createInvoice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+### Create Payment
+Name: createPayment
+
+`Creates a new payment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new payment will be created. | true |
+| supplier | Supplier | STRING | The supplier that is being paid. | true |
+| paymentDate | Payment Date | DATE | The date of the payment. | true |
+| totalAmount | Total Amount | NUMBER | The total amount of the payment applied. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Payment",
+  "name" : "createPayment",
+  "parameters" : {
+    "bookId" : "",
+    "supplier" : "",
+    "paymentDate" : "2021-01-01",
+    "totalAmount" : 0.0
+  },
+  "type" : "reckon/v1/createPayment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+## Triggers
+
+
+### New Invoice
+Name: newInvoice
+
+`Triggers when a new invoice is created.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| invoiceNumber | STRING |  |
+| customer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
+| invoiceDate | DATE |  |
+| amountTaxStatus | STRING |  |
+| lineItems | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(lineNumber)&#125;] </details> |  |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Invoice",
+  "name" : "newInvoice",
+  "parameters" : {
+    "bookId" : ""
+  },
+  "type" : "reckon/v1/newInvoice"
+}
+```
+
+
+### New Payment
+Name: newPayment
+
+`Triggers when a new payment is created.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| paymentNumber | STRING |  |
+| supplier | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> |  |
+| paymentDate | DATE |  |
+| totalAmount | NUMBER |  |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Payment",
+  "name" : "newPayment",
+  "parameters" : {
+    "bookId" : ""
+  },
+  "type" : "reckon/v1/newPayment"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

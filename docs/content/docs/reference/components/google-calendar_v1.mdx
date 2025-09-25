@@ -1,0 +1,806 @@
+---
+title: "Google Calendar"
+description: "Google Calendar is a web-based application that allows users to schedule and organize events, appointments, and reminders, synchronizing across multiple devices."
+---
+
+
+Categories: Calendars and Scheduling
+
+
+Type: googleCalendar/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Add Attendees to Event
+Name: addAttendeesToEvent
+
+`Invites one or more person to an existing event.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to add attendees to. | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Attendees to Event",
+  "name" : "addAttendeesToEvent",
+  "parameters" : {
+    "calendarId" : "",
+    "eventId" : "",
+    "attendees" : [ "" ]
+  },
+  "type" : "googleCalendar/v1/addAttendeesToEvent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "iCalUID" : "",
+  "id" : "",
+  "summary" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "etag" : "",
+  "eventType" : "",
+  "htmlLink" : "",
+  "status" : "",
+  "location" : "",
+  "hangoutLink" : "",
+  "attendees" : [ {
+    "additionalGuests" : 1,
+    "comment" : "",
+    "displayName" : "",
+    "email" : "",
+    "id" : "",
+    "optional" : false,
+    "organizer" : false,
+    "resource" : false,
+    "responseStatus" : "",
+    "self" : false
+  } ],
+  "attachments" : [ {
+    "fileId" : "",
+    "fileUrl" : "",
+    "iconLink" : "",
+    "mimeType" : "",
+    "title" : ""
+  } ],
+  "reminders" : {
+    "overrides" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ],
+    "useDefault" : false
+  }
+}
+```
+
+
+### Create Event
+Name: createEvent
+
+`Creates a new event in Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| summary | Title | STRING | Title of the event. | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+| start | Start Date | DATE | The start date of the event. | true |
+| end | End Date | DATE | The end date of the event. | true |
+| start | Start Date Time | DATE_TIME | The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | Description of the event. Can contain HTML. | false |
+| location | Location | STRING | Geographic location of the event as free-form text. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  | false |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
+| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can invite others to the event. | false |
+| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can modify the event. | false |
+| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can see who the event's attendees are. | false |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the default reminders of the calendar apply to the event. | true |
+| reminders | Reminders | ARRAY <details> <summary> Items </summary> [&#123;STRING\(method), INTEGER\(minutes)&#125;] </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Event",
+  "name" : "createEvent",
+  "parameters" : {
+    "calendarId" : "",
+    "summary" : "",
+    "allDay" : false,
+    "start" : "2021-01-01T00:00:00",
+    "end" : "2021-01-01T00:00:00",
+    "description" : "",
+    "location" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "attendees" : [ "" ],
+    "guestsCanInviteOthers" : false,
+    "guestsCanModify" : false,
+    "guestsCanSeeOtherGuests" : false,
+    "sendUpdates" : "",
+    "useDefault" : false,
+    "reminders" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ]
+  },
+  "type" : "googleCalendar/v1/createEvent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "iCalUID" : "",
+  "id" : "",
+  "summary" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "etag" : "",
+  "eventType" : "",
+  "htmlLink" : "",
+  "status" : "",
+  "location" : "",
+  "hangoutLink" : "",
+  "attendees" : [ {
+    "additionalGuests" : 1,
+    "comment" : "",
+    "displayName" : "",
+    "email" : "",
+    "id" : "",
+    "optional" : false,
+    "organizer" : false,
+    "resource" : false,
+    "responseStatus" : "",
+    "self" : false
+  } ],
+  "attachments" : [ {
+    "fileId" : "",
+    "fileUrl" : "",
+    "iconLink" : "",
+    "mimeType" : "",
+    "title" : ""
+  } ],
+  "reminders" : {
+    "overrides" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ],
+    "useDefault" : false
+  }
+}
+```
+
+
+### Create Quick Event
+Name: createQuickEvent
+
+`Creates a quick event in Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| text | Text | STRING | The text describing the event to be created. | true |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Quick Event",
+  "name" : "createQuickEvent",
+  "parameters" : {
+    "calendarId" : "",
+    "text" : "",
+    "sendUpdates" : ""
+  },
+  "type" : "googleCalendar/v1/createQuickEvent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "iCalUID" : "",
+  "id" : "",
+  "summary" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "etag" : "",
+  "eventType" : "",
+  "htmlLink" : "",
+  "status" : "",
+  "location" : "",
+  "hangoutLink" : "",
+  "attendees" : [ {
+    "additionalGuests" : 1,
+    "comment" : "",
+    "displayName" : "",
+    "email" : "",
+    "id" : "",
+    "optional" : false,
+    "organizer" : false,
+    "resource" : false,
+    "responseStatus" : "",
+    "self" : false
+  } ],
+  "attachments" : [ {
+    "fileId" : "",
+    "fileUrl" : "",
+    "iconLink" : "",
+    "mimeType" : "",
+    "title" : ""
+  } ],
+  "reminders" : {
+    "overrides" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ],
+    "useDefault" : false
+  }
+}
+```
+
+
+### Delete Event
+Name: deleteEvent
+
+`Deletes an event from Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Event",
+  "name" : "deleteEvent",
+  "parameters" : {
+    "calendarId" : "",
+    "eventId" : ""
+  },
+  "type" : "googleCalendar/v1/deleteEvent"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Get Events
+Name: getEvents
+
+`List events from the specified Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | Event types to return. | false |
+| maxResults | Max Results | INTEGER | Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. | false |
+| q | Search Terms | STRING | Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label | false |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find events that exist in this range. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Events",
+  "name" : "getEvents",
+  "parameters" : {
+    "calendarId" : "",
+    "eventType" : [ "" ],
+    "maxResults" : 1,
+    "q" : "",
+    "dateRange" : {
+      "from" : "2021-01-01T00:00:00",
+      "to" : "2021-01-01T00:00:00"
+    }
+  },
+  "type" : "googleCalendar/v1/getEvents"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "iCalUID" : "",
+  "id" : "",
+  "summary" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "etag" : "",
+  "eventType" : "",
+  "htmlLink" : "",
+  "status" : "",
+  "location" : "",
+  "hangoutLink" : "",
+  "attendees" : [ {
+    "additionalGuests" : 1,
+    "comment" : "",
+    "displayName" : "",
+    "email" : "",
+    "id" : "",
+    "optional" : false,
+    "organizer" : false,
+    "resource" : false,
+    "responseStatus" : "",
+    "self" : false
+  } ],
+  "attachments" : [ {
+    "fileId" : "",
+    "fileUrl" : "",
+    "iconLink" : "",
+    "mimeType" : "",
+    "title" : ""
+  } ],
+  "reminders" : {
+    "overrides" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ],
+    "useDefault" : false
+  }
+} ]
+```
+
+
+### Get Free Time Slots
+Name: getFreeTimeSlots
+
+`Get free time slots from Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(from), DATE_TIME\(to)&#125; </details> | Date range to find free time. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Free Time Slots",
+  "name" : "getFreeTimeSlots",
+  "parameters" : {
+    "calendarId" : "",
+    "dateRange" : {
+      "from" : "2021-01-01T00:00:00",
+      "to" : "2021-01-01T00:00:00"
+    }
+  },
+  "type" : "googleCalendar/v1/getFreeTimeSlots"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| startTime | DATE_TIME | Start time of the free time slot. |
+| endTime | DATE_TIME | End time of the free time slot. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00"
+} ]
+```
+
+
+### Update Event
+Name: updateEvent
+
+`Updates event in Google Calendar.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to update. | true |
+| summary | Title | STRING | New title of the event. | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+| start | Start Date | DATE | New start date of the event. | true |
+| end | End Date | DATE | New end date of the event. | true |
+| start | Start Date Time | DATE_TIME | New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | New description of the event. Can contain HTML. | false |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | New attendees of the event. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Event",
+  "name" : "updateEvent",
+  "parameters" : {
+    "calendarId" : "",
+    "eventId" : "",
+    "summary" : "",
+    "allDay" : false,
+    "start" : "2021-01-01T00:00:00",
+    "end" : "2021-01-01T00:00:00",
+    "description" : "",
+    "attendees" : [ "" ]
+  },
+  "type" : "googleCalendar/v1/updateEvent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "iCalUID" : "",
+  "id" : "",
+  "summary" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "etag" : "",
+  "eventType" : "",
+  "htmlLink" : "",
+  "status" : "",
+  "location" : "",
+  "hangoutLink" : "",
+  "attendees" : [ {
+    "additionalGuests" : 1,
+    "comment" : "",
+    "displayName" : "",
+    "email" : "",
+    "id" : "",
+    "optional" : false,
+    "organizer" : false,
+    "resource" : false,
+    "responseStatus" : "",
+    "self" : false
+  } ],
+  "attachments" : [ {
+    "fileId" : "",
+    "fileUrl" : "",
+    "iconLink" : "",
+    "mimeType" : "",
+    "title" : ""
+  } ],
+  "reminders" : {
+    "overrides" : [ {
+      "method" : "",
+      "minutes" : 1
+    } ],
+    "useDefault" : false
+  }
+}
+```
+
+
+
+## Triggers
+
+
+### New or Updated Event
+Name: newOrUpdatedEvent
+
+`Triggers when an event is added or updated`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)&#125;] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)&#125;] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(method), INTEGER\(minutes)&#125;]\(overrides), BOOLEAN\(useDefault)&#125; </details> | Information about the event's reminders for the authenticated user. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New or Updated Event",
+  "name" : "newOrUpdatedEvent",
+  "parameters" : {
+    "calendarId" : ""
+  },
+  "type" : "googleCalendar/v1/newOrUpdatedEvent"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Click on the project dropdown in the top navigation bar.
+3. Click **New Project**.
+4. Enter a project name and click **Create**.
+5. Click on the project dropdown again.
+6. Select the project you just created.
+7. Go to the **APIs & Services**.
+8. Go to the **OAuth consent screen**.
+9. Click **Get Started**.
+10. Enter an App name and add user support email. Click **Next**.
+11. Select your Audience and click **Next**.
+12. Add email addresses and click **Next**.
+13. Agree to the terms and click **Create**.
+14. Go to **Data Access**.
+15. Click on **Add or Remove Scopes**.
+16. Select all necessary scopes.
+17. Click **Update**.
+18. Click **Save**.
+19. Go to the **Clients**.
+20. Click on **Create Client**.
+21. Click on application type dropdown.
+22. Choose **Web application** as the application type.
+23. Click on **Add Uri**.
+24. Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`. Click **Create**.
+25. Click on the client you just created.
+26. Copy the **Client ID** and **Client Secret**. Use these credentials to create a connection in ByteChef.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+### Enable Google Calendar API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "calendar" in the search bar.
+5. Click on **Google Calendar API**.
+6. Click **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+<iframe src="https://www.guidejar.com/embed/c1fe8158-a72f-45ed-942e-c1bab5802afa?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+![anl-c-google-calendar-md](https://static.scarf.sh/a.png?x-pxid=88f94c85-204a-4086-bfae-12024a15535d)

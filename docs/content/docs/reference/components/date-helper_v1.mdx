@@ -1,0 +1,353 @@
+---
+title: "Date Helper"
+description: "Helper component for date and time manipulation."
+---
+
+
+Categories: Helpers
+
+
+Type: dateHelper/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Add Time
+Name: addTime
+
+`Add time to the date.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME |  | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | Years to add. | false |
+| month | Month | INTEGER | Months to add. | false |
+| day | Day | INTEGER | Days to add. | false |
+| hour | Hour | INTEGER | Hours to add. | false |
+| minute | Minute | INTEGER | Minutes to add. | false |
+| second | Second | INTEGER | Seconds to add. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Time",
+  "name" : "addTime",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "dateFormat" : "",
+    "year" : 1,
+    "month" : 1,
+    "day" : 1,
+    "hour" : 1,
+    "minute" : 1,
+    "second" : 1
+  },
+  "type" : "dateHelper/v1/addTime"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Convert Date Timestamp
+Name: convertUnixTimestampToIso8601
+
+`Converts UNIX timestamp to ISO8601 format.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| dateTimestamp | UNIX Timestamp | NUMBER | UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits) | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> yyyy-MM-dd'T'HH:mm:ss.SSSZ, yyyy-MM-dd </details> | Formatting that should be applied the text representation of date. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Convert Date Timestamp",
+  "name" : "convertUnixTimestampToIso8601",
+  "parameters" : {
+    "dateTimestamp" : 0.0,
+    "dateFormat" : ""
+  },
+  "type" : "dateHelper/v1/convertUnixTimestampToIso8601"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Date Difference
+Name: dateDifference
+
+`Get the difference between two dates.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| startDate | Start Date | DATE_TIME |  | true |
+| endDate | End Date | DATE_TIME |  | true |
+| unit | Unit | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second </details> | The unit of difference between the two dates. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Date Difference",
+  "name" : "dateDifference",
+  "parameters" : {
+    "startDate" : "2021-01-01T00:00:00",
+    "endDate" : "2021-01-01T00:00:00",
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/dateDifference"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Extract Date Units
+Name: extractDateUnits
+
+`Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or time) from a given date.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | The date from which to extract the specified unit. | true |
+| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName, date, time </details> | Unit to extract from the input date. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Date Units",
+  "name" : "extractDateUnits",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/extractDateUnits"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Get Current Date
+Name: getCurrentDate
+
+`Get current date in the specified format.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| timeZone | Time Zone | STRING | Time zone to use when formatting date. | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Current Date",
+  "name" : "getCurrentDate",
+  "parameters" : {
+    "timeZone" : "",
+    "dateFormat" : ""
+  },
+  "type" : "dateHelper/v1/getCurrentDate"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Is Business Hours?
+Name: isBusinessHours
+
+`Check to see if it's business hours or not.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | Date to check to see if it is business hours. | true |
+| businessWeekStart | Business Week Start | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | First day of the business week. | true |
+| businessWeekEnd | Business Week End | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | Last day of the business week. | true |
+| businessHoursStart | Business Hours Start | TIME | Time of the day that business hours start. | true |
+| businessHoursEnd | Business Hours End | TIME | Time of the day that business hours end. | true |
+| timeZone | Time Zone | STRING | Time zone to check business hours for. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Business Hours?",
+  "name" : "isBusinessHours",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "businessWeekStart" : 1,
+    "businessWeekEnd" : 1,
+    "businessHoursStart" : "00:00:00",
+    "businessHoursEnd" : "00:00:00",
+    "timeZone" : ""
+  },
+  "type" : "dateHelper/v1/isBusinessHours"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Is Weekend?
+Name: isWeekend
+
+`Check if the current date is a weekend.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | Date to check to see if it is a weekend. | true |
+| timeZone | Time Zone | STRING | Time zone you are in. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Weekend?",
+  "name" : "isWeekend",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "timeZone" : ""
+  },
+  "type" : "dateHelper/v1/isWeekend"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Subtract Time
+Name: subtractTime
+
+`Subtract time from date`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME |  | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | Years to subtract. | false |
+| month | Month | INTEGER | Months to subtract. | false |
+| day | Day | INTEGER | Days to subtract. | false |
+| hour | Hour | INTEGER | Hours to subtract. | false |
+| minute | Minute | INTEGER | Minutes to subtract. | false |
+| second | Second | INTEGER | Seconds to subtract. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Subtract Time",
+  "name" : "subtractTime",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "dateFormat" : "",
+    "year" : 1,
+    "month" : 1,
+    "day" : 1,
+    "hour" : 1,
+    "minute" : 1,
+    "second" : 1
+  },
+  "type" : "dateHelper/v1/subtractTime"
+}
+```
+
+#### Output
+
+
+
+Type: DATE_TIME
+
+
+
+
+
+
+
+
+
+

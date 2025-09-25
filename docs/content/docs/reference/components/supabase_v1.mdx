@@ -1,0 +1,134 @@
+---
+title: "Supabase"
+description: "Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings."
+---
+
+
+Categories: Developer Tools
+
+
+Type: supabase/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### bearer_token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| projectUrl | Project URL | STRING | Can be found in Project Settings -&gt; Data API. | true |
+| token | Project API Key | STRING | Can be found in Project Settings -&gt; Data API. Choose service_role/secret API key. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Upload File
+Name: uploadFile
+
+`Upload file to Supabase Bucket.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bucketName | Bucket Name | STRING |  | true |
+| fileName | File Name | STRING | Name of the file that will be uploaded. | true |
+| file | File Entry | FILE_ENTRY | File you want to upload to Supabase. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "bucketName" : "",
+    "fileName" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "supabase/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Key | STRING | Key of the file that was uploaded. |
+| Id | STRING | Id of the file that was uploaded. |
+
+
+
+
+#### Output Example
+```json
+{
+  "Key" : "",
+  "Id" : ""
+}
+```
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find Project URL
+
+1. Navigate to your Supabase dashboard.
+2. Click on the project you want to connect to.
+3. Click on **Project Settings**.
+4. Click on **Data API**.
+5. Click on **Copy**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/3e846e41-7f5a-4cff-997f-d132f1e27d9f?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+
+### Find Project API Key
+
+1. Navigate to your Supabase dashboard.
+2. Click on the project you want to connect to.
+3. Click on **Project Settings**.
+4. Click on **API Keys**.
+5. Click on **API Keys**.
+6. Click on **Create new API keys**.
+7. Click on **Create keys**.
+8. Click here to copy the API key.
+
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/d2885676-bf3f-4641-acf8-4419cfd096c6?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

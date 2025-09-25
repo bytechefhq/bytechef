@@ -1,0 +1,288 @@
+---
+title: "Twilio"
+description: "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and video capabilities into their applications."
+---
+
+
+Categories: Communication
+
+
+Type: twilio/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Account SID | STRING | The Account SID from your Twilio account. | true |
+| password | Auth Token | STRING | The Auth Token from your Twilio account. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Send SMS
+Name: sendSMS
+
+`Send a new SMS message`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| To | To | STRING | The recipient's phone number in E.164 format. | true |
+| From | From | STRING | The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool. | true |
+| Body | Body | STRING | The text content of the outgoing message. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSMS",
+  "parameters" : {
+    "To" : "",
+    "From" : "",
+    "Body" : ""
+  },
+  "type" : "twilio/v1/sendSMS"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| body | STRING |  |
+| numSegments | STRING |  |
+| direction | STRING |  |
+| from | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rawNumber)&#125; </details> |  |
+| to | STRING |  |
+| dateUpdated | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| price | STRING |  |
+| errorMessage | STRING |  |
+| uri | STRING |  |
+| accountSid | STRING |  |
+| numMedia | STRING |  |
+| status | STRING |  |
+| messagingServiceSid | STRING |  |
+| sid | STRING |  |
+| dateSent | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| dateCreated | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| errorCode | INTEGER |  |
+| currency | OBJECT <details> <summary> Properties </summary> &#123;STRING\(currencyCode), INTEGER\(defaultFractionDigits), INTEGER\(numericCode)&#125; </details> |  |
+| apiVersion | STRING |  |
+| subresourceUris | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "body" : "",
+  "numSegments" : "",
+  "direction" : "",
+  "from" : {
+    "rawNumber" : ""
+  },
+  "to" : "",
+  "dateUpdated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "price" : "",
+  "errorMessage" : "",
+  "uri" : "",
+  "accountSid" : "",
+  "numMedia" : "",
+  "status" : "",
+  "messagingServiceSid" : "",
+  "sid" : "",
+  "dateSent" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "dateCreated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "errorCode" : 1,
+  "currency" : {
+    "currencyCode" : "",
+    "defaultFractionDigits" : 1,
+    "numericCode" : 1
+  },
+  "apiVersion" : "",
+  "subresourceUris" : { }
+}
+```
+
+
+### Send WhatsApp Message
+Name: sendWhatsAppMessage
+
+`Send a new WhatsApp message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| To | To | STRING | The recipient channel address. | true |
+| From | From | STRING | The sender's Twilio channel address. | true |
+| useTemplate | Use Template | BOOLEAN <details> <summary> Options </summary> true, false </details> | Use a template for the message body. | true |
+| ContentSid | Content Sid | STRING | The SID of the content template to be used for the message body. | true |
+| ContentVariables | null | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Key-value pairs of template variables and their substitution values. | false |
+| Body | Body | STRING | The text content of the outgoing message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send WhatsApp Message",
+  "name" : "sendWhatsAppMessage",
+  "parameters" : {
+    "To" : "",
+    "From" : "",
+    "useTemplate" : false,
+    "ContentSid" : "",
+    "ContentVariables" : { },
+    "Body" : ""
+  },
+  "type" : "twilio/v1/sendWhatsAppMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| body | STRING |  |
+| numSegments | STRING |  |
+| direction | STRING |  |
+| from | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rawNumber)&#125; </details> |  |
+| to | STRING |  |
+| dateUpdated | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| price | STRING |  |
+| errorMessage | STRING |  |
+| uri | STRING |  |
+| accountSid | STRING |  |
+| numMedia | STRING |  |
+| status | STRING |  |
+| messagingServiceSid | STRING |  |
+| sid | STRING |  |
+| dateSent | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| dateCreated | OBJECT <details> <summary> Properties </summary> &#123;DATE_TIME\(dateTime), STRING\(zoneId)&#125; </details> |  |
+| errorCode | INTEGER |  |
+| currency | OBJECT <details> <summary> Properties </summary> &#123;STRING\(currencyCode), INTEGER\(defaultFractionDigits), INTEGER\(numericCode)&#125; </details> |  |
+| apiVersion | STRING |  |
+| subresourceUris | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "body" : "",
+  "numSegments" : "",
+  "direction" : "",
+  "from" : {
+    "rawNumber" : ""
+  },
+  "to" : "",
+  "dateUpdated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "price" : "",
+  "errorMessage" : "",
+  "uri" : "",
+  "accountSid" : "",
+  "numMedia" : "",
+  "status" : "",
+  "messagingServiceSid" : "",
+  "sid" : "",
+  "dateSent" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "dateCreated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "errorCode" : 1,
+  "currency" : {
+    "currencyCode" : "",
+    "defaultFractionDigits" : 1,
+    "numericCode" : 1
+  },
+  "apiVersion" : "",
+  "subresourceUris" : { }
+}
+```
+
+
+
+## Triggers
+
+
+### New WhatsApp Message
+Name: newWhatsappMessage
+
+`Triggers when a new WhatsApp message is received.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New WhatsApp Message",
+  "name" : "newWhatsappMessage",
+  "type" : "twilio/v1/newWhatsappMessage"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

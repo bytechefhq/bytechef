@@ -1,0 +1,96 @@
+---
+title: "Qdrant"
+description: "Qdrant is an open-source vector similarity search engine designed to handle high-dimensional data, enabling efficient and scalable nearest neighbor search for applications like recommendation systems and machine learning."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: qdrant/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| host | Host | STRING | The host of the Qdrant server. | true |
+| port | Port | INTEGER | The gRPC port of the Qdrant server. | true |
+| apiKey | API Key | STRING | The API key to use for authentication withe the server. | true |
+| collection | Collection Name | STRING | The name of the collection to use. | true |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the schema. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Load Data
+Name: load
+
+`Loads data into the vector store using LLM embeddings.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "type" : "qdrant/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Search Data
+Name: search
+
+`Query data from the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Data",
+  "name" : "search",
+  "parameters" : {
+    "query" : ""
+  },
+  "type" : "qdrant/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+

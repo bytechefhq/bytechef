@@ -1,0 +1,334 @@
+---
+title: "MailerLite"
+description: "MailerLite is an intuitive email marketing platform that offers automation, landing pages, and subscriber management for businesses and creators."
+---
+
+
+Categories: Marketing Automation
+
+
+Type: mailerLite/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### bearer_token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Token | STRING | API Token needed for authorization. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Add Subscriber to Group
+Name: addSubscriberToGroup
+
+`Adding a subscriber to a selected group.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subscriber_id | Subscriber Email | STRING | ID of the user that will be added to the selected group. | true |
+| group_id | Group ID | STRING | ID of the group to which the user will be added. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Subscriber to Group",
+  "name" : "addSubscriberToGroup",
+  "parameters" : {
+    "subscriber_id" : "",
+    "group_id" : ""
+  },
+  "type" : "mailerLite/v1/addSubscriberToGroup"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), INTEGER\(active_count), INTEGER\(sent_count), INTEGER\(opens_count), &#123;NUMBER\(float), STRING\(string)&#125;\(open_rate), INTEGER\(clicks_count), &#123;NUMBER\(float), STRING\(string)&#125;\(click_rate), INTEGER\(unsubscribed_count), INTEGER\(unconfirmed_count), INTEGER\(bounced_count), INTEGER\(junk_count), STRING\(created_at)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "name" : "",
+    "active_count" : 1,
+    "sent_count" : 1,
+    "opens_count" : 1,
+    "open_rate" : {
+      "float" : 0.0,
+      "string" : ""
+    },
+    "clicks_count" : 1,
+    "click_rate" : {
+      "float" : 0.0,
+      "string" : ""
+    },
+    "unsubscribed_count" : 1,
+    "unconfirmed_count" : 1,
+    "bounced_count" : 1,
+    "junk_count" : 1,
+    "created_at" : ""
+  }
+}
+```
+
+
+### Create or Update Subscriber
+Name: createOrUpdateSubscriber
+
+`Create new user or update an existing user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | null | STRING | The email address of the subscriber. | true |
+| group_id | Group ID | STRING | ID of the group to which you want to add the subscriber to. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create or Update Subscriber",
+  "name" : "createOrUpdateSubscriber",
+  "parameters" : {
+    "email" : "",
+    "group_id" : ""
+  },
+  "type" : "mailerLite/v1/createOrUpdateSubscriber"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(email), STRING\(status), STRING\(source), INTEGER\(sent), INTEGER\(opens_count), INTEGER\(clicks_count), INTEGER\(open_rate), INTEGER\(click_rate), STRING\(subscribed_at), STRING\(created_at), STRING\(updated_at), []\(fields), []\(groups)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "email" : "",
+    "status" : "",
+    "source" : "",
+    "sent" : 1,
+    "opens_count" : 1,
+    "clicks_count" : 1,
+    "open_rate" : 1,
+    "click_rate" : 1,
+    "subscribed_at" : "",
+    "created_at" : "",
+    "updated_at" : "",
+    "fields" : [ ],
+    "groups" : [ ]
+  }
+}
+```
+
+
+### Remove Subscriber from Group
+Name: removeSubscriberFromGroup
+
+`Remove selected subscriber from the group.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subscriber_id | Subscriber | STRING | ID of the user that will be added to the selected group. | true |
+| group_id | Group ID | STRING | ID of the group to which the user will be added. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Remove Subscriber from Group",
+  "name" : "removeSubscriberFromGroup",
+  "parameters" : {
+    "subscriber_id" : "",
+    "group_id" : ""
+  },
+  "type" : "mailerLite/v1/removeSubscriberFromGroup"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+## Triggers
+
+
+### Subscriber Added to the Group
+Name: subscriberAddedToGroup
+
+`Triggers when a subscriber is added to the group.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(account_id), STRING\(id), STRING\(email), STRING\(status), STRING\(source), INTEGER\(sent), INTEGER\(opens_count), INTEGER\(clicks_count), INTEGER\(open_rate), INTEGER\(click_rate), STRING\(subscribed_at), STRING\(created_at), STRING\(updated_at), []\(fields), []\(groups)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Subscriber Added to the Group",
+  "name" : "subscriberAddedToGroup",
+  "type" : "mailerLite/v1/subscriberAddedToGroup"
+}
+```
+
+
+### Subscriber Created
+Name: subscriberCreated
+
+`Triggers when a subscriber is created.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(email), STRING\(status), STRING\(source), INTEGER\(sent), INTEGER\(opens_count), INTEGER\(clicks_count), INTEGER\(open_rate), INTEGER\(click_rate), &#123;&#125;\(ip_address), STRING\(subscribed_at), STRING\(unsubscribed_at), STRING\(created_at), STRING\(updated_at), STRING\(deleted_at), STRING\(forget_at), []\(fields), []\(groups), STRING\(account_id)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Subscriber Created",
+  "name" : "subscriberCreated",
+  "type" : "mailerLite/v1/subscriberCreated"
+}
+```
+
+
+### Subscriber Unsubscribed
+Name: subscriberUnsubscribed
+
+`Triggers when a subscriber unsubscribes.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(account_id), STRING\(id), STRING\(email), STRING\(status), STRING\(source), INTEGER\(sent), INTEGER\(opens_count), INTEGER\(clicks_count), INTEGER\(open_rate), INTEGER\(click_rate), STRING\(subscribed_at), STRING\(created_at), STRING\(updated_at), []\(fields), []\(groups)&#125; </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Subscriber Unsubscribed",
+  "name" : "subscriberUnsubscribed",
+  "type" : "mailerLite/v1/subscriberUnsubscribed"
+}
+```
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find API Token
+
+1. Navigate to your MailerLite dashboard.
+2. Click on **Integrations**.
+3. Click on **API**.
+4. Click on **Generate new token**.
+5. Enter name of your API token.
+6. Enable **Terms of Use**.
+7. Click on **Create token**.
+8. **Copy** your API token because you will not be able to see the full token again.
+9. Exit the popup window.
+
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/1e893316-4f6e-4317-8a49-0dede23bf9f4?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>

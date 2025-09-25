@@ -1,0 +1,224 @@
+---
+title: "Pipeliner"
+description: "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting."
+---
+
+
+Categories: CRM
+
+
+Type: pipeliner/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceId | Space Id | STRING | Your Space ID | true |
+| serverUrl | Server URL | STRING <details> <summary> Options </summary> https://us-east.api.pipelinersales.com/api/v100/rest/spaces/, https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/ </details> |  | true |
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Account
+Name: createAccount
+
+`Creates new account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner_id | Owner ID | STRING | Id of the user in Pipeliner Application that will become the owner of the newly created account. | true |
+| name | Name | STRING | Account name | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "owner_id" : "",
+    "name" : ""
+  },
+  "type" : "pipeliner/v1/createAccount"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | True when response succeeded, false on error. |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(owner_id), STRING\(name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "data" : {
+    "id" : "",
+    "owner_id" : "",
+    "name" : ""
+  }
+}
+```
+
+
+### Create Contact
+Name: createContact
+
+`Creates new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner_id | Owner ID | STRING | ID of the user in Pipeliner Application that will become the owner of the newly created Contact. | true |
+| first_name | First Name | STRING | The firstname of the contact. | false |
+| last_name | Last Name | STRING | The lastname of the contact. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "owner_id" : "",
+    "first_name" : "",
+    "last_name" : ""
+  },
+  "type" : "pipeliner/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | True when response succeeded, false on error. |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "data" : {
+    "id" : "",
+    "owner_id" : "",
+    "first_name" : "",
+    "last_name" : ""
+  }
+}
+```
+
+
+### Create Task
+Name: createTask
+
+`Creates new Task`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subject | Subject | STRING | Name of the entity and its default text representation. | true |
+| activity_type_id | Activity Type ID | STRING | Id of the activity type of task. | true |
+| unit_id | Unit ID | STRING | Sales Unit ID | true |
+| owner_id | Owner ID | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "subject" : "",
+    "activity_type_id" : "",
+    "unit_id" : "",
+    "owner_id" : ""
+  },
+  "type" : "pipeliner/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "data" : {
+    "id" : "",
+    "subject" : "",
+    "activity_type_id" : "",
+    "unit_id" : "",
+    "owner_id" : ""
+  }
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

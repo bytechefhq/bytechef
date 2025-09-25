@@ -1,0 +1,230 @@
+---
+title: "Insightly"
+description: "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform."
+---
+
+
+Categories: CRM
+
+
+Type: insightly/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pod | Pod | STRING | Your instances pod can be found under your API URL, e.g. https://api.&#123;pod&#125;.insightly.com/v3.1 | true |
+| username | API Key | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Creates new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| FIRST_NAME | First Name | STRING | The first name of the contact. | true |
+| LAST_NAME | Last Name | STRING | The last name of the contact. | false |
+| EMAIL_ADDRESS | Email Address | STRING | Email address of the contact. | false |
+| PHONE | Phone | STRING | Phone number of the contact. | false |
+| TITLE | Title | STRING | The contact's title in company. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "FIRST_NAME" : "",
+    "LAST_NAME" : "",
+    "EMAIL_ADDRESS" : "",
+    "PHONE" : "",
+    "TITLE" : ""
+  },
+  "type" : "insightly/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| CONTACT_ID | INTEGER | ID of the contact. |
+| FIRST_NAME | STRING | First name of the contact. |
+| LAST_NAME | STRING | Last name of the contact. |
+| EMAIL_ADDRESS | STRING | Email address of the contact. |
+| PHONE | STRING | Phone number of the contact. |
+| TITLE | STRING | The contact's title in company. |
+
+
+
+
+#### Output Example
+```json
+{
+  "CONTACT_ID" : 1,
+  "FIRST_NAME" : "",
+  "LAST_NAME" : "",
+  "EMAIL_ADDRESS" : "",
+  "PHONE" : "",
+  "TITLE" : ""
+}
+```
+
+
+### Create Organization
+Name: createOrganization
+
+`Creates new organization.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ORGANISATION_NAME | Organization Name | STRING | The name of the organization. | true |
+| PHONE | Phone | STRING | A contact phone number for the organization. | false |
+| WEBSITE | Website | STRING | The organization's website. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "ORGANISATION_NAME" : "",
+    "PHONE" : "",
+    "WEBSITE" : ""
+  },
+  "type" : "insightly/v1/createOrganization"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ORGANISATION_ID | INTEGER | ID of the organization. |
+| ORGANISATION_NAME | STRING | The name of the organization. |
+| PHONE | STRING | A contact phone number for the organization. |
+| WEBSITE | STRING | The organization's website. |
+
+
+
+
+#### Output Example
+```json
+{
+  "ORGANISATION_ID" : 1,
+  "ORGANISATION_NAME" : "",
+  "PHONE" : "",
+  "WEBSITE" : ""
+}
+```
+
+
+### Create Task
+Name: createTask
+
+`Creates new task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| TITLE | Title | STRING |  | true |
+| STATUS | Status | STRING <details> <summary> Options </summary> Not Started, In Progress, Completed, Deferred, Waiting </details> | Task status | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "TITLE" : "",
+    "STATUS" : ""
+  },
+  "type" : "insightly/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| TASK_ID | INTEGER | ID of the task. |
+| TITLE | STRING | Title of the task. |
+| STATUS | STRING | Task status. |
+
+
+
+
+#### Output Example
+```json
+{
+  "TASK_ID" : 1,
+  "TITLE" : "",
+  "STATUS" : ""
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## CONNECTION
+
+[API key location](https://crm.na1.insightly.com/Users/UserSettings)

@@ -1,0 +1,158 @@
+---
+title: "Webhook"
+description: "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL."
+---
+
+
+Categories: Helpers
+
+
+Type: webhook/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Response to Webhook Request
+Name: responseToWebhookRequest
+
+`Converts the response to the webhook request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| responseType | Response Type | STRING <details> <summary> Options </summary> JSON, RAW, BINARY, REDIRECT, NO_DATA </details> | The type of the response. | false |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The headers of the response. | false |
+| body | Body | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The body of the response. | true |
+| body | Body | STRING | The body of the response. | true |
+| body | Redirect URL | STRING | The redirect URL. | true |
+| body | Body | FILE_ENTRY | The body of the response. | true |
+| statusCode | Status Code | INTEGER | The status code of the response. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Response to Webhook Request",
+  "name" : "responseToWebhookRequest",
+  "parameters" : {
+    "responseType" : "",
+    "headers" : { },
+    "body" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "statusCode" : 1
+  },
+  "type" : "webhook/v1/responseToWebhookRequest"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+## Triggers
+
+
+### Auto Respond with HTTP 200 Status
+Name: autoRespondWithHTTP200
+
+`The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.`
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+
+null
+
+#### JSON Example
+```json
+{
+  "label" : "Auto Respond with HTTP 200 Status",
+  "name" : "autoRespondWithHTTP200",
+  "type" : "webhook/v1/autoRespondWithHTTP200"
+}
+```
+
+
+### Validate and Respond
+Name: validateAndRespond
+
+`Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| csrfToken | CSRF Token | STRING | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
+
+
+#### Output
+
+
+null
+
+#### JSON Example
+```json
+{
+  "label" : "Validate and Respond",
+  "name" : "validateAndRespond",
+  "parameters" : {
+    "csrfToken" : ""
+  },
+  "type" : "webhook/v1/validateAndRespond"
+}
+```
+
+
+### Await Workflow and Respond
+Name: awaitWorkflowAndRespond
+
+`You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| csrfToken | CSRF Token | STRING | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
+| timeout | Timeout (ms) | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | false |
+
+
+#### Output
+
+
+null
+
+#### JSON Example
+```json
+{
+  "label" : "Await Workflow and Respond",
+  "name" : "awaitWorkflowAndRespond",
+  "parameters" : {
+    "csrfToken" : "",
+    "timeout" : 1
+  },
+  "type" : "webhook/v1/awaitWorkflowAndRespond"
+}
+```
+
+
+
+

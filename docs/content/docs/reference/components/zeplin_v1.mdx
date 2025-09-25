@@ -1,0 +1,131 @@
+---
+title: "Zeplin"
+description: "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development."
+---
+
+
+Categories: Communication
+
+
+Type: zeplin/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Update Project
+Name: updateProject
+
+`Updates an existing project.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project_id | Project ID | STRING | Project to update. | true |
+| name | Name | STRING | New name for the project. | true |
+| description | Description | STRING | New description for the project. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Project",
+  "name" : "updateProject",
+  "parameters" : {
+    "project_id" : "",
+    "name" : "",
+    "description" : ""
+  },
+  "type" : "zeplin/v1/updateProject"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+## Triggers
+
+
+### Project Note
+Name: projectNote
+
+`Triggers when new note is created, deleted or updated in specified project.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project_id | Project ID | STRING | ID of the project you want to monitor. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| context | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(type), &#123;STRING\(id), STRING\(status), [&#123;STRING\(id), &#123;STRING\(id), STRING\(email), STRING\(username)&#125;\(author), STRING\(content)&#125;]\(comments)&#125;\(data)&#125; </details> |  |
+| action | STRING |  |
+| event | STRING |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Project Note",
+  "name" : "projectNote",
+  "parameters" : {
+    "project_id" : ""
+  },
+  "type" : "zeplin/v1/projectNote"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

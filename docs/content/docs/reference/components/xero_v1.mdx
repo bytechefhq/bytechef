@@ -1,0 +1,593 @@
+---
+title: "Xero"
+description: "Xero is an online accounting software platform designed for small businesses and accountants to manage finances efficiently."
+---
+
+
+Categories: Accounting
+
+
+Type: xero/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Bill
+Name: createBill
+
+`Creates draft bill (Accounts Payable).`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ContactID | Contact ID | STRING | ID of the contact to create the bill for. | true |
+| Date | Date | DATE | Date of the bill. If no date is specified, the current date will be used. | true |
+| DueDate | Due Date | DATE | Date bill is due. If no date is specified, the current date will be used. | false |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), NUMBER\(Quantity), NUMBER\(UnitAmount), STRING\(AccountCode)&#125;\($LineItem)] </details> | Line items on the bill. | true |
+| CurrencyCode | Currency | STRING | Currency that bill is raised in. | false |
+| Reference | Invoice Reference | STRING | Reference number of the bill. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Bill",
+  "name" : "createBill",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "DueDate" : "2021-01-01",
+    "LineAmountTypes" : "",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 0.0,
+      "UnitAmount" : 0.0,
+      "AccountCode" : ""
+    } ],
+    "CurrencyCode" : "",
+    "Reference" : ""
+  },
+  "type" : "xero/v1/createBill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+
+
+
+
+#### Output Example
+```json
+{
+  "Type" : "",
+  "Contact" : {
+    "ContactID" : "",
+    "Name" : "",
+    "EmailAddress" : ""
+  },
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : ""
+}
+```
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| Name | Name | STRING | Full name of a contact or organisation. | true |
+| CompanyNumber | Company Number | STRING | Company registration number. | false |
+| AccountNumber | Account Number | STRING | Unique account number to identify, reference and search for the contact. | false |
+| ContactStatus | Contact Status | STRING <details> <summary> Options </summary> ACTIVE, ARCHIVED, GDPRREQUEST </details> | Current status of a contact. | false |
+| FirstName | First Name | STRING | First name of primary person. | false |
+| LastName | Last Name | STRING | Last name of primary person. | false |
+| EmailAddress | Email Address | STRING | Email address of contact person. | false |
+| BankAccountDetails | Bank Account Number | STRING | Bank account number of contact. | false |
+| TaxNumber | Tax Number | STRING | Tax number of contact – this is also known as the ABN (Australia), GST Number (New Zealand), VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which regionalized version of Xero you are using. | false |
+| Phones | Phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)&#125;] </details> |  | false |
+| Addresses | Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)&#125;] </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "Name" : "",
+    "CompanyNumber" : "",
+    "AccountNumber" : "",
+    "ContactStatus" : "",
+    "FirstName" : "",
+    "LastName" : "",
+    "EmailAddress" : "",
+    "BankAccountDetails" : "",
+    "TaxNumber" : "",
+    "Phones" : [ {
+      "PhoneType" : "",
+      "PhoneNumber" : "",
+      "PhoneAreaCode" : "",
+      "PhoneCountryCode" : ""
+    } ],
+    "Addresses" : [ {
+      "AddressType" : "",
+      "City" : "",
+      "Region" : "",
+      "PostalCode" : "",
+      "Country" : ""
+    } ]
+  },
+  "type" : "xero/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ContactID | STRING | ID of the contact. |
+| CompanyNumber | STRING | Company registration number. |
+| AccountNumber | STRING | A user defined account number. |
+| ContactStatus | STRING | Status of the contact. |
+| Name | STRING | Full name of contact/organisation. |
+| FirstName | STRING | First name of contact person. |
+| LastName | STRING | Last name of contact person. |
+| EmailAddress | STRING | Email address of contact person. |
+| BankAccountDetails | STRING | Bank account number of contact. |
+| TaxNumber | STRING | Tax number of contact. |
+| Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)&#125;] </details> | List of addresses associated with the contact. |
+| Phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ContactID" : "",
+  "CompanyNumber" : "",
+  "AccountNumber" : "",
+  "ContactStatus" : "",
+  "Name" : "",
+  "FirstName" : "",
+  "LastName" : "",
+  "EmailAddress" : "",
+  "BankAccountDetails" : "",
+  "TaxNumber" : "",
+  "Addresses" : [ {
+    "AddressType" : "",
+    "City" : "",
+    "Region" : "",
+    "PostalCode" : "",
+    "Country" : ""
+  } ],
+  "Phones" : [ {
+    "PhoneType" : "",
+    "PhoneNumber" : "",
+    "PhoneAreaCode" : "",
+    "PhoneCountryCode" : ""
+  } ]
+}
+```
+
+
+### Create Invoice
+Name: createSalesInvoice
+
+`Creates draft invoice (Acount Receivable).`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ContactID | Contact ID | STRING | ID of the contact to create the invoice for. | true |
+| Date | Date | DATE | Date invoice was issued. If no date is specified, the current date will be used. | false |
+| DueDate | Due Date | DATE | Date invoice is due. If no date is specified, the current date will be used. | false |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
+| CurrencyCode | Currency Code | STRING | Currency code that invoice is raised in. | false |
+| Reference | Invoice Reference | STRING | Reference number of the invoice. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createSalesInvoice",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "DueDate" : "2021-01-01",
+    "LineAmountTypes" : "",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 1,
+      "UnitAmount" : 0.0,
+      "DiscountRate" : 0.0
+    } ],
+    "CurrencyCode" : "",
+    "Reference" : ""
+  },
+  "type" : "xero/v1/createSalesInvoice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+
+
+
+
+#### Output Example
+```json
+{
+  "Type" : "",
+  "Contact" : {
+    "ContactID" : "",
+    "Name" : "",
+    "EmailAddress" : ""
+  },
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : ""
+}
+```
+
+
+### Create Quote
+Name: createQuote
+
+`Creates a new quote draft.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ContactID | Contact ID | STRING | ID of the contact that the quote is being raised for. | true |
+| Date | Date | DATE | Date quote was issued. | true |
+| LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| ExpiryDate | Expiry Date | DATE | Date quote expires | false |
+| CurrencyCode | Currency Code | STRING | The currency code that quote has been raised in. | false |
+| QuoteNumber | Quote Number | STRING | Unique alpha numeric code identifying a quote. | false |
+| Reference | Reference | STRING | Additional reference number | false |
+| BrandingThemeID | Branding Theme ID | STRING | The branding theme ID to be applied to this quote. | false |
+| Title | Title | STRING | The title of the quote. | false |
+| Summary | Summary | STRING | The summary of the quote. | false |
+| Terms | Terms | STRING | The terms of the quote. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Quote",
+  "name" : "createQuote",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 1,
+      "UnitAmount" : 0.0,
+      "DiscountRate" : 0.0
+    } ],
+    "LineAmountTypes" : "",
+    "ExpiryDate" : "2021-01-01",
+    "CurrencyCode" : "",
+    "QuoteNumber" : "",
+    "Reference" : "",
+    "BrandingThemeID" : "",
+    "Title" : "",
+    "Summary" : "",
+    "Terms" : ""
+  },
+  "type" : "xero/v1/createQuote"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| QuoteID | STRING |  |
+| QuoteNumber | STRING |  |
+| Reference | STRING |  |
+| Terms | STRING |  |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> |  |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(LineItemID), STRING\(Description), NUMBER\(UnitAmount), INTEGER\(DiscountRate), INTEGER\(Quantity)&#125;] </details> |  |
+| DateString | STRING |  |
+| ExpiryDateString | STRING |  |
+| Status | STRING |  |
+| CurrencyCode | STRING |  |
+| Title | STRING |  |
+| BrandingThemeID | STRING |  |
+| Summary | STRING |  |
+| LineAmountTypes | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "QuoteID" : "",
+  "QuoteNumber" : "",
+  "Reference" : "",
+  "Terms" : "",
+  "Contact" : {
+    "ContactID" : "",
+    "Name" : "",
+    "EmailAddress" : ""
+  },
+  "LineItems" : [ {
+    "LineItemID" : "",
+    "Description" : "",
+    "UnitAmount" : 0.0,
+    "DiscountRate" : 1,
+    "Quantity" : 1
+  } ],
+  "DateString" : "",
+  "ExpiryDateString" : "",
+  "Status" : "",
+  "CurrencyCode" : "",
+  "Title" : "",
+  "BrandingThemeID" : "",
+  "Summary" : "",
+  "LineAmountTypes" : ""
+}
+```
+
+
+
+## Triggers
+
+
+### New Bill
+Name: newBill
+
+`Trigger off whenever a new bill is added.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Bill",
+  "name" : "newBill",
+  "parameters" : {
+    "webhookKey" : ""
+  },
+  "type" : "xero/v1/newBill"
+}
+```
+
+
+### New Contact
+Name: newContact
+
+`Triggers when a contact is created.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ContactID | STRING | ID of the contact. |
+| CompanyNumber | STRING | Company registration number. |
+| AccountNumber | STRING | A user defined account number. |
+| ContactStatus | STRING | Status of the contact. |
+| Name | STRING | Full name of contact/organisation. |
+| FirstName | STRING | First name of contact person. |
+| LastName | STRING | Last name of contact person. |
+| EmailAddress | STRING | Email address of contact person. |
+| BankAccountDetails | STRING | Bank account number of contact. |
+| TaxNumber | STRING | Tax number of contact. |
+| Addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)&#125;] </details> | List of addresses associated with the contact. |
+| Phones | ARRAY <details> <summary> Items </summary> [&#123;STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)&#125;] </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Contact",
+  "name" : "newContact",
+  "parameters" : {
+    "webhookKey" : ""
+  },
+  "type" : "xero/v1/newContact"
+}
+```
+
+
+### New Invoice
+Name: newInvoice
+
+`Trigger off whenever a new invoice is added.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| webhookKey | Webhook Key | STRING | The key used to sign the webhook request. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Invoice",
+  "name" : "newInvoice",
+  "parameters" : {
+    "webhookKey" : ""
+  },
+  "type" : "xero/v1/newInvoice"
+}
+```
+
+
+
+

@@ -1,0 +1,85 @@
+---
+title: "AI Image"
+description: "AI Helper component for image analysis and generation."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: aiImage/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Generate Image
+Name: generateImage
+
+`AI generate an image that you prompt.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| provider | Provider | STRING |  | true |
+| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | ID of the model to use. | true |
+| model | Model | STRING | ID of the model to use. | true |
+| prompt | Prompt | STRING | Write your prompt for generating an image. | true |
+| n | Number of Responses | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | false |
+| size | Size | STRING <details> <summary> Options </summary> DALL_E_2_256x256, DALL_E_2_512x512, _1024x1024, DALL_E_3_1792x1024, DALL_E_3_1024x1792 </details> | The size of the generated images. | true |
+| height | Height | INTEGER | Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies. | true |
+| width | Width | INTEGER | Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies. | true |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | The format in which the generated images are returned. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Generate Image",
+  "name" : "generateImage",
+  "parameters" : {
+    "provider" : "",
+    "model" : "",
+    "prompt" : "",
+    "n" : 1,
+    "size" : "",
+    "height" : 1,
+    "width" : 1,
+    "responseFormat" : ""
+  },
+  "type" : "aiImage/v1/generateImage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | URL of the generated image. |
+| b64Json | STRING | Base64 encoded JSON of the generated image. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "b64Json" : ""
+}
+```
+
+
+
+

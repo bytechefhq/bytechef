@@ -1,0 +1,141 @@
+---
+title: "Logger"
+description: "Logs a value to the system log."
+---
+
+
+Categories: Helpers
+
+
+Type: logger/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Debug
+Name: debug
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | | STRING |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Debug",
+  "name" : "debug",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/debug"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Error
+Name: error
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | | STRING |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Error",
+  "name" : "error",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/error"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Info
+Name: info
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | | STRING |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Info",
+  "name" : "info",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/info"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Warn
+Name: warn
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | | STRING |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Warn",
+  "name" : "warn",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/warn"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
