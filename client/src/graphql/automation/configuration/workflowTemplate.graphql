@@ -1,0 +1,19 @@
+query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
+    workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
+        description
+        projectVersion
+        publicUrl
+        workflow {
+            label
+        }
+        components {
+            connection {
+                version
+            }
+            icon
+            name
+            title
+            version
+        }
+    }
+}

@@ -1,0 +1,8 @@
+query sharedProject($projectUuid: String!) {
+    sharedProject(projectUuid: $projectUuid) {
+        description
+        exported
+        projectVersion
+        publicUrl
+    }
+}
