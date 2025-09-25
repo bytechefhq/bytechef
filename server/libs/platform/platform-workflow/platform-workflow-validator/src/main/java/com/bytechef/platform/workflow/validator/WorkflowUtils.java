@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
@@ -41,7 +41,8 @@ class WorkflowUtils {
     private static final Pattern COMBINED_PATTERN = Pattern.compile(
         "\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
 
-    public static Evaluator evaluator = SpelEvaluator.builder().build();
+    private static final Evaluator EVALUATOR = SpelEvaluator.builder()
+        .build();
 
     public static String convertPropertyInfoToJson(@Nullable List<PropertyInfo> propertyInfos) {
         if (propertyInfos == null || propertyInfos.isEmpty()) {
@@ -173,6 +174,31 @@ class WorkflowUtils {
         return currentJsonNode;
     }
 
+    public static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
+        if (taskParameters == null) {
+            return taskDefinition;
+        }
+
+        try {
+            JsonNode parametersNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
+
+            return processMetadataObjectsRecursively(
+                taskDefinition,
+                parametersNode != null ? parametersNode : com.bytechef.commons.util.JsonUtils.readTree("{}"));
+        } catch (RuntimeException e) {
+            // Re-throw runtime exceptions from invalid display conditions
+            String message = e.getMessage();
+
+            if (message != null && message.startsWith("Invalid logic for display condition:")) {
+                throw e;
+            }
+
+            return taskDefinition;
+        } catch (Exception e) {
+            return taskDefinition;
+        }
+    }
+
     private static String buildComplexArrayContent(PropertyInfo propertyInfo) {
         List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
 
@@ -289,6 +315,7 @@ class WorkflowUtils {
         }
 
         json.append(" ]");
+
         return json.toString();
     }
 
@@ -298,9 +325,9 @@ class WorkflowUtils {
         String displayCondition = propertyInfo.displayCondition();
 
         if (displayCondition != null && !displayCondition.isEmpty()) {
-            json.append("\"metadata\": \"")
-                .append(displayCondition)
-                .append("\", ");
+            json.append("\"metadata\": \"");
+            json.append(displayCondition);
+            json.append("\", ");
         }
 
         List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
@@ -332,9 +359,9 @@ class WorkflowUtils {
         StringBuilder json = new StringBuilder();
         String propertyName = propertyInfo.name();
 
-        json.append("\"")
-            .append(propertyName)
-            .append("\": ");
+        json.append("\"");
+        json.append(propertyName);
+        json.append("\": ");
 
         if (hasNestedProperties(propertyInfo)) {
             if (isArrayType(propertyInfo)) {
@@ -352,34 +379,20 @@ class WorkflowUtils {
     private static boolean evaluateCondition(String condition, JsonNode actualParameters) {
         Map<String, String> map = new HashMap<>();
         // convert condition to SpEL condition
-        map.put("convertedExpression", "="+condition);
+        map.put("convertedExpression", "=" + condition);
 
-        Map<String, Object> actualParametersMap = actualParameters != null ?
-            com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new com.fasterxml.jackson.core.type.TypeReference<>() {}) :
-            new java.util.HashMap<>();
+        Map<String, Object> actualParametersMap = actualParameters != null
+            ? com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new TypeReference<>() {})
+            : Map.of();
 
-        try{
-            Map<String, Object> evaluated = evaluator.evaluate(map, actualParametersMap);
-            return parseBoolean(evaluated.get("convertedExpression").toString());
-        }
-        catch (Exception e) {
+        try {
+            Map<String, Object> evaluated = EVALUATOR.evaluate(map, actualParametersMap);
+
+            Object convertedExpression = evaluated.get("convertedExpression");
+
+            return parseBoolean(convertedExpression.toString());
+        } catch (Exception e) {
             throw new IllegalArgumentException(e);
-        }
-    }
-
-    public static boolean parseBoolean(String s) {
-        if (s == null) {
-            throw new IllegalArgumentException("String cannot be null");
-        }
-
-        if ("true".equalsIgnoreCase(s)) {
-            return true;
-        } else if ("false".equalsIgnoreCase(s)) {
-            return false;
-        } else {
-            throw new IllegalArgumentException(
-                "Invalid boolean value: '" + s + "'. Expected 'true' or 'false'"
-            );
         }
     }
 
@@ -446,16 +459,6 @@ class WorkflowUtils {
         return "ARRAY".equalsIgnoreCase(propertyInfo.type());
     }
 
-    private static boolean isNumeric(String str) {
-        try {
-            Double.parseDouble(str);
-
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     private static boolean isTaskTypeArray(PropertyInfo propertyInfo) {
         List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
 
@@ -468,27 +471,18 @@ class WorkflowUtils {
         }
     }
 
-    public static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
-        if (taskParameters == null) {
-            return taskDefinition;
+    private static boolean parseBoolean(String string) {
+        if (string == null) {
+            throw new IllegalArgumentException("String cannot be null");
         }
 
-        try {
-            JsonNode parametersNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
-
-            return processMetadataObjectsRecursively(taskDefinition,
-                parametersNode != null ? parametersNode : com.bytechef.commons.util.JsonUtils.readTree("{}"));
-        } catch (RuntimeException e) {
-            // Re-throw runtime exceptions from invalid display conditions
-            String message = e.getMessage();
-
-            if (message != null && message.startsWith("Invalid logic for display condition:")) {
-                throw e;
-            }
-
-            return taskDefinition;
-        } catch (Exception e) {
-            return taskDefinition;
+        if ("true".equalsIgnoreCase(string)) {
+            return true;
+        } else if ("false".equalsIgnoreCase(string)) {
+            return false;
+        } else {
+            throw new IllegalArgumentException(
+                "Invalid boolean value: '" + string + "'. Expected 'true' or 'false'");
         }
     }
 

@@ -130,6 +130,7 @@ class TaskValidator {
 
         try {
             String originalTaskDefinition = WorkflowUtils.convertPropertyInfoToJson(taskDefinition);
+
             String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
                 originalTaskDefinition, taskParameters);
 
@@ -192,6 +193,7 @@ class TaskValidator {
         if (message != null && message.startsWith("Invalid logic for display condition:")) {
             // Extract the condition from the error message to check if it's truly malformed
             String condition = extractConditionFromMessage(message);
+
             boolean isActuallyMalformed = isMalformedCondition(condition);
 
             try {
@@ -234,11 +236,13 @@ class TaskValidator {
         }
 
         int startQuote = message.indexOf('\'');
+
         if (startQuote == -1) {
             return "";
         }
 
         int endQuote = message.lastIndexOf('\'');
+
         if (endQuote == startQuote) {
             return "";
         }
@@ -250,12 +254,14 @@ class TaskValidator {
      * Determines if a condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
      */
     private static boolean isMalformedCondition(String condition) {
-        if (condition == null || condition.trim().isEmpty()) {
+        if (condition == null || condition.trim()
+            .isEmpty()) {
             return false;
         }
 
         // Clean the condition by removing @ markers if present
         String cleanCondition = condition.trim();
+
         if (cleanCondition.startsWith("@") && cleanCondition.endsWith("@")) {
             cleanCondition = cleanCondition.substring(1, cleanCondition.length() - 1);
         }
