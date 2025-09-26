@@ -17,24 +17,25 @@
 package com.bytechef.component.github.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.NAME;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Luka Ljubić
@@ -45,23 +46,40 @@ public class GithubUtils {
     private GithubUtils() {
     }
 
-    public static List<Option<String>> getCollaborators(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+    public static List<Option<String>> getMilestones(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+            ActionContext context) {
 
         List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/collaborators"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .http(http -> http.get(
+                        "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                                + "/milestones"))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute().getBody(new TypeReference<>() {
+                });
+
+        return getOptions(body, TITLE, "number");
+    }
+
+    public static List<Option<String>> getCollaborators(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+            ActionContext context) {
+
+        List<Map<String, Object>> body = context
+                .http(http -> http.get(
+                        "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                                + "/collaborators"))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return getOptions(body, NAME, "login");
     }
 
     public static Map<String, Object> getContent(WebhookBody body) {
-        Map<String, Object> content = body.getContent(new TypeReference<>() {});
+        Map<String, Object> content = body.getContent(new TypeReference<>() {
+        });
 
         if (Objects.equals(content.get("action"), "opened")) {
             return content;
@@ -71,52 +89,57 @@ public class GithubUtils {
     }
 
     public static List<Option<String>> getIssueOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+            ActionContext context) {
 
         List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .http(http -> http.get(
+                        "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                                + "/issues"))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return getOptions(body, TITLE, "number");
     }
 
     public static List<Option<String>> getLabels(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+            ActionContext context) {
 
         List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/labels"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .http(http -> http.get(
+                        "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                                + "/labels"))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return getOptions(body, NAME, NAME);
     }
 
     public static String getOwnerName(Context context) {
         Map<String, Object> body = context
-            .http(http -> http.get("/user"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .http(http -> http.get("/user"))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return (String) body.get("login");
     }
 
     public static List<Option<String>> getRepositoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+            Context context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get("/user/repos"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return getOptions(body, NAME, NAME);
     }
@@ -134,22 +157,23 @@ public class GithubUtils {
 
     public static Integer subscribeWebhook(String repository, String event, String webhookUrl, TriggerContext context) {
         Map<String, Object> body = context
-            .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repository + "/hooks"))
-            .body(
-                Http.Body.of(
-                    "events", List.of(event),
-                    "config", Map.of("url", webhookUrl, "content_type", "json")))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+                .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repository + "/hooks"))
+                .body(
+                        Http.Body.of(
+                                "events", List.of(event),
+                                "config", Map.of("url", webhookUrl, "content_type", "json")))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {
+                });
 
         return (Integer) body.get(ID);
     }
 
     public static void unsubscribeWebhook(String repository, Integer webhookId, TriggerContext context) {
         context
-            .http(http -> http.delete("/repos/" + getOwnerName(context) + "/" + repository + "/hooks/" + webhookId))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute();
+                .http(http -> http.delete("/repos/" + getOwnerName(context) + "/" + repository + "/hooks/" + webhookId))
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute();
     }
 }

@@ -45,8 +45,8 @@ public class GithubUpdateIssueAction {
                                     option("Open", "open"),
                                     option("Closed", "closed")),
                     string(MILESTONE).label("Milestone")
-                            .description("Change issue milestone or remove it by passing in the null"),
-
+                            .description("Change issue milestone or remove it by passing in the null")
+                            .options((ActionOptionsFunction<String>) GithubUtils::getMilestones),
                     array(LABELS).label("Labels").description("Change issue labels")
                             .items(string())
                             .options((ActionOptionsFunction<String>) GithubUtils::getLabels),
@@ -68,7 +68,7 @@ public class GithubUpdateIssueAction {
                 .body(Body.of(
                         TITLE, inputParameters.getString(TITLE),
                         STATE, inputParameters.getString(STATE),
-                        MILESTONE, inputParameters.getInteger(MILESTONE),
+                        MILESTONE, inputParameters.getString(MILESTONE),
                         LABELS, inputParameters.getArray(LABELS),
                         ASSIGNEES, inputParameters.getArray(ASSIGNEES)
 
