@@ -79,7 +79,8 @@ Please review the following sections before proposing code changes.
 
 ### Step-by-step guide to contributing
 
-#### We Use [GitHub](https://guides.github.com/introduction/flow/index.html) Flow, So All Code Changes Happen Through Pull Requests
+#### We Use [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow), So All Code Changes Happen Through Pull Requests
+
 Pull requests are the best way to propose changes to the codebase (we use [Git-Flow](https://nvie.com/posts/a-successful-git-branching-model/)). We actively welcome your pull requests:
 
 1. Fork the repo and create a new branch from the `develop` branch.
