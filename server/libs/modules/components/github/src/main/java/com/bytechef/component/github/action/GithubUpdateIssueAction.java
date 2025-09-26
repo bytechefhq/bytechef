@@ -10,6 +10,7 @@ import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.LABELS;
+import static com.bytechef.component.github.constant.GithubConstants.MILESTONE;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
@@ -43,7 +44,7 @@ public class GithubUpdateIssueAction {
                             .options(
                                     option("Open", "open"),
                                     option("Closed", "closed")),
-                    string("milestone").label("Milestone")
+                    string(MILESTONE).label("Milestone")
                             .description("Change issue milestone or remove it by passing in the null"),
 
                     array(LABELS).label("Labels").description("Change issue labels")
@@ -67,7 +68,7 @@ public class GithubUpdateIssueAction {
                 .body(Body.of(
                         TITLE, inputParameters.getString(TITLE),
                         STATE, inputParameters.getString(STATE),
-                        "milestone", inputParameters.getInteger("milestone"),
+                        MILESTONE, inputParameters.getInteger(MILESTONE),
                         LABELS, inputParameters.getArray(LABELS),
                         ASSIGNEES, inputParameters.getArray(ASSIGNEES)
 
