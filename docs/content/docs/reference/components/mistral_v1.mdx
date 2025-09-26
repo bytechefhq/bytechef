@@ -118,8 +118,9 @@ Name: ocr
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | model | Model | STRING | Model to use. | true |
-| type | Type | STRING <details> <summary> Options </summary> image_url, document_url </details> | Type of the document to run OCR on. | true |
+| type | Type | STRING <details> <summary> Options </summary> image_url, document_url, file </details> | Type of the document to run OCR on. | true |
 | url | Image URL | STRING | Url of the image to run OCR on. | true |
+| file_id | File ID | STRING | File ID of the document to run OCR on. | true |
 | url | Document URL | STRING | Url of the document to run OCR on. | true |
 
 #### Example JSON Structure
@@ -130,7 +131,8 @@ Name: ocr
   "parameters" : {
     "model" : "",
     "type" : "",
-    "url" : ""
+    "url" : "",
+    "file_id" : ""
   },
   "type" : "mistral/v1/ocr"
 }
@@ -178,6 +180,80 @@ Type: OBJECT
     "pages_processed" : 1,
     "doc_size_bytes" : 1
   }
+}
+```
+
+
+### Upload File
+Name: uploadFile
+
+`Extracts text and structured content from documents.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| purpose | Purpose | STRING <details> <summary> Options </summary> fine-tune, batch, ocr </details> | Model to use. | false |
+| file | File | FILE_ENTRY | The file to be uploaded. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "purpose" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "mistral/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the uploaded file. |
+| object | STRING | The object type, which is always file. |
+| bytes | INTEGER | Size of the file in bytes. |
+| created_at | INTEGER | The UNIX timestamp (in seconds) of the event. |
+| filename | STRING | Name of the uploaded file. |
+| purpose | STRING | The intended purpose of the uploaded file. |
+| sample_type | STRING |  |
+| num_lines | INTEGER |  |
+| mimetype | STRING | MIME type of the uploaded file. |
+| source | STRING |  |
+| signature | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "object" : "",
+  "bytes" : 1,
+  "created_at" : 1,
+  "filename" : "",
+  "purpose" : "",
+  "sample_type" : "",
+  "num_lines" : 1,
+  "mimetype" : "",
+  "source" : "",
+  "signature" : ""
 }
 ```
 
