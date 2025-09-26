@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import WorkflowComponentsIcons from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcons';
+import WorkflowComponentsIcon from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useMemo} from 'react';
 
@@ -27,7 +27,7 @@ const WorkflowComponentsList = ({
     return (
         <div className="flex">
             {memoizedFilteredComponentNamesList.icons.map((name) => (
-                <WorkflowComponentsIcons
+                <WorkflowComponentsIcon
                     key={name}
                     name={name}
                     workflowComponentDefinitions={workflowComponentDefinitions}
@@ -48,7 +48,7 @@ const WorkflowComponentsList = ({
                     <TooltipContent className="mt-1 text-pretty" side="bottom">
                         {memoizedFilteredComponentNamesList.remainingComponents.map((name) => (
                             <div className="flex items-center gap-1 py-0.5" key={name}>
-                                <WorkflowComponentsIcons
+                                <WorkflowComponentsIcon
                                     key={name}
                                     name={name}
                                     workflowComponentDefinitions={workflowComponentDefinitions}
