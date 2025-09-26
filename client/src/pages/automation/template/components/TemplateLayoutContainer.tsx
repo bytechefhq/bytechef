@@ -23,7 +23,7 @@ const TemplateLayoutContainer = ({
 
             <div className="flex flex-1 items-center justify-center px-6 py-8">
                 <Card className="w-8/12 overflow-hidden">
-                    <div className="template-height flex">{children}</div>
+                    <div className="flex h-template-height">{children}</div>
                 </Card>
             </div>
         </div>
