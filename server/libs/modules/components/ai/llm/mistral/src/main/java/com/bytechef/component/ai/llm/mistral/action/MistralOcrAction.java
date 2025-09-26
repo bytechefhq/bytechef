@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.llm.mistral.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.FILE_ID;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.TYPE;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.URL;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -41,6 +42,7 @@ public class MistralOcrAction {
     public enum DocumentType {
 
         DOCUMENT_URL("document_url"),
+        FILE("file"),
         IMAGE_URL("image_url");
 
         private final String value;
@@ -68,13 +70,19 @@ public class MistralOcrAction {
                 .description("Type of the document to run OCR on.")
                 .options(
                     option("Image", DocumentType.IMAGE_URL.getValue()),
-                    option("PDF", DocumentType.DOCUMENT_URL.getValue()))
+                    option("PDF", DocumentType.DOCUMENT_URL.getValue()),
+                    option("File", DocumentType.FILE.getValue()))
                 .defaultValue(DocumentType.IMAGE_URL.getValue())
                 .required(true),
             string(URL)
                 .label("Image URL")
                 .description("Url of the image to run OCR on.")
                 .displayCondition("%s == '%s'".formatted(TYPE, DocumentType.IMAGE_URL.getValue()))
+                .required(true),
+            string(FILE_ID)
+                .label("File ID")
+                .description("File ID of the document to run OCR on.")
+                .displayCondition("%s == '%s'".formatted(TYPE, DocumentType.FILE.getValue()))
                 .required(true),
             string(URL)
                 .label("Document URL")
@@ -142,12 +150,18 @@ public class MistralOcrAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String type = inputParameters.getRequiredString(TYPE);
+        boolean isFileType = type.equals(DocumentType.FILE.getValue());
 
         return context.http(http -> http.post("https://api.mistral.ai/v1/ocr"))
             .body(
                 Http.Body.of(
                     MODEL, inputParameters.getRequiredString(MODEL),
-                    "document", Map.of(TYPE, type, type, inputParameters.getRequiredString(URL))))
+                    "document",
+                    Map.of(
+                        TYPE, type,
+                        isFileType ? FILE_ID : type,
+                        isFileType ? inputParameters.getRequiredString(FILE_ID)
+                            : inputParameters.getRequiredString(URL))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
