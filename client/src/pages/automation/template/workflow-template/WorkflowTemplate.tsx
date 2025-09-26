@@ -1,7 +1,7 @@
 import {ComboBoxItemType} from '@/components/ComboBox';
 import {Button} from '@/components/ui/button';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
-import LayoutContainer from '@/pages/automation/template/components/LayoutContainer';
+import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import ProjectsComboBox from '@/pages/automation/template/workflow-template/components/ProjectsComboBox';
 import WorkflowPreviewSvg from '@/pages/automation/template/workflow-template/components/WorkflowPreviewSvg';
 import {useImportWorkflowTemplateMutation, useWorkflowTemplateQuery} from '@/shared/middleware/graphql';
@@ -15,10 +15,9 @@ const WorkflowTemplate = ({
     fromInternalFlow?: boolean;
     sharedWorkflow?: boolean;
 }) => {
-    const [connectedComponents, setConnectedComponents] = useState<string[]>([]);
-
     const {id, projectId} = useParams();
 
+    const [connectedComponents, setConnectedComponents] = useState<string[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(projectId);
 
     const navigate = useNavigate();
@@ -49,7 +48,7 @@ const WorkflowTemplate = ({
     };
 
     return (
-        <LayoutContainer fromInternalFlow={fromInternalFlow}>
+        <TemplateLayoutContainer fromInternalFlow={fromInternalFlow}>
             <div className="flex w-7/12 flex-col space-y-5 p-5">
                 <div>
                     <h1 className="mb-1 text-xl font-semibold text-primary">{workflowTemplate?.workflow?.label}</h1>
@@ -95,7 +94,7 @@ const WorkflowTemplate = ({
                     <WorkflowPreviewSvg className="h-auto max-w-full opacity-90" />
                 </div>
             </div>
-        </LayoutContainer>
+        </TemplateLayoutContainer>
     );
 };
 

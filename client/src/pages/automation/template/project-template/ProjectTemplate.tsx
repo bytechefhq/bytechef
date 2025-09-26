@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
-import LayoutContainer from '@/pages/automation/template/components/LayoutContainer';
+import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import WorkflowPreviewSvg from '@/pages/automation/template/workflow-template/components/WorkflowPreviewSvg';
 import {useImportProjectTemplateMutation, useProjectTemplateQuery} from '@/shared/middleware/graphql';
 import {useState} from 'react';
@@ -41,7 +41,7 @@ const ProjectTemplate = ({
     };
 
     return (
-        <LayoutContainer fromInternalFlow={fromInternalFlow}>
+        <TemplateLayoutContainer fromInternalFlow={fromInternalFlow}>
             <div className="flex w-7/12 flex-col space-y-5 p-6">
                 <div>
                     <h1 className="mb-1 text-xl font-semibold text-primary">{projectTemplate?.project?.name}</h1>
@@ -54,9 +54,9 @@ const ProjectTemplate = ({
                 <div className="relative flex-1 space-y-4">
                     <span>This template contains the following components:</span>
 
-                    <div className="absolute bottom-0 top-5 w-full space-y-3 overflow-y-auto">
-                        {projectTemplate &&
-                            projectTemplate.workflows.map((workflow) => {
+                    {projectTemplate && (
+                        <div className="absolute bottom-0 top-5 w-full space-y-3 overflow-y-auto">
+                            {projectTemplate.workflows.map((workflow) => {
                                 const componentDefinitions = projectTemplate?.components?.find(
                                     (component) => component!.key === workflow!.id
                                 )!.value;
@@ -78,7 +78,8 @@ const ProjectTemplate = ({
                                     </div>
                                 );
                             })}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex justify-start">
@@ -91,7 +92,7 @@ const ProjectTemplate = ({
                     <WorkflowPreviewSvg className="h-auto max-w-full opacity-90" />
                 </div>
             </div>
-        </LayoutContainer>
+        </TemplateLayoutContainer>
     );
 };
 

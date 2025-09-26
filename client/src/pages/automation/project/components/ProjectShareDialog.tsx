@@ -1,5 +1,3 @@
-'use client';
-
 import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
@@ -137,7 +135,7 @@ export function ProjectShareDialog({
                         }
                     >
                         <AlertDescription>
-                            {shareState === 'not-shared' ? (
+                            {shareState === 'not-shared' && (
                                 <div>
                                     <p className="mb-2 text-sm font-medium">This project has not been shared</p>
 
@@ -151,7 +149,9 @@ export function ProjectShareDialog({
                                         Learn more
                                     </Button>
                                 </div>
-                            ) : shareState === 'exported' ? (
+                            )}
+
+                            {shareState === 'exported' && (
                                 <>
                                     <div className="flex items-center justify-between pb-4 font-semibold text-primary">
                                         {sharedProject?.projectVersion === projectVersion ? (
@@ -194,7 +194,9 @@ export function ProjectShareDialog({
                                         )}
                                     </div>
                                 </>
-                            ) : (
+                            )}
+
+                            {shareState !== 'not-shared' && shareState !== 'exported' && (
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-medium">
