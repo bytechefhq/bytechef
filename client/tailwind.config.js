@@ -136,6 +136,7 @@ module.exports = {
                 'connection-list-item-taglist-height': '38px',
                 'footer-height': '34px',
                 'header-height': '34px',
+                'template-height': '600px',
             },
             inset: {
                 'data-pill-panel-placement': '536px',

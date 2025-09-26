@@ -18,10 +18,6 @@ const ComponentRow = ({
 }: TemplateImportComponentProps) => {
     const isConnected = (component: string) => connectedComponents.includes(component);
 
-    const handleConnect = (componentName: string) => {
-        setConnectedComponents((prev) => [...prev, componentName]);
-    };
-
     return (
         <div className="flex items-center justify-between rounded-lg border border-muted p-2">
             <div className="flex items-center gap-3">
@@ -35,7 +31,7 @@ const ComponentRow = ({
             {componentDefinition.connection && false && (
                 <Button
                     disabled={isConnected(componentDefinition.name)}
-                    onClick={() => handleConnect(componentDefinition.name)}
+                    onClick={() => setConnectedComponents((prev) => [...prev, componentDefinition.name])}
                 >
                     {isConnected(componentDefinition.name) ? 'Connected' : 'Connect'}
                 </Button>

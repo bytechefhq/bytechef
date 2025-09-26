@@ -1,5 +1,3 @@
-'use client';
-
 import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
@@ -81,9 +79,7 @@ export function WorkflowShareDialog({
                     workflowId,
                 },
                 {
-                    onSuccess: () => {
-                        setShareState('disabled');
-                    },
+                    onSuccess: () => setShareState('disabled'),
                 }
             );
         }

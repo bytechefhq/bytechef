@@ -4,7 +4,13 @@ import {ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-const LayoutContainer = ({children, fromInternalFlow = false}: {children: ReactNode; fromInternalFlow?: boolean}) => {
+const TemplateLayoutContainer = ({
+    children,
+    fromInternalFlow = false,
+}: {
+    children: ReactNode;
+    fromInternalFlow?: boolean;
+}) => {
     return (
         <div className={twMerge('flex size-full flex-col', !fromInternalFlow && 'bg-surface-main')}>
             {!fromInternalFlow && (
@@ -17,11 +23,11 @@ const LayoutContainer = ({children, fromInternalFlow = false}: {children: ReactN
 
             <div className="flex flex-1 items-center justify-center px-6 py-8">
                 <Card className="w-8/12 overflow-hidden">
-                    <div className="flex h-[600px]">{children}</div>
+                    <div className="template-height flex">{children}</div>
                 </Card>
             </div>
         </div>
     );
 };
 
-export default LayoutContainer;
+export default TemplateLayoutContainer;
