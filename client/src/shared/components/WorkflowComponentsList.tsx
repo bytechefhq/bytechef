@@ -45,11 +45,18 @@ const WorkflowComponentsList = ({
                         </div>
                     </TooltipTrigger>
 
-                    <TooltipContent className="mt-1 max-w-28 text-pretty" side="bottom">
-                        {memoizedFilteredComponentNamesList.remainingComponents.map((name, index) => (
-                            <span className="block" key={index}>
-                                {name}
-                            </span>
+                    <TooltipContent className="mt-1 text-pretty" side="bottom">
+                        {memoizedFilteredComponentNamesList.remainingComponents.map((name) => (
+                            <div className="flex items-center gap-1 py-0.5" key={name}>
+                                <WorkflowComponentsIcons
+                                    key={name}
+                                    name={name}
+                                    workflowComponentDefinitions={workflowComponentDefinitions}
+                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                />
+
+                                <span className="block">{name}</span>
+                            </div>
                         ))}
                     </TooltipContent>
                 </Tooltip>
