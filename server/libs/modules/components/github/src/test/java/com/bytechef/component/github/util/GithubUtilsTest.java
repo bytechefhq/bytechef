@@ -18,6 +18,7 @@ package com.bytechef.component.github.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.MILESTONE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,15 +58,41 @@ class GithubUtilsTest {
     @BeforeEach()
     void beforeEach() {
         when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
+                .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+                .thenReturn(mockedResponse);
+    }
+
+    @Test
+    void testGetMilestones() {
+        List<Map<String, Object>> body = new ArrayList<>();
+        Map<String, Object> firstMilestone = new LinkedHashMap<>();
+        Map<String, Object> secondMilestone = new LinkedHashMap<>();
+        firstMilestone.put("name", "first");
+        firstMilestone.put("number", 1);
+        firstMilestone.put("id", 1);
+        secondMilestone.put("name", "second");
+        secondMilestone.put("number", 2);
+        secondMilestone.put("id", 2);
+        body.add(firstMilestone);
+        body.add(secondMilestone);
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(body);
+        List<Option<String>> expectedOptions = new ArrayList<>();
+        expectedOptions.add(option("first", "first"));
+        expectedOptions.add(option("second", "second"));
+
+        assertEquals(expectedOptions,
+                GithubUtils.getRepositoryOptions(mockedParameters, mockedParameters, Map.of(), "",
+                        mockedActionContext));
+
     }
 
     @Test
@@ -73,7 +100,7 @@ class GithubUtilsTest {
         Map<String, String> content = Map.of("action", "opened");
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
-            .thenReturn(content);
+                .thenReturn(content);
 
         assertEquals(content, GithubUtils.getContent(mockedWebhookBody));
     }
@@ -87,14 +114,15 @@ class GithubUtilsTest {
         body.add(items);
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+                .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("taskName", "taskName"));
 
         assertEquals(expectedOptions,
-            GithubUtils.getRepositoryOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                GithubUtils.getRepositoryOptions(mockedParameters, mockedParameters, Map.of(), "",
+                        mockedActionContext));
     }
 
     @Test
@@ -106,14 +134,14 @@ class GithubUtilsTest {
         body.add(items);
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+                .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("taskName", "123"));
 
         assertEquals(expectedOptions,
-            GithubUtils.getIssueOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                GithubUtils.getIssueOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -125,14 +153,14 @@ class GithubUtilsTest {
         body.add(items);
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+                .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("John Doe", "jdTest123"));
 
         assertEquals(expectedOptions,
-            GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -141,14 +169,14 @@ class GithubUtilsTest {
         body.add(Map.of("name", "Bug", "id", "12323123"));
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+                .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("Bug", "Bug"));
 
         assertEquals(expectedOptions,
-            GithubUtils.getLabels(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                GithubUtils.getLabels(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
@@ -157,7 +185,7 @@ class GithubUtilsTest {
         body.put("login", "name");
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+                .thenReturn(body);
 
         String actualOwnerName = GithubUtils.getOwnerName(mockedActionContext);
         String expectedOwnerName = "name";
@@ -168,7 +196,7 @@ class GithubUtilsTest {
     @Test
     void testSubscribeWebhook() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, 123));
+                .thenReturn(Map.of(ID, 123));
 
         Integer id = GithubUtils.subscribeWebhook("", "event", "webhookUrl", mockedTriggerContext);
 
@@ -177,8 +205,8 @@ class GithubUtilsTest {
         Http.Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of(
-            "events", List.of("event"),
-            "config", Map.of("url", "webhookUrl", "content_type", "json"));
+                "events", List.of("event"),
+                "config", Map.of("url", "webhookUrl", "content_type", "json"));
 
         assertEquals(expectedBody, body.getContent());
     }
