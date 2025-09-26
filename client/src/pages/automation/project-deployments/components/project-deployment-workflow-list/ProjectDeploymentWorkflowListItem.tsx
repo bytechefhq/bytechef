@@ -1,4 +1,3 @@
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
@@ -6,12 +5,12 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
+import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
-import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
@@ -115,31 +114,11 @@ const ProjectDeploymentWorkflowListItem = ({
                 </span>
 
                 <div className="ml-6 flex space-x-1">
-                    {filteredComponentNames?.map((name) => {
-                        const componentDefinition = workflowComponentDefinitions[name];
-                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
-
-                        return (
-                            <div className="flex items-center justify-center rounded-full border-2 p-1" key={name}>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <LazyLoadSVG
-                                            className="size-5"
-                                            key={name}
-                                            preloader={<Component1Icon className="size-5 flex-none text-gray-900" />}
-                                            src={
-                                                componentDefinition?.icon
-                                                    ? componentDefinition?.icon
-                                                    : (taskDispatcherDefinition?.icon ?? '')
-                                            }
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
-                                </Tooltip>
-                            </div>
-                        );
-                    })}
+                    <WorkflowComponentsList
+                        filteredComponentNames={filteredComponentNames || []}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
                 </div>
             </div>
 
