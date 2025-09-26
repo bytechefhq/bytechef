@@ -9,7 +9,7 @@ interface WorkflowComponentsIconsProps {
     workflowTaskDispatcherDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
 }
 
-const WorkflowComponentsIcons = ({
+const WorkflowComponentsIcon = ({
     name,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
@@ -41,4 +41,4 @@ const WorkflowComponentsIcons = ({
     );
 };
 
-export default WorkflowComponentsIcons;
+export default WorkflowComponentsIcon;
