@@ -266,7 +266,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                     return toConnectionDTO(
                         isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
                         filterTags(tags, connection));
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     logger.error(e.getMessage());
 
                     return null;
