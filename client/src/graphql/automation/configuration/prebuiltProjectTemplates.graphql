@@ -1,0 +1,30 @@
+query preBuiltProjectTemplates($query: String, $category: String) {
+    preBuiltProjectTemplates(query: $query, category: $category) {
+        authorName
+        categories
+        components {
+            key
+            value {
+                connection {
+                    version
+                }
+                icon
+                name
+                title
+                version
+            }
+        }
+        description
+        id
+        project {
+            name
+            description
+        }
+        projectVersion
+        publicUrl
+        workflows {
+            id
+            label
+        }
+    }
+}

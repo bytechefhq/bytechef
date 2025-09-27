@@ -1,0 +1,23 @@
+query preBuiltWorkflowTemplates($query: String, $category: String) {
+    preBuiltWorkflowTemplates(query: $query, category: $category) {
+        authorName
+        categories
+        components {
+            connection {
+                version
+            }
+            icon
+            name
+            title
+            version
+        }
+        description
+        id
+        projectVersion
+        publicUrl
+        workflow {
+            label
+            description
+        }
+    }
+}
