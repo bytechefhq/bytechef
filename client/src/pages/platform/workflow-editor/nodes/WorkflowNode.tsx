@@ -64,16 +64,14 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {invalidateWorkflowQueries} = useWorkflowEditor();
 
-    const nodeClickHandler = useNodeClickHandler(data, id);
-
-    const handleNodeClick = () => nodeClickHandler();
+    const handleNodeClick = useNodeClickHandler(data, id);
 
     const isSelected = currentNode?.name === data.name;
 
     const isMainRootClusterElement = !!data.clusterRoot && !data.isNestedClusterRoot;
     const isClusterElement = data.clusterElementType;
     const isNestedClusterRoot = data.isNestedClusterRoot;
-    const parentClusterRootId = data.parentClusterRootId || id.split('-')[0];
+    const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
@@ -236,7 +234,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             hideClusterElementComponents={!data.clusterElementType}
                             hideTaskDispatchers={!!data.clusterElementType}
                             hideTriggerComponents
-                            sourceNodeId={data.clusterElementType ? parentClusterRootId : id}
+                            sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
                         >
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
@@ -351,56 +349,17 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             )}
 
-            {!isMainRootClusterElement ? (
+            {isNestedClusterRoot || isMainRootClusterElement ? (
                 <>
-                    {isNestedClusterRoot && filteredClusterElementTypes?.length ? (
-                        <>
-                            <Handle
-                                className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
-                                isConnectable={false}
-                                position={Position.Top}
-                                type="target"
-                            />
-
-                            {filteredClusterElementTypes.map((clusterElementType, index) => (
-                                <Handle
-                                    className={twMerge(styles.handle)}
-                                    id={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
-                                    isConnectable={false}
-                                    key={`${convertNameToCamelCase(clusterElementType.name as string)}-handle`}
-                                    position={Position.Bottom}
-                                    style={{
-                                        left: `${getHandlePosition({
-                                            handlesCount: clusterElementTypesCount,
-                                            index,
-                                            nodeWidth,
-                                        })}px`,
-                                        transform: 'translateX(-50%)',
-                                    }}
-                                    type="source"
-                                />
-                            ))}
-                        </>
-                    ) : (
-                        <>
-                            <Handle
-                                className={twMerge('left-node-handle-placement', styles.handle)}
-                                isConnectable={false}
-                                position={Position.Top}
-                                type="target"
-                            />
-
-                            <Handle
-                                className={twMerge('left-node-handle-placement', styles.handle)}
-                                isConnectable={false}
-                                position={Position.Bottom}
-                                type="source"
-                            />
-                        </>
+                    {!isMainRootClusterElement && (
+                        <Handle
+                            className={twMerge(`left-${nodeWidth / 2}px`, styles.handle)}
+                            isConnectable={false}
+                            position={Position.Top}
+                            type="target"
+                        />
                     )}
-                </>
-            ) : (
-                <>
+
                     {filteredClusterElementTypes.map((clusterElementType, index) => (
                         <Handle
                             className={twMerge(styles.handle)}
@@ -419,6 +378,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             type="source"
                         />
                     ))}
+                </>
+            ) : (
+                <>
+                    <Handle
+                        className={twMerge('left-node-handle-placement', styles.handle)}
+                        isConnectable={false}
+                        position={Position.Top}
+                        type="target"
+                    />
+
+                    <Handle
+                        className={twMerge('left-node-handle-placement', styles.handle)}
+                        isConnectable={false}
+                        position={Position.Bottom}
+                        type="source"
+                    />
                 </>
             )}
 

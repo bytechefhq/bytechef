@@ -299,6 +299,10 @@ const useClusterElementsLayout = () => {
         const layoutNodes = allNodes;
         const edges: Edge[] = taskEdges;
 
+        if (layoutNodes.length === 0) {
+            return;
+        }
+
         getLayoutedElements({
             canvasWidth,
             edges,

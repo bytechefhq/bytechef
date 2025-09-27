@@ -233,8 +233,6 @@ export default function handleDeleteTask({
                         ...rootClusterElementNodeData,
                         clusterElements: updatedClusterElements,
                     });
-
-                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
                 }
             }
         }
