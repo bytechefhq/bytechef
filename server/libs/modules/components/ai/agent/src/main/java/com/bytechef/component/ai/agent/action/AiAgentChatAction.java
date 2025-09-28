@@ -235,7 +235,7 @@ public class AiAgentChatAction {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-            ComponentConnection componentConnection = connectionParameters.get(clusterElement.getComponentName());
+            ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
                 clusterElementDefinition.getName(),
