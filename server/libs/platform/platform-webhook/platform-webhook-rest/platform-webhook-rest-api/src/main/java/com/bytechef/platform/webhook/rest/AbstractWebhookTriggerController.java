@@ -79,9 +79,9 @@ public abstract class AbstractWebhookTriggerController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
-    private final TempFileStorage tempFileStorage;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrld;
+    private final TempFileStorage tempFileStorage;
     private final TriggerDefinitionService triggerDefinitionService;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowService workflowService;
