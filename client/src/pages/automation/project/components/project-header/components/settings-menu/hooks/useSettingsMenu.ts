@@ -7,7 +7,6 @@ import {
     useGetProjectGitConfigurationQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
-import {useProject} from '@/pages/automation/project/hooks/useProject';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -26,7 +25,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
     const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
 
-    const {projectId} = useProject();
+    const projectId = project.id;
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
