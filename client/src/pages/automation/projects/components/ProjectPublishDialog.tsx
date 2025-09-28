@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {DialogCloseButton, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/hooks/use-toast';
@@ -39,12 +39,14 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
     return (
         <Dialog onOpenChange={() => onClose()} open={true}>
             <DialogContent className="flex flex-col">
-                <DialogHeader>
-                    <div className="flex items-center justify-between">
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
                         <DialogTitle>Publish Project {project.name}</DialogTitle>
+
+                        <DialogDescription>Publish project to activate its workflows.</DialogDescription>
                     </div>
 
-                    <DialogDescription>Publish project to activate its workflows.</DialogDescription>
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="flex flex-col space-y-4">
