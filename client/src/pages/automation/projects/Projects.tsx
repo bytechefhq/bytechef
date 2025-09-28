@@ -14,9 +14,9 @@ import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automa
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, FolderIcon, PlusIcon} from 'lucide-react';
+import {FolderIcon, LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {useRef} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
 import ProjectList from './components/project-list/ProjectList';
@@ -32,8 +32,10 @@ const Projects = () => {
 
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_1041 = useFeatureFlagsStore()('ff-1041');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const categoryId = searchParams.get('categoryId');
@@ -120,13 +122,20 @@ const Projects = () => {
                                             triggerNode={
                                                 <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                                                     <PlusIcon className="mr-2 size-4" />
-                                                    Create New Project
+                                                    From Scratch
                                                 </DropdownMenuItem>
                                             }
                                         />
 
+                                        {ff_1041 && (
+                                            <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                                <LayoutTemplateIcon className="mr-2 size-4" />
+                                                From Template
+                                            </DropdownMenuItem>
+                                        )}
+
                                         <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <DownloadIcon className="mr-2 size-4" />
+                                            <UploadIcon className="mr-2 size-4" />
                                             Import Project
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -173,7 +182,7 @@ const Projects = () => {
                                         />
 
                                         <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <DownloadIcon className="mr-2 size-4" /> Import Project
+                                            <UploadIcon className="mr-2 size-4" /> Import Project
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
