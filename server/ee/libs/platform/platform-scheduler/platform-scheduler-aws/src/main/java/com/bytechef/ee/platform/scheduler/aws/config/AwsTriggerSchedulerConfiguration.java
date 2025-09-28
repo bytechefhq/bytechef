@@ -39,27 +39,33 @@ public class AwsTriggerSchedulerConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AwsTriggerSchedulerConfiguration.class);
 
-    private final ApplicationProperties.Cloud.Aws aws;
+    private final ApplicationProperties applicationProperties;
 
     AwsTriggerSchedulerConfiguration(ApplicationProperties applicationProperties) {
         if (log.isInfoEnabled()) {
             log.info("Trigger scheduler provider type enabled: aws");
         }
 
-        this.aws = applicationProperties.getCloud()
-            .getAws();
+        this.applicationProperties = applicationProperties;
     }
 
     @Bean
     AwsTriggerScheduler awsTriggerScheduler(
         AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
 
-        SchedulerClient client = SchedulerClient.builder()
+        ApplicationProperties.Cloud.Aws aws = applicationProperties.getCloud()
+            .getAws();
+        ApplicationProperties.Coordinator.Trigger.Polling polling = applicationProperties
+            .getCoordinator()
+            .getTrigger()
+            .getPolling();
+
+        SchedulerClient schedulerClient = SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())
             .build();
 
-        return new AwsTriggerScheduler(client, aws);
+        return new AwsTriggerScheduler(aws, polling, schedulerClient);
     }
 
     @Bean
