@@ -75,8 +75,13 @@ public class QuartzTriggerSchedulerConfiguration implements SchedulerFactoryBean
     }
 
     @Bean
-    TriggerScheduler quartzTriggerScheduler(Scheduler scheduler) {
-        return new QuartzTriggerScheduler(scheduler);
+    TriggerScheduler quartzTriggerScheduler(ApplicationProperties applicationProperties, Scheduler scheduler) {
+        return new QuartzTriggerScheduler(
+            applicationProperties
+                .getCoordinator()
+                .getTrigger()
+                .getPolling(),
+            scheduler);
     }
 
     private static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory

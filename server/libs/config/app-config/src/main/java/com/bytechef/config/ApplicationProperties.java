@@ -1117,9 +1117,17 @@ public class ApplicationProperties {
          */
         public static class Trigger {
 
+            private Polling polling = new Polling();
             private Subscriptions subscriptions = new Subscriptions();
-
             private Scheduler scheduler = new Scheduler();
+
+            public Polling getPolling() {
+                return polling;
+            }
+
+            public void setPolling(Polling polling) {
+                this.polling = polling;
+            }
 
             public Scheduler getScheduler() {
                 return scheduler;
@@ -1135,6 +1143,19 @@ public class ApplicationProperties {
 
             public void setSubscriptions(Subscriptions subscriptions) {
                 this.subscriptions = subscriptions;
+            }
+
+            public static class Polling {
+
+                private int checkPeriod = 5;
+
+                public int getCheckPeriod() {
+                    return checkPeriod;
+                }
+
+                public void setCheckPeriod(int checkPeriod) {
+                    this.checkPeriod = checkPeriod;
+                }
             }
 
             /**

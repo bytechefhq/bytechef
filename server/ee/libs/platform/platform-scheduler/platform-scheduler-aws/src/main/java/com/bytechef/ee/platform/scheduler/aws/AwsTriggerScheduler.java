@@ -42,12 +42,17 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     private static final String POLLING_TRIGGER = "PollingTrigger";
     private static final String ONE_TIME_TASK = "OneTimeTask";
 
+    private final int pollingTriggerCheckPeriod;
     private final SchedulerClient schedulerClient;
     private final String sqsArn;
     private final String roleArn;
 
     @SuppressFBWarnings("EI")
-    public AwsTriggerScheduler(SchedulerClient schedulerClient, ApplicationProperties.Cloud.Aws aws) {
+    public AwsTriggerScheduler(
+        ApplicationProperties.Cloud.Aws aws, ApplicationProperties.Coordinator.Trigger.Polling polling,
+        SchedulerClient schedulerClient) {
+
+        this.pollingTriggerCheckPeriod = polling.getCheckPeriod();
         this.schedulerClient = schedulerClient;
 
         String accountId = aws.getAccountId();
@@ -120,7 +125,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(Instant.now())
-            .scheduleExpression("rate(5 minutes)"));
+            .scheduleExpression("rate(%s minutes)".formatted(pollingTriggerCheckPeriod)));
     }
 
     @Override

@@ -77,19 +77,18 @@ class AwsTriggerSchedulerTest {
         jsonUtilsMock.when(() -> JsonUtils.write(any()))
             .thenReturn("{\"mocked\":\"json\"}");
 
-        // Create mock SchedulerClient
-        mockSchedulerClient = mock(SchedulerClient.class);
-
-        // Create AWS properties
         ApplicationProperties.Cloud.Aws awsProperties = new ApplicationProperties.Cloud.Aws();
 
         awsProperties.setAccountId(TEST_ACCOUNT_ID);
         awsProperties.setRegion(TEST_REGION);
 
-        // Create AwsTriggerScheduler instance
-        awsTriggerScheduler = new AwsTriggerScheduler(mockSchedulerClient, awsProperties);
+        ApplicationProperties.Coordinator.Trigger.Polling polling =
+            new ApplicationProperties.Coordinator.Trigger.Polling();
 
-        // Setup default mock responses
+        mockSchedulerClient = mock(SchedulerClient.class);
+
+        awsTriggerScheduler = new AwsTriggerScheduler(awsProperties, polling, mockSchedulerClient);
+
         when(mockSchedulerClient.createSchedule(any(Consumer.class)))
             .thenReturn(CreateScheduleResponse.builder()
                 .build());
@@ -316,8 +315,12 @@ class AwsTriggerSchedulerTest {
         testAws.setAccountId("999888777666");
         testAws.setRegion("eu-west-1");
 
+        // Create Trigger Polling properties
+        ApplicationProperties.Coordinator.Trigger.Polling polling =
+            new ApplicationProperties.Coordinator.Trigger.Polling();
+
         // When
-        AwsTriggerScheduler scheduler = new AwsTriggerScheduler(mockSchedulerClient, testAws);
+        AwsTriggerScheduler scheduler = new AwsTriggerScheduler(testAws, polling, mockSchedulerClient);
 
         // Then - verify constructor doesn't throw and object is created
         assertNotNull(scheduler);

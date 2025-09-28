@@ -220,6 +220,9 @@ bytechef:
     provider: caffeine
   coordinator:
     trigger:
+      polling:
+        # Trigger polling interval in minutes (default: 5)
+        check-period: 5
       scheduler:
         # Trigger scheduler provider (aws(ee) | quartz) default: quartz
         provider: quartz

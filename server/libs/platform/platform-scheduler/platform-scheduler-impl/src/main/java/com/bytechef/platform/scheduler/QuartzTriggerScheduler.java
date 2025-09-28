@@ -18,6 +18,7 @@ package com.bytechef.platform.scheduler;
 
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.job.DelaySchedulerJob;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
@@ -44,10 +45,14 @@ import org.quartz.TriggerKey;
  */
 public class QuartzTriggerScheduler implements TriggerScheduler {
 
+    private final int pollingTriggerCheckPeriod;
     private final Scheduler scheduler;
 
     @SuppressFBWarnings("EI")
-    public QuartzTriggerScheduler(Scheduler scheduler) {
+    public QuartzTriggerScheduler(
+        ApplicationProperties.Coordinator.Trigger.Polling polling, Scheduler scheduler) {
+
+        this.pollingTriggerCheckPeriod = polling.getCheckPeriod();
         this.scheduler = scheduler;
     }
 
@@ -116,7 +121,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "PollingTrigger"))
             .withSchedule(
-                SimpleScheduleBuilder.repeatMinutelyForever(5))
+                SimpleScheduleBuilder.repeatMinutelyForever(pollingTriggerCheckPeriod))
             .startNow()
             .build();
 
