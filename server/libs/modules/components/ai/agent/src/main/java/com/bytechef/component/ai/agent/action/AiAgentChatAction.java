@@ -148,6 +148,8 @@ public class AiAgentChatAction {
                 .messages(ModelUtils.getMessages(inputParameters, actionContext))
                 .tools(
                     getTools(
+                .toolCallbacks(
+                    getToolCallbacks(
                         clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
                         actionContextAware.isEditorEnvironment(), actionContext))
                 .call();
@@ -223,7 +225,7 @@ public class AiAgentChatAction {
     }
 
     @SuppressFBWarnings("NP")
-    private List<ToolCallback> getTools(
+    private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
         boolean editorEnvironment, ActionContext actionContext) {
 
