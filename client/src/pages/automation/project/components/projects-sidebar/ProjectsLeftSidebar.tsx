@@ -15,6 +15,7 @@ import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/wo
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
@@ -48,6 +49,8 @@ const ProjectsLeftSidebar = ({
     const navigate = useNavigate();
 
     const {captureProjectWorkflowImported} = useAnalytics();
+
+    const ff_1041 = useFeatureFlagsStore()('ff-1041');
 
     const {data: eachProjectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
         selectedProjectId,
@@ -167,6 +170,12 @@ const ProjectsLeftSidebar = ({
                             <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
                                 <PlusIcon /> From Scratch
                             </DropdownMenuItem>
+
+                            {ff_1041 && (
+                                <DropdownMenuItem onClick={() => navigate(`./../../templates`)}>
+                                    <LayoutTemplateIcon /> From Template
+                                </DropdownMenuItem>
+                            )}
 
                             <DropdownMenuItem
                                 onClick={() => {
