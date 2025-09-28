@@ -8,11 +8,9 @@ import {
 } from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
 import {useProject} from '@/pages/automation/project/hooks/useProject';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
-    useCreateProjectWorkflowMutation,
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
 } from '@/shared/mutations/automation/workflows.mutations';
@@ -23,7 +21,6 @@ import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
@@ -31,12 +28,9 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const {projectId} = useProject();
 
-    const {captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const {toast} = useToast();
-
-    const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {data: projectVersions} = useGetProjectVersionsQuery(project.id!);
 
@@ -70,24 +64,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-        },
-    });
-
-    const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: () => {
-            captureProjectWorkflowImported();
-
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
-
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            if (hiddenFileInputRef.current) {
-                hiddenFileInputRef.current.value = '';
-            }
-
-            toast({
-                description: 'Workflow is imported.',
-            });
         },
     });
 
@@ -164,15 +140,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         });
     };
 
-    const handleImportProjectWorkflowClick = (definition: string) => {
-        importProjectWorkflowMutation.mutate({
-            id: project.id!,
-            workflow: {
-                definition,
-            },
-        });
-    };
-
     const handlePullProjectFromGitClick = () => {
         pullProjectFromGitMutation.mutate({id: project.id!});
     };
@@ -200,10 +167,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         handleDeleteWorkflowAlertDialogClick,
         handleDuplicateProjectClick,
         handleDuplicateWorkflowClick,
-        handleImportProjectWorkflowClick,
         handlePullProjectFromGitClick,
         handleUpdateProjectGitConfigurationSubmit,
-        hiddenFileInputRef,
         projectGitConfiguration,
         projectVersions,
     };
