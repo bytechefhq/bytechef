@@ -18,6 +18,7 @@ package com.bytechef.platform.scheduler;
 
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.scheduler.job.DelaySchedulerJob;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
@@ -117,6 +118,26 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             .withSchedule(
                 SimpleScheduleBuilder.repeatMinutelyForever(5))
             .startNow()
+            .build();
+
+        schedule(jobDetail, trigger);
+    }
+
+    @Override
+    public void scheduleOneTimeTask(
+        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        String taskExecutionId) {
+
+        JobDetail jobDetail = JobBuilder.newJob(DelaySchedulerJob.class)
+            .withIdentity(JobKey.jobKey(taskExecutionId, "DelayTask"))
+            .usingJobData("output", JsonUtils.write(output))
+            .usingJobData("workflowExecutionId", workflowExecutionId.toString())
+            .usingJobData("taskExecutionId", taskExecutionId)
+            .build();
+
+        Trigger trigger = TriggerBuilder.newTrigger()
+            .withIdentity(TriggerKey.triggerKey(taskExecutionId, "DelayTask"))
+            .startAt(DateUtils.toDate(executeAt))
             .build();
 
         schedule(jobDetail, trigger);

@@ -45,4 +45,10 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
     }
+
+    @Override
+    public void scheduleOneTimeTask(
+        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        String taskExecutionId) {
+    }
 }
