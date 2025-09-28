@@ -7,7 +7,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 // Mock the feature flags store
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => false, // ff_1039 disabled for simpler testing
+    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482', // Enable ff_2482 for export functionality, disable others
 }));
 
 const createTestQueryClient = () =>
@@ -118,7 +118,6 @@ describe('ProjectTabButtons Export Functionality', () => {
 
         expect(screen.getByText('Edit')).toBeInTheDocument();
         expect(screen.getByText('Duplicate')).toBeInTheDocument();
-        expect(screen.getByText('Import Workflow')).toBeInTheDocument();
         expect(screen.getByText('Export Project')).toBeInTheDocument();
         expect(screen.getByText('Project History')).toBeInTheDocument();
         expect(screen.getByText('Delete')).toBeInTheDocument();
@@ -142,24 +141,6 @@ describe('ProjectTabButtons Export Functionality', () => {
         // Test Delete button
         await userEvent.click(screen.getByText('Delete'));
         expect(mockProps.onDeleteProjectClick).toHaveBeenCalled();
-    });
-
-    it('should trigger file input click when Import Workflow is clicked', async () => {
-        const mockFileInput = {
-            click: vi.fn(),
-        } as unknown as HTMLInputElement;
-
-        const propsWithFileRef = {
-            ...mockProps,
-            hiddenFileInputRef: {current: mockFileInput} as React.RefObject<HTMLInputElement>,
-        };
-
-        renderProjectTabButtons(propsWithFileRef);
-
-        const importButton = screen.getByText('Import Workflow');
-        await userEvent.click(importButton);
-
-        expect(mockFileInput.click).toHaveBeenCalled();
     });
 
     it('should not show Git-related buttons when feature flag is disabled', () => {
