@@ -39,6 +39,7 @@ const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordRe
 const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
+const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Register = lazy(() => import('@/pages/account/public/Register'));
 const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
@@ -46,6 +47,7 @@ const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
+const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
@@ -438,7 +440,17 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <LazyLoadWrapper>
-                                                <ProjectTemplate fromInternalFlow />
+                                                <ProjectTemplates />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'projects/templates',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <ProjectTemplate fromInternalFlow sharedProject={false} />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
@@ -448,7 +460,17 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <LazyLoadWrapper>
-                                                <WorkflowTemplate fromInternalFlow />
+                                                <WorkflowTemplates />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'projects/:projectId/templates',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <WorkflowTemplate fromInternalFlow sharedWorkflow={false} />
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
