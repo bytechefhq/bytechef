@@ -87,7 +87,8 @@ public class ContextFactoryImpl implements ContextFactory {
         String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment) {
 
         return new ContextImpl(
-            componentName, -1, null, connection, getHttpClientExecutor(editorEnvironment), tempFileStorage);
+            componentName, -1, null, connection, getHttpClientExecutor(editorEnvironment),
+            getTempFileStorage(editorEnvironment));
     }
 
     @Override

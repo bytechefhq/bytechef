@@ -106,7 +106,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @Override
     public Context createContext(String componentName, @Nullable ComponentConnection connection) {
-        return contextFactory.createContext(componentName, connection);
+        return contextFactory.createContext(componentName, connection, editorEnvironment);
     }
 
     @Override
