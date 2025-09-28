@@ -52,6 +52,7 @@ import {
     EllipsisVerticalIcon,
     GitBranchIcon,
     GitPullRequestArrowIcon,
+    LayoutTemplateIcon,
     PlusIcon,
     SendIcon,
     Share2Icon,
@@ -89,6 +90,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const {toast} = useToast();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
+    const ff_1041 = useFeatureFlagsStore()('ff-1041');
     const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
@@ -404,8 +406,17 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     className="dropdown-menu-item"
                                     onClick={() => setShowWorkflowDialog(true)}
                                 >
-                                    <PlusIcon /> New Workflow
+                                    <PlusIcon /> New Empty Workflow
                                 </DropdownMenuItem>
+
+                                {ff_1041 && (
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item"
+                                        onClick={() => navigate(`${project.id}/templates`)}
+                                    >
+                                        <LayoutTemplateIcon /> Workflow from Template
+                                    </DropdownMenuItem>
+                                )}
 
                                 <DropdownMenuItem
                                     className="dropdown-menu-item"
