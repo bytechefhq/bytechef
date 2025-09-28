@@ -128,6 +128,8 @@ public class AiAgentChatAction {
             ComponentConnection componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
             ChatModel chatModel = (ChatModel) modelFunction.apply(
+                ParametersFactory.createParameters(
+                    MapUtils.concat(Map.copyOf(inputParameters.toMap()), Map.copyOf(clusterElement.getParameters()))),
                 ParametersFactory.createParameters(componentConnection.getParameters()), true);
 
             ChatClient chatClient = ChatClient.builder(chatModel)
