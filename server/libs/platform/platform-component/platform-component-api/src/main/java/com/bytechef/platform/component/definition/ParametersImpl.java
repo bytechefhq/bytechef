@@ -542,6 +542,11 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public Map<String, ?> toMap() {
+        return map;
+    }
+
+    @Override
     public boolean isEmpty() {
         return map.isEmpty();
     }

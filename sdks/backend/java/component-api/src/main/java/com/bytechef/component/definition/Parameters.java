@@ -186,4 +186,6 @@ public interface Parameters extends Map<String, Object> {
     String getString(String key);
 
     String getString(String key, String defaultValue);
+
+    Map<String, ?> toMap();
 }
