@@ -102,7 +102,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 (projectWorkflowId) => projectWorkflowId !== deletedWorkflowId
             );
 
-            if (!projectId || !firstRemainingWorkflowId || !deletedWorkflowId) {
+            if (!projectId || !deletedWorkflowId) {
                 return;
             }
 
@@ -116,7 +116,11 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`);
+            const baseUrl = '/automation/projects';
+            const firstRemainingWorkflowUrlSuffix = firstRemainingWorkflowId
+                ? `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`
+                : '';
+            navigate(baseUrl + firstRemainingWorkflowUrlSuffix);
         },
     });
 
