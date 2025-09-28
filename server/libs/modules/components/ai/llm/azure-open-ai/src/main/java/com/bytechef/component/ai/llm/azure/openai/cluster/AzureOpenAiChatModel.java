@@ -57,7 +57,10 @@ public class AzureOpenAiChatModel {
                 STOP_PROPERTY,
                 USER_PROPERTY);
 
-    protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return AzureOpenAiChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+    protected static ChatModel apply(
+        Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
+
+        return AzureOpenAiChatAction.CHAT_MODEL.createChatModel(
+            inputParameters, connectionParameters, responseFormatRequired);
     }
 }

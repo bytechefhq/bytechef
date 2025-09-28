@@ -91,11 +91,17 @@ public class AzureOpenAiChatAction {
         .output(ModelUtils::output)
         .perform(AzureOpenAiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        AzureOpenAiResponseFormat azureOpenAiResponseFormat = null;
 
-        Type type = responseFormat == ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+        if (responseFormatRequired) {
+            ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+            Type type = responseFormat == ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+
+            azureOpenAiResponseFormat = new AzureOpenAiResponseFormat(type, null);
+        }
 
         return AzureOpenAiChatModel.builder()
             .openAIClientBuilder(
@@ -110,7 +116,7 @@ public class AzureOpenAiChatAction {
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
                     .N(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(new AzureOpenAiResponseFormat(type, null))
+                    .responseFormat(azureOpenAiResponseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
@@ -124,6 +130,7 @@ public class AzureOpenAiChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

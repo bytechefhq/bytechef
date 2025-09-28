@@ -89,16 +89,20 @@ public class GroqChatAction {
         .output(ModelUtils::output)
         .perform(GroqChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        ResponseFormat responseFormat = null;
 
-        ResponseFormat.Type type =
-            responseFormat.equals(TEXT) ? ResponseFormat.Type.TEXT : ResponseFormat.Type.JSON_OBJECT;
+        if (responseFormatRequired) {
+            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
 
-        ResponseFormat format = ResponseFormat.builder()
-            .type(type)
-            .build();
+            ResponseFormat.Type type =
+                chatModelResponseFormat.equals(TEXT) ? ResponseFormat.Type.TEXT : ResponseFormat.Type.JSON_OBJECT;
+
+            responseFormat = ResponseFormat.builder()
+                .type(type)
+                .build();
+        }
 
         return OpenAiChatModel.builder()
             .openAiApi(
@@ -115,7 +119,7 @@ public class GroqChatAction {
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
                     .N(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(format)
+                    .responseFormat(responseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))

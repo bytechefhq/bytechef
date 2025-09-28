@@ -56,7 +56,7 @@ class ChatModelActionTest extends AbstractActionTest {
         org.springframework.ai.chat.model.ChatModel mockedChatModelModel = mock(
             org.springframework.ai.chat.model.ChatModel.class);
 
-        when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModelModel);
+        when(mockedChat.createChatModel(mockedParameters, mockedParameters, eq(true))).thenReturn(mockedChatModelModel);
 
         when(mockedChatModelModel.call(any(Prompt.class))).thenReturn(
             new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));
@@ -70,7 +70,7 @@ class ChatModelActionTest extends AbstractActionTest {
 
         @Override
         public org.springframework.ai.chat.model.ChatModel createChatModel(
-            Parameters inputParameters, Parameters connectionParameters) {
+            Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
 
             return prompt -> new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER))));
         }

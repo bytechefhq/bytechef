@@ -80,15 +80,19 @@ public class DeepSeekChatAction {
         .output(ModelUtils::output)
         .perform(DeepSeekChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        ResponseFormat responseFormat = null;
 
-        Type type = responseFormat == ChatModel.ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+        if (responseFormatRequired) {
+            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
 
-        ResponseFormat format = ResponseFormat.builder()
-            .type(type)
-            .build();
+            Type type = chatModelResponseFormat == ChatModel.ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+
+            responseFormat = ResponseFormat.builder()
+                .type(type)
+                .build();
+        }
 
         return DeepSeekChatModel.builder()
             .deepSeekApi(
@@ -103,7 +107,7 @@ public class DeepSeekChatAction {
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
                     .model(inputParameters.getRequiredString(MODEL))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(format)
+                    .responseFormat(responseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))

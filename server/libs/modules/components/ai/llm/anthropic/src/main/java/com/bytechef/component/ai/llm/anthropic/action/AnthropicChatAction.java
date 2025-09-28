@@ -72,21 +72,23 @@ public class AnthropicChatAction {
         .output(ModelUtils::output)
         .perform(AnthropicChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> AnthropicChatModel.builder()
-        .anthropicApi(
-            AnthropicApi.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .build())
-        .defaultOptions(
-            AnthropicChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .topP(inputParameters.getDouble(TOP_P))
-                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .topK(inputParameters.getInteger(TOP_K))
-                .build())
-        .build();
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters, responseFormatRequired) -> AnthropicChatModel.builder()
+            .anthropicApi(
+                AnthropicApi.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .build())
+            .defaultOptions(
+                AnthropicChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .topK(inputParameters.getInteger(TOP_K))
+                    .build())
+            .build();
 
     private AnthropicChatAction() {
     }

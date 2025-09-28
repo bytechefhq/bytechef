@@ -32,10 +32,15 @@ public interface ModelFunction {
     ClusterElementType MODEL = new ClusterElementType("MODEL", "model", "Model", true);
 
     /**
-     * @param inputParameters
-     * @param connectionParameters
-     * @return
-     * @throws Exception
+     * @param inputParameters        The input parameters for the model function.
+     * @param connectionParameters   The connection parameters required to access the model.
+     * @param responseFormatRequired If {@code true}, the model's response should be formatted according to a specific
+     *                               response format; if {@code false}, the raw response can be returned. Set to
+     *                               {@code true} when a structured or standardized output is required from the model,
+     *                               otherwise set to {@code false}.
+     * @return The result of the model function.
+     * @throws Exception If an error occurs during model execution.
      */
-    Model<?, ?> apply(Parameters inputParameters, Parameters connectionParameters) throws Exception;
+    Model<?, ?> apply(Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired)
+        throws Exception;
 }

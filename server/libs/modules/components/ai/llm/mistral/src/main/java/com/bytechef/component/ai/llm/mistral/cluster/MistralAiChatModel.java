@@ -51,7 +51,10 @@ public class MistralAiChatModel {
                 SEED_PROPERTY,
                 SAFE_PROMPT_PROPERTY);
 
-    protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return MistralChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+    protected static ChatModel apply(
+        Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
+
+        return MistralChatAction.CHAT_MODEL.createChatModel(
+            inputParameters, connectionParameters, responseFormatRequired);
     }
 }

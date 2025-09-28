@@ -151,7 +151,7 @@ public class OllamaChatAction {
         .output(ModelUtils::output)
         .perform(OllamaChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
         String url = connectionParameters.getString(URL);
 
         OllamaApi ollamaApi = url.isEmpty() ? OllamaApi.builder()

@@ -49,7 +49,10 @@ public class AntropicChatModel {
                 TOP_K_PROPERTY,
                 STOP_PROPERTY);
 
-    protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return AnthropicChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+    protected static ChatModel apply(
+        Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
+
+        return AnthropicChatAction.CHAT_MODEL.createChatModel(
+            inputParameters, connectionParameters, responseFormatRequired);
     }
 }
