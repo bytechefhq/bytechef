@@ -80,7 +80,7 @@ public abstract class AbstractWebhookTriggerController {
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private String publicUrld;
+    private String publicUrl;
     private final TempFileStorage tempFileStorage;
     private final TriggerDefinitionService triggerDefinitionService;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
@@ -97,12 +97,12 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     protected AbstractWebhookTriggerController(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrld, TempFileStorage tempFileStorage,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrl, TempFileStorage tempFileStorage,
         TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
         WorkflowService workflowService) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
-        this.publicUrld = publicUrld;
+        this.publicUrl = publicUrl;
         this.tempFileStorage = tempFileStorage;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
@@ -200,7 +200,7 @@ public abstract class AbstractWebhookTriggerController {
     private String convertToFileEntryUrl(Map<?, ?> map) {
         FileEntry fileEntry = new FileEntry((Map<String, ?>) map);
 
-        return publicUrld + "/file-entries/%s/content".formatted(fileEntry.toId());
+        return publicUrl + "/file-entries/%s/content".formatted(fileEntry.toId());
     }
 
     private BodyAndParameters getBodyAndParameters(
