@@ -13,12 +13,10 @@ import {
     HistoryIcon,
     Share2Icon,
     Trash2Icon,
-    UploadIcon,
 } from 'lucide-react';
-import {MouseEvent, RefObject} from 'react';
+import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
-    hiddenFileInputRef,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
     onDuplicateProjectClick,
@@ -30,7 +28,6 @@ const ProjectTabButtons = ({
     projectGitConfigurationEnabled,
     projectId,
 }: {
-    hiddenFileInputRef: RefObject<HTMLInputElement>;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
@@ -63,26 +60,6 @@ const ProjectTabButtons = ({
 
             <Button className="dropdown-menu-item" onClick={onDuplicateProjectClick} variant="ghost">
                 <CopyIcon /> Duplicate
-            </Button>
-
-            <Button
-                className="dropdown-menu-item"
-                onClick={() => {
-                    if (hiddenFileInputRef.current) {
-                        hiddenFileInputRef.current.click();
-                    }
-                }}
-                variant="ghost"
-            >
-                <DownloadIcon /> Import Workflow
-            </Button>
-
-            <Button
-                className="dropdown-menu-item"
-                onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
-                variant="ghost"
-            >
-                <UploadIcon /> Export Project
             </Button>
 
             {ff_1042 && (

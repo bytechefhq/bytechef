@@ -18,7 +18,7 @@ import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {SettingsIcon} from 'lucide-react';
-import {ChangeEvent, useState} from 'react';
+import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderSettingsMenuProps {
@@ -49,21 +49,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
         handleDeleteWorkflowAlertDialogClick,
         handleDuplicateProjectClick,
         handleDuplicateWorkflowClick,
-        handleImportProjectWorkflowClick,
         handlePullProjectFromGitClick,
         handleUpdateProjectGitConfigurationSubmit,
-        hiddenFileInputRef,
         projectGitConfiguration,
         projectVersions,
     } = useSettingsMenu({project, workflow});
-
-    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const definition = await e.target.files[0].text();
-
-            handleImportProjectWorkflowClick(definition);
-        }
-    };
 
     return (
         <>
@@ -121,7 +111,6 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
 
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
-                                hiddenFileInputRef={hiddenFileInputRef}
                                 onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
                                 onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
@@ -206,7 +195,6 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                     workflowUuid={workflow.workflowUuid!}
                 />
             )}
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
         </>
     );
 };
