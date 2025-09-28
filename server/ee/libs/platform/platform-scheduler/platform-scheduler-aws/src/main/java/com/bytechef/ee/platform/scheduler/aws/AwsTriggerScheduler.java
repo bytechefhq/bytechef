@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.scheduler.aws;
 
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_ONE_TIME_TASK_QUEUE;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_POLLING_TRIGGER_QUEUE;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SCHEDULE_TRIGGER_QUEUE;
 
@@ -39,6 +40,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     private static final String SCHEDULE_TRIGGER = "ScheduleTrigger";
     private static final String POLLING_TRIGGER = "PollingTrigger";
+    private static final String ONE_TIME_TASK = "OneTimeTask";
 
     private final SchedulerClient schedulerClient;
     private final String sqsArn;
@@ -119,6 +121,26 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
             .startDate(Instant.now())
             .scheduleExpression("rate(5 minutes)"));
+    }
+
+    @Override
+    public void scheduleOneTimeTask(
+        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        String taskExecutionId) {
+
+        Target sqsTarget = Target.builder()
+            .roleArn(roleArn)
+            .arn(sqsArn + ":" + SCHEDULER_ONE_TIME_TASK_QUEUE)
+            .input(workflowExecutionId.toString() + AwsTriggerSchedulerConstants.SPLITTER + taskExecutionId +
+                AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output))
+            .build();
+
+        schedulerClient.createSchedule(request -> request.clientToken(taskExecutionId.substring(16))
+            .groupName(ONE_TIME_TASK)
+            .name(ONE_TIME_TASK + taskExecutionId.substring(0, 16))
+            .target(sqsTarget)
+            .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+            .startDate(executeAt.toInstant(ZoneOffset.UTC)));
     }
 
     @Override

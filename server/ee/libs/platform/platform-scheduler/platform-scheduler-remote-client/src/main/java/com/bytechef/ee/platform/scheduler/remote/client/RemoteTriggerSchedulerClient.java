@@ -99,10 +99,29 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
             new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output));
     }
 
+    @Override
+    public void scheduleOneTimeTask(
+        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        String taskExecutionId) {
+
+        loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(SCHEDULER_APP)
+                .path(TRIGGER_SCHEDULER + "/schedule-one-time-task")
+                .build(),
+            new OneTimeTaskRequest(workflowExecutionId, executeAt, output, taskExecutionId));
+    }
+
     @SuppressFBWarnings("EI")
     private record DynamicWebhookRefreshTaskRequest(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion, Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record OneTimeTaskRequest(
+        WorkflowExecutionId workflowExecutionId, LocalDateTime executeAt, Map<String, Object> output,
+        String taskExecutionId) {
     }
 
     @SuppressFBWarnings("EI")

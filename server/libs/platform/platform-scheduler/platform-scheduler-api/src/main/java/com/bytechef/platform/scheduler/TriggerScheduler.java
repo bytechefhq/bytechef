@@ -39,4 +39,8 @@ public interface TriggerScheduler {
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId);
 
     void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId);
+
+    void scheduleOneTimeTask(
+        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        String taskExecutionId);
 }

@@ -18,6 +18,7 @@ public class AwsTriggerSchedulerConstants {
     public static final String SPLITTER = "_;_";
     public static final String SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE =
         "scheduler-dynamic_webhook_trigger_refresh_queue";
+    public static final String SCHEDULER_ONE_TIME_TASK_QUEUE = "scheduler-one_time_task_queue";
     public static final String SCHEDULER_POLLING_TRIGGER_QUEUE = "scheduler-polling_trigger_queue";
     public static final String SCHEDULER_SCHEDULE_TRIGGER_QUEUE = "scheduler-schedule_trigger_queue";
 }
