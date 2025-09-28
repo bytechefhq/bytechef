@@ -80,11 +80,17 @@ public class MistralChatAction {
         .output(ModelUtils::output)
         .perform(MistralChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        ChatModel.ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        ResponseFormat responseFormat = null;
 
-        String type = responseFormat.equals(ChatModel.ResponseFormat.TEXT) ? "text" : "json_object";
+        if (responseFormatRequired) {
+            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+
+            String type = chatModelResponseFormat.equals(ChatModel.ResponseFormat.TEXT) ? "text" : "json_object";
+
+            responseFormat = new ResponseFormat(type);
+        }
 
         return MistralAiChatModel.builder()
             .mistralAiApi(
@@ -102,7 +108,7 @@ public class MistralChatAction {
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                     .randomSeed(inputParameters.getInteger(SEED))
-                    .responseFormat(new ResponseFormat(type))
+                    .responseFormat(responseFormat)
                     .build())
             .build();
     };

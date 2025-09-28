@@ -51,13 +51,14 @@ public interface ChatModel {
     }
 
     org.springframework.ai.chat.model.ChatModel createChatModel(
-        Parameters inputParameters, Parameters connectionParameters);
+        Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired);
 
     @Nullable
     default Object getResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
+        org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(
+            inputParameters, connectionParameters, true);
 
         List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
             inputParameters, actionContext);

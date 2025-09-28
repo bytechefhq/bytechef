@@ -54,7 +54,7 @@ public abstract class AbstractMetadataEnricher {
         try {
             return (ChatModel) modelFunction.apply(
                 ParametersFactory.createParameters(clusterElement.getParameters()),
-                ParametersFactory.createParameters(componentConnection.getParameters()));
+                ParametersFactory.createParameters(componentConnection.getParameters()), false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

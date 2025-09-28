@@ -57,7 +57,9 @@ public class GroqChatModel {
                 STOP_PROPERTY,
                 USER_PROPERTY);
 
-    protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return GroqChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+    protected static ChatModel apply(
+        Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
+
+        return GroqChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters, responseFormatRequired);
     }
 }

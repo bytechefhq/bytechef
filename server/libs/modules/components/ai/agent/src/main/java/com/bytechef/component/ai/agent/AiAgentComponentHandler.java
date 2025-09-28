@@ -49,8 +49,8 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .icon("path:assets/ai-agent.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
-                    new AiAgentChatAction(clusterElementDefinitionFacade,
-                        clusterElementDefinitionService).actionDefinition));
+                    new AiAgentChatAction(
+                        clusterElementDefinitionFacade, clusterElementDefinitionService).actionDefinition));
     }
 
     @Override

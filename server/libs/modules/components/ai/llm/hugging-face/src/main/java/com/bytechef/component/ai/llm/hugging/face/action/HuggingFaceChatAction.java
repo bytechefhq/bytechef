@@ -54,8 +54,9 @@ public class HuggingFaceChatAction {
         .output(ModelUtils::output)
         .perform(HuggingFaceChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new HuggingfaceChatModel(
-        connectionParameters.getString(TOKEN), inputParameters.getString(URL));
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters, responseFormatRequired) -> new HuggingfaceChatModel(
+            connectionParameters.getString(TOKEN), inputParameters.getString(URL));
 
     private HuggingFaceChatAction() {
     }

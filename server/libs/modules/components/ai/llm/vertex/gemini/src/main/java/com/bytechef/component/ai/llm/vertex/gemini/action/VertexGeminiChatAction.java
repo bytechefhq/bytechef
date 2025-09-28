@@ -79,25 +79,28 @@ public class VertexGeminiChatAction {
         .output(ModelUtils::output)
         .perform(VertexGeminiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        VertexAiGeminiChatOptions.Builder builder = VertexAiGeminiChatOptions.builder()
+            .model(inputParameters.getRequiredString(MODEL))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K))
+            .candidateCount(inputParameters.getInteger(N));
+
+        if (responseFormatRequired) {
+            ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+
+            builder.responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json");
+        }
 
         return VertexAiGeminiChatModel
             .builder()
             .vertexAI(
                 new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)))
-            .defaultOptions(
-                VertexAiGeminiChatOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .topK(inputParameters.getInteger(TOP_K))
-                    .candidateCount(inputParameters.getInteger(N))
-                    .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
-                    .build())
+            .defaultOptions(builder.build())
             .build();
     };
 
