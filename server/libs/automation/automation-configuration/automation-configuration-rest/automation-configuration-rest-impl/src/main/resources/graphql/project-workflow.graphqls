@@ -22,7 +22,7 @@ type WorkflowTemplate {
     description: String
     projectVersion: Int
     publicUrl: String
-    workflow: SharedWorkflowInfo
+    workflow: SharedWorkflowInfo!
 }
 
 type SharedWorkflow {
