@@ -83,7 +83,12 @@ public class MapUtils {
     }
 
     public static boolean containsPath(Map<String, ?> map, String path) {
-        return readFromPath(map, path) != null;
+        try {
+            JsonPath.read(map, path);
+            return true;
+        } catch (PathNotFoundException e) {
+            return false;
+        }
     }
 
     public static boolean isEmpty(Map<String, ?> map) {
