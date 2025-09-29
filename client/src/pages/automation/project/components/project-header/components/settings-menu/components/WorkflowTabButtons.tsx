@@ -1,6 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {CopyIcon, DownloadIcon, EditIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 import {MouseEvent} from 'react';
@@ -20,7 +21,10 @@ const WorkflowTabButtons = ({
     onShowDeleteWorkflowAlertDialog: () => void;
     workflowId: string;
 }) => {
+    const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
+
     const ff_1042 = useFeatureFlagsStore()('ff-1042');
+    const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -41,6 +45,20 @@ const WorkflowTabButtons = ({
             {ff_1042 && (
                 <Button className="dropdown-menu-item" onClick={onShareWorkflow} variant="ghost">
                     <Share2Icon /> Share
+                </Button>
+            )}
+
+            {ff_2939 && (
+                <Button
+                    className="dropdown-menu-item"
+                    onClick={() => {
+                        if (templatesSubmissionForm) {
+                            window.open(templatesSubmissionForm, '_blank');
+                        }
+                    }}
+                    variant="ghost"
+                >
+                    <Share2Icon /> Share with Community
                 </Button>
             )}
 

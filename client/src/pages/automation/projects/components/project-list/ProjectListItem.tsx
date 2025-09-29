@@ -41,6 +41,7 @@ import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories
 import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -80,6 +81,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
+
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -88,6 +91,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
     const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
+    const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
 
@@ -367,6 +371,19 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         onClick={() => setShowProjectShareDialog(true)}
                                     >
                                         <Share2Icon /> Share Project
+                                    </DropdownMenuItem>
+                                )}
+
+                                {ff_2939 && (
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item"
+                                        onClick={() => {
+                                            if (templatesSubmissionForm) {
+                                                window.open(templatesSubmissionForm, '_blank');
+                                            }
+                                        }}
+                                    >
+                                        <Share2Icon /> Share with Community
                                     </DropdownMenuItem>
                                 )}
 

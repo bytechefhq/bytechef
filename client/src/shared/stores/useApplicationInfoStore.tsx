@@ -35,6 +35,10 @@ export interface ApplicationInfoI {
         activationRequired: boolean;
         enabled: boolean;
     };
+    templatesSubmissionForm: {
+        projects: string;
+        workflows: string;
+    };
 
     getApplicationInfo: () => Promise<void>;
 }
@@ -74,6 +78,10 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     activationRequired: false,
                     enabled: true,
                 },
+                templatesSubmissionForm: {
+                    projects: undefined,
+                    workflow: undefined,
+                },
 
                 getApplicationInfo: async () => {
                     if (get().loading) {
@@ -109,6 +117,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             },
                             loading: false,
                             signUp: json.signUp,
+                            templatesSubmissionForm: json.templatesSubmissionForm,
                         }));
                     }
                 },
