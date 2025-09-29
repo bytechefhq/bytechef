@@ -116,6 +116,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(projectId),
+            });
+
             const baseUrl = '/automation/projects';
             const firstRemainingWorkflowUrlSuffix = firstRemainingWorkflowId
                 ? `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`
