@@ -17,6 +17,7 @@
 package com.bytechef.component.github;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.github.connection.GithubConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -56,6 +57,15 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
             GithubStarRepositoryAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
+        .clusterElements(
+            tool(GithubAddAssigneesToIssueAction.ACTION_DEFINITION),
+            tool(GithubAddLabelsToIssueAction.ACTION_DEFINITION),
+            tool(GithubCreateCommentOnIssueAction.ACTION_DEFINITION),
+            tool(GithubCreateIssueAction.ACTION_DEFINITION),
+            tool(GithubGetIssueAction.ACTION_DEFINITION),
+            tool(GithubListIssuesAction.ACTION_DEFINITION),
+            tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
+            tool(GithubStarRepositoryAction.ACTION_DEFINITION))
         .triggers(
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
             GithubNewPullRequestTrigger.TRIGGER_DEFINITION);
