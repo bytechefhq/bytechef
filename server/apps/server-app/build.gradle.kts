@@ -176,6 +176,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:calendly"))
     implementation(project(":server:libs:modules:components:capsule-crm"))
     implementation(project(":server:libs:modules:components:chat"))
+    implementation(project(":server:libs:modules:components:claude-code"))
     implementation(project(":server:libs:modules:components:clickup"))
     implementation(project(":server:libs:modules:components:coda"))
     implementation(project(":server:libs:modules:components:contiguity"))
