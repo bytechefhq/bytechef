@@ -17,28 +17,45 @@
 package com.bytechef.component.delay;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.delay.action.DelaySleepAction;
-import com.google.auto.service.AutoService;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.ScheduleComponentDefinition;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component(DELAY + "_v1_ComponentHandler")
 public class DelayComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("delay")
-        .title("Delay")
-        .description("Sets a value which can then be referenced in other tasks.")
-        .categories(ComponentCategory.HELPERS)
-        .icon("path:assets/delay.svg")
-        .actions(DelaySleepAction.ACTION_DEFINITION);
+    private final ComponentDefinition componentDefinition;
+
+    public DelayComponentHandler(TriggerScheduler triggerScheduler) {
+        this.componentDefinition = new DelayComponentDefinitionImpl(triggerScheduler);
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
+    }
+
+    private static class DelayComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements ScheduleComponentDefinition {
+
+        public DelayComponentDefinitionImpl(TriggerScheduler triggerScheduler) {
+            super(
+                component(DELAY)
+                    .title("Delay")
+                    .description("Sets a value which can then be referenced in other tasks.")
+                    .categories(ComponentCategory.HELPERS)
+                    .icon("path:assets/delay.svg")
+                    .actions(new DelaySleepAction(triggerScheduler).actionDefinition));
+        }
     }
 }

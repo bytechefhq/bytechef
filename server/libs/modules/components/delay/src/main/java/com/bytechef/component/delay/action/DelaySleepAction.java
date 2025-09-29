@@ -23,15 +23,19 @@ import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class DelaySleepAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sleep")
+    public final ModifiableActionDefinition actionDefinition = action("sleep")
         .title("Sleep")
         .description("Delay action execution.")
         .properties(
@@ -40,26 +44,43 @@ public class DelaySleepAction {
                 .description("Time in milliseconds.")
                 .required(true)
                 .defaultValue(1))
-        .perform(DelaySleepAction::perform);
+        .perform(this::perform);
 
-    protected static Object perform(
+    private final TriggerScheduler triggerScheduler;
+
+    public DelaySleepAction(TriggerScheduler triggerScheduler) {
+        this.triggerScheduler = triggerScheduler;
+    }
+
+    protected Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws InterruptedException {
 
+        long millis;
         if (inputParameters.containsKey(MILLIS)) {
-            sleep(inputParameters.getLong(MILLIS));
+            millis = inputParameters.getLong(MILLIS);
         } else if (inputParameters.containsKey("duration")) {
             Duration duration = inputParameters.getDuration("duration");
-
-            sleep(duration.toMillis());
+            millis = duration.toMillis();
         } else {
-            sleep(1000);
+            millis = 1000;
         }
 
-        return null;
+        LocalDateTime executeAt = scheduleDelay(millis, (ActionContextAware) context);
+
+        return Map.of("scheduledAt", executeAt, "delayMillis", millis);
     }
 
-    protected static void sleep(long millis) throws InterruptedException {
-        TimeUnit.MILLISECONDS.sleep(millis);
+    private LocalDateTime scheduleDelay(long millis, ActionContextAware context) throws InterruptedException {
+        String taskExecutionId = String.valueOf(context.getJobId());
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(context.getWorkflowId());
+
+        LocalDateTime executeAt = LocalDateTime.now()
+            .plusNanos(millis * 1_000_000);
+
+        triggerScheduler.scheduleOneTimeTask(
+            executeAt, Map.of("delayMillis", millis), workflowExecutionId, taskExecutionId);
+
+        return executeAt;
     }
 }

@@ -17,11 +17,18 @@
 package com.bytechef.component.delay.action;
 
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,53 +39,144 @@ import org.mockito.Mockito;
 public class DelaySleepActionTest {
 
     @Test
-    public void test1() throws InterruptedException {
+    public void testWithDuration() throws InterruptedException {
+        // Mock dependencies
+        TriggerScheduler triggerScheduler = Mockito.mock(TriggerScheduler.class);
         Parameters parameters = Mockito.mock(Parameters.class);
+        ActionContextAware context = Mockito.mock(ActionContextAware.class);
 
-        Mockito.when(parameters.containsKey(Mockito.eq("duration")))
+        // Setup parameter mocks
+        Mockito.when(parameters.containsKey(eq("duration")))
             .thenReturn(true);
-        Mockito.when(parameters.getDuration(Mockito.eq("duration")))
+        Mockito.when(parameters.getDuration(eq("duration")))
             .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
-        long now = System.currentTimeMillis();
+        // Setup context mocks
+        Mockito.when(context.getJobId())
+            .thenReturn(456L);
 
-        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
 
-        long delta = System.currentTimeMillis() - now;
+        Mockito.when(context.getWorkflowId())
+            .thenReturn(workflowExecutionId.toString());
 
-        Assertions.assertTrue(
-            delta >= 1500 && delta < 16000, String.format("Period %dms does not meet range [1500,16000>", delta));
+        // Execute
+        Object result = new DelaySleepAction(triggerScheduler).perform(parameters, parameters, context);
+
+        // Verify
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof Map);
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+        Assertions.assertTrue(resultMap.containsKey("scheduledAt"));
+        Assertions.assertTrue(resultMap.get("scheduledAt") instanceof LocalDateTime);
+        Assertions.assertEquals(1500L, resultMap.get("delayMillis"));
+
+        // Verify scheduler was called with correct parameters
+        Mockito.verify(triggerScheduler)
+            .scheduleOneTimeTask(any(LocalDateTime.class),
+                eq(Map.of("delayMillis", 1500L)), any(WorkflowExecutionId.class), eq("456"));
     }
 
     @Test
-    public void test2() throws InterruptedException {
+    public void testWithMillis() throws InterruptedException {
+        // Mock dependencies
+        TriggerScheduler triggerScheduler = Mockito.mock(TriggerScheduler.class);
         Parameters parameters = Mockito.mock(Parameters.class);
+        ActionContextAware context = Mockito.mock(ActionContextAware.class);
 
-        Mockito.when(parameters.containsKey(Mockito.eq(MILLIS)))
+        // Setup parameter mocks
+        Mockito.when(parameters.containsKey(eq(MILLIS)))
             .thenReturn(true);
-        Mockito.when(parameters.getLong(Mockito.eq(MILLIS)))
+        Mockito.when(parameters.getLong(eq(MILLIS)))
             .thenReturn(500L);
 
-        long now = System.currentTimeMillis();
+        // Setup context mocks
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+        Mockito.when(context.getJobId())
+            .thenReturn(456L);
+        Mockito.when(context.getWorkflowId())
+            .thenReturn(workflowExecutionId.toString());
 
-        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        // Execute
+        Object result = new DelaySleepAction(triggerScheduler).perform(parameters, parameters, context);
 
-        long delta = System.currentTimeMillis() - now;
+        // Verify
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof Map);
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+        Assertions.assertTrue(resultMap.containsKey("scheduledAt"));
+        Assertions.assertTrue(resultMap.get("scheduledAt") instanceof LocalDateTime);
+        Assertions.assertEquals(500L, resultMap.get("delayMillis"));
 
-        Assertions.assertTrue(
-            delta >= 500 && delta < 700, String.format("Period %dms does not meet range [500,700>", delta));
+        // Verify scheduler was called with correct parameters
+        Mockito.verify(triggerScheduler)
+            .scheduleOneTimeTask(any(LocalDateTime.class),
+                eq(Map.of("delayMillis", 500L)), any(WorkflowExecutionId.class), eq("456"));
     }
 
     @Test
-    public void test3() throws InterruptedException {
-        long now = System.currentTimeMillis();
+    public void testWithDefaultDelay() throws InterruptedException {
+        // Mock dependencies
+        TriggerScheduler triggerScheduler = Mockito.mock(TriggerScheduler.class);
+        Parameters inputParameters = Mockito.mock(Parameters.class);
+        Parameters connectionParameters = Mockito.mock(Parameters.class);
+        ActionContextAware context = Mockito.mock(ActionContextAware.class);
 
-        DelaySleepAction.perform(
-            Mockito.mock(Parameters.class), Mockito.mock(Parameters.class), Mockito.mock(ActionContext.class));
+        // Ensure the parameters don't contain MILLIS or duration
+        Mockito.when(inputParameters.containsKey(MILLIS))
+            .thenReturn(false);
+        Mockito.when(inputParameters.containsKey("duration"))
+            .thenReturn(false);
 
-        long delta = System.currentTimeMillis() - now;
+        // Setup context mocks
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+        Mockito.when(context.getJobId())
+            .thenReturn(456L);
+        Mockito.when(context.getWorkflowId())
+            .thenReturn(workflowExecutionId.toString());
 
-        Assertions.assertTrue(
-            delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
+        // Execute
+        Object result = new DelaySleepAction(triggerScheduler).perform(inputParameters, connectionParameters, context);
+
+        // Verify
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof Map);
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+        Assertions.assertTrue(resultMap.containsKey("scheduledAt"));
+        Assertions.assertTrue(resultMap.get("scheduledAt") instanceof LocalDateTime);
+        Assertions.assertEquals(1000L, resultMap.get("delayMillis")); // Default delay is 1000ms
+
+        // Verify scheduler was called with correct parameters
+        Mockito.verify(triggerScheduler)
+            .scheduleOneTimeTask(any(LocalDateTime.class),
+                eq(Map.of("delayMillis", 1000L)), any(WorkflowExecutionId.class), eq("456"));
+    }
+
+    @Test
+    public void testWithNullScheduler() throws InterruptedException {
+        // Test that when TriggerScheduler is null, it throws a NullPointerException
+        Parameters parameters = Mockito.mock(Parameters.class);
+        ActionContextAware contextAware = Mockito.mock(ActionContextAware.class);
+
+        Mockito.when(parameters.containsKey(eq(MILLIS)))
+            .thenReturn(true);
+        Mockito.when(parameters.getLong(eq(MILLIS)))
+            .thenReturn(200L);
+
+        // Setup context mocks
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+        Mockito.when(contextAware.getJobId())
+            .thenReturn(456L);
+        Mockito.when(contextAware.getWorkflowId())
+            .thenReturn(workflowExecutionId.toString());
+
+        // TriggerScheduler is null, should throw NullPointerException
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            new DelaySleepAction(null).perform(parameters, parameters, contextAware);
+        });
     }
 }

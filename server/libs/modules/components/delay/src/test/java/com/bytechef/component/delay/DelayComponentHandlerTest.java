@@ -18,8 +18,10 @@
 
 package com.bytechef.component.delay;
 
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Arik Cohen
@@ -28,6 +30,7 @@ public class DelayComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/delay_v1.json",
+            new DelayComponentHandler(Mockito.mock(TriggerScheduler.class)).getDefinition());
     }
 }
