@@ -26,7 +26,7 @@ export const useTemplatesStore = create<TemplatesI>()(
                 })),
         }),
         {
-            name: 'bytechef.mode-type',
+            name: 'mode-type',
         }
     )
 );
