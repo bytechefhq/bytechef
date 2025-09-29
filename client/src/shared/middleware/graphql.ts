@@ -713,7 +713,7 @@ export type WorkflowTemplate = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectVersion?: Maybe<Scalars['Int']['output']>;
   publicUrl?: Maybe<Scalars['String']['output']>;
-  workflow?: Maybe<SharedWorkflowInfo>;
+  workflow: SharedWorkflowInfo;
 };
 
 export type CreateMcpProjectWithWorkflowsMutationVariables = Exact<{
@@ -820,7 +820,7 @@ export type PreBuiltWorkflowTemplatesQueryVariables = Exact<{
 }>;
 
 
-export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow?: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } | null }> };
+export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } }> };
 
 export type ProjectByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -873,7 +873,7 @@ export type WorkflowTemplateQueryVariables = Exact<{
 }>;
 
 
-export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow?: { __typename?: 'SharedWorkflowInfo', label: string } | null, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }> } | null };
+export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow: { __typename?: 'SharedWorkflowInfo', label: string }, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }> } | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
