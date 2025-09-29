@@ -26,6 +26,7 @@ import Text from '@tiptap/extension-text';
 import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
+import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
 import {
     ForwardedRef,
@@ -37,6 +38,7 @@ import {
     useMemo,
     useState,
 } from 'react';
+import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/shallow';
@@ -137,13 +139,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }))
         );
 
-        const memoizedWorkflowTask = useMemo(
-            () =>
-                [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-                    (node) => node.name === currentNode?.name
-                ),
-            [workflow.triggers, workflow.tasks, currentNode?.name]
-        );
+        const memoizedWorkflowTask = useMemo(() => {
+            return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+                (node) => node.name === currentNode?.name
+            );
+        }, [workflow.triggers, workflow.tasks, currentNode?.name]);
 
         const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
             if (!currentNode?.name || !workflow.definition) {
@@ -255,7 +255,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             workflow.id,
         ]);
 
-        const saveMentionInputValue = useDebouncedCallback((editorValue: string | number) => {
+        const saveMentionInputValue = useDebouncedCallback(() => {
             if (
                 !workflow.id ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -276,6 +276,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (typeof value === 'string') {
+                if (controlType !== 'RICH_TEXT') {
+                    value = decode(sanitizeHtml(value, {allowedTags: []}));
+                } else {
+                    value = decode(value);
+                }
+
                 value = transformValueForObjectAccess(value);
 
                 if (isFormulaMode && !value.startsWith('=')) {
@@ -300,18 +306,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 let value = editor.getHTML();
 
-                if (
-                    !isFormulaMode &&
-                    setIsFormulaMode &&
-                    (value === '<p>=</p>' || value === '=' || value.startsWith('<p>='))
-                ) {
-                    setIsFormulaMode(true);
+                value = value.replace(/\r\n/g, '\n');
 
-                    const contentWithoutEquals = value.replace(/^<p>=/, '<p>').replace(/^=/, '');
+                const paragraphMatchRegex = /<p>(.*?)<\/p>/g;
 
-                    editor.commands.setContent(contentWithoutEquals, false);
+                const matchedParagraphs = value.match(paragraphMatchRegex);
 
-                    return;
+                if (matchedParagraphs) {
+                    value = matchedParagraphs.map((match) => match.replace(/<\/?p>/g, '')).join('\n');
                 }
 
                 const mentionSpanRegex = /<span data-type="mention"[^>]*data-id="([^"]+)"[^>]*>.*?<\/span>/g;
@@ -326,9 +328,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     });
                 }
 
-                if (value !== editorValue) {
-                    setEditorValue(value);
-                }
+                setEditorValue(value);
 
                 if (onChange) {
                     onChange(value);
@@ -338,9 +338,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 setMentionOccurences(propertyMentions?.length || 0);
 
-                saveMentionInputValue(value);
+                saveMentionInputValue();
             },
-            [onChange, saveMentionInputValue, editorValue, isFormulaMode, setIsFormulaMode]
+            [onChange, saveMentionInputValue]
         );
 
         const getContent = useCallback((value?: string) => {
@@ -379,11 +379,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, []);
 
         const editor = useEditor({
-            coreExtensionOptions: {
-                clipboardTextSerializer: {
-                    blockSeparator: '\n',
-                },
-            },
             editorProps: {
                 attributes: {
                     class: twMerge(
@@ -398,17 +393,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
-                    if (event.key === '=' && isEditorEmpty) {
-                        event.preventDefault();
-
-                        if (setIsFormulaMode) {
-                            setIsFormulaMode(true);
-                        }
-
-                        return false;
-                    }
-
-                    if (isFormulaMode) {
+                    if ((event.key === '=' && isEditorEmpty) || isFormulaMode) {
                         return;
                     }
 
@@ -425,14 +410,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             onUpdate,
         });
-
-        const memoizedContent = useMemo(() => {
-            if (editorValue === undefined || typeof editorValue !== 'string') {
-                return '';
-            }
-
-            return getContent(editorValue);
-        }, [editorValue, getContent]);
 
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
@@ -451,7 +428,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [dataPills, editor]);
 
-        // Handle workflow definition changes and update editor content
+        useEffect(() => {
+            if (editor && !isLocalUpdate) {
+                editor.commands.setContent(getContent(editorValue as string)!, false, {
+                    preserveWhitespace: 'full',
+                });
+            }
+        }, [editor, getContent, editorValue, isLocalUpdate]);
+
+        // set propertyParameterValue on workflow definition change
         useEffect(() => {
             if (!workflow.definition || !currentNode?.name || !path) {
                 return;
@@ -460,25 +445,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             const encodedParameters = encodeParameters(
                 (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
             );
-
             const encodedPath = encodePath(path);
 
             const propertyValue = resolvePath(encodedParameters, encodedPath);
 
-            let newValue: string | number | undefined;
-
             if (typeof propertyValue === 'string' && propertyValue.startsWith('=')) {
-                newValue = propertyValue.substring(1);
-
-                if (setIsFormulaMode) {
-                    setIsFormulaMode(true);
-                }
+                setEditorValue(propertyValue.substring(1));
             } else {
-                newValue = propertyValue;
-            }
-
-            if (newValue !== editorValue) {
-                setEditorValue(newValue);
+                setEditorValue(propertyValue);
             }
         }, [
             currentNode?.name,
@@ -486,24 +460,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             memoizedWorkflowTask?.parameters,
             path,
             workflow.definition,
-            editorValue,
-            setIsFormulaMode,
         ]);
-
-        // Update editor content when editorValue changes (but not during local updates)
-        useEffect(() => {
-            if (editor && !isLocalUpdate && memoizedContent !== undefined) {
-                editor.commands.setContent(memoizedContent, false, {
-                    preserveWhitespace: 'full',
-                });
-            }
-        }, [editor, memoizedContent, isLocalUpdate]);
 
         // Set formula mode based on value and sync with editor storage
         useEffect(() => {
-            if (!editor) {
-                return;
-            }
+            if (!editor) return;
 
             if (typeof value === 'string' && value.startsWith('=') && setIsFormulaMode) {
                 setIsFormulaMode(true);
