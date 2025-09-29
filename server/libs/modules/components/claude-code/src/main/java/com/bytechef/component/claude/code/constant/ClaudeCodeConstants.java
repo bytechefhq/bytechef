@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.amazon.bedrock;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.component.claude.code.constant;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
  */
-class AmazonBedrockComponentHandlerTest {
+public class ClaudeCodeConstants {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/amazon-bedrock_v1.json",
-            new AmazonBedrockComponentHandler().getDefinition());
-    }
+    public static final String SCRIPT = "script";
+    public static final String AUTHENTICATION_TYPE = "authenticationType";
+    public static final String AUTHENTICATION = "Authentication";
+    public static final String HEADER_NAME = "headerName";
+    public static final String HEADER_VALUE = "headerValue";
 }
