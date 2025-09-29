@@ -24,22 +24,24 @@ const WorkflowTemplates = () => {
                 {isLoading ? (
                     <>
                         <Skeleton className="h-60 w-96" />
+
                         <Skeleton className="h-60 w-96" />
+
                         <Skeleton className="h-60 w-96" />
                     </>
                 ) : preBuiltWorkflowTemplates && preBuiltWorkflowTemplates.length > 0 ? (
                     preBuiltWorkflowTemplates.map((template) => {
-                        const icons = template!.components.map((component) => component!.icon);
+                        const icons = template.components.map((component) => component!.icon);
 
                         return (
                             <TemplateCard
-                                authorName={template!.authorName}
-                                categories={template!.categories}
-                                description={template!.workflow!.description}
+                                authorName={template.authorName}
+                                categories={template.categories}
+                                description={template.workflow.description}
                                 icons={icons}
                                 key={template.id}
-                                templateId={template!.id!}
-                                title={template!.workflow!.label}
+                                templateId={template.id!}
+                                title={template.workflow.label}
                             />
                         );
                     })

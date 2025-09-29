@@ -18,11 +18,10 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({authorName, categories, description, icons, templateId, title}: TemplateCardProps) {
-    let moreThan8 = false;
+    const hasExcessIcons = icons.length > MAX_VISIBLE_ICONS;
 
-    if (icons.length > MAX_VISIBLE_ICONS) {
+    if (hasExcessIcons) {
         icons = icons.slice(0, MAX_VISIBLE_ICONS - 1);
-        moreThan8 = true;
     }
 
     return (
@@ -40,7 +39,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
                     <CardTitle>
                         <Tooltip>
                             <TooltipTrigger asChild className="line-clamp-1 text-base font-semibold leading-tight">
-                                <div>{title}</div>
+                                <span>{title}</span>
                             </TooltipTrigger>
 
                             <TooltipContent>{title}</TooltipContent>
@@ -61,7 +60,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
                                 </div>
                             ))}
 
-                            {moreThan8 && (
+                            {hasExcessIcons && (
                                 <div className="flex items-center justify-center rounded-full bg-muted">
                                     <span className="m-1.5 size-6">+{MAX_VISIBLE_ICONS}</span>
                                 </div>

@@ -21,16 +21,20 @@ const ProjectTemplates = () => {
     return (
         <TemplatesLayoutContainer searchPlaceholder="Search projects..." title="Explore Project Templates">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {isLoading ? (
+                {isLoading && (
                     <>
                         <Skeleton className="h-60 w-96" />
                         <Skeleton className="h-60 w-96" />
                         <Skeleton className="h-60 w-96" />
                     </>
-                ) : preBuiltProjectTemplates && preBuiltProjectTemplates.length > 0 ? (
+                )}
+
+                {!isLoading &&
+                    preBuiltProjectTemplates &&
+                    preBuiltProjectTemplates.length > 0 &&
                     preBuiltProjectTemplates.map((template) => {
-                        const icons = template!.components.flatMap((component) =>
-                            component!.value.map((component1) => component1!.icon)
+                        const icons = template!.components.flatMap((templateComponent) =>
+                            templateComponent!.value.map((component) => component!.icon)
                         );
 
                         return (
@@ -44,9 +48,10 @@ const ProjectTemplates = () => {
                                 title={template!.project!.name}
                             />
                         );
-                    })
-                ) : (
-                    <div className="text-muted-foreground">No project templates found.</div>
+                    })}
+
+                {!isLoading && !preBuiltProjectTemplates && (
+                    <span className="text-muted-foreground">No project templates found.</span>
                 )}
             </div>
         </TemplatesLayoutContainer>

@@ -15,7 +15,7 @@ const categories = [
 ];
 
 export function TemplatesLayoutContainerCategoryFilters() {
-    const [active, setActive] = useState<string>('all');
+    const [activeCategory, setActiveCategory] = useState<string>('all');
 
     const setCategory = useTemplatesStore((state) => state.setCategory);
 
@@ -26,11 +26,11 @@ export function TemplatesLayoutContainerCategoryFilters() {
                     className="rounded-full"
                     key={category.id}
                     onClick={() => {
-                        setActive(category.id);
+                        setActiveCategory(category.id);
                         setCategory(category.id === 'all' ? undefined : category.id);
                     }}
                     size="sm"
-                    variant={category.id === active ? 'default' : 'outline'}
+                    variant={category.id === activeCategory ? 'default' : 'outline'}
                 >
                     {category.label}
                 </Button>
