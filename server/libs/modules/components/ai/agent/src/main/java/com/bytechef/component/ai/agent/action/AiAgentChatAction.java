@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -134,24 +135,15 @@ public class AiAgentChatAction {
 
             ChatClient chatClient = ChatClient.builder(chatModel)
                 .build();
-            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
             ChatClient.CallResponseSpec call = chatClient.prompt()
                 .advisors(getAdvisors(clusterElementMap, connectionParameters))
-                .advisors(advisor -> {
-                    String conversationId = inputParameters.getString(CONVERSATION_ID);
-
-                    if (conversationId != null) {
-                        advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
-                    }
-                })
+                .advisors(getConversationAdvisor(inputParameters))
                 .messages(ModelUtils.getMessages(inputParameters, actionContext))
-                .tools(
-                    getTools(
                 .toolCallbacks(
                     getToolCallbacks(
                         clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
-                        actionContextAware.isEditorEnvironment(), actionContext))
+                        ((ActionContextAware) actionContext).isEditorEnvironment(), actionContext))
                 .call();
 
             return ModelUtils.getChatResponse(call, inputParameters, actionContext);
@@ -201,6 +193,16 @@ public class AiAgentChatAction {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(Parameters inputParameters) {
+        return advisor -> {
+            String conversationId = inputParameters.getString(CONVERSATION_ID);
+
+            if (conversationId != null) {
+                advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
+            }
+        };
     }
 
     private Advisor getRagAdvisor(
