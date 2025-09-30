@@ -91,31 +91,38 @@ public class ClaudeCodeAddMCPAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {
 
-        StringBuilder command = new StringBuilder("claude mcp add ");
-        command.append(connectionParameters.getString("label"))
+        StringBuilder sb = new StringBuilder("claude mcp add ");
+
+        sb.append(connectionParameters.getString("label"))
             .append(" --scope user --transport http ")
             .append(connectionParameters.getString("url"));
+
         switch (connectionParameters.getInteger(AUTHENTICATION_TYPE)) {
             case 1:
-                command.append(" --header \"")
+                sb.append(" --header \"")
                     .append(AUTHENTICATION)
                     .append("\": \"")
                     .append(connectionParameters.getString(AUTHENTICATION))
                     .append("\"");
+
                 break;
             case 2:
-                command.append(" --header");
-                for (Authentication auth : connectionParameters.getArray(AUTHENTICATION, Authentication.class)) {
-                    command.append(" \"")
-                        .append(auth.name())
+                sb.append(" --header");
+
+                Authentication[] authentications = connectionParameters.getArray(AUTHENTICATION, Authentication.class);
+
+                for (Authentication authentication : authentications) {
+                    sb.append(" \"")
+                        .append(authentication.name())
                         .append("\": \"")
-                        .append(auth.value())
+                        .append(authentication.value())
                         .append("\"");
                 }
+
                 break;
             default:
         }
-        return ClaudeCodeUtil.execute(command.toString());
+        return ClaudeCodeUtil.execute(sb.toString());
     }
 
     private record Authentication(String name, String value) {
