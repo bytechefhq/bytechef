@@ -117,7 +117,7 @@ const ClusterElementsWorkflowEditor = () => {
                     edgeTypes={clusterElementsEdgeTypes}
                     edges={edges}
                     maxZoom={1}
-                    minZoom={0.6}
+                    minZoom={0.001}
                     nodeTypes={clusterElementsNodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
