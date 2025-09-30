@@ -24,6 +24,6 @@ public class ClaudeCodeConstants {
     public static final String SCRIPT = "script";
     public static final String AUTHENTICATION_TYPE = "authenticationType";
     public static final String AUTHENTICATION = "Authentication";
-    public static final String HEADER_NAME = "headerName";
-    public static final String HEADER_VALUE = "headerValue";
+    public static final String NAME = "name";
+    public static final String VALUE = "value";
 }

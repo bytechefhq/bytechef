@@ -18,8 +18,8 @@ package com.bytechef.component.claude.code.action;
 
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.AUTHENTICATION;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.AUTHENTICATION_TYPE;
-import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.HEADER_NAME;
-import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.HEADER_VALUE;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.NAME;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -34,6 +34,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -71,13 +72,14 @@ public class ClaudeCodeAddMCPAction {
                 .description("The custom headers to use for authentication")
                 .displayCondition("authenticationType == 2")
                 .items(
-                    object().properties(
-                        string(HEADER_NAME)
-                            .label("Header Name")
-                            .required(true),
-                        string(HEADER_VALUE)
-                            .label("Header Value")
-                            .required(true))))
+                    object()
+                        .properties(
+                            string(NAME)
+                                .label("Header Name")
+                                .required(true),
+                            string(VALUE)
+                                .label("Header Value")
+                                .required(true))))
         .output(
             outputSchema(
                 string()
@@ -93,28 +95,29 @@ public class ClaudeCodeAddMCPAction {
 
         StringBuilder sb = new StringBuilder("claude mcp add ");
 
-        sb.append(connectionParameters.getString("label"))
+        sb.append(inputParameters.getString("label"))
             .append(" --scope user --transport http ")
-            .append(connectionParameters.getString("url"));
+            .append(inputParameters.getString("url"));
 
-        switch (connectionParameters.getInteger(AUTHENTICATION_TYPE)) {
+        switch (inputParameters.getInteger(AUTHENTICATION_TYPE)) {
             case 1:
                 sb.append(" --header \"")
                     .append(AUTHENTICATION)
-                    .append("\": \"")
-                    .append(connectionParameters.getString(AUTHENTICATION))
+                    .append(": ")
+                    .append(inputParameters.getString(AUTHENTICATION))
                     .append("\"");
 
                 break;
             case 2:
                 sb.append(" --header");
 
-                Authentication[] authentications = connectionParameters.getArray(AUTHENTICATION, Authentication.class);
+                List<Authentication> authentications = inputParameters.getList(
+                    AUTHENTICATION, Authentication.class, List.of());
 
                 for (Authentication authentication : authentications) {
                     sb.append(" \"")
                         .append(authentication.name())
-                        .append("\": \"")
+                        .append(": ")
                         .append(authentication.value())
                         .append("\"");
                 }
@@ -125,6 +128,6 @@ public class ClaudeCodeAddMCPAction {
         return ClaudeCodeUtil.execute(sb.toString());
     }
 
-    private record Authentication(String name, String value) {
+    public record Authentication(String name, String value) {
     }
 }
