@@ -70,6 +70,7 @@ public class ClaudeCodeUtil {
         }
 
         Files.walkFileTree(root, new SimpleFileVisitor<>() {
+
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);
@@ -87,9 +88,9 @@ public class ClaudeCodeUtil {
 
     }
 
-    private static void writeStringToFile(File file, String str) throws IOException {
+    private static void writeStringToFile(File file, String string) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write(str);
+            writer.write(string);
         }
     }
 }
