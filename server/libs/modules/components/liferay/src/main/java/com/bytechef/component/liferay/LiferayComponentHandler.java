@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.liferay.action.LiferayHeadlessAction;
+import com.bytechef.component.liferay.action.LiferayJsonWsRequestAction;
 import com.bytechef.component.liferay.connection.LiferayConnection;
 import com.google.auto.service.AutoService;
 
@@ -39,7 +40,9 @@ public class LiferayComponentHandler implements ComponentHandler {
         .icon("path:assets/liferay.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(LiferayConnection.CONNECTION_DEFINITION)
-        .actions(LiferayHeadlessAction.ACTION_DEFINITION);
+        .actions(
+            LiferayHeadlessAction.ACTION_DEFINITION,
+            LiferayJsonWsRequestAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
