@@ -116,7 +116,9 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
+            // exact here prevents double fetchs of project
             queryClient.invalidateQueries({
+                exact: true,
                 queryKey: ProjectKeys.project(projectId),
             });
 
