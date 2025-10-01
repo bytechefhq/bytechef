@@ -7,7 +7,6 @@ import {
     useGetProjectGitConfigurationQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
-import {useProject} from '@/pages/automation/project/hooks/useProject';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -29,7 +28,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 export const useSettingsMenu = ({project, workflow}: {project: Project; workflow: Workflow}) => {
     const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(project.id!);
 
-    const {projectId} = useProject();
+    const projectId = project.id;
 
     const {captureProjectWorkflowImported} = useAnalytics();
     const navigate = useNavigate();
@@ -127,7 +126,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 (projectWorkflowId) => projectWorkflowId !== deletedWorkflowId
             );
 
-            if (!projectId || !firstRemainingWorkflowId || !deletedWorkflowId) {
+            if (!projectId || !deletedWorkflowId) {
                 return;
             }
 
@@ -141,7 +140,15 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`);
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(projectId),
+            });
+
+            const baseUrl = '/automation/projects';
+            const firstRemainingWorkflowUrlSuffix = firstRemainingWorkflowId
+                ? `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`
+                : '';
+            navigate(baseUrl + firstRemainingWorkflowUrlSuffix);
         },
     });
 
