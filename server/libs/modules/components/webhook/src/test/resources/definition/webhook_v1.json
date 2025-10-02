@@ -51,6 +51,7 @@
         "value" : "NO_DATA"
       } ],
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : null,
@@ -73,6 +74,7 @@
         "name" : null,
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : null,
@@ -133,6 +135,7 @@
       "name" : "body",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : "Add property",
       "regex" : null,
       "required" : true,
@@ -154,6 +157,7 @@
       "name" : "body",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
@@ -188,6 +192,7 @@
         "name" : "extension",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -209,6 +214,7 @@
         "name" : "mimeType",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -230,6 +236,7 @@
         "name" : "name",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -251,6 +258,7 @@
         "name" : "url",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -311,10 +319,10 @@
       "outputResponse" : {
         "outputSchema" : null,
         "placeholder" : {
-          "headers" : { },
-          "body" : { },
           "parameters" : { },
-          "method" : "POST"
+          "method" : "POST",
+          "headers" : { },
+          "body" : { }
         },
         "sampleOutput" : null
       },
@@ -349,10 +357,10 @@
       "outputResponse" : {
         "outputSchema" : null,
         "placeholder" : {
-          "headers" : { },
-          "body" : { },
           "parameters" : { },
-          "method" : "POST"
+          "method" : "POST",
+          "headers" : { },
+          "body" : { }
         },
         "sampleOutput" : null
       },
@@ -378,6 +386,7 @@
       "name" : "csrfToken",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
@@ -408,10 +417,10 @@
       "outputResponse" : {
         "outputSchema" : null,
         "placeholder" : {
-          "headers" : { },
-          "body" : { },
           "parameters" : { },
-          "method" : "POST"
+          "method" : "POST",
+          "headers" : { },
+          "body" : { }
         },
         "sampleOutput" : null
       },
@@ -437,6 +446,7 @@
       "name" : "csrfToken",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,

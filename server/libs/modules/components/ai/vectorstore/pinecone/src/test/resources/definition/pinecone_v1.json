@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes" : {
-    "load" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search" : [ "EMBEDDING" ]
+    "search" : [ "EMBEDDING" ],
+    "load" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions" : [ {
     "batch" : null,
@@ -48,6 +48,7 @@
       "name" : "query",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
@@ -129,6 +130,7 @@
         "name" : "apiKey",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -150,6 +152,7 @@
         "name" : "host",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,

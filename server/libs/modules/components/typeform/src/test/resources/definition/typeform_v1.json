@@ -75,6 +75,7 @@
       "name" : "title",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
@@ -120,6 +121,7 @@
         "value" : "score_branching"
       } ],
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : false,
@@ -144,6 +146,7 @@
         "options" : { },
         "optionsLookupDependsOn" : null
       },
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : false,
@@ -188,6 +191,7 @@
         "name" : "clientId",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -209,6 +213,7 @@
         "name" : "clientSecret",
         "options" : null,
         "optionsDataSource" : null,
+        "optionsLoadedDynamically" : null,
         "placeholder" : null,
         "regex" : null,
         "required" : true,
@@ -319,6 +324,7 @@
         "options" : { },
         "optionsLookupDependsOn" : null
       },
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
