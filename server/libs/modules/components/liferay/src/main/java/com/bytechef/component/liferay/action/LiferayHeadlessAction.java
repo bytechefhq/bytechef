@@ -64,5 +64,4 @@ public class LiferayHeadlessAction {
 
         return endpoint;
     }
-
 }

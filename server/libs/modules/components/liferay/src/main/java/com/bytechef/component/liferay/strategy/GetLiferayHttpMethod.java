@@ -29,7 +29,7 @@ import com.bytechef.component.definition.TypeReference;
 /**
  * @author Nikolina Spehar
  */
-public class LiferayHttpGetStrategy implements LiferayHttpStrategy {
+public class GetLiferayHttpMethod implements LiferayHttpMethod {
 
     @Override
     public Object perform(

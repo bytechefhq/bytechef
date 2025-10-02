@@ -20,6 +20,7 @@ package com.bytechef.component.liferay.constant;
  * @author Nikolina Spehar
  */
 public enum LiferayFieldType {
+
     LONG("long"),
     INT("int"),
     STRING("string"),

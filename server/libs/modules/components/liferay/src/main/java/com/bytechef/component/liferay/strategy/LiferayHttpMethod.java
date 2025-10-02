@@ -22,8 +22,8 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Nikolina Spehar
  */
-public interface LiferayHttpStrategy {
+public interface LiferayHttpMethod {
 
-    Object
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context, String serviceEndpoint);
+    Object perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context, String serviceEndpoint);
 }

@@ -62,25 +62,68 @@ public class LiferayUtils {
         return contextNameOptions;
     }
 
+    public static List<ValueProperty<?>> createParameters(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        Context context) {
+
+        List<Map<String, String>> parameters = getParameters(
+            context, inputParameters.getRequiredString(CONTEXT_NAME), inputParameters.getRequiredLong(SERVICE));
+
+        return List.copyOf(
+            parameters.stream()
+                .map(LiferayUtils::createProperty)
+                .filter(Objects::nonNull)
+                .toList());
+    }
+
+    private static List<Map<String, String>> getParameters(Context context, String contextName, long serviceId) {
+        List<Map<String, String>> parameters = new ArrayList<>();
+        List<Object> services = getServices(context, contextName);
+
+        if (services.get((int) serviceId - 1) instanceof Map<?, ?> serviceMap &&
+            serviceMap.get(PARAMETERS) instanceof List<?> curParameters) {
+
+            for (Object parameter : curParameters) {
+                if (parameter instanceof Map<?, ?> parameterMap) {
+                    parameters.add(Map.of(
+                        NAME, (String) parameterMap.get(NAME), TYPE, (String) parameterMap.get(TYPE)));
+                }
+            }
+        }
+
+        return parameters;
+    }
+
+    public static Map<String, String> getServiceHttpData(Context context, String contextName, long serviceId) {
+        String endpoint = "";
+        String method = "";
+        List<Object> services = getServices(context, contextName);
+
+        if (services.get((int) serviceId - 1) instanceof Map<?, ?> serviceMap) {
+            endpoint = (String) serviceMap.get("path");
+            method = (String) serviceMap.get("method");
+        }
+
+        return Map.of(METHOD, method, ENDPOINT, endpoint);
+    }
+
     public static List<Option<Long>> getServiceOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        List<Object> services = getContextServices(context, inputParameters.getRequiredString(CONTEXT_NAME));
-
         List<Option<Long>> serviceOptions = new ArrayList<>();
+        List<Object> services = getServices(context, inputParameters.getRequiredString(CONTEXT_NAME));
 
         for (int index = 0; index < services.size(); index++) {
             if (services.get(index) instanceof Map<?, ?> servicesMap) {
-                serviceOptions.add(
-                    option((String) servicesMap.get("name"), index + 1));
+                serviceOptions.add(option((String) servicesMap.get("name"), index + 1));
             }
         }
 
         return serviceOptions;
     }
 
-    public static List<Object> getContextServices(Context context, String contextName) {
+    public static List<Object> getServices(Context context, String contextName) {
         contextName = contextName.equals("portal") ? "" : contextName;
 
         Map<String, Object> response = context.http(http -> http.get("/api/jsonws"))
@@ -91,59 +134,11 @@ public class LiferayUtils {
 
         List<Object> services = new ArrayList<>();
 
-        if (response.get(SERVICES) instanceof List<?> servicesList) {
-            services.addAll(servicesList);
+        if (response.get(SERVICES) instanceof List<?> curServices) {
+            services.addAll(curServices);
         }
 
         return services;
-    }
-
-    public static List<ValueProperty<?>> createParameters(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        Context context) {
-
-        List<Map<String, String>> parametersList = getParametersList(
-            context,
-            inputParameters.getRequiredString(CONTEXT_NAME),
-            inputParameters.getRequiredLong(SERVICE));
-
-        return new ArrayList<>(parametersList.stream()
-            .map(LiferayUtils::createProperty)
-            .filter(Objects::nonNull)
-            .toList());
-    }
-
-    private static List<Map<String, String>> getParametersList(Context context, String contextName, long serviceId) {
-        List<Object> services = getContextServices(context, contextName);
-
-        List<Map<String, String>> parametersList = new ArrayList<>();
-
-        if (services.get((int) serviceId - 1) instanceof Map<?, ?> serviceMap &&
-            serviceMap.get(PARAMETERS) instanceof List<?> parameters) {
-            for (Object parameter : parameters) {
-                if (parameter instanceof Map<?, ?> parameterMap) {
-                    parametersList.add(Map.of(
-                        NAME, (String) parameterMap.get(NAME),
-                        TYPE, (String) parameterMap.get(TYPE)));
-                }
-            }
-        }
-
-        return parametersList;
-    }
-
-    public static Map<String, String> getServiceHttpData(Context context, String contextName, long serviceId) {
-        List<Object> services = getContextServices(context, contextName);
-
-        String endpoint = "";
-        String method = "";
-
-        if (services.get((int) serviceId - 1) instanceof Map<?, ?> serviceMap) {
-            endpoint = (String) serviceMap.get("path");
-            method = (String) serviceMap.get("method");
-        }
-
-        return Map.of(METHOD, method, ENDPOINT, endpoint);
     }
 
     private static ModifiableValueProperty<?, ?> createProperty(Map<String, String> map) {

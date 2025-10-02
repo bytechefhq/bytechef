@@ -33,9 +33,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.liferay.strategy.LiferayHttpGetStrategy;
-import com.bytechef.component.liferay.strategy.LiferayHttpPostStrategy;
-import com.bytechef.component.liferay.strategy.LiferayHttpStrategy;
+import com.bytechef.component.liferay.strategy.GetLiferayHttpMethod;
+import com.bytechef.component.liferay.strategy.LiferayHttpMethod;
+import com.bytechef.component.liferay.strategy.PostLiferayHttpMethod;
 import com.bytechef.component.liferay.util.LiferayUtils;
 import java.util.Map;
 
@@ -64,24 +64,22 @@ public class LiferayJsonWsRequestAction {
         .perform(LiferayJsonWsRequestAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, String> serviceMethodEndpoint = getServiceHttpData(
-            context,
-            inputParameters.getRequiredString(CONTEXT_NAME),
-            inputParameters.getRequiredInteger(SERVICE));
+        Map<String, String> serviceHttpData = getServiceHttpData(
+            context, inputParameters.getRequiredString(CONTEXT_NAME), inputParameters.getRequiredInteger(SERVICE));
 
-        LiferayHttpStrategy strategy;
+        LiferayHttpMethod liferayHttpMethod;
 
-        final String method = serviceMethodEndpoint.get(METHOD);
+        String method = serviceHttpData.get(METHOD);
 
         switch (method) {
             case POST ->
-                strategy = new LiferayHttpPostStrategy();
+                liferayHttpMethod = new PostLiferayHttpMethod();
             case GET ->
-                strategy = new LiferayHttpGetStrategy();
+                liferayHttpMethod = new GetLiferayHttpMethod();
             default ->
                 throw new IllegalArgumentException("Unknown HTTP method: " + method);
         }
 
-        return strategy.perform(inputParameters, connectionParameters, context, serviceMethodEndpoint.get(ENDPOINT));
+        return liferayHttpMethod.perform(inputParameters, connectionParameters, context, serviceHttpData.get(ENDPOINT));
     }
 }

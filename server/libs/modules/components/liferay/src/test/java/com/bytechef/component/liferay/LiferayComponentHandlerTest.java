@@ -19,9 +19,6 @@ package com.bytechef.component.liferay;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-
 class LiferayComponentHandlerTest {
 
     @Test
