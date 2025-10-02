@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-08T23:16:06.020476+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-02T07:57:53.449713913+02:00[Europe/Zagreb]", comments = "Generator version: 7.15.0")
 public class ApiKeyModel {
 
   private @Nullable String createdBy;

@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-15T19:36:11.241407+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-02T07:57:58.800783178+02:00[Europe/Zagreb]", comments = "Generator version: 7.15.0")
 public class ComponentConnectionModel {
 
   private String componentName;

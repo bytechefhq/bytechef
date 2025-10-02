@@ -14,9 +14,9 @@ src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreatedRecordM
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/EmailsInnerModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ErrorsInnerMetaModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ErrorsInnerModel.java
-src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/InlineObjectModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/LeadModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/LifecycleStageModel.java
+src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ListAccounts400ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ListAccountsPageableParameterModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/OpportunityModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/PhonesInnerModel.java

@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createApiClient_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-09-15T19:36:13.274117+02:00[Europe/Zagreb]", comments = "Generator version: 7.14.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-02T07:58:00.624849764+02:00[Europe/Zagreb]", comments = "Generator version: 7.15.0")
 public class CreateApiClient200ResponseModel {
 
   private @Nullable String secretKey;

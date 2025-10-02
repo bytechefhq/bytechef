@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/security/web/rest/ApiKeyApi.java
