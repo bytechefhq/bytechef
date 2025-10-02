@@ -19,7 +19,6 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -77,22 +76,20 @@ public class WorkflowValidator {
         StringBuilder errors, StringBuilder warnings) {
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             // First, validate the basic workflow structure
             validateWorkflowStructure(workflow, errors);
 
             // Extract task properties from the provided workflow JSON
-            JsonNode workflowNode = objectMapper.readTree(workflow);
+            JsonNode workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
 
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
-            processTriggers(taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings, workflowNode, taskJsonNodes);
-
-            processTasks(taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings, workflowNode, taskJsonNodes);
-
+            processTriggers(
+                taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings,
+                workflowJsonNode, taskJsonNodes);
+            processTasks(taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings,
+                workflowJsonNode, taskJsonNodes);
             validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
-
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
             errors.append(e.getMessage());
@@ -130,13 +127,11 @@ public class WorkflowValidator {
         String task, TaskDefinitionProvider taskDefinitionProvider, StringBuilder errors, StringBuilder warnings) {
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             // First, validate the basic task structure
             TaskValidator.validateTask(task, errors);
 
             // Extract task properties from the provided task JSON
-            JsonNode taskJsonNode = objectMapper.readTree(task);
+            JsonNode taskJsonNode = com.bytechef.commons.util.JsonUtils.readTree(task);
 
             JsonNode typeJsonNode = taskJsonNode.get("type");
 
@@ -149,7 +144,7 @@ public class WorkflowValidator {
             JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
             if (parametersJsonNode != null && parametersJsonNode.isObject()) {
-                taskParameters = objectMapper.writeValueAsString(parametersJsonNode);
+                taskParameters = com.bytechef.commons.util.JsonUtils.write(parametersJsonNode);
             }
 
             // Validate task properties against the definition
@@ -218,7 +213,10 @@ public class WorkflowValidator {
         }
     }
 
-    private static void processTasks(TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider, Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
+    private static void processTasks(
+        TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
         JsonNode tasksJsonNode = workflowNode.get("tasks");
 
         if (tasksJsonNode != null && tasksJsonNode.isArray()) {
@@ -254,7 +252,10 @@ public class WorkflowValidator {
         }
     }
 
-    private static void processTriggers(TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider, Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
+    private static void processTriggers(
+        TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
         JsonNode triggersJsonNode = workflowNode.get("triggers");
         if (triggersJsonNode != null && triggersJsonNode.isArray()) {
             Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.elements();
