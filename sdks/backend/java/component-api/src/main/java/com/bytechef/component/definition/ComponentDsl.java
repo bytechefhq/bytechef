@@ -2987,6 +2987,7 @@ public final class ComponentDsl {
         private String regex;
         private List<? extends Option<String>> options;
         private OptionsFunction optionsFunction;
+        private Boolean optionsLoadedDynamically;
 
         private ModifiableStringProperty() {
             this(null);
@@ -3067,6 +3068,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableStringProperty optionsLoadedDynamically(boolean optionsLoadedDynamically) {
+            this.optionsLoadedDynamically = optionsLoadedDynamically;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -3085,14 +3092,15 @@ public final class ComponentDsl {
                 && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
                 && Objects.equals(regex, that.regex)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction)
+                && Objects.equals(optionsLoadedDynamically, that.optionsLoadedDynamically);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), controlType, optionsLookupDependsOn, maxLength, minLength, regex,
-                options,
-                optionsFunction);
+            return Objects.hash(
+                super.hashCode(), controlType, optionsLookupDependsOn, maxLength, minLength, regex,
+                options, optionsFunction, optionsLoadedDynamically);
         }
 
         @Override
@@ -3146,6 +3154,11 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<Boolean> getOptionsLoadedDynamically() {
+            return Optional.ofNullable(optionsLoadedDynamically);
+        }
+
+        @Override
         public String toString() {
             return "ModifiableStringProperty{" +
                 "controlType=" + controlType +
@@ -3156,6 +3169,7 @@ public final class ComponentDsl {
                 ", regex='" + regex + '\'' +
                 ", options=" + options +
                 ", optionsFunction=" + optionsFunction +
+                ", dynamicOptionsLoad=" + optionsLoadedDynamically +
                 "} " + super.toString();
         }
     }
