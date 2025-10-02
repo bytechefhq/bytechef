@@ -570,7 +570,7 @@ public class ComponentTools {
         } catch (Exception e) {
             logger.error("Failed to get output properties for '{}:{}'", componentName, operationName, e);
 
-            throw new RuntimeException(FAILED_TO_GET_OUTPUT_PROPERTIES, e);
+            throw new RuntimeException(FAILED_TO_GET_OUTPUT_PROPERTIES + ": " + e.getMessage(), e);
         }
     }
 
