@@ -2547,6 +2547,9 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
+          optionsLoadedDynamically:
+            description: "If the property options should be loaded dynamically."
+            type: "boolean"
     Tag:
       $ref: "../../../platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     TaskDispatcherDefinition:
