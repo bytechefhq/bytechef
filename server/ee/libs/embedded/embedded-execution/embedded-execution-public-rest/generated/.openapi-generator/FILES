@@ -10,7 +10,7 @@ src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ErrorsIn
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ErrorsInnerModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteActionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteToolRequestModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteWorkflows400ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/FunctionModel.java
-src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/InlineObjectModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
