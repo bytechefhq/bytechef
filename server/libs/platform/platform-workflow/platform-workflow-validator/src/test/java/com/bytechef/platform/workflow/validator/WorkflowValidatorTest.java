@@ -3948,7 +3948,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksAddsNestedTasksTotaskDefinitionMapMultipleFlowsNoErrors() {
+    void validateWorkflowTasksAddsNestedTasksToTaskDefinitionMapMultipleFlowsNoErrors() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -4151,7 +4151,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void taskOutputProviderFunctionalInterfaceWorksCorrectly() {
+    void taskOutputProviderFunctionalInterfaceThrowsError() {
         WorkflowValidator.TaskOutputProvider provider = (taskType, kind, warnings) -> {
             if ("test/v1".equals(taskType)) {
                 return new PropertyInfo("output", "STRING", null, false, false, null, null);

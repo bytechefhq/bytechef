@@ -87,63 +87,9 @@ public class WorkflowValidator {
 
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
-            // Process triggers
-            JsonNode triggersJsonNode = workflowNode.get("triggers");
-            if (triggersJsonNode != null && triggersJsonNode.isArray()) {
-                Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.elements();
+            processTriggers(taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings, workflowNode, taskJsonNodes);
 
-                triggersJsonNodeIterator.forEachRemaining(triggerJsonNode -> {
-                    if (taskJsonNodes.isEmpty()) {
-                        taskJsonNodes.add(triggerJsonNode);
-
-                        JsonNode typeJsonNode = triggerJsonNode.get("type");
-
-                        String type = typeJsonNode.asText();
-
-                        taskDefinitionMap.putIfAbsent(
-                            type, taskDefinitionProvider.getTaskProperties(type, "trigger"));
-                        taskOutputMap.putIfAbsent(
-                            type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
-                    } else {
-                        errors.append("There can only be one trigger in the workflow");
-                    }
-                });
-            }
-
-            // Process tasks
-            JsonNode tasksJsonNode = workflowNode.get("tasks");
-
-            if (tasksJsonNode != null && tasksJsonNode.isArray()) {
-                Iterator<JsonNode> elements = tasksJsonNode.elements();
-
-                elements.forEachRemaining(taskJsonNode -> {
-                    Stream<JsonNode> stream = taskJsonNodes.stream();
-
-                    JsonNode nameJsonNode = taskJsonNode.get("name");
-
-                    if (stream.anyMatch(previousTask -> Objects.equals(
-                        previousTask.get("name"), nameJsonNode))) {
-
-                        errors.append("Tasks cannot have repeating names: ");
-                        errors.append(nameJsonNode.asText());
-                    }
-
-                    taskJsonNodes.add(taskJsonNode);
-
-                    JsonNode typeJsonNode = taskJsonNode.get("type");
-
-                    String type = typeJsonNode.asText();
-
-                    taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
-                    taskOutputMap.putIfAbsent(
-                        type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
-
-                    // Handle nested TASK type properties by recursively processing them
-                    processNestedTasks(
-                        taskJsonNode, taskDefinitionMap, taskDefinitionMap, taskOutputMap, taskJsonNodes,
-                        taskDefinitionProvider, taskOutputProvider, errors, warnings);
-                });
-            }
+            processTasks(taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings, workflowNode, taskJsonNodes);
 
             validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
@@ -269,6 +215,66 @@ public class WorkflowValidator {
             discoverNestedTasksFromJsonStructure(
                 parametersJsonNode, allTaskDefinitionMap, taskOutputMap, allTaskJsonNode, taskDefinitionProvider,
                 taskOutputProvider, errors, warnings);
+        }
+    }
+
+    private static void processTasks(TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider, Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
+        JsonNode tasksJsonNode = workflowNode.get("tasks");
+
+        if (tasksJsonNode != null && tasksJsonNode.isArray()) {
+            Iterator<JsonNode> elements = tasksJsonNode.elements();
+
+            elements.forEachRemaining(taskJsonNode -> {
+                Stream<JsonNode> stream = taskJsonNodes.stream();
+
+                JsonNode nameJsonNode = taskJsonNode.get("name");
+
+                if (stream.anyMatch(previousTask -> Objects.equals(
+                    previousTask.get("name"), nameJsonNode))) {
+
+                    errors.append("Tasks cannot have repeating names: ");
+                    errors.append(nameJsonNode.asText());
+                }
+
+                taskJsonNodes.add(taskJsonNode);
+
+                JsonNode typeJsonNode = taskJsonNode.get("type");
+
+                String type = typeJsonNode.asText();
+
+                taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
+                taskOutputMap.putIfAbsent(
+                    type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
+
+                // Handle nested TASK type properties by recursively processing them
+                processNestedTasks(
+                    taskJsonNode, taskDefinitionMap, taskDefinitionMap, taskOutputMap, taskJsonNodes,
+                    taskDefinitionProvider, taskOutputProvider, errors, warnings);
+            });
+        }
+    }
+
+    private static void processTriggers(TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider, Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap, StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
+        JsonNode triggersJsonNode = workflowNode.get("triggers");
+        if (triggersJsonNode != null && triggersJsonNode.isArray()) {
+            Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.elements();
+
+            triggersJsonNodeIterator.forEachRemaining(triggerJsonNode -> {
+                if (taskJsonNodes.isEmpty()) {
+                    taskJsonNodes.add(triggerJsonNode);
+
+                    JsonNode typeJsonNode = triggerJsonNode.get("type");
+
+                    String type = typeJsonNode.asText();
+
+                    taskDefinitionMap.putIfAbsent(
+                        type, taskDefinitionProvider.getTaskProperties(type, "trigger"));
+                    taskOutputMap.putIfAbsent(
+                        type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
+                } else {
+                    errors.append("There can only be one trigger in the workflow");
+                }
+            });
         }
     }
 
