@@ -22,13 +22,13 @@ import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     AudioLinesIcon,
     BlendIcon,
     DiamondIcon,
     HelpCircleIcon,
+    PlusIcon,
     SettingsIcon,
     User2Icon,
     UserRoundCogIcon,

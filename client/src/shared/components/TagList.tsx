@@ -2,7 +2,7 @@ import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/Cr
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon, PlusIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
@@ -31,7 +31,7 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
                     className="ml-1.5 rounded-full p-1 text-red-500 hover:bg-red-100 hover:text-red-700"
                     onClick={() => onDeleteTag(tag)}
                 >
-                    <Cross2Icon className="size-3 cursor-pointer" />
+                    <XIcon className="size-3 cursor-pointer" />
                 </button>
             </TooltipTrigger>
 
@@ -143,7 +143,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                                 size="sm"
                                 variant="ghost"
                             >
-                                <Cross2Icon />
+                                <XIcon />
                             </Button>
                         </TooltipTrigger>
 

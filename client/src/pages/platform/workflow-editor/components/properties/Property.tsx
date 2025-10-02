@@ -21,11 +21,11 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ArrayPropertyType, ClusterElementItemType, PropertyAllType, SelectOptionType} from '@/shared/types';
-import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
+import {CircleQuestionMarkIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
 import {ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
@@ -1091,7 +1091,7 @@ const Property = ({
                                         {description && (
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <QuestionMarkCircledIcon className="ml-1" />
+                                                    <CircleQuestionMarkIcon className="ml-1" />
                                                 </TooltipTrigger>
 
                                                 <TooltipPortal>

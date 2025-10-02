@@ -12,8 +12,7 @@ import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
-import {Cross2Icon} from '@radix-ui/react-icons';
-import {LinkIcon} from 'lucide-react';
+import {LinkIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
@@ -216,7 +215,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                                         onClick={() => setShowConnectionNote(false)}
                                         title="Close the note"
                                     >
-                                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                                     </button>
                                 </div>
 

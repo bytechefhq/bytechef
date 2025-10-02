@@ -41,10 +41,9 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
-import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, ClipboardIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
@@ -801,7 +800,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
 
             <Tooltip>
                 <TooltipTrigger>
-                    <QuestionMarkCircledIcon />
+                    <CircleQuestionMarkIcon />
                 </TooltipTrigger>
 
                 <TooltipContent>OAuth permission scopes used for this connection.</TooltipContent>

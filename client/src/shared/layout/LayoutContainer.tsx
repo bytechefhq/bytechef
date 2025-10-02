@@ -1,5 +1,5 @@
 import {Dialog, DialogContent} from '@/components/ui/dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
+import {XIcon} from 'lucide-react';
 import {PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -69,7 +69,7 @@ const LayoutContainer = ({
                                 onClick={() => setSidebarOpen(false)}
                                 type="button"
                             >
-                                <Cross2Icon aria-hidden="true" className="size-4" />
+                                <XIcon aria-hidden="true" className="size-4" />
 
                                 <span className="sr-only">Close sidebar</span>
                             </button>

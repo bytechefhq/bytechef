@@ -3,8 +3,7 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {Cross2Icon} from '@radix-ui/react-icons';
-import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
+import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -62,7 +61,7 @@ const CopilotPanel = () => {
                     </Tooltip>
 
                     <Button onClick={handleCloseClick} size="icon" variant="ghost">
-                        <Cross2Icon />
+                        <XIcon />
                     </Button>
                 </div>
             </div>

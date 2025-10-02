@@ -6,8 +6,8 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
+import {XIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -60,7 +60,7 @@ const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
                     <span className="font-medium">Add Component</span>
 
                     <PopoverClose asChild onClick={() => form.reset()}>
-                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                     </PopoverClose>
                 </header>
 

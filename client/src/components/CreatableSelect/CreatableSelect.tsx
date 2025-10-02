@@ -3,7 +3,7 @@ import {twMerge} from 'tailwind-merge';
 
 import './CreatableSelect.css';
 
-import {ExclamationTriangleIcon} from '@radix-ui/react-icons';
+import {TriangleAlertIcon} from 'lucide-react';
 import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {GroupBase} from 'react-select';
@@ -60,7 +60,7 @@ const CreatableSelect = <
 
             {error && (
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
+                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
                 </div>
             )}
         </div>

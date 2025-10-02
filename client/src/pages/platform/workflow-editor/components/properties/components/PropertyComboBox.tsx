@@ -10,7 +10,7 @@ import {
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
 } from '@/shared/queries/platform/workflowNodeOptions.queries';
-import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -313,7 +313,7 @@ const PropertyComboBox = ({
                         {description && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
+                                    <CircleQuestionMarkIcon />
                                 </TooltipTrigger>
 
                                 <TooltipContent>{description}</TooltipContent>
@@ -398,7 +398,7 @@ const PropertyComboBox = ({
                             </>
                         )}
 
-                        <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+                        <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
 
