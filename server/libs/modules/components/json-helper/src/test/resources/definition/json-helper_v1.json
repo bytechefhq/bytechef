@@ -31,6 +31,7 @@
       "name" : "source",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : true,
@@ -78,6 +79,7 @@
         "value" : "ARRAY"
       } ],
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : null,

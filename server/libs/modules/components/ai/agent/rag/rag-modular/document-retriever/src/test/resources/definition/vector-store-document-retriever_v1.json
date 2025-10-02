@@ -32,6 +32,7 @@
       "name" : "filterExpression",
       "options" : null,
       "optionsDataSource" : null,
+      "optionsLoadedDynamically" : null,
       "placeholder" : null,
       "regex" : null,
       "required" : false,
