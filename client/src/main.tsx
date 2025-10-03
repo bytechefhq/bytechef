@@ -16,7 +16,9 @@ import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
-import {StrictMode} from 'react';
+import { StrictMode } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter as getMainRouter} from './routes';
@@ -67,17 +69,18 @@ async function renderApp() {
 
     root.render(
         <StrictMode>
-            <ThemeProvider defaultTheme="light">
-                <QueryClientProvider client={queryClient}>
-                    <ConditionalPostHogProvider>
-                        <TooltipProvider>
-                            <RouterProvider router={router} />
-                        </TooltipProvider>
-                    </ConditionalPostHogProvider>
-
-                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-                </QueryClientProvider>
-            </ThemeProvider>
+            <DndProvider backend={HTML5Backend}>
+                <ThemeProvider defaultTheme="light">
+                    <QueryClientProvider client={queryClient}>
+                        <ConditionalPostHogProvider>
+                            <TooltipProvider>
+                                <RouterProvider router={router} />
+                            </TooltipProvider>
+                        </ConditionalPostHogProvider>
+                        <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+                    </QueryClientProvider>
+                </ThemeProvider>
+            </DndProvider>
         </StrictMode>
     );
 }
