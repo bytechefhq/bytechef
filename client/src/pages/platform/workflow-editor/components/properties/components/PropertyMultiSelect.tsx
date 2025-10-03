@@ -6,7 +6,7 @@ import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore
 import {OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {PropertyAllType} from '@/shared/types';
-import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -193,7 +193,7 @@ const PropertyMultiSelect = ({
                         {description && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
+                                    <CircleQuestionMarkIcon />
                                 </TooltipTrigger>
 
                                 <TooltipContent>{description}</TooltipContent>

@@ -17,8 +17,8 @@ import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 

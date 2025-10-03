@@ -23,9 +23,8 @@ import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDa
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ControlType} from '@/shared/middleware/platform/configuration';
-import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Editor} from '@tiptap/react';
-import {EqualIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -177,7 +176,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                 {description && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <QuestionMarkCircledIcon />
+                                            <CircleQuestionMarkIcon />
                                         </TooltipTrigger>
 
                                         <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>

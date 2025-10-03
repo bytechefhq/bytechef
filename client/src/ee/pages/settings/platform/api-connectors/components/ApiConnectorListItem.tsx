@@ -17,8 +17,8 @@ import {
     useEnableApiConnectorMutation,
 } from '@/ee/shared/mutations/platform/apiConnector.mutations';
 import {ApiConnectorKeys} from '@/ee/shared/queries/platform/apiConnectors.queries';
-import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ApiConnectorItemProps {
@@ -131,7 +131,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="icon" variant="ghost">
-                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                             </Button>
                         </DropdownMenuTrigger>
 

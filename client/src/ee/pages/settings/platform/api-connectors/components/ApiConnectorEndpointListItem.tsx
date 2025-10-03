@@ -3,8 +3,7 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
-import {CalendarIcon} from 'lucide-react';
+import {CalendarIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -57,7 +56,7 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

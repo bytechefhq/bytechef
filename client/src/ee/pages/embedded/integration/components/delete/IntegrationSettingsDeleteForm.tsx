@@ -1,7 +1,7 @@
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {ExclamationTriangleIcon} from '@radix-ui/react-icons';
+import {TriangleAlertIcon} from 'lucide-react';
 import * as React from 'react';
 
 const IntegrationSettingsDeleteForm = () => {
@@ -15,7 +15,7 @@ const IntegrationSettingsDeleteForm = () => {
                 <Alert variant="destructive">
                     <div className="flex items-center gap-x-4">
                         <div>
-                            <ExclamationTriangleIcon className="size-4" />
+                            <TriangleAlertIcon className="size-4" />
                         </div>
 
                         <div className="flex-auto">

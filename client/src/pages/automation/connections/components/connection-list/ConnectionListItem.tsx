@@ -33,9 +33,8 @@ import {
     ComponentDefinitionKeys,
     useGetConnectionComponentDefinitionQuery,
 } from '@/shared/queries/platform/componentDefinitions.queries';
-import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {ComponentIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -104,7 +103,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 <div className="relative flex items-center gap-2">
                                     <LazyLoadSVG
                                         className="size-5 flex-none"
-                                        preloader={<Component1Icon />}
+                                        preloader={<ComponentIcon />}
                                         src={componentDefinition.icon!}
                                     />
 

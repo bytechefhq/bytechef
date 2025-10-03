@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheet';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -66,7 +66,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                             {description && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <QuestionMarkCircledIcon />
+                                        <CircleQuestionMarkIcon />
                                     </TooltipTrigger>
 
                                     <TooltipContent>{description}</TooltipContent>
@@ -94,7 +94,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
 
                             {error && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
+                                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
                                 </div>
                             )}
                         </div>

@@ -11,7 +11,6 @@ import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
-import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
@@ -131,7 +130,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 icon: icon ? (
                     <InlineSVG className="size-9 text-gray-700" src={icon} />
                 ) : (
-                    <Component1Icon className="size-9 text-gray-700" />
+                    <ComponentIcon className="size-9 text-gray-700" />
                 ),
                 label: componentLabel,
                 metadata: undefined,
