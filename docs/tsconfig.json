@@ -24,7 +24,7 @@
         "./.source/index.ts"
       ],
       "@/*": [
-        "./src/*"
+        "./*"
       ]
     },
     "plugins": [
