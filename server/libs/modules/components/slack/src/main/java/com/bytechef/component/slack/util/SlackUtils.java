@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class SlackUtils {
     public static Object sendMessage(
         String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
 
-        return actionContext
+        Map<String, Object> body = actionContext
             .http(http -> http.post("/chat.postMessage"))
             .body(
                 Http.Body.of(
@@ -53,6 +54,12 @@ public class SlackUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        if ((boolean) body.get("ok")) {
+            return body;
+        } else {
+            throw new ProviderException((String) body.get("error"));
+        }
     }
 
     public static List<Option<String>> getChannelOptions(
