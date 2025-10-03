@@ -364,6 +364,11 @@ class ContextImpl implements Context {
         public String base64EncodeToString(byte[] bytes) {
             return EncodingUtils.base64EncodeToString(bytes);
         }
+
+        @Override
+        public String urlEncode(String string) {
+            return EncodingUtils.urlEncode(string);
+        }
     }
 
     private record FileImpl(TempFileStorage tempFileStorage) implements File {
