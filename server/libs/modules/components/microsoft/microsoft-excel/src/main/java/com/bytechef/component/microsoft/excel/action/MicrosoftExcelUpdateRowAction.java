@@ -36,6 +36,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -63,7 +64,8 @@ public class MicrosoftExcelUpdateRowAction {
                 .properties(MicrosoftExcelUtils::createPropertiesToUpdateRow)
                 .required(true))
         .output()
-        .perform(MicrosoftExcelUpdateRowAction::perform);
+        .perform(MicrosoftExcelUpdateRowAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftExcelUpdateRowAction() {
     }
@@ -73,5 +75,4 @@ public class MicrosoftExcelUpdateRowAction {
             inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER),
             getUpdatedRowValues(inputParameters, context));
     }
-
 }

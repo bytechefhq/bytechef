@@ -32,6 +32,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,8 @@ public class MicrosoftSharePointCreateListItemAction {
                 .propertiesLookupDependsOn(SITE_ID, LIST_ID)
                 .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
         .output()
-        .perform(MicrosoftSharePointCreateListItemAction::perform);
+        .perform(MicrosoftSharePointCreateListItemAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateListItemAction() {
     }

@@ -36,6 +36,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -79,7 +80,8 @@ public class MicrosoftTeamsSendChannelMessageAction {
                                     .description("ID of the team in which the message was posted."),
                                 string(CHANNEL_ID)
                                     .description("ID of the channel in which the message was posted.")))))
-        .perform(MicrosoftTeamsSendChannelMessageAction::perform);
+        .perform(MicrosoftTeamsSendChannelMessageAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsSendChannelMessageAction() {
     }

@@ -35,6 +35,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -71,7 +72,8 @@ public class MicrosoftOneDriveCreateNewTextFileAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
-        .perform(MicrosoftOneDriveCreateNewTextFileAction::perform);
+        .perform(MicrosoftOneDriveCreateNewTextFileAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveCreateNewTextFileAction() {
     }

@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -44,7 +45,8 @@ public class MicrosoftOneDriveGetFileAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
-        .perform(MicrosoftOneDriveGetFileAction::perform);
+        .perform(MicrosoftOneDriveGetFileAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveGetFileAction() {
     }

@@ -41,6 +41,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.outlook.constant.ContentType;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -105,7 +106,8 @@ public class MicrosoftOutlook365SendEmailAction {
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry())
                 .required(false))
-        .perform(MicrosoftOutlook365SendEmailAction::perform);
+        .perform(MicrosoftOutlook365SendEmailAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365SendEmailAction() {
     }

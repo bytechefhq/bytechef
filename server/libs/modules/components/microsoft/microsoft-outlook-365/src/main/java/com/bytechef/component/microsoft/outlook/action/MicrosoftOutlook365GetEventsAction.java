@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 
 /**
@@ -58,7 +59,8 @@ public class MicrosoftOutlook365GetEventsAction {
                         .required(false))
                 .required(false))
         .output(outputSchema(array().items(CUSTOM_EVENT_OUTPUT_PROPERTY)))
-        .perform(MicrosoftOutlook365GetEventsAction::perform);
+        .perform(MicrosoftOutlook365GetEventsAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365GetEventsAction() {
     }

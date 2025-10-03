@@ -30,6 +30,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -52,7 +53,8 @@ public class MicrosoftToDoGetTaskAction {
                 .optionsLookupDependsOn(TASK_LIST_ID)
                 .required(true))
         .output(outputSchema(OUTPUT_TASK_PROPERTY))
-        .perform(MicrosoftToDoGetTaskAction::perform);
+        .perform(MicrosoftToDoGetTaskAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftToDoGetTaskAction() {
     }

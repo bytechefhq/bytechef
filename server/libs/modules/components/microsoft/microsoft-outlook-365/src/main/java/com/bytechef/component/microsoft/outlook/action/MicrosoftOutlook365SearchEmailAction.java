@@ -36,6 +36,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,8 @@ public class MicrosoftOutlook365SearchEmailAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
         .output(outputSchema(array().items(FULL_MESSAGE_OUTPUT_PROPERTY)))
-        .perform(MicrosoftOutlook365SearchEmailAction::perform);
+        .perform(MicrosoftOutlook365SearchEmailAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365SearchEmailAction() {
     }

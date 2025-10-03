@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -53,7 +54,8 @@ public class MicrosoftOneDriveCreateFolderAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FOLDER_OUTPUT_PROPERTY))
-        .perform(MicrosoftOneDriveCreateFolderAction::perform);
+        .perform(MicrosoftOneDriveCreateFolderAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveCreateFolderAction() {
     }

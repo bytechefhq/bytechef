@@ -28,6 +28,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import java.util.Map;
 
@@ -63,7 +65,7 @@ public class MicrosoftOneDriveCopyFileAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        context
+        Http.Response response = context
             .http(http -> http.post(
                 "/me/drive/items/%s/copy".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -72,6 +74,35 @@ public class MicrosoftOneDriveCopyFileAction {
                 "parentReference", Map.of(ID, getFolderId(inputParameters.getString(PARENT_ID)))))
             .execute();
 
-        return null;
+        int statusCode = response.getStatusCode();
+
+        if (statusCode == 202) {
+            String location = response.getFirstHeader("location");
+
+            Http.Response response1 = context
+                .http(http -> http.get(location))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute();
+
+            Map<String, Object> body = response1.getBody(new TypeReference<>() {});
+
+            String status = (String) body.get("status");
+
+            if (status.equals("completed")) {
+                return null;
+            } else {
+                if (body.get("error") instanceof Map<?, ?> map) {
+                    throw new ProviderException(response1.getStatusCode(), (String) map.get("message"));
+                } else {
+                    throw new ProviderException("Failed to copy file. Status code: " + response1.getStatusCode());
+                }
+            }
+        } else {
+            Map<String, Map<String, Object>> body = response.getBody(new TypeReference<>() {});
+
+            Map<String, Object> error = body.get("error");
+
+            throw new ProviderException(statusCode, (String) error.get("message"));
+        }
     }
 }

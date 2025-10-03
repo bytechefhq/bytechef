@@ -39,6 +39,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -109,7 +110,8 @@ public class MicrosoftSharePointUploadFileAction {
                                                     "contents of the file change.")),
                                 string("mimeType")
                                     .description("The MIME type for the file..")))))
-        .perform(MicrosoftSharePointUploadFileAction::perform);
+        .perform(MicrosoftSharePointUploadFileAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointUploadFileAction() {
     }

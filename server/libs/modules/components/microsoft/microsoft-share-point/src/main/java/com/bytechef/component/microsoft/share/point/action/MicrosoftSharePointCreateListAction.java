@@ -34,6 +34,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -86,7 +87,8 @@ public class MicrosoftSharePointCreateListAction {
                                     .description(
                                         "Specifies whether this list is hidden in the SharePoint user interface."),
                                 string("template")))))
-        .perform(MicrosoftSharePointCreateListAction::perform);
+        .perform(MicrosoftSharePointCreateListAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateListAction() {
     }

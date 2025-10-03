@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -49,7 +50,8 @@ public class MicrosoftOutlook365MoveEmailAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getFolderIdOptions)
                 .required(true))
         .output()
-        .perform(MicrosoftOutlook365MoveEmailAction::perform);
+        .perform(MicrosoftOutlook365MoveEmailAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365MoveEmailAction() {
     }
