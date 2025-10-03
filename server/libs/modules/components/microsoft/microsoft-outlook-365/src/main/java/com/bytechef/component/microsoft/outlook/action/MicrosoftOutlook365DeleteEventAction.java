@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -45,7 +46,8 @@ public class MicrosoftOutlook365DeleteEventAction {
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getEventOptions)
                 .optionsLookupDependsOn(CALENDAR)
                 .required(true))
-        .perform(MicrosoftOutlook365DeleteEventAction::perform);
+        .perform(MicrosoftOutlook365DeleteEventAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365DeleteEventAction() {
     }

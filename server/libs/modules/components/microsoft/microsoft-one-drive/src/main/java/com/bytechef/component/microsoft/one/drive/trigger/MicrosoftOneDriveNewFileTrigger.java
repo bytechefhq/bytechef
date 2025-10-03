@@ -33,6 +33,7 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -56,7 +57,8 @@ public class MicrosoftOneDriveNewFileTrigger {
                 .options((TriggerOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
-        .poll(MicrosoftOneDriveNewFileTrigger::poll);
+        .poll(MicrosoftOneDriveNewFileTrigger::poll)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 

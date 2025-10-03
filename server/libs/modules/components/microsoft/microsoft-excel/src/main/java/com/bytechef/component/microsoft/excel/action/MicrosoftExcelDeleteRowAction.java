@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 
 /**
@@ -46,7 +47,8 @@ public class MicrosoftExcelDeleteRowAction {
                 .label("Row Number")
                 .description("The row number to delete.")
                 .required(true))
-        .perform(MicrosoftExcelDeleteRowAction::perform);
+        .perform(MicrosoftExcelDeleteRowAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftExcelDeleteRowAction() {
     }

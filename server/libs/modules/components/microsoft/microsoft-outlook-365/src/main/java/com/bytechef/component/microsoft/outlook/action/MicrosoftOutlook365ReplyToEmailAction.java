@@ -40,6 +40,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.outlook.constant.ContentType;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,8 @@ public class MicrosoftOutlook365ReplyToEmailAction {
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry())
                 .required(false))
-        .perform(MicrosoftOutlook365ReplyToEmailAction::perform);
+        .perform(MicrosoftOutlook365ReplyToEmailAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365ReplyToEmailAction() {
     }

@@ -29,6 +29,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -55,7 +56,8 @@ public class MicrosoftToDoCreateTaskListAction {
                         bool("isOwner"),
                         bool("isShared"),
                         string("wellKnownListName"))))
-        .perform(MicrosoftToDoCreateTaskListAction::perform);
+        .perform(MicrosoftToDoCreateTaskListAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftToDoCreateTaskListAction() {
     }

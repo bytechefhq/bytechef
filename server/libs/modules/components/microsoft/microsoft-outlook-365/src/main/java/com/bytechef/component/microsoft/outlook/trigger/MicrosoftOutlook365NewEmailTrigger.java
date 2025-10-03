@@ -35,6 +35,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +54,8 @@ public class MicrosoftOutlook365NewEmailTrigger {
         .type(TriggerType.POLLING)
         .properties(FORMAT_PROPERTY)
         .output(MicrosoftOutlook365Utils::getMessageOutput)
-        .poll(MicrosoftOutlook365NewEmailTrigger::poll);
+        .poll(MicrosoftOutlook365NewEmailTrigger::poll)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 

@@ -34,6 +34,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -66,7 +67,8 @@ public class MicrosoftToDoCreateTaskAction {
                 .description("Set to true if an alert is set to remind the user of the task.")
                 .required(false))
         .output(outputSchema(OUTPUT_TASK_PROPERTY))
-        .perform(MicrosoftToDoCreateTaskAction::perform);
+        .perform(MicrosoftToDoCreateTaskAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftToDoCreateTaskAction() {
     }

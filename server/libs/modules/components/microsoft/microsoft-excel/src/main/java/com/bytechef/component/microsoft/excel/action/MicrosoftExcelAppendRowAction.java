@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Kušter
@@ -51,7 +52,8 @@ public class MicrosoftExcelAppendRowAction {
                 .properties(MicrosoftExcelUtils::createPropertiesForNewRow)
                 .required(true))
         .output()
-        .perform(MicrosoftExcelAppendRowAction::perform);
+        .perform(MicrosoftExcelAppendRowAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftExcelAppendRowAction() {
     }

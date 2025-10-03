@@ -28,6 +28,7 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.ge
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 
 /**
@@ -47,7 +48,8 @@ public class MicrosoftExcelFindRowByNumAction {
                 .description("The row number to get the values from.")
                 .required(true))
         .output()
-        .perform(MicrosoftExcelFindRowByNumAction::perform);
+        .perform(MicrosoftExcelFindRowByNumAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftExcelFindRowByNumAction() {
     }

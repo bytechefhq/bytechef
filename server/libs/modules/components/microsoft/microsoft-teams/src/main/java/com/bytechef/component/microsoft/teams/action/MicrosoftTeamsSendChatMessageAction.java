@@ -35,6 +35,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -66,7 +67,8 @@ public class MicrosoftTeamsSendChatMessageAction {
                                     .description("Type of the content."),
                                 string(CONTENT)
                                     .description("The content of the message.")))))
-        .perform(MicrosoftTeamsSendChatMessageAction::perform);
+        .perform(MicrosoftTeamsSendChatMessageAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsSendChatMessageAction() {
     }

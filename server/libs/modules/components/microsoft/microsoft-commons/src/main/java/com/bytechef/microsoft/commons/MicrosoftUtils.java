@@ -22,6 +22,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,20 @@ public class MicrosoftUtils {
         }
 
         return otherItems;
+    }
+
+    public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
+        String message;
+
+        Object json = context.json(json1 -> json1.read((String) body));
+
+        if (json instanceof Map<?, ?> map && map.get("error") instanceof Map<?, ?> errorMap) {
+            message = (String) errorMap.get("message");
+        } else {
+            message = body == null ? null : body.toString();
+        }
+
+        return new ProviderException(statusCode, message);
     }
 
     private MicrosoftUtils() {

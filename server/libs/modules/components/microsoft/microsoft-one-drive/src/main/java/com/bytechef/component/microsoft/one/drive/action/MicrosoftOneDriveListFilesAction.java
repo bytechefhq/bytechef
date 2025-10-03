@@ -35,6 +35,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,8 @@ public class MicrosoftOneDriveListFilesAction {
             outputSchema(
                 array()
                     .items(FILE_OUTPUT_PROPERTY)))
-        .perform(MicrosoftOneDriveListFilesAction::perform);
+        .perform(MicrosoftOneDriveListFilesAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveListFilesAction() {
     }

@@ -31,6 +31,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -70,7 +71,8 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
                                     .description("Start time of the free time slot."),
                                 dateTime("endTime")
                                     .description("End time of the free time slot.")))))
-        .perform(MicrosoftOutlook365GetFreeTimeSlotsAction::perform);
+        .perform(MicrosoftOutlook365GetFreeTimeSlotsAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365GetFreeTimeSlotsAction() {
     }

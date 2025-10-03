@@ -39,6 +39,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.Map;
 
 /**
@@ -109,7 +110,8 @@ public class MicrosoftSharePointCreateFolderAction {
                             .properties(
                                 string("scope")
                                     .description("The scope of the shared item.")))))
-        .perform(MicrosoftSharePointCreateFolderAction::perform);
+        .perform(MicrosoftSharePointCreateFolderAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointCreateFolderAction() {
     }

@@ -34,6 +34,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -75,7 +76,8 @@ public class MicrosoftTeamsCreateChannelAction {
                             .description("URL to access the channel in a web browser."),
                         bool("isArchived")
                             .description("Indicates whether the channel is archived."))))
-        .perform(MicrosoftTeamsCreateChannelAction::perform);
+        .perform(MicrosoftTeamsCreateChannelAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftTeamsCreateChannelAction() {
     }

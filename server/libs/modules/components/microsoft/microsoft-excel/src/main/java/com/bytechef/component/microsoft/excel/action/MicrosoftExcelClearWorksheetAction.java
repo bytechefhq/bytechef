@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.List;
 
 /**
@@ -44,7 +45,8 @@ public class MicrosoftExcelClearWorksheetAction {
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY)
-        .perform(MicrosoftExcelClearWorksheetAction::perform);
+        .perform(MicrosoftExcelClearWorksheetAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftExcelClearWorksheetAction() {
     }

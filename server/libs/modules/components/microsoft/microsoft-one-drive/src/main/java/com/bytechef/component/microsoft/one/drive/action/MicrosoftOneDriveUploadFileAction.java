@@ -33,6 +33,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
  * @author Monika Domiter
@@ -55,7 +56,8 @@ public class MicrosoftOneDriveUploadFileAction {
                 .description("File to upload.")
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
-        .perform(MicrosoftOneDriveUploadFileAction::perform);
+        .perform(MicrosoftOneDriveUploadFileAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOneDriveUploadFileAction() {
     }

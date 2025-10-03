@@ -47,6 +47,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -109,7 +110,8 @@ public class MicrosoftOutlook365CreateEventAction {
                 .defaultValue(15)
                 .required(false))
         .output(outputSchema(CUSTOM_EVENT_OUTPUT_PROPERTY))
-        .perform(MicrosoftOutlook365CreateEventAction::perform);
+        .perform(MicrosoftOutlook365CreateEventAction::perform)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365CreateEventAction() {
     }
