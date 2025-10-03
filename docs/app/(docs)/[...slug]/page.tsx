@@ -1,26 +1,14 @@
 import type { Metadata } from 'next';
-import {
-  DocsBody,
-  DocsDescription,
-  DocsPage,
-  DocsTitle,
-} from 'fumadocs-ui/page';
-import { notFound } from 'next/navigation';
-import {
-  type ComponentProps,
-  type FC,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { type ComponentProps, type FC, type ReactNode } from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata } from '@/lib/metadata';
-import { openapi, source } from '@/lib/source';
+import { source } from '@/lib/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/mdx/mermaid';
-import { Rate } from '@/components/rate';
+import { Feedback } from '@/components/feedback';
 import { onRateAction, owner, repo } from '@/lib/github';
 import {
   HoverCard,
@@ -28,14 +16,21 @@ import {
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
 import Link from 'fumadocs-core/link';
-import { UiOverview } from '@/components/ui-overview';
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import { createGenerator } from 'fumadocs-typescript';
-import { getPageTreePeers } from 'fumadocs-core/server';
+import { getPageTreePeers } from 'fumadocs-core/page-tree';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { getMDXComponents } from '@/mdx-components';
 import { APIPage } from 'fumadocs-openapi/ui';
-import { EditOnGitHub, LLMCopyButton } from './page.client';
+import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
+import * as path from 'node:path';
+import { Banner } from 'fumadocs-ui/components/banner';
+import { openapi } from '@/lib/openapi';
+import { Installation } from '@/components/preview/installation';
+import { Customisation } from '@/components/preview/customisation';
+import { DocsPage } from 'fumadocs-ui/page';
+import { NotFound } from '@/components/not-found';
+// import { getSuggestions } from '@/app/(docs)/[...slug]/suggestions';
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
@@ -50,48 +45,46 @@ const generator = createGenerator();
 
 export const revalidate = false;
 
-export default async function Page(props: {
-  params: Promise<{ slug: string[] }>;
-}): Promise<ReactElement> {
+export default async function Page(props: PageProps<'/[...slug]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
 
-  if (!page) notFound();
+  if (!page)
+    return (
+      // <NotFound getSuggestions={() => getSuggestions(params.slug.join(' '))} />
+      <NotFound getSuggestions={() => Promise.resolve([])} />
+    );
 
-  const path = `apps/docs/content/docs/${page.file.path}`;
   const preview = page.data.preview;
-  const { body: Mdx, toc } = await page.data.load();
+  const { body: Mdx, toc, lastModified } = page.data;
 
   return (
     <DocsPage
       toc={toc}
-      full={page.data.full}
+      lastUpdate={lastModified ? new Date(lastModified) : undefined}
       tableOfContent={{
         style: 'clerk',
-        single: false,
-      }}
-      article={{
-        className: 'max-sm:pb-16',
       }}
     >
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">
+      <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
+      <p className="text-lg text-fd-muted-foreground">
         {page.data.description}
-      </DocsDescription>
-      <div className="flex flex-row gap-2 items-center mb-4">
-        <LLMCopyButton slug={params.slug} />
-        <EditOnGitHub
-          url={`https://github.com/${owner}/${repo}/blob/dev/${path}`}
+      </p>
+      <div className="flex flex-row gap-2 items-center border-b pt-2 pb-6">
+        <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
+        <ViewOptions
+          markdownUrl={`${page.url}.mdx`}
+          githubUrl={`https://github.com/${owner}/${repo}/blob/master/docs/content/docs/${page.path}`}
         />
       </div>
-      <DocsBody className="text-fd-foreground/80">
+      <div className="prose flex-1 text-fd-foreground/90">
         {preview ? <PreviewRenderer preview={preview} /> : null}
         <Mdx
           components={getMDXComponents({
             ...Twoslash,
             a: ({ href, ...props }) => {
               const found = source.getPageByHref(href ?? '', {
-                dir: page.file.dirname,
+                dir: path.dirname(page.path),
               });
 
               if (!found) return <Link href={href} {...props} />;
@@ -117,6 +110,7 @@ export default async function Page(props: {
                 </HoverCard>
               );
             },
+            Banner,
             Mermaid,
             TypeTable,
             AutoTypeTable: (props) => (
@@ -128,15 +122,13 @@ export default async function Page(props: {
             DocsCategory: ({ url }) => {
               return <DocsCategory url={url ?? page.url} />;
             },
-            UiOverview,
-
-            ...(await import('@/content/docs/ui/components/tabs.client')),
-            ...(await import('@/content/docs/ui/theme.client')),
+            Installation,
+            Customisation,
           })}
         />
         {page.data.index ? <DocsCategory url={page.url} /> : null}
-      </DocsBody>
-      <Rate onRateAction={onRateAction} />
+      </div>
+      <Feedback onRateAction={onRateAction} />
     </DocsPage>
   );
 }
@@ -153,18 +145,21 @@ function DocsCategory({ url }: { url: string }) {
   );
 }
 
-export async function generateMetadata(props: {
-  params: Promise<{ slug: string[] }>;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<'/[...slug]'>,
+): Promise<Metadata> {
   const { slug = [] } = await props.params;
   const page = source.getPage(slug);
-  if (!page) notFound();
+  if (!page)
+    return createMetadata({
+      title: 'Not Found',
+    });
 
   const description =
-    page.data.description ?? 'The library for building documentation sites';
+    page.data.description ?? 'The platform for building ai-driven automations';
 
   const image = {
-    url: ['/og', ...slug, 'image.png'].join('/'),
+    url: ['/og', ...slug, 'image.webp'].join('/'),
     width: 1200,
     height: 630,
   };
@@ -173,7 +168,7 @@ export async function generateMetadata(props: {
     title: page.data.title,
     description,
     openGraph: {
-      url: `/docs/${page.slugs.join('/')}`,
+      url: `/${page.slugs.join('/')}`,
       images: [image],
     },
     twitter: {

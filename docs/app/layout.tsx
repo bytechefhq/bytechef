@@ -1,9 +1,13 @@
 import './global.css';
-import { RootProvider } from 'fumadocs-ui/provider';
-import { Inter } from 'next/font/google';
+import type { Viewport } from 'next';
+import { baseUrl, createMetadata } from '@/lib/metadata';
+import { Body } from '@/app/layout.client';
+import { Provider } from './provider';
 import type { ReactNode } from 'react';
-import {baseUrl, createMetadata} from "@/lib/metadata";
-import {PostHogProvider} from "@/app/providers";
+import { Geist, Geist_Mono } from 'next/font/google';
+import { TreeContextProvider } from 'fumadocs-ui/contexts/tree';
+import { source } from '@/lib/source';
+import { NextProvider } from 'fumadocs-core/framework/next';
 
 export const metadata = createMetadata({
   title: {
@@ -14,18 +18,37 @@ export const metadata = createMetadata({
   metadataBase: baseUrl,
 });
 
-const inter = Inter({
+const geist = Geist({
+  variable: '--font-sans',
   subsets: ['latin'],
 });
 
-export default function Layout({ children }: { children: ReactNode }) {
+const mono = Geist_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+});
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
+    { media: '(prefers-color-scheme: light)', color: '#fff' },
+  ],
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen">
-        <PostHogProvider>
-          <RootProvider>{children}</RootProvider>
-        </PostHogProvider>
-      </body>
+    <html
+      lang="en"
+      className={`${geist.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <Body>
+        <NextProvider>
+          <TreeContextProvider tree={source.pageTree}>
+            <Provider>{children}</Provider>
+          </TreeContextProvider>
+        </NextProvider>
+      </Body>
     </html>
   );
 }

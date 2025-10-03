@@ -1,13 +1,15 @@
-import { docs } from '@/.source';
-import type { InferMetaType, InferPageType } from 'fumadocs-core/source';
-import { loader } from 'fumadocs-core/source';
+import {
+  type InferMetaType,
+  type InferPageType,
+  loader,
+} from 'fumadocs-core/source';
+import { openapiPlugin } from 'fumadocs-openapi/server';
 import { icons } from 'lucide-react';
 import { createElement } from 'react';
-// import { attachFile, createOpenAPI } from 'fumadocs-openapi/server';
+import { docs } from '@/.source';
+// import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 
-// See https://fumadocs.vercel.app/docs/headless/source-api for more info
 export const source = loader({
-  // it assigns a URL to your pages
   baseUrl: '/',
   icon(icon) {
     if (!icon) {
@@ -18,20 +20,8 @@ export const source = loader({
     if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
   },
   source: docs.toFumadocsSource(),
-  // pageTree: {
-  //   attachFile,
-  // },
+  plugins: [/*lucideIconsPlugin(),*/ openapiPlugin()],
 });
-
-// export const openapi = createOpenAPI({
-//   proxyUrl: '/api/proxy',
-//   shikiOptions: {
-//     themes: {
-//       dark: 'vesper',
-//       light: 'vitesse-light',
-//     },
-//   },
-// });
 
 export type Page = InferPageType<typeof source>;
 export type Meta = InferMetaType<typeof source>;
