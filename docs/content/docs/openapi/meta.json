@@ -1,6 +1,7 @@
 {
-  "title": "API Specification",
-  "description": "The API specification docs",
+  "title": "API Reference",
+  "description": "The API reference docs",
   "icon": "Play",
-  "root": true
+  "root": true,
+  "pages": ["index"]
 }

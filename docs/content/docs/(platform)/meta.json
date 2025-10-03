@@ -3,10 +3,8 @@
   "description": "The platform overview",
   "icon": "Building",
   "pages": [
-    "---Getting Started---",
-    "index",
+    "introduction",
     "platform-overview",
-    "---Setup---",
-    "deployment"
+    "setup"
   ]
 }

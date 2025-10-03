@@ -19,6 +19,17 @@ export function createMetadata(override: Metadata): Metadata {
       images: '/banner.png',
       ...override.twitter,
     },
+    // alternates: {
+    //   types: {
+    //     'application/rss+xml': [
+    //       {
+    //         title: 'ByteChef Blog',
+    //         url: 'https://blog.bytechef.io/rss.xml',
+    //       },
+    //     ],
+    //   },
+    //   ...override.alternates,
+    // },
   };
 }
 
