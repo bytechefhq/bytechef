@@ -584,6 +584,99 @@ This action does not produce any output.
 
 
 
+### Create Fork
+Name: createFork
+
+`Forks a repository. Fork creation is asynchronous; this action returns the fork URL once available.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repositoryId | Repository ID | NUMBER | ID of the repository to fork. | true |
+| name | Name | STRING | New name for the fork. | false |
+| organization | Organization | STRING | Target organization if forking into an org. | false |
+| default_branch_only | Default Branch Only | BOOLEAN | Fork only the default branch. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Fork",
+  "name" : "createFork",
+  "parameters" : {
+    "repositoryId" : 0,
+    "name" : "",
+    "organization" : "",
+    "default_branch_only" : false
+  },
+  "type" : "github/v1/createFork"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL of the created fork. |
+
+
+
+### Search Code
+Name: searchCode
+
+`Searches code in a repository and returns up to 100 results per page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repositoryId | Repository ID | NUMBER | ID of the repository to search in. | true |
+| query | Query | OBJECT <details> <summary> Properties </summary> { STRING(extension), STRING(filename), STRING(path), STRING(user), STRING(in) } </details> | Query qualifiers. | false |
+| page | Page | NUMBER | Page number to fetch. | false |
+| per_page | Per Page | NUMBER | Results per page (max 100). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Code",
+  "name" : "searchCode",
+  "parameters" : {
+    "repositoryId" : 0,
+    "query" : {
+      "extension" : "kt",
+      "filename" : "QuoteViewModel.kt",
+      "path" : "app/src/main/java",
+      "in" : "file"
+    },
+    "page" : 1,
+    "per_page" : 30
+  },
+  "type" : "github/v1/searchCode"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+#### Output Example
+```json
+[ "https://github.com/owner/repo/blob/main/app/src/Main.kt" ]
+```
+
+
 
 ## Triggers
 
