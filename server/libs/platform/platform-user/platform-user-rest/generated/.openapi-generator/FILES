@@ -1,5 +1,0 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/platform/user/web/rest/ApiUtil.java
-src/main/java/com/bytechef/platform/user/web/rest/AuthorityApi.java
-src/main/java/com/bytechef/platform/user/web/rest/model/AuthorityModel.java

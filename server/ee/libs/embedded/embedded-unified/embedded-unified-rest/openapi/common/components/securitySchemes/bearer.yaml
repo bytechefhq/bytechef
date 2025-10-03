@@ -1,3 +1,0 @@
-type: http
-scheme: bearer
-description: API key to allow developers to access the API

@@ -1,7 +1,0 @@
-spring:
-  liquibase:
-    contexts: configuration
-
-bytechef:
-  edition: EE
-  webhook-url: /webhooks/{id}

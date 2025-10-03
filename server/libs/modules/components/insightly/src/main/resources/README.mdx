@@ -1,3 +1,0 @@
-## CONNECTION
-
-[API key location](https://crm.na1.insightly.com/Users/UserSettings)

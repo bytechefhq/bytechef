@@ -1,3 +1,0 @@
-id;login;password_hash;first_name;last_name;email;image_url;activated;lang_key;created_by;created_date;last_modified_by;last_modified_date;uuid
-1;admin;$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC;Administrator;Administrator;admin@localhost.com;;true;en;system;CURRENT_TIMESTAMP;system;CURRENT_TIMESTAMP;13ae46f5-df3a-4f43-89aa-6148789569bf
-2;user;$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K;User;User;user@localhost.com;;true;en;system;CURRENT_TIMESTAMP;system;CURRENT_TIMESTAMP;ba579f15-2b1b-4984-a9eb-fa6a8f36f021

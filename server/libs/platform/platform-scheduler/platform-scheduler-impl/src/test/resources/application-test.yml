@@ -1,7 +1,0 @@
-bytechef:
-  coordinator:
-    trigger:
-      scheduler:
-        provider: quartz
-  tenant:
-    mode: SINGLE

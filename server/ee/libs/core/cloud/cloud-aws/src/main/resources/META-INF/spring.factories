@@ -1,2 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.ee.cloud.aws.env.AwsCloudProviderEnvironmentPostProcessor

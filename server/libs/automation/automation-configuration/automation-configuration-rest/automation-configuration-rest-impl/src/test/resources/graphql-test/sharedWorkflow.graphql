@@ -1,6 +1,0 @@
-query sharedWorkflow($workflowUuid: String!) {
-    sharedWorkflow(workflowUuid: $workflowUuid) {
-        description
-        exported
-    }
-}

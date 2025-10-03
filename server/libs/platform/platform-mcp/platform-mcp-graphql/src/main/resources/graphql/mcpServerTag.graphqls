@@ -1,3 +1,0 @@
-extend type Query {
-    mcpServerTags(type: ModeType!): [Tag]
-}

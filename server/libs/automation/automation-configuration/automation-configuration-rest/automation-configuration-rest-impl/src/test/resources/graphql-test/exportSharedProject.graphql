@@ -1,3 +1,0 @@
-mutation exportSharedProject($id: ID!, $description: String!) {
-    exportSharedProject(id: $id, description: $description)
-}

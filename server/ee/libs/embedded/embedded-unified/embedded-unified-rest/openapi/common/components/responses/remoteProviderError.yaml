@@ -1,8 +1,0 @@
-description: Remote provider error
-content:
-  application/json:
-    schema:
-      type: object
-      properties:
-        errors:
-          $ref: ../schemas/errors.yaml
