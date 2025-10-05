@@ -28,6 +28,46 @@ interface WorkflowNodesTabsProps {
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
 }
 
+interface WorkflowNodesTabContentProps {
+    emptyMessage: string;
+    items: Array<ComponentDefinitionBasic | DefinitionType> | undefined;
+    itemsDraggable: boolean;
+    onItemClick?: (clickedItem: ClickedDefinitionType) => void;
+    selectedComponentName?: string;
+    tabValue: string;
+}
+
+const WorkflowNodesTabContent = ({
+    emptyMessage,
+    items,
+    itemsDraggable,
+    onItemClick,
+    selectedComponentName,
+    tabValue,
+}: WorkflowNodesTabContentProps) => {
+    return (
+        <ScrollArea className="overflow-y-auto px-3">
+            <TabsContent className="mt-0 w-full flex-1" value={tabValue}>
+                <ul className="space-y-2" role="list">
+                    {(!items || items.length === 0) && (
+                        <span className="block px-3 py-2 text-xs text-content-neutral-secondary">{emptyMessage}</span>
+                    )}
+
+                    {items?.map((item) => (
+                        <WorkflowNodesTabsItem
+                            draggable={itemsDraggable}
+                            handleClick={() => onItemClick && onItemClick(item as ClickedDefinitionType)}
+                            key={item.name}
+                            node={item as DefinitionType}
+                            selected={tabValue === 'components' ? selectedComponentName === item.name : undefined}
+                        />
+                    ))}
+                </ul>
+            </TabsContent>
+        </ScrollArea>
+    );
+};
+
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,
     clusterElementComponentDefinitions,
@@ -123,6 +163,35 @@ const WorkflowNodesTabs = ({
         setActiveView,
     ]);
 
+    const tabContentConfigs = useMemo(
+        () => ({
+            clusterElements: {
+                emptyMessage: 'No cluster element components found.',
+                items: availableClusterElements,
+            },
+            components: {
+                emptyMessage:
+                    filterState.activeView === 'all' ? 'No action components found.' : 'No filtered components found.',
+                items: filteredComponents,
+            },
+            taskDispatchers: {
+                emptyMessage: 'No flow controls found.',
+                items: availableTaskDispatchers,
+            },
+            triggers: {
+                emptyMessage: 'No trigger components found.',
+                items: availableTriggers,
+            },
+        }),
+        [
+            availableTriggers,
+            filteredComponents,
+            availableTaskDispatchers,
+            availableClusterElements,
+            filterState.activeView,
+        ]
+    );
+
     return (
         <Tabs className="flex h-full flex-col" onValueChange={setActiveTab} value={activeTab}>
             <div className="px-2">
@@ -167,110 +236,47 @@ const WorkflowNodesTabs = ({
             )}
 
             {!hideClusterElementComponents && (
-                <ScrollArea className="overflow-y-auto px-3">
-                    <TabsContent className="mt-0 w-full flex-1" value="clusterElements">
-                        <ul className="space-y-2" role="list">
-                            {!clusterElementComponentDefinitions?.length && (
-                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
-                                    No cluster element components found.
-                                </span>
-                            )}
-
-                            {availableClusterElements?.map((clusterElementDefinition, index) => (
-                                <WorkflowNodesTabsItem
-                                    draggable={itemsDraggable}
-                                    handleClick={() =>
-                                        onItemClick && onItemClick(clusterElementDefinition as ClickedDefinitionType)
-                                    }
-                                    key={index}
-                                    node={clusterElementDefinition}
-                                />
-                            ))}
-                        </ul>
-                    </TabsContent>
-                </ScrollArea>
+                <WorkflowNodesTabContent
+                    emptyMessage={tabContentConfigs.clusterElements.emptyMessage}
+                    items={tabContentConfigs.clusterElements.items}
+                    itemsDraggable={itemsDraggable}
+                    onItemClick={onItemClick}
+                    selectedComponentName={selectedComponentName}
+                    tabValue="clusterElements"
+                />
             )}
 
             {!hideTriggerComponents && (
-                <ScrollArea className="overflow-y-auto px-3">
-                    <TabsContent className="mt-0 w-full flex-1" value="triggers">
-                        <ul className="space-y-2" role="list">
-                            {!triggerComponentDefinitions.length && (
-                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
-                                    No trigger components found.
-                                </span>
-                            )}
-
-                            {availableTriggers.map((triggerDefinition) => (
-                                <WorkflowNodesTabsItem
-                                    draggable={itemsDraggable}
-                                    handleClick={() =>
-                                        onItemClick && onItemClick(triggerDefinition as ClickedDefinitionType)
-                                    }
-                                    key={triggerDefinition.name}
-                                    node={triggerDefinition as DefinitionType}
-                                />
-                            ))}
-                        </ul>
-                    </TabsContent>
-                </ScrollArea>
+                <WorkflowNodesTabContent
+                    emptyMessage={tabContentConfigs.triggers.emptyMessage}
+                    items={tabContentConfigs.triggers.items}
+                    itemsDraggable={itemsDraggable}
+                    onItemClick={onItemClick}
+                    selectedComponentName={selectedComponentName}
+                    tabValue="triggers"
+                />
             )}
 
             {!hideActionComponents && (
-                <ScrollArea className="overflow-y-auto px-3">
-                    <TabsContent className="mt-0 w-full flex-1" value="components">
-                        <ul className="space-y-2" role="list">
-                            {actionComponentDefinitions.length === 0 && filterState.activeView === 'all' && (
-                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
-                                    No action components found.
-                                </span>
-                            )}
-
-                            {filteredComponents?.length === 0 && filterState.activeView === 'filtered' && (
-                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
-                                    No filtered components found.
-                                </span>
-                            )}
-
-                            {filteredComponents?.map((componentDefinition) => (
-                                <WorkflowNodesTabsItem
-                                    draggable={itemsDraggable}
-                                    handleClick={() =>
-                                        onItemClick && onItemClick(componentDefinition as ClickedDefinitionType)
-                                    }
-                                    key={componentDefinition.name}
-                                    node={componentDefinition as DefinitionType}
-                                    selected={selectedComponentName === componentDefinition.name}
-                                />
-                            ))}
-                        </ul>
-                    </TabsContent>
-                </ScrollArea>
+                <WorkflowNodesTabContent
+                    emptyMessage={tabContentConfigs.components.emptyMessage}
+                    items={tabContentConfigs.components.items}
+                    itemsDraggable={itemsDraggable}
+                    onItemClick={onItemClick}
+                    selectedComponentName={selectedComponentName}
+                    tabValue="components"
+                />
             )}
 
             {!hideTaskDispatchers && (
-                <ScrollArea className="overflow-y-auto px-3">
-                    <TabsContent className="mt-0 w-full flex-1" value="taskDispatchers">
-                        <ul className="space-y-2" role="list">
-                            {!taskDispatcherDefinitions.length && (
-                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
-                                    No flow controls found.
-                                </span>
-                            )}
-
-                            {availableTaskDispatchers.map((taskDispatcherDefinition) => (
-                                <WorkflowNodesTabsItem
-                                    draggable={itemsDraggable}
-                                    handleClick={() =>
-                                        onItemClick && onItemClick(taskDispatcherDefinition as ClickedDefinitionType)
-                                    }
-                                    key={taskDispatcherDefinition.name}
-                                    node={taskDispatcherDefinition as DefinitionType}
-                                />
-                            ))}
-                        </ul>
-                    </TabsContent>
-                </ScrollArea>
+                <WorkflowNodesTabContent
+                    emptyMessage={tabContentConfigs.taskDispatchers.emptyMessage}
+                    items={tabContentConfigs.taskDispatchers.items}
+                    itemsDraggable={itemsDraggable}
+                    onItemClick={onItemClick}
+                    selectedComponentName={selectedComponentName}
+                    tabValue="taskDispatchers"
+                />
             )}
         </Tabs>
     );
