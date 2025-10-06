@@ -21,20 +21,24 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.liferay.util.LiferayUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Nikolina Spehar
  */
 public class LiferayConstants {
 
+    public static final String APPLICATION = "application";
     public static final String CONTEXT_NAME = "contextName";
     public static final String DISCOVER = "discover";
     public static final String ENDPOINT = "endpoint";
     public static final String GET = "GET";
-    public static final String NAME = "name";
     public static final String METHOD = "method";
+    public static final String NAME = "name";
     public static final String PARAMETERS = "parameters";
     public static final String POST = "POST";
+    public static final String PROPERTIES = "properties";
     public static final String SERVICE = "service";
     public static final String SERVICES = "services";
     public static final String TYPE = "type";
@@ -43,4 +47,10 @@ public class LiferayConstants {
         .propertiesLookupDependsOn(SERVICE)
         .properties((ActionPropertiesFunction) LiferayUtils::createParameters)
         .required(true);
+
+    public static final List<String> BODY_PARAMETERS = new ArrayList<>();
+    public static final List<String> HEADER_PARAMETERS = new ArrayList<>();
+    public static final List<String> PATH_PARAMETERS = new ArrayList<>();
+    public static final List<String> QUERY_PARAMETERS = new ArrayList<>();
+
 }
