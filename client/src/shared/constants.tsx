@@ -1,18 +1,22 @@
 import {
     CalculatorIcon,
     CalendarCheckIcon,
+    ChartLineIcon,
     CircleDollarSign,
     CodeIcon,
     DiamondPercentIcon,
     GaugeIcon,
     HandshakeIcon,
     HeadsetIcon,
+    MegaphoneIcon,
     MessageCircleQuestionIcon,
     MessagesSquareIcon,
     Package2,
     SmileIcon,
     SparklesIcon,
     SquareKanbanIcon,
+    ThumbsUpIcon,
+    UsersIcon,
 } from 'lucide-react';
 
 import IconECommerce from '../assets/IconECommerce.svg';
@@ -138,21 +142,25 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
 };
 
 export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
+    advertising: <MegaphoneIcon />,
     accounting: <CalculatorIcon />,
-    'artificial-intelligence': <SparklesIcon />,
-    'calendars-and-scheduling': <CalendarCheckIcon />,
+    analytics: <ChartLineIcon />,
+    'artificial intelligence': <SparklesIcon />,
+    'calendars and scheduling': <CalendarCheckIcon />,
     communication: <MessagesSquareIcon />,
     crm: <HandshakeIcon />,
-    'customer-support': <HeadsetIcon />,
-    'developer-tools': <CodeIcon />,
+    'customer support': <HeadsetIcon />,
+    'developer tools': <CodeIcon />,
     'e-commerce': <img alt="E-Commerce" src={IconECommerce} />,
-    'file-storage': <Package2 />,
+    'file storage': <Package2 />,
     helpers: <MessageCircleQuestionIcon />,
-    'marketing-automation': <DiamondPercentIcon />,
-    'payment-processing': <CircleDollarSign />,
-    'productivity-and-collaboration': <GaugeIcon />,
-    'project-management': <SquareKanbanIcon />,
-    'surveys-and-feedback': <SmileIcon />,
+    'human resources information system': <UsersIcon />,
+    'marketing automation': <DiamondPercentIcon />,
+    'payment processing': <CircleDollarSign />,
+    'productivity and collaboration': <GaugeIcon />,
+    'project management': <SquareKanbanIcon />,
+    'social media': <ThumbsUpIcon />,
+    'surveys and feedback': <SmileIcon />,
 };
 
 export const TASK_DISPATCHER_DATA_KEY_MAP = {
