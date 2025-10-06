@@ -56,6 +56,9 @@ management:
           include: livenessState
         readiness:
           include: readinessState,db
+  health:
+    neo4j:
+      enabled: false
   info:
     git:
       mode: full
