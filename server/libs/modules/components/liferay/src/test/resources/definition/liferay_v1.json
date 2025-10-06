@@ -5,7 +5,7 @@
     "description" : "The Headless endpoint to use.",
     "help" : null,
     "metadata" : null,
-    "name" : "headless",
+    "name" : "headlessRequest",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
@@ -16,7 +16,32 @@
     "processErrorResponse" : null,
     "properties" : [ {
       "advancedOption" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
+      "defaultValue" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "exampleValue" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "label" : "Application",
+      "languageId" : null,
+      "maxLength" : null,
+      "metadata" : { },
+      "minLength" : null,
+      "name" : "application",
+      "options" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : null
+      },
+      "optionsLoadedDynamically" : null,
+      "placeholder" : null,
+      "regex" : null,
+      "required" : true,
+      "type" : "STRING"
+    }, {
+      "advancedOption" : null,
+      "controlType" : "SELECT",
       "defaultValue" : null,
       "description" : null,
       "displayCondition" : null,
@@ -30,14 +55,32 @@
       "minLength" : null,
       "name" : "endpoint",
       "options" : null,
-      "optionsDataSource" : null,
+      "optionsDataSource" : {
+        "options" : { },
+        "optionsLookupDependsOn" : [ "application" ]
+      },
       "optionsLoadedDynamically" : null,
-      "placeholder" : "headless-portal/v1.0)",
+      "placeholder" : null,
       "regex" : null,
       "required" : true,
       "type" : "STRING"
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "dynamicPropertiesDataSource" : {
+        "properties" : { },
+        "propertiesLookupDependsOn" : [ "application", "endpoint" ]
+      },
+      "expressionEnabled" : null,
+      "header" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "name" : "properties",
+      "required" : false,
+      "type" : "DYNAMIC_PROPERTIES"
     } ],
-    "title" : "Headless Api",
+    "title" : "Headless Request",
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
