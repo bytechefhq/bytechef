@@ -203,7 +203,14 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-destructive-foreground">
+            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+            onClick={() => {
+     if (project.projectWorkflowIds && project.projectWorkflowIds.length > 0) {
+      const collapsibleTrigger = document.getElementById(`collapsible-trigger-${project.id}`);
+      collapsibleTrigger?.click();
+    }
+  }}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -240,7 +247,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground">
+                                <CollapsibleTrigger id={`collapsible-trigger-${project.id}`} className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground">
                                     <div className="mr-1">
                                         {project.projectWorkflowIds?.length === 1
                                             ? `${project.projectWorkflowIds?.length} workflow`
