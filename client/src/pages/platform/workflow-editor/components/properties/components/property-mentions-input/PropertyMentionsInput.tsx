@@ -18,6 +18,7 @@ import './PropertyMentionsInput.css';
 
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
+import {Skeleton} from '@/components/ui/skeleton';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -187,7 +188,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                         <div className="flex items-center gap-1">
                             {(controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA') && (
-                                <Suspense fallback={<h1>Loading PropertyMentionsInputEditorSheet...</h1>}>
+                                <Suspense fallback={<Skeleton className="size-6" />}>
                                     <PropertyMentionsInputEditorSheet
                                         componentDefinitions={componentDefinitions}
                                         controlType={controlType}
