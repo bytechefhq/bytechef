@@ -123,12 +123,12 @@ export function ApiKeyToJSONTyped(value?: ApiKey | null, ignoreDiscriminator: bo
     return {
         
         'createdBy': value['createdBy'],
-        'createdDate': value['createdDate'] == null ? undefined : ((value['createdDate']).toISOString()),
+        'createdDate': value['createdDate'] == null ? value['createdDate'] : value['createdDate'].toISOString(),
         'environmentId': value['environmentId'],
         'id': value['id'],
         'lastModifiedBy': value['lastModifiedBy'],
-        'lastModifiedDate': value['lastModifiedDate'] == null ? undefined : ((value['lastModifiedDate']).toISOString()),
-        'lastUsedDate': value['lastUsedDate'] == null ? undefined : ((value['lastUsedDate']).toISOString()),
+        'lastModifiedDate': value['lastModifiedDate'] == null ? value['lastModifiedDate'] : value['lastModifiedDate'].toISOString(),
+        'lastUsedDate': value['lastUsedDate'] == null ? value['lastUsedDate'] : value['lastUsedDate'].toISOString(),
         'name': value['name'],
         'secretKey': value['secretKey'],
         'type': value['type'],
