@@ -181,10 +181,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public Optional<String> executeBaseUri(
-        String componentName, ComponentConnection connection, Context context) {
+        String componentName, ComponentConnection componentConnection, Context context) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getConnectionDefinition(componentName, connection.getVersion());
+            componentDefinitionRegistry.getConnectionDefinition(componentName, componentConnection.getVersion());
 
         BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(
@@ -192,7 +192,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
         return Optional.ofNullable(
-            baseUriFunction.apply(ParametersFactory.createParameters(connection.parameters()), context));
+            baseUriFunction.apply(ParametersFactory.createParameters(componentConnection.parameters()), context));
     }
 
     @Override
