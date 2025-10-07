@@ -116,16 +116,18 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
-            // exact here prevents double fetchs of project
             queryClient.invalidateQueries({
                 exact: true,
                 queryKey: ProjectKeys.project(projectId),
             });
 
             const baseUrl = '/automation/projects';
-            const firstRemainingWorkflowUrlSuffix = firstRemainingWorkflowId
-                ? `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`
-                : '';
+            let firstRemainingWorkflowUrlSuffix = '';
+
+            if (firstRemainingWorkflowId) {
+                firstRemainingWorkflowUrlSuffix = `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`;
+            }
+
             navigate(baseUrl + firstRemainingWorkflowUrlSuffix);
         },
     });
