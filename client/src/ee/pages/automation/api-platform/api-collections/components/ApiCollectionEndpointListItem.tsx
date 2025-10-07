@@ -17,8 +17,8 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -123,7 +123,7 @@ const ApiCollectionEndpointListItem = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

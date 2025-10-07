@@ -2,7 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ChangeEvent, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -52,7 +52,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
+                                <CircleQuestionMarkIcon />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>
@@ -88,7 +88,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
 
                     {error && (
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
+                            <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
                         </div>
                     )}
                 </div>

@@ -6,7 +6,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
-import {PlusIcon} from '@radix-ui/react-icons';
+import {PlusIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useCallback, useEffect, useState} from 'react';
 

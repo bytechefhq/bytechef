@@ -3,8 +3,8 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SelectOptionType} from '@/shared/types';
-import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
+import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -54,7 +54,7 @@ const PropertySelect = ({
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
+                                <CircleQuestionMarkIcon />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>

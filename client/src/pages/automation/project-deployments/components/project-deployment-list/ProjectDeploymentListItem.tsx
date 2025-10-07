@@ -16,8 +16,8 @@ import {
 } from '@/shared/mutations/automation/projectDeployments.mutations';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';

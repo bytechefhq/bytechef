@@ -6,9 +6,9 @@ import {
     ClusterElementDefinitionBasic,
     TriggerDefinitionBasic,
 } from '@/shared/middleware/platform/configuration';
-import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface CurrentOperationSelectProps {
@@ -37,7 +37,7 @@ const OperationSelect = ({
             {description && (
                 <Tooltip>
                     <TooltipTrigger>
-                        <QuestionMarkCircledIcon />
+                        <CircleQuestionMarkIcon />
                     </TooltipTrigger>
 
                     <TooltipPortal>
@@ -105,7 +105,7 @@ const CurrentOperationSelect = ({
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
+                                <CircleQuestionMarkIcon />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>

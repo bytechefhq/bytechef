@@ -1,8 +1,8 @@
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
-import {CheckIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
+import {CheckIcon} from 'lucide-react';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
     integrationId,

@@ -3,7 +3,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon} from 'lucide-react';
 
 interface ConnectedUserProjectListItemProps {
     connectedUserProject: ConnectedUserProject;

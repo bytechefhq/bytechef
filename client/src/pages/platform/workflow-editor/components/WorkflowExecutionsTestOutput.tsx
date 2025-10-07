@@ -5,8 +5,7 @@ import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/W
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
-import {RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
+import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 

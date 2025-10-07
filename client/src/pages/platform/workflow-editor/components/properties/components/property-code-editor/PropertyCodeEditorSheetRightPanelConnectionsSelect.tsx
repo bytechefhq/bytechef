@@ -8,8 +8,8 @@ import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
 export interface PropertyCodeEditorSheetRightPanelConnectionsSelectProps {

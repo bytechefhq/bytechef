@@ -2,8 +2,7 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {PropertyAllType} from '@/shared/types';
-import {CaretDownIcon} from '@radix-ui/react-icons';
-import {PenIcon} from 'lucide-react';
+import {ChevronDownIcon, PenIcon} from 'lucide-react';
 import {Suspense, lazy} from 'react';
 
 const PropertyField = lazy(() => import('../../PropertyField'));
@@ -47,7 +46,7 @@ const OutputSchemaDisplay = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} size="sm" variant="outline">
-                            <PenIcon /> Define <CaretDownIcon className="ml-0.5" />
+                            <PenIcon /> Define <ChevronDownIcon className="ml-0.5" />
                         </Button>
                     </DropdownMenuTrigger>
 

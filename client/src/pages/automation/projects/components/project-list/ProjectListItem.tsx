@@ -43,9 +43,9 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    ChevronDownIcon,
     CopyIcon,
     DownloadIcon,
     EditIcon,

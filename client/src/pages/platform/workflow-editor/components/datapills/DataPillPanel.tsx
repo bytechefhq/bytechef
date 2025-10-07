@@ -5,7 +5,7 @@ import DataPillPanelBody, {
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
-import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
+import {InfoIcon, XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -89,7 +89,7 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <InfoCircledIcon className="ml-1 size-4" />
+                            <InfoIcon className="ml-1 size-4" />
                         </TooltipTrigger>
 
                         <TooltipContent>
@@ -103,7 +103,7 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
                         className="ml-auto pr-0"
                         onClick={() => setDataPillPanelOpen(false)}
                     >
-                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                     </button>
                 </header>
 
