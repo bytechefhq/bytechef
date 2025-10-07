@@ -334,7 +334,7 @@ const PropertyComboBox = ({
                 </div>
             )}
 
-            <Popover onOpenChange={setOpen} open={open}>
+            <Popover modal={true} onOpenChange={setOpen} open={open}>
                 <PopoverTrigger asChild onBlur={onBlur}>
                     <Button
                         aria-expanded={open}
