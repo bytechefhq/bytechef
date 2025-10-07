@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,8 @@ class MicrosoftOneDriveCopyFileActionTest {
 
     @Test
     void testPerform() {
+        Http.Response mockedStatusResponse = mock(Http.Response.class);
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -54,7 +57,14 @@ class MicrosoftOneDriveCopyFileActionTest {
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+            .thenReturn(mockedResponse)
+            .thenReturn(mockedStatusResponse);
+        when(mockedResponse.getStatusCode())
+            .thenReturn(202);
+        when(mockedResponse.getFirstHeader("location"))
+            .thenReturn("https://graph.microsoft.com/v1.0/monitor/operations/123");
+        when(mockedStatusResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("status", "completed"));
 
         Object result = MicrosoftOneDriveCopyFileAction.perform(parameters, parameters, mockedContext);
 

@@ -1143,7 +1143,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "FILE_ENTRY",
@@ -3774,7 +3774,7 @@
       "sampleOutput" : null
     },
     "poll" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "TEXT",

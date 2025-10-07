@@ -838,7 +838,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "TEXT",
@@ -1733,7 +1733,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "TEXT",
@@ -1849,7 +1849,7 @@
     "name" : "deleteFile",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -2104,7 +2104,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -2977,7 +2977,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -3892,7 +3892,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -4717,7 +4717,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -5590,7 +5590,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -12422,7 +12422,7 @@
       "sampleOutput" : null
     },
     "poll" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",

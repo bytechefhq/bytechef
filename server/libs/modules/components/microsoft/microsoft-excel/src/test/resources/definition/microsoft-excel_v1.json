@@ -13,7 +13,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -115,7 +115,7 @@
     "name" : "clearWorksheet",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -202,7 +202,7 @@
     "name" : "deleteRow",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -289,7 +289,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -400,7 +400,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
