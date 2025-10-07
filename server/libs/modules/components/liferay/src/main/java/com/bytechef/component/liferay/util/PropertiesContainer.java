@@ -17,11 +17,13 @@
 package com.bytechef.component.liferay.util;
 
 import com.bytechef.component.definition.Property;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record PropertiesContainer(
     List<Property.ValueProperty<?>> properties, List<String> bodyParameters, List<String> headerParameters,
     List<String> pathParameters, List<String> queryParameters) {
