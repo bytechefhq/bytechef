@@ -35,7 +35,10 @@ import {
     TriggerDefinitionKeys,
     useGetTriggerDefinitionQuery,
 } from '@/shared/queries/platform/triggerDefinitions.queries';
-import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
+import {
+    ClusterElementDynamicPropertyKeys,
+    WorkflowNodeDynamicPropertyKeys,
+} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
@@ -202,7 +205,7 @@ const WorkflowNodeDetailsPanel = ({
             componentName: currentNode?.componentName as string,
             componentVersion: currentNode?.version as number,
         },
-        isClusterElement
+        !!currentNode?.clusterElementType
     );
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
@@ -239,7 +242,7 @@ const WorkflowNodeDetailsPanel = ({
             componentVersion: currentComponentDefinition?.version as number,
             triggerName: getTriggerName(),
         },
-        !!currentNode?.componentName && currentNode?.trigger && !!currentComponentDefinition
+        !!currentNode?.componentName && !!currentNode?.trigger && !!currentComponentDefinition
     );
 
     const fetchClusterElementDefinition = useCallback(
@@ -646,9 +649,9 @@ const WorkflowNodeDetailsPanel = ({
                 return;
             }
 
-            if (currentNode?.trigger) {
+            if (currentNode?.trigger && !isClusterElement) {
                 newOperationDefinition = await fetchTriggerDefinition(newOperationName);
-            } else if (clusterElementsCanvasOpen && isClusterElement) {
+            } else if (clusterElementsCanvasOpen && !!isClusterElement) {
                 newOperationDefinition = await fetchClusterElementDefinition(newOperationName);
             } else {
                 newOperationDefinition = await fetchActionDefinition(newOperationName);
@@ -671,7 +674,15 @@ const WorkflowNodeDetailsPanel = ({
             });
 
             queryClient.invalidateQueries({
+                queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties,
+            });
+
+            queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
             });
 
             const {componentName, description, label, workflowNodeName} = currentComponent;
@@ -711,7 +722,7 @@ const WorkflowNodeDetailsPanel = ({
                 return;
             }
 
-            if (isClusterElement) {
+            if (currentNode?.clusterElementType && currentNode?.clusterElementType !== undefined) {
                 saveClusterElementFieldChange({
                     currentComponentDefinition,
                     currentOperationProperties: newOperationDefinition.properties as Array<PropertyAllType>,
@@ -898,6 +909,16 @@ const WorkflowNodeDetailsPanel = ({
 
         let updatedNode = {...currentNode};
 
+        const currentClusterElementConnectionId = workflowTestConfigurationConnections?.find(
+            (connection) => connection.workflowConnectionKey === currentNode?.workflowNodeName
+        )?.connectionId;
+
+        const currentMainRootElementConnectionId = workflowTestConfigurationConnections?.find(
+            (connection) =>
+                connection.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
+                !connection.workflowConnectionKey.includes('_')
+        )?.connectionId;
+
         if (currentNode.operationName && currentOperationName) {
             updatedNode = {
                 ...updatedNode,
@@ -908,18 +929,35 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (currentWorkflowNodeConnections.length) {
-            updatedNode = {
-                ...updatedNode,
-                connectionId: workflowTestConfigurationConnections
-                    ? workflowTestConfigurationConnections[0]?.connectionId
-                    : undefined,
-                connections: currentWorkflowNodeConnections,
-            };
+            if (currentNode?.clusterElementType && currentNode?.clusterElementType !== undefined) {
+                updatedNode = {
+                    ...updatedNode,
+                    connectionId: currentClusterElementConnectionId,
+                    connections: currentWorkflowNodeConnections,
+                };
+            } else if (currentNode?.workflowNodeName === rootClusterElementNodeData?.workflowNodeName) {
+                updatedNode = {
+                    ...updatedNode,
+                    connectionId: currentMainRootElementConnectionId,
+                    connections: currentWorkflowNodeConnections,
+                };
+            } else {
+                updatedNode = {
+                    ...updatedNode,
+                    connectionId: workflowTestConfigurationConnections
+                        ? workflowTestConfigurationConnections[0]?.connectionId
+                        : undefined,
+                    connections: currentWorkflowNodeConnections,
+                };
+            }
         }
 
         if (!isEqual(updatedNode, currentNode)) {
             setCurrentNode(updatedNode);
+
+            setCurrentComponent(updatedNode);
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         currentNode,
@@ -1133,7 +1171,9 @@ const WorkflowNodeDetailsPanel = ({
                                     description={
                                         currentNode?.trigger
                                             ? currentTriggerDefinition?.description
-                                            : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
+                                            : !!currentNode?.clusterElementType &&
+                                                currentNode?.workflowNodeName !==
+                                                    rootClusterElementNodeData?.workflowNodeName
                                               ? currentComponentDefinition?.description
                                               : currentActionDefinition?.description
                                     }
@@ -1141,7 +1181,9 @@ const WorkflowNodeDetailsPanel = ({
                                     operations={
                                         (currentNode?.trigger
                                             ? currentComponentDefinition?.triggers
-                                            : clusterElementsCanvasOpen && currentComponentDefinition?.clusterElement
+                                            : !!currentNode?.clusterElementType &&
+                                                currentNode?.workflowNodeName !==
+                                                    rootClusterElementNodeData?.workflowNodeName
                                               ? filteredClusterElementOperations
                                               : currentComponentDefinition?.actions)!
                                     }
