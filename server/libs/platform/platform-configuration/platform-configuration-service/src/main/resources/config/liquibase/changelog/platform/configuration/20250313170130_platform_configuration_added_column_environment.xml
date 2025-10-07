@@ -9,7 +9,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20250313170130-2" author="Ivica Cardic">
+    <changeSet id="20250313170130-4" author="Ivica Cardic">
         <sql>
             UPDATE workflow_node_test_output
             SET environment = 0 -- DEVELOPMENT environment
@@ -17,7 +17,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20250313170130-3" author="Ivica Cardic">
+    <changeSet id="20250313170130-5" author="Ivica Cardic">
         <addNotNullConstraint tableName="workflow_node_test_output" columnName="environment"/>
     </changeSet>
 </databaseChangeLog>

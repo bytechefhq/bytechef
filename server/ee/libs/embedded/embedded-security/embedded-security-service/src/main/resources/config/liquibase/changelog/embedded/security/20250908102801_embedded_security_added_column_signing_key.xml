@@ -22,7 +22,7 @@
         <dropUniqueConstraint tableName="signing_key" constraintName="signing_key_environment_key"/>
     </changeSet>
 
-    <changeSet id="20250908102801-3" author="Ivica Cardic">
+    <changeSet id="20250908102801-5" author="Ivica Cardic">
         <sql>
             UPDATE signing_key
             SET environment = 0 -- DEVELOPMENT environment
@@ -30,7 +30,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20250908102801-4" author="Ivica Cardic">
+    <changeSet id="20250908102801-6" author="Ivica Cardic">
         <addNotNullConstraint tableName="signing_key" columnName="environment"/>
     </changeSet>
 </databaseChangeLog>
