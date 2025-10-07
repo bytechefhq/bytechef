@@ -58,7 +58,10 @@ public class GithubUtils {
                 .execute().getBody(new TypeReference<>() {
                 });
 
-        return getOptions(body, TITLE, "number");
+        List<Option<String>> options = getOptions(body, TITLE, "number");
+        options.add(option("Remove milestone", ""));
+
+        return options;
     }
 
     public static List<Option<String>> getCollaborators(
