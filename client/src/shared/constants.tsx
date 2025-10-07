@@ -142,8 +142,8 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
 };
 
 export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
-    advertising: <MegaphoneIcon />,
     accounting: <CalculatorIcon />,
+    advertising: <MegaphoneIcon />,
     analytics: <ChartLineIcon />,
     'artificial intelligence': <SparklesIcon />,
     'calendars and scheduling': <CalendarCheckIcon />,
