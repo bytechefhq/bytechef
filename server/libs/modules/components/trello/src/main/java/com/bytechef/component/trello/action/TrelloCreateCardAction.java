@@ -26,9 +26,9 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 import static com.bytechef.component.trello.constant.TrelloConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.trello.util.TrelloUtils;
@@ -45,12 +45,12 @@ public class TrelloCreateCardAction {
             string(ID_BOARD)
                 .label("Board ID")
                 .description("ID of the board.")
-                .options((ActionOptionsFunction<String>) TrelloUtils::getBoardOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID_LIST)
                 .label("List ID")
                 .description("ID of the list where the card should be created in.")
-                .options((ActionOptionsFunction<String>) TrelloUtils::getListOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getListOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(true),
             string(NAME)

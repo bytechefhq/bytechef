@@ -23,10 +23,10 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
@@ -45,7 +45,7 @@ public class MicrosoftOneDriveCopyFileAction {
             string(ID)
                 .label("File ID")
                 .description("ID of the file to copy.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true),
             string(NAME)
                 .label("New File Name")
@@ -57,7 +57,7 @@ public class MicrosoftOneDriveCopyFileAction {
                 .description(
                     "The ID of the folder where the copied file will be stored. If not specified, the root folder " +
                         "will be used.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .perform(MicrosoftOneDriveCopyFileAction::perform);
 

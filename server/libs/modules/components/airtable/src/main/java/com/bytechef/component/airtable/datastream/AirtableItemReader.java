@@ -19,12 +19,12 @@ package com.bytechef.component.airtable.datastream;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.datastream.ExecutionContext;
@@ -50,11 +50,11 @@ public class AirtableItemReader implements ItemReader {
                 string("baseId").label("Base ID")
                     .description("ID of the base where table is located.")
                     .required(true)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions),
+                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getBaseIdOptions),
                 string("tableId").label("Table ID")
                     .description("ID of the table where the record is located.")
                     .required(true)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getTableIdOptions)
                     .optionsLookupDependsOn("baseId"));
 
     private String baseId;
@@ -92,7 +92,10 @@ public class AirtableItemReader implements ItemReader {
             @SuppressWarnings("unchecked")
             Map<String, Object> record = (Map<String, Object>) map;
 
-            return record;
+            @SuppressWarnings("unchecked")
+            Map<String, Object> fields = (Map<String, Object>) record.get("fields");
+
+            return fields;
         }
 
         // Fallback: wrap non-map record as value

@@ -101,42 +101,27 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+    Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
     /**
      *
      */
     @FunctionalInterface
-    interface ActionWorkflowNodeDescriptionFunction {
-
-        /**
-         * @param inputParameters
-         * @param context
-         * @return
-         */
-        String apply(Parameters inputParameters, ActionContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    interface PerformFunction {
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ProcessErrorResponseFunction {
+    interface OptionsFunction<T> extends OptionsDataSource.BaseOptionsFunction {
 
         /**
          *
-         * @param statusCode
-         * @param body
+         * @param inputParameters
+         * @param connectionParameters
+         * @param lookupDependsOnPaths
+         * @param searchText
          * @param context
          * @return
+         * @throws Exception
          */
-        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
+        List<? extends Option<T>> apply(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+            String searchText, ActionContext context) throws Exception;
     }
 
     /**
@@ -152,6 +137,50 @@ public interface ActionDefinition {
          */
         OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
+
+    }
+
+    /**
+     *
+     */
+    interface PerformFunction {
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ProcessErrorResponseFunction {
+
+        /**
+         *
+         * @param statusCode
+         * @param body
+         * @param actionContext
+         * @return
+         */
+        ProviderException apply(int statusCode, Object body, ActionContext actionContext) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PropertiesFunction extends PropertiesDataSource.BasePropertiesFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param lookupDependsOnPaths
+         * @param context
+         * @return
+         * @throws Exception
+         */
+        List<? extends Property.ValueProperty<?>> apply(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+            ActionContext context) throws Exception;
     }
 
     /**
@@ -169,5 +198,19 @@ public interface ActionDefinition {
          */
         Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WorkflowNodeDescriptionFunction {
+
+        /**
+         * @param inputParameters
+         * @param context
+         * @return
+         */
+        String apply(Parameters inputParameters, ActionContext context) throws Exception;
     }
 }

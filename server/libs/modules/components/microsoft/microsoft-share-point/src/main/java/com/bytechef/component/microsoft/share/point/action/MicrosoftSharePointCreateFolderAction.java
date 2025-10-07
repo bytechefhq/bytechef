@@ -33,9 +33,9 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
@@ -56,7 +56,7 @@ public class MicrosoftSharePointCreateFolderAction {
                 .label("Parent Folder ID")
                 .description("If no folder is selected, file will be uploaded to root folder.")
                 .optionsLookupDependsOn(SITE_ID)
-                .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
                 .required(false),
             string(NAME)
                 .label("Folder Name")

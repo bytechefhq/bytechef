@@ -27,10 +27,10 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPU
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -46,11 +46,11 @@ public class GithubCreateCommentOnIssueAction {
         .description("Adds a comment to the specified issue.")
         .properties(
             string(REPOSITORY)
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .label("Repository")
                 .required(true),
             string(ISSUE)
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .label("Issue Number")
                 .description("The number of the issue to comment on.")

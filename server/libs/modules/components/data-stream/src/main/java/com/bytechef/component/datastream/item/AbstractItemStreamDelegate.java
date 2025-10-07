@@ -24,8 +24,8 @@ import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_VERSION;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -52,7 +52,7 @@ public abstract class AbstractItemStreamDelegate {
     protected ComponentConnection componentConnection;
     @Nullable
     protected Parameters connectionParameters;
-    protected Context context;
+    protected ClusterElementContext clusterElementContext;
     protected Parameters inputParameters;
     protected String tenantId;
 
@@ -89,8 +89,6 @@ public abstract class AbstractItemStreamDelegate {
         inputParameters = ParametersFactory.createParameters(
             MapUtils.getRequiredMap(clusterElementMap, INPUT_PARAMETERS));
 
-        context = contextFactory.createContext(componentName, componentConnection, editorEnvironment);
-
         jobParameter = Validate.notNull(jobParameters.getParameter(TENANT_ID), "tenantId is required");
 
         tenantId = (String) jobParameter.getValue();
@@ -99,6 +97,9 @@ public abstract class AbstractItemStreamDelegate {
             jobParameters.getParameter(MetadataConstants.EDITOR_ENVIRONMENT), "editorEnvironment is required");
 
         editorEnvironment = (boolean) jobParameter.getValue();
+
+        clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);
 
         doBeforeStep(stepExecution);
     }

@@ -32,6 +32,7 @@ import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -85,7 +86,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                     Map<String, Object> value = new HashMap<>();
 
                     ComponentConnection componentConnection = connectionParameters.get(
-                        DESTINATION.key() + "_" + clusterElement.getClusterElementName());
+                        clusterElement.getWorkflowNodeName());
 
                     if (componentConnection != null) {
                         value.put(COMPONENT_CONNECTION, componentConnection);
@@ -115,8 +116,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     value = new HashMap<>();
 
-                    componentConnection = connectionParameters.get(
-                        SOURCE.key() + "_" + clusterElement.getClusterElementName());
+                    componentConnection = connectionParameters.get(clusterElement.getWorkflowNodeName());
 
                     if (componentConnection != null) {
                         value.put(COMPONENT_CONNECTION, componentConnection);
@@ -145,10 +145,10 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
-        List<Throwable> failureExceptions = jobExecution.getFailureExceptions();
+        List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();
 
         if (!failureExceptions.isEmpty()) {
-            throw new RuntimeException(
+            throw new ProviderException(
                 failureExceptions.stream()
                     .map(Throwable::getMessage)
                     .collect(Collectors.joining(",")));

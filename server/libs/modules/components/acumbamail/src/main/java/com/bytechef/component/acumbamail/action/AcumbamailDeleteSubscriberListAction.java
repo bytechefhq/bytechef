@@ -23,9 +23,9 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.acumbamail.util.AcumbamailUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -41,7 +41,7 @@ public class AcumbamailDeleteSubscriberListAction {
             integer(LIST_ID)
                 .label("List Id")
                 .description("List identifier.")
-                .options((ActionOptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
+                .options((OptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
                 .required(true))
         .perform(AcumbamailDeleteSubscriberListAction::perform);
 

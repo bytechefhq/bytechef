@@ -28,11 +28,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.coda.util.CodaPropertiesUtils;
 import com.bytechef.component.coda.util.CodaUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
@@ -50,12 +50,12 @@ public class CodaInsertRowAction {
                 .label("Doc ID")
                 .description("ID of the doc.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) CodaUtils::getDocIdOptions),
+                .options((OptionsFunction<String>) CodaUtils::getDocIdOptions),
             string(TABLE_ID)
                 .label("Table ID")
                 .description("ID of the table.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) CodaUtils::getTableIdOptions)
+                .options((OptionsFunction<String>) CodaUtils::getTableIdOptions)
                 .optionsLookupDependsOn(DOC_ID),
             dynamicProperties(ROW_VALUES)
                 .properties(CodaPropertiesUtils::createPropertiesForRowValues)

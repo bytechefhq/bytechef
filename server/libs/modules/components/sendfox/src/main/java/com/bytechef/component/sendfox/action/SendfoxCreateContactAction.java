@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.sendfox.util.SendfoxUtils;
 import java.util.Map;
 
@@ -76,7 +76,7 @@ public class SendfoxCreateContactAction {
                 .label("Lists")
                 .description("Lists to which the new contact will be added.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<Long>) SendfoxUtils::getListsOptions))
+                .options((ActionDefinition.OptionsFunction<Long>) SendfoxUtils::getListsOptions))
         .output(outputSchema(object().properties(integer("id").description("ID of the contact.")
             .required(false),
             string("email").description("Email of the contact.")

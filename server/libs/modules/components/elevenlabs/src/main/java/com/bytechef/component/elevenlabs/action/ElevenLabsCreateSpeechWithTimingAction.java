@@ -26,11 +26,11 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.TEXT;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.VOICE_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.elevenlabs.util.ElevenLabsUtils;
@@ -49,7 +49,7 @@ public class ElevenLabsCreateSpeechWithTimingAction {
             string(VOICE_ID)
                 .label("Voice")
                 .description("Voice you want to use for converting the text into speech.")
-                .options((ActionOptionsFunction<String>) ElevenLabsUtils::getVoiceOptions)
+                .options((OptionsFunction<String>) ElevenLabsUtils::getVoiceOptions)
                 .required(true),
             string(TEXT)
                 .label("Text")

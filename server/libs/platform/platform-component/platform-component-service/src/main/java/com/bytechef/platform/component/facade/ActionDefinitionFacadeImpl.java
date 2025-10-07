@@ -64,13 +64,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName, String workflowId,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, workflowId, componentConnection, true);
+            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -79,7 +79,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, true));
     }
 
     @Override
@@ -90,7 +90,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true);
+            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -99,7 +99,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 searchText, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, true));
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             ComponentConnection singleComponentConnection = executeFunctionData.getSingleComponentConnection();
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, singleComponentConnection,
+                componentName, componentVersion, actionName, null, null, null, null, singleComponentConnection, null,
                 true);
 
             return tokenRefreshHelper.executeSingleConnectionFunction(
@@ -124,7 +124,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1,
+                    componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null,
                     true));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
@@ -149,8 +149,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             ComponentConnection singleComponentConnection = executeFunctionData.getSingleComponentConnection();
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                workflowId, singleComponentConnection, editorEnvironment);
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+                singleComponentConnection, type, editorEnvironment);
 
             return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, singleComponentConnection, actionContext,
@@ -159,12 +159,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId,
-                    jobId, workflowId, componentConnection1, editorEnvironment));
+                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                    workflowId, componentConnection1, type, editorEnvironment));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                workflowId, null, editorEnvironment);
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+                null, type, editorEnvironment);
 
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
@@ -185,9 +185,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                 componentName, componentVersion, actionName, inputParameters, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextAware.getModeType(),
-                actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
-                actionContextAware.getJobId(), actionContextAware.getWorkflowId(), componentConnection1,
+                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
+                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
+                actionContextAware.getWorkflowId(), componentConnection1, actionContextAware.getModeType(),
                 actionContextAware.isEditorEnvironment()));
     }
 
@@ -195,11 +195,10 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body) {
 
-        ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, null, false);
-
         return actionDefinitionService.executeProcessErrorResponse(
-            componentName, componentVersion, actionName, statusCode, body, actionContext);
+            componentName, componentVersion, actionName, statusCode, body,
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, null, null, false));
     }
 
     @Override

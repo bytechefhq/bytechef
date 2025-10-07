@@ -33,10 +33,10 @@ import static com.bytechef.component.retable.constant.RetableConstants.ROWS_IDS;
 import static com.bytechef.component.retable.constant.RetableConstants.ROW_ID;
 import static com.bytechef.component.retable.constant.RetableConstants.WORKSPACE_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.retable.util.RetablePropertiesUtils;
 import com.bytechef.component.retable.util.RetableUtils;
@@ -55,19 +55,19 @@ public class RetableUpdateRowAction {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .description("ID of the workspace.")
-                .options((ActionOptionsFunction<String>) RetableUtils::getWorkspaceIdOptions)
+                .options((OptionsFunction<String>) RetableUtils::getWorkspaceIdOptions)
                 .required(true),
             string(PROJECT_ID)
                 .label("Project ID")
                 .description("ID of the project.")
                 .optionsLookupDependsOn(WORKSPACE_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) RetableUtils::getProjectIdOptions)
                 .required(true),
             string(RETABLE_ID)
                 .label("Retable ID")
                 .description("ID of the retable.")
                 .optionsLookupDependsOn(PROJECT_ID)
-                .options((ActionOptionsFunction<String>) RetableUtils::getRetableIdOptions)
+                .options((OptionsFunction<String>) RetableUtils::getRetableIdOptions)
                 .required(true),
             integer(ROW_ID)
                 .label("Row ID")

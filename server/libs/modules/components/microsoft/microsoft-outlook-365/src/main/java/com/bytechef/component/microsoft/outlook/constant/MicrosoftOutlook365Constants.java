@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.definition.Format.FULL;
 import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 
 /**
@@ -75,7 +75,7 @@ public class MicrosoftOutlook365Constants {
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR)
         .label("Calendar ID")
-        .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
+        .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
         .required(true);
 
     public static final ModifiableObjectProperty CUSTOM_EVENT_OUTPUT_PROPERTY = object()

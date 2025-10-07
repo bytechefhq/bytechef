@@ -57,7 +57,7 @@ public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
 
         TenantUtils.runWithTenantId(
             tenantId, () -> itemWriter.open(
-                inputParameters, connectionParameters, context, itemStreamExecutionContext));
+                inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
         TenantUtils.runWithTenantId(tenantId, () -> itemWriter.update(
-            inputParameters, connectionParameters, context, itemStreamExecutionContext));
+            inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     @Override

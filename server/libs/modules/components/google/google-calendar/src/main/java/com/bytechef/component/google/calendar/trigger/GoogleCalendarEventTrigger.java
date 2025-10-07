@@ -28,11 +28,11 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -66,7 +66,7 @@ public class GoogleCalendarEventTrigger {
             string(CALENDAR_ID)
                 .label("Calendar Identifier")
                 .options(
-                    (TriggerOptionsFunction<String>) (
+                    (OptionsFunction<String>) (
                         inputParameters, connectionParameters, arrayIndex, searchText, context) -> GoogleCalendarUtils
                             .getCalendarIdOptions(inputParameters, connectionParameters, null, null, context))
                 .required(true))

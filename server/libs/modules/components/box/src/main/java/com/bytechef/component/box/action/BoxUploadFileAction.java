@@ -31,11 +31,11 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class BoxUploadFileAction {
                 .description(
                     "ID of the folder where the file should be uploaded; if no folder is selected, the file will be " +
                         "uploaded in the root folder.")
-                .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
+                .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true),
             fileEntry(FILE)

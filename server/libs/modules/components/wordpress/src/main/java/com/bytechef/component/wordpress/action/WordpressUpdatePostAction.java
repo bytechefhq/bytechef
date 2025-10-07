@@ -28,8 +28,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.wordpress.util.WordpressUtils;
 import java.util.Map;
 
@@ -91,7 +91,7 @@ public class WordpressUpdatePostAction {
                 .label("Categories")
                 .description("Categories of the post.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<Long>) WordpressUtils::getCategoriesOptions),
+                .options((ActionDefinition.OptionsFunction<Long>) WordpressUtils::getCategoriesOptions),
             string("comment_status").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

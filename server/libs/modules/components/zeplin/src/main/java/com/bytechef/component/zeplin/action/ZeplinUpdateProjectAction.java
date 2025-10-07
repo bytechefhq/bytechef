@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.zeplin.util.ZeplinUtils;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class ZeplinUpdateProjectAction {
         .properties(string("project_id").label("Project ID")
             .description("Project to update.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ZeplinUtils::getProjectIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) ZeplinUtils::getProjectIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

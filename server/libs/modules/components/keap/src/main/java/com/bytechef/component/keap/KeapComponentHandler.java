@@ -18,12 +18,12 @@ package com.bytechef.component.keap;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.keap.util.KeapUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -53,7 +53,7 @@ public class KeapComponentHandler extends AbstractKeapComponentHandler {
                 .get()) {
                 if (Objects.equals(baseProperty.getName(), "id")) {
                     ((ModifiableIntegerProperty) baseProperty).options(
-                        (ActionOptionsFunction<Long>) KeapUtils::getCompanyIdOptions);
+                        (OptionsFunction<Long>) KeapUtils::getCompanyIdOptions);
                 }
             }
         }

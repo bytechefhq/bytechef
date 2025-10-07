@@ -28,7 +28,7 @@ public interface WorkflowComponentDefinition {
      *
      * @return
      */
-    Optional<List<? extends ActionDefinition>> getActions();
+    Optional<List<ActionDefinition>> getActions();
 
     /**
      *
@@ -46,5 +46,5 @@ public interface WorkflowComponentDefinition {
      *
      * @return
      */
-    Optional<List<? extends TriggerDefinition>> getTriggers();
+    Optional<List<TriggerDefinition>> getTriggers();
 }

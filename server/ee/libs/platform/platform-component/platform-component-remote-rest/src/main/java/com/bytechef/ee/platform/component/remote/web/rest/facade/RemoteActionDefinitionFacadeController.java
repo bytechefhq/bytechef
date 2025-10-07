@@ -49,7 +49,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.workflowId, propertiesRequest.inputParameters,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters,
                 propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }

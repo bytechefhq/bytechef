@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.platform.component.remote.client.service;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -49,7 +48,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection connection,
+        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection,
         TriggerContext context) {
 
         throw new UnsupportedOperationException();
@@ -58,7 +57,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection connection,
+        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection componentConnection,
         TriggerContext context) {
 
         throw new UnsupportedOperationException();
@@ -68,7 +67,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     public WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
-        ComponentConnection connection, TriggerContext context) {
+        ComponentConnection componentConnection, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -76,7 +75,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName,
-        ComponentConnection connection, Map<String, ?> outputParameters, TriggerContext context) {
+        ComponentConnection componentConnection, Map<String, ?> outputParameters, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -84,7 +83,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public void executeListenerDisable(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, ComponentConnection connection,
+        Map<String, ?> inputParameters, String workflowExecutionId, ComponentConnection componentConnection,
         TriggerContext context) {
 
         throw new UnsupportedOperationException();
@@ -93,7 +92,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection connection, TriggerContext context) {
+        String workflowExecutionId, ComponentConnection componentConnection, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -101,7 +100,8 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, String searchText, ComponentConnection connection,
+        String propertyName, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection,
         TriggerContext context) {
 
         throw new UnsupportedOperationException();
@@ -110,7 +110,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, ComponentConnection connection, TriggerContext context) {
+        Map<String, ?> inputParameters, ComponentConnection componentConnection, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -118,7 +118,8 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
+        Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
+        TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -126,7 +127,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
+        WebhookRequest webhookRequest, ComponentConnection componentConnection, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -134,7 +135,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
+        WebhookRequest webhookRequest, ComponentConnection componentConnection, TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -191,7 +192,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        Context triggerContext) {
+        TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
