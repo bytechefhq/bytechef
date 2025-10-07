@@ -32,6 +32,7 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -63,7 +64,8 @@ public class GoogleTasksNewTaskTrigger {
                 .options((TriggerOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
-        .poll(GoogleTasksNewTaskTrigger::poll);
+        .poll(GoogleTasksNewTaskTrigger::poll)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleTasksNewTaskTrigger() {
     }

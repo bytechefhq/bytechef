@@ -68,14 +68,13 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
                 .additionalProperties(string())
                 .required(true))
         .output()
-        .perform(GoogleSlidesCreatePresentationBasedOnTemplateAction::perform);
+        .perform(GoogleSlidesCreatePresentationBasedOnTemplateAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleSlidesCreatePresentationBasedOnTemplateAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
         List<Map<String, Map<String, Object>>> requests = createReplaceTextRequests(
             inputParameters.getMap(VALUES, String.class, Map.of()));

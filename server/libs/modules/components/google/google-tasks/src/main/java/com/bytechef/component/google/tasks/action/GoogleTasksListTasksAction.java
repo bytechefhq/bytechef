@@ -33,6 +33,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -57,7 +58,8 @@ public class GoogleTasksListTasksAction {
                 .defaultValue(true)
                 .required(true))
         .output(outputSchema(array().items(TASK_OUTPUT_PROPERTY)))
-        .perform(GoogleTasksListTasksAction::perform);
+        .perform(GoogleTasksListTasksAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleTasksListTasksAction() {
     }

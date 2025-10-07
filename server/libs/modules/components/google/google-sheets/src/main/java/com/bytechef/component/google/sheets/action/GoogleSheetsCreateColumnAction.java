@@ -59,9 +59,7 @@ public class GoogleSheetsCreateColumnAction {
     private GoogleSheetsCreateColumnAction() {
     }
 
-    public static SheetRecord perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static SheetRecord perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         String spreadSheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
         String sheetName = inputParameters.getRequiredString(SHEET_NAME);

@@ -30,6 +30,7 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -89,19 +90,22 @@ public class GoogleContactsUpdateContactAction {
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(GoogleContactsUpdateContactAction::perform);
 
-    public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
 
         String resourceName = inputParameters.getRequiredString(RESOURCE_NAME);
         String personFields = "names,emailAddresses,phoneNumbers,organizations";
 
-        Person existingPerson = peopleService
-            .people()
-            .get(resourceName)
-            .setPersonFields(personFields)
-            .execute();
+        Person existingPerson;
+        try {
+            existingPerson = peopleService
+                .people()
+                .get(resourceName)
+                .setPersonFields(personFields)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         existingPerson
             .setNames(List.of(createName(inputParameters)))
@@ -109,10 +113,14 @@ public class GoogleContactsUpdateContactAction {
             .setPhoneNumbers(List.of(new PhoneNumber().setValue(inputParameters.getString(PHONE_NUMBER))))
             .setOrganizations(List.of(createOrganization(inputParameters)));
 
-        return peopleService
-            .people()
-            .updateContact(resourceName, existingPerson)
-            .setUpdatePersonFields(personFields)
-            .execute();
+        try {
+            return peopleService
+                .people()
+                .updateContact(resourceName, existingPerson)
+                .setUpdatePersonFields(personFields)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

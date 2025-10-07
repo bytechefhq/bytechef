@@ -66,7 +66,7 @@ public class GoogleSheetsInsertRowAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         List<Object> row = getRowValues(inputParameters);

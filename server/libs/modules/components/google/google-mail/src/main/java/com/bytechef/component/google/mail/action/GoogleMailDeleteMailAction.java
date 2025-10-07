@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -49,15 +50,17 @@ public class GoogleMailDeleteMailAction {
     private GoogleMailDeleteMailAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        return gmail
-            .users()
-            .messages()
-            .delete(ME, inputParameters.getRequiredString(ID))
-            .execute();
+        try {
+            return gmail
+                .users()
+                .messages()
+                .delete(ME, inputParameters.getRequiredString(ID))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

@@ -33,6 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AddSheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
@@ -40,6 +41,7 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -67,9 +69,7 @@ public class GoogleSheetsCreateSheetAction {
     private GoogleSheetsCreateSheetAction() {
     }
 
-    public static SheetRecord perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static SheetRecord perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         String sheetName = inputParameters.getRequiredString(SHEET_NAME);
@@ -86,10 +86,15 @@ public class GoogleSheetsCreateSheetAction {
 
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
 
-        BatchUpdateSpreadsheetResponse batchUpdateSpreadsheetResponse = sheets
-            .spreadsheets()
-            .batchUpdate(spreadsheetId, request)
-            .execute();
+        BatchUpdateSpreadsheetResponse batchUpdateSpreadsheetResponse;
+        try {
+            batchUpdateSpreadsheetResponse = sheets
+                .spreadsheets()
+                .batchUpdate(spreadsheetId, request)
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         List<Object> headers = inputParameters.getList(HEADERS, Object.class);
 

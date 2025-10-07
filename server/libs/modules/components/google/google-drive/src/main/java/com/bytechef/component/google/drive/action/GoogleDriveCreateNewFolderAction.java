@@ -24,6 +24,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -63,9 +64,7 @@ public class GoogleDriveCreateNewFolderAction {
     private GoogleDriveCreateNewFolderAction() {
     }
 
-    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
         String parentFolder = inputParameters.getString(FOLDER_ID);
 
@@ -74,9 +73,13 @@ public class GoogleDriveCreateNewFolderAction {
             .setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER)
             .setParents(parentFolder == null ? null : List.of(parentFolder));
 
-        return drive
-            .files()
-            .create(folderFile)
-            .execute();
+        try {
+            return drive
+                .files()
+                .create(folderFile)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

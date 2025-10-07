@@ -32,6 +32,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SN
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -73,9 +74,7 @@ public class GoogleMailGetThreadAction {
     private GoogleMailGetThreadAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         Format format = inputParameters.getRequired(FORMAT, Format.class);
@@ -95,13 +94,17 @@ public class GoogleMailGetThreadAction {
         }
     }
 
-    private static Thread getThread(Parameters inputParameters, Gmail gmail, Format format) throws IOException {
-        return gmail.users()
-            .threads()
-            .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(format == SIMPLE ? Format.FULL.getMapping() : format.getMapping())
-            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute();
+    private static Thread getThread(Parameters inputParameters, Gmail gmail, Format format) {
+        try {
+            return gmail.users()
+                .threads()
+                .get(ME, inputParameters.getRequiredString(ID))
+                .setFormat(format == SIMPLE ? Format.FULL.getMapping() : format.getMapping())
+                .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
     @SuppressFBWarnings("EI")

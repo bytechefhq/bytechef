@@ -38,8 +38,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +77,7 @@ public class GoogleSheetsUpdateRowAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         String range = createRange(
@@ -86,11 +88,15 @@ public class GoogleSheetsUpdateRowAction {
             .setValues(List.of(row))
             .setMajorDimension("ROWS");
 
-        sheets.spreadsheets()
-            .values()
-            .update(inputParameters.getRequiredString(SPREADSHEET_ID), range, valueRange)
-            .setValueInputOption("USER_ENTERED")
-            .execute();
+        try {
+            sheets.spreadsheets()
+                .values()
+                .update(inputParameters.getRequiredString(SPREADSHEET_ID), range, valueRange)
+                .setValueInputOption("USER_ENTERED")
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
     }

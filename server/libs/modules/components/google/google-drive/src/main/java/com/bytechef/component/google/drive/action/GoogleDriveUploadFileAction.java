@@ -25,6 +25,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -67,22 +68,24 @@ public class GoogleDriveUploadFileAction {
     private GoogleDriveUploadFileAction() {
     }
 
-    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
         String parentFolder = inputParameters.getString(FOLDER_ID);
 
-        return drive
-            .files()
-            .create(
-                new File()
-                    .setName(fileEntry.getName())
-                    .setParents(parentFolder == null ? null : List.of(parentFolder)),
-                new FileContent(
-                    fileEntry.getMimeType(),
-                    context.file(file -> file.toTempFile(fileEntry))))
-            .execute();
+        try {
+            return drive
+                .files()
+                .create(
+                    new File()
+                        .setName(fileEntry.getName())
+                        .setParents(parentFolder == null ? null : List.of(parentFolder)),
+                    new FileContent(
+                        fileEntry.getMimeType(),
+                        context.file(file -> file.toTempFile(fileEntry))))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

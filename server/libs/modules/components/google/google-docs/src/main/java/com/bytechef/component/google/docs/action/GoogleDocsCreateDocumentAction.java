@@ -33,7 +33,6 @@ import com.google.api.services.docs.v1.model.Document;
 import com.google.api.services.docs.v1.model.EndOfSegmentLocation;
 import com.google.api.services.docs.v1.model.InsertTextRequest;
 import com.google.api.services.docs.v1.model.Request;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -60,9 +59,7 @@ public class GoogleDocsCreateDocumentAction {
     private GoogleDocsCreateDocumentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Docs docs = GoogleServices.getDocs(connectionParameters);
 
         Document newDocument = createDocument(inputParameters.getRequiredString(TITLE), docs);

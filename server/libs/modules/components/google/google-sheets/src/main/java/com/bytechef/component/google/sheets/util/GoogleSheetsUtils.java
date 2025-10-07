@@ -43,6 +43,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
@@ -70,14 +71,17 @@ public class GoogleSheetsUtils {
     }
 
     public static void appendValues(
-        Sheets sheets, String spreadsheetId, String range, ValueRange valueRange, String valueInputOption)
-        throws IOException {
+        Sheets sheets, String spreadsheetId, String range, ValueRange valueRange, String valueInputOption) {
 
-        sheets.spreadsheets()
-            .values()
-            .append(spreadsheetId, range, valueRange)
-            .setValueInputOption(valueInputOption)
-            .execute();
+        try {
+            sheets.spreadsheets()
+                .values()
+                .append(spreadsheetId, range, valueRange)
+                .setValueInputOption(valueInputOption)
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
     }
 
     public static String createRange(String sheetName, Integer rowNumber) {
@@ -90,7 +94,7 @@ public class GoogleSheetsUtils {
 
     public static List<ValueProperty<?>> createPropertiesToUpdateRow(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        ActionContext actionContext) throws Exception {
+        ActionContext actionContext) {
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
         boolean updateWholeRow = inputParameters.getRequiredBoolean(UPDATE_WHOLE_ROW);
@@ -150,7 +154,7 @@ public class GoogleSheetsUtils {
     }
 
     private static List<ModifiableValueProperty<?, ?>> createPropertiesBasedOnHeader(
-        Parameters inputParameters, Parameters connectionParameters) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters) {
 
         List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
             GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
@@ -212,7 +216,7 @@ public class GoogleSheetsUtils {
     }
 
     public static void deleteDimension(
-        Parameters inputParameters, Parameters connectionParameters, Integer index, String dimension) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Integer index, String dimension) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
@@ -230,14 +234,17 @@ public class GoogleSheetsUtils {
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
             .setRequests(List.of(request));
 
-        sheets.spreadsheets()
-            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
-            .execute();
+        try {
+            sheets.spreadsheets()
+                .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
     }
 
-    public static Map<String, Object> getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row)
-        throws IOException {
-
+    public static Map<String, Object>
+        getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row) {
         Map<String, Object> valuesMap;
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
@@ -269,8 +276,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Map<String, Object>> getMapOfValuesForRowAndColumn(
-        Parameters inputParameters, Sheets sheets, List<List<Object>> values, int currentRowNum, int newRowNum)
-        throws IOException {
+        Parameters inputParameters, Sheets sheets, List<List<Object>> values, int currentRowNum, int newRowNum) {
 
         List<Map<String, Object>> list = new ArrayList<>();
 
@@ -304,17 +310,13 @@ public class GoogleSheetsUtils {
 
     public static List<Option<String>> getSheetIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) throws Exception {
+        String searchText, ActionContext context) {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
-            .spreadsheets()
-            .get(inputParameters.getRequiredString(SPREADSHEET_ID))
-            .execute()
-            .getSheets();
+        List<Sheet> sheets = getSheets(inputParameters, connectionParameters);
 
-        for (Sheet sheet : sheetsList) {
+        for (Sheet sheet : sheets) {
             SheetProperties sheetProperties = sheet.getProperties();
 
             options.add(option(sheetProperties.getTitle(), String.valueOf(sheetProperties.getSheetId())));
@@ -325,17 +327,13 @@ public class GoogleSheetsUtils {
 
     public static List<Option<String>> getSheetNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) throws Exception {
+        String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
-            .spreadsheets()
-            .get(inputParameters.getRequiredString(SPREADSHEET_ID))
-            .execute()
-            .getSheets();
+        List<Sheet> sheets = getSheets(inputParameters, connectionParameters);
 
-        for (Sheet sheet : sheetsList) {
+        for (Sheet sheet : sheets) {
             SheetProperties sheetProperties = sheet.getProperties();
 
             String sheetTitle = sheetProperties.getTitle();
@@ -346,22 +344,38 @@ public class GoogleSheetsUtils {
         return options;
     }
 
-    public static List<List<Object>> getSpreadsheetValues(Sheets sheets, String spreadSheetId, String sheetName)
-        throws IOException {
+    private static List<Sheet> getSheets(Parameters inputParameters, Parameters connectionParameters) {
+        List<Sheet> sheets;
 
-        return sheets.spreadsheets()
-            .values()
-            .get(spreadSheetId, sheetName)
-            .setValueRenderOption("UNFORMATTED_VALUE")
-            .setDateTimeRenderOption("FORMATTED_STRING")
-            .setMajorDimension("ROWS")
-            .execute()
-            .getValues();
+        try {
+            sheets = GoogleServices.getSheets(connectionParameters)
+                .spreadsheets()
+                .get(inputParameters.getRequiredString(SPREADSHEET_ID))
+                .execute()
+                .getSheets();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
+
+        return sheets;
     }
 
-    public static List<Object> getUpdatedRowValues(Parameters inputParameters, Parameters connectionParameters)
-        throws Exception {
+    public static List<List<Object>> getSpreadsheetValues(Sheets sheets, String spreadSheetId, String sheetName) {
+        try {
+            return sheets.spreadsheets()
+                .values()
+                .get(spreadSheetId, sheetName)
+                .setValueRenderOption("UNFORMATTED_VALUE")
+                .setDateTimeRenderOption("FORMATTED_STRING")
+                .setMajorDimension("ROWS")
+                .execute()
+                .getValues();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
+    }
 
+    public static List<Object> getUpdatedRowValues(Parameters inputParameters, Parameters connectionParameters) {
         List<Object> row = new ArrayList<>();
 
         if (inputParameters.get(ROW) instanceof Map<?, ?> rowMap) {
@@ -428,9 +442,7 @@ public class GoogleSheetsUtils {
         return row;
     }
 
-    private static List<Option<String>> getColumnOptions(Parameters inputParameters, Parameters connectionParameters)
-        throws Exception {
-
+    private static List<Option<String>> getColumnOptions(Parameters inputParameters, Parameters connectionParameters) {
         List<Option<String>> options = new ArrayList<>();
 
         List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(

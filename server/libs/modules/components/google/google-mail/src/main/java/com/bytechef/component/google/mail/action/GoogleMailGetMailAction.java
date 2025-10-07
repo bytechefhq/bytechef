@@ -34,7 +34,6 @@ import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
-import java.io.IOException;
 
 /**
  * @author Monika Kušter
@@ -58,9 +57,7 @@ public class GoogleMailGetMailAction {
     private GoogleMailGetMailAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Format format = inputParameters.get(FORMAT, Format.class, SIMPLE);
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 

@@ -27,6 +27,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -58,15 +59,19 @@ public class GoogleCalendarCreateQuickEventAction {
     private GoogleCalendarCreateQuickEventAction() {
     }
 
-    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        Event event;
 
-        Event event = calendar.events()
-            .quickAdd(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(TEXT))
-            .setSendUpdates(inputParameters.getString(SEND_UPDATES))
-            .execute();
+        try {
+            event = calendar.events()
+                .quickAdd(inputParameters.getRequiredString(CALENDAR_ID),
+                    inputParameters.getRequiredString(TEXT))
+                .setSendUpdates(inputParameters.getString(SEND_UPDATES))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         return createCustomEvent(event, getCalendarTimezone(calendar));
     }

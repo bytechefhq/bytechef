@@ -36,8 +36,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +69,7 @@ public class GoogleSheetsInsertMultipleRowsAction {
     }
 
     public static List<Map<String, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
@@ -77,13 +79,17 @@ public class GoogleSheetsInsertMultipleRowsAction {
             .setValues(rows)
             .setMajorDimension("ROWS");
 
-        sheets.spreadsheets()
-            .values()
-            .append(
-                inputParameters.getRequiredString(SPREADSHEET_ID),
-                createRange(inputParameters.getRequiredString(SHEET_NAME), null), valueRange)
-            .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))
-            .execute();
+        try {
+            sheets.spreadsheets()
+                .values()
+                .append(
+                    inputParameters.getRequiredString(SPREADSHEET_ID),
+                    createRange(inputParameters.getRequiredString(SHEET_NAME), null), valueRange)
+                .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         List<Map<String, Object>> newRows = new ArrayList<>();
 

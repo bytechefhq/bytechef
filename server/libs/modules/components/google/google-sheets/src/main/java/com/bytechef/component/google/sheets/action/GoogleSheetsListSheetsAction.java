@@ -28,6 +28,7 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetR
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
@@ -55,18 +56,23 @@ public class GoogleSheetsListSheetsAction {
     }
 
     public static List<SheetRecord> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         return getSheetsListResponse(sheets, inputParameters.getRequiredString(SPREADSHEET_ID));
     }
 
-    private static List<SheetRecord> getSheetsListResponse(Sheets sheets, String spreadsheetId) throws IOException {
-        Collection<Sheet> spreadsheetData = sheets.spreadsheets()
-            .get(spreadsheetId)
-            .execute()
-            .getSheets();
+    private static List<SheetRecord> getSheetsListResponse(Sheets sheets, String spreadsheetId) {
+        Collection<Sheet> spreadsheetData = null;
+        try {
+            spreadsheetData = sheets.spreadsheets()
+                .get(spreadsheetId)
+                .execute()
+                .getSheets();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         return spreadsheetData.stream()
             .map(sheet -> {

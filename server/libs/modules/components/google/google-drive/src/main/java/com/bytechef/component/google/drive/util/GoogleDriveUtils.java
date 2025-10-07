@@ -18,12 +18,13 @@ package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.google.commons.GoogleUtils.fetchAllFiles;
-import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.constant.GoogleCommonsContants;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -48,8 +49,7 @@ public class GoogleDriveUtils {
 
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
-        TriggerContext triggerContext, boolean newFile)
-        throws IOException {
+        TriggerContext triggerContext, boolean newFile) {
 
         ZoneId zoneId = ZoneId.systemDefault();
 
@@ -68,16 +68,22 @@ public class GoogleDriveUtils {
         String nextPageToken = null;
 
         do {
-            FileList fileList = drive.files()
-                .list()
-                .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID) + "' in parents and " +
-                    "trashed = false and createdTime > '" +
-                    startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")) + "'")
-                .setFields("files(id, name, mimeType, webViewLink, kind)")
-                .setOrderBy("createdTime asc")
-                .setPageSize(1000)
-                .setPageToken(nextPageToken)
-                .execute();
+            FileList fileList = null;
+            try {
+                fileList = drive.files()
+                    .list()
+                    .setQ(mimeType + " and '" + inputParameters.getRequiredString(GoogleCommonsContants.FOLDER_ID)
+                        + "' in parents and " +
+                        "trashed = false and createdTime > '" +
+                        startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")) + "'")
+                    .setFields("files(id, name, mimeType, webViewLink, kind)")
+                    .setOrderBy("createdTime asc")
+                    .setPageSize(1000)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             files.addAll(fileList.getFiles());
             nextPageToken = fileList.getNextPageToken();
@@ -86,9 +92,7 @@ public class GoogleDriveUtils {
         return new PollOutput(files, Map.of(LAST_TIME_CHECKED, now), false);
     }
 
-    public static List<File> listFiles(String folderId, boolean isEqualMimetype, Parameters connectionParameters)
-        throws IOException {
-
+    public static List<File> listFiles(String folderId, boolean isEqualMimetype, Parameters connectionParameters) {
         String operator = isEqualMimetype ? "=" : "!=";
         String query = "mimeType %s '%s' and trashed = false and parents in '%s'".formatted(
             operator, APPLICATION_VND_GOOGLE_APPS_FOLDER, folderId);

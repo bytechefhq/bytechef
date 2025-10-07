@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -90,7 +91,7 @@ public class GoogleMailNewEmailPollingTrigger {
             return new PollOutput(listMessagesResponse.getMessages(), Map.of(LAST_TIME_CHECKED, now), false);
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw translateGoogleIOException(e);
         }
     }
 }

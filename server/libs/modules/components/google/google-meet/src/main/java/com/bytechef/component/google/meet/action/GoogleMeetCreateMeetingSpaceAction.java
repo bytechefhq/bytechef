@@ -28,6 +28,7 @@ import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.ME
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -55,7 +56,8 @@ public class GoogleMeetCreateMeetingSpaceAction {
                         "Only invitees can join without knocking. Everyone else must knock."))
                 .required(false))
         .output(outputSchema(MEETING_SPACE_OUTPUT_PROPERTY))
-        .perform(GoogleMeetCreateMeetingSpaceAction::perform);
+        .perform(GoogleMeetCreateMeetingSpaceAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleMeetCreateMeetingSpaceAction() {
     }

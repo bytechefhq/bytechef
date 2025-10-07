@@ -49,6 +49,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.VALUE;
 import static com.bytechef.component.google.mail.definition.Format.FULL;
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
@@ -290,17 +291,21 @@ public class GoogleMailUtils {
 
     public static List<Option<String>> getLabelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context)
-        throws IOException {
+        String searchText, ActionContext context) {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Label> labels = GoogleServices.getMail(connectionParameters)
-            .users()
-            .labels()
-            .list(ME)
-            .execute()
-            .getLabels();
+        List<Label> labels = null;
+        try {
+            labels = GoogleServices.getMail(connectionParameters)
+                .users()
+                .labels()
+                .list(ME)
+                .execute()
+                .getLabels();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         for (Label label : labels) {
             options.add(option(label.getName(), label.getId()));
@@ -309,21 +314,25 @@ public class GoogleMailUtils {
         return options;
     }
 
-    public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
+    public static Message getMessage(Parameters inputParameters, Gmail service) {
         Format format = inputParameters.get(FORMAT, Format.class, SIMPLE);
 
-        return service.users()
-            .messages()
-            .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(format == null || format == SIMPLE ? FULL.getMapping() : format.getMapping())
-            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute();
+        try {
+            return service.users()
+                .messages()
+                .get(ME, inputParameters.getRequiredString(ID))
+                .setFormat(format == null || format == SIMPLE ? FULL.getMapping() : format.getMapping())
+                .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
     public static List<Option<String>> getMessageIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context)
-        throws IOException {
+        String searchText, ActionContext context) {
+
         List<Option<String>> options = new ArrayList<>();
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
@@ -332,12 +341,17 @@ public class GoogleMailUtils {
         String nextPageToken = null;
 
         do {
-            ListMessagesResponse listMessagesResponse = gmail.users()
-                .messages()
-                .list(ME)
-                .setMaxResults(500L)
-                .setPageToken(nextPageToken)
-                .execute();
+            ListMessagesResponse listMessagesResponse = null;
+            try {
+                listMessagesResponse = gmail.users()
+                    .messages()
+                    .list(ME)
+                    .setMaxResults(500L)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             messages.addAll(listMessagesResponse.getMessages());
 
@@ -369,9 +383,7 @@ public class GoogleMailUtils {
         };
     }
 
-    public static SimpleMessage getSimpleMessage(Message message, Context context, Gmail service)
-        throws IOException {
-
+    public static SimpleMessage getSimpleMessage(Message message, Context context, Gmail service) {
         MessagePart payload = message.getPayload();
 
         List<MessagePart> parts = payload.getParts();
@@ -459,9 +471,7 @@ public class GoogleMailUtils {
             bodyHtml, fileEntries);
     }
 
-    private static List<FileEntry> getFileEntries(Message message, Context context, Gmail service)
-        throws IOException {
-
+    private static List<FileEntry> getFileEntries(Message message, Context context, Gmail service) {
         MessagePart payload = message.getPayload();
         List<MessagePart> parts = payload.getParts();
 
@@ -491,22 +501,25 @@ public class GoogleMailUtils {
                             messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
             }
         }
+
         return fileEntries;
     }
 
-    private static MessagePartBody getAttachment(Gmail service, String messageId, String attachmentId)
-        throws IOException {
-
-        return service.users()
-            .messages()
-            .attachments()
-            .get(ME, messageId, attachmentId)
-            .execute();
+    private static MessagePartBody getAttachment(Gmail service, String messageId, String attachmentId) {
+        try {
+            return service.users()
+                .messages()
+                .attachments()
+                .get(ME, messageId, attachmentId)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
     public static List<Option<String>> getThreadIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) throws IOException {
+        String searchText, ActionContext context) {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
@@ -514,13 +527,18 @@ public class GoogleMailUtils {
 
         String nextPageToken = null;
         do {
-            ListThreadsResponse listThreadsResponse = gmail
-                .users()
-                .threads()
-                .list(ME)
-                .setMaxResults(500L)
-                .setPageToken(nextPageToken)
-                .execute();
+            ListThreadsResponse listThreadsResponse = null;
+            try {
+                listThreadsResponse = gmail
+                    .users()
+                    .threads()
+                    .list(ME)
+                    .setMaxResults(500L)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             threads.addAll(listThreadsResponse.getThreads());
 
@@ -536,12 +554,16 @@ public class GoogleMailUtils {
         return options;
     }
 
-    public static Message sendMail(Gmail service, Message message) throws IOException {
-        return service
-            .users()
-            .messages()
-            .send(ME, message)
-            .execute();
+    public static Message sendMail(Gmail service, Message message) {
+        try {
+            return service
+                .users()
+                .messages()
+                .send(ME, message)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
     @SuppressFBWarnings("EI")

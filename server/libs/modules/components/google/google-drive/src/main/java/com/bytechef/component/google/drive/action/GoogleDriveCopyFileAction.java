@@ -30,7 +30,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
-import java.io.IOException;
 
 /**
  * @author Mayank Madan
@@ -61,9 +60,7 @@ public class GoogleDriveCopyFileAction {
     private GoogleDriveCopyFileAction() {
     }
 
-    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
     }
 }

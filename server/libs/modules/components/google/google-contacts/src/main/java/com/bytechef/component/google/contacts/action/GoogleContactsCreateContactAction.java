@@ -29,6 +29,7 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -87,9 +88,7 @@ public class GoogleContactsCreateContactAction {
     private GoogleContactsCreateContactAction() {
     }
 
-    public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
 
         Person person = new Person()
@@ -98,9 +97,13 @@ public class GoogleContactsCreateContactAction {
             .setPhoneNumbers(List.of(new PhoneNumber().setValue(inputParameters.getString(PHONE_NUMBER))))
             .setOrganizations(List.of(createOrganization(inputParameters)));
 
-        return peopleService
-            .people()
-            .createContact(person)
-            .execute();
+        try {
+            return peopleService
+                .people()
+                .createContact(person)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

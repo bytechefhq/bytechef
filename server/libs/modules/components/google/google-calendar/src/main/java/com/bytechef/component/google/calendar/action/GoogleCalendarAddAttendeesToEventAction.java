@@ -40,7 +40,6 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -73,9 +72,7 @@ public class GoogleCalendarAddAttendeesToEventAction {
     private GoogleCalendarAddAttendeesToEventAction() {
     }
 
-    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         Event event = getEvent(inputParameters, calendar);

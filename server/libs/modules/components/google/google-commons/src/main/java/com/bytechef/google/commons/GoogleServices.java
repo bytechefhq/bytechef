@@ -89,7 +89,7 @@ public class GoogleServices {
                 .build();
     }
 
-    public static Sheets getSheets(Parameters connectionParameters) throws Exception {
+    public static Sheets getSheets(Parameters connectionParameters) {
         return new Sheets.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(), new OAuthAuthentication(connectionParameters))

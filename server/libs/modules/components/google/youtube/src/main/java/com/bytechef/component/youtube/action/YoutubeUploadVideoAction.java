@@ -43,6 +43,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.youtube.util.YoutubeUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.List;
 import java.util.Map;
 
@@ -145,7 +146,8 @@ public class YoutubeUploadVideoAction {
                                     .description("Description of the video.")),
                         string("publishTime")
                             .description("The date and time when the video was published."))))
-        .perform(YoutubeUploadVideoAction::perform);
+        .perform(YoutubeUploadVideoAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private YoutubeUploadVideoAction() {
     }
