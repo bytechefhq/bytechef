@@ -43,7 +43,8 @@ public class GoogleFormsGetFormAction {
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FORM, true))
                 .required(true))
         .output()
-        .perform(GoogleFormsGetFormAction::perform);
+        .perform(GoogleFormsGetFormAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleFormsGetFormAction() {
     }

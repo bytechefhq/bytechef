@@ -49,9 +49,7 @@ public class GoogleSheetsDeleteColumnAction {
     private GoogleSheetsDeleteColumnAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Integer columnNumber = labelToColumn(inputParameters.getRequiredString(LABEL));
 
         deleteDimension(inputParameters, connectionParameters, columnNumber, "COLUMNS");

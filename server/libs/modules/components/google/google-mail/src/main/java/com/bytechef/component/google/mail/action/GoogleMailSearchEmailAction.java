@@ -38,6 +38,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RE
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -126,21 +127,25 @@ public class GoogleMailSearchEmailAction {
     }
 
     public static ListMessagesResponse perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Gmail service = GoogleServices.getMail(connectionParameters);
 
         StringBuilder query = createQuery(inputParameters);
 
-        return service.users()
-            .messages()
-            .list(ME)
-            .setMaxResults(inputParameters.getLong(MAX_RESULTS))
-            .setPageToken(inputParameters.getString(PAGE_TOKEN))
-            .setQ(query.toString())
-            .setLabelIds(inputParameters.getList(LABEL_IDS, String.class, List.of()))
-            .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH))
-            .execute();
+        try {
+            return service.users()
+                .messages()
+                .list(ME)
+                .setMaxResults(inputParameters.getLong(MAX_RESULTS))
+                .setPageToken(inputParameters.getString(PAGE_TOKEN))
+                .setQ(query.toString())
+                .setLabelIds(inputParameters.getList(LABEL_IDS, String.class, List.of()))
+                .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
     private static StringBuilder createQuery(Parameters inputParameters) {

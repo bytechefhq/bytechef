@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.meet.util.GoogleMeetUtils;
+import com.bytechef.google.commons.GoogleUtils;
 
 /**
  * @author Marija Horvat
@@ -68,7 +69,8 @@ public class GoogleMeetListParticipantsAction {
                                             .description(
                                                 "Time when the participant left the meeting for the last time. This " +
                                                     "can be null if it's an active meeting."))))))
-        .perform(GoogleMeetListParticipantsAction::perform);
+        .perform(GoogleMeetListParticipantsAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleMeetListParticipantsAction() {
     }

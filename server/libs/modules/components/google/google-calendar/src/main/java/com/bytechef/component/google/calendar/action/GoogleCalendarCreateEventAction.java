@@ -30,7 +30,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTACHMENTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
@@ -42,18 +41,19 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.METHOD;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MINUTES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.REMINDERS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.constant.GoogleCalendarConstants;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
@@ -176,9 +176,7 @@ public class GoogleCalendarCreateEventAction {
     private GoogleCalendarCreateEventAction() {
     }
 
-    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<EventAttachment> eventAttachments = new ArrayList<>();
 
         for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
@@ -213,10 +211,15 @@ public class GoogleCalendarCreateEventAction {
             .setStart(createEventDateTime(inputParameters, START, timezone))
             .setSummary(inputParameters.getString(SUMMARY));
 
-        Event newEvent = calendar.events()
-            .insert(inputParameters.getRequiredString(CALENDAR_ID), event)
-            .setSendUpdates(inputParameters.getString(SEND_UPDATES))
-            .execute();
+        Event newEvent;
+        try {
+            newEvent = calendar.events()
+                .insert(inputParameters.getRequiredString(GoogleCalendarConstants.CALENDAR_ID), event)
+                .setSendUpdates(inputParameters.getString(GoogleCalendarConstants.SEND_UPDATES))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         return createCustomEvent(newEvent, timezone);
     }

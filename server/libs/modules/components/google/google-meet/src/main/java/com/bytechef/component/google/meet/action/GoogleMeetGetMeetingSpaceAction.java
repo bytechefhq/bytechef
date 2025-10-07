@@ -27,6 +27,7 @@ import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NA
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.google.commons.GoogleUtils;
 
 /**
  * @author Marija Horvat
@@ -42,7 +43,8 @@ public class GoogleMeetGetMeetingSpaceAction {
                 .description("The name of the meeting space or meeting code in format spaces/{meetingCode}.")
                 .required(true))
         .output(outputSchema(MEETING_SPACE_OUTPUT_PROPERTY))
-        .perform(GoogleMeetGetMeetingSpaceAction::perform);
+        .perform(GoogleMeetGetMeetingSpaceAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleMeetGetMeetingSpaceAction() {
     }

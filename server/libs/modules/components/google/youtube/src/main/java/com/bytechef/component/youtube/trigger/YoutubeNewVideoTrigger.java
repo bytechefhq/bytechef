@@ -35,6 +35,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.google.commons.GoogleUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -105,7 +106,8 @@ public class YoutubeNewVideoTrigger {
                             .description("Live broadcasting content."),
                         string("publishTime")
                             .description("The date and time when the video was published."))))
-        .poll(YoutubeNewVideoTrigger::poll);
+        .poll(YoutubeNewVideoTrigger::poll)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private YoutubeNewVideoTrigger() {
     }

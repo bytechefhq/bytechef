@@ -31,6 +31,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import java.io.IOException;
 
 /**
  * @author Marija Horvat
@@ -58,9 +59,7 @@ public class GoogleSheetsCreateSpreadsheetAction {
     private GoogleSheetsCreateSpreadsheetAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Spreadsheet spreadsheet = new Spreadsheet()
             .setProperties(
                 new SpreadsheetProperties()
@@ -68,9 +67,14 @@ public class GoogleSheetsCreateSpreadsheetAction {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        Spreadsheet newSpreadsheet = sheets.spreadsheets()
-            .create(spreadsheet)
-            .execute();
+        Spreadsheet newSpreadsheet;
+        try {
+            newSpreadsheet = sheets.spreadsheets()
+                .create(spreadsheet)
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         String folderId = inputParameters.getString(FOLDER_ID);
 
@@ -82,20 +86,29 @@ public class GoogleSheetsCreateSpreadsheetAction {
     }
 
     private static void moveSpreadsheetToFolder(
-        Parameters connectionParameters, String spreadsheetId, String folderId) throws Exception {
+        Parameters connectionParameters, String spreadsheetId, String folderId) {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        File newFile = drive.files()
-            .get(spreadsheetId)
-            .setFields("parents")
-            .execute();
+        File newFile;
+        try {
+            newFile = drive.files()
+                .get(spreadsheetId)
+                .setFields("parents")
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
-        drive.files()
-            .update(spreadsheetId, null)
-            .setAddParents(folderId)
-            .setRemoveParents(String.join(",", newFile.getParents()))
-            .setFields("id, parents")
-            .execute();
+        try {
+            drive.files()
+                .update(spreadsheetId, null)
+                .setAddParents(folderId)
+                .setRemoveParents(String.join(",", newFile.getParents()))
+                .setFields("id, parents")
+                .execute();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
     }
 }

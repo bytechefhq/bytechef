@@ -32,6 +32,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.chat.util.GoogleChatUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -79,7 +80,8 @@ public class GoogleChatCreateMessageAction {
                                     .description("Space to which the message was sent.")),
                         string("argumentText"),
                         string("formattedText"))))
-        .perform(GoogleChatCreateMessageAction::perform);
+        .perform(GoogleChatCreateMessageAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleChatCreateMessageAction() {
     }

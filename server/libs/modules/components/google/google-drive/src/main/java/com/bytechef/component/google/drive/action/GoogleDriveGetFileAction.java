@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -52,14 +53,16 @@ public class GoogleDriveGetFileAction {
     private GoogleDriveGetFileAction() {
     }
 
-    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        return drive
-            .files()
-            .get(inputParameters.getRequiredString(FILE_ID))
-            .execute();
+        try {
+            return drive
+                .files()
+                .get(inputParameters.getRequiredString(FILE_ID))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

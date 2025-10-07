@@ -29,6 +29,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
@@ -135,7 +136,7 @@ public class GoogleCalendarUtils {
 
     public static List<Option<String>> getCalendarIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) throws IOException {
+        String searchText, Context context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
         List<CalendarListEntry> calendarListEntries = fetchAllCalendarListEntries(calendar);
@@ -145,19 +146,23 @@ public class GoogleCalendarUtils {
             .collect(Collectors.toList());
     }
 
-    private static List<CalendarListEntry> fetchAllCalendarListEntries(Calendar calendar)
-        throws IOException {
+    private static List<CalendarListEntry> fetchAllCalendarListEntries(Calendar calendar) {
         List<CalendarListEntry> calendarListEntries = new ArrayList<>();
         String nextPageToken = null;
 
         do {
-            CalendarList calendarList = calendar
-                .calendarList()
-                .list()
-                .setMinAccessRole("writer")
-                .setMaxResults(250)
-                .setPageToken(nextPageToken)
-                .execute();
+            CalendarList calendarList = null;
+            try {
+                calendarList = calendar
+                    .calendarList()
+                    .list()
+                    .setMinAccessRole("writer")
+                    .setMaxResults(250)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             calendarListEntries.addAll(calendarList.getItems());
             nextPageToken = calendarList.getNextPageToken();
@@ -166,18 +171,22 @@ public class GoogleCalendarUtils {
         return calendarListEntries;
     }
 
-    public static List<CustomEvent> getCustomEvents(Parameters inputParameters, Parameters connectionParameters)
-        throws IOException {
-
+    public static List<CustomEvent> getCustomEvents(Parameters inputParameters, Parameters connectionParameters) {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        List<Event> items = calendar.events()
-            .list(inputParameters.getRequiredString(CALENDAR_ID))
-            .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
-            .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
-            .setQ(inputParameters.getString(Q))
-            .execute()
-            .getItems();
+        List<Event> items;
+        try {
+            items = calendar.events()
+                .list(inputParameters.getRequiredString(CALENDAR_ID))
+                .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
+                .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
+                .setQ(inputParameters.getString(Q))
+                .execute()
+                .getItems();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
+
         String calendarTimezone = getCalendarTimezone(calendar);
         Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
@@ -249,15 +258,19 @@ public class GoogleCalendarUtils {
             .toList();
     }
 
-    public static Event getEvent(Parameters inputParameters, Calendar calendar) throws IOException {
-        return calendar.events()
-            .get(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID))
-            .execute();
+    public static Event getEvent(Parameters inputParameters, Calendar calendar) {
+        try {
+            return calendar.events()
+                .get(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID))
+                .execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static List<Option<String>> getEventIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) throws IOException {
+        String searchText, Context context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
         List<Event> events = fetchAllCalendarEvents(calendar, inputParameters.getRequiredString(CALENDAR_ID));
@@ -272,17 +285,21 @@ public class GoogleCalendarUtils {
             .collect(Collectors.toList());
     }
 
-    private static List<Event> fetchAllCalendarEvents(Calendar calendar, String calendarId)
-        throws IOException {
+    private static List<Event> fetchAllCalendarEvents(Calendar calendar, String calendarId) {
         List<Event> allEvents = new ArrayList<>();
         String nextPageToken = null;
 
         do {
-            Events events = calendar.events()
-                .list(calendarId)
-                .setMaxResults(2500)
-                .setPageToken(nextPageToken)
-                .execute();
+            Events events;
+            try {
+                events = calendar.events()
+                    .list(calendarId)
+                    .setMaxResults(2500)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             allEvents.addAll(events.getItems());
             nextPageToken = events.getNextPageToken();
@@ -291,18 +308,21 @@ public class GoogleCalendarUtils {
         return allEvents;
     }
 
-    public static Event updateEvent(Parameters inputParameters, Parameters connectionParameters, Event event)
-        throws IOException {
-
+    public static Event updateEvent(Parameters inputParameters, Parameters connectionParameters, Event event) {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        return calendar
-            .events()
-            .update(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID), event)
-            .execute();
+        try {
+            return calendar
+                .events()
+                .update(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID),
+                    event)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
-    public static String getCalendarTimezone(Calendar calendar) throws IOException {
+    public static String getCalendarTimezone(Calendar calendar) {
         List<Setting> settings = fetchAllCalendarSettings(calendar);
 
         return settings.stream()
@@ -312,17 +332,22 @@ public class GoogleCalendarUtils {
             .orElseThrow(() -> new ProviderException("Timezone setting not found."));
     }
 
-    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) throws IOException {
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
         List<Setting> allSettings = new ArrayList<>();
 
         String nextPageToken = null;
 
         do {
-            Settings settings = calendar.settings()
-                .list()
-                .setMaxResults(250)
-                .setPageToken(nextPageToken)
-                .execute();
+            Settings settings;
+            try {
+                settings = calendar.settings()
+                    .list()
+                    .setMaxResults(250)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
 
             allSettings.addAll(settings.getItems());
             nextPageToken = settings.getNextPageToken();

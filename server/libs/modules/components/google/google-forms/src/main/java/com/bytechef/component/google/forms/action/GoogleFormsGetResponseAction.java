@@ -54,7 +54,8 @@ public class GoogleFormsGetResponseAction {
                 .optionsLookupDependsOn(FORM_ID)
                 .required(true))
         .output()
-        .perform(GoogleFormsGetResponseAction::perform);
+        .perform(GoogleFormsGetResponseAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleFormsGetResponseAction() {
     }

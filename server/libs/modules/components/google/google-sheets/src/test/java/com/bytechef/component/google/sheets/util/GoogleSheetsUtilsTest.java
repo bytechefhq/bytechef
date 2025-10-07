@@ -565,7 +565,7 @@ class GoogleSheetsUtilsTest {
 
     @Test
     void testGetSheetIdOptions() throws Exception {
-        List<Sheet> sheetsList = getSheetList();
+        List<Sheet> sheetsList = getSheets();
 
         mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "spreadsheetId"));
 
@@ -597,7 +597,7 @@ class GoogleSheetsUtilsTest {
 
     @Test
     void testGetSheetNameOptions() throws Exception {
-        List<Sheet> sheetsList = getSheetList();
+        List<Sheet> sheetsList = getSheets();
 
         mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "spreadsheetId"));
 
@@ -744,7 +744,7 @@ class GoogleSheetsUtilsTest {
         }
     }
 
-    private static List<Sheet> getSheetList() {
+    private static List<Sheet> getSheets() {
         Sheet sheet1 = createSheet("Sheet 1", 1234567890);
         Sheet sheet2 = createSheet("Sheet 2", 98765432);
 

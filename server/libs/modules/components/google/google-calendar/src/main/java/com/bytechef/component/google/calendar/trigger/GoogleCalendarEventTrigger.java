@@ -25,8 +25,8 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -79,8 +79,8 @@ public class GoogleCalendarEventTrigger {
     }
 
     protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+        TriggerContext context) {
 
         Channel channelConfig = new Channel()
             .setAddress(webhookUrl)
@@ -97,7 +97,7 @@ public class GoogleCalendarEventTrigger {
                 .watch(calendarId, channelConfig)
                 .execute();
         } catch (IOException e) {
-            throw new ProviderException(e);
+            throw translateGoogleIOException(e);
         }
 
         return new WebhookEnableOutput(Map.of(ID, channel.getId(), RESOURCE_ID, channel.getResourceId()), null);
@@ -124,8 +124,7 @@ public class GoogleCalendarEventTrigger {
 
     protected static CustomEvent webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context)
-        throws IOException {
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime now = LocalDateTime.now(zoneId);
@@ -139,13 +138,19 @@ public class GoogleCalendarEventTrigger {
 
         String calendarTimezone = GoogleCalendarUtils.getCalendarTimezone(calendar);
 
-        List<Event> events = calendar.events()
-            .list(inputParameters.getRequiredString(CALENDAR_ID))
-            .setOrderBy("updated")
-            .setShowDeleted(true)
-            .setUpdatedMin(new DateTime(convertLocalDateTimeToDateInTimezone(currentRowNum, calendarTimezone)))
-            .execute()
-            .getItems();
+        List<Event> events;
+        try {
+            events = calendar.events()
+                .list(inputParameters.getRequiredString(CALENDAR_ID))
+                .setOrderBy("updated")
+                .setShowDeleted(true)
+                .setUpdatedMin(new DateTime(
+                    GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone(currentRowNum, calendarTimezone)))
+                .execute()
+                .getItems();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         context.data(data -> data.put(WORKFLOW, "lastTimeChecked", now));
 

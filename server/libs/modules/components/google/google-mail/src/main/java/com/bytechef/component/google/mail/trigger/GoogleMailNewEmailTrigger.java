@@ -28,6 +28,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO
 import static com.bytechef.component.google.mail.definition.Format.FULL;
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -37,7 +38,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -100,7 +100,7 @@ public class GoogleMailNewEmailTrigger {
                 .watch(ME, watchRequest)
                 .execute();
         } catch (IOException e) {
-            throw new ProviderException("Failed to start Gmail webhook", e);
+            throw translateGoogleIOException(e);
         }
 
         return new WebhookEnableOutput(Map.of(HISTORY_ID, watchResponse.getHistoryId()), null);
@@ -117,14 +117,14 @@ public class GoogleMailNewEmailTrigger {
                 .stop(ME)
                 .execute();
         } catch (IOException e) {
-            throw new ProviderException("Failed to stop Gmail webhook", e);
+            throw translateGoogleIOException(e);
         }
     }
 
     protected static List<Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
-        TriggerContext context) throws IOException {
+        TriggerContext context) {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
@@ -137,11 +137,16 @@ public class GoogleMailNewEmailTrigger {
         BigInteger historyId = historyIdOptional.map(o -> new BigInteger(o.toString()))
             .orElse(new BigInteger(triggerHistoryId.toString()));
 
-        ListHistoryResponse listHistoryResponse = gmail.users()
-            .history()
-            .list(ME)
-            .setStartHistoryId(historyId)
-            .execute();
+        ListHistoryResponse listHistoryResponse;
+        try {
+            listHistoryResponse = gmail.users()
+                .history()
+                .list(ME)
+                .setStartHistoryId(historyId)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         List<Object> newEmails = new ArrayList<>();
 
@@ -158,11 +163,16 @@ public class GoogleMailNewEmailTrigger {
                 for (HistoryMessageAdded historyMessageAdded : messagesAdded) {
                     Message historyMessage = historyMessageAdded.getMessage();
 
-                    Message message = gmail.users()
-                        .messages()
-                        .get(ME, historyMessage.getId())
-                        .setFormat(format == SIMPLE ? FULL.getMapping() : format.getMapping())
-                        .execute();
+                    Message message;
+                    try {
+                        message = gmail.users()
+                            .messages()
+                            .get(ME, historyMessage.getId())
+                            .setFormat(format == SIMPLE ? FULL.getMapping() : format.getMapping())
+                            .execute();
+                    } catch (IOException e) {
+                        throw translateGoogleIOException(e);
+                    }
 
                     if (format.equals(SIMPLE)) {
                         newEmails.add(getSimpleMessage(message, context, gmail));

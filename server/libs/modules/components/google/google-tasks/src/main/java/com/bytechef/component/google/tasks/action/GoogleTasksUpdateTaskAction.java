@@ -35,6 +35,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -73,7 +74,8 @@ public class GoogleTasksUpdateTaskAction {
                 .description("Notes describing the task. If empty, notes will not be changed.")
                 .required(false))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
-        .perform(GoogleTasksUpdateTaskAction::perform);
+        .perform(GoogleTasksUpdateTaskAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleTasksUpdateTaskAction() {
     }

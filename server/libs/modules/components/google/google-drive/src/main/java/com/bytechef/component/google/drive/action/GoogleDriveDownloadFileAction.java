@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -55,17 +56,24 @@ public class GoogleDriveDownloadFileAction {
     private GoogleDriveDownloadFileAction() {
     }
 
-    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
         String fileId = inputParameters.getRequiredString(FILE_ID);
 
-        Drive.Files.Get get = drive.files()
-            .get(fileId);
+        Drive.Files.Get get;
+        File googleFile;
 
-        File googleFile = get.execute();
+        try {
+            get = drive
+                .files()
+                .get(fileId);
+
+            googleFile = get
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         String mimeType = googleFile.getMimeType();
         String fileName = googleFile.getName();
@@ -81,6 +89,8 @@ public class GoogleDriveDownloadFileAction {
                 String finalFileName = fileName + "." + extension;
 
                 return context.file(file -> file.storeContent(finalFileName, inputStream));
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
             }
         } else {
             String fileExtension = googleFile.getFileExtension();
@@ -98,6 +108,8 @@ public class GoogleDriveDownloadFileAction {
                 String finalFilename = fileName;
 
                 return context.file(file -> file.storeContent(finalFilename, inputStream));
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
             }
         }
     }

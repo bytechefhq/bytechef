@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -49,15 +50,17 @@ public class GoogleDocsGetDocumentAction {
     private GoogleDocsGetDocumentAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Docs docs = GoogleServices.getDocs(connectionParameters);
 
-        return docs
-            .documents()
-            .get(inputParameters.getRequiredString(DOCUMENT_ID))
-            .execute();
+        try {
+            return docs
+                .documents()
+                .get(inputParameters.getRequiredString(DOCUMENT_ID))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 
 }

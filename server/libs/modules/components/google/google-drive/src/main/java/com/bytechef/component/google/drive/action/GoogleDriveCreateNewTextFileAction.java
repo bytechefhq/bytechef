@@ -26,6 +26,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
@@ -88,7 +89,6 @@ public class GoogleDriveCreateNewTextFileAction {
 
     public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws IOException {
-
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
         File newFile = new File()
@@ -112,9 +112,13 @@ public class GoogleDriveCreateNewTextFileAction {
             bufferedWriter.write(inputParameters.getRequiredString(TEXT));
         }
 
-        return drive
-            .files()
-            .create(newFile, new FileContent(mimeType, file))
-            .execute();
+        try {
+            return drive
+                .files()
+                .create(newFile, new FileContent(mimeType, file))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }

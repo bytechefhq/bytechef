@@ -19,17 +19,18 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.sheets.constant.GoogleSheetsConstants;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,17 +53,22 @@ public class GoogleSheetsGetRowsAction {
     private GoogleSheetsGetRowsAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<List<Object>> values = sheets
-            .spreadsheets()
-            .values()
-            .get(inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredString(SHEET_NAME))
-            .execute()
-            .getValues();
+        List<List<Object>> values;
+
+        try {
+            values = sheets
+                .spreadsheets()
+                .values()
+                .get(inputParameters.getRequiredString(GoogleSheetsConstants.SPREADSHEET_ID),
+                    inputParameters.getRequiredString(GoogleSheetsConstants.SHEET_NAME))
+                .execute()
+                .getValues();
+        } catch (IOException e) {
+            throw GoogleUtils.translateGoogleIOException(e);
+        }
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
             values = values.subList(1, values.size());

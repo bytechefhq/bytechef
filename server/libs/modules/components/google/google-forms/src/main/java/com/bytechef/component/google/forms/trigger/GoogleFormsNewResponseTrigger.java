@@ -55,7 +55,8 @@ public class GoogleFormsNewResponseTrigger {
                 .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_FORM, true))
                 .required(true))
         .output()
-        .poll(GoogleFormsNewResponseTrigger::poll);
+        .poll(GoogleFormsNewResponseTrigger::poll)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleFormsNewResponseTrigger() {
     }

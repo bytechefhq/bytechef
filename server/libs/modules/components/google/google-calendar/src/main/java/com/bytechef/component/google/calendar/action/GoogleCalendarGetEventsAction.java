@@ -38,7 +38,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -105,7 +104,7 @@ public class GoogleCalendarGetEventsAction {
     }
 
     public static List<CustomEvent> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return GoogleCalendarUtils.getCustomEvents(inputParameters, connectionParameters);
     }

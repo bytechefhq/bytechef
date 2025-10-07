@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -67,7 +68,8 @@ public class GoogleChatCreateSpaceAction {
                                 string("accessSettings")
                                     .description("Access settings for the space.")),
                         string("spaceUri"))))
-        .perform(GoogleChatCreateSpaceAction::perform);
+        .perform(GoogleChatCreateSpaceAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleChatCreateSpaceAction() {
     }

@@ -26,6 +26,7 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PAGE_SIZE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.QUERY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.READ_MASK;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -105,17 +106,21 @@ public class GoogleContactsSearchContactsAction {
     private GoogleContactsSearchContactsAction() {
     }
 
-    public static List<Person> perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static List<Person> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
 
-        SearchResponse searchResponse = peopleService.people()
-            .searchContacts()
-            .setQuery(inputParameters.getRequiredString(QUERY))
-            .setReadMask(String.join(",", inputParameters.getRequiredList(READ_MASK, String.class)))
-            .setPageSize(inputParameters.getRequiredInteger(PAGE_SIZE))
-            .execute();
+        SearchResponse searchResponse;
+        try {
+            searchResponse = peopleService.people()
+                .searchContacts()
+                .setQuery(inputParameters.getRequiredString(QUERY))
+                .setReadMask(
+                    String.join(",", inputParameters.getRequiredList(READ_MASK, String.class)))
+                .setPageSize(inputParameters.getRequiredInteger(PAGE_SIZE))
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         return Optional.ofNullable(searchResponse.getResults())
             .orElse(Collections.emptyList())

@@ -47,9 +47,7 @@ public class GoogleSheetsDeleteRowAction {
     private GoogleSheetsDeleteRowAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         deleteDimension(inputParameters, connectionParameters, inputParameters.getRequiredInteger(ROW_NUMBER), "ROWS");
 
         return null;

@@ -44,7 +44,8 @@ public class GoogleFormsGetAllResponsesAction {
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FORM, true))
                 .required(true))
         .output()
-        .perform(GoogleFormsGetAllResponsesAction::perform);
+        .perform(GoogleFormsGetAllResponsesAction::perform)
+        .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleFormsGetAllResponsesAction() {
     }

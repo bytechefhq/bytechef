@@ -32,7 +32,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
@@ -80,9 +79,7 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
     private GoogleCalendarGetFreeTimeSlotsAction() {
     }
 
-    public static List<Interval> perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static List<Interval> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<CustomEvent> customEvents = new ArrayList<>(getCustomEvents(inputParameters, connectionParameters));
 
         customEvents.sort(Comparator.comparing(CustomEvent::startTime, (s1, s2) -> {

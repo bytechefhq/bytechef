@@ -85,9 +85,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
     private GoogleDocsCreateDocumentFromTemplateAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws Exception {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Docs docs = GoogleServices.getDocs(connectionParameters);
         File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
         List<Request> requests = createRequests(inputParameters);

@@ -58,7 +58,7 @@ public class GoogleSheetsFindRowByNumAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
@@ -68,5 +68,4 @@ public class GoogleSheetsFindRowByNumAction {
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
     }
-
 }

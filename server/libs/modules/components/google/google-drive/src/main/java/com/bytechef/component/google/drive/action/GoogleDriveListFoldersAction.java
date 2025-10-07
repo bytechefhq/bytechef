@@ -30,7 +30,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -58,9 +57,7 @@ public class GoogleDriveListFoldersAction {
     private GoogleDriveListFoldersAction() {
     }
 
-    public static List<File> perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static List<File> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return listFiles(inputParameters.getString(FOLDER_ID, "root"), true, connectionParameters);
     }
 }

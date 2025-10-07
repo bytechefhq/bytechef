@@ -26,6 +26,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
+import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -74,18 +75,20 @@ public class GoogleMailAddLabelsAction {
     private GoogleMailAddLabelsAction() {
     }
 
-    public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context)
-        throws IOException {
-
+    public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         ModifyMessageRequest messageRequest = new ModifyMessageRequest()
             .setAddLabelIds(inputParameters.getRequiredList(LABEL_IDS, String.class));
 
-        return gmail
-            .users()
-            .messages()
-            .modify(ME, inputParameters.getRequiredString(ID), messageRequest)
-            .execute();
+        try {
+            return gmail
+                .users()
+                .messages()
+                .modify(ME, inputParameters.getRequiredString(ID), messageRequest)
+                .execute();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
     }
 }
