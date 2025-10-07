@@ -21,5 +21,8 @@ package com.bytechef.platform.configuration.facade;
  */
 public interface WorkflowNodeDescriptionFacade {
 
+    String getClusterElementWorkflowNodeDescription(
+        String workflowId, String workflowNodeName, String clusterElementName, Long environmentId);
+
     String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId);
 }
