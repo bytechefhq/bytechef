@@ -29,13 +29,16 @@ export default function saveClusterElementFieldChange({
     invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
-    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
+        useWorkflowNodeDetailsPanelStore.getState();
     const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!currentNode || !workflow.definition) {
         return;
     }
+
+    const {componentName, name, workflowNodeName} = currentNode;
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
@@ -75,7 +78,7 @@ export default function saveClusterElementFieldChange({
             clusterElements,
             currentComponentDefinition,
             currentOperationProperties,
-            elementName: currentNode.workflowNodeName,
+            elementName: workflowNodeName,
             fieldUpdate,
         });
 
@@ -94,10 +97,23 @@ export default function saveClusterElementFieldChange({
         invalidateWorkflowQueries,
         nodeData: updatedMainRootData,
         onSuccess: () => {
-            let updatedStateData = {};
+            let commonUpdates: NodeDataType = {
+                componentName,
+                name,
+                workflowNodeName,
+            };
 
             if (fieldUpdate.field === 'operation') {
-                updatedStateData = {
+                commonUpdates = {
+                    ...commonUpdates,
+                    clusterElementName: fieldUpdate.value,
+                    metadata: {
+                        ui: {
+                            nodePosition: currentNode.metadata?.ui?.nodePosition
+                                ? currentNode.metadata?.ui?.nodePosition
+                                : undefined,
+                        },
+                    },
                     operationName: fieldUpdate.value,
                     parameters: getParametersWithDefaultValues({
                         properties: currentOperationProperties as Array<PropertyAllType>,
@@ -105,21 +121,24 @@ export default function saveClusterElementFieldChange({
                     type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
                 };
             } else {
-                updatedStateData = {
-                    [fieldUpdate.field]: fieldUpdate.value,
-                };
+                commonUpdates[fieldUpdate.field] = fieldUpdate.value;
             }
 
             setCurrentNode({
                 ...currentNode,
-                ...updatedStateData,
+                ...commonUpdates,
+            });
+
+            setCurrentComponent({
+                ...currentComponent,
+                ...commonUpdates,
             });
 
             if (rootClusterElementNodeData) {
                 if (currentNode.clusterRoot && !currentNode.isNestedClusterRoot) {
                     setRootClusterElementNodeData({
                         ...rootClusterElementNodeData,
-                        ...updatedStateData,
+                        ...commonUpdates,
                     });
                 } else {
                     setRootClusterElementNodeData({
