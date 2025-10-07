@@ -1,7 +1,7 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/components/workflow-test-chat/runtime-providers/WorkflowTestChatRuntimeProvider';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {Cross2Icon} from '@radix-ui/react-icons';
+import {XIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -37,7 +37,7 @@ const WorkflowTestChatPanel = () => {
                         className="ml-auto pr-0"
                         onClick={handlePanelClose}
                     >
-                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                     </button>
                 </header>
 

@@ -10,8 +10,8 @@ import {
 } from '@/ee/pages/settings/platform/custom-components/mutations/customComponents.mutations';
 import {CustomComponentKeys} from '@/ee/pages/settings/platform/custom-components/queries/customComponents.queries';
 import {CustomComponent} from '@/ee/shared/middleware/platform/custom-component';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface CustomComponentItemProps {
@@ -121,7 +121,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="icon" variant="ghost">
-                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                             </Button>
                         </DropdownMenuTrigger>
 

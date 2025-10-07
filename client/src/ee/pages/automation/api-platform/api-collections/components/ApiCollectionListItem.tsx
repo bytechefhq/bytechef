@@ -17,8 +17,8 @@ import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ApiCollectionListItemProps {

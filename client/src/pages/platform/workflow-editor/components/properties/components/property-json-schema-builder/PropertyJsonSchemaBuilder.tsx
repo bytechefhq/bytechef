@@ -5,7 +5,7 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
-import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -59,7 +59,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                                 {description && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <QuestionMarkCircledIcon />
+                                            <CircleQuestionMarkIcon />
                                         </TooltipTrigger>
 
                                         <TooltipContent>{description}</TooltipContent>
@@ -95,7 +95,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                             {error && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
+                                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
                                 </div>
                             )}
                         </div>

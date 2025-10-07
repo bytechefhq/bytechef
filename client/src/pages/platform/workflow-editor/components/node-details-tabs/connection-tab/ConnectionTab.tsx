@@ -1,6 +1,6 @@
 import ConnectionTabConnectionFieldset from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTabConnectionFieldset';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
-import {Cross2Icon} from '@radix-ui/react-icons';
+import {XIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useConnectionNoteStore} from '../../../stores/useConnectionNoteStore';
@@ -54,7 +54,7 @@ const ConnectionTab = ({
                             onClick={() => setShowConnectionNote(false)}
                             title="Close the note"
                         >
-                            <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                            <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                         </button>
                     </div>
 

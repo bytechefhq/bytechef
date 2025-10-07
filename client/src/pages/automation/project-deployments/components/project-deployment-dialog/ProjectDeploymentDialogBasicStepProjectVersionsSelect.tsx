@@ -1,8 +1,8 @@
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
-import {CheckIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
+import {CheckIcon} from 'lucide-react';
 
 const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
     onChange,

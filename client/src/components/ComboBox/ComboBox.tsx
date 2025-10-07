@@ -3,8 +3,8 @@ import {Button} from '@/components/ui/button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
-import {CaretSortIcon, CheckIcon} from '@radix-ui/react-icons';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import {CheckIcon, ChevronsUpDownIcon} from 'lucide-react';
 import {FC, FocusEventHandler, ReactNode, useState} from 'react';
 
 export type ComboBoxItemType = {
@@ -73,7 +73,7 @@ const ComboBox: FC<ComboBoxProps> = ({disabled, emptyMessage, items, name, onBlu
                         'Select...'
                     )}
 
-                    <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+                    <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
 
