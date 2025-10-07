@@ -83,10 +83,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         String externalUserId, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
         Long integrationInstanceId, Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(
+        ComponentConnection componentConnection = getComponentConnection(
             externalUserId, category, integrationInstanceId, environment);
 
-        String componentName = connection.getComponentName();
+        String componentName = componentConnection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
             unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
@@ -98,8 +98,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         return providerModelAdapter.create(
-            providerInputModel, ParametersFactory.createParameters(connection.getParameters()),
-            contextFactory.createContext(componentName, connection));
+            providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
+            contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
@@ -107,18 +107,18 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
         Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(
+        ComponentConnection componentConnection = getComponentConnection(
             externalUserId, category, integrationInstanceId, environment);
 
-        String componentName = connection.getComponentName();
+        String componentName = componentConnection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
             unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         providerModelAdapter.delete(
-            id, ParametersFactory.createParameters(connection.getParameters()),
-            contextFactory.createContext(componentName, connection));
+            id, ParametersFactory.createParameters(componentConnection.getParameters()),
+            contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
@@ -126,10 +126,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         String externalUserId, String id, UnifiedApiCategory category, Long integrationInstanceId,
         Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(
+        ComponentConnection componentConnection = getComponentConnection(
             externalUserId, category, integrationInstanceId, environment);
 
-        String componentName = connection.getComponentName();
+        String componentName = componentConnection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
             unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
@@ -139,8 +139,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderOutputModel providerOutputModel = providerModelAdapter.get(
-            id, ParametersFactory.createParameters(connection.getParameters()),
-            contextFactory.createContext(componentName, connection));
+            id, ParametersFactory.createParameters(componentConnection.getParameters()),
+            contextFactory.createContext(componentName, componentConnection));
 
         return providerModelMapper.unify(providerOutputModel, List.of());
     }
@@ -157,10 +157,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 //            throw new IllegalArgumentException("Sorting is only allowed on fields: " + sortableFields);
 //        }
 
-        ComponentConnection connection = getComponentConnection(
+        ComponentConnection componentConnection = getComponentConnection(
             externalUserId, category, integrationInstanceId, environment);
 
-        String componentName = connection.getComponentName();
+        String componentName = componentConnection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
             unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
@@ -196,9 +196,9 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         }
 
         Page<? extends ProviderOutputModel> page = providerModelAdapter.getPage(
-            ParametersFactory.createParameters(connection.getParameters()),
+            ParametersFactory.createParameters(componentConnection.getParameters()),
             ParametersFactory.createParameters(cursorParameters),
-            contextFactory.createContext(componentName, connection));
+            contextFactory.createContext(componentName, componentConnection));
 
         String continuationToken = null;
 
@@ -232,10 +232,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         String externalUserId, String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
         Long integrationInstanceId, Environment environment, ModelType modelType) {
 
-        ComponentConnection connection = getComponentConnection(
+        ComponentConnection componentConnection = getComponentConnection(
             externalUserId, category, integrationInstanceId, environment);
 
-        String componentName = connection.getComponentName();
+        String componentName = componentConnection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
             unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
@@ -247,8 +247,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
         providerModelAdapter.update(
-            id, providerInputModel, ParametersFactory.createParameters(connection.getParameters()),
-            contextFactory.createContext(componentName, connection));
+            id, providerInputModel, ParametersFactory.createParameters(componentConnection.getParameters()),
+            contextFactory.createContext(componentName, componentConnection));
     }
 
     private String decrypt(String strToDecrypt) throws CursorPaginationException {

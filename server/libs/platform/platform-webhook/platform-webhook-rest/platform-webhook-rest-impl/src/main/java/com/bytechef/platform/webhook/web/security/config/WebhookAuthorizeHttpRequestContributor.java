@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class WebhookrAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
+public class WebhookAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     @Override
     public List<String> getPermitAllRequestMatcherPaths() {
