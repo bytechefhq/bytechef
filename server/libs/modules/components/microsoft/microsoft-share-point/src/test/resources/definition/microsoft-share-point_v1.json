@@ -1009,7 +1009,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1823,7 +1823,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1910,7 +1910,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -2911,7 +2911,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",

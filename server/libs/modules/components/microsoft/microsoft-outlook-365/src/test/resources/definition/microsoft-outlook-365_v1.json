@@ -483,7 +483,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -721,7 +721,7 @@
     "name" : "deleteEvent",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1301,7 +1301,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1552,7 +1552,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1649,7 +1649,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1722,7 +1722,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -1785,7 +1785,7 @@
     "name" : "replyToEmail",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",
@@ -4223,7 +4223,7 @@
       "sampleOutput" : null
     },
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "TEXT",
@@ -4327,7 +4327,7 @@
     "name" : "sendEmail",
     "outputDefinition" : null,
     "perform" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "ARRAY_BUILDER",
@@ -9637,7 +9637,7 @@
       "sampleOutput" : null
     },
     "poll" : { },
-    "processErrorResponse" : null,
+    "processErrorResponse" : { },
     "properties" : [ {
       "advancedOption" : null,
       "controlType" : "SELECT",

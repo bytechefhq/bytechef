@@ -430,9 +430,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -545,9 +545,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform" : { },
@@ -723,9 +723,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -838,9 +838,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform" : { },
@@ -2238,9 +2238,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -2353,9 +2353,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "perform" : { },
@@ -2924,9 +2924,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -3039,9 +3039,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -3219,9 +3219,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -3334,9 +3334,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -4746,9 +4746,9 @@
         },
         "placeholder" : null,
         "sampleOutput" : {
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
           "name" : "new-file.txt",
-          "mimeType" : "plain/text"
+          "mimeType" : "plain/text",
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
       },
       "outputSchema" : {
@@ -4861,9 +4861,9 @@
         "type" : "OBJECT"
       },
       "sampleOutput" : {
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "name" : "new-file.txt",
-        "mimeType" : "plain/text"
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {

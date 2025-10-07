@@ -22,6 +22,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.ID;
 import static com.bytechef.component.slack.constant.SlackConstants.NAME;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,6 @@ class SlackUtilsTest {
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
@@ -66,15 +67,27 @@ class SlackUtilsTest {
     @Test
     void testSendMessage() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedObject);
+            .thenReturn(Map.of("ok", true));
 
         Object result = SlackUtils.sendMessage("general", "hello", null, mockedActionContext);
 
-        assertEquals(mockedObject, result);
+        assertEquals(Map.of("ok", true), result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of(CHANNEL, "general", TEXT, "hello"), body.getContent());
+    }
+
+    @Test
+    void testSendMessageError() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("ok", false, "error", "some_error"));
+
+        ProviderException providerException = assertThrows(
+            ProviderException.class,
+            () -> SlackUtils.sendMessage("general", "hello", null, mockedActionContext));
+
+        assertEquals("some_error", providerException.getMessage());
     }
 
     @Test

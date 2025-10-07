@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
@@ -89,7 +90,7 @@ class GoogleDriveDeleteFileActionTest {
                 .when(mockedDelete)
                 .execute();
 
-            assertThrows(IOException.class,
+            assertThrows(ProviderException.class,
                 () -> GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext));
 
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
