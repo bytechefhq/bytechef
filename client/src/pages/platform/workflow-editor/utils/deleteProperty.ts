@@ -55,15 +55,15 @@ export default function deleteProperty(
 
                     setCurrentComponent({
                         ...currentComponent,
+                        metadata: response.metadata,
                         parameters: response.parameters,
                     });
 
-                    if (currentNode) {
-                        setCurrentNode({
-                            ...currentNode,
-                            parameters: response.parameters,
-                        });
-                    }
+                    setCurrentNode({
+                        ...currentNode,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
                 },
             }
         );
@@ -74,6 +74,7 @@ export default function deleteProperty(
     deleteWorkflowNodeParameterMutation.mutate(
         {
             deleteClusterElementParameterRequest: {
+                includeInMetadata,
                 path,
             },
             environmentId: environmentStore.getState().currentEnvironmentId,
@@ -86,12 +87,14 @@ export default function deleteProperty(
 
                 setCurrentComponent({
                     ...currentComponent,
+                    metadata: response.metadata,
                     parameters: response.parameters,
                 });
 
                 if (currentNode) {
                     setCurrentNode({
                         ...currentNode,
+                        metadata: response.metadata,
                         parameters: response.parameters,
                     });
                 }

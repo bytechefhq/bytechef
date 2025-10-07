@@ -80,6 +80,13 @@ export default function saveProperty({
                         metadata: response.metadata,
                         parameters: response.parameters,
                     });
+
+                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
+                        ...currentNode,
+                        displayConditions: response.displayConditions,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
                 },
             }
         );
@@ -111,6 +118,15 @@ export default function saveProperty({
                     metadata: response.metadata,
                     parameters: response.parameters,
                 });
+
+                if (currentNode) {
+                    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
+                        ...currentNode,
+                        displayConditions: response.displayConditions,
+                        metadata: response.metadata,
+                        parameters: response.parameters,
+                    });
+                }
             },
         }
     );

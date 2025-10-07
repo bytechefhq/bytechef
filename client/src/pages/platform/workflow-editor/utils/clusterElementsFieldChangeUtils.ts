@@ -26,6 +26,14 @@ export function createUpdatedElement({
         case 'operation':
             return {
                 ...element,
+                clusterElementName: fieldUpdate.value,
+                metadata: {
+                    ui: {
+                        nodePosition: element.metadata?.ui?.nodePosition
+                            ? element.metadata?.ui?.nodePosition
+                            : undefined,
+                    },
+                },
                 operationName: fieldUpdate.value,
                 parameters: getParametersWithDefaultValues({
                     properties: currentOperationProperties as Array<PropertyAllType>,
