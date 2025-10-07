@@ -9,10 +9,10 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20250313170130-2" author="Ivica Cardic" context="mono">
+    <changeSet id="20250313170130-2" author="Ivica Cardic">
         <sql>
             UPDATE workflow_node_test_output
-            SET environment = 0
+            SET environment = 0 -- DEVELOPMENT environment
             WHERE environment IS NULL;
         </sql>
     </changeSet>

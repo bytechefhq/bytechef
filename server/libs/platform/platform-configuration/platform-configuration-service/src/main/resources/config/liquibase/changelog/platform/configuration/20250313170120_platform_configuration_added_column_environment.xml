@@ -15,21 +15,23 @@
             SET environment = c.environment
             FROM (
                 SELECT workflow_test_configuration_id AS id, MAX(environment) as environment
-                FROM  connection
+                FROM connection
                 JOIN workflow_test_configuration_connection ON workflow_test_configuration_connection.connection_id = connection.id
                 GROUP BY workflow_test_configuration_id
             ) AS c
             WHERE workflow_test_configuration.id = c.id;
         </sql>
+    </changeSet>
 
+    <changeSet id="20250313170120-3" author="Ivica Cardic">
         <sql>
             UPDATE workflow_test_configuration
-            SET environment = 0
+            SET environment = 0 -- DEVELOPMENT environment
             WHERE environment IS NULL;
         </sql>
     </changeSet>
 
-    <changeSet id="20250313170120-3" author="Ivica Cardic">
+    <changeSet id="20250313170120-4" author="Ivica Cardic">
         <addNotNullConstraint tableName="workflow_test_configuration" columnName="environment"/>
     </changeSet>
 </databaseChangeLog>

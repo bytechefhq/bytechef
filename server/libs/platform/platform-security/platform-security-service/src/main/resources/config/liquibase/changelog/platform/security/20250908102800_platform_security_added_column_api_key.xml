@@ -15,7 +15,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20250908102800-2" author="Ivica Cardic" context="mono">
+    <changeSet id="20250908102800-2" author="Ivica Cardic">
         <sql>
             UPDATE api_key
             SET environment = 0 -- DEVELOPMENT environment
