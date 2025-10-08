@@ -21,8 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.liferay.util.LiferayUtils;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Nikolina Spehar
@@ -47,10 +45,5 @@ public class LiferayConstants {
         .propertiesLookupDependsOn(SERVICE)
         .properties((ActionPropertiesFunction) LiferayUtils::createParameters)
         .required(true);
-
-    public static final List<String> BODY_PARAMETERS = new ArrayList<>();
-    public static final List<String> HEADER_PARAMETERS = new ArrayList<>();
-    public static final List<String> PATH_PARAMETERS = new ArrayList<>();
-    public static final List<String> QUERY_PARAMETERS = new ArrayList<>();
 
 }
