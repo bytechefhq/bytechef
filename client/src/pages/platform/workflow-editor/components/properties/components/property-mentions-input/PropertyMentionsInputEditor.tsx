@@ -139,11 +139,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }))
         );
 
-        const memoizedWorkflowTask = useMemo(() => {
-            return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-                (node) => node.name === currentNode?.name
-            );
-        }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+        const memoizedWorkflowTask = useMemo(
+            () =>
+                [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+                    (node) => node.name === currentNode?.name
+                ),
+            [workflow.triggers, workflow.tasks, currentNode?.name]
+        );
 
         const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
             if (!currentNode?.name || !workflow.definition) {
@@ -255,7 +257,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             workflow.id,
         ]);
 
-        const saveMentionInputValue = useDebouncedCallback(() => {
+        const saveMentionInputValue = useDebouncedCallback((editorValue: string | number) => {
             if (
                 !workflow.id ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -328,7 +330,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     });
                 }
 
-                setEditorValue(value);
+                if (value !== editorValue) {
+                    setEditorValue(value);
+                }
 
                 if (onChange) {
                     onChange(value);
@@ -338,9 +342,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 setMentionOccurences(propertyMentions?.length || 0);
 
-                saveMentionInputValue();
+                saveMentionInputValue(value);
             },
-            [onChange, saveMentionInputValue]
+            [onChange, saveMentionInputValue, editorValue, isFormulaMode, setIsFormulaMode]
         );
 
         const getContent = useCallback((value?: string) => {
@@ -411,6 +415,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             onUpdate,
         });
 
+        const memoizedContent = useMemo(() => {
+            if (editorValue === undefined || typeof editorValue !== 'string') {
+                return '';
+            }
+
+            return getContent(editorValue);
+        }, [editorValue, getContent]);
+
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
         }
@@ -462,9 +474,20 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             workflow.definition,
         ]);
 
+        // Update editor content when editorValue changes (but not during local updates)
+        useEffect(() => {
+            if (editor && !isLocalUpdate && memoizedContent !== undefined) {
+                editor.commands.setContent(memoizedContent, false, {
+                    preserveWhitespace: 'full',
+                });
+            }
+        }, [editor, memoizedContent, isLocalUpdate]);
+
         // Set formula mode based on value and sync with editor storage
         useEffect(() => {
-            if (!editor) return;
+            if (!editor) {
+                return;
+            }
 
             if (typeof value === 'string' && value.startsWith('=') && setIsFormulaMode) {
                 setIsFormulaMode(true);
