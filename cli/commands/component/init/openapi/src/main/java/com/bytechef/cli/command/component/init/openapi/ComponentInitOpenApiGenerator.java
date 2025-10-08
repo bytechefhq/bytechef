@@ -225,9 +225,9 @@ public class ComponentInitOpenApiGenerator {
             builder.add("dynamicProperties($S)", propertyName);
 
             builder.add(
-                ".properties(($T.ActionPropertiesFunction)$T::get" + buildOptionsFunctionsName(propertyName) +
+                ".properties(($T.PropertiesFunction)$T::get" + buildOptionsFunctionsName(propertyName) +
                     "Properties)",
-                ClassName.get("com.bytechef.component.definition", "PropertiesDataSource"),
+                ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
                 ClassName.get(
                     "com.bytechef.component." + componentName + ".util",
                     getComponentClassName(componentName) + "Utils"));
@@ -2153,9 +2153,9 @@ public class ComponentInitOpenApiGenerator {
             dynamicOptionsMap.put(buildOptionsFunctionsName(propertyName), type);
 
             builder.add(
-                ".options(($T.ActionOptionsFunction<" + optionType + ">)$T::get"
+                ".options(($T.OptionsFunction<" + optionType + ">)$T::get"
                     + buildOptionsFunctionsName(propertyName) + "Options)",
-                ClassName.get("com.bytechef.component.definition", "OptionsDataSource"),
+                ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
                 ClassName.get("com.bytechef.component." + componentName + ".util",
                     getComponentClassName(componentName) + "Utils"));
 
