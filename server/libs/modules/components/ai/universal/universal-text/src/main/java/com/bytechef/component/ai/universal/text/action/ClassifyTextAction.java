@@ -34,6 +34,7 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
 import com.bytechef.component.definition.Parameters;
@@ -113,6 +114,8 @@ public class ClassifyTextAction implements AiTextAction {
                 Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
                 Map.of("content", userBuilder, ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+        modelInputParametersMap.put("response", Map.of(
+            "responseFormat", ChatModel.ResponseFormat.TEXT));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }

@@ -120,27 +120,31 @@ public class ModelUtils {
             .toList();
     }
 
-    public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext) {
+    public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext, boolean responseFormatRequired) {
         List<ChatModel.Message> chatModelMessages = new ArrayList<>();
 
-        String format = inputParameters.getRequiredString(FORMAT);
+        if (responseFormatRequired) {
+            String format = inputParameters.getRequiredString(FORMAT);
+            if (format.equals(Format.SIMPLE.name())) {
+                String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
 
-        if (format.equals(Format.SIMPLE.name())) {
-            String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
+                ChatModel.Message userMessage = new ChatModel.Message(
+                    userPrompt, inputParameters.getList(ATTACHMENTS, FileEntry.class), Role.USER);
 
-            ChatModel.Message userMessage = new ChatModel.Message(
-                userPrompt, inputParameters.getList(ATTACHMENTS, FileEntry.class), Role.USER);
+                chatModelMessages.add(userMessage);
 
-            chatModelMessages.add(userMessage);
+                String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
 
-            String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
+                if (systemPrompt != null && !systemPrompt.isEmpty()) {
+                    ChatModel.Message systeMMessage = new ChatModel.Message(systemPrompt, null, Role.SYSTEM);
 
-            if (systemPrompt != null && !systemPrompt.isEmpty()) {
-                ChatModel.Message systeMMessage = new ChatModel.Message(systemPrompt, null, Role.SYSTEM);
-
-                chatModelMessages.add(systeMMessage);
+                    chatModelMessages.add(systeMMessage);
+                }
+            } else {
+                chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
             }
-        } else {
+        }
+        else {
             chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
         }
 
