@@ -61,7 +61,7 @@ public interface ChatModel {
             inputParameters, connectionParameters, true);
 
         List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
-            inputParameters, actionContext);
+            inputParameters, actionContext, false);
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
             inputParameters, actionContext, chatModel);
