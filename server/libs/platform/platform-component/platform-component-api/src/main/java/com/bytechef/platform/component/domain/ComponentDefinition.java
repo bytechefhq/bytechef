@@ -276,7 +276,8 @@ public class ComponentDefinition {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getClusterElements(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions,
+            clusterElementDefinitions -> CollectionUtils.map(
+                clusterElementDefinitions,
                 clusterElementDefinition -> new ClusterElementDefinition(
                     clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
                     OptionalUtils.orElse(componentDefinition.getIcon(), null))),

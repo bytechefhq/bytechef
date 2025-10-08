@@ -56,7 +56,7 @@ public class FilesystemFileStorageServiceTest {
         FileEntry fileEntry = fileStorageService.storeFileContent(
             "data", "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
 
-        InputStream inputStream = fileStorageService.getFileStream("data", fileEntry);
+        InputStream inputStream = fileStorageService.getInputStream("data", fileEntry);
 
         Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
             .isEqualTo(TEST_STRING);

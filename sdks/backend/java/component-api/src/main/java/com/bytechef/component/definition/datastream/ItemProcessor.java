@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.datastream.item;
+package com.bytechef.component.definition.datastream;
 
+import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.Parameters;
 import java.util.Map;
-import org.springframework.batch.item.ItemProcessor;
 
 /**
  * @author Ivica Cardic
  */
-public class ItemProcessorDelegate implements ItemProcessor<Map<String, ?>, Map<String, ?>> {
+public interface ItemProcessor<I, O> extends ItemStream {
 
-    @Override
-    public Map<String, ?> process(Map<String, ?> item) throws Exception {
-        return item;
-    }
+    ClusterElementType PROCESSOR = new ClusterElementType("PROCESSOR", "processor", "Processor");
+
+    Map<String, I> process(
+        Map<String, O> item, Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
+
+        throws Exception;
 }

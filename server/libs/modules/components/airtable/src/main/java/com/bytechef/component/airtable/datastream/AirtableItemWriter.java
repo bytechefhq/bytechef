@@ -22,9 +22,17 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemWriter;
+import com.bytechef.component.exception.ProviderException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +44,7 @@ public class AirtableItemWriter implements ItemWriter {
     public static final ModifiableClusterElementDefinition<AirtableItemWriter> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<AirtableItemWriter>clusterElement("write")
             .title("Write tabel rows")
+            .description("Writes a list of rows to a table.")
             .type(DESTINATION)
             .object(AirtableItemWriter.class)
             .properties(
@@ -53,8 +62,54 @@ public class AirtableItemWriter implements ItemWriter {
                     .propertiesLookupDependsOn("baseId", "tableId")
                     .required(false));
 
+    private String baseId;
+    private Context context;
+    private String tableId;
+
     @Override
-    public void write(List<? extends Map<String, ?>> items) throws Exception {
-        // TODO
+    public void open(
+        Parameters inputParameters, Parameters connectionParameters, Context context,
+        ExecutionContext executionContext) {
+
+        this.baseId = inputParameters.getRequiredString("baseId");
+        this.tableId = inputParameters.getRequiredString("tableId");
+        this.context = context;
+    }
+
+    @Override
+    public void write(List<? extends Map<String, Object>> items) {
+
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        List<Map<String, ?>> records = new ArrayList<>(items.size());
+
+        for (Map<String, ?> item : items) {
+            Object fieldsObj = item.get("fields");
+
+            Map<?, ?> fieldsMap = fieldsObj instanceof Map<?, ?> fm ? fm : item;
+
+            records.add(Map.of("fields", fieldsMap));
+        }
+
+        Map<String, Object> payload = Map.of("records", records);
+
+        Http.Response response = context
+            .http(http -> http.post("/%s/%s".formatted(baseId, tableId)))
+            .body(Http.Body.of(payload))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute();
+
+        Map<String, ?> body = response.getBody(new TypeReference<>() {});
+
+        if (body.containsKey("error")) {
+            Object error = body.get("error");
+
+            String message = error instanceof Map<?, ?> errorMap
+                ? (String) errorMap.get("message") : String.valueOf(error);
+
+            throw new ProviderException.BadRequestException(message);
+        }
     }
 }

@@ -23,6 +23,7 @@ import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemReader;
@@ -42,6 +43,7 @@ public class CsvFileItemReader implements ItemReader {
     public static final ModifiableClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<CsvFileItemReader>clusterElement("reader")
             .title("Read CSV file row")
+            .description("Reads a single row from a CSV file.")
             .type(SOURCE)
             .object(CsvFileItemReader.class)
             .properties(READ_PROPERTIES);
@@ -63,14 +65,17 @@ public class CsvFileItemReader implements ItemReader {
     }
 
     @Override
-    public void open(Parameters inputParameters, Parameters connectionParameters, ExecutionContext context) {
+    public void open(
+        Parameters inputParameters, Parameters connectionParameters, Context context,
+        ExecutionContext executionContext) {
+
         configuration = CsvFileReadUtils.getReadConfiguration(inputParameters);
 
         enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
 
         bufferedReader = new BufferedReader(
             new InputStreamReader(
-                context.file(file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
+                context.file(file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
                 StandardCharsets.UTF_8));
 
         try {
@@ -81,7 +86,7 @@ public class CsvFileItemReader implements ItemReader {
     }
 
     @Override
-    public Map<String, ?> read() throws Exception {
+    public Map<String, Object> read() throws Exception {
         if (configuration.headerRow()) {
             if (iterator.hasNext()) {
                 Map<?, ?> row = (Map<?, ?>) iterator.nextValue();

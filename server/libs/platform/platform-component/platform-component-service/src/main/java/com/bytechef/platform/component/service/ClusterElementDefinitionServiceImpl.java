@@ -17,19 +17,30 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction;
+import com.bytechef.component.definition.ClusterElementDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
-import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
+import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -48,9 +59,90 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
+    public List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection componentConnection, ClusterElementContext context) {
+
+        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+        try {
+            com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction propertiesFunction =
+                getComponentPropertiesFunction(
+                    componentName, componentVersion, clusterElementNameName, propertyName,
+                    convertResult.inputParameters,
+                    convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
+
+            return propertiesFunction
+                .apply(
+                    convertResult.inputParameters, convertResult.connectionParameters,
+                    convertResult.lookupDependsOnPathsMap,
+                    context)
+                .stream()
+                .map(valueProperty -> (Property) Property.toProperty(valueProperty))
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(
+                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+        }
+    }
+
+    @Override
+    public List<Option> executeOptions(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection, ClusterElementContext context) {
+
+        try {
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+                componentName, componentVersion, clusterElementName, propertyName, convertResult.inputParameters(),
+                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+
+            return optionsFunction
+                .apply(
+                    convertResult.inputParameters(), convertResult.connectionParameters(),
+                    convertResult.lookupDependsOnPathsMap(), searchText, context)
+                .stream()
+                .map(Option::new)
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_OPTIONS);
+        }
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
+        ClusterElementContext context) {
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
+            componentDefinitionRegistry.getClusterElementDefinition(
+                componentName, componentVersion, clusterElementName);
+
+        try {
+            return clusterElementDefinition.getProcessErrorResponse()
+                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                    statusCode1, body1))
+                .apply(statusCode, body, context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, ClusterElementDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+        }
+    }
+
+    @Override
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, ActionContext context) {
+        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
         SingleConnectionToolFunction toolFunction = getClusterElement(
             componentName, componentVersion, clusterElementName);
@@ -66,7 +158,23 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 throw (ProviderException) e;
             }
 
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        ClusterElementContext context) {
+
+        WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
+            componentName, componentVersion, clusterElementName);
+
+        try {
+            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }
 
@@ -95,24 +203,28 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
             componentName, componentVersion, clusterElementName);
 
+        ComponentDefinition componentDefinition = result.componentDefinition;
+
         return new ClusterElementDefinition(
-            result.clusterElementDefinition, result.componentDefinition.getName(), componentVersion,
-            OptionalUtils.orElse(result.componentDefinition.getIcon(), null));
+            result.clusterElementDefinition, componentDefinition.getName(), componentVersion,
+            getIcon(componentDefinition));
     }
 
     @Override
     public List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getClusterElements()))
+            .filter(componentDefinition -> componentDefinition.getClusterElements()
+                .isPresent())
             .flatMap(componentDefinition -> CollectionUtils.stream(
-                OptionalUtils.get(componentDefinition.getClusterElements())
+                componentDefinition.getClusterElements()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Cluster elements not found in component %s".formatted(componentDefinition.getName())))
                     .stream()
-                    .filter(clusterElementDefinition -> clusterElementType.equals(
-                        clusterElementDefinition.getType()))
+                    .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
                     .map(clusterElementDefinition -> new ClusterElementDefinition(
                         clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
-                        OptionalUtils.orElse(componentDefinition.getIcon(), null)))
+                        getIcon(componentDefinition)))
                     .toList()))
             .distinct()
             .toList();
@@ -125,14 +237,14 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        return OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
+        String icon = getIcon(componentDefinition);
+
+        return componentDefinition.getClusterElements()
+            .orElse(List.of())
             .stream()
-            .map(
-                clusterElementDefinition -> (com.bytechef.component.definition.ClusterElementDefinition<?>) clusterElementDefinition)
             .filter(clusterElementDefinition -> clusterElementType == clusterElementDefinition.getType())
             .map(clusterElementDefinition -> new ClusterElementDefinition(
-                clusterElementDefinition, componentDefinition.getName(), componentVersion,
-                OptionalUtils.orElse(componentDefinition.getIcon(), null)))
+                clusterElementDefinition, componentDefinition.getName(), componentVersion, icon))
             .toList();
     }
 
@@ -163,26 +275,107 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return getClusterElementDefinitions(clusterElementType);
     }
 
+    private static ConvertResult convert(
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+
+        return new ConvertResult(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(
+                componentConnection == null ? Map.of() : componentConnection.parameters()),
+            getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
     private ComponentClusterElementDefinitionResult getComponentClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
+        List<com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
+            componentDefinition.getClusterElements()
+                .orElse(List.of());
+
         return new ComponentClusterElementDefinitionResult(
             componentDefinition,
-            OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
-                .stream()
-                .map(
-                    clusterElementDefinition -> (com.bytechef.component.definition.ClusterElementDefinition<?>) clusterElementDefinition)
+            clusterElementDefinitions.stream()
                 .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                     "Cluster element definition " + clusterElementName + " not found in component " + componentName)));
     }
 
+    private com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction
+        getComponentPropertiesFunction(
+            String componentName, int componentVersion, String clusterElementName, String propertyName,
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+            ClusterElementContext context) throws Exception {
+
+        DynamicPropertiesProperty dynamicPropertiesProperty = (DynamicPropertiesProperty) componentDefinitionRegistry
+            .getClusterElementProperty(
+                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+                connectionParameters, lookupDependsOnPaths, context);
+
+        PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
+
+        return (com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction) propertiesDataSource
+            .getProperties();
+    }
+
+    private OptionsFunction<?> getComponentOptionsFunction(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ClusterElementContext context) throws Exception {
+
+        DynamicOptionsProperty<?> dynamicOptionsProperty = (DynamicOptionsProperty<?>) componentDefinitionRegistry
+            .getClusterElementProperty(
+                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+                connectionParameters, lookupDependsOnPaths, context);
+
+        OptionsDataSource optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Options data source not found for property " + propertyName + " in cluster element " +
+                    clusterElementName));
+
+        return (OptionsFunction<?>) optionsDataSource.getOptions();
+    }
+
+    private static String getIcon(ComponentDefinition componentDefinition) {
+        return componentDefinition.getIcon()
+            .orElse(null);
+    }
+
+    private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {
+        return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
+    }
+
+    private WorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
+        String componentName, int componentVersion, String triggerName) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
+            componentDefinitionRegistry.getClusterElementDefinition(componentName, componentVersion, triggerName);
+
+        String componentTitle = componentDefinition.getTitle()
+            .orElse(componentDefinition.getName());
+        String operationTitle = clusterElementDefinition.getTitle()
+            .orElse(clusterElementDefinition.getName());
+        String operationDescription = clusterElementDefinition
+            .getDescription()
+            .orElse(null);
+
+        return clusterElementDefinition.getWorkflowNodeDescription()
+            .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
+                inputParameters, componentTitle, operationTitle, operationDescription));
+    }
+
     record ComponentClusterElementDefinitionResult(
         ComponentDefinition componentDefinition,
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition) {
+    }
+
+    private record ConvertResult(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPathsMap) {
     }
 }

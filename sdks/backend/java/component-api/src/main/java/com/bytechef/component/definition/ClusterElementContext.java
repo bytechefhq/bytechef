@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition.ai.agent;
-
-import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.definition.Parameters;
+package com.bytechef.component.definition;
 
 /**
  * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface SingleConnectionToolFunction extends ToolFunction {
-
-    /**
-     *
-     * @param inputParameters
-     * @param connectionParameters
-     * @param context
-     * @return
-     */
-    Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
-        throws Exception;
+public interface ClusterElementContext extends Context {
 }

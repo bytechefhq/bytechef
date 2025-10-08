@@ -21,13 +21,17 @@ import com.bytechef.component.airtable.datastream.AirtableItemReader;
 import com.bytechef.component.airtable.datastream.AirtableItemWriter;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
+
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 /**
  * @author Ivica Cardic
@@ -59,13 +63,17 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     }
 
     @Override
+    public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
+        return List.of(
+            AirtableItemReader.CLUSTER_ELEMENT_DEFINITION,
+            AirtableItemWriter.CLUSTER_ELEMENT_DEFINITION);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/airtable.svg")
-            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-            .clusterElements(
-                AirtableItemReader.CLUSTER_ELEMENT_DEFINITION,
-                AirtableItemWriter.CLUSTER_ELEMENT_DEFINITION);
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
     }
 }

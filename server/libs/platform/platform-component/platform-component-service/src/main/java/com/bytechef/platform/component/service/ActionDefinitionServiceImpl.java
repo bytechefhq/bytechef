@@ -308,6 +308,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return OptionalUtils.get(actionDefinition.getPerform()) instanceof SingleConnectionPerformFunction;
     }
 
+    private static ConvertResult convert(
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
+
+        return new ConvertResult(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
+            getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
     private ActionOptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String actionName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -370,15 +379,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         return SchemaUtils.toOutput(
             outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
-    }
-
-    private static ConvertResult convert(
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
-
-        return new ConvertResult(
-            ParametersFactory.createParameters(inputParameters),
-            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-            getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
     private record ConvertResult(

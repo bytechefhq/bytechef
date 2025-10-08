@@ -17,7 +17,7 @@
 package com.bytechef.component.datastream.item;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CLUSTER_ELEMENT_NAME;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_CONNECTION;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_NAME;
@@ -25,12 +25,15 @@ import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import java.util.Objects;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -40,20 +43,25 @@ import org.springframework.batch.core.annotation.BeforeStep;
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractItemDelegate {
+@SuppressFBWarnings("NP")
+public abstract class AbstractItemStreamDelegate {
 
     protected boolean editorEnvironment;
     protected String componentName;
     protected String clusterElementName;
     protected int componentVersion;
+    @Nullable
+    protected ComponentConnection componentConnection;
+    @Nullable
     protected Parameters connectionParameters;
-    protected ContextFactory contextFactory;
+    protected Context context;
     protected Parameters inputParameters;
     protected String tenantId;
 
     private final ClusterElementType clusterElementType;
+    private final ContextFactory contextFactory;
 
-    protected AbstractItemDelegate(ClusterElementType clusterElementType, ContextFactory contextFactory) {
+    protected AbstractItemStreamDelegate(ClusterElementType clusterElementType, ContextFactory contextFactory) {
         this.contextFactory = contextFactory;
         this.clusterElementType = clusterElementType;
     }
@@ -61,24 +69,29 @@ public abstract class AbstractItemDelegate {
     @BeforeStep
     @SuppressWarnings("unchecked")
     public void beforeStep(final StepExecution stepExecution) {
-        JobParameters jobParameters = stepExecution
-            .getJobExecution()
+        JobParameters jobParameters = stepExecution.getJobExecution()
             .getJobParameters();
 
-        JobParameter<?> jobParameter = Objects.requireNonNull(jobParameters.getParameter(clusterElementType.name()));
+        JobParameter<?> jobParameter = jobParameters.getParameter(clusterElementType.name());
+
+        if (jobParameter == null) {
+            return;
+        }
 
         Map<String, ?> clusterElementMap = (Map<String, ?>) jobParameter.getValue();
 
         componentName = MapUtils.getRequiredString(clusterElementMap, COMPONENT_NAME);
         componentVersion = MapUtils.getRequiredInteger(clusterElementMap, COMPONENT_VERSION);
         clusterElementName = MapUtils.getRequiredString(clusterElementMap, CLUSTER_ELEMENT_NAME);
+        componentConnection = MapUtils.get(clusterElementMap, COMPONENT_CONNECTION, ComponentConnection.class);
 
-        Map<String, ?> connectionParameterMap = MapUtils.getMap(clusterElementMap, CONNECTION_PARAMETERS);
+        connectionParameters = componentConnection == null
+            ? null : ParametersFactory.createParameters(componentConnection.getParameters());
 
-        connectionParameters = connectionParameterMap == null
-            ? null : ParametersFactory.createParameters(connectionParameterMap);
+        inputParameters = ParametersFactory.createParameters(
+            MapUtils.getRequiredMap(clusterElementMap, INPUT_PARAMETERS));
 
-        inputParameters = ParametersFactory.createParameters(MapUtils.getMap(clusterElementMap, INPUT_PARAMETERS));
+        context = contextFactory.createContext(componentName, componentConnection, editorEnvironment);
 
         jobParameter = Validate.notNull(jobParameters.getParameter(TENANT_ID), "tenantId is required");
 

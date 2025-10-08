@@ -34,6 +34,7 @@ import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -369,8 +370,18 @@ class ContextImpl implements Context {
     private record FileImpl(TempFileStorage tempFileStorage) implements File {
 
         @Override
-        public InputStream getStream(FileEntry fileEntry) {
-            return tempFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
+        public long getContentLength(FileEntry fileEntry) {
+            return tempFileStorage.getContentLength(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public InputStream getInputStream(FileEntry fileEntry) {
+            return tempFileStorage.getInputStream(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public OutputStream getOutputStream(FileEntry fileEntry) {
+            return tempFileStorage.getOutputStream(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
@@ -398,7 +409,7 @@ class ContextImpl implements Context {
                 tempFilePath = Files.createTempFile("context_", fileEntry.getName());
 
                 Files.copy(
-                    tempFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
+                    tempFileStorage.getInputStream(toFileEntry(fileEntry)), tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -409,7 +420,7 @@ class ContextImpl implements Context {
 
         @Override
         public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
-            InputStream inputStream = getStream(fileEntry);
+            InputStream inputStream = getInputStream(fileEntry);
 
             return inputStream.readAllBytes();
         }

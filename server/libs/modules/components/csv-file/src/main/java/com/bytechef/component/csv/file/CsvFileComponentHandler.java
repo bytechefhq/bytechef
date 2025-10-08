@@ -19,6 +19,7 @@ package com.bytechef.component.csv.file;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.csv.file.action.CsvFileAppendAction;
 import com.bytechef.component.csv.file.action.CsvFileReadAction;
 import com.bytechef.component.csv.file.action.CsvFileWriteAction;
 import com.bytechef.component.csv.file.datastream.CsvFileItemReader;
@@ -40,7 +41,8 @@ public class CsvFileComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             CsvFileReadAction.ACTION_DEFINITION,
-            CsvFileWriteAction.ACTION_DEFINITION)
+            CsvFileWriteAction.ACTION_DEFINITION,
+            CsvFileAppendAction.ACTION_DEFINITION)
         .clusterElements(
             CsvFileItemReader.CLUSTER_ELEMENT_DEFINITION,
             CsvFileItemWriter.CLUSTER_ELEMENT_DEFINITION);
