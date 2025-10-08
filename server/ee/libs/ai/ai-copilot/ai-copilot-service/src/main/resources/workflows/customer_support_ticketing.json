@@ -1,124 +1,124 @@
 {
-  "label" : "Customer Support Ticketing",
-  "description" : "Whenever a Hubspot ticket is created: analyse its contents and rewrite it in clear, concise, and organized format. Then determine if it's a tech or customer support ticket and send it to Notion. If it's customer support then send a notification message with the rewritten to #sales-team, and if it's tech send it to #tech-team.",
-  "inputs" : [ ],
-  "triggers" : [ {
-    "label" : "New Hubspot ticket is created",
-    "name" : "trigger_1",
-    "type" : "hubspot/v1/newTicket",
-    "parameters" : {
-      "appId" : "3642127"
+  "label": "Customer Support Ticketing",
+  "description": "Whenever a Hubspot ticket is created: analyse its contents and rewrite it in clear, concise, and organized format. Then determine if it's a tech or customer support ticket and send it to Notion. If it's customer support then send a notification message with the rewritten to #sales-team, and if it's tech send it to #tech-team.",
+  "inputs": [ ],
+  "triggers": [ {
+    "label": "New Hubspot ticket is created",
+    "name": "trigger_1",
+    "type": "hubspot/v1/newTicket",
+    "parameters": {
+      "appId": "3642127"
     },
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : { }
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": { }
       }
     }
   } ],
-  "tasks" : [ {
-    "label" : "Get the ticket from the trigger",
-    "name" : "hubspot_1",
-    "parameters" : {
-      "ticketId" : "${trigger_1.objectId}"
+  "tasks": [ {
+    "label": "Get the ticket from the trigger",
+    "name": "hubspot_1",
+    "parameters": {
+      "ticketId": "${trigger_1.objectId}"
     },
-    "type" : "hubspot/v1/getTicket",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : { }
+    "type": "hubspot/v1/getTicket",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": { }
       }
     },
-    "description" : "Fetches ticket information from Hubspot."
+    "description": "Fetches ticket information from Hubspot."
   }, {
-    "label" : "Rewrite Ticket Content",
-    "name" : "openAi_1",
-    "parameters" : {
-      "response" : {
-        "responseFormat" : "TEXT"
+    "label": "Rewrite Ticket Content",
+    "name": "openAi_1",
+    "parameters": {
+      "response": {
+        "responseFormat": "TEXT"
       },
-      "n" : 1,
-      "temperature" : 1,
-      "topP" : 1,
-      "frequencyPenalty" : 0,
-      "presencePenalty" : 0,
-      "model" : "gpt-4",
-      "messages" : [ {
-        "role" : "USER",
-        "content" : "Analyze the following customer support ticket and rewrite it in clear, concise, and organized format.\n\nEnsure the rewritten version includes:\n\nCustomer Issue:\nClearly state the problem or question raised by the customer.\n\nBackground Information: \nSummarize any context or details provided by the customer.\n\nRequested Action: Highlight what the customer wants or needs from support.\n\n\nTone: Use a professional and empathetic tone while simplifying the original text.\n\nOriginal ticket: ${hubspot_1.body.properties.content}, ${hubspot_1.body.properties.subject}\n\nTicket priority: ${hubspot_1.body.properties.hs_ticket_priority}"
+      "n": 1,
+      "temperature": 1,
+      "topP": 1,
+      "frequencyPenalty": 0,
+      "presencePenalty": 0,
+      "model": "gpt-4",
+      "messages": [ {
+        "role": "USER",
+        "content": "Analyze the following customer support ticket and rewrite it in clear, concise, and organized format.\n\nEnsure the rewritten version includes:\n\nCustomer Issue:\nClearly state the problem or question raised by the customer.\n\nBackground Information: \nSummarize any context or details provided by the customer.\n\nRequested Action: Highlight what the customer wants or needs from support.\n\n\nTone: Use a professional and empathetic tone while simplifying the original text.\n\nOriginal ticket: ${hubspot_1.body.properties.content}, ${hubspot_1.body.properties.subject}\n\nTicket priority: ${hubspot_1.body.properties.hs_ticket_priority}"
       } ]
     },
-    "type" : "openAi/v1/ask",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : { }
+    "type": "openAi/v1/ask",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": { }
       }
     },
-    "description" : "Use OpenAI to rewrite the ticket for clarity."
+    "description": "Use OpenAI to rewrite the ticket for clarity."
   }, {
-    "label" : "Categorize Ticket",
-    "name" : "openAi_2",
-    "parameters" : {
-      "response" : {
-        "responseFormat" : "JSON",
-        "responseSchema" : "{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"category\":{\"type\":\"string\",\"title\":\"category\"}},\"required\":[],\"type\":\"object\",\"title\":\"ticket\"}"
+    "label": "Categorize Ticket",
+    "name": "openAi_2",
+    "parameters": {
+      "response": {
+        "responseFormat": "JSON",
+        "responseSchema": "{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"category\":{\"type\":\"string\",\"title\":\"category\"}},\"required\":[],\"type\":\"object\",\"title\":\"ticket\"}"
       },
-      "n" : 1,
-      "temperature" : 1,
-      "topP" : 1,
-      "frequencyPenalty" : 0,
-      "presencePenalty" : 0,
-      "model" : "gpt-4",
-      "messages" : [ {
-        "role" : "user",
-        "content" : "Read the following customer support ticket and categorize it into one of the following categories: tech or customer support. \n\nTicket: ${hubspot_1.body.properties.subject}, ${hubspot_1.body.properties.content}"
+      "n": 1,
+      "temperature": 1,
+      "topP": 1,
+      "frequencyPenalty": 0,
+      "presencePenalty": 0,
+      "model": "gpt-4",
+      "messages": [ {
+        "role": "user",
+        "content": "Read the following customer support ticket and categorize it into one of the following categories: tech or customer support. \n\nTicket: ${hubspot_1.body.properties.subject}, ${hubspot_1.body.properties.content}"
       } ]
     },
-    "type" : "openAi/v1/ask",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : { }
+    "type": "openAi/v1/ask",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": { }
       }
     },
-    "description" : "Use OpenAI to categorize the ticket as either tech or customer support."
+    "description": "Use OpenAI to categorize the ticket as either tech or customer support."
   }, {
-    "description" : "Directs a stream based on true/false results of comparisons.",
-    "label" : "Notify appropriate team",
-    "name" : "condition_1",
-    "parameters" : {
-      "rawExpression" : true,
-      "caseFalse" : [ {
-        "label" : "Notify Sales Team",
-        "name" : "slack_2",
-        "parameters" : {
-          "channel" : "C08803FUJ7P",
-          "text" : "Hey #sales-team,\n\nA new customer support ticket has been assigned to your team. Please review the details below and assist the customer as soon as possible.\n\nRewritten Ticket Details:\n${openAi_1}"
+    "description": "Directs a stream based on true/false results of comparisons.",
+    "label": "Notify appropriate team",
+    "name": "condition_1",
+    "parameters": {
+      "rawExpression": true,
+      "caseFalse": [ {
+        "label": "Notify Sales Team",
+        "name": "slack_2",
+        "parameters": {
+          "channel": "C08803FUJ7P",
+          "text": "Hey #sales-team,\n\nA new customer support ticket has been assigned to your team. Please review the details below and assist the customer as soon as possible.\n\nRewritten Ticket Details:\n${openAi_1}"
         },
-        "type" : "slack/v1/sendMessage",
-        "metadata" : {
-          "ui" : {
-            "dynamicPropertyTypes" : { }
+        "type": "slack/v1/sendMessage",
+        "metadata": {
+          "ui": {
+            "dynamicPropertyTypes": { }
           }
         }
       } ],
-      "caseTrue" : [ {
-        "label" : "Notify Tech Team",
-        "name" : "slack_1",
-        "parameters" : {
-          "channel" : "C0882TX7MJ6",
-          "text" : "Hey #tech-team\n\nA new technical support ticket has been assigned to your team. Please review the details below and address the issue promptly.\n\nRewritten Ticket Details:\n${openAi_1}"
+      "caseTrue": [ {
+        "label": "Notify Tech Team",
+        "name": "slack_1",
+        "parameters": {
+          "channel": "C0882TX7MJ6",
+          "text": "Hey #tech-team\n\nA new technical support ticket has been assigned to your team. Please review the details below and address the issue promptly.\n\nRewritten Ticket Details:\n${openAi_1}"
         },
-        "type" : "slack/v1/sendMessage",
-        "metadata" : {
-          "ui" : {
-            "dynamicPropertyTypes" : { }
+        "type": "slack/v1/sendMessage",
+        "metadata": {
+          "ui": {
+            "dynamicPropertyTypes": { }
           }
         }
       } ],
-      "expression" : "'${openAi_2.category}'=='tech'"
+      "expression": "'${openAi_2.category}'=='tech'"
     },
-    "type" : "condition/v1",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : { }
+    "type": "condition/v1",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": { }
       }
     }
   } ]
