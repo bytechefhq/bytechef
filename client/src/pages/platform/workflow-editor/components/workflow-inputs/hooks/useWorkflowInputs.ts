@@ -184,35 +184,6 @@ export default function useWorkflowInputs({
                     });
                 },
                 onSuccess: async () => {
-                    if (!getValues().testValue) {
-                        setWorkflow({
-                            ...workflow,
-                            inputs,
-                            version: (workflow.version ?? 0) + 1,
-                        });
-
-                        form.reset({
-                            label: '',
-                            name: '',
-                            required: false,
-                            testValue: '',
-                            type: undefined,
-                        });
-
-                        setTimeout(() => {
-                            const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement;
-                            if (nameInput) {
-                                nameInput.focus();
-                            }
-                        }, 0);
-
-                        invalidateWorkflowQueries();
-
-                        closeEditDialog();
-
-                        return;
-                    }
-
                     saveWorkflowTestConfigurationInputsMutation.mutate({
                         environmentId: currentEnvironmentId,
                         saveWorkflowTestConfigurationInputsRequest: {
