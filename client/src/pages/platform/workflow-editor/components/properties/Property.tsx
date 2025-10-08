@@ -1091,7 +1091,7 @@ const Property = ({
                                         {description && (
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <CircleQuestionMarkIcon className="ml-1" />
+                                                    <CircleQuestionMarkIcon className="ml-1 size-3.5" />
                                                 </TooltipTrigger>
 
                                                 <TooltipPortal>

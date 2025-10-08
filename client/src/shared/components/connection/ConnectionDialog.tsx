@@ -800,7 +800,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
 
             <Tooltip>
                 <TooltipTrigger>
-                    <CircleQuestionMarkIcon />
+                    <CircleQuestionMarkIcon className="size-3.5" />
                 </TooltipTrigger>
 
                 <TooltipContent>OAuth permission scopes used for this connection.</TooltipContent>

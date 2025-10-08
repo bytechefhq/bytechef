@@ -59,7 +59,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                                 {description && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <CircleQuestionMarkIcon />
+                                            <CircleQuestionMarkIcon className="size-3.5" />
                                         </TooltipTrigger>
 
                                         <TooltipContent>{description}</TooltipContent>

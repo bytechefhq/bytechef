@@ -83,7 +83,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             {description && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <CircleQuestionMarkIcon />
+                                        <CircleQuestionMarkIcon className="size-3.5" />
                                     </TooltipTrigger>
 
                                     <TooltipContent>{description}</TooltipContent>

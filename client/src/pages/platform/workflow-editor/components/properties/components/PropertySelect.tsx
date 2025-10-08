@@ -54,7 +54,7 @@ const PropertySelect = ({
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <CircleQuestionMarkIcon />
+                                <CircleQuestionMarkIcon className="size-3.5" />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>
