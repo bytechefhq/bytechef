@@ -23,6 +23,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDynamicPropertiesFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final Evaluator evaluator;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -51,12 +53,14 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDynamicPropertiesFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        Evaluator evaluator, TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
+        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -93,7 +97,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        return actionDefinitionFacade.executeDynamicProperties(
+        return clusterElementDefinitionFacade.executeDynamicProperties(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName, workflowId,
             evaluator.evaluate(

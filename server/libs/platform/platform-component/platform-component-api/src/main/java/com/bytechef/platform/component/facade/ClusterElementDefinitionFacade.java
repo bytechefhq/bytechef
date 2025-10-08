@@ -17,7 +17,11 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.ModeType;
+
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -25,6 +29,14 @@ import javax.annotation.Nullable;
  * @author Ivica Cardic
  */
 public interface ClusterElementDefinitionFacade {
+
+    List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementName, String propertyName, String workflowId,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId);
+
+    List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId);
 
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,

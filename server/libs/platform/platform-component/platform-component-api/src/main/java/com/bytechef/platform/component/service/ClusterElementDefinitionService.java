@@ -20,6 +20,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.Property;
+
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -28,6 +31,16 @@ import javax.annotation.Nullable;
  * @author Ivica Cardic
  */
 public interface ClusterElementDefinitionService {
+
+    List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection connection, ActionContext context);
+
+    List<Option> executeOptions(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection connection, ActionContext context);
 
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,

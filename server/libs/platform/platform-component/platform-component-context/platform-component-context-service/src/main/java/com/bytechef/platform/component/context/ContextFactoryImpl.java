@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
@@ -78,17 +79,20 @@ public class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public Context createContext(String componentName, @Nullable ComponentConnection connection) {
-        return createContext(componentName, connection, false);
+    public Context createContext(String componentName, @Nullable ComponentConnection componentConnection) {
+        return new ContextImpl(
+            componentName, -1, null, componentConnection, false, getHttpClientExecutor(false),
+            getTempFileStorage(false));
     }
 
     @Override
-    public Context createContext(
-        String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment) {
+    public ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        return new ContextImpl(
-            componentName, -1, null, connection, getHttpClientExecutor(editorEnvironment),
-            getTempFileStorage(editorEnvironment));
+        return new ClusterElementContextImpl(
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment,
+            getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment));
     }
 
     @Override

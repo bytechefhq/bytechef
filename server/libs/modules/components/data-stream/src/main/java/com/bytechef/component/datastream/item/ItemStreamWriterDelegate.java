@@ -32,12 +32,13 @@ import org.springframework.batch.item.ItemStreamWriter;
 /**
  * @author Ivica Cardic
  */
-public class ItemWriterDelegate extends AbstractItemDelegate implements ItemStreamWriter<Map<String, ?>> {
+public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
+    implements ItemStreamWriter<Map<String, Object>> {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private ItemWriter itemWriter;
 
-    public ItemWriterDelegate(
+    public ItemStreamWriterDelegate(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
 
         super(DESTINATION, contextFactory);
@@ -47,29 +48,28 @@ public class ItemWriterDelegate extends AbstractItemDelegate implements ItemStre
 
     @Override
     public void close() throws ItemStreamException {
-        if (itemWriter != null) {
-            itemWriter.close();
-        }
+        itemWriter.close();
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
+
         TenantUtils.runWithTenantId(
             tenantId, () -> itemWriter.open(
-                inputParameters, connectionParameters,
-                new ExecutionContextImpl(
-                    contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
+                inputParameters, connectionParameters, context, itemStreamExecutionContext));
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
+        ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
+
         TenantUtils.runWithTenantId(tenantId, () -> itemWriter.update(
-            new ExecutionContextImpl(
-                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
+            inputParameters, connectionParameters, context, itemStreamExecutionContext));
     }
 
     @Override
-    public void write(Chunk<? extends Map<String, ?>> chunk) {
+    public void write(Chunk<? extends Map<String, Object>> chunk) {
         TenantUtils.runWithTenantId(tenantId, () -> itemWriter.write(chunk.getItems()));
     }
 

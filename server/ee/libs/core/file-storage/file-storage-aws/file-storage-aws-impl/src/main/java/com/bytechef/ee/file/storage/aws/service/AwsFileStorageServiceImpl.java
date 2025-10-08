@@ -15,9 +15,9 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -69,6 +69,13 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    public long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException {
+        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+
+        return s3Resource.contentLength();
+    }
+
+    @Override
     public FileEntry getFileEntry(String directory, String filename) {
         S3Resource s3Resource = getObject(directory, filename);
 
@@ -88,16 +95,33 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directory, FileEntry fileEntry) {
-        return new ByteArrayInputStream(readFileToBytes(directory, fileEntry));
-    }
-
-    @Override
     public URL getFileEntryURL(String directory, FileEntry fileEntry) {
         S3Resource s3Resource = getObject(directory, fileEntry.getName());
 
         try {
             return s3Resource.getURL();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public InputStream getInputStream(String directory, FileEntry fileEntry) {
+        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+
+        try {
+            return s3Resource.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
+        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+
+        try {
+            return s3Resource.getOutputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
