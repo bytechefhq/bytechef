@@ -193,7 +193,10 @@ const PropertyMultiSelect = ({
                         {description && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <CircleQuestionMarkIcon />
+                                    <CircleQuestionMarkIcon
+                                        className="size-4 text-muted-foreground"
+                                        strokeWidth={1.75}
+                                    />
                                 </TooltipTrigger>
 
                                 <TooltipContent>{description}</TooltipContent>

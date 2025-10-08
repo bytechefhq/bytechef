@@ -66,7 +66,10 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                             {description && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <CircleQuestionMarkIcon />
+                                        <CircleQuestionMarkIcon
+                                            className="ml-1 size-4 text-muted-foreground"
+                                            strokeWidth={1.75}
+                                        />
                                     </TooltipTrigger>
 
                                     <TooltipContent>{description}</TooltipContent>
