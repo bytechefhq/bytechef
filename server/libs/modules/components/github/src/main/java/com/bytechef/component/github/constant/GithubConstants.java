@@ -43,6 +43,10 @@ public class GithubConstants {
     public static final String REPOSITORY = "repository";
     public static final String STATE = "state";
     public static final String TITLE = "title";
+    public static final String HEAD = "head";
+    public static final String HEAD_REPO = "head_repo";
+    public static final String BASE = "base";
+    public static final String DRAFT = "draft";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object().properties(
         string("url")
@@ -89,6 +93,13 @@ public class GithubConstants {
         .description("The owner of the repository (user or organization).")
         .exampleValue("bytechefhq")
         .required(true);
+
+    public static final ModifiableObjectProperty PULL_REQUEST_OUTPUT_PROBERTY = object("pull_request")
+        .properties(
+            string("url")
+                .description("The URL of the created pull request."),
+            integer(ID)
+                .description("ID of the created pull request."));
 
     private GithubConstants() {
     }
