@@ -137,8 +137,11 @@ public final class SendgridSendEmailAction {
     }
 
     private static List<Map<String, Object>> getAllAttachments(List<FileEntry> attachmentFiles, Context context) {
-        List<Map<String, Object>> allAttachments = new ArrayList<>();
+        if (attachmentFiles == null) {
+            return Collections.emptyList();
+        }
 
+        List<Map<String, Object>> allAttachments = new ArrayList<>();
         for (FileEntry attachment : attachmentFiles) {
             String fileContent = context.file(file -> ENCODER.encodeToString(file.readAllBytes(attachment)));
 
