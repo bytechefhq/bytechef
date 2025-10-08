@@ -182,7 +182,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
                         {currentComponent && (
                             <>
-                                <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
+                                <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton className="right-0" />}>
                                     <WorkflowNodeDetailsPanel
                                         className="fixed inset-y-0 right-0 rounded-l-none border-none"
                                         invalidateWorkflowQueries={invalidateWorkflowQueries!}
