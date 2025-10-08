@@ -23,14 +23,7 @@ import static com.bytechef.component.github.connection.GithubConnection.CONNECTI
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.github.action.GithubAddAssigneesToIssueAction;
-import com.bytechef.component.github.action.GithubAddLabelsToIssueAction;
-import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
-import com.bytechef.component.github.action.GithubCreateIssueAction;
-import com.bytechef.component.github.action.GithubGetIssueAction;
-import com.bytechef.component.github.action.GithubListIssuesAction;
-import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
-import com.bytechef.component.github.action.GithubStarRepositoryAction;
+import com.bytechef.component.github.action.*;
 import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
 import com.bytechef.component.github.trigger.GithubNewPullRequestTrigger;
 import com.google.auto.service.AutoService;
@@ -65,7 +58,8 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubGetIssueAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
-            tool(GithubStarRepositoryAction.ACTION_DEFINITION))
+            tool(GithubStarRepositoryAction.ACTION_DEFINITION),
+            tool(GitHubCreatePullRequestAction.ACTION_DEFINITION))
         .triggers(
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
             GithubNewPullRequestTrigger.TRIGGER_DEFINITION);
