@@ -380,13 +380,12 @@ public class ComponentDefinitionRegistry {
                         inputParameters, connectionParameters, lookupDependsOnPaths, (ActionContext) context);
                 } else if (propertiesFunction instanceof ClusterElementDefinition.PropertiesFunction clusterElementPropertiesFunction) {
 
-                    dynamicPropertyProperties = clusterElementPropertiesFunction
-                        .apply(
-                            inputParameters, connectionParameters, lookupDependsOnPaths,
-                            (ClusterElementContext) context);
+                    dynamicPropertyProperties = clusterElementPropertiesFunction.apply(
+                        inputParameters, connectionParameters, lookupDependsOnPaths,
+                        (ClusterElementContext) context);
                 } else {
-                    dynamicPropertyProperties = ((PropertiesFunction) propertiesFunction)
-                        .apply(inputParameters, connectionParameters, lookupDependsOnPaths, (TriggerContext) context);
+                    dynamicPropertyProperties = ((PropertiesFunction) propertiesFunction).apply(
+                        inputParameters, connectionParameters, lookupDependsOnPaths, (TriggerContext) context);
                 }
 
                 return getProperty(
