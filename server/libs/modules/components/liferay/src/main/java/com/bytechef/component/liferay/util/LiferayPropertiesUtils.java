@@ -60,36 +60,43 @@ public class LiferayPropertiesUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        String[] endpointParts = inputParameters.getRequiredString(ENDPOINT)
-            .split(" ");
+        String endpoint = inputParameters.getRequiredString(ENDPOINT);
+
+        String[] endpointParts = endpoint.split(" ");
+
         String method = endpointParts[0].toLowerCase();
-        String endpoint = endpointParts[1];
+        String endpointUrl = endpointParts[1];
 
         List<Map<String, Object>> parameters = new ArrayList<>();
 
         String version = "";
+
         if (body.get("info") instanceof Map<?, ?> info) {
-            version = info.get("version")
-                .toString();
+            version = String.valueOf(info.get("version"));
         }
 
         if (body.get("paths") instanceof Map<?, ?> paths) {
             for (Map.Entry<?, ?> pathEntry : paths.entrySet()) {
-                String pathKey = pathEntry.getKey()
-                    .toString();
+                String pathKey = String.valueOf(pathEntry.getKey());
 
-                if (pathKey
-                    .replaceFirst("/" + version, "")
-                    .equals(endpoint)) {
+                String replaceFirst = pathKey.replaceFirst("/" + version, "");
+
+                if (replaceFirst.equals(endpointUrl)) {
                     Object path = pathEntry.getValue();
+
                     if (path instanceof Map<?, ?> pathObj) {
                         Object methodObj = pathObj.get(method);
-                        if (methodObj instanceof Map<?, ?> methods) {
 
+                        if (methodObj instanceof Map<?, ?> methods) {
                             if (methods.get("parameters") instanceof List<?> parametersList) {
-                                for (Object param : parametersList) {
-                                    if (param instanceof Map<?, ?> paramMap) {
-                                        parameters.add((Map<String, Object>) paramMap);
+                                for (Object parametersObj : parametersList) {
+                                    if (parametersObj instanceof Map<?, ?> parametersMap) {
+                                        Map<String, Object> parametersTypedMap = new HashMap<>();
+
+                                        parametersMap.forEach(
+                                            (key, value) -> parametersTypedMap.put(String.valueOf(key), value));
+
+                                        parameters.add(parametersTypedMap);
                                     }
                                 }
                             }
@@ -98,8 +105,10 @@ public class LiferayPropertiesUtils {
                                 requestBody.get("content") instanceof Map<?, ?> content) {
 
                                 Object jsonContent = content.get("application/json");
-                                if (jsonContent instanceof Map<?, ?> jsonContentMap
-                                    && jsonContentMap.get("schema") instanceof Map<?, ?> schema) {
+
+                                if (jsonContent instanceof Map<?, ?> jsonContentMap &&
+                                    jsonContentMap.get("schema") instanceof Map<?, ?> schema) {
+
                                     parameters.addAll(extractPropertiesFromSchema(schema, body));
                                 }
                             }
@@ -109,26 +118,28 @@ public class LiferayPropertiesUtils {
             }
         }
 
-        return new ArrayList<>(parameters.stream()
-            .map(p -> createProperty((Map<String, ?>) p))
-            .filter(Objects::nonNull)
-            .toList());
+        return new ArrayList<>(
+            parameters.stream()
+                .map(LiferayPropertiesUtils::createProperty)
+                .filter(Objects::nonNull)
+                .toList());
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(
-        Map<?, ?> schema, Map<String, ?> fullSpec) {
+        Map<?, ?> schema, Map<String, ?> specification) {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
         if (schema.containsKey("$ref")) {
             String ref = (String) schema.get("$ref");
+
             String component = ref.replace("#/components/schemas/", "");
 
-            if (fullSpec.get("components") instanceof Map<?, ?> components &&
+            if (specification.get("components") instanceof Map<?, ?> components &&
                 components.get("schemas") instanceof Map<?, ?> schemas &&
                 schemas.get(component) instanceof Map<?, ?> referencedSchema) {
 
-                return extractPropertiesFromSchema(referencedSchema, fullSpec);
+                return extractPropertiesFromSchema(referencedSchema, specification);
             }
         }
 
@@ -137,58 +148,64 @@ public class LiferayPropertiesUtils {
         }
 
         for (Map.Entry<?, ?> entry : props.entrySet()) {
-            String propName = entry.getKey()
-                .toString();
-            Object propValue = entry.getValue();
+            String key = String.valueOf(entry.getKey());
+            Object value = entry.getValue();
 
-            if (!(propValue instanceof Map<?, ?> propSchema)) {
+            if (!(value instanceof Map<?, ?> propertySchema)) {
                 continue;
             }
 
-            Object readOnly = propSchema.get("readOnly");
+            Object readOnly = propertySchema.get("readOnly");
+
             if (Boolean.TRUE.equals(readOnly)) {
                 continue;
             }
 
-            String type = (String) propSchema.get("type");
+            String type = (String) propertySchema.get("type");
 
-            if ("object".equals(type) && propSchema.containsKey("properties")) {
-                result.addAll(extractPropertiesFromSchema(propSchema, fullSpec));
+            if ("object".equals(type) && propertySchema.containsKey("properties")) {
+                result.addAll(extractPropertiesFromSchema(propertySchema, specification));
+
                 continue;
             }
 
-            if (propSchema.containsKey("$ref")) {
-                String ref = (String) propSchema.get("$ref");
+            if (propertySchema.containsKey("$ref")) {
+                String ref = (String) propertySchema.get("$ref");
+
                 String component = ref.replace("#/components/schemas/", "");
 
-                if (fullSpec.get("components") instanceof Map<?, ?> components &&
+                if (specification.get("components") instanceof Map<?, ?> components &&
                     components.get("schemas") instanceof Map<?, ?> schemas &&
                     schemas.get(component) instanceof Map<?, ?> nestedSchema) {
 
-                    result.addAll(extractPropertiesFromSchema(nestedSchema, fullSpec));
+                    result.addAll(extractPropertiesFromSchema(nestedSchema, specification));
+
                     continue;
                 }
             }
 
             Map<String, Object> field = new HashMap<>();
-            field.put("name", propName);
+
+            field.put("name", key);
             field.put("schema", Map.of("type", type != null ? type : "string"));
             field.put("in", "body");
             field.put("required", true);
+
             result.add(field);
         }
 
         return result;
     }
 
-    private static ModifiableValueProperty<?, ?> createProperty(Map<String, ?> parameters) {
+    private static ModifiableValueProperty<?, ?> createProperty(Map<String, ?> parameterMap) {
+        String in = (String) parameterMap.get("in");
 
-        String in = (String) parameters.get("in");
         if (in == null) {
             return null;
         }
 
-        String name = (String) parameters.get("name");
+        String name = (String) parameterMap.get("name");
+
         if (name == null) {
             return null;
         }
@@ -201,17 +218,19 @@ public class LiferayPropertiesUtils {
             default -> throw new IllegalArgumentException("Unknown parameter type: " + in);
         }
 
-        Object schemaObj = parameters.get("schema");
+        Object schemaObj = parameterMap.get("schema");
+
         if (!(schemaObj instanceof Map<?, ?> schema)) {
             return null;
         }
 
         String type = (String) schema.get("type");
+
         if (type == null) {
             return null;
         }
 
-        boolean required = parameters.get("required") != null;
+        boolean required = parameterMap.get("required") != null;
 
         return switch (type) {
             case "boolean" -> bool(name)
@@ -235,7 +254,6 @@ public class LiferayPropertiesUtils {
                     string()
                         .options())
                 .required(required);
-
             default -> null;
         };
     }
