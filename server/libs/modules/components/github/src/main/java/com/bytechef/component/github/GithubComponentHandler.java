@@ -23,6 +23,7 @@ import static com.bytechef.component.github.connection.GithubConnection.CONNECTI
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.github.action.GitHubCreatePullRequestAction;
 import com.bytechef.component.github.action.GithubAddAssigneesToIssueAction;
 import com.bytechef.component.github.action.GithubAddLabelsToIssueAction;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
@@ -53,6 +54,7 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubAddLabelsToIssueAction.ACTION_DEFINITION,
             GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
             GithubCreateIssueAction.ACTION_DEFINITION,
+            GitHubCreatePullRequestAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
@@ -63,6 +65,7 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubAddLabelsToIssueAction.ACTION_DEFINITION),
             tool(GithubCreateCommentOnIssueAction.ACTION_DEFINITION),
             tool(GithubCreateIssueAction.ACTION_DEFINITION),
+            tool(GitHubCreatePullRequestAction.ACTION_DEFINITION),
             tool(GithubGetIssueAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
