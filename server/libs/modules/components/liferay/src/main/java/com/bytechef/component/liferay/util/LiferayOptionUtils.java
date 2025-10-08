@@ -82,22 +82,22 @@ public class LiferayOptionUtils {
             .getBody(new TypeReference<>() {});
 
         String version = "";
+
         if (body.get("info") instanceof Map<?, ?> info) {
-            version = info.get("version")
-                .toString();
+            version = String.valueOf(info.get("version"));
         }
 
         if (body.get("paths") instanceof Map<?, ?> paths) {
             for (Map.Entry<?, ?> pathEntry : paths.entrySet()) {
-                String endpoint = pathEntry.getKey()
-                    .toString();
+                String endpoint = String.valueOf(pathEntry.getKey());
                 Object methodsObj = pathEntry.getValue();
 
                 if (methodsObj instanceof Map<?, ?> methods) {
                     for (Map.Entry<?, ?> methodEntry : methods.entrySet()) {
-                        String method = methodEntry.getKey()
-                            .toString()
-                            .toUpperCase();
+                        String key = String.valueOf(methodEntry.getKey());
+
+                        String method = key.toUpperCase();
+
                         String label = method + " " + endpoint;
 
                         String value = method + " " + endpoint.replaceFirst("/" + version, "");
@@ -107,6 +107,7 @@ public class LiferayOptionUtils {
                 }
             }
         }
+
         return options;
     }
 }

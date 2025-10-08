@@ -72,93 +72,75 @@ public class LiferayHeadlessAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String baseUri = connectionParameters.getRequiredString(BASE_URI);
+        String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
-        String[] endpointParts = inputParameters.getRequiredString(ENDPOINT)
-            .split(" ");
+        String[] endpointParts = endpoint.split(" ");
         String method = endpointParts[0];
-        String endpoint = endpointParts[1];
+        String endpointUrl = endpointParts[1];
 
-        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpoint;
+        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointUrl;
 
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
 
         Map<String, ?> body = Map.of();
         Map<String, List<String>> headers = Map.of();
-        Map<String, List<String>> queryParams = Map.of();
-        Map<String, ?> pathParams = Map.of();
+        Map<String, List<String>> queryParameters = Map.of();
+        Map<String, ?> pathParameters = Map.of();
 
         if (properties != null) {
             body = BODY_PARAMETERS.stream()
                 .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> properties.get(p)
-                    .toString()));
+                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
 
             BODY_PARAMETERS.clear();
 
             headers = HEADER_PARAMETERS.stream()
                 .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(properties.get(p)
-                    .toString())));
+                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
 
             HEADER_PARAMETERS.clear();
 
-            queryParams = QUERY_PARAMETERS.stream()
+            queryParameters = QUERY_PARAMETERS.stream()
                 .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(properties.get(p)
-                    .toString())));
+                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
 
             QUERY_PARAMETERS.clear();
 
-            pathParams = PATH_PARAMETERS.stream()
+            pathParameters = PATH_PARAMETERS.stream()
                 .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> properties.get(p)
-                    .toString()));
+                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
 
             PATH_PARAMETERS.clear();
         }
 
-        for (Map.Entry<String, ?> entry : pathParams.entrySet()) {
+        for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue()
-                .toString();
+            String value = String.valueOf(entry.getValue());
+
             endpointUri = endpointUri.replace("{" + key + "}", value);
         }
 
-        final String finalEndpointUri = endpointUri;
+        Executor executor = getExecutor(context, method, endpointUri);
 
-        Executor request = context.http(http -> {
-            Executor req;
-
-            switch (method) {
-                case "GET" -> req = http.get(finalEndpointUri);
-                case "POST" -> req = http.post(finalEndpointUri);
-                case "PUT" -> req = http.put(finalEndpointUri);
-                case "PATCH" -> req = http.patch(finalEndpointUri);
-                case "DELETE" -> req = http.delete(finalEndpointUri);
-                case "HEAD" -> req = http.head(finalEndpointUri);
-                default ->
-                    throw new IllegalArgumentException("Unknown HTTP method: " + method);
-            }
-
-            return req;
-        });
-
-        Response response = request
-            .headers(headers)
-            .queryParameters(queryParams)
+        Response response = executor.headers(headers)
+            .queryParameters(queryParameters)
             .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(responseType(ResponseType.JSON))
             .body(Body.of(body))
             .execute();
 
-        int statusCode = response.getStatusCode();
+        return response.getBody();
+    }
 
-        if ((statusCode >= 200) && (statusCode < 300)) {
-            return response.getBody();
-        }
-
-        context.log(log -> log.warn("Received response code {}, from endpoint {}", statusCode, finalEndpointUri));
-
-        return endpoint;
+    private static Executor getExecutor(Context context, String method, String finalEndpointUri) {
+        return context.http(http -> switch (method) {
+            case "GET" -> http.get(finalEndpointUri);
+            case "POST" -> http.post(finalEndpointUri);
+            case "PUT" -> http.put(finalEndpointUri);
+            case "PATCH" -> http.patch(finalEndpointUri);
+            case "DELETE" -> http.delete(finalEndpointUri);
+            case "HEAD" -> http.head(finalEndpointUri);
+            default -> throw new IllegalArgumentException("Unknown HTTP method: " + method);
+        });
     }
 }
