@@ -153,7 +153,7 @@ export function JobBasicToJSONTyped(value?: Omit<JobBasic, 'createdBy'|'createdD
 
     return {
         
-        'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),
+        'endDate': value['endDate'] == null ? value['endDate'] : value['endDate'].toISOString(),
     };
 }
 
