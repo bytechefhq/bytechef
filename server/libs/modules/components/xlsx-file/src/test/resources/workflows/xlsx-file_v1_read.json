@@ -1,22 +1,22 @@
 {
-  "label" : "XLSX File - READ operation",
-  "inputs" : [ {
-    "name" : "fileEntry",
-    "label" : "File property",
-    "type" : "FILE_ENTRY",
-    "required" : true
+  "label": "XLSX File - READ operation",
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "readXlsxFile",
-    "value" : "${readXlsxFile}"
+  "outputs": [ {
+    "name": "readXlsxFile",
+    "value": "${readXlsxFile}"
   } ],
-  "tasks" : [ {
-    "name" : "readXlsxFile",
-    "label" : "Read from the XLSX file",
-    "type" : "xlsxFile/v1/read",
-    "parameters" : {
-      "fileEntry" : "${fileEntry}",
-      "includeEmptyCells" : true
+  "tasks": [ {
+    "name": "readXlsxFile",
+    "label": "Read from the XLSX file",
+    "type": "xlsxFile/v1/read",
+    "parameters": {
+      "fileEntry": "${fileEntry}",
+      "includeEmptyCells": true
     }
   } ]
 }

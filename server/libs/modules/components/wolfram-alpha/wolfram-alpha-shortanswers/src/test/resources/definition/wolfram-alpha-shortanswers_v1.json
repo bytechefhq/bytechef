@@ -1,384 +1,384 @@
 {
-  "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Returns a short answer for your query.",
-    "help" : null,
-    "metadata" : {
-      "method" : "GET",
-      "path" : "/result"
+  "actions": [ {
+    "batch": null,
+    "deprecated": null,
+    "description": "Returns a short answer for your query.",
+    "help": null,
+    "metadata": {
+      "method": "GET",
+      "path": "/result"
     },
-    "name" : "getShortAnswer",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "controlType" : "TEXT",
-          "defaultValue" : null,
-          "description" : "Short answer for query.",
-          "displayCondition" : null,
-          "exampleValue" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "label" : null,
-          "languageId" : null,
-          "maxLength" : null,
-          "metadata" : {
-            "responseType" : {
-              "contentType" : "text/plain",
-              "type" : "TEXT"
+    "name": "getShortAnswer",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Short answer for query.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "responseType": {
+              "contentType": "text/plain",
+              "type": "TEXT"
             }
           },
-          "minLength" : null,
-          "name" : null,
-          "options" : null,
-          "optionsDataSource" : null,
-          "optionsLoadedDynamically" : null,
-          "placeholder" : null,
-          "regex" : null,
-          "required" : null,
-          "type" : "STRING"
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
         },
-        "placeholder" : null,
-        "sampleOutput" : null
+        "placeholder": null,
+        "sampleOutput": null
       },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : "Short answer for query.",
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : null,
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : {
-          "responseType" : {
-            "contentType" : "text/plain",
-            "type" : "TEXT"
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Short answer for query.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": {
+          "responseType": {
+            "contentType": "text/plain",
+            "type": "TEXT"
           }
         },
-        "minLength" : null,
-        "name" : null,
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : null,
-        "type" : "STRING"
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
       },
-      "sampleOutput" : null
+      "sampleOutput": null
     },
-    "perform" : null,
-    "processErrorResponse" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "TEXT",
-      "defaultValue" : null,
-      "description" : "Query that will be answered.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Query",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : {
-        "type" : "QUERY"
+    "perform": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Query that will be answered.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Query",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
       },
-      "minLength" : null,
-      "name" : "i",
-      "options" : null,
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : true,
-      "type" : "STRING"
+      "minLength": null,
+      "name": "i",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
     }, {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : "What system of units to use for measurements and quantities.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Units",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : {
-        "type" : "QUERY"
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "What system of units to use for measurements and quantities.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Units",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
       },
-      "minLength" : null,
-      "name" : "units",
-      "options" : [ {
-        "description" : null,
-        "label" : "Metric",
-        "value" : "metric"
+      "minLength": null,
+      "name": "units",
+      "options": [ {
+        "description": null,
+        "label": "Metric",
+        "value": "metric"
       }, {
-        "description" : null,
-        "label" : "Imperial",
-        "value" : "imperial"
+        "description": null,
+        "label": "Imperial",
+        "value": "imperial"
       } ],
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : false,
-      "type" : "STRING"
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
-    "title" : "Get Short Answer",
-    "workflowNodeDescription" : null
+    "title": "Get Short Answer",
+    "workflowNodeDescription": null
   } ],
-  "clusterElements" : [ {
-    "description" : "Returns a short answer for your query.",
-    "element" : { },
-    "help" : null,
-    "name" : "getShortAnswer",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "controlType" : "TEXT",
-          "defaultValue" : null,
-          "description" : "Short answer for query.",
-          "displayCondition" : null,
-          "exampleValue" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "label" : null,
-          "languageId" : null,
-          "maxLength" : null,
-          "metadata" : {
-            "responseType" : {
-              "contentType" : "text/plain",
-              "type" : "TEXT"
+  "clusterElements": [ {
+    "description": "Returns a short answer for your query.",
+    "element": { },
+    "help": null,
+    "name": "getShortAnswer",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Short answer for query.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "responseType": {
+              "contentType": "text/plain",
+              "type": "TEXT"
             }
           },
-          "minLength" : null,
-          "name" : null,
-          "options" : null,
-          "optionsDataSource" : null,
-          "optionsLoadedDynamically" : null,
-          "placeholder" : null,
-          "regex" : null,
-          "required" : null,
-          "type" : "STRING"
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
         },
-        "placeholder" : null,
-        "sampleOutput" : null
+        "placeholder": null,
+        "sampleOutput": null
       },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : "Short answer for query.",
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : null,
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : {
-          "responseType" : {
-            "contentType" : "text/plain",
-            "type" : "TEXT"
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Short answer for query.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": {
+          "responseType": {
+            "contentType": "text/plain",
+            "type": "TEXT"
           }
         },
-        "minLength" : null,
-        "name" : null,
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : null,
-        "type" : "STRING"
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
       },
-      "sampleOutput" : null
+      "sampleOutput": null
     },
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "TEXT",
-      "defaultValue" : null,
-      "description" : "Query that will be answered.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Query",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : {
-        "type" : "QUERY"
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Query that will be answered.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Query",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
       },
-      "minLength" : null,
-      "name" : "i",
-      "options" : null,
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : true,
-      "type" : "STRING"
+      "minLength": null,
+      "name": "i",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
     }, {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : "What system of units to use for measurements and quantities.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Units",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : {
-        "type" : "QUERY"
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "What system of units to use for measurements and quantities.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Units",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "QUERY"
       },
-      "minLength" : null,
-      "name" : "units",
-      "options" : [ {
-        "description" : null,
-        "label" : "Metric",
-        "value" : "metric"
+      "minLength": null,
+      "name": "units",
+      "options": [ {
+        "description": null,
+        "label": "Metric",
+        "value": "metric"
       }, {
-        "description" : null,
-        "label" : "Imperial",
-        "value" : "imperial"
+        "description": null,
+        "label": "Imperial",
+        "value": "imperial"
       } ],
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : false,
-      "type" : "STRING"
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
-    "title" : "Get Short Answer",
-    "type" : {
-      "key" : "tools",
-      "label" : "Tools",
-      "multipleElements" : true,
-      "name" : "TOOLS",
-      "required" : false
+    "title": "Get Short Answer",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
     }
   } ],
-  "componentCategories" : [ {
-    "label" : "Helpers",
-    "name" : "helpers"
+  "componentCategories": [ {
+    "label": "Helpers",
+    "name": "helpers"
   } ],
-  "connection" : {
-    "authorizationRequired" : null,
-    "authorizations" : [ {
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "description" : null,
-      "detectOn" : null,
-      "name" : "api_key",
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : "appid",
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "label" : "Key",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "key",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+  "connection": {
+    "authorizationRequired": null,
+    "authorizations": [ {
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": null,
+      "name": "api_key",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": "appid",
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": true,
+        "label": "Key",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "key",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       }, {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "App ID",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "value",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "App ID",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "value",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       }, {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : "QUERY_PARAMETERS",
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "label" : "Add to",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "addTo",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": "QUERY_PARAMETERS",
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": true,
+        "label": "Add to",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "addTo",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       } ],
-      "refresh" : null,
-      "refreshOn" : null,
-      "refreshToken" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "title" : "API Key",
-      "tokenUrl" : null,
-      "type" : "API_KEY"
+      "refresh": null,
+      "refreshOn": null,
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": "API Key",
+      "tokenUrl": null,
+      "type": "API_KEY"
     } ],
-    "baseUri" : { },
-    "properties" : null,
-    "test" : null,
-    "version" : 1
+    "baseUri": { },
+    "properties": null,
+    "test": null,
+    "version": 1
   },
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "Wolfram Alpha Short Answers returns a single plain text result as an answer to your query.",
-  "icon" : "path:assets/wolfram-alpha.svg",
-  "metadata" : null,
-  "name" : "wolfram-alpha-shortanswers",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Wolfram Alpha Short Answers",
-  "triggers" : [ ],
-  "unifiedApi" : null,
-  "version" : 1
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Wolfram Alpha Short Answers returns a single plain text result as an answer to your query.",
+  "icon": "path:assets/wolfram-alpha.svg",
+  "metadata": null,
+  "name": "wolfram-alpha-shortanswers",
+  "resources": null,
+  "tags": null,
+  "title": "Wolfram Alpha Short Answers",
+  "triggers": [ ],
+  "unifiedApi": null,
+  "version": 1
 }

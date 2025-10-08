@@ -1,64 +1,64 @@
 {
-  "actionClusterElementTypes" : { },
-  "actions" : [ ],
-  "clusterElementClusterElementTypes" : { },
-  "clusterElementTypes" : [ {
-    "key" : "vectorStore",
-    "label" : "Vector Store",
-    "multipleElements" : false,
-    "name" : "VECTOR_STORE",
-    "required" : true
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ {
+    "key": "vectorStore",
+    "label": "Vector Store",
+    "multipleElements": false,
+    "name": "VECTOR_STORE",
+    "required": true
   } ],
-  "clusterElements" : [ {
-    "description" : "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
-    "element" : { },
-    "help" : null,
-    "name" : "chatMemory",
-    "outputDefinition" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "INTEGER",
-      "defaultValue" : 20,
-      "description" : "The number of messages to retrieve from the vector store.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Chat Memory Retrieve Size",
-      "maxValue" : null,
-      "metadata" : { },
-      "minValue" : null,
-      "name" : "chatMemoryRetrieveSize",
-      "options" : null,
-      "optionsDataSource" : null,
-      "placeholder" : null,
-      "required" : null,
-      "type" : "INTEGER"
+  "clusterElements": [ {
+    "description": "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
+    "element": { },
+    "help": null,
+    "name": "chatMemory",
+    "outputDefinition": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": 20,
+      "description": "The number of messages to retrieve from the vector store.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Chat Memory Retrieve Size",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "chatMemoryRetrieveSize",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "INTEGER"
     } ],
-    "title" : "Vector Store Chat Memory",
-    "type" : {
-      "key" : "chatMemory",
-      "label" : "Memory",
-      "multipleElements" : false,
-      "name" : "CHAT_MEMORY",
-      "required" : false
+    "title": "Vector Store Chat Memory",
+    "type": {
+      "key": "chatMemory",
+      "label": "Memory",
+      "multipleElements": false,
+      "name": "CHAT_MEMORY",
+      "required": false
     }
   } ],
-  "componentCategories" : [ {
-    "label" : "Artificial Intelligence",
-    "name" : "artificial-intelligence"
+  "componentCategories": [ {
+    "label": "Artificial Intelligence",
+    "name": "artificial-intelligence"
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "Vector Store Chat Memory.",
-  "icon" : "path:assets/vector-store-chat-memory.svg",
-  "metadata" : null,
-  "name" : "vectorStoreChatMemory",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Vector Store Chat Memory",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Vector Store Chat Memory.",
+  "icon": "path:assets/vector-store-chat-memory.svg",
+  "metadata": null,
+  "name": "vectorStoreChatMemory",
+  "resources": null,
+  "tags": null,
+  "title": "Vector Store Chat Memory",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }

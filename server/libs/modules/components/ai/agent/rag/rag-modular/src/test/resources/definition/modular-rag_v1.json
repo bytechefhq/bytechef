@@ -1,69 +1,69 @@
 {
-  "actionClusterElementTypes" : { },
-  "actions" : [ ],
-  "clusterElementClusterElementTypes" : { },
-  "clusterElementTypes" : [ {
-    "key" : "documentJoiner",
-    "label" : "Document Joiner",
-    "multipleElements" : false,
-    "name" : "DOCUMENT_JOINER",
-    "required" : false
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ {
+    "key": "documentJoiner",
+    "label": "Document Joiner",
+    "multipleElements": false,
+    "name": "DOCUMENT_JOINER",
+    "required": false
   }, {
-    "key" : "documentRetriever",
-    "label" : "Document Retriever",
-    "multipleElements" : false,
-    "name" : "DOCUMENT_RETRIEVER",
-    "required" : true
+    "key": "documentRetriever",
+    "label": "Document Retriever",
+    "multipleElements": false,
+    "name": "DOCUMENT_RETRIEVER",
+    "required": true
   }, {
-    "key" : "queryAugmenter",
-    "label" : "Query Augmenter",
-    "multipleElements" : false,
-    "name" : "QUERY_AUGMENTER",
-    "required" : false
+    "key": "queryAugmenter",
+    "label": "Query Augmenter",
+    "multipleElements": false,
+    "name": "QUERY_AUGMENTER",
+    "required": false
   }, {
-    "key" : "queryExpander",
-    "label" : "Query Expander",
-    "multipleElements" : false,
-    "name" : "QUERY_EXPANDER",
-    "required" : false
+    "key": "queryExpander",
+    "label": "Query Expander",
+    "multipleElements": false,
+    "name": "QUERY_EXPANDER",
+    "required": false
   }, {
-    "key" : "queryTransformer",
-    "label" : "Query Transformer",
-    "multipleElements" : true,
-    "name" : "QUERY_TRANSFORMER",
-    "required" : false
+    "key": "queryTransformer",
+    "label": "Query Transformer",
+    "multipleElements": true,
+    "name": "QUERY_TRANSFORMER",
+    "required": false
   } ],
-  "clusterElements" : [ {
-    "description" : "Moduler RAG.",
-    "element" : { },
-    "help" : null,
-    "name" : "rag",
-    "outputDefinition" : null,
-    "properties" : null,
-    "title" : "Moduler RAG",
-    "type" : {
-      "key" : "rag",
-      "label" : "RAG",
-      "multipleElements" : false,
-      "name" : "RAG",
-      "required" : false
+  "clusterElements": [ {
+    "description": "Moduler RAG.",
+    "element": { },
+    "help": null,
+    "name": "rag",
+    "outputDefinition": null,
+    "properties": null,
+    "title": "Moduler RAG",
+    "type": {
+      "key": "rag",
+      "label": "RAG",
+      "multipleElements": false,
+      "name": "RAG",
+      "required": false
     }
   } ],
-  "componentCategories" : [ {
-    "label" : "Artificial Intelligence",
-    "name" : "artificial-intelligence"
+  "componentCategories": [ {
+    "label": "Artificial Intelligence",
+    "name": "artificial-intelligence"
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "A modular RAG (Retrieval-Augmented Generation) component that provides a flexible and customizable approach to building RAG systems. It allows you to combine different retrieval, augmentation, and generation strategies into a cohesive pipeline for enhanced AI-driven information processing and response generation.",
-  "icon" : "path:assets/modular-rag.svg",
-  "metadata" : null,
-  "name" : "modularRag",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Modular RAG",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "A modular RAG (Retrieval-Augmented Generation) component that provides a flexible and customizable approach to building RAG systems. It allows you to combine different retrieval, augmentation, and generation strategies into a cohesive pipeline for enhanced AI-driven information processing and response generation.",
+  "icon": "path:assets/modular-rag.svg",
+  "metadata": null,
+  "name": "modularRag",
+  "resources": null,
+  "tags": null,
+  "title": "Modular RAG",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }
