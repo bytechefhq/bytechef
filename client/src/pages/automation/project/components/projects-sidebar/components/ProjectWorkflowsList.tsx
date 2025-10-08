@@ -3,7 +3,7 @@ import {Separator} from '@/components/ui/separator';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
-import {useMemo} from 'react';
+import {Fragment, useMemo} from 'react';
 
 interface ProjectWorkflowsListProps {
     calculateTimeDifference: (date: string) => string;
@@ -37,7 +37,7 @@ const ProjectWorkflowsList = ({
     }
 
     return (
-        <>
+        <Fragment key={project.id}>
             <li className="max-w-full pb-2 last:pb-0">
                 <div className="flex w-80 items-center gap-1">
                     <Tooltip>
@@ -83,7 +83,7 @@ const ProjectWorkflowsList = ({
             </li>
 
             <Separator />
-        </>
+        </Fragment>
     );
 };
 
