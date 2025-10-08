@@ -21,7 +21,6 @@ import com.bytechef.component.airtable.datastream.AirtableItemReader;
 import com.bytechef.component.airtable.datastream.AirtableItemWriter;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
@@ -30,8 +29,6 @@ import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.component.definition.ComponentDsl.tool;
 
 /**
  * @author Ivica Cardic

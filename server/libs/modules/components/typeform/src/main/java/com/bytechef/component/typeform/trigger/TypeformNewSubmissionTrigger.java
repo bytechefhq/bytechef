@@ -24,11 +24,11 @@ import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -50,7 +50,7 @@ public class TypeformNewSubmissionTrigger {
         .properties(
             string("form")
                 .label("Form Name")
-                .options((TriggerOptionsFunction<String>) TypeformUtils::getFormOptions)
+                .options((OptionsFunction<String>) TypeformUtils::getFormOptions)
                 .required(true))
         .output(
             outputSchema(

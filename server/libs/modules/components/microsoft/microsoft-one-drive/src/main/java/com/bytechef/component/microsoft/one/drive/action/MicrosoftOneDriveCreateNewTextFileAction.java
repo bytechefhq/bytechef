@@ -27,11 +27,11 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.TEXT;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
@@ -69,7 +69,7 @@ public class MicrosoftOneDriveCreateNewTextFileAction {
                 .description(
                     "ID of the folder where the file should be created; if no folder is selected, the file will be " +
                         "created in the root folder.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .perform(MicrosoftOneDriveCreateNewTextFileAction::perform)

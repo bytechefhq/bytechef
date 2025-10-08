@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.linear.util.LinearUtils;
 
 /**
@@ -58,7 +58,7 @@ public class LinearConstants {
     public static final ModifiableStringProperty TEAM_ID_TRIGGER_PROPERTY = string(TEAM_ID)
         .label("Team ID")
         .displayCondition("%s == false".formatted(ALL_PUBLIC_TEAMS))
-        .options((TriggerOptionsFunction<String>) LinearUtils::getTeamOptions)
+        .options((OptionsFunction<String>) LinearUtils::getTeamOptions)
         .required(true);
 
     public static final ModifiableObjectProperty TRIGGER_OUTPUT_PROPERTY =

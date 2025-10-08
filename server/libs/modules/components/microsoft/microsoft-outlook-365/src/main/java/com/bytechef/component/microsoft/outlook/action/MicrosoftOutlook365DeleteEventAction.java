@@ -22,10 +22,10 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EVENT;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
@@ -43,7 +43,7 @@ public class MicrosoftOutlook365DeleteEventAction {
             string(EVENT)
                 .label("Event ID")
                 .description("Id of the event to delete.")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getEventOptions)
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getEventOptions)
                 .optionsLookupDependsOn(CALENDAR)
                 .required(true))
         .perform(MicrosoftOutlook365DeleteEventAction::perform)

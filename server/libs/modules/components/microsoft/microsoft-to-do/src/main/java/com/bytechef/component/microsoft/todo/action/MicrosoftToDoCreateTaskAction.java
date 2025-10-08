@@ -27,10 +27,10 @@ import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConsta
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TITLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
@@ -48,7 +48,7 @@ public class MicrosoftToDoCreateTaskAction {
             string(TASK_LIST_ID)
                 .label("Task List ID")
                 .description("ID of the task list where the task will be created.")
-                .options((ActionOptionsFunction<String>) MicrosoftToDoUtils::getTaskListIdOptions)
+                .options((OptionsFunction<String>) MicrosoftToDoUtils::getTaskListIdOptions)
                 .required(true),
             string(TITLE)
                 .label("Title")

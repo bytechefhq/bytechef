@@ -29,9 +29,9 @@ import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_I
 import static com.bytechef.component.monday.util.MondayOptionUtils.getColumnTypeOptions;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayOptionUtils;
 import java.util.Map;
@@ -47,12 +47,12 @@ public class MondayCreateColumnAction {
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
-                .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+                .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
                 .label("Board ID")
                 .description("Id of the board where the new column should be created.")
-                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+                .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),
             string(TITLE)

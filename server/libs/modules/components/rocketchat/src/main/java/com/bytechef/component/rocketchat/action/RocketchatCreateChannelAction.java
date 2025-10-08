@@ -29,9 +29,9 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.MEM
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.READ_ONLY;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rocketchat.util.RocketchatUtils;
 
@@ -52,7 +52,7 @@ public class RocketchatCreateChannelAction {
                 .label("Members")
                 .description("An array of the users to be added to the channel when it is created.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) RocketchatUtils::getUsersOptions)
+                .options((OptionsFunction<String>) RocketchatUtils::getUsersOptions)
                 .required(false),
             bool(READ_ONLY)
                 .label("Read Only")

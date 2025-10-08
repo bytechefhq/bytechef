@@ -27,9 +27,9 @@ import static com.bytechef.component.myob.constant.MyobConstants.PAY_FROM_PROPER
 import static com.bytechef.component.myob.constant.MyobConstants.UID;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.myob.util.MyobUtils;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class MyobCreateCustomerPaymentAction {
                 .required(true),
             string(CUSTOMER)
                 .label("Customer UID")
-                .options((ActionOptionsFunction<String>) MyobUtils::getCustomerOptions)
+                .options((OptionsFunction<String>) MyobUtils::getCustomerOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))
         .perform(MyobCreateCustomerPaymentAction::perform);

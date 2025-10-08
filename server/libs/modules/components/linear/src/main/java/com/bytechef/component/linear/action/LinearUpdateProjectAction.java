@@ -35,8 +35,8 @@ import static com.bytechef.component.linear.constant.LinearConstants.STATUS_ID;
 import static com.bytechef.component.linear.util.LinearUtils.appendOptionalField;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class LinearUpdateProjectAction {
             string(PROJECT_ID)
                 .label("Project ID")
                 .description("The identifier of the project to update.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getProjectOptions)
+                .options((OptionsFunction<String>) LinearUtils::getProjectOptions)
                 .required(true),
             string(NAME)
                 .label("Project Name")
@@ -62,7 +62,7 @@ public class LinearUpdateProjectAction {
             string(STATUS_ID)
                 .label("Status")
                 .description("The status of the project.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getProjectStateOptions)
+                .options((OptionsFunction<String>) LinearUtils::getProjectStateOptions)
                 .required(false),
             integer(PRIORITY)
                 .label("Priority")

@@ -19,8 +19,8 @@ package com.bytechef.component.clickup.constant;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 
 /**
  * @author Monika Kušter
@@ -35,19 +35,19 @@ public class ClickupConstants {
 
     public static final ModifiableStringProperty FOLDER_ID_PROPERTY = string(FOLDER_ID)
         .label("Folder ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
+        .options((OptionsFunction<String>) ClickupUtils::getFolderIdOptions)
         .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID)
         .required(false);
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
         .label("Space ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
+        .options((OptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
         .optionsLookupDependsOn(WORKSPACE_ID)
         .required(true);
 
     public static final ModifiableStringProperty WORKSPACE_ID_PROPERTY = string(WORKSPACE_ID)
         .label("Workspace ID")
-        .options((ActionOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
+        .options((OptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
         .required(true);
 
     private ClickupConstants() {

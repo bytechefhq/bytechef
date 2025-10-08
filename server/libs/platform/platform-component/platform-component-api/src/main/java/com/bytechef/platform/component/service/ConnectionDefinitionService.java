@@ -45,7 +45,7 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context, String redirectUri);
 
-    Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context);
+    Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection, Context context);
 
     RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,

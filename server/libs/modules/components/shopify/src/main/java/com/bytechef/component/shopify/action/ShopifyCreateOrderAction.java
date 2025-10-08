@@ -28,8 +28,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
@@ -68,11 +68,11 @@ public class ShopifyCreateOrderAction {
                         integer("product_id").label("Product ID")
                             .description("The ID of the product that the line item belongs to.")
                             .required(false)
-                            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getProductIdOptions),
+                            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getProductIdOptions),
                         integer("variant_id").label("Variant ID")
                             .description("The ID of the product variant.")
                             .required(false)
-                            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getVariantIdOptions)
+                            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getVariantIdOptions)
                             .optionsLookupDependsOn("order.line_items[index].product_id"),
                         integer("quantity").label("Quantity")
                             .description("The number of items that were purchased.")

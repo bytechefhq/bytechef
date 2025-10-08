@@ -28,8 +28,8 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.bitbucket.property.BitbucketRepositoryObjectProperties;
 import com.bytechef.component.bitbucket.util.BitbucketUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -51,7 +51,7 @@ public class BitbucketCreateRepositoryAction {
         .properties(string("workspace").label("Workspace")
             .description("Workspace in which repository will be created.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) BitbucketUtils::getWorkspaceOptions)
+            .options((ActionDefinition.OptionsFunction<String>) BitbucketUtils::getWorkspaceOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
@@ -77,7 +77,7 @@ public class BitbucketCreateRepositoryAction {
             object("project").properties(string("key").label("Key")
                 .description("The key of the parent project.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BitbucketUtils::getKeyOptions)
+                .options((ActionDefinition.OptionsFunction<String>) BitbucketUtils::getKeyOptions)
                 .optionsLookupDependsOn("workspace"))
                 .metadata(
                     Map.of(

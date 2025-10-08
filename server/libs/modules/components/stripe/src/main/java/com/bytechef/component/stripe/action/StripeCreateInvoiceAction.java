@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.stripe.util.StripeUtils;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class StripeCreateInvoiceAction {
             .label("Customer ID")
             .description("ID of the customer who will be billed.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) StripeUtils::getCustomerOptions),
+            .options((ActionDefinition.OptionsFunction<String>) StripeUtils::getCustomerOptions),
             string("currency").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

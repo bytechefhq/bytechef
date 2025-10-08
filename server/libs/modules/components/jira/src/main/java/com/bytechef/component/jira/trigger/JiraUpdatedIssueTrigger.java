@@ -26,11 +26,11 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -53,12 +53,12 @@ public class JiraUpdatedIssueTrigger {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project where issues is updated.")
-                .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUETYPE)
                 .label("Issue Type ID")
                 .description("ID of the issue type.")
-                .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(false))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))

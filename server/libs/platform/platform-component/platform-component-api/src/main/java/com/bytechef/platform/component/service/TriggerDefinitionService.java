@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.service;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -40,11 +39,11 @@ public interface TriggerDefinitionService {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection,
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection,
         TriggerContext context);
 
     WebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, ComponentConnection connection,
+        String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
         Map<String, ?> outputParameters, TriggerContext context);
 
     String executeWorkflowNodeDescription(
@@ -53,48 +52,48 @@ public interface TriggerDefinitionService {
 
     void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, @Nullable ComponentConnection connection, TriggerContext context);
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, @Nullable ComponentConnection connection, TriggerContext context);
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText,
-        @Nullable ComponentConnection connection, TriggerContext context);
+        @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection connection, TriggerContext context);
+        @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        Context triggerContext);
+        TriggerContext context);
 
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        @Nullable ComponentConnection connection, TriggerContext context);
+        @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, String workflowExecutionId,
-        Map<String, ?> outputParameters, @Nullable ComponentConnection connection,
+        Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection,
         TriggerContext context);
 
     WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String webhookUrl, String workflowExecutionId, @Nullable ComponentConnection connection,
+        String webhookUrl, String workflowExecutionId, @Nullable ComponentConnection componentConnection,
         TriggerContext context);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, @Nullable ComponentConnection connection, TriggerContext context);
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, @Nullable ComponentConnection connection, TriggerContext context);
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context);
 
     TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 

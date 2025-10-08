@@ -34,10 +34,10 @@ import static com.bytechef.component.klaviyo.constant.KlaviyoConstants.TYPE;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfileEmail;
 import static com.bytechef.component.klaviyo.util.KlaviyoUtils.getProfilePhoneNumber;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.klaviyo.util.KlaviyoUtils;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class KlaviyoSubscribeProfilesAction {
                 .label("Profile ID")
                 .description("The IDs of the profile to subscribe.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) KlaviyoUtils::getProfileIdOptions)
+                .options((OptionsFunction<String>) KlaviyoUtils::getProfileIdOptions)
                 .required(true),
             array(SUBSCRIPTION)
                 .label("Subscription")

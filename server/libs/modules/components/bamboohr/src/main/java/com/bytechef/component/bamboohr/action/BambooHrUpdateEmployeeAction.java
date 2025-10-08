@@ -28,10 +28,10 @@ import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -46,7 +46,7 @@ public class BambooHrUpdateEmployeeAction {
             string(ID)
                 .label("Employee ID")
                 .description("The ID of the employee.")
-                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
                 .required(true),
             string(FIRST_NAME)
                 .label("Updated First Name")

@@ -29,7 +29,7 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public final class OutputDefinition implements BaseOutputDefinition {
 
-    private OutputFunction output;
+    private TaskDispatcherDefinition.OutputFunction output;
     private OutputResponse outputResponse;
 
     public OutputDefinition(ValueProperty<?> outputSchema) {
@@ -45,7 +45,7 @@ public final class OutputDefinition implements BaseOutputDefinition {
         this.outputResponse = OutputResponse.of(outputSchema, sampleOutput);
     }
 
-    public OutputDefinition(OutputFunction output) {
+    public OutputDefinition(TaskDispatcherDefinition.OutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
         this.output = output;

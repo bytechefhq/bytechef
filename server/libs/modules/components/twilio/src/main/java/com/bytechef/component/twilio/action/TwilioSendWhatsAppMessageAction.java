@@ -32,10 +32,10 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGE_OUT
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.USE_TEMPLATE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -74,7 +74,7 @@ public class TwilioSendWhatsAppMessageAction {
             string(CONTENT_SID)
                 .label("Content Sid")
                 .description("The SID of the content template to be used for the message body.")
-                .options((ActionOptionsFunction<String>) TwilioUtils::getContentSidOptions)
+                .options((OptionsFunction<String>) TwilioUtils::getContentSidOptions)
                 .maxLength(34)
                 .minLength(34)
                 .displayCondition("%s == true".formatted(USE_TEMPLATE))

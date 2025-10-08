@@ -29,11 +29,11 @@ import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY_
 import static com.bytechef.component.github.util.GithubUtils.getContent;
 import static com.bytechef.component.github.util.GithubUtils.subscribeWebhook;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -53,7 +53,7 @@ public class GithubNewIssueTrigger {
         .properties(
             string(REPOSITORY)
                 .label("Repository")
-                .options((TriggerOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true))
         .output(
             outputSchema(

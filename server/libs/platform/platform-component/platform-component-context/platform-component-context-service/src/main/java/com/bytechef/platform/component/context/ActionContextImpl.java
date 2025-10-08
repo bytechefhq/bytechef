@@ -144,11 +144,6 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         return workflowId;
     }
 
-    @Override
-    public boolean isEditorEnvironment() {
-        return editorEnvironment;
-    }
-
     private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
 
         @Override

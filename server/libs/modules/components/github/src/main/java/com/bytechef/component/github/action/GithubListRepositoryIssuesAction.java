@@ -25,10 +25,10 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPU
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -46,7 +46,7 @@ public class GithubListRepositoryIssuesAction {
         .properties(
             string(REPOSITORY)
                 .label("Repository")
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .description("The name of the repository")
                 .required(true))
         .output(
