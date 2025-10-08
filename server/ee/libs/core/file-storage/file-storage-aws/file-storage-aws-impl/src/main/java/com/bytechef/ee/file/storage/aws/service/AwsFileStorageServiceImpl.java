@@ -15,6 +15,7 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -107,13 +108,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public InputStream getInputStream(String directory, FileEntry fileEntry) {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
-
-        try {
-            return s3Resource.getInputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new ByteArrayInputStream(readFileToBytes(directory, fileEntry));
     }
 
     @Override
