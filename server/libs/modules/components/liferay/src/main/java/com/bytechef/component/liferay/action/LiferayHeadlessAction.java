@@ -22,13 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.liferay.constant.LiferayConstants.APPLICATION;
-import static com.bytechef.component.liferay.constant.LiferayConstants.BODY_PARAMETERS;
 import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
-import static com.bytechef.component.liferay.constant.LiferayConstants.HEADER_PARAMETERS;
-import static com.bytechef.component.liferay.constant.LiferayConstants.PATH_PARAMETERS;
 import static com.bytechef.component.liferay.constant.LiferayConstants.PROPERTIES;
-import static com.bytechef.component.liferay.constant.LiferayConstants.QUERY_PARAMETERS;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -38,8 +35,10 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.liferay.util.LiferayOptionUtils;
 import com.bytechef.component.liferay.util.LiferayPropertiesUtils;
+import com.bytechef.component.liferay.util.PropertiesContainer;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -64,13 +63,22 @@ public class LiferayHeadlessAction {
                 .optionsLookupDependsOn(APPLICATION)
                 .required(true),
             dynamicProperties(PROPERTIES)
-                .properties(LiferayPropertiesUtils::createPropertiesForParameters)
+                .properties(
+                    (PropertiesDataSource.ActionPropertiesFunction) (
+                        inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
+
+                        PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
+                            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
+                            context);
+
+                        return propertiesContainer.properties();
+                    })
                 .propertiesLookupDependsOn(APPLICATION, ENDPOINT)
                 .required(false))
         .output()
         .perform(LiferayHeadlessAction::perform);
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String baseUri = connectionParameters.getRequiredString(BASE_URI);
         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
@@ -87,30 +95,30 @@ public class LiferayHeadlessAction {
         Map<String, List<String>> queryParameters = Map.of();
         Map<String, ?> pathParameters = Map.of();
 
+        PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
+            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
+            context);
+
         if (properties != null) {
-            body = BODY_PARAMETERS.stream()
+            body = propertiesContainer.bodyParameters()
+                .stream()
                 .filter(properties::containsKey)
                 .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
 
-            BODY_PARAMETERS.clear();
-
-            headers = HEADER_PARAMETERS.stream()
+            headers = propertiesContainer.headerParameters()
+                .stream()
                 .filter(properties::containsKey)
                 .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
 
-            HEADER_PARAMETERS.clear();
-
-            queryParameters = QUERY_PARAMETERS.stream()
+            queryParameters = propertiesContainer.queryParameters()
+                .stream()
                 .filter(properties::containsKey)
                 .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
 
-            QUERY_PARAMETERS.clear();
-
-            pathParameters = PATH_PARAMETERS.stream()
+            pathParameters = propertiesContainer.headerParameters()
+                .stream()
                 .filter(properties::containsKey)
                 .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
-
-            PATH_PARAMETERS.clear();
         }
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {

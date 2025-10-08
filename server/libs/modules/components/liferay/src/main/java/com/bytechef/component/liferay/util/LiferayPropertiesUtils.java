@@ -23,106 +23,40 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.liferay.constant.LiferayConstants.APPLICATION;
-import static com.bytechef.component.liferay.constant.LiferayConstants.BODY_PARAMETERS;
-import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
-import static com.bytechef.component.liferay.constant.LiferayConstants.HEADER_PARAMETERS;
-import static com.bytechef.component.liferay.constant.LiferayConstants.PATH_PARAMETERS;
-import static com.bytechef.component.liferay.constant.LiferayConstants.QUERY_PARAMETERS;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Marija Horvat
  */
 public class LiferayPropertiesUtils {
 
+    private static final Cache<String, PropertiesContainer> PROPERTIES_CONTAINER_CACHE =
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
+
     private LiferayPropertiesUtils() {
     }
 
-    public static List<Property.ValueProperty<?>> createPropertiesForParameters(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        ActionContext context) {
+    public static PropertiesContainer createPropertiesForParameters(
+        String application, String endpoint, ActionContext context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("/o/" + inputParameters.getRequiredString(APPLICATION) + "/openapi.json"))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String url = "/o/" + application + "/openapi.json";
 
-        String endpoint = inputParameters.getRequiredString(ENDPOINT);
-
-        String[] endpointParts = endpoint.split(" ");
-
-        String method = endpointParts[0].toLowerCase();
-        String endpointUrl = endpointParts[1];
-
-        List<Map<String, Object>> parameters = new ArrayList<>();
-
-        String version = "";
-
-        if (body.get("info") instanceof Map<?, ?> info) {
-            version = String.valueOf(info.get("version"));
-        }
-
-        if (body.get("paths") instanceof Map<?, ?> paths) {
-            for (Map.Entry<?, ?> pathEntry : paths.entrySet()) {
-                String pathKey = String.valueOf(pathEntry.getKey());
-
-                String replaceFirst = pathKey.replaceFirst("/" + version, "");
-
-                if (replaceFirst.equals(endpointUrl)) {
-                    Object path = pathEntry.getValue();
-
-                    if (path instanceof Map<?, ?> pathObj) {
-                        Object methodObj = pathObj.get(method);
-
-                        if (methodObj instanceof Map<?, ?> methods) {
-                            if (methods.get("parameters") instanceof List<?> parametersList) {
-                                for (Object parametersObj : parametersList) {
-                                    if (parametersObj instanceof Map<?, ?> parametersMap) {
-                                        Map<String, Object> parametersTypedMap = new HashMap<>();
-
-                                        parametersMap.forEach(
-                                            (key, value) -> parametersTypedMap.put(String.valueOf(key), value));
-
-                                        parameters.add(parametersTypedMap);
-                                    }
-                                }
-                            }
-
-                            if (methods.get("requestBody") instanceof Map<?, ?> requestBody &&
-                                requestBody.get("content") instanceof Map<?, ?> content) {
-
-                                Object jsonContent = content.get("application/json");
-
-                                if (jsonContent instanceof Map<?, ?> jsonContentMap &&
-                                    jsonContentMap.get("schema") instanceof Map<?, ?> schema) {
-
-                                    parameters.addAll(extractPropertiesFromSchema(schema, body));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return new ArrayList<>(
-            parameters.stream()
-                .map(LiferayPropertiesUtils::createProperty)
-                .filter(Objects::nonNull)
-                .toList());
+        return PROPERTIES_CONTAINER_CACHE.get(url, cacheKey -> getPropertiesContainer(url, endpoint, context));
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(
@@ -197,7 +131,10 @@ public class LiferayPropertiesUtils {
         return result;
     }
 
-    private static ModifiableValueProperty<?, ?> createProperty(Map<String, ?> parameterMap) {
+    private static ModifiableValueProperty<?, ?> createProperty(
+        Map<String, ?> parameterMap, List<String> bodyParameters, List<String> headerParameters,
+        List<String> pathParameters, List<String> queryParameters) {
+
         String in = (String) parameterMap.get("in");
 
         if (in == null) {
@@ -211,10 +148,10 @@ public class LiferayPropertiesUtils {
         }
 
         switch (in) {
-            case "body" -> BODY_PARAMETERS.add(name);
-            case "header" -> HEADER_PARAMETERS.add(name);
-            case "path" -> PATH_PARAMETERS.add(name);
-            case "query" -> QUERY_PARAMETERS.add(name);
+            case "body" -> bodyParameters.add(name);
+            case "header" -> headerParameters.add(name);
+            case "path" -> pathParameters.add(name);
+            case "query" -> queryParameters.add(name);
             default -> throw new IllegalArgumentException("Unknown parameter type: " + in);
         }
 
@@ -256,5 +193,82 @@ public class LiferayPropertiesUtils {
                 .required(required);
             default -> null;
         };
+    }
+
+    private static PropertiesContainer getPropertiesContainer(String url, String endpoint, ActionContext context) {
+        Map<String, ?> body = context.http(http -> http.get(url))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        String[] endpointParts = endpoint.split(" ");
+
+        String method = endpointParts[0].toLowerCase();
+        String endpointUrl = endpointParts[1];
+
+        List<Map<String, Object>> parameters = new ArrayList<>();
+
+        String version = "";
+
+        if (body.get("info") instanceof Map<?, ?> info) {
+            version = String.valueOf(info.get("version"));
+        }
+
+        if (body.get("paths") instanceof Map<?, ?> paths) {
+            for (Map.Entry<?, ?> pathEntry : paths.entrySet()) {
+                String pathKey = String.valueOf(pathEntry.getKey());
+
+                String replaceFirst = pathKey.replaceFirst("/" + version, "");
+
+                if (replaceFirst.equals(endpointUrl)) {
+                    Object path = pathEntry.getValue();
+
+                    if (path instanceof Map<?, ?> pathObj) {
+                        Object methodObj = pathObj.get(method);
+
+                        if (methodObj instanceof Map<?, ?> methods) {
+                            if (methods.get("parameters") instanceof List<?> parametersList) {
+                                for (Object parametersObj : parametersList) {
+                                    if (parametersObj instanceof Map<?, ?> parametersMap) {
+                                        Map<String, Object> parametersTypedMap = new HashMap<>();
+
+                                        parametersMap.forEach(
+                                            (key, value) -> parametersTypedMap.put(String.valueOf(key), value));
+
+                                        parameters.add(parametersTypedMap);
+                                    }
+                                }
+                            }
+
+                            if (methods.get("requestBody") instanceof Map<?, ?> requestBody &&
+                                requestBody.get("content") instanceof Map<?, ?> content) {
+
+                                Object jsonContent = content.get("application/json");
+
+                                if (jsonContent instanceof Map<?, ?> jsonContentMap &&
+                                    jsonContentMap.get("schema") instanceof Map<?, ?> schema) {
+
+                                    parameters.addAll(extractPropertiesFromSchema(schema, body));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        List<String> bodyParameters = new ArrayList<>();
+        List<String> headerParameters = new ArrayList<>();
+        List<String> pathParameters = new ArrayList<>();
+        List<String> queryParameters = new ArrayList<>();
+
+        return new PropertiesContainer(
+            new ArrayList<>(
+                parameters.stream()
+                    .map(parameterMap -> createProperty(
+                        parameterMap, bodyParameters, headerParameters, pathParameters, queryParameters))
+                    .filter(Objects::nonNull)
+                    .toList()),
+            bodyParameters, headerParameters, pathParameters, queryParameters);
     }
 }
