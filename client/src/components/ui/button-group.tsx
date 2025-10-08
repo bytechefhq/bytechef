@@ -41,7 +41,7 @@ function ButtonGroupText({
   className,
   asChild = false,
   ...props
-}: React.ComponentProps<"div"> & {
+}: React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean
 }) {
   const Comp = asChild ? Slot : "div"
