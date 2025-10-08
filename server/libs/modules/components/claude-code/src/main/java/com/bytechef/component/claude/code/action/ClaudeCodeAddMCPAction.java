@@ -103,7 +103,7 @@ public class ClaudeCodeAddMCPAction {
             case 1:
                 sb.append(" --header \"")
                     .append(AUTHENTICATION)
-                    .append(": ")
+                    .append(": Bearer ")
                     .append(inputParameters.getString(AUTHENTICATION))
                     .append("\"");
 
