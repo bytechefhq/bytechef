@@ -73,8 +73,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         if (workflowNodeName.equals("manual")) {
             description = triggerDefinitionFacade.executeWorkflowNodeDescription("manual", 1, "manual", Map.of());
         } else {
-            description = WorkflowTrigger
-                .fetch(workflow, workflowNodeName)
+            description = WorkflowTrigger.fetch(workflow, workflowNodeName)
                 .map(workflowTrigger -> {
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
