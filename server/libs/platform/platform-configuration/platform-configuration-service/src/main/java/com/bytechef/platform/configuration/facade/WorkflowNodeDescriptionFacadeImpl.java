@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -41,6 +42,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeDescriptionFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -49,17 +51,37 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDescriptionFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, Evaluator evaluator,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        Evaluator evaluator, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    public String getClusterElementWorkflowNodeDescription(
+        String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflowId, environmentId);
+
+        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        Map<String, ?> inputParameters = getInputParameters(workflowTask, inputs);
+
+        return clusterElementDefinitionFacade.executeWorkflowNodeDescription(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
+            inputParameters);
     }
 
     @Override
@@ -86,17 +108,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-                    Map<String, ?> inputParameters;
-
-                    try {
-                        inputParameters = workflowTask.evaluateParameters(inputs, evaluator);
-                    } catch (Exception e) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(e.getMessage());
-                        }
-
-                        inputParameters = workflowTask.getParameters();
-                    }
+                    Map<String, ?> inputParameters = getInputParameters(workflowTask, inputs);
 
                     if (workflowNodeType.operation() == null) {
                         return taskDispatcherDefinitionService.executeWorkflowNodeDescription(
@@ -110,5 +122,20 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         }
 
         return description;
+    }
+
+    private Map<String, ?> getInputParameters(WorkflowTask workflowTask, Map<String, ?> inputs) {
+        Map<String, ?> inputParameters;
+
+        try {
+            inputParameters = workflowTask.evaluateParameters(inputs, evaluator);
+        } catch (Exception e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage());
+            }
+
+            inputParameters = workflowTask.getParameters();
+        }
+        return inputParameters;
     }
 }
