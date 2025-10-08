@@ -278,10 +278,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (typeof value === 'string') {
-                if (controlType !== 'RICH_TEXT') {
+                if (controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA') {
                     value = decode(sanitizeHtml(value, {allowedTags: []}));
-                } else {
-                    value = decode(value);
                 }
 
                 value = transformValueForObjectAccess(value);
@@ -344,7 +342,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 saveMentionInputValue(value);
             },
-            [onChange, saveMentionInputValue, editorValue, isFormulaMode, setIsFormulaMode]
+            [editorValue, onChange, saveMentionInputValue]
         );
 
         const getContent = useCallback((value?: string) => {
@@ -383,6 +381,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, []);
 
         const editor = useEditor({
+            coreExtensionOptions: {
+                clipboardTextSerializer: {
+                    blockSeparator: '\n',
+                },
+            },
             editorProps: {
                 attributes: {
                     class: twMerge(
@@ -440,6 +443,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [dataPills, editor]);
 
+        // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
             if (editor && !isLocalUpdate) {
                 editor.commands.setContent(getContent(editorValue as string)!, false, {
@@ -448,7 +452,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [editor, getContent, editorValue, isLocalUpdate]);
 
-        // set propertyParameterValue on workflow definition change
+        // Set propertyParameterValue on workflow definition change
         useEffect(() => {
             if (!workflow.definition || !currentNode?.name || !path) {
                 return;
