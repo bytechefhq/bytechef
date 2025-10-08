@@ -77,29 +77,11 @@ export const DataPillPanelSkeleton = () => (
     </div>
 );
 
-export const ConnectionTabSkeleton = () => (
-    <div className="p-4">
-        <FieldsetSkeleton label="Connection" />
-    </div>
-);
-
 export const PropertiesTabSkeleton = () => (
     <div className="flex flex-col gap-4 p-4">
         {Array.from({length: 4}).map((_, index) => (
             <PropertySkeleton key={index} />
         ))}
-    </div>
-);
-
-export const OutputTabSkeleton = () => (
-    <div className="flex flex-col gap-4 p-4">
-        <Skeleton className="h-8 w-1/2" />
-
-        <Skeleton className="h-6 w-full" />
-
-        <Skeleton className="h-6 w-3/4" />
-
-        <Skeleton className="h-6 w-1/2" />
     </div>
 );
 
