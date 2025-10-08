@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.box.util.BoxUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -43,14 +43,14 @@ public class BoxDownloadFileAction {
             string(ID)
                 .label("Parent Folder ID")
                 .description("ID of the folder from which you want to download the file.")
-                .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
+                .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true),
             string(FILE_ID)
                 .label("File ID")
                 .description("ID of the file to download.")
                 .optionsLookupDependsOn(ID)
-                .options((ActionOptionsFunction<String>) BoxUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) BoxUtils::getFileIdOptions)
                 .required(true))
         .output(outputSchema(fileEntry()))
         .perform(BoxDownloadFileAction::perform);

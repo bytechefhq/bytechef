@@ -31,10 +31,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.beamer.util.BeamerUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class BeamerNewCommentAction {
             string(POST_ID)
                 .label("Post")
                 .description("ID of the post that will have the new comment.")
-                .options((ActionOptionsFunction<String>) BeamerUtils::getPostsOptions)
+                .options((OptionsFunction<String>) BeamerUtils::getPostsOptions)
                 .required(true),
             string(TEXT)
                 .label("Text")

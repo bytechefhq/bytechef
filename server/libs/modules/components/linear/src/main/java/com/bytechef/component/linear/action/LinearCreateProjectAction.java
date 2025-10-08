@@ -34,9 +34,9 @@ import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.util.LinearUtils.appendOptionalField;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import java.util.Map;
@@ -57,12 +57,12 @@ public class LinearCreateProjectAction {
             string(TEAM_ID)
                 .label("Team ID")
                 .description("The ID of the team where this project should be created.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getTeamOptions)
+                .options((OptionsFunction<String>) LinearUtils::getTeamOptions)
                 .required(true),
             string(STATUS_ID)
                 .label("Status")
                 .description("The status of the project.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getProjectStateOptions)
+                .options((OptionsFunction<String>) LinearUtils::getProjectStateOptions)
                 .required(false),
             integer(PRIORITY)
                 .label("Priority")

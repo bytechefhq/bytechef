@@ -39,9 +39,9 @@ import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.ge
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.updateEvent;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
@@ -64,7 +64,7 @@ public class GoogleCalendarUpdateEventAction {
             string(EVENT_ID)
                 .label("Event ID")
                 .description("ID of the event to update.")
-                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+                .options((OptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true),
             string(SUMMARY)

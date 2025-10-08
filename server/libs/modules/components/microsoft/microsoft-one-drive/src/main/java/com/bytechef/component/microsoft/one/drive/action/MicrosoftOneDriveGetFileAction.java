@@ -22,10 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
@@ -42,7 +42,7 @@ public class MicrosoftOneDriveGetFileAction {
             string(ID)
                 .label("File ID")
                 .description("ID of the file to retrieve.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .perform(MicrosoftOneDriveGetFileAction::perform)

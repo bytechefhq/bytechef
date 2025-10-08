@@ -21,9 +21,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.myob.util.MyobUtils;
 
 /**
@@ -80,7 +80,7 @@ public class MyobConstants {
     public static final ModifiableStringProperty COMPANY_FILE_PROPERTY = string(COMPANY_FILE)
         .label("Company File")
         .description("The MYOB company file to use.")
-        .options((ActionOptionsFunction<String>) MyobUtils::getCompanyFileOptions)
+        .options((OptionsFunction<String>) MyobUtils::getCompanyFileOptions)
         .required(true);
 
     public static final ModifiableStringProperty FIRST_NAME_PROPERTY = string(FIRST_NAME)

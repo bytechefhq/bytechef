@@ -26,11 +26,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.box.util.BoxUtils;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -51,7 +51,7 @@ public class BoxNewFileTrigger {
             string(FOLDER_ID)
                 .label("Folder ID")
                 .description("ID of the folder in which file uploads will trigger this webhook.")
-                .options((TriggerOptionsFunction<String>) BoxUtils::getRootFolderOptions)
+                .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .webhookEnable(BoxNewFileTrigger::webhookEnable)

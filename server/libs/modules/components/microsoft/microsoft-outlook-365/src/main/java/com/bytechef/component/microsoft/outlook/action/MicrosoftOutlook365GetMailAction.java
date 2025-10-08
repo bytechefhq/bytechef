@@ -24,10 +24,10 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createSimpleMessage;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
@@ -48,7 +48,7 @@ public class MicrosoftOutlook365GetMailAction {
             string(ID)
                 .label("Message Id")
                 .description("Id of the message.")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY)
         .output(MicrosoftOutlook365Utils::getMessageOutput)

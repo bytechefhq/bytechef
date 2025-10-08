@@ -24,9 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
@@ -51,12 +51,12 @@ public class AirtableNewRecordTrigger {
             string(BASE_ID)
                 .label("Base ID")
                 .description("ID of the base which contains the table that you want to monitor.")
-                .options((TriggerOptionsFunction<String>) AirtableUtils::getBaseIdOptions)
+                .options((OptionsFunction<String>) AirtableUtils::getBaseIdOptions)
                 .required(true),
             string(TABLE_ID)
                 .label("Table")
                 .description("The table to monitor for new records.")
-                .options((TriggerOptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                .options((OptionsFunction<String>) AirtableUtils::getTableIdOptions)
                 .optionsLookupDependsOn(BASE_ID)
                 .required(true),
             string(TRIGGER_FIELD)

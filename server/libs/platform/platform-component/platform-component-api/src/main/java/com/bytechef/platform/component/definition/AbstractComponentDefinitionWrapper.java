@@ -39,12 +39,12 @@ import java.util.Optional;
  */
 public abstract class AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
-    protected final List<? extends ActionDefinition> actions;
+    protected final List<ActionDefinition> actions;
     protected final List<ComponentCategory> componentCategories;
     protected final ConnectionDefinition connection;
     protected final Boolean customAction;
     protected final Help customActionHelp;
-    protected final List<? extends ClusterElementDefinition<?>> clusterElements;
+    protected final List<ClusterElementDefinition<?>> clusterElements;
     protected final String description;
     protected final String icon;
     protected final List<String> tags;
@@ -52,7 +52,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final String name;
     protected final Resources resources;
     protected final String title;
-    protected final List<? extends TriggerDefinition> triggers;
+    protected final List<TriggerDefinition> triggers;
     protected final UnifiedApiDefinition unifiedApi;
     protected final int version;
 
@@ -76,7 +76,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<? extends ActionDefinition>> getActions() {
+    public Optional<List<ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+    public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
         return Optional.ofNullable(clusterElements);
     }
 
@@ -142,7 +142,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<? extends TriggerDefinition>> getTriggers() {
+    public Optional<List<TriggerDefinition>> getTriggers() {
         return Optional.ofNullable(triggers == null ? null : new ArrayList<>(triggers));
     }
 

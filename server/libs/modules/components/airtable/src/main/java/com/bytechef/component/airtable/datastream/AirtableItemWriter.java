@@ -16,18 +16,16 @@
 
 package com.bytechef.component.airtable.datastream;
 
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemWriter;
@@ -51,16 +49,12 @@ public class AirtableItemWriter implements ItemWriter {
                 string("baseId").label("Base ID")
                     .description("ID of the base where table is located.")
                     .required(true)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions),
+                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getBaseIdOptions),
                 string("tableId").label("Table ID")
                     .description("The table where the record will be created.")
                     .required(true)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions)
-                    .optionsLookupDependsOn("baseId"),
-                dynamicProperties("fields")
-                    .properties((PropertiesDataSource.ActionPropertiesFunction) AirtableUtils::getFieldsProperties)
-                    .propertiesLookupDependsOn("baseId", "tableId")
-                    .required(false));
+                    .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                    .optionsLookupDependsOn("baseId"));
 
     private String baseId;
     private Context context;
@@ -78,7 +72,6 @@ public class AirtableItemWriter implements ItemWriter {
 
     @Override
     public void write(List<? extends Map<String, Object>> items) {
-
         if (items == null || items.isEmpty()) {
             return;
         }

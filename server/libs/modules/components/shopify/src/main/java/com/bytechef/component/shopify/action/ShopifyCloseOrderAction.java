@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class ShopifyCloseOrderAction {
         .properties(integer("orderId").label("Order ID")
             .description("ID of the order to close.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
+            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

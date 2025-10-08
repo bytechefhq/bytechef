@@ -22,9 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.attio.util.AttioUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 
 /**
  * @author Nikolina Spehar
@@ -195,7 +195,7 @@ public class AttioConstants {
             array("associated_users")
                 .label("Associated Users")
                 .description("The associated users of the person.")
-                .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
+                .options((OptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
                 .required(false)
                 .items(
                     string("user")

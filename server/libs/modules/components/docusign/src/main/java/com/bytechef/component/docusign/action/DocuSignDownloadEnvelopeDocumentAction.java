@@ -27,11 +27,11 @@ import static com.bytechef.component.docusign.constant.DocuSignConstants.DOCUMEN
 import static com.bytechef.component.docusign.constant.DocuSignConstants.ENVELOPE_ID;
 import static com.bytechef.component.docusign.constant.DocuSignConstants.FROM_DATE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.docusign.util.DocuSignUtils;
@@ -54,13 +54,13 @@ public class DocuSignDownloadEnvelopeDocumentAction {
                 .description("The ID of the envelope.")
                 .required(true)
                 .optionsLookupDependsOn(FROM_DATE)
-                .options((ActionOptionsFunction<String>) DocuSignUtils::getEnvelopeIdOptions),
+                .options((OptionsFunction<String>) DocuSignUtils::getEnvelopeIdOptions),
             string(DOCUMENT_ID)
                 .label("Document ID")
                 .description("ID of the document that will be downloaded from the envelope.")
                 .required(true)
                 .optionsLookupDependsOn(ENVELOPE_ID)
-                .options((ActionOptionsFunction<String>) DocuSignUtils::getDocumentIdOptions))
+                .options((OptionsFunction<String>) DocuSignUtils::getDocumentIdOptions))
         .output(outputSchema(fileEntry().description("Downloaded document.")))
         .perform(DocuSignDownloadEnvelopeDocumentAction::perform);
 

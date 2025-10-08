@@ -40,11 +40,11 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
@@ -284,7 +284,7 @@ class GoogleSheetsUtilsTest {
                     integerArgumentCaptor.capture()))
                 .thenReturn(List.of("header1", "header2", "header3"));
 
-            ActionPropertiesFunction arrayPropertyForRow = GoogleSheetsUtils.createPropertiesForNewRows(true);
+            PropertiesFunction arrayPropertyForRow = GoogleSheetsUtils.createPropertiesForNewRows(true);
 
             List<? extends ValueProperty<?>> result = arrayPropertyForRow.apply(
                 mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -329,7 +329,7 @@ class GoogleSheetsUtilsTest {
                     integerArgumentCaptor.capture()))
                 .thenReturn(List.of("header1", "header2", "header3"));
 
-            ActionPropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(false);
+            PropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(false);
 
             List<? extends ValueProperty<?>> result = propertiesForNewRows.apply(
                 mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -365,7 +365,7 @@ class GoogleSheetsUtilsTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(IS_THE_FIRST_ROW_HEADER, false, SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName"));
 
-        ActionPropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(false);
+        PropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(false);
 
         List<? extends ValueProperty<?>> result = propertiesForNewRows.apply(
             mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -387,7 +387,7 @@ class GoogleSheetsUtilsTest {
         mockedParameters = MockParametersFactory.create(
             Map.of(IS_THE_FIRST_ROW_HEADER, false, SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName"));
 
-        ActionPropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(true);
+        PropertiesFunction propertiesForNewRows = GoogleSheetsUtils.createPropertiesForNewRows(true);
 
         List<? extends ValueProperty<?>> result = propertiesForNewRows.apply(
             mockedParameters, mockedParameters, Map.of(), mockedActionContext);

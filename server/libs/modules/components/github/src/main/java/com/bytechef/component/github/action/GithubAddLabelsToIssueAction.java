@@ -28,10 +28,10 @@ import static com.bytechef.component.github.constant.GithubConstants.LABELS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -47,11 +47,11 @@ public class GithubAddLabelsToIssueAction {
         .description("Adds labels to the specified issue.")
         .properties(
             string(REPOSITORY)
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .label("Repository")
                 .required(true),
             string(ISSUE)
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .label("Issue Number")
                 .description("The number of the issue to add labels to.")
@@ -60,7 +60,7 @@ public class GithubAddLabelsToIssueAction {
                 .label("Labels")
                 .description("The list of labels to add to the issue.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
+                .options((OptionsFunction<String>) GithubUtils::getLabels)
                 .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
         .output(outputSchema(

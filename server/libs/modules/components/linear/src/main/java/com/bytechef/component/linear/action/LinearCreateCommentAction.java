@@ -28,8 +28,8 @@ import static com.bytechef.component.linear.constant.LinearConstants.ISSUE_ID;
 import static com.bytechef.component.linear.constant.LinearConstants.TEAM_ID;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import java.util.Map;
@@ -46,12 +46,12 @@ public class LinearCreateCommentAction {
             string(TEAM_ID)
                 .label("Team ID")
                 .description("The ID of the team where this issue should be created.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getTeamOptions)
+                .options((OptionsFunction<String>) LinearUtils::getTeamOptions)
                 .required(true),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("The identifier of the issue to update.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getIssueOptions)
+                .options((OptionsFunction<String>) LinearUtils::getIssueOptions)
                 .optionsLookupDependsOn(TEAM_ID)
                 .required(true),
             string(BODY)

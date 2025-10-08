@@ -39,11 +39,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.attio.util.AttioUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -79,7 +79,7 @@ public class AttioCreateTaskAction {
                         .properties(
                             string(TARGET_OBJECT)
                                 .label("Target Object")
-                                .options((ActionOptionsFunction<String>) AttioUtils::getTargetObjectOptions)
+                                .options((OptionsFunction<String>) AttioUtils::getTargetObjectOptions)
                                 .required(true),
                             string(TARGET_RECORD_ID)
                                 .label("Target Record ID")
@@ -90,7 +90,7 @@ public class AttioCreateTaskAction {
             array(ASSIGNEES)
                 .label("Assignees")
                 .description("Assignees of the task.")
-                .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
+                .options((OptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
                 .required(false)
                 .items(string()))
         .output(

@@ -20,9 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
@@ -39,7 +39,7 @@ public class MicrosoftOneDriveDeleteFileAction {
             string(ID)
                 .label("File ID")
                 .description("The id of a file to delete.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
         .perform(MicrosoftOneDriveDeleteFileAction::perform)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);

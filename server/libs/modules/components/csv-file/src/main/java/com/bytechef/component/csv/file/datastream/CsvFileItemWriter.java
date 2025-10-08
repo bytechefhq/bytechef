@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemWriter;
@@ -53,6 +54,7 @@ public class CsvFileItemWriter implements ItemWriter {
                     .required(true));
 
     private BufferedWriter bufferedWriter;
+    boolean headerWritten;
     private SequenceWriter sequenceWriter;
 
     @Override
@@ -62,7 +64,7 @@ public class CsvFileItemWriter implements ItemWriter {
             try {
                 bufferedWriter.close();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                // Ignore
             }
         }
 
@@ -70,7 +72,7 @@ public class CsvFileItemWriter implements ItemWriter {
             try {
                 sequenceWriter.close();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                // Ignore
             }
         }
     }
@@ -80,10 +82,14 @@ public class CsvFileItemWriter implements ItemWriter {
         Parameters inputParameters, Parameters connectionParameters, Context context,
         ExecutionContext executionContext) {
 
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
+
         bufferedWriter = new BufferedWriter(
             new OutputStreamWriter(
-                context.file(file -> file.getOutputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
+                context.file(file -> file.getOutputStream(fileEntry)),
                 StandardCharsets.UTF_8));
+
+        headerWritten = context.file(file -> file.getContentLength(fileEntry)) > 0;
 
         ObjectWriter writer = CSV_MAPPER.writer();
 
@@ -97,6 +103,12 @@ public class CsvFileItemWriter implements ItemWriter {
     @Override
     public void write(List<? extends Map<String, Object>> items) throws Exception {
         for (Map<String, ?> row : items) {
+            if (!headerWritten) {
+                headerWritten = true;
+
+                sequenceWriter.write(row.keySet());
+            }
+
             sequenceWriter.write(row.values());
         }
     }

@@ -99,7 +99,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
         return clusterElementDefinitionFacade.executeDynamicProperties(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
-            clusterElementWorkflowNodeType.operation(), propertyName, workflowId,
+            clusterElementWorkflowNodeType.operation(), propertyName,
             evaluator.evaluate(
                 clusterElement.getParameters(),
                 MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
@@ -135,8 +135,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                 return actionDefinitionFacade.executeDynamicProperties(
-                    workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation(), propertyName, workflowId,
+                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
                     lookupDependsOnPaths, connectionId);

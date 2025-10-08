@@ -67,6 +67,13 @@ public interface Context {
     <R> R http(ContextFunction<Http, R> httpFunction);
 
     /**
+     * Determines whether the current environment is the editor environment.
+     *
+     * @return true if the current environment is an editor environment, false otherwise.
+     */
+    boolean isEditorEnvironment();
+
+    /**
      *
      * @param jsonFunction
      * @return

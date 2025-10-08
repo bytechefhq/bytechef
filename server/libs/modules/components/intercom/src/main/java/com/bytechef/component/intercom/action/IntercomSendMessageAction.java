@@ -32,12 +32,12 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.TEMPLAT
 import static com.bytechef.component.intercom.constant.IntercomConstants.TO;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
@@ -79,7 +79,7 @@ public class IntercomSendMessageAction {
                 .label("To")
                 .description("ID of the contact to send the message to.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
+                .options((OptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(
             outputSchema(
                 object()

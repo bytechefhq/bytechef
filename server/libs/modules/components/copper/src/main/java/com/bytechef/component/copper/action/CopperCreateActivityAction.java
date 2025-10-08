@@ -33,10 +33,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class CopperCreateActivityAction {
             string(ACTIVITY_TYPE)
                 .label("Activity Type ID")
                 .description("Id of activity type for this activity.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
                 .required(true),
             string(DETAILS)
                 .label("Details")
@@ -72,7 +72,7 @@ public class CopperCreateActivityAction {
             string(ID)
                 .label("Parent ID")
                 .description("ID of the parent this activity will be associated with.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getParentOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getParentOptions)
                 .optionsLookupDependsOn(TYPE)
                 .required(true))
         .output(outputSchema(

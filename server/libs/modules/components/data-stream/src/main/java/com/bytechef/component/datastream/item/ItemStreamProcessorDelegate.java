@@ -46,7 +46,7 @@ public class ItemStreamProcessorDelegate extends AbstractItemStreamDelegate
     @Override
     public Map<String, Object> process(Map<String, Object> item) throws Exception {
         if (itemProcessor != null) {
-            item = itemProcessor.process(item, inputParameters, connectionParameters, context);
+            item = itemProcessor.process(item, inputParameters, connectionParameters, clusterElementContext);
         }
 
         return item;

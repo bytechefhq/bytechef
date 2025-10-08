@@ -18,8 +18,8 @@ package com.bytechef.component.discord.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.discord.util.DiscordUtils;
 
 /**
@@ -34,7 +34,7 @@ public class DiscordConstants {
 
     public static final ModifiableStringProperty GUILD_ID_PROPERTY = string(GUILD_ID)
         .label("Guild ID")
-        .options((ActionOptionsFunction<String>) DiscordUtils::getGuildIdOptions)
+        .options((OptionsFunction<String>) DiscordUtils::getGuildIdOptions)
         .required(true);
 
     private DiscordConstants() {

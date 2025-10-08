@@ -27,12 +27,12 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID_LIST;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -54,11 +54,11 @@ public class TrelloNewCardTrigger {
         .properties(
             string(ID_BOARD)
                 .label("Board ID")
-                .options((TriggerOptionsFunction<String>) TrelloUtils::getBoardOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID_LIST)
                 .label("List ID")
-                .options((TriggerOptionsFunction<String>) TrelloUtils::getListOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getListOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(false))
         .output(outputSchema(CARD_OUTPUT_PROPERTY))

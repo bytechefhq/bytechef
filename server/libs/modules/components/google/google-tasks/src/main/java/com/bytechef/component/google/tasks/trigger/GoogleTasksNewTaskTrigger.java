@@ -25,9 +25,9 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
@@ -61,7 +61,7 @@ public class GoogleTasksNewTaskTrigger {
             string(LIST_ID)
                 .label("List ID")
                 .description("ID of the list where new task is added.")
-                .options((TriggerOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .options((OptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .poll(GoogleTasksNewTaskTrigger::poll)

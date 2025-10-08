@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.apify.util.ApifyUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -46,7 +46,7 @@ public class ApifyGetLastRunAction {
         .properties(string("actorId").label("Actor ID")
             .description("ID of the actor that will be fetched.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ApifyUtils::getActorIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) ApifyUtils::getActorIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

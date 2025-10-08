@@ -31,9 +31,9 @@ import static com.bytechef.component.discord.constant.DiscordConstants.TTS;
 import static com.bytechef.component.discord.util.DiscordUtils.getDMChannel;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.discord.util.DiscordUtils;
@@ -52,7 +52,7 @@ public class DiscordSendDirectMessageAction {
                 .label("Recipient")
                 .description("The recipient to open a DM channel with.")
                 .optionsLookupDependsOn(GUILD_ID)
-                .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions)
+                .options((OptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions)
                 .required(true),
             string(CONTENT)
                 .label("Message Text")

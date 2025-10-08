@@ -58,7 +58,7 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
 
         TenantUtils.runWithTenantId(
             tenantId, () -> itemReader.open(
-                inputParameters, connectionParameters, context, itemStreamExecutionContext));
+                inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
 
         TenantUtils.runWithTenantId(
             tenantId, () -> itemReader.update(
-                inputParameters, connectionParameters, context, itemStreamExecutionContext));
+                inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {

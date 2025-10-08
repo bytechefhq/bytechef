@@ -16,14 +16,12 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesFunction> {
+public interface PropertiesDataSource<F extends PropertiesDataSource.BasePropertiesFunction> {
 
     /**
      * The function that returns a list of properties.
@@ -41,46 +39,7 @@ public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesF
     /**
      *
      */
-    interface PropertiesFunction {
+    interface BasePropertiesFunction {
     }
 
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ActionPropertiesFunction extends PropertiesFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            ActionContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface TriggerPropertiesFunction extends PropertiesFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            TriggerContext context) throws Exception;
-    }
 }

@@ -24,10 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -44,12 +44,12 @@ public class BambooHrGetEmployeeAction {
             string(ID)
                 .label("Employee ID")
                 .description("The ID of the employee.")
-                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
                 .required(true),
             array(FIELDS)
                 .description("Fields you want to get from employee. See documentation for available fields.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) BambooHrUtils::getFieldOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getFieldOptions)
                 .required(true))
         .output()
         .perform(BambooHrGetEmployeeAction::perform);
