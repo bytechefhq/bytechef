@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public class ClusterElement {
 
-    private final ComponentConnection connection;
+    private final ComponentConnection componentConnection;
     private final String clusterElementName;
     private final String componentName;
     private final int componentVersion;
@@ -39,10 +39,10 @@ public class ClusterElement {
     private final String workflowNodeName;
 
     public ClusterElement(
-        ComponentConnection connection, String description, Map<String, ?> extensions, String label, String type,
-        Map<String, ?> parameters, String workflowNodeName) {
+        ComponentConnection componentConnection, String description, Map<String, ?> extensions, String label,
+        String type, Map<String, ?> parameters, String workflowNodeName) {
 
-        this.connection = connection;
+        this.componentConnection = componentConnection;
         this.extensions = Collections.unmodifiableMap(extensions);
         this.description = description;
         this.label = label;
@@ -58,7 +58,7 @@ public class ClusterElement {
     }
 
     public ComponentConnection getConnection() {
-        return connection;
+        return componentConnection;
     }
 
     public String getClusterElementName() {
@@ -103,7 +103,8 @@ public class ClusterElement {
             return false;
         }
 
-        return componentVersion == that.componentVersion && Objects.equals(connection, that.connection) &&
+        return componentVersion == that.componentVersion
+            && Objects.equals(componentConnection, that.componentConnection) &&
             Objects.equals(clusterElementName, that.clusterElementName) &&
             Objects.equals(componentName, that.componentName) && Objects.equals(extensions, that.extensions) &&
             Objects.equals(type, that.type) && Objects.equals(label, that.label) &&
@@ -114,7 +115,8 @@ public class ClusterElement {
     @Override
     public int hashCode() {
         return Objects.hash(
-            connection, clusterElementName, componentName, componentVersion, extensions, type, label, description,
+            componentConnection, clusterElementName, componentName, componentVersion, extensions, type, label,
+            description,
             parameters, workflowNodeName);
     }
 
@@ -125,7 +127,7 @@ public class ClusterElement {
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
             ", clusterElementName='" + clusterElementName + '\'' +
-            ", connection=" + connection +
+            ", connection=" + componentConnection +
             ", type='" + type + '\'' +
             ", label='" + label + '\'' +
             ", description='" + description + '\'' +

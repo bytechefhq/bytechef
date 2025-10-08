@@ -17,7 +17,7 @@
 package com.bytechef.component.datastream.action.definition;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CLUSTER_ELEMENT_NAME;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_CONNECTION;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.MODE_TYPE;
@@ -43,6 +43,7 @@ import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.batch.core.Job;
@@ -81,17 +82,22 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                 {
                     ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
-                    put(
-                        DESTINATION.name(),
-                        new JobParameter<>(
-                            Map.of(
-                                COMPONENT_NAME, clusterElement.getComponentName(),
-                                COMPONENT_VERSION, clusterElement.getComponentVersion(),
-                                CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName(),
-                                CONNECTION_PARAMETERS, connectionParameters.get(
-                                    DESTINATION.key() + "_" + clusterElement.getClusterElementName()),
-                                INPUT_PARAMETERS, clusterElement.getParameters()),
-                            Map.class));
+                    Map<String, Object> value = new HashMap<>();
+
+                    ComponentConnection componentConnection = connectionParameters.get(
+                        DESTINATION.key() + "_" + clusterElement.getClusterElementName());
+
+                    if (componentConnection != null) {
+                        value.put(COMPONENT_CONNECTION, componentConnection);
+                    }
+
+                    value.put(COMPONENT_NAME, clusterElement.getComponentName());
+                    value.put(COMPONENT_VERSION, clusterElement.getComponentVersion());
+                    value.put(CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName());
+
+                    value.put(INPUT_PARAMETERS, clusterElement.getParameters());
+
+                    put(DESTINATION.name(), new JobParameter<>(value, Map.class));
 
                     if (actionContextAware.getJobPrincipalId() != null) {
                         put(PRINCIPAL_ID, new JobParameter<>(actionContextAware.getJobPrincipalId(), Long.class));
@@ -107,17 +113,22 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     clusterElement = clusterElementMap.getClusterElement(SOURCE);
 
-                    put(
-                        SOURCE.name(),
-                        new JobParameter<>(
-                            Map.of(
-                                COMPONENT_NAME, clusterElement.getComponentName(),
-                                COMPONENT_VERSION, clusterElement.getComponentVersion(),
-                                CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName(),
-                                CONNECTION_PARAMETERS, connectionParameters.get(
-                                    SOURCE.key() + "_" + clusterElement.getClusterElementName()),
-                                INPUT_PARAMETERS, clusterElement.getParameters()),
-                            Map.class));
+                    value = new HashMap<>();
+
+                    componentConnection = connectionParameters.get(
+                        SOURCE.key() + "_" + clusterElement.getClusterElementName());
+
+                    if (componentConnection != null) {
+                        value.put(COMPONENT_CONNECTION, componentConnection);
+                    }
+
+                    value.put(COMPONENT_NAME, clusterElement.getComponentName());
+                    value.put(COMPONENT_VERSION, clusterElement.getComponentVersion());
+                    value.put(CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName());
+
+                    value.put(INPUT_PARAMETERS, clusterElement.getParameters());
+
+                    put(SOURCE.name(), new JobParameter<>(value, Map.class));
 
                     put(TENANT_ID, new JobParameter<>(TenantContext.getCurrentTenantId(), String.class));
                     put(
@@ -144,8 +155,8 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
         }
 
         return Map.of(
-            "endTime", jobExecution.getEndTime(),
+            "endTime", Objects.requireNonNull(jobExecution.getEndTime()),
             "status", jobExecution.getStatus(),
-            "startTime", jobExecution.getStartTime());
+            "startTime", Objects.requireNonNull(jobExecution.getStartTime()));
     }
 }

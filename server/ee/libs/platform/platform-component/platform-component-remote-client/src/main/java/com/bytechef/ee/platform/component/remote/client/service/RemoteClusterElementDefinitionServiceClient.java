@@ -7,10 +7,13 @@
 
 package com.bytechef.ee.platform.component.remote.client.service;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +29,43 @@ import org.springframework.stereotype.Component;
 public class RemoteClusterElementDefinitionServiceClient implements ClusterElementDefinitionService {
 
     @Override
+    public List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection,
+        ClusterElementContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Option> executeOptions(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection, ClusterElementContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
+        ClusterElementContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, ActionContext context) {
+        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        ClusterElementContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -40,7 +77,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
 
     @Override
     public ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

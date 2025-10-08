@@ -46,6 +46,18 @@ public class CsvFileConstants {
     public static final String READ_AS_STRING = "readAsString";
     public static final String ROWS = "rows";
 
+    public static final CsvMapper CSV_MAPPER = new CsvMapper();
+
+    public static final Property ROWS_PROPERTY = array(ROWS)
+        .label("Rows")
+        .description("The array of rows to append to the file.")
+        .required(true)
+        .placeholder("Add Row")
+        .items(
+            object()
+                .placeholder("Add Column")
+                .additionalProperties(bool(), dateTime(), number(), string()));
+
     @SuppressFBWarnings("MS")
     public static final Property[] READ_PROPERTIES = {
         fileEntry(FILE_ENTRY)
@@ -90,25 +102,4 @@ public class CsvFileConstants {
             .defaultValue(false)
             .advancedOption(true)
     };
-
-    @SuppressFBWarnings("MS")
-    public static final Property[] WRITE_PROPERTIES = {
-        array(ROWS)
-            .label("Rows")
-            .description("The array of rows to write to the file.")
-            .required(true)
-            .placeholder("Add Row")
-            .items(
-                object()
-                    .placeholder("Add Column")
-                    .additionalProperties(bool(), dateTime(), number(), string())),
-        string(FILENAME)
-            .label("Filename")
-            .description(
-                "Filename to set for binary data. By default, \"file.csv\" will be used.")
-            .defaultValue("file.csv")
-            .advancedOption(true)
-    };
-
-    public static final CsvMapper CSV_MAPPER = new CsvMapper();
 }

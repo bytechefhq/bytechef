@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
@@ -33,9 +34,11 @@ public interface ContextFactory {
         @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
         @Nullable String workflowId, @Nullable ComponentConnection connection, boolean editorEnvironment);
 
-    Context createContext(String componentName, @Nullable ComponentConnection connection);
+    Context createContext(String componentName, @Nullable ComponentConnection componentConnection);
 
-    Context createContext(String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment);
+    ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable ModeType type,

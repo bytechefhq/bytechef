@@ -19,7 +19,7 @@ package com.bytechef.platform.component.context;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.constant.ModeType;
@@ -44,7 +44,6 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private Approval approval;
     private final ContextFactory contextFactory;
     private final Data data;
-    private final boolean editorEnvironment;
     private final Event event;
     private final Long jobPrincipalId;
     private final Long jobPrincipalWorkflowId;
@@ -54,13 +53,16 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String actionName, String componentName, int componentVersion, @Nullable ComponentConnection connection,
-        ContextFactory contextFactory, DataStorage dataStorage, boolean editorEnvironment,
-        ApplicationEventPublisher eventPublisher, HttpClientExecutor httpClientExecutor, @Nullable Long jobId,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable ModeType modeType,
-        String publicUrl, TempFileStorage tempFileStorage, @Nullable String workflowId) {
+        String actionName, String componentName, int componentVersion,
+        @Nullable ComponentConnection componentConnection, ContextFactory contextFactory, DataStorage dataStorage,
+        boolean editorEnvironment, ApplicationEventPublisher eventPublisher, HttpClientExecutor httpClientExecutor,
+        @Nullable Long jobId, @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId,
+        @Nullable ModeType modeType, @Nullable String publicUrl, TempFileStorage tempFileStorage,
+        @Nullable String workflowId) {
 
-        super(componentName, componentVersion, actionName, connection, httpClientExecutor, tempFileStorage);
+        super(
+            componentName, componentVersion, actionName, componentConnection, editorEnvironment, httpClientExecutor,
+            tempFileStorage);
 
         this.actionName = actionName;
         this.contextFactory = contextFactory;
@@ -72,7 +74,6 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.data = new DataImpl(
             componentName, componentVersion, actionName, modeType, jobPrincipalId, jobPrincipalWorkflowId, jobId,
             dataStorage);
-        this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.jobPrincipalId = jobPrincipalId;
         this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
@@ -105,8 +106,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public Context createContext(String componentName, @Nullable ComponentConnection connection) {
-        return contextFactory.createContext(componentName, connection, editorEnvironment);
+    public ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String componentOperationName,
+        @Nullable ComponentConnection componentConnection) {
+
+        return contextFactory.createClusterElementContext(
+            componentName, componentVersion, componentOperationName, componentConnection, isEditorEnvironment());
     }
 
     @Override

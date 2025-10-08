@@ -164,7 +164,7 @@ class AwsFileStorageIntTest {
     void canGetFileStream() {
         FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
 
-        InputStream fileStream = storageService.getFileStream(DIR_PATH, fileEntry);
+        InputStream fileStream = storageService.getInputStream(DIR_PATH, fileEntry);
 
         await()
             .pollInterval(Duration.ofSeconds(2))

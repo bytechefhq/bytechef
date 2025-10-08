@@ -20,6 +20,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Ivica Cardic
@@ -36,8 +37,18 @@ public class TempFileStorageImpl implements TempFileStorage {
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
-        return fileStorageService.getFileStream(TEMP_DIR, fileEntry);
+    public long getContentLength(FileEntry fileEntry) {
+        return fileStorageService.getContentLength(TEMP_DIR, fileEntry);
+    }
+
+    @Override
+    public InputStream getInputStream(FileEntry fileEntry) {
+        return fileStorageService.getInputStream(TEMP_DIR, fileEntry);
+    }
+
+    @Override
+    public OutputStream getOutputStream(FileEntry fileEntry) {
+        return fileStorageService.getOutputStream(TEMP_DIR, fileEntry);
     }
 
     @Override

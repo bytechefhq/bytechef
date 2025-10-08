@@ -16,6 +16,10 @@
 
 package com.bytechef.component.csv.file.util;
 
+/**
+ *
+ * @author Ivica Cardic
+ */
 public record ReadConfiguration(
     String delimiter, String enclosingCharacter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow,
     long rangeEndRow, boolean readAsString) {

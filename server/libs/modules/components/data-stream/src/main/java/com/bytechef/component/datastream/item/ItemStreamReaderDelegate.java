@@ -22,6 +22,7 @@ import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.util.TenantUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
@@ -31,13 +32,14 @@ import org.springframework.batch.item.ItemStreamReader;
 /**
  * @author Ivica Cardic
  */
-public class ItemReaderDelegate extends AbstractItemDelegate
-    implements ItemStreamReader<Map<String, ?>> {
+@SuppressFBWarnings("NP")
+public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
+    implements ItemStreamReader<Map<String, Object>> {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private ItemReader itemReader;
 
-    public ItemReaderDelegate(
+    public ItemStreamReaderDelegate(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
 
         super(SOURCE, contextFactory);
@@ -47,29 +49,30 @@ public class ItemReaderDelegate extends AbstractItemDelegate
 
     @Override
     public void close() throws ItemStreamException {
-        if (itemReader != null) {
-            itemReader.close();
-        }
+        itemReader.close();
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        TenantUtils.runWithTenantId(tenantId, () -> itemReader.open(
-            inputParameters, connectionParameters,
-            new ExecutionContextImpl(
-                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
+        ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
+
+        TenantUtils.runWithTenantId(
+            tenantId, () -> itemReader.open(
+                inputParameters, connectionParameters, context, itemStreamExecutionContext));
     }
 
     @Override
-    public Map<String, ?> read() {
+    public Map<String, Object> read() {
         return TenantUtils.callWithTenantId(tenantId, () -> itemReader.read());
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-        TenantUtils.runWithTenantId(tenantId, () -> itemReader.update(
-            new ExecutionContextImpl(
-                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
+        ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
+
+        TenantUtils.runWithTenantId(
+            tenantId, () -> itemReader.update(
+                inputParameters, connectionParameters, context, itemStreamExecutionContext));
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {

@@ -17,13 +17,12 @@
 package com.bytechef.component.csv.file.action;
 
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPPER;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILENAME;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -32,58 +31,52 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Appends rows to an existing CSV file referenced by a FileEntry.
+ *
  * @author Ivica Cardic
  */
-public class CsvFileWriteAction {
+public class CsvFileAppendAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
-        .title("Write to CSV File")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("append")
+        .title("Append to CSV File")
         .description(
-            "Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.")
+            "Appends the data records into an existing CSV file. Record values are assembled into a line and " +
+                "separated with a delimiter (comma by default). The existing header (if any) is preserved.")
         .properties(
-            ROWS_PROPERTY,
-            string(FILENAME)
-                .label("Filename")
-                .description(
-                    "Filename to set for binary data. By default, \"file.csv\" will be used.")
-                .defaultValue("file.csv")
-                .advancedOption(true))
-        .output(outputSchema(fileEntry().description("File entry representing new csv file.")))
-        .perform(CsvFileWriteAction::perform);
+            fileEntry(FILE_ENTRY)
+                .label("File Entry")
+                .description("The object property which contains a reference to the csv file to append to.")
+                .required(true),
+            ROWS_PROPERTY)
+        .output(outputSchema(fileEntry().description("File entry representing updated csv file.")))
+        .perform(CsvFileAppendAction::perform);
 
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
         List<Map<String, ?>> rows = inputParameters.getList(ROWS, new TypeReference<>() {}, List.of());
 
-        try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
-            return context.file(
-                file -> file.storeContent(inputParameters.getString(FILENAME, "file.csv"), inputStream));
-        }
-    }
-
-    private static byte[] write(List<Map<String, ?>> rows) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        boolean headerRow = false;
+        OutputStream outputStream = context.file(f -> f.getOutputStream(fileEntry));
 
         ObjectWriter writer = CSV_MAPPER.writer();
 
-        try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8);
+        try (PrintWriter printWriter = new PrintWriter(outputStream, false, StandardCharsets.UTF_8);
             SequenceWriter sequenceWriter = writer.writeValues(printWriter)) {
 
+            boolean headerWritten = context.file(file -> file.getContentLength(fileEntry)) > 0;
+
             for (Map<String, ?> row : rows) {
-                if (!headerRow) {
-                    headerRow = true;
+                if (!headerWritten) {
+                    headerWritten = true;
 
                     sequenceWriter.write(row.keySet());
                 }
@@ -92,6 +85,6 @@ public class CsvFileWriteAction {
             }
         }
 
-        return byteArrayOutputStream.toByteArray();
+        return fileEntry;
     }
 }

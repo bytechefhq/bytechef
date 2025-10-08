@@ -44,13 +44,11 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     public TriggerContextImpl(
         String componentName, int componentVersion, @Nullable ComponentConnection connection, DataStorage dataStorage,
         boolean editorEnvironment, TempFileStorage tempFileStorage, HttpClientExecutor httpClientExecutor,
-        @Nullable Long jobPrincipalId, String triggerName, @Nullable ModeType type,
-        @Nullable String workflowUuid) {
+        @Nullable Long jobPrincipalId, String triggerName, @Nullable ModeType type, @Nullable String workflowUuid) {
 
         super(componentName, componentVersion, triggerName, connection, httpClientExecutor, tempFileStorage);
 
-        this.data = new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowUuid, dataStorage);
+        this.data = new DataImpl(componentName, componentVersion, triggerName, type, workflowUuid, dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.jobPrincipalId = jobPrincipalId;
         this.triggerName = triggerName;

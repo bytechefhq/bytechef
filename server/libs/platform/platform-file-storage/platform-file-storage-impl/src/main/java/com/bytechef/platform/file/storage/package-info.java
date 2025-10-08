@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 ByteChef
+ * Copyright 2023-present ByteChef Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition.datastream;
+@NonNullApi
+@NonNullFields
+package com.bytechef.platform.file.storage;
 
-import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import java.util.Map;
-
-/**
- * @author Ivica Cardic
- */
-public interface ItemReader extends ItemStream {
-
-    ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
-
-    Map<String, Object> read() throws Exception;
-}
+import org.springframework.lang.NonNullApi;
+import org.springframework.lang.NonNullFields;

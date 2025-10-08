@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ConnectionDefinition;
@@ -217,6 +218,39 @@ public class ComponentDefinitionRegistry {
             })
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public ClusterElementDefinition<?> getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName) {
+
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getClusterElements()
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "The component '%s' does not contain the '%s' cluster element.".formatted(
+                        componentName, clusterElementName)));
+    }
+
+    public Property getClusterElementProperty(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ActionContext context) throws Exception {
+
+        ClusterElementDefinition<?> clusterElementDefinition = getClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
+
+        List<? extends Property> properties = clusterElementDefinition.getProperties()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "The cluster element '%s' in component '%s' does not have any properties defined.".formatted(
+                    clusterElementName, componentName)));
+
+        return getProperty(
+            propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
     }
 
     public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
