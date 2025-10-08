@@ -1,21 +1,21 @@
 {
-  "label" : "Local File - READ operation",
-  "inputs" : [ {
-    "name" : "filename",
-    "label" : "Absolute file path to read from",
-    "type" : "STRING",
-    "required" : true
+  "label": "Local File - READ operation",
+  "inputs": [ {
+    "name": "filename",
+    "label": "Absolute file path to read from",
+    "type": "STRING",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "readLocalFile",
-    "value" : "${readLocalFile}"
+  "outputs": [ {
+    "name": "readLocalFile",
+    "value": "${readLocalFile}"
   } ],
-  "tasks" : [ {
-    "name" : "readLocalFile",
-    "label" : "Read from local file",
-    "type" : "filesystem/v1/readFile",
-    "parameters" : {
-      "filename" : "${filename}"
+  "tasks": [ {
+    "name": "readLocalFile",
+    "label": "Read from local file",
+    "type": "filesystem/v1/readFile",
+    "parameters": {
+      "filename": "${filename}"
     }
   } ]
 }

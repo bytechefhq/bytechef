@@ -1,33 +1,33 @@
 [ {
-  "column_1" : 77,
-  "column_2" : "A",
-  "column_3" : "B",
-  "column_4" : "C",
-  "column_5" : true,
-  "column_6" : "2021-12-07",
-  "column_7" : 11.2
+  "column_1": 77,
+  "column_2": "A",
+  "column_3": "B",
+  "column_4": "C",
+  "column_5": true,
+  "column_6": "2021-12-07",
+  "column_7": 11.2
 }, {
-  "column_1" : 4,
-  "column_2" : "name1",
-  "column_3" : "city1",
-  "column_4" : "description1",
-  "column_5" : false,
-  "column_6" : "",
-  "column_7" : 12
+  "column_1": 4,
+  "column_2": "name1",
+  "column_3": "city1",
+  "column_4": "description1",
+  "column_5": false,
+  "column_6": "",
+  "column_7": 12
 }, {
-  "column_1" : 2,
-  "column_2" : "A",
-  "column_3" : "city2",
-  "column_4" : "",
-  "column_5" : true,
-  "column_6" : "2021-12-09",
-  "column_7" : ""
+  "column_1": 2,
+  "column_2": "A",
+  "column_3": "city2",
+  "column_4": "",
+  "column_5": true,
+  "column_6": "2021-12-09",
+  "column_7": ""
 }, {
-  "column_1" : 5678,
-  "column_2" : "ABCD",
-  "column_3" : "city3",
-  "column_4" : "EFGH",
-  "column_5" : false,
-  "column_6" : "2021-12-10",
-  "column_7" : 13.23
+  "column_1": 5678,
+  "column_2": "ABCD",
+  "column_3": "city3",
+  "column_4": "EFGH",
+  "column_5": false,
+  "column_6": "2021-12-10",
+  "column_7": 13.23
 } ]

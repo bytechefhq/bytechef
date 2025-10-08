@@ -1,21 +1,21 @@
 {
-  "label" : "CSV File - WRITE operation",
-  "inputs" : [ {
-    "name" : "rows",
-    "label" : "Array of objects",
-    "type" : "ARRAY",
-    "required" : true
+  "label": "CSV File - WRITE operation",
+  "inputs": [ {
+    "name": "rows",
+    "label": "Array of objects",
+    "type": "ARRAY",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "writeCsvFile",
-    "value" : "${writeCsvFile}"
+  "outputs": [ {
+    "name": "writeCsvFile",
+    "value": "${writeCsvFile}"
   } ],
-  "tasks" : [ {
-    "name" : "writeCsvFile",
-    "label" : "Write to the csv file",
-    "type" : "csvFile/v1/write",
-    "parameters" : {
-      "rows" : "${rows}"
+  "tasks": [ {
+    "name": "writeCsvFile",
+    "label": "Write to the csv file",
+    "type": "csvFile/v1/write",
+    "parameters": {
+      "rows": "${rows}"
     }
   } ]
 }

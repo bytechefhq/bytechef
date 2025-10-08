@@ -1,21 +1,21 @@
 {
-  "label" : "ODS File - WRITE operation",
-  "inputs" : [ {
-    "name" : "rows",
-    "label" : "Array of objects",
-    "type" : "ARRAY",
-    "required" : true
+  "label": "ODS File - WRITE operation",
+  "inputs": [ {
+    "name": "rows",
+    "label": "Array of objects",
+    "type": "ARRAY",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "writeOdsFile",
-    "value" : "${writeOdsFile}"
+  "outputs": [ {
+    "name": "writeOdsFile",
+    "value": "${writeOdsFile}"
   } ],
-  "tasks" : [ {
-    "name" : "writeOdsFile",
-    "label" : "Write to the ODS file",
-    "type" : "odsFile/v1/write",
-    "parameters" : {
-      "rows" : "${rows}"
+  "tasks": [ {
+    "name": "writeOdsFile",
+    "label": "Write to the ODS file",
+    "type": "odsFile/v1/write",
+    "parameters": {
+      "rows": "${rows}"
     }
   } ]
 }

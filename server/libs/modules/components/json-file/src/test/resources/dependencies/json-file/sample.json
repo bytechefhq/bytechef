@@ -1,26 +1,26 @@
 {
-  "id" : 77,
-  "city" : "B",
-  "name" : "A",
-  "active" : true,
-  "description" : "C",
-  "date" : "2021-12-07",
-  "sum" : 11.2,
-  "cities" : [ {
-    "id" : 4,
-    "city" : "city1",
-    "name" : "name1",
-    "active" : false,
-    "description" : "description1",
-    "date" : "",
-    "sum" : 12
+  "id": 77,
+  "city": "B",
+  "name": "A",
+  "active": true,
+  "description": "C",
+  "date": "2021-12-07",
+  "sum": 11.2,
+  "cities": [ {
+    "id": 4,
+    "city": "city1",
+    "name": "name1",
+    "active": false,
+    "description": "description1",
+    "date": "",
+    "sum": 12
   }, {
-    "id" : 2,
-    "city" : "city2",
-    "name" : "A",
-    "active" : true,
-    "description" : "",
-    "date" : "2021-12-09",
-    "sum" : ""
+    "id": 2,
+    "city": "city2",
+    "name": "A",
+    "active": true,
+    "description": "",
+    "date": "2021-12-09",
+    "sum": ""
   } ]
 }
