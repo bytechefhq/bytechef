@@ -9,6 +9,7 @@ import {
     PATH_SPACE_REPLACEMENT,
     PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
+import {describe, expect, it} from 'vitest';
 
 import {decodePath, encodeParameters, encodePath, transformPathForObjectAccess} from '../utils/encodingUtils';
 
