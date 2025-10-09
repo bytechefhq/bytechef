@@ -21,5 +21,5 @@ package com.bytechef.platform.constant;
  */
 public class PlatformConstants {
 
-    public static final String FILE_ENTRY_SAMPLE_URL = "file:///tmp/sampleFileName.txt";
+    public static final String FILE_ENTRY_SAMPLE_URL = "file://sample/sampleFileName.txt";
 }
