@@ -133,6 +133,6 @@ public class OpenAiChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, actionContext);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, actionContext, true);
     }
 }

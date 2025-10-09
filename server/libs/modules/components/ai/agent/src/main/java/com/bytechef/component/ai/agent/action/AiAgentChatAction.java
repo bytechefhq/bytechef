@@ -138,7 +138,7 @@ public class AiAgentChatAction {
             ChatClient.CallResponseSpec call = chatClient.prompt()
                 .advisors(getAdvisors(clusterElementMap, connectionParameters))
                 .advisors(getConversationAdvisor(inputParameters))
-                .messages(ModelUtils.getMessages(inputParameters, actionContext))
+                .messages(ModelUtils.getMessages(inputParameters, actionContext, true))
                 .toolCallbacks(
                     getToolCallbacks(
                         clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,

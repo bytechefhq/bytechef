@@ -115,7 +115,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         modelConnectionParametersMap.put(TOKEN, chatModelResult.token);
 
         Object response = chatModelResult.chatModel.getResponse(
-            modelInputParameters, ParametersFactory.createParameters(modelConnectionParametersMap), context);
+            modelInputParameters, ParametersFactory.createParameters(modelConnectionParametersMap), context, false);
 
         return response != null ? response.toString() : null;
     }
