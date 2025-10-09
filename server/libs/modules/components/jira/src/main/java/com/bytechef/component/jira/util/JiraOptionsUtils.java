@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
+import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
@@ -31,8 +32,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,16 +48,16 @@ public class JiraOptionsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        String encode = URLEncoder.encode(
-            "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"", StandardCharsets.UTF_8);
+        List<Option<String>> options = new ArrayList<>();
 
         Map<String, Object> body = context
-            .http(http -> http.get("/search?jql=project" + encode))
+            .http(http -> http.get("/search/jql"))
+            .queryParameters(
+                JQL, PROJECT + "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"",
+                FIELDS, SUMMARY)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         if (body.get(ISSUES) instanceof List<?> list) {
             for (Object object : list) {
@@ -76,8 +75,8 @@ public class JiraOptionsUtils {
         String searchText, Context context) {
 
         List<Object> body = context
-            .http(http -> http.get("/issuetype/project?projectId=" +
-                inputParameters.getRequiredString(PROJECT)))
+            .http(http -> http.get("/issuetype/project"))
+            .queryParameter("projectId", inputParameters.getRequiredString(PROJECT))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -102,13 +101,13 @@ public class JiraOptionsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
+
         Map<String, Object> body = context
             .http(http -> http.get("/project/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         if (body.get("values") instanceof List<?> list) {
             for (Object item : list) {
@@ -125,13 +124,13 @@ public class JiraOptionsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
+        List<Option<String>> options = new ArrayList<>();
+
         List<Object> body = context
             .http(http -> http.get("/users/search"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
 
         for (Object object : body) {
             if (object instanceof Map<?, ?> map) {
