@@ -44,7 +44,7 @@ public class SlackAnyEventTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .output()
         .webhookRequest(SlackAnyEventTrigger::webhookRequest)
-        .webhookValidate(SlackAnyEventTrigger::webhookValidate);
+        .webhookValidateOnEnable(SlackAnyEventTrigger::webhookValidateOnEnable);
 
     private SlackAnyEventTrigger() {
     }
@@ -58,7 +58,7 @@ public class SlackAnyEventTrigger {
         return content.get("event");
     }
 
-    public static WebhookValidateResponse webhookValidate(
+    public static WebhookValidateResponse webhookValidateOnEnable(
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 

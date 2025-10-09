@@ -64,11 +64,11 @@ class SlackAnyEventTriggerTest {
     }
 
     @Test
-    void testWebhookValidate() {
+    void testWebhookValidateOnEnable() {
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(Map.of(CHALLENGE, "123456789"));
 
-        WebhookValidateResponse webhookValidateResponse = SlackAnyEventTrigger.webhookValidate(
+        WebhookValidateResponse webhookValidateResponse = SlackAnyEventTrigger.webhookValidateOnEnable(
             mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody, mockedWebhookMethod,
             mockedTriggerContext);
 
