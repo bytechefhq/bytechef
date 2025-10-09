@@ -162,7 +162,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentConnection, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
-            componentName, componentVersion, componentConnection, triggerContext, null,
+            componentName, componentVersion, componentConnection, triggerContext,
+            TriggerDefinitionErrorType.TRIGGER_TEST_FAILED,
             (componentConnection1, triggerContext1) -> triggerDefinitionService.executeTrigger(
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
                 componentConnection1, triggerContext1),
