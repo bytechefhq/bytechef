@@ -20,26 +20,37 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Represents a data source that provides option retrieval functionalities. The type parameter {@code F} is a functional
+ * interface extending {@link OptionsDataSource.BaseOptionsFunction}, used to define the logic for fetching or
+ * processing options.
+ *
+ * @param <F> the type of the options function associated with this data source
+ *
  * @author Ivica Cardic
  */
-public interface OptionsDataSource {
+public interface OptionsDataSource<F extends OptionsDataSource.BaseOptionsFunction> {
 
     /**
+     * Retrieves the options function associated with this data source.
      *
-     * @return
+     * @return an instance of the options function of type {@code F}
      */
-    BaseOptionsFunction getOptions();
+    F getOptions();
 
     /**
+     * Retrieves an optional list of field names that this data source depends on for lookup operations.
      *
-     * @return
+     * @return an {@code Optional} containing a list of field names if dependencies exist; otherwise, an empty
+     *         {@code Optional}.
      */
     default Optional<List<String>> getOptionsLookupDependsOn() {
         return Optional.empty();
     }
 
     /**
-     *
+     * Marker interface representing a base options function in the data source framework. This interface is intended to
+     * be extended by more specific functional interfaces used for option lookup or retrieval operations, defining
+     * custom behaviors depending on implementation requirements.
      */
     interface BaseOptionsFunction {
     }
