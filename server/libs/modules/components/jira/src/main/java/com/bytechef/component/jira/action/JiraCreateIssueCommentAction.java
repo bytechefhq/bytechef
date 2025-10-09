@@ -25,6 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.COMMENT;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
+import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -93,10 +95,12 @@ public class JiraCreateIssueCommentAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(
                 "body", Map.of(
+                    "version", 1,
+                    TYPE, "doc",
                     "content", List.of(
                         Map.of(
-                            "content", List.of("text", inputParameters.getRequiredString(COMMENT), "type", "text"),
-                            "type", "paragraph")))))
+                            "content", List.of(Map.of(TEXT, inputParameters.getRequiredString(COMMENT), TYPE, TEXT)),
+                            TYPE, "paragraph")))))
             .execute()
             .getBody(new TypeReference<>() {});
     }
