@@ -55,13 +55,13 @@ public interface ChatModel {
 
     @Nullable
     default Object getResponse(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext, boolean messageFormatRequired) {
 
         org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(
             inputParameters, connectionParameters, true);
 
         List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
-            inputParameters, actionContext, false);
+            inputParameters, actionContext, messageFormatRequired);
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
             inputParameters, actionContext, chatModel);
