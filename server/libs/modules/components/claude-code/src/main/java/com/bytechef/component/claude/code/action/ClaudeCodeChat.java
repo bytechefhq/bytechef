@@ -54,8 +54,8 @@ public class ClaudeCodeChat {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {
 
-        String command = "su - claude-user -c \"claude --dangerously-skip-permissions -p \""
-            + inputParameters.getString(SCRIPT) + "\"\"";
+        String command =
+            "IS_SANDBOX=1 claude --dangerously-skip-permissions -p \"" + inputParameters.getString(SCRIPT) + "\"";
 
         return ClaudeCodeUtil.execute(command);
     }
