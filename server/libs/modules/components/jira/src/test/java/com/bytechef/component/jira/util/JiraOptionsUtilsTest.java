@@ -20,7 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
+import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
+import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +35,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,10 +52,11 @@ class JiraOptionsUtilsTest {
         ArgumentCaptor.forClass(ActionContext.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PROJECT, "test"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private List<Option<String>> result;
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
 
     @BeforeEach
@@ -69,6 +73,10 @@ class JiraOptionsUtilsTest {
     void testGetIssueIdOptions() {
         Map<String, Object> valuesMap = Map.of(ISSUES, List.of(Map.of(FIELDS, Map.of(SUMMARY, "abc"), ID, "123")));
 
+        when(mockedExecutor.queryParameters(
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(valuesMap);
 
@@ -79,13 +87,13 @@ class JiraOptionsUtilsTest {
                     actionContextArgumentCaptor.capture()))
                 .thenReturn("PROJECT");
 
-            result =
-                JiraOptionsUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "",
-                    mockedActionContext);
+            result = JiraOptionsUtils.getIssueIdOptions(
+                mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
             assertEquals(expectedOptions, result);
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
             assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(List.of(JQL, PROJECT + "=\"PROJECT\"", FIELDS, SUMMARY), stringArgumentCaptor.getAllValues());
         }
     }
 
@@ -93,6 +101,8 @@ class JiraOptionsUtilsTest {
     void testGetIssueTypesIdOptions() {
         List<Object> list = List.of(Map.of(NAME, "abc", ID, "123"));
 
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(list);
 
@@ -100,6 +110,7 @@ class JiraOptionsUtilsTest {
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
+        assertEquals(List.of("projectId", "test"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
@@ -122,8 +133,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(valuesMap);
 
-        result =
-            JiraOptionsUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+        result = JiraOptionsUtils.getProjectIdOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -135,8 +146,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(list);
 
-        result =
-            JiraOptionsUtils.getUserIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+        result = JiraOptionsUtils.getUserIdOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
