@@ -37,8 +37,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.10.43",
-    "@assistant-ui/react-markdown": "^0.10.9",
+    "@assistant-ui/react": "^0.11.28",
+    "@assistant-ui/react-markdown": "^0.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/colors": "^3.0.0",
@@ -79,6 +79,7 @@
     "lucide-react": "^0.541.0",
     "monaco-editor": "^0.52.2",
     "monaco-yaml": "^5.4.0",
+    "motion": "^12.23.22",
     "posthog-js": "^1.273.1",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
