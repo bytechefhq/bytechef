@@ -18,6 +18,7 @@ package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction;
@@ -34,6 +35,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -317,10 +319,20 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
-        return (com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction) propertiesDataSource
-            .getProperties();
+        PropertiesDataSource.BasePropertiesFunction basePropertiesFunction = propertiesDataSource.getProperties();
+
+        if (basePropertiesFunction instanceof ActionDefinition.PropertiesFunction propertiesFunction) {
+            return (inputParameters1, connectionParameters1, lookupDependsOnPaths1, context1) -> propertiesFunction
+                .apply(
+                    inputParameters1, connectionParameters1, lookupDependsOnPaths1,
+                    new ActionContextAdapater(context1));
+        } else {
+            return (com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction) propertiesDataSource
+                .getProperties();
+        }
     }
 
+    @SuppressWarnings("unchecked")
     private OptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -331,12 +343,22 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 componentName, componentVersion, clusterElementName, propertyName, inputParameters,
                 connectionParameters, lookupDependsOnPaths, context);
 
-        OptionsDataSource optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
+        OptionsDataSource<?> optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
             .orElseThrow(() -> new IllegalArgumentException(
                 "Options data source not found for property " + propertyName + " in cluster element " +
                     clusterElementName));
 
-        return (OptionsFunction<?>) optionsDataSource.getOptions();
+        OptionsDataSource.BaseOptionsFunction baseOptionsFunction = optionsDataSource.getOptions();
+
+        if (baseOptionsFunction instanceof ActionDefinition.OptionsFunction<?> optionsFunction) {
+            return (
+                inputParameters1, connectionParameters1, lookupDependsOnPaths1, searchText,
+                context1) -> (List<? extends com.bytechef.component.definition.Option<Object>>) optionsFunction.apply(
+                    inputParameters1, connectionParameters1, lookupDependsOnPaths1, searchText,
+                    new ActionContextAdapater(context1));
+        } else {
+            return (OptionsFunction<?>) baseOptionsFunction;
+        }
     }
 
     private static String getIcon(ComponentDefinition componentDefinition) {
