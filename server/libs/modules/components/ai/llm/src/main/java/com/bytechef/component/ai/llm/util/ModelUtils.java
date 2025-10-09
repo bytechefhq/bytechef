@@ -120,10 +120,10 @@ public class ModelUtils {
             .toList();
     }
 
-    public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext, boolean responseFormatRequired) {
+    public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext, boolean messageFormatRequired) {
         List<ChatModel.Message> chatModelMessages = new ArrayList<>();
 
-        if (responseFormatRequired) {
+        if (messageFormatRequired) {
             String format = inputParameters.getRequiredString(FORMAT);
             if (format.equals(Format.SIMPLE.name())) {
                 String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
