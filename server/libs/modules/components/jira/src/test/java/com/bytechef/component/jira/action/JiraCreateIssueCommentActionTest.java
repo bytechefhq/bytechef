@@ -16,6 +16,8 @@
 
 package com.bytechef.component.jira.action;
 
+import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
+import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -63,10 +65,12 @@ class JiraCreateIssueCommentActionTest {
         Http.Body body = bodyArgumentCaptor.getValue();
 
         Map<String, Object> expectedBody = Map.of("body", Map.of(
+            "version", 1,
+            TYPE, "doc",
             "content", List.of(
                 Map.of(
-                    "content", List.of("text", "This is a comment", "type", "text"),
-                    "type", "paragraph"))));
+                    "content", List.of(Map.of(TEXT, "This is a comment", TYPE, TEXT)),
+                    TYPE, "paragraph"))));
 
         assertEquals(expectedBody, body.getContent());
     }
