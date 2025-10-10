@@ -90,7 +90,7 @@ const Login = () => {
         <PublicLayoutContainer>
             <Card className="mx-auto max-w-sm rounded-xl p-6 text-start shadow-none">
                 <CardHeader className="p-0 pb-10">
-                    <CardTitle className="self-center text-xl font-bold text-content-neutral-primary">
+                    <CardTitle className="self-center text-xl font-semibold text-content-neutral-primary">
                         Welcome back
                     </CardTitle>
                 </CardHeader>
