@@ -189,6 +189,14 @@ public interface Context {
          * @return
          */
         String base64EncodeToString(byte[] bytes);
+
+        /**
+         *
+         * @param string
+         * @return
+         */
+        String urlEncode(String string);
+
     }
 
     /**
