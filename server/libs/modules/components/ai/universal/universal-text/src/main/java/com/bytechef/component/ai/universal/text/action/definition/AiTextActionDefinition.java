@@ -93,31 +93,27 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         return Optional.of((SingleConnectionPerformFunction) this::perform);
     }
 
-    protected String perform(
-        Parameters inputParameters, Parameters connectionParameter, ActionContext context) {
-
+    protected Object perform(Parameters inputParameters, Parameters connectionParameter, ActionContext context) {
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
-        List<String> activeProviderKeys = propertyService.getProperties(
-            Arrays.stream(Provider.values())
-                .map(Provider::getKey)
-                .toList(),
-            Scope.PLATFORM, null)
+        List<String> providers = Arrays.stream(Provider.values())
+            .map(Provider::getKey)
+            .toList();
+
+        List<String> activeProviderKeys = propertyService.getProperties(providers, Scope.PLATFORM, null)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)
             .toList();
 
-        Parameters modelInputParameters = aiTextAction.createParameters(inputParameters);
-
         ChatModelResult chatModelResult = getChatModel(inputParameters, activeProviderKeys);
+        Parameters modelInputParameters = aiTextAction.createParameters(inputParameters);
 
         modelConnectionParametersMap.put(TOKEN, chatModelResult.token);
 
-        Object response = chatModelResult.chatModel.getResponse(
-            modelInputParameters, ParametersFactory.createParameters(modelConnectionParametersMap), context, false);
-
-        return response != null ? response.toString() : null;
+        return chatModelResult.chatModel.getResponse(
+            modelInputParameters, ParametersFactory.createParameters(modelConnectionParametersMap), context, false,
+            modelInputParameters.containsPath("response.responseFormat"));
     }
 
     private String getAiProviderToken(String key, List<String> activeProviderKeys) {

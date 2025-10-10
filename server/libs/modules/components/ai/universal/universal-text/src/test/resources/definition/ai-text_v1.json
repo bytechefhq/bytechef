@@ -8,9 +8,57 @@
     "name": "classifyText",
     "outputDefinition": {
       "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The chosen category.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": "sample category"
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "The chosen category.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": "sample category"
     },
     "perform": { },
     "processErrorResponse": null,
@@ -268,9 +316,57 @@
     "name": "sentimentAnalysis",
     "outputDefinition": {
       "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The chosen category.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": "sample category"
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "The chosen category.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": "sample category"
     },
     "perform": { },
     "processErrorResponse": null,
@@ -442,7 +538,7 @@
     "metadata": null,
     "name": "score",
     "outputDefinition": {
-      "output": null,
+      "output": { },
       "outputResponse": null,
       "outputSchema": null,
       "sampleOutput": null
@@ -749,9 +845,57 @@
     "name": "summarizeText",
     "outputDefinition": {
       "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "The summarized text.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": "sample summarized text"
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "The summarized text.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": "sample summarized text"
     },
     "perform": { },
     "processErrorResponse": null,
@@ -987,7 +1131,7 @@
     "metadata": null,
     "name": "similaritySearch",
     "outputDefinition": {
-      "output": null,
+      "output": { },
       "outputResponse": null,
       "outputSchema": null,
       "sampleOutput": null
@@ -1248,7 +1392,7 @@
           "type": "STRING"
         },
         "placeholder": null,
-        "sampleOutput": "Generated text."
+        "sampleOutput": "sample generated text."
       },
       "outputSchema": {
         "advancedOption": null,
@@ -1273,7 +1417,7 @@
         "required": null,
         "type": "STRING"
       },
-      "sampleOutput": "Generated text."
+      "sampleOutput": "sample generated text."
     },
     "perform": { },
     "processErrorResponse": null,

@@ -205,6 +205,6 @@ public class OllamaChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context, true);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

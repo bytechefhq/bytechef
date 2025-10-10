@@ -36,6 +36,8 @@ import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.
 import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
@@ -97,7 +99,11 @@ public class SummarizeTextAction implements AiTextAction {
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(),
+                .output(
+                    outputSchema(
+                        string()
+                            .description("The summarized text.")),
+                    sampleOutput("sample summarized text")),
             provider, this, propertyService);
     }
 
