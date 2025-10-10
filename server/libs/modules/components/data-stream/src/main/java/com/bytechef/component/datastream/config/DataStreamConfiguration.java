@@ -18,13 +18,14 @@ package com.bytechef.component.datastream.config;
 
 import com.bytechef.component.datastream.converter.MapToStringConverter;
 import com.bytechef.component.datastream.converter.StringToMapConverter;
-import com.bytechef.component.datastream.item.ItemProcessorDelegate;
-import com.bytechef.component.datastream.item.ItemReaderDelegate;
-import com.bytechef.component.datastream.item.ItemWriterDelegate;
+import com.bytechef.component.datastream.item.ItemStreamProcessorDelegate;
+import com.bytechef.component.datastream.item.ItemStreamReaderDelegate;
+import com.bytechef.component.datastream.item.ItemStreamWriterDelegate;
 import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.batch.core.Job;
@@ -54,6 +55,7 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
     }
 
     @Override
+    @NonNull
     protected ConfigurableConversionService getConversionService() {
         ConfigurableConversionService conversionService = super.getConversionService();
 
@@ -79,10 +81,10 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
         JobRepository jobRepository, DataSourceTransactionManager transactionManager) {
 
         return new StepBuilder("step1", jobRepository)
-            .<Map<String, ?>, Map<String, ?>>chunk(10, transactionManager)
-            .reader(new ItemReaderDelegate(clusterElementDefinitionService, contextFactory))
-            .processor(new ItemProcessorDelegate())
-            .writer(new ItemWriterDelegate(clusterElementDefinitionService, contextFactory))
+            .<Map<String, Object>, Map<String, Object>>chunk(10, transactionManager)
+            .reader(new ItemStreamReaderDelegate(clusterElementDefinitionService, contextFactory))
+            .processor(new ItemStreamProcessorDelegate(clusterElementDefinitionService, contextFactory))
+            .writer(new ItemStreamWriterDelegate(clusterElementDefinitionService, contextFactory))
             .build();
     }
 }

@@ -45,7 +45,7 @@ class FilesystemWriteFileActionTest {
         File file = getSampleFile();
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))

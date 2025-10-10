@@ -101,7 +101,9 @@ public abstract class AbstractLoadAction {
             ParametersFactory.createParameters(clusterElement.getParameters()),
             ParametersFactory.createParameters(
                 componentConnection == null ? Map.of() : componentConnection.getParameters()),
-            ((ActionContextAware) context).createContext(clusterElement.getComponentName(), componentConnection));
+            ((ActionContextAware) context).createClusterElementContext(
+                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                clusterElement.getClusterElementName(), componentConnection));
     }
 
     private List<DocumentTransformer> getDocumentTransformers(

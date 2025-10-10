@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class ComponentConnectionFactoryResolverChain implements ComponentConnectionFactoryResolver {
+class ComponentConnectionFactoryResolverChain implements ComponentConnectionFactoryResolver {
 
     private final List<ComponentConnectionFactoryResolver> componentConnectionFactoryResolvers;
 

@@ -22,9 +22,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -43,7 +43,7 @@ public class GoogleMailDeleteMailAction {
             string(ID)
                 .label("Message ID")
                 .description("The ID of the message to delete.")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+                .options((OptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true))
         .perform(GoogleMailDeleteMailAction::perform);
 

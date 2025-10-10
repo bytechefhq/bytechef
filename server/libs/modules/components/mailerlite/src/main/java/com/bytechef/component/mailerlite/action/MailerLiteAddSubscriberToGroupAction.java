@@ -29,10 +29,10 @@ import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.ID;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.NAME;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.mailerlite.util.MailerLiteUtils;
@@ -49,12 +49,12 @@ public class MailerLiteAddSubscriberToGroupAction {
             string(SUBSCRIBER_ID)
                 .label("Subscriber Email")
                 .description("ID of the user that will be added to the selected group.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getSubscriberIdOptions)
+                .options((OptionsFunction<String>) MailerLiteUtils::getSubscriberIdOptions)
                 .required(true),
             string(GROUP_ID)
                 .label("Group ID")
                 .description("ID of the group to which the user will be added.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
+                .options((OptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(true))
         .output(
             outputSchema(

@@ -31,9 +31,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.date.helper.util.DateHelperUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -75,7 +75,7 @@ public class DateHelperIsBusinessHoursAction {
             string(TIME_ZONE)
                 .label("Time Zone")
                 .description("Time zone to check business hours for.")
-                .options((ActionOptionsFunction<String>) DateHelperUtils::getZoneOptions)
+                .options((OptionsFunction<String>) DateHelperUtils::getZoneOptions)
                 .required(true))
         .output(outputSchema(bool().description("True if the date is a weekend, false otherwise.")))
         .perform(DateHelperIsBusinessHoursAction::perform);

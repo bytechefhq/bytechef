@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.teamwork.util.TeamworkUtils;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class TeamworkCreateTaskAction {
         .properties(integer("tasklistId").label("Task List ID")
             .description("Task list where new task is added")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<Long>) TeamworkUtils::getTasklistIdOptions)
+            .options((ActionDefinition.OptionsFunction<Long>) TeamworkUtils::getTasklistIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

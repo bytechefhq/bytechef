@@ -19,7 +19,7 @@ package com.bytechef.component.definition;
 import java.util.Optional;
 
 /**
- *
+ * @author Ivica Cardic
  */
 public interface TriggerContext extends Context {
 
@@ -29,13 +29,6 @@ public interface TriggerContext extends Context {
      * @return
      */
     <R> R data(ContextFunction<Data, R> dataFunction);
-
-    /**
-     * Determines whether the current environment is the editor environment.
-     *
-     * @return true if the current environment is an editor environment, false otherwise.
-     */
-    boolean isEditorEnvironment();
 
     interface Data {
 

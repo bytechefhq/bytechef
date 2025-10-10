@@ -24,9 +24,9 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROO
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
 import static com.bytechef.component.rocketchat.util.RocketchatUtils.sendMessage;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rocketchat.util.RocketchatUtils;
 
@@ -42,7 +42,7 @@ public class RocketchatSendDirectMessageAction {
             string(ROOM_ID)
                 .label("Username")
                 .description("Username to send the direct message to.")
-                .options((ActionOptionsFunction<String>) RocketchatUtils::getUsersOptions)
+                .options((OptionsFunction<String>) RocketchatUtils::getUsersOptions)
                 .required(true),
             string(TEXT)
                 .label("Message")

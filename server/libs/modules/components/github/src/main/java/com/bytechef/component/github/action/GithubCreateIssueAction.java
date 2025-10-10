@@ -28,9 +28,9 @@ import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -45,7 +45,7 @@ public class GithubCreateIssueAction {
             string(REPOSITORY)
                 .label("Repository")
                 .description("Repository where new issue will be created.")
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true),
             string(TITLE)
                 .label("Title")

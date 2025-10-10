@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.gitlab.util.GitlabUtils;
 import java.util.Map;
 
@@ -46,14 +46,14 @@ public class GitlabCreateCommentOnIssueAction {
             ))
         .properties(string("projectId").label("Project ID")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) GitlabUtils::getProjectIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) GitlabUtils::getProjectIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             integer("issueId").label("Issue ID")
                 .description("ID of the issue to comment on.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<Long>) GitlabUtils::getIssueIdOptions)
+                .options((ActionDefinition.OptionsFunction<Long>) GitlabUtils::getIssueIdOptions)
                 .optionsLookupDependsOn("projectId")
                 .metadata(
                     Map.of(

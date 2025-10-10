@@ -26,11 +26,11 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -55,13 +55,13 @@ public class BambooHrUpdatedEmployeeTrigger {
                 .label("Fields to Monitor")
                 .description("The fields to monitor for changes.")
                 .items(string())
-                .options((TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getFieldOptions)
                 .required(true),
             array(POST_FIELDS)
                 .label("Fields to include in the Output")
                 .description("The fields to include in the output.")
                 .items(string())
-                .options((TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getFieldOptions)
                 .required(true))
         .output()
         .webhookEnable(BambooHrUpdatedEmployeeTrigger::webhookEnable)

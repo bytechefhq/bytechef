@@ -19,11 +19,12 @@ package com.bytechef.component.csv.file.action;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPPER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILENAME;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
@@ -50,7 +51,13 @@ public class CsvFileWriteAction {
         .description(
             "Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.")
         .properties(
-            CsvFileConstants.WRITE_PROPERTIES)
+            ROWS_PROPERTY,
+            string(FILENAME)
+                .label("Filename")
+                .description(
+                    "Filename to set for binary data. By default, \"file.csv\" will be used.")
+                .defaultValue("file.csv")
+                .advancedOption(true))
         .output(outputSchema(fileEntry().description("File entry representing new csv file.")))
         .perform(CsvFileWriteAction::perform);
 

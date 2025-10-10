@@ -23,6 +23,7 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -50,8 +51,18 @@ final class EditorTempFileStorage implements TempFileStorage {
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
-        return tempFileStorage.getFileStream(fileEntry);
+    public long getContentLength(FileEntry fileEntry) {
+        return tempFileStorage.getContentLength(fileEntry);
+    }
+
+    @Override
+    public InputStream getInputStream(FileEntry fileEntry) {
+        return tempFileStorage.getInputStream(fileEntry);
+    }
+
+    @Override
+    public OutputStream getOutputStream(FileEntry fileEntry) {
+        return tempFileStorage.getOutputStream(fileEntry);
     }
 
     @Override

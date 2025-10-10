@@ -31,11 +31,11 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAM
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDateProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
@@ -79,7 +79,7 @@ public class QuickbooksUtils {
         return List.of(incomeAccount, assetAccount, inventoryStartDate);
     }
 
-    public static ActionOptionsFunction<String> getOptions(Entity entity, String accountType) {
+    public static OptionsFunction<String> getOptions(Entity entity, String accountType) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, actionContext) -> {
 
             String encodeQuery = URLEncoder.encode("SELECT * FROM " + entity.getName(), StandardCharsets.UTF_8);

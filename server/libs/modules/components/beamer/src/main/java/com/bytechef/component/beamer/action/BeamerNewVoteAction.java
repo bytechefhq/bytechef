@@ -30,10 +30,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.beamer.util.BeamerUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class BeamerNewVoteAction {
             string(FEATURE_REQUEST_ID)
                 .label("Feature Request ID")
                 .description("ID of the feature request that will have the new vote.")
-                .options((ActionOptionsFunction<String>) BeamerUtils::getFeatureRequestsOptions)
+                .options((OptionsFunction<String>) BeamerUtils::getFeatureRequestsOptions)
                 .required(true),
             string(USER_ID)
                 .label("User ID")

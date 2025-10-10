@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.spotify.util.SpotifyUtils;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class SpotifyAddItemsToPlaylistAction {
             ))
         .properties(string("playlist_id").label("Playlist ID")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) SpotifyUtils::getPlaylistIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) SpotifyUtils::getPlaylistIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

@@ -161,7 +161,7 @@ export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploym
         'inputs': value['inputs'],
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(ProjectDeploymentWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
-        'lastExecutionDate': value['lastExecutionDate'] == null ? undefined : ((value['lastExecutionDate']).toISOString()),
+        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : value['lastExecutionDate'].toISOString(),
         'projectDeploymentId': value['projectDeploymentId'],
         'staticWebhookUrl': value['staticWebhookUrl'],
         'workflowId': value['workflowId'],

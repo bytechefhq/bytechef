@@ -20,10 +20,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.webflow.constant.WebflowConstants.SITE_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.webflow.util.WebflowUtils;
 import com.google.auto.service.AutoService;
@@ -50,7 +50,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                 properties.addFirst(
                     string(SITE_ID)
                         .label("Site ID")
-                        .options((ActionOptionsFunction<String>) WebflowUtils::getSiteIdOptions)
+                        .options((OptionsFunction<String>) WebflowUtils::getSiteIdOptions)
                         .required(true));
 
                 modifiableActionDefinition.properties(properties);

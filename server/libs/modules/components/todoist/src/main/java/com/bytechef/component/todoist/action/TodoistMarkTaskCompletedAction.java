@@ -20,8 +20,8 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.todoist.util.TodoistUtils;
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class TodoistMarkTaskCompletedAction {
         .properties(string("taskId").label("Task ID")
             .description("ID of the task to be closed.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) TodoistUtils::getTaskIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getTaskIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)));

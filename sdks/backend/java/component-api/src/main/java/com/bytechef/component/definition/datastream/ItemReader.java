@@ -26,5 +26,5 @@ public interface ItemReader extends ItemStream {
 
     ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
 
-    Map<String, ?> read() throws Exception;
+    Map<String, Object> read() throws Exception;
 }

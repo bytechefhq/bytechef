@@ -24,11 +24,11 @@ import static com.bytechef.component.posthog.constant.PostHogConstants.ID;
 import static com.bytechef.component.posthog.constant.PostHogConstants.NAME;
 import static com.bytechef.component.posthog.constant.PostHogConstants.PROJECT_OUTPUT_SCHEMA;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.posthog.util.PostHogUtils;
@@ -45,7 +45,7 @@ public class PostHogCreateProjectAction {
         .properties(
             string(ID)
                 .label("Organization ID")
-                .options((ActionOptionsFunction<String>) PostHogUtils::getOrganizationOptions)
+                .options((OptionsFunction<String>) PostHogUtils::getOrganizationOptions)
                 .required(true),
             string(NAME)
                 .label("Project Name")

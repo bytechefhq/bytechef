@@ -28,9 +28,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -51,7 +51,7 @@ public class AITableUpdateRecordAction {
                 .label("Record ID")
                 .description("ID of the record to update.")
                 .optionsLookupDependsOn(DATASHEET_ID)
-                .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
+                .options((OptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),
             FIELDS_DYNAMIC_PROPERTY)
         .output()

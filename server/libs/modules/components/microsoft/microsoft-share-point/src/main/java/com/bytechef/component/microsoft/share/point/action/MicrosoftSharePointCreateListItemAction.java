@@ -26,9 +26,9 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
@@ -50,7 +50,7 @@ public class MicrosoftSharePointCreateListItemAction {
             string(LIST_ID)
                 .label("List ID")
                 .optionsLookupDependsOn(SITE_ID)
-                .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
                 .required(true),
             dynamicProperties(COLUMNS)
                 .propertiesLookupDependsOn(SITE_ID, LIST_ID)

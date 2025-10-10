@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.CONFERENCE_RECORDS;
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NAME;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.meet.util.GoogleMeetUtils;
 import com.bytechef.google.commons.GoogleUtils;
@@ -46,7 +46,7 @@ public class GoogleMeetListParticipantsAction {
             string(CONFERENCE_RECORDS)
                 .label("Conference Records")
                 .description("Conference Records")
-                .options((ActionOptionsFunction<String>) GoogleMeetUtils::getConferenceRecordsOptions)
+                .options((OptionsFunction<String>) GoogleMeetUtils::getConferenceRecordsOptions)
                 .required(true))
         .output(
             outputSchema(

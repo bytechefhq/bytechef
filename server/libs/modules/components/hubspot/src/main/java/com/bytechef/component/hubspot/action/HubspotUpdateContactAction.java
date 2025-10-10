@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.hubspot.property.HubspotContactProperties;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class HubspotUpdateContactAction {
             ))
         .properties(string("contactId").label("Contact")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getContactIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getContactIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

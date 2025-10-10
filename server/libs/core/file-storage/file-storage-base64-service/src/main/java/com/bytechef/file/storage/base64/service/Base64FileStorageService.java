@@ -25,7 +25,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 /**
@@ -53,6 +55,17 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
+    public long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException {
+        String url = fileEntry.getUrl();
+
+        String string = EncodingUtils.base64DecodeToString(url.replace(URL_PREFIX, ""));
+
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+
+        return bytes.length;
+    }
+
+    @Override
     public FileEntry getFileEntry(String directory, String filename) throws FileStorageException {
         throw new UnsupportedOperationException();
     }
@@ -63,14 +76,19 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directory, FileEntry fileEntry) {
+    public URL getFileEntryURL(String directory, FileEntry fileEntry) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public InputStream getInputStream(String directory, FileEntry fileEntry) {
         String url = fileEntry.getUrl();
 
         return new ByteArrayInputStream(EncodingUtils.base64Decode(url.replace(URL_PREFIX, "")));
     }
 
     @Override
-    public URL getFileEntryURL(String directory, FileEntry fileEntry) {
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
         throw new UnsupportedOperationException();
     }
 

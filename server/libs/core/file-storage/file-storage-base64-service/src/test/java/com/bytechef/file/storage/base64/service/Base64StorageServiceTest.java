@@ -37,7 +37,7 @@ public class Base64StorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        InputStream inputStream = base64StorageService.getFileStream(
+        InputStream inputStream = base64StorageService.getInputStream(
             DATA, new FileEntry("file.text", "base64://" + EncodingUtils.base64EncodeToString(STRING)));
 
         Assertions.assertThat(

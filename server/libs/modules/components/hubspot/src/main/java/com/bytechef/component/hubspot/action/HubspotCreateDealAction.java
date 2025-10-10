@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
@@ -54,14 +54,14 @@ public class HubspotCreateDealAction {
                 .required(false),
             string("pipeline").label("Pipeline")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getPipelineOptions),
+                .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getPipelineOptions),
             string("dealstage").label("Deal Stage")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getDealstageOptions)
+                .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getDealstageOptions)
                 .optionsLookupDependsOn("properties.pipeline"),
             string("hubspot_owner_id").label("Deal Owner")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getHubspotOwnerIdOptions))
+                .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getHubspotOwnerIdOptions))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))

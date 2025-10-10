@@ -105,7 +105,7 @@ public class XmlFileReadActionTest {
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(list.stream());
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Assertions.assertThat((List<?>) XmlFileReadAction.perform(parameters, parameters, context))
@@ -124,7 +124,7 @@ public class XmlFileReadActionTest {
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(list.stream());
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Assertions.assertThat(((List<?>) XmlFileReadAction.perform(parameters, parameters, context))

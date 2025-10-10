@@ -35,9 +35,9 @@ import static com.bytechef.component.google.mail.util.GoogleMailUtils.getEncoded
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessage;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.sendMail;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
@@ -59,7 +59,7 @@ public class GoogleMailReplyToEmailAction {
             string(ID)
                 .label("Message ID")
                 .description("The ID of the message to reply to.")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+                .options((OptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
             array(TO)
                 .label("To")

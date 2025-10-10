@@ -21,10 +21,9 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.google.api.client.googleapis.json.GoogleJsonError;
@@ -72,12 +71,12 @@ public class GoogleUtils {
         }
     }
 
-    public static ActionOptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
+    public static OptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,
             isEqualMimetype, connectionParameters);
     }
 
-    public static TriggerOptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
+    public static OptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
         String mimeType, boolean isEqualMimetype) {
 
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,

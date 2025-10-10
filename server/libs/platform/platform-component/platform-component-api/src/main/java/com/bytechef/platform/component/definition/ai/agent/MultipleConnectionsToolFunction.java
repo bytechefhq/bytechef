@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.definition.ai.agent;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
@@ -38,5 +38,5 @@ public interface MultipleConnectionsToolFunction extends ToolFunction {
      */
     Object apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, ActionContext context) throws Exception;
+        Map<String, ComponentConnection> componentConnections, ClusterElementContext context) throws Exception;
 }

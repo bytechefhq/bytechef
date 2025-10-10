@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(2)
-public class ScriptComponentConnectionFactory
+class ScriptComponentConnectionFactory
     implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     private final ComponentDefinitionService componentDefinitionService;

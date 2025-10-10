@@ -155,7 +155,7 @@ export function IntegrationInstanceConfigurationWorkflowToJSONTyped(value?: Omit
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
-        'lastExecutionDate': value['lastExecutionDate'] == null ? undefined : ((value['lastExecutionDate']).toISOString()),
+        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : value['lastExecutionDate'].toISOString(),
         'workflowId': value['workflowId'],
         '__version': value['version'],
     };

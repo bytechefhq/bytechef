@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.sendfox.util.SendfoxUtils;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class SendfoxUnsubscribeContactAction {
             .label("Email")
             .description("Email of the Contact.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) SendfoxUtils::getEmailOptions))
+            .options((ActionDefinition.OptionsFunction<String>) SendfoxUtils::getEmailOptions))
         .output(outputSchema(object().properties(integer("id").description("ID of the contact.")
             .required(false),
             string("email").description("Email of the contact.")

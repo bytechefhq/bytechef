@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.accelo.util.AcceloUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -62,7 +62,7 @@ public class AcceloCreateContactAction {
                 .label("Company ID")
                 .description("ID of the company  to which the newly affiliated contact will be linked.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AcceloUtils::getCompanyIdOptions),
+                .options((ActionDefinition.OptionsFunction<String>) AcceloUtils::getCompanyIdOptions),
             string("phone").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

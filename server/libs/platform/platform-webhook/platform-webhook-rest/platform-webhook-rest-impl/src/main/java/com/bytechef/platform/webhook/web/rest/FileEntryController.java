@@ -48,6 +48,6 @@ public class FileEntryController {
 
         return ResponseEntity.ok()
             .contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())))
-            .body(new InputStreamResource(tempFileStorage.getFileStream(fileEntry)));
+            .body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
     }
 }

@@ -17,7 +17,6 @@
 package com.bytechef.component.definition;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,7 +28,7 @@ public interface OptionsDataSource {
      *
      * @return
      */
-    OptionsFunction getOptions();
+    BaseOptionsFunction getOptions();
 
     /**
      *
@@ -42,48 +41,6 @@ public interface OptionsDataSource {
     /**
      *
      */
-    interface OptionsFunction {
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ActionOptionsFunction<T> extends OptionsFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param searchText
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, ActionContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface TriggerOptionsFunction<T> extends OptionsFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param searchText
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            String searchText, TriggerContext context) throws Exception;
+    interface BaseOptionsFunction {
     }
 }

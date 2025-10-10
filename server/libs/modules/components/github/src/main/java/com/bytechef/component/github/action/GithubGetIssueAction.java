@@ -27,8 +27,8 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPU
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -45,12 +45,12 @@ public class GithubGetIssueAction {
         .properties(
             string(REPOSITORY)
                 .label("Repository")
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true),
             string(ISSUE)
                 .label("Issue Number")
                 .description("The number of the issue you want to get details from.")
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))

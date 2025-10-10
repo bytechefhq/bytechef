@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName, String workflowId,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
 
     List<Option> executeOptions(

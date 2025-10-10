@@ -45,10 +45,10 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.WEIGHT;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.WIDTH;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.woocommerce.util.WoocommerceUtils;
 import java.util.List;
@@ -123,12 +123,12 @@ public class WoocommerceCreateProductAction {
                 .label("Categories")
                 .description("List of categories.")
                 .required(false)
-                .options((ActionOptionsFunction<String>) WoocommerceUtils::getCategoryIdOptions)
+                .options((OptionsFunction<String>) WoocommerceUtils::getCategoryIdOptions)
                 .items(string()),
             array(TAGS)
                 .label("Tags")
                 .description("List of tags.")
-                .options((ActionOptionsFunction<String>) WoocommerceUtils::getTagIdOptions)
+                .options((OptionsFunction<String>) WoocommerceUtils::getTagIdOptions)
                 .required(false)
                 .items(string()),
             array(IMAGES)

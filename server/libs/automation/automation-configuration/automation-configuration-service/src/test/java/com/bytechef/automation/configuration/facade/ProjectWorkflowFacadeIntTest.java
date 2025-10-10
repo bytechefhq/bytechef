@@ -182,7 +182,7 @@ public class ProjectWorkflowFacadeIntTest {
         SharedTemplate sharedTemplate = new SharedTemplate();
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(workflowZip));
 
         String workflowUuid = UUID.randomUUID()
@@ -311,7 +311,7 @@ public class ProjectWorkflowFacadeIntTest {
 
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(workflowZip));
 
         UUID uuid = UUID.randomUUID();
@@ -474,7 +474,7 @@ public class ProjectWorkflowFacadeIntTest {
 
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(workflowZip));
 
         UUID uuid = UUID.randomUUID();

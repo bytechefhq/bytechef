@@ -26,9 +26,9 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
@@ -54,7 +54,7 @@ public class MicrosoftOneDriveNewFileTrigger {
             string(PARENT_ID)
                 .label("Parent Folder ID")
                 .description("If no folder is specified, the root folder will be used.")
-                .options((TriggerOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .poll(MicrosoftOneDriveNewFileTrigger::poll)

@@ -20,11 +20,11 @@ import static com.bytechef.component.encharge.constant.EnchargeConstants.EMAIL;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.encharge.util.EnchargeUtils;
 import com.google.auto.service.AutoService;
 import java.util.Objects;
@@ -50,7 +50,7 @@ public class EnchargeComponentHandler extends AbstractEnchargeComponentHandler {
         if (Objects.equals(actionDefinition.getName(), "addTag") &&
             Objects.equals(modifiableProperty.getName(), EMAIL)) {
             ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
+                .options((OptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
         }
 
         return modifiableProperty;

@@ -45,6 +45,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -63,7 +64,7 @@ public class ConnectionIntTestConfiguration {
     ComponentHandler componentHandler() {
         return () -> new ComponentDefinition() {
             @Override
-            public Optional<List<? extends ActionDefinition>> getActions() {
+            public Optional<List<ActionDefinition>> getActions() {
                 return Optional.empty();
             }
 
@@ -73,7 +74,7 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+            public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
                 return Optional.empty();
             }
 
@@ -128,7 +129,7 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<? extends TriggerDefinition>> getTriggers() {
+            public Optional<List<TriggerDefinition>> getTriggers() {
                 return Optional.empty();
             }
 
@@ -164,6 +165,7 @@ public class ConnectionIntTestConfiguration {
         }
 
         @Override
+        @NonNull
         protected List<?> userConverters() {
             return Arrays.asList(
                 new EncryptedMapWrapperToStringConverter(encryption, objectMapper),

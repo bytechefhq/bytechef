@@ -24,9 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 
 import com.bytechef.component.brevo.util.BrevoUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -41,7 +41,7 @@ public class BrevoUpdateContactAction {
             string(EMAIL)
                 .label("Email")
                 .description("Email address of the contact to update.")
-                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .options((OptionsFunction<String>) BrevoUtils::getContactsOptions)
                 .required(true),
             string(FIRST_NAME)
                 .label("First Name")

@@ -24,10 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.snowflake.util.SnowflakePropertiesUtils;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
@@ -48,18 +48,18 @@ public class SnowflakeConstants {
 
     public static final ModifiableStringProperty DATABASE_PROPERTY = string(DATABASE)
         .label("Database")
-        .options((ActionOptionsFunction<String>) SnowflakeUtils::getDatabaseNameOptions)
+        .options((OptionsFunction<String>) SnowflakeUtils::getDatabaseNameOptions)
         .required(true);
 
     public static final ModifiableStringProperty SCHEMA_PROPERTY = string(SCHEMA)
         .label("Schema")
-        .options((ActionOptionsFunction<String>) SnowflakeUtils::getSchemaNameOptions)
+        .options((OptionsFunction<String>) SnowflakeUtils::getSchemaNameOptions)
         .optionsLookupDependsOn(DATABASE)
         .required(true);
 
     public static final ModifiableStringProperty TABLE_PROPERTY = string(TABLE)
         .label("Table")
-        .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
+        .options((OptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
         .optionsLookupDependsOn(SCHEMA, DATABASE)
         .required(true);
 

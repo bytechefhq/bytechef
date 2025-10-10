@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.mattermost.util.MattermostUtils;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class MattermostSendMessageAction {
             .label("Channel Id")
             .description("The channel ID to send message to.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) MattermostUtils::getChannelIdOptions),
+            .options((ActionDefinition.OptionsFunction<String>) MattermostUtils::getChannelIdOptions),
             string("message").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

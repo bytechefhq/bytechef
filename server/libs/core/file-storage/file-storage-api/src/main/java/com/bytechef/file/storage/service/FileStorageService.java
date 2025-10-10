@@ -19,6 +19,7 @@ package com.bytechef.file.storage.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Set;
 
@@ -33,13 +34,17 @@ public interface FileStorageService {
 
     boolean fileExists(String directory, String filename) throws FileStorageException;
 
+    long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException;
+
     FileEntry getFileEntry(String directory, String filename) throws FileStorageException;
 
     Set<FileEntry> getFileEntries(String directory) throws FileStorageException;
 
-    InputStream getFileStream(String directory, FileEntry fileEntry) throws FileStorageException;
-
     URL getFileEntryURL(String directory, FileEntry fileEntry);
+
+    InputStream getInputStream(String directory, FileEntry fileEntry) throws FileStorageException;
+
+    OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException;
 
     byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException;
 

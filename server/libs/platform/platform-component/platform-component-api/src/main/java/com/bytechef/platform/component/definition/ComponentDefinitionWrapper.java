@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.util.CustomActionUtils;
@@ -38,7 +37,10 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
 
         // Custom Actions support
 
-        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
+        Boolean exists = componentDefinition.getCustomAction()
+            .orElse(false);
+
+        if (exists) {
             actionDefinitions = new ArrayList<>(actionDefinitions);
 
             actionDefinitions.add(CustomActionUtils.getCustomActionDefinition(componentDefinition));
@@ -48,7 +50,7 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
     }
 
     @Override
-    public Optional<List<? extends ActionDefinition>> getActions() {
+    public Optional<List<ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
     }
 

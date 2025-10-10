@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.ahrefs.util.AhrefsUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -54,7 +54,7 @@ public class AhrefsGetPageContentAction {
                 .description(
                     "The unique identifier of the project. Only projects with verified ownership are supported.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AhrefsUtils::getProjectIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) AhrefsUtils::getProjectIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),

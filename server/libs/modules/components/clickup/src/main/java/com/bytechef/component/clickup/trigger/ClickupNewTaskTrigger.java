@@ -29,11 +29,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -52,7 +52,7 @@ public class ClickupNewTaskTrigger {
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
-                .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
+                .options((OptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
                 .required(true))
         .output(
             outputSchema(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 ByteChef
+ * Copyright 2023-present ByteChef Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.definition;
+@NonNullApi
+@NonNullFields
+package com.bytechef.platform.file.storage;
 
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.definition.BaseOutputFunction;
-import java.util.Map;
-
-/**
- *
- */
-@FunctionalInterface
-public interface OutputFunction extends BaseOutputFunction {
-
-    /**
-     * @param inputParameters
-     * @return
-     */
-    OutputResponse apply(Map<String, ?> inputParameters) throws Exception;
-}
+import org.springframework.lang.NonNullApi;
+import org.springframework.lang.NonNullFields;

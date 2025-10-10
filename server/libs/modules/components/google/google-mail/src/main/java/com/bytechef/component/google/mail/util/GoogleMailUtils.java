@@ -220,7 +220,7 @@ public class GoogleMailUtils {
             attachmentBodyPart.setDataHandler(
                 new DataHandler(
                     new ByteArrayDataSource(
-                        (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
+                        (InputStream) context.file(file -> file.getInputStream(fileEntry)), fileEntry.getMimeType())));
             attachmentBodyPart.setFileName(fileEntry.getName());
 
             multipart.addBodyPart(attachmentBodyPart);

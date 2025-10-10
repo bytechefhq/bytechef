@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
@@ -29,16 +30,18 @@ import javax.annotation.Nullable;
 public interface ContextFactory {
 
     ActionContext createActionContext(
-        String componentName, int componentVersion, String actionName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
-        @Nullable String workflowId, @Nullable ComponentConnection connection, boolean editorEnvironment);
+        String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
+        @Nullable ComponentConnection componentConnection, @Nullable ModeType type, boolean editorEnvironment);
 
-    Context createContext(String componentName, @Nullable ComponentConnection connection);
+    Context createContext(String componentName, @Nullable ComponentConnection componentConnection);
 
-    Context createContext(String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment);
+    ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 
     TriggerContext createTriggerContext(
-        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable String workflowUuid, @Nullable ComponentConnection connection,
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable ModeType type,
         boolean editorEnvironment);
 }

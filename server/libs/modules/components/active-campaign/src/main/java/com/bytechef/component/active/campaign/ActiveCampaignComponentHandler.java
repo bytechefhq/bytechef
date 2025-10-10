@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.util.ActiveCampaignUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
@@ -32,7 +33,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -95,10 +95,10 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
                     for (BaseProperty baseProperty2 : propertiesOptional.get()) {
                         if (Objects.equals(baseProperty2.getName(), "relid")) {
                             ((ModifiableIntegerProperty) baseProperty2).options(
-                                (ActionOptionsFunction<String>) ActiveCampaignUtils::getContactIdOptions);
+                                (OptionsFunction<String>) ActiveCampaignUtils::getContactIdOptions);
                         } else if (Objects.equals(baseProperty2.getName(), "dealTasktype")) {
                             ((ModifiableIntegerProperty) baseProperty2)
-                                .options((ActionOptionsFunction<String>) ActiveCampaignUtils::getTaskTypeIdOptions);
+                                .options((OptionsFunction<String>) ActiveCampaignUtils::getTaskTypeIdOptions);
                         }
                     }
                 }

@@ -34,11 +34,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.agile.crm.util.AgileCrmUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -67,13 +67,13 @@ public class AgileCrmCreateDealAction {
             number(PIPELINE_ID)
                 .label("Pipeline ID")
                 .description("ID of the pipeline that the deal follows.")
-                .options((ActionOptionsFunction<Long>) AgileCrmUtils::getPipelineIdOptions)
+                .options((OptionsFunction<Long>) AgileCrmUtils::getPipelineIdOptions)
                 .required(true),
             string(MILESTONE)
                 .label("Milestone")
                 .description("Milestone the deal is currently at.")
                 .optionsLookupDependsOn(PIPELINE_ID)
-                .options((ActionOptionsFunction<String>) AgileCrmUtils::getMilestoneOptions)
+                .options((OptionsFunction<String>) AgileCrmUtils::getMilestoneOptions)
                 .required(true),
             integer(PROBABILITY)
                 .label("Probability")
@@ -84,7 +84,7 @@ public class AgileCrmCreateDealAction {
             string(OWNER_ID)
                 .label("Owner ID")
                 .description("ID of the owner of the deal.")
-                .options((ActionOptionsFunction<String>) AgileCrmUtils::getUserIdOptions)
+                .options((OptionsFunction<String>) AgileCrmUtils::getUserIdOptions)
                 .required(true))
         .output(
             outputSchema(

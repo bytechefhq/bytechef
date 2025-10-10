@@ -49,10 +49,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -93,7 +93,7 @@ public class CopperCreatePersonAction {
             string(ASSIGNEE_ID)
                 .label("Assignee ID")
                 .description("User ID that will be the owner of the person.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(TITLE)
                 .label("Title")
@@ -102,12 +102,12 @@ public class CopperCreatePersonAction {
             string(COMPANY_ID)
                 .label("Company ID")
                 .description("ID of the primary company with which the person is associated.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
                 .required(false),
             string(CONTACT_TYPE_ID)
                 .label("Contact Type ID")
                 .description("The unique identifier of the contact type of the person.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),
             string(DETAILS)
                 .label("Details")
@@ -200,7 +200,7 @@ public class CopperCreatePersonAction {
                 .label("Tags")
                 .description("Tags associated with the person.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getTagsOptions)
                 .required(false))
         .output(outputSchema(
             object()

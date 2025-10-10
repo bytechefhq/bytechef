@@ -106,7 +106,7 @@ public class JsonFileReadAction {
 
         if (isArray) {
             String path = inputParameters.getString(PATH);
-            InputStream inputStream = context.file(file -> file.getStream(fileEntry));
+            InputStream inputStream = context.file(file -> file.getInputStream(fileEntry));
             List<Map<String, ?>> items;
 
             if (fileType == FileType.JSON) {

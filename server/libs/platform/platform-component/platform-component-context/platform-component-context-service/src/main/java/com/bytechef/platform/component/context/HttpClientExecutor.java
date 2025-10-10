@@ -290,7 +290,7 @@ class HttpClientExecutor {
         builder.formPart(
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
-                BodyPublishers.ofInputStream(() -> tempFileStorage.getFileStream(
+                BodyPublishers.ofInputStream(() -> tempFileStorage.getInputStream(
                     ((FileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
@@ -337,7 +337,7 @@ class HttpClientExecutor {
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofInputStream(
-                () -> tempFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry())),
+                () -> tempFileStorage.getInputStream(((FileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 

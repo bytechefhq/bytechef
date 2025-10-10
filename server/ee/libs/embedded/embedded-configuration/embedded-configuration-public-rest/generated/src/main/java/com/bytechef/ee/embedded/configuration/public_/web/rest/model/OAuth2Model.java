@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-02T07:57:54.259635598+02:00[Europe/Zagreb]", comments = "Generator version: 7.15.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-07T14:49:43.557695+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
 public class OAuth2Model {
 
   private @Nullable String authorizationUrl;

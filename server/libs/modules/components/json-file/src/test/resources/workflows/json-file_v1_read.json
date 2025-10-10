@@ -1,21 +1,21 @@
 {
-  "label" : "JSON File - READ operation",
-  "inputs" : [ {
-    "name" : "fileEntry",
-    "label" : "File property",
-    "type" : "FILE_ENTRY",
-    "required" : true
+  "label": "JSON File - READ operation",
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "readJSONFile",
-    "value" : "${readJSONFile}"
+  "outputs": [ {
+    "name": "readJSONFile",
+    "value": "${readJSONFile}"
   } ],
-  "tasks" : [ {
-    "name" : "readJSONFile",
-    "label" : "Read from the JSON file",
-    "type" : "jsonFile/v1/read",
-    "parameters" : {
-      "fileEntry" : "${fileEntry}"
+  "tasks": [ {
+    "name": "readJSONFile",
+    "label": "Read from the JSON file",
+    "type": "jsonFile/v1/read",
+    "parameters": {
+      "fileEntry": "${fileEntry}"
     }
   } ]
 }

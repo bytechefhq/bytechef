@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.webflow.util.WebflowUtils;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class WebflowGetCollectionItemAction {
         .properties(string("collectionId").label("Collection ID")
             .description("")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) WebflowUtils::getCollectionIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getCollectionIdOptions)
             .optionsLookupDependsOn("siteId")
             .metadata(
                 Map.of(
@@ -54,7 +54,7 @@ public class WebflowGetCollectionItemAction {
             string("itemId").label("Item  ID")
                 .description("")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) WebflowUtils::getItemIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) WebflowUtils::getItemIdOptions)
                 .optionsLookupDependsOn("collectionId", "siteId")
                 .metadata(
                     Map.of(

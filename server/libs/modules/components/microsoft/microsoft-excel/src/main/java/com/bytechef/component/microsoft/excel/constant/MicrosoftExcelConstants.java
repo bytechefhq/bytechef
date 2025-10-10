@@ -19,9 +19,9 @@ package com.bytechef.component.microsoft.excel.constant;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
 /**
@@ -49,12 +49,12 @@ public class MicrosoftExcelConstants {
 
     public static final ModifiableStringProperty WORKBOOK_ID_PROPERTY = string(WORKBOOK_ID)
         .label("Workbook ID")
-        .options((ActionOptionsFunction<String>) MicrosoftExcelUtils::getWorkbookIdOptions)
+        .options((OptionsFunction<String>) MicrosoftExcelUtils::getWorkbookIdOptions)
         .required(true);
 
     public static final ModifiableStringProperty WORKSHEET_NAME_PROPERTY = string(WORKSHEET_NAME)
         .label("Worksheet")
-        .options((ActionOptionsFunction<String>) MicrosoftExcelUtils::getWorksheetNameOptions)
+        .options((OptionsFunction<String>) MicrosoftExcelUtils::getWorksheetNameOptions)
         .optionsLookupDependsOn(WORKBOOK_ID)
         .required(true);
 

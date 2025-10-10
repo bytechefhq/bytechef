@@ -33,12 +33,12 @@ import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TITLE;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
@@ -56,7 +56,7 @@ public class NocoDbUtils {
     private NocoDbUtils() {
     }
 
-    public static ActionPropertiesFunction createPropertiesForRecord(boolean isNewRecord) {
+    public static PropertiesFunction createPropertiesForRecord(boolean isNewRecord) {
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
 
             Map<String, Object> body = context
@@ -131,7 +131,7 @@ public class NocoDbUtils {
                 properties.addFirst(
                     integer("Id")
                         .description("Id of the record to update.")
-                        .options((ActionOptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
+                        .options((OptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
                         .optionsLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
                         .required(true));
             }

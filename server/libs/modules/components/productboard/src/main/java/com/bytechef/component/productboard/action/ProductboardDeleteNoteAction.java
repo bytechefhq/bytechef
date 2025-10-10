@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.productboard.util.ProductboardUtils;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class ProductboardDeleteNoteAction {
             string("noteId").label("Note ID")
                 .description("ID of the note")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)));

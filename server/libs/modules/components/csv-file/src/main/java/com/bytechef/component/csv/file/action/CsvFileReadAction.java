@@ -56,15 +56,14 @@ public class CsvFileReadAction {
 
         try (
             InputStream inputStream = context.file(
-                file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
+                file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
             return read(inputStream, readConfiguration, context);
         }
     }
 
     protected static List<Map<String, Object>> read(
-        InputStream inputStream, ReadConfiguration configuration, Context context)
-        throws IOException {
+        InputStream inputStream, ReadConfiguration configuration, Context context) throws IOException {
 
         List<Map<String, Object>> rows = new ArrayList<>();
         int count = 0;

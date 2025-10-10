@@ -118,13 +118,23 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
     public ClusterElement getClusterElement(
         ClusterElementType clusterElementType, String clusterElementWorkflowNodeName) {
 
-        return getClusterElements(clusterElementType)
-            .stream()
-            .filter(curClusterElement -> Objects.equals(
-                curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
+        if (clusterElementType.multipleElements()) {
+            return getClusterElements(clusterElementType)
+                .stream()
+                .filter(curClusterElement -> Objects.equals(
+                    curClusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Cluster element %s not found".formatted(clusterElementWorkflowNodeName)));
+        } else {
+            ClusterElement clusterElement = getClusterElement(clusterElementType);
+
+            if (!Objects.equals(clusterElement.getWorkflowNodeName(), clusterElementWorkflowNodeName)) {
+                throw new IllegalArgumentException("Cluster element type %s not found".formatted(clusterElementType));
+            }
+
+            return clusterElement;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -147,7 +157,7 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
     }
 
     private static ClusterElement toClusterElement(
-        Map<String, ?> clusterElementMap, List<ComponentConnection> connections) {
+        Map<String, ?> clusterElementMap, List<ComponentConnection> componentConnections) {
 
         Map<String, Object> extensions = new HashMap<>();
 
@@ -159,13 +169,13 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
 
         String name = MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.NAME);
 
-        ComponentConnection connection = connections.stream()
+        ComponentConnection firstComponentConnection = componentConnections.stream()
             .filter(componentConnection -> Objects.equals(componentConnection.key(), name))
             .findFirst()
             .orElse(null);
 
         return new ClusterElement(
-            connection, MapUtils.getString(clusterElementMap, WorkflowConstants.DESCRIPTION), extensions,
+            firstComponentConnection, MapUtils.getString(clusterElementMap, WorkflowConstants.DESCRIPTION), extensions,
             MapUtils.getString(clusterElementMap, WorkflowConstants.LABEL),
             MapUtils.getRequiredString(clusterElementMap, WorkflowConstants.TYPE),
             MapUtils.getMap(clusterElementMap, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()),

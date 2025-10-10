@@ -42,7 +42,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final PerformFunction performFunction;
     protected final List<? extends Property> properties;
     protected final String title;
-    protected final ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
+    protected final WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
     public AbstractActionDefinitionWrapper(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
@@ -116,7 +116,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+    public Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
         return Optional.ofNullable(workflowNodeDescriptionFunction);
     }
 }

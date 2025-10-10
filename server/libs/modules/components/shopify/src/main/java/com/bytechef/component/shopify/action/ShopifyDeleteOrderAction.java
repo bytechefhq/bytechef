@@ -20,8 +20,8 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class ShopifyDeleteOrderAction {
         .properties(integer("orderId").label("Order ID")
             .description("ID of the order to delete.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
+            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)));

@@ -23,11 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleUtils;
 
@@ -70,14 +70,14 @@ public class GoogleSheetsConstants {
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
         .label("Sheet ID")
         .description("The ID of the sheet.")
-        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
+        .options((OptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
         .label("Sheet Name")
         .description("The name of the sheet.")
-        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+        .options((OptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
 

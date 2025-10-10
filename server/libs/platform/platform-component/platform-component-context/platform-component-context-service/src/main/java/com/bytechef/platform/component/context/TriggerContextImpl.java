@@ -34,7 +34,6 @@ import org.apache.commons.lang3.Validate;
 class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerContextAware {
 
     private final Data data;
-    private final boolean editorEnvironment;
     private final Long jobPrincipalId;
     private final String triggerName;
     private final ModeType type;
@@ -42,16 +41,16 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, @Nullable ComponentConnection connection, DataStorage dataStorage,
-        boolean editorEnvironment, TempFileStorage tempFileStorage, HttpClientExecutor httpClientExecutor,
-        @Nullable Long jobPrincipalId, String triggerName, @Nullable ModeType type,
-        @Nullable String workflowUuid) {
+        String componentName, int componentVersion, @Nullable ComponentConnection componentConnection,
+        DataStorage dataStorage, boolean editorEnvironment, TempFileStorage tempFileStorage,
+        HttpClientExecutor httpClientExecutor, @Nullable Long jobPrincipalId, String triggerName,
+        @Nullable ModeType type, @Nullable String workflowUuid) {
 
-        super(componentName, componentVersion, triggerName, connection, httpClientExecutor, tempFileStorage);
+        super(
+            componentName, componentVersion, triggerName, componentConnection, editorEnvironment, httpClientExecutor,
+            tempFileStorage);
 
-        this.data = new DataImpl(
-            componentName, componentVersion, triggerName, type, workflowUuid, dataStorage);
-        this.editorEnvironment = editorEnvironment;
+        this.data = new DataImpl(componentName, componentVersion, triggerName, type, workflowUuid, dataStorage);
         this.jobPrincipalId = jobPrincipalId;
         this.triggerName = triggerName;
         this.type = type;
@@ -85,11 +84,6 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     @Override
     public String getWorkflowUuid() {
         return workflowUuid;
-    }
-
-    @Override
-    public boolean isEditorEnvironment() {
-        return editorEnvironment;
     }
 
     private record DataImpl(

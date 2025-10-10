@@ -81,12 +81,12 @@ public class XmlFileReadAction {
 
         if (isArray) {
             String path = inputParameters.getString(PATH);
-            InputStream inputStream = context.file(file -> file.getStream(fileEntry));
+            InputStream inputStream = context.file(file -> file.getInputStream(fileEntry));
             List<Map<String, ?>> items;
 
             if (path == null) {
                 try (Stream<Map<String, ?>> stream = context.xml(
-                    xml -> xml.stream(context.file(file -> file.getStream(fileEntry))))) {
+                    xml -> xml.stream(context.file(file -> file.getInputStream(fileEntry))))) {
 
                     items = stream.toList();
                 }

@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.coda.property.CodaDocumentCreationResultProperties;
 import com.bytechef.component.coda.util.CodaUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -57,7 +57,7 @@ public class CodaCopyDocAction {
                 .label("Source Doc")
                 .description("A doc ID from which to create a copy.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CodaUtils::getSourceDocOptions))
+                .options((ActionDefinition.OptionsFunction<String>) CodaUtils::getSourceDocOptions))
         .output(outputSchema(object().properties(CodaDocumentCreationResultProperties.PROPERTIES)
             .description("The result of a doc creation.")
             .metadata(

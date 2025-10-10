@@ -1,21 +1,21 @@
 {
-  "label" : "JSON File - WRITE operation",
-  "inputs" : [ {
-    "name" : "source",
-    "label" : "Object or array of objects",
-    "type" : "ARRAY,OBJECT",
-    "required" : true
+  "label": "JSON File - WRITE operation",
+  "inputs": [ {
+    "name": "source",
+    "label": "Object or array of objects",
+    "type": "ARRAY,OBJECT",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "writeJSONFile",
-    "value" : "${writeJSONFile}"
+  "outputs": [ {
+    "name": "writeJSONFile",
+    "value": "${writeJSONFile}"
   } ],
-  "tasks" : [ {
-    "name" : "writeJSONFile",
-    "label" : "Write to the JSON file",
-    "type" : "jsonFile/v1/write",
-    "parameters" : {
-      "source" : "${source}"
+  "tasks": [ {
+    "name": "writeJSONFile",
+    "label": "Write to the JSON file",
+    "type": "jsonFile/v1/write",
+    "parameters": {
+      "source": "${source}"
     }
   } ]
 }

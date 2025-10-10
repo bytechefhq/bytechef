@@ -37,11 +37,11 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
 import static com.bytechef.component.pagerduty.util.PagerDutyUtils.getRequestBody;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.pagerduty.util.PagerDutyUtils;
@@ -63,12 +63,12 @@ public class PagerDutyUpdateIncidentAction {
             string(INCIDENT_ID)
                 .label("Incident ID")
                 .description("ID of the incident to which the note will be added.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getIncidentIdOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getIncidentIdOptions)
                 .required(true),
             string(INCIDENT_TYPE)
                 .label("Incident Type")
                 .description("Incident type.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getIncidentTypeOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getIncidentTypeOptions)
                 .required(true),
             string(STATUS)
                 .label("Status")
@@ -80,7 +80,7 @@ public class PagerDutyUpdateIncidentAction {
             array(ASSIGNMENTS)
                 .label("Assignments")
                 .description("Assign the incident to these assignees.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getUserIdOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getUserIdOptions)
                 .items(
                     string(ASSIGNEE)
                         .label("Assignee")
@@ -101,7 +101,7 @@ public class PagerDutyUpdateIncidentAction {
                 .description(
                     "Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use " +
                         "them.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getPriorityOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getPriorityOptions)
                 .required(false),
             string(URGENCY)
                 .label("Urgency")
@@ -115,7 +115,7 @@ public class PagerDutyUpdateIncidentAction {
                 .description(
                     "Delegate this incident to the specified escalation policy. Cannot be specified if an assignee " +
                         "is given.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getEscalationPolicyIdOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getEscalationPolicyIdOptions)
                 .required(false))
         .output(outputSchema(INCIDENT_OBJECT))
         .perform(PagerDutyUpdateIncidentAction::perform);

@@ -35,11 +35,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.attio.util.AttioUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class AttioCreateRecordAction {
             string(RECORD_TYPE)
                 .label("Record Type")
                 .description("Type of record that will be created.")
-                .options((ActionOptionsFunction<String>) AttioUtils::getTargetObjectOptions)
+                .options((OptionsFunction<String>) AttioUtils::getTargetObjectOptions)
                 .required(true),
             PERSON_RECORD
                 .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))

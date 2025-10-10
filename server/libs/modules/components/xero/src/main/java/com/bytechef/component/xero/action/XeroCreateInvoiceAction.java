@@ -34,9 +34,9 @@ import static com.bytechef.component.xero.constant.XeroConstants.REFERENCE;
 import static com.bytechef.component.xero.util.XeroUtils.createInvoice;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xero.util.XeroUtils;
 
@@ -53,7 +53,7 @@ public class XeroCreateInvoiceAction {
             string(CONTACT_ID)
                 .label("Contact ID")
                 .description("ID of the contact to create the invoice for.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
+                .options((OptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
                 .label("Date")
@@ -70,7 +70,7 @@ public class XeroCreateInvoiceAction {
             string(CURRENCY_CODE)
                 .label("Currency Code")
                 .description("Currency code that invoice is raised in.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
+                .options((OptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(REFERENCE)
                 .label("Invoice Reference")

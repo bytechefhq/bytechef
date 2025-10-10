@@ -1,19 +1,19 @@
 {
-  "label" : "JSON File - READ operation",
-  "inputs" : [ {
-    "name" : "source",
-    "label" : "Object or array of objects"
+  "label": "JSON File - READ operation",
+  "inputs": [ {
+    "name": "source",
+    "label": "Object or array of objects"
   } ],
-  "outputs" : [ {
-    "name" : "writeXMLFile",
-    "value" : "${writeXMLFile}"
+  "outputs": [ {
+    "name": "writeXMLFile",
+    "value": "${writeXMLFile}"
   } ],
-  "tasks" : [ {
-    "name" : "writeXMLFile",
-    "label" : "Write to the XML file",
-    "type" : "xmlFile/v1/write",
-    "parameters" : {
-      "source" : "${source}"
+  "tasks": [ {
+    "name": "writeXMLFile",
+    "label": "Write to the XML file",
+    "type": "xmlFile/v1/write",
+    "parameters": {
+      "source": "${source}"
     }
   } ]
 }

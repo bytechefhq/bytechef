@@ -28,10 +28,10 @@ import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET_ID;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET_OBJECT_PROPERTY;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.zendesk.util.ZendeskUtils;
@@ -50,7 +50,7 @@ public class ZendeskCommentTicketAction {
                 .label("Ticket ID")
                 .description("ID of the ticket that will get the comment.")
                 .required(true)
-                .options((ActionOptionsFunction<Long>) ZendeskUtils::getTicketIdOptions),
+                .options((OptionsFunction<Long>) ZendeskUtils::getTicketIdOptions),
             string(COMMENT)
                 .label("Comment")
                 .description("A ticket comment.")

@@ -24,9 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import java.time.LocalTime;
 
@@ -70,7 +70,7 @@ public class GoogleCalendarConstants {
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
         .label("Calendar Identifier")
-        .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
+        .options((OptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
         .required(true);
 
     public static final ModifiableObjectProperty EVENT_OUTPUT_PROPERTY = object()

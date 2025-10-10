@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.todoist.util.TodoistUtils;
 import java.util.Map;
 
@@ -65,7 +65,7 @@ public class TodoistCreateTaskAction {
                 .label("Project ID")
                 .description("Task project ID. If not set, task is put to user's Inbox.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) TodoistUtils::getProjectIdOptions),
+                .options((ActionDefinition.OptionsFunction<String>) TodoistUtils::getProjectIdOptions),
             integer("priority").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

@@ -26,11 +26,11 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRowAndColumn;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -68,7 +68,7 @@ public class GoogleSheetsNewRowTrigger {
             string(SHEET_NAME)
                 .label("Sheet")
                 .description("The name of the sheet")
-                .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+                .options((OptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
                 .optionsLookupDependsOn(SPREADSHEET_ID)
                 .required(true))
         .output()

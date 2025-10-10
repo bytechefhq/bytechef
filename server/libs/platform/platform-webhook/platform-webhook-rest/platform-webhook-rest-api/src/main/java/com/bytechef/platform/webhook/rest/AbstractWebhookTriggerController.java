@@ -414,7 +414,7 @@ public abstract class AbstractWebhookTriggerController {
 
                 bodyBuilder.contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
 
-                responseEntity = bodyBuilder.body(new InputStreamResource(tempFileStorage.getFileStream(fileEntry)));
+                responseEntity = bodyBuilder.body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
 
                 break;
             case JSON:

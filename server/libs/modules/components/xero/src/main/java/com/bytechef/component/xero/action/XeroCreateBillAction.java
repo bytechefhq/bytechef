@@ -40,7 +40,7 @@ import static com.bytechef.component.xero.constant.XeroConstants.UNIT_AMOUNT;
 import static com.bytechef.component.xero.util.XeroUtils.createInvoice;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xero.util.XeroUtils;
 
@@ -56,7 +56,7 @@ public class XeroCreateBillAction {
             string(CONTACT_ID)
                 .label("Contact ID")
                 .description("ID of the contact to create the bill for.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
+                .options((OptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
                 .label("Date")
@@ -89,13 +89,13 @@ public class XeroCreateBillAction {
                                 .required(false),
                             string("AccountCode")
                                 .label("Account Code")
-                                .options((ActionOptionsFunction<String>) XeroUtils::getAccountCodeOptions)
+                                .options((OptionsFunction<String>) XeroUtils::getAccountCodeOptions)
                                 .required(false)))
                 .required(true),
             string(CURRENCY_CODE)
                 .label("Currency")
                 .description("Currency that bill is raised in.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
+                .options((OptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(REFERENCE)
                 .label("Invoice Reference")

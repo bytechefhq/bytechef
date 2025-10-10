@@ -25,11 +25,11 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.CONTE
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.INCIDENT_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.pagerduty.util.PagerDutyUtils;
@@ -51,7 +51,7 @@ public class PagerDutyCreateIncidentNoteAction {
             string(INCIDENT_ID)
                 .label("Incident ID")
                 .description("ID of the incident to which the note will be added.")
-                .options((ActionOptionsFunction<String>) PagerDutyUtils::getIncidentIdOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getIncidentIdOptions)
                 .required(true),
             string(CONTENT)
                 .label("Content")

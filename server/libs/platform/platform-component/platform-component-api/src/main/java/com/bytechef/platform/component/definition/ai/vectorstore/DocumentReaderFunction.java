@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.definition.ai.vectorstore;
 
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.document.DocumentReader;
 
@@ -38,5 +38,5 @@ public interface DocumentReaderFunction {
      * @param connectionParameters
      * @return
      */
-    DocumentReader apply(Parameters inputParameters, Parameters connectionParameters, Context context);
+    DocumentReader apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context);
 }

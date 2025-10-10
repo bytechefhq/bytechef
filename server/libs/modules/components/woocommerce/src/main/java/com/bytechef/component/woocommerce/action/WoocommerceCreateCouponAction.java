@@ -38,10 +38,10 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.MINIMUM_AMOUNT;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.PRODUCT_IDS;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.woocommerce.util.WoocommerceUtils;
 
@@ -88,7 +88,7 @@ public class WoocommerceCreateCouponAction {
                 .label("Product Ids")
                 .description("List of product IDs the coupon can be used on.")
                 .required(false)
-                .options((ActionOptionsFunction<String>) WoocommerceUtils::getProductIdOptions)
+                .options((OptionsFunction<String>) WoocommerceUtils::getProductIdOptions)
                 .items(integer()),
             bool(EXCLUDE_SALE_ITEMS)
                 .label("Exclude Sale Items")

@@ -26,6 +26,7 @@ import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
 import static com.bytechef.component.liferay.constant.LiferayConstants.PROPERTIES;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -33,9 +34,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.liferay.util.LiferayOptionUtils;
 import com.bytechef.component.liferay.util.LiferayPropertiesUtils;
 import com.bytechef.component.liferay.util.PropertiesContainer;
@@ -55,16 +54,16 @@ public class LiferayHeadlessAction {
         .properties(
             string(APPLICATION)
                 .label("Application")
-                .options((ActionOptionsFunction<String>) LiferayOptionUtils::getApplicationsOptions)
+                .options((ActionDefinition.OptionsFunction<String>) LiferayOptionUtils::getApplicationsOptions)
                 .required(true),
             string(ENDPOINT)
                 .label("Endpoint")
-                .options((ActionOptionsFunction<String>) LiferayOptionUtils::getEndpointsOptions)
+                .options((ActionDefinition.OptionsFunction<String>) LiferayOptionUtils::getEndpointsOptions)
                 .optionsLookupDependsOn(APPLICATION)
                 .required(true),
             dynamicProperties(PROPERTIES)
                 .properties(
-                    (ActionPropertiesFunction) (
+                    (ActionDefinition.PropertiesFunction) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
                         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(

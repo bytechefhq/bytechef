@@ -177,7 +177,7 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        public Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
             return Optional.empty();
         }
     }
@@ -187,7 +187,7 @@ class ComponentHandlerPolyglotEngine {
         implements ComponentDefinition {
 
         @Override
-        public Optional<List<? extends ActionDefinition>> getActions() {
+        public Optional<List<ActionDefinition>> getActions() {
             return Optional.ofNullable(actions);
         }
 
@@ -197,7 +197,7 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
             return Optional.empty();
         }
 
@@ -252,7 +252,7 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<? extends TriggerDefinition>> getTriggers() {
+        public Optional<List<TriggerDefinition>> getTriggers() {
             return Optional.empty();
         }
 

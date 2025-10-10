@@ -70,7 +70,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeDynamicProperties(
             componentName, componentVersion, triggerName, inputParameters, propertyName, lookupDependsOnPaths,
             componentConnection, contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection, true));
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, true));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         triggerDefinitionService.executeListenerDisable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
             componentConnection, contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         triggerDefinitionService.executeListenerEnable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, componentConnection,
             contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, componentConnection, true);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
@@ -128,7 +128,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentName, componentVersion, triggerName, inputParameters,
                 propertyName, lookupDependsOnPaths, searchText, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection1, true));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
     }
 
     @Override
@@ -139,14 +139,14 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, componentConnection, true);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
             (componentConnection1, triggerContext1) -> triggerDefinitionService.executeOutput(
                 componentName, componentVersion, triggerName, inputParameters, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection1, true));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
     }
 
     @Override
@@ -158,8 +158,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, jobPrincipalId, workflowUuid,
-            componentConnection, editorEnvironment);
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection, null,
+            editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext,
@@ -168,8 +168,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
                 componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, jobPrincipalId, workflowUuid,
-                componentConnection1, editorEnvironment));
+                componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1, null,
+                editorEnvironment));
     }
 
     @Override
@@ -180,7 +180,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, componentConnection, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
         tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
@@ -192,7 +192,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 return null;
             },
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection1, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
     }
 
     @Override
@@ -203,7 +203,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, componentConnection, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext,
@@ -212,7 +212,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentName, componentVersion, triggerName, inputParameters,
                 webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
-                null, null, null, componentConnection1, false));
+                null, null, componentConnection1, null, false));
     }
 
     @Override
@@ -223,7 +223,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, componentConnection, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(componentName, componentVersion, componentConnection,
             triggerContext, null,
@@ -231,7 +231,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentName, componentVersion, triggerName, inputParameters,
                 webhookRequest, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection1, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
     }
 
     @Override
@@ -244,7 +244,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeWebhookValidateOnEnable(
             componentName, componentVersion, triggerName, inputParameters, webhookRequest,
             componentConnection, contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, componentConnection, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
     }
 
     @Override

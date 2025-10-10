@@ -45,7 +45,9 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         List<Map<String, ?>> columns = MapUtils.getList(inputParameters, COLUMNS, new TypeReference<>() {}, List.of());
         Map<Object, ?> valuesMap = MapUtils.getMap(inputParameters, VALUES);
+
         List<Map<String, Object>> rows = MapUtils.getList(valuesMap, ROWS, new TypeReference<>() {}, List.of());
+
         String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, TABLE);
 

@@ -24,10 +24,10 @@ import static com.bytechef.component.vbout.constant.VboutConstants.CHANNEL;
 import static com.bytechef.component.vbout.constant.VboutConstants.CHANNEL_ID;
 import static com.bytechef.component.vbout.constant.VboutConstants.MESSAGE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.vbout.util.VboutUtils;
 
@@ -56,7 +56,7 @@ public class VboutCreateSocialMediaMessageAction {
                 .label("Social Media Account")
                 .description("The social media account which will create the post.")
                 .optionsLookupDependsOn(CHANNEL)
-                .options((ActionOptionsFunction<String>) VboutUtils::getChannelIdOptions)
+                .options((OptionsFunction<String>) VboutUtils::getChannelIdOptions)
                 .required(true))
         .perform(VboutCreateSocialMediaMessageAction::perform);
 

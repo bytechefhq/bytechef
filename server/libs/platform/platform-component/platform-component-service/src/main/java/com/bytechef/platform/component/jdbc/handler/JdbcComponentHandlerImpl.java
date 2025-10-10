@@ -63,7 +63,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.Type;
@@ -81,6 +80,7 @@ import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
+import com.bytechef.platform.component.util.SqlUtils;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
@@ -88,7 +88,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
@@ -153,19 +152,19 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .description("Name of the table in which to insert data to.")
                     .required(true),
                 array(COLUMNS)
-                    .label("Fields")
-                    .description("The list of the table field names where corresponding values would be inserted.")
+                    .label("Columns")
+                    .description("The list of the table column names where corresponding values would be inserted.")
                     .items(
                         object()
                             .properties(
                                 string(NAME)
                                     .label("Field Name")
-                                    .description("Name of the fields.")
+                                    .description("Name of the column.")
                                     .required(true),
                                 string(TYPE)
                                     .label("Type")
-                                    .description("Type of the field.")
-                                    .options(getTypeOptions())
+                                    .description("Type of the column.")
+                                    .options(SqlUtils.getTypeOptions())
                                     .defaultValue("STRING")
                                     .required(true))),
                 dynamicProperties(VALUES)
@@ -191,19 +190,19 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .description("Condition that will be checked in the column. Example: column1=5")
                     .required(true),
                 array(COLUMNS)
-                    .label("Fields")
-                    .description("The list of the table field names where corresponding values would be updated.")
+                    .label("Columns")
+                    .description("The list of the table column names where corresponding values would be updated.")
                     .items(
                         object()
                             .properties(
                                 string(NAME)
-                                    .label("Field Name")
-                                    .description("Name of the fields.")
+                                    .label("Column Name")
+                                    .description("Name of the column.")
                                     .required(true),
                                 string(TYPE)
                                     .label("Type")
-                                    .description("Type of the field.")
-                                    .options(getTypeOptions())
+                                    .description("Type of the column.")
+                                    .options(SqlUtils.getTypeOptions())
                                     .defaultValue("STRING")
                                     .required(true))),
                 dynamicProperties(VALUES)
@@ -434,16 +433,6 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {
         return DataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName);
-    }
-
-    private List<Option<String>> getTypeOptions() {
-        List<Type> types = List.of(
-            Type.ARRAY, Type.BOOLEAN, Type.DATE, Type.DATE_TIME, Type.INTEGER, Type.NUMBER, Type.OBJECT, Type.STRING,
-            Type.TIME);
-
-        return types.stream()
-            .map(type -> option(type.name(), type.name()))
-            .collect(Collectors.toList());
     }
 
     public static List<ValueProperty<?>> createProperties(

@@ -49,9 +49,9 @@ import static com.bytechef.component.xero.constant.XeroConstants.TITLE;
 import static com.bytechef.component.xero.constant.XeroConstants.UNIT_AMOUNT;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -71,7 +71,7 @@ public class XeroCreateQuoteAction {
             string(CONTACT_ID)
                 .label("Contact ID")
                 .description("ID of the contact that the quote is being raised for.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
+                .options((OptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
                 .label("Date")
@@ -86,7 +86,7 @@ public class XeroCreateQuoteAction {
             string(CURRENCY_CODE)
                 .label("Currency Code")
                 .description("The currency code that quote has been raised in.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
+                .options((OptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(QUOTE_NUMBER)
                 .label("Quote Number")
@@ -100,7 +100,7 @@ public class XeroCreateQuoteAction {
             string(BRANDING_THEME_ID)
                 .label("Branding Theme ID")
                 .description("The branding theme ID to be applied to this quote.")
-                .options((ActionOptionsFunction<String>) XeroUtils::getBrandingThemeIdOptions)
+                .options((OptionsFunction<String>) XeroUtils::getBrandingThemeIdOptions)
                 .required(false),
             string(TITLE)
                 .label(TITLE)

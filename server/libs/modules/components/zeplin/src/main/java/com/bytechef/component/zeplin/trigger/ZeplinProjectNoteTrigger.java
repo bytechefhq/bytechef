@@ -26,11 +26,11 @@ import static com.bytechef.component.zeplin.constant.ZeplinConstants.ID;
 import static com.bytechef.component.zeplin.constant.ZeplinConstants.PROJECT_ID;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -54,7 +54,7 @@ public class ZeplinProjectNoteTrigger {
             string(PROJECT_ID)
                 .label("Project ID")
                 .description("ID of the project you want to monitor.")
-                .options((TriggerOptionsFunction<String>) ZeplinUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) ZeplinUtils::getProjectIdOptions)
                 .required(true))
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(

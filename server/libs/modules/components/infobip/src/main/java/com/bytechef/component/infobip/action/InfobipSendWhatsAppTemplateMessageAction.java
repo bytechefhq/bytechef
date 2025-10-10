@@ -32,10 +32,10 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static com.bytechef.component.infobip.constant.InfobipConstants.WHATSAPP_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.infobip.util.InfobipUtils.getTemplates;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.infobip.util.InfobipUtils;
@@ -68,7 +68,7 @@ public class InfobipSendWhatsAppTemplateMessageAction {
                 .label("Template Name")
                 .description("Name of the WhatsApp template to use.")
                 .optionsLookupDependsOn(FROM)
-                .options((ActionOptionsFunction<String>) InfobipUtils::getTemplateOptions)
+                .options((OptionsFunction<String>) InfobipUtils::getTemplateOptions)
                 .required(true),
             dynamicProperties(PLACEHOLDERS)
                 .properties(InfobipUtils::createPlaceholderProperties)

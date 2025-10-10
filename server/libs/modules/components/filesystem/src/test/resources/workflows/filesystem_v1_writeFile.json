@@ -1,27 +1,27 @@
 {
-  "label" : "Local File - WRITE operation",
-  "inputs" : [ {
-    "name" : "fileEntry",
-    "label" : "File property",
-    "type" : "FILE_ENTRY",
-    "required" : true
+  "label": "Local File - WRITE operation",
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
   }, {
-    "name" : "filename",
-    "label" : "Absolute file path to write to",
-    "type" : "STRING",
-    "required" : true
+    "name": "filename",
+    "label": "Absolute file path to write to",
+    "type": "STRING",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "writeLocalFile",
-    "value" : "${writeLocalFile}"
+  "outputs": [ {
+    "name": "writeLocalFile",
+    "value": "${writeLocalFile}"
   } ],
-  "tasks" : [ {
-    "name" : "writeLocalFile",
-    "label" : "Write to the local file",
-    "type" : "filesystem/v1/writeFile",
-    "parameters" : {
-      "fileEntry" : "${fileEntry}",
-      "filename" : "${filename}"
+  "tasks": [ {
+    "name": "writeLocalFile",
+    "label": "Write to the local file",
+    "type": "filesystem/v1/writeFile",
+    "parameters": {
+      "fileEntry": "${fileEntry}",
+      "filename": "${filename}"
     }
   } ]
 }

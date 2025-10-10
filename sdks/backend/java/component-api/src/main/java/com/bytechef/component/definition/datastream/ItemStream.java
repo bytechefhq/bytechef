@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition.datastream;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -23,10 +24,14 @@ import com.bytechef.component.definition.Parameters;
  */
 public interface ItemStream {
 
-    default void open(Parameters inputParameters, Parameters connectionParameters, ExecutionContext context) {
+    default void open(
+        Parameters inputParameters, Parameters connectionParameters, Context context,
+        ExecutionContext executionContext) {
     }
 
-    default void update(ExecutionContext context) {
+    default void update(
+        Parameters inputParameters, Parameters connectionParameters, Context context,
+        ExecutionContext executionContext) {
     }
 
     default void close() {

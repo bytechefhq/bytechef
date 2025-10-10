@@ -26,6 +26,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ConnectionDefinition;
@@ -33,13 +35,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
-import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ArrayProperty;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
@@ -128,7 +129,7 @@ public class ComponentDefinitionRegistry {
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         ComponentDefinition componentDefinition = null;
 
-        if (version == null) {
+        if (version == null || version == -1) {
             List<ComponentDefinition> filteredComponentDefinitions = getComponentDefinitions(name);
 
             if (!filteredComponentDefinitions.isEmpty()) {
@@ -217,6 +218,39 @@ public class ComponentDefinitionRegistry {
             })
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public ClusterElementDefinition<?> getClusterElementDefinition(
+        String componentName, int componentVersion, String clusterElementName) {
+
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getClusterElements()
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "The component '%s' does not contain the '%s' cluster element.".formatted(
+                        componentName, clusterElementName)));
+    }
+
+    public Property getClusterElementProperty(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ClusterElementContext context) throws Exception {
+
+        ClusterElementDefinition<?> clusterElementDefinition = getClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
+
+        List<? extends Property> properties = clusterElementDefinition.getProperties()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "The cluster element '%s' in component '%s' does not have any properties defined.".formatted(
+                    clusterElementName, componentName)));
+
+        return getProperty(
+            propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
     }
 
     public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
@@ -336,17 +370,22 @@ public class ComponentDefinitionRegistry {
                 PropertiesDataSource<?> dynamicPropertiesDataSource = dynamicPropertiesProperty
                     .getDynamicPropertiesDataSource();
 
-                PropertiesDataSource.PropertiesFunction propertiesFunction = dynamicPropertiesDataSource
+                PropertiesDataSource.BasePropertiesFunction propertiesFunction = dynamicPropertiesDataSource
                     .getProperties();
 
                 List<? extends Property.ValueProperty<?>> dynamicPropertyProperties;
 
-                if (propertiesFunction instanceof ActionPropertiesFunction actionPropertiesFunction) {
+                if (propertiesFunction instanceof ActionDefinition.PropertiesFunction actionPropertiesFunction) {
                     dynamicPropertyProperties = actionPropertiesFunction.apply(
                         inputParameters, connectionParameters, lookupDependsOnPaths, (ActionContext) context);
+                } else if (propertiesFunction instanceof ClusterElementDefinition.PropertiesFunction clusterElementPropertiesFunction) {
+
+                    dynamicPropertyProperties = clusterElementPropertiesFunction.apply(
+                        inputParameters, connectionParameters, lookupDependsOnPaths,
+                        (ClusterElementContext) context);
                 } else {
-                    dynamicPropertyProperties = ((TriggerPropertiesFunction) propertiesFunction)
-                        .apply(inputParameters, connectionParameters, lookupDependsOnPaths, (TriggerContext) context);
+                    dynamicPropertyProperties = ((PropertiesFunction) propertiesFunction).apply(
+                        inputParameters, connectionParameters, lookupDependsOnPaths, (TriggerContext) context);
                 }
 
                 return getProperty(

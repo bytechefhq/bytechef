@@ -172,7 +172,7 @@ public class SendEmailAction {
             for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
                 attachmentBodyPart.setDataHandler(
                     new DataHandler(new ByteArrayDataSource(
-                        (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
+                        (InputStream) context.file(file -> file.getInputStream(fileEntry)), fileEntry.getMimeType())));
 
                 multipart.addBodyPart(attachmentBodyPart);
             }

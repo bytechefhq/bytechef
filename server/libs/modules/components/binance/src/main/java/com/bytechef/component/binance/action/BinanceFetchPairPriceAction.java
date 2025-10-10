@@ -24,10 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.binance.util.BinanceUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -43,7 +43,7 @@ public class BinanceFetchPairPriceAction {
             string(SYMBOL)
                 .label("Symbol")
                 .description("The symbol of the crypto pair.")
-                .options((ActionOptionsFunction<String>) BinanceUtils::getSymbolsOptions)
+                .options((OptionsFunction<String>) BinanceUtils::getSymbolsOptions)
                 .required(true))
         .output(
             outputSchema(

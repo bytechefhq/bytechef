@@ -33,7 +33,7 @@ public interface SharedTemplateFileStorage {
      * @param fileEntry the file entry representing the file to be accessed
      * @return an InputStream to read the content of the file
      */
-    InputStream getFileStream(FileEntry fileEntry);
+    InputStream getInputStream(FileEntry fileEntry);
 
     /**
      * Stores the content of a file using the specified file name and input stream.

@@ -21,6 +21,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.PlatformConstants;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Objects;
 
 /**
@@ -31,13 +32,23 @@ public final class TempFileStorageImpl implements TempFileStorage {
     private final TempFileStorage tempFileStorage;
 
     public TempFileStorageImpl() {
-        this.tempFileStorage =
-            new com.bytechef.platform.file.storage.TempFileStorageImpl(new Base64FileStorageService());
+        this.tempFileStorage = new com.bytechef.platform.file.storage.TempFileStorageImpl(
+            new Base64FileStorageService());
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
-        return tempFileStorage.getFileStream(fileEntry);
+    public long getContentLength(FileEntry fileEntry) {
+        return tempFileStorage.getContentLength(fileEntry);
+    }
+
+    @Override
+    public InputStream getInputStream(FileEntry fileEntry) {
+        return tempFileStorage.getInputStream(fileEntry);
+    }
+
+    @Override
+    public OutputStream getOutputStream(FileEntry fileEntry) {
+        return tempFileStorage.getOutputStream(fileEntry);
     }
 
     @Override

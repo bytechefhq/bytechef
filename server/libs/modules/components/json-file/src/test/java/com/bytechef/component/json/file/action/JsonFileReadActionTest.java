@@ -94,7 +94,7 @@ public class JsonFileReadActionTest {
         File file = getFile("sample_array.json");
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(FileEntry.class));
@@ -119,7 +119,7 @@ public class JsonFileReadActionTest {
             new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
             new JSONArray((List<?>) JsonFileReadAction.perform(parameters, parameters, context)), true);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
@@ -149,7 +149,7 @@ public class JsonFileReadActionTest {
         File file = getFile("sample.jsonl");
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
@@ -172,7 +172,7 @@ public class JsonFileReadActionTest {
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
             new JSONArray((List<?>) JsonFileReadAction.perform(parameters, parameters, context)), true);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getInputStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameters.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(FileEntry.class)))

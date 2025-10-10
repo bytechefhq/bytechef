@@ -16,7 +16,7 @@
 
 package com.bytechef.component.definition.ai.agent;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -32,5 +32,6 @@ public interface SingleConnectionToolFunction extends ToolFunction {
      * @param context
      * @return
      */
-    Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
+    Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
+        throws Exception;
 }

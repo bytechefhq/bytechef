@@ -28,5 +28,5 @@ public interface ClusterElementComponentDefinition {
      *
      * @return
      */
-    Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements();
+    Optional<List<ClusterElementDefinition<?>>> getClusterElements();
 }

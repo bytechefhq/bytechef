@@ -24,5 +24,5 @@ import com.bytechef.component.exception.ProviderException;
 public interface OperationDefinitionFacade {
 
     ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body);
+        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body);
 }

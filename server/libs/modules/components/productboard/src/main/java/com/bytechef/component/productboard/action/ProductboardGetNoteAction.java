@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.productboard.property.ProductboardExpandedNoteProperties;
 import com.bytechef.component.productboard.util.ProductboardUtils;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class ProductboardGetNoteAction {
             string("noteId").label("Note ID")
                 .description("ID of the note")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))

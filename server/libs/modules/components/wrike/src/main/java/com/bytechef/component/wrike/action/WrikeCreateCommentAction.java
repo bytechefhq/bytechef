@@ -29,10 +29,10 @@ import static com.bytechef.component.wrike.constant.WrikeConstants.PARENT_ID;
 import static com.bytechef.component.wrike.constant.WrikeConstants.PLAIN_TEXT;
 import static com.bytechef.component.wrike.constant.WrikeConstants.TEXT;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.wrike.util.WrikeUtils;
@@ -57,7 +57,7 @@ public class WrikeCreateCommentAction {
                 .label("Parent ID")
                 .description("ID of the parent folder or the parent task.")
                 .optionsLookupDependsOn(PARENT)
-                .options((ActionOptionsFunction<String>) WrikeUtils::getParentIdOptions)
+                .options((OptionsFunction<String>) WrikeUtils::getParentIdOptions)
                 .required(true),
             string(TEXT)
                 .label("Text")

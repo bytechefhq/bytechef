@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.pipeliner.util.PipelinerUtils;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class PipelinerCreateContactAction {
             .description(
                 "ID of the user in Pipeliner Application that will become the owner of the newly created Contact.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) PipelinerUtils::getOwnerIdOptions),
+            .options((ActionDefinition.OptionsFunction<String>) PipelinerUtils::getOwnerIdOptions),
             string("first_name").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

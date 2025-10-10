@@ -25,10 +25,10 @@ import static com.bytechef.component.vbout.constant.VboutConstants.ID;
 import static com.bytechef.component.vbout.constant.VboutConstants.LIST_ID;
 import static com.bytechef.component.vbout.constant.VboutConstants.STATUS;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.vbout.util.VboutUtils;
 
@@ -44,13 +44,13 @@ public class VboutUpdateContactAction {
             string(LIST_ID)
                 .label("List ID")
                 .description("The ID of the list with contact.")
-                .options((ActionOptionsFunction<String>) VboutUtils::getListIdOptions)
+                .options((OptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(true),
             string(ID)
                 .label("Contact ID")
                 .description("The ID of the contact.")
                 .optionsLookupDependsOn(LIST_ID)
-                .options((ActionOptionsFunction<String>) VboutUtils::getContactIdOptions)
+                .options((OptionsFunction<String>) VboutUtils::getContactIdOptions)
                 .required(true),
             string(EMAIL)
                 .label("Email")

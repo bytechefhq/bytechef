@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.security.config;
-
-import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
-import java.util.List;
-import org.springframework.stereotype.Component;
+package com.bytechef.component.definition;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class WebhookrAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
-
-    @Override
-    public List<String> getPermitAllRequestMatcherPaths() {
-        return List.of("/approvals/**", "/callback", "/file-entries/**", "/oauth.html", "/webhooks/**");
-    }
+public interface ClusterElementContext extends Context {
 }

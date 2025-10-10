@@ -91,7 +91,7 @@ export function IntegrationVersionToJSONTyped(value?: Omit<IntegrationVersion, '
     return {
         
         'description': value['description'],
-        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
+        'publishedDate': value['publishedDate'] == null ? value['publishedDate'] : value['publishedDate'].toISOString(),
         'status': IntegrationStatusToJSON(value['status']),
     };
 }

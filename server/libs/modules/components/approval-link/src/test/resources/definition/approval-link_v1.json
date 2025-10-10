@@ -1,42 +1,42 @@
 {
-  "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Creates approval/disapproval links.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "createApprovalLinks",
-    "outputDefinition" : {
-      "output" : { },
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+  "actions": [ {
+    "batch": null,
+    "deprecated": null,
+    "description": "Creates approval/disapproval links.",
+    "help": null,
+    "metadata": null,
+    "name": "createApprovalLinks",
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
     },
-    "perform" : { },
-    "processErrorResponse" : null,
-    "properties" : [ ],
-    "title" : "Create Approval Links",
-    "workflowNodeDescription" : null
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ ],
+    "title": "Create Approval Links",
+    "workflowNodeDescription": null
   } ],
-  "clusterElements" : null,
-  "componentCategories" : [ {
-    "label" : "Developer Tools",
-    "name" : "developer-tools"
+  "clusterElements": null,
+  "componentCategories": [ {
+    "label": "Developer Tools",
+    "name": "developer-tools"
   }, {
-    "label" : "File Storage",
-    "name" : "file-storage"
+    "label": "File Storage",
+    "name": "file-storage"
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "The Approval Link component that create approval/disapproval links.",
-  "icon" : "path:assets/approval-link.svg",
-  "metadata" : null,
-  "name" : "approvalLink",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Approval Link",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "The Approval Link component that create approval/disapproval links.",
+  "icon": "path:assets/approval-link.svg",
+  "metadata": null,
+  "name": "approvalLink",
+  "resources": null,
+  "tags": null,
+  "title": "Approval Link",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }

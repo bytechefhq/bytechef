@@ -19,9 +19,9 @@ package com.bytechef.component.pipedrive.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.pipedrive.constant.PipedriveConstants.ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
@@ -38,7 +38,7 @@ public class PipedriveUtils {
     private PipedriveUtils() {
     }
 
-    public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
+    public static OptionsFunction<String> getOptions(String path, String dependsOn) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             Map<String, ?> response = context
                 .http(http -> http.get(path))

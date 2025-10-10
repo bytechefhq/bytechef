@@ -35,10 +35,10 @@ import static com.bytechef.component.vbout.constant.VboutConstants.SCHEDULED_DAT
 import static com.bytechef.component.vbout.constant.VboutConstants.SUBJECT;
 import static com.bytechef.component.vbout.constant.VboutConstants.TYPE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.vbout.util.VboutUtils;
 
@@ -99,7 +99,7 @@ public class VboutCreateEmailMarketingCampaignAction {
                 .label("Lists")
                 .description("IDs of list campaign recipients.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) VboutUtils::getListIdOptions)
+                .options((OptionsFunction<String>) VboutUtils::getListIdOptions)
                 .required(false))
         .perform(VboutCreateEmailMarketingCampaignAction::perform);
 

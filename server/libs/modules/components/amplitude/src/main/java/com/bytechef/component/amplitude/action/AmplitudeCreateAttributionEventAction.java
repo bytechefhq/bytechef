@@ -33,10 +33,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.amplitude.util.AmplitudeUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -69,7 +69,7 @@ public class AmplitudeCreateAttributionEventAction {
                         .description(
                             "For iOS input the Identifier for Advertiser or the Identifier for Vendor.For Android " +
                                 "input the Google ADID or App Set ID.")
-                        .options((ActionOptionsFunction<String>) AmplitudeUtils::getIdentifierKeyOptions)
+                        .options((OptionsFunction<String>) AmplitudeUtils::getIdentifierKeyOptions)
                         .optionsLookupDependsOn(PLATFORM)
                         .required(true),
                     string(VALUE)

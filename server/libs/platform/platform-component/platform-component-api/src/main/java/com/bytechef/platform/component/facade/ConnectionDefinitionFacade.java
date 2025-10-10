@@ -35,7 +35,7 @@ public interface ConnectionDefinitionFacade {
         return null;
     }
 
-    Optional<String> executeBaseUri(String componentName, ComponentConnection connection);
+    Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,

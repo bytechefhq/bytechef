@@ -24,9 +24,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.PropertiesDataSource;
 import java.util.Map;
 
 /**
@@ -48,20 +47,20 @@ public class AirtableCreateRecordAction {
         .properties(string("baseId").label("Base ID")
             .description("ID of the base where table is located.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getBaseIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("tableId").label("Table ID")
                 .description("The table where the record will be created.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getTableIdOptions)
                 .optionsLookupDependsOn("baseId")
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
             dynamicProperties("fields")
-                .properties((PropertiesDataSource.ActionPropertiesFunction) AirtableUtils::getFieldsProperties)
+                .properties((ActionDefinition.PropertiesFunction) AirtableUtils::getFieldsProperties)
                 .propertiesLookupDependsOn("baseId", "tableId")
                 .required(false)
                 .metadata(

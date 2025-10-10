@@ -18,8 +18,8 @@ package com.bytechef.component.liferay.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 
+import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.liferay.util.LiferayUtils;
 
 /**
@@ -43,7 +43,7 @@ public class LiferayConstants {
 
     public static final ModifiableDynamicPropertiesProperty PARAMETERS_DYNAMIC_PROPERTY = dynamicProperties(PARAMETERS)
         .propertiesLookupDependsOn(SERVICE)
-        .properties((ActionPropertiesFunction) LiferayUtils::createParameters)
+        .properties((PropertiesFunction) LiferayUtils::createParameters)
         .required(true);
 
 }

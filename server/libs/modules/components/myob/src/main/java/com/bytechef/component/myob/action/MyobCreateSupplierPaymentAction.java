@@ -27,9 +27,9 @@ import static com.bytechef.component.myob.constant.MyobConstants.SUPPLIER;
 import static com.bytechef.component.myob.constant.MyobConstants.UID;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.myob.util.MyobUtils;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class MyobCreateSupplierPaymentAction {
                 .required(true),
             string(SUPPLIER)
                 .label("Supplier UID")
-                .options((ActionOptionsFunction<String>) MyobUtils::getSupplierOptions)
+                .options((OptionsFunction<String>) MyobUtils::getSupplierOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))
         .perform(MyobCreateSupplierPaymentAction::perform);

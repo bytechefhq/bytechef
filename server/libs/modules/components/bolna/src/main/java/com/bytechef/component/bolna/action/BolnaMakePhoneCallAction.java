@@ -25,10 +25,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.bolna.util.BolnaUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
@@ -44,12 +44,12 @@ public class BolnaMakePhoneCallAction {
             string(AGENT_ID)
                 .label("Agent ID")
                 .description("Agent id which will initiate the outbound call.")
-                .options((ActionOptionsFunction<String>) BolnaUtils::getAgentIdOptions)
+                .options((OptionsFunction<String>) BolnaUtils::getAgentIdOptions)
                 .required(true),
             string(RECIPIENT_PHONE_NUMBER)
                 .label("Recipient Phone Number")
                 .description("Phone number of the recipient alongwith country code (in E.164 format).")
-                .options((ActionOptionsFunction<String>) BolnaUtils::getPhoneNumbersOptions)
+                .options((OptionsFunction<String>) BolnaUtils::getPhoneNumbersOptions)
                 .required(true))
         .output(
             outputSchema(

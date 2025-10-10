@@ -33,11 +33,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.brevo.util.BrevoUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -60,26 +60,26 @@ public class BrevoSendTransactionalEmailAction {
             string(SENDER_EMAIL)
                 .label("Sender Email")
                 .description("Email of the sender from which the emails will be sent.")
-                .options((ActionOptionsFunction<String>) BrevoUtils::getSendersOptions)
+                .options((OptionsFunction<String>) BrevoUtils::getSendersOptions)
                 .required(true),
             array(TO)
                 .label("To Recipients")
                 .description("The To: recipients for the message.")
                 .items(string().controlType(ControlType.EMAIL))
-                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .options((OptionsFunction<String>) BrevoUtils::getContactsOptions)
                 .minItems(1)
                 .required(true),
             array(BCC)
                 .label("Bcc Recipients")
                 .description("The Bcc recipients for the message.")
                 .items(string().controlType(ControlType.EMAIL))
-                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .options((OptionsFunction<String>) BrevoUtils::getContactsOptions)
                 .required(false),
             array(CC)
                 .label("Cc Recipients")
                 .description("The Cc recipients for the message.")
                 .items(string().controlType(ControlType.EMAIL))
-                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .options((OptionsFunction<String>) BrevoUtils::getContactsOptions)
                 .required(false),
             string(SUBJECT)
                 .label("Subject")

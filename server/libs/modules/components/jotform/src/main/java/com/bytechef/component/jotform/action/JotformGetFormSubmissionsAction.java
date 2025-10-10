@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.jotform.util.JotformUtils;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class JotformGetFormSubmissionsAction {
         .properties(string("formId").label("Form ID")
             .description("ID of the form to retrieve submissions for.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) JotformUtils::getFormIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) JotformUtils::getFormIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

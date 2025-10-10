@@ -41,8 +41,8 @@ public class SharedTemplateFileStorageImpl implements SharedTemplateFileStorage 
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
-        return fileStorageService.getFileStream(SHARED_TEMPLATES_DIR, fileEntry);
+    public InputStream getInputStream(FileEntry fileEntry) {
+        return fileStorageService.getInputStream(SHARED_TEMPLATES_DIR, fileEntry);
     }
 
     @Override

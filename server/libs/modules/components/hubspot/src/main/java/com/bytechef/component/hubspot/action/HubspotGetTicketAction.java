@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class HubspotGetTicketAction {
             ))
         .properties(string("ticketId").label("Ticket ID")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getTicketIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) HubspotUtils::getTicketIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

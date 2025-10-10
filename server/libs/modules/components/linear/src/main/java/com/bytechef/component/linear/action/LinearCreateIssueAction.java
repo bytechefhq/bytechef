@@ -33,9 +33,9 @@ import static com.bytechef.component.linear.constant.LinearConstants.TITLE;
 import static com.bytechef.component.linear.util.LinearUtils.appendOptionalField;
 import static com.bytechef.component.linear.util.LinearUtils.executeGraphQLQuery;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linear.util.LinearUtils;
 import java.util.Map;
@@ -56,12 +56,12 @@ public class LinearCreateIssueAction {
             string(TEAM_ID)
                 .label("Team ID")
                 .description("The ID of the team where this issue should be created.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getTeamOptions)
+                .options((OptionsFunction<String>) LinearUtils::getTeamOptions)
                 .required(true),
             string(STATUS_ID)
                 .label("Status")
                 .description("The status of the issue.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getIssueStateOptions)
+                .options((OptionsFunction<String>) LinearUtils::getIssueStateOptions)
                 .required(true),
             integer(PRIORITY)
                 .label("Priority")
@@ -77,7 +77,7 @@ public class LinearCreateIssueAction {
             string(ASSIGNEE_ID)
                 .label("Assignee ID")
                 .description("The identifier of the user to assign the issue to.")
-                .options((ActionOptionsFunction<String>) LinearUtils::getAssigneeOptions)
+                .options((OptionsFunction<String>) LinearUtils::getAssigneeOptions)
                 .required(false),
             string(DESCRIPTION)
                 .label("Description")

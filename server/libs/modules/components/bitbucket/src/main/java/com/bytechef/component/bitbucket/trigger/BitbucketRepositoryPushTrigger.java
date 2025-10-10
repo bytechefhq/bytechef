@@ -28,11 +28,11 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import com.bytechef.component.bitbucket.util.BitbucketUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -54,12 +54,12 @@ public class BitbucketRepositoryPushTrigger {
                 .label("Workspace")
                 .description("Workspace where the repository is located.")
                 .required(true)
-                .options((TriggerOptionsFunction<String>) BitbucketUtils::getWorkspaceOptions),
+                .options((OptionsFunction<String>) BitbucketUtils::getWorkspaceOptions),
             string(REPOSITORY)
                 .label("Repository")
                 .description("Repository that will be connected to the trigger.")
                 .required(true)
-                .options((TriggerOptionsFunction<String>) BitbucketUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) BitbucketUtils::getRepositoryOptions)
                 .optionsLookupDependsOn(WORKSPACE))
         .output()
         .webhookEnable(BitbucketRepositoryPushTrigger::webhookEnable)

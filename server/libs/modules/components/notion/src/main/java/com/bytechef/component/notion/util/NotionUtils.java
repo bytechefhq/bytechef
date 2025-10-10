@@ -22,9 +22,9 @@ import static com.bytechef.component.notion.constant.NotionConstants.ID;
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class NotionUtils {
     private NotionUtils() {
     }
 
-    public static ActionOptionsFunction<String> gePageOrDatabaseIdOptions(boolean isPage) {
+    public static OptionsFunction<String> gePageOrDatabaseIdOptions(boolean isPage) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             String objectType = isPage ? "page" : "database";
 

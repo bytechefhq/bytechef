@@ -367,7 +367,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             if (sharedTemplate.getTemplate() == null) {
                 sharedWorkflowDTO = new SharedWorkflowDTO(false);
             } else {
-                try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+                try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                     TemplateFiles templateFiles = readTemplate(inputStream.readAllBytes());
 
                     Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
@@ -395,7 +395,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
                 throw new IllegalStateException("Shared template is not available");
             }
 
-            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                 data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);
@@ -429,7 +429,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         if (sharedWorkflow) {
             SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
 
-            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                 data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);

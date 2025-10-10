@@ -29,10 +29,10 @@ import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID_PR
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID_PROPERTY;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.nocodb.util.NocoDbUtils;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class NocoDbDeleteRecords {
                 .label("Records ID")
                 .description("ID of the records to delete.")
                 .items(integer())
-                .options((ActionOptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
+                .options((OptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
                 .optionsLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
                 .minItems(1)
                 .required(true))

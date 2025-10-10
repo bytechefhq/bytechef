@@ -27,7 +27,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY
 import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
 
@@ -46,7 +46,7 @@ public class SlackSendDirectMessageAction {
             string(CHANNEL)
                 .label("User ID")
                 .description("ID of the user to send the direct message to.")
-                .options((ActionOptionsFunction<String>) SlackUtils::getUserOptions)
+                .options((OptionsFunction<String>) SlackUtils::getUserOptions)
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))

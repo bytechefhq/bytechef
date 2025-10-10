@@ -26,10 +26,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.wrike.constant.WrikeConstants.PARENT_ID;
 import static com.bytechef.component.wrike.constant.WrikeConstants.TITLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.wrike.util.WrikeUtils;
 
@@ -45,7 +45,7 @@ public class WrikeCreateFolderAction {
             string(PARENT_ID)
                 .label("Parent ID")
                 .description("ID of the parent folder.")
-                .options((ActionOptionsFunction<String>) WrikeUtils::getParentIdOptions)
+                .options((OptionsFunction<String>) WrikeUtils::getParentIdOptions)
                 .required(true),
             string(TITLE)
                 .label("Title")

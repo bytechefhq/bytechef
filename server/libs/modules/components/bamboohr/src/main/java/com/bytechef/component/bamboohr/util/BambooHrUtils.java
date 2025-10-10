@@ -21,10 +21,10 @@ import static com.bytechef.component.bamboohr.constant.BambooHrConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class BambooHrUtils {
         return options;
     }
 
-    public static ActionOptionsFunction<String> getOptions(String targetName) {
+    public static OptionsFunction<String> getOptions(String targetName) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
 
             List<Map<String, Object>> body = context

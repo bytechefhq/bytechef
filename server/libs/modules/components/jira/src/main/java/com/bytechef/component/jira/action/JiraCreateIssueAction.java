@@ -35,10 +35,10 @@ import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -59,7 +59,7 @@ public class JiraCreateIssueAction {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project to create the issue in.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(SUMMARY)
                 .label("Summary")
@@ -68,26 +68,26 @@ public class JiraCreateIssueAction {
             string(ISSUETYPE)
                 .label("Issue Type ID")
                 .description("Id of the issue type.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(PARENT)
                 .label("Parent Issue ID")
                 .description("ID of the parent issue.")
                 .displayCondition("%s == '%s'".formatted(ISSUETYPE, "10003"))
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(ASSIGNEE)
                 .label("Assignee ID")
                 .description("ID of the user who will be assigned to the issue.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(false),
             string(PRIORITY)
                 .label("Priority ID")
                 .description("ID of the priority of the issue.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getPriorityIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getPriorityIdOptions)
                 .required(false),
             string(DESCRIPTION)
                 .label("Description")

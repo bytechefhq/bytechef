@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.pipeliner.util.PipelinerUtils;
 import java.util.Map;
 
@@ -57,20 +57,20 @@ public class PipelinerCreateTaskAction {
                 .label("Activity Type ID")
                 .description("Id of the activity type of task.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) PipelinerUtils::getActivityTypeIdOptions),
+                .options((ActionDefinition.OptionsFunction<String>) PipelinerUtils::getActivityTypeIdOptions),
             string("unit_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Unit ID")
                 .description("Sales Unit ID")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) PipelinerUtils::getUnitIdOptions),
+                .options((ActionDefinition.OptionsFunction<String>) PipelinerUtils::getUnitIdOptions),
             string("owner_id").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Owner ID")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) PipelinerUtils::getOwnerIdOptions))
+                .options((ActionDefinition.OptionsFunction<String>) PipelinerUtils::getOwnerIdOptions))
         .output(outputSchema(object()
             .properties(bool("success").required(false), object("data").properties(
                 string("id").description("ID of the task.")

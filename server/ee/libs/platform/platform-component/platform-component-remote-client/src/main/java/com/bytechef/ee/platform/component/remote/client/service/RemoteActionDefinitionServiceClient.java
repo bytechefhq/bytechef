@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
@@ -45,7 +44,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection connection, ActionContext context) {
+        ComponentConnection componentConnection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -64,7 +63,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection connection, ActionContext context) {
+        ComponentConnection componentConnection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -72,7 +71,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        Context actionContext) {
+        ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -80,8 +79,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public OutputResponse executeSingleConnectionOutput(
         String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters,
-        ComponentConnection connection, ActionContext context) {
+        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -89,7 +87,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Object executeSingleConnectionPerform(
         String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection connection, ActionContext context) {
+        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

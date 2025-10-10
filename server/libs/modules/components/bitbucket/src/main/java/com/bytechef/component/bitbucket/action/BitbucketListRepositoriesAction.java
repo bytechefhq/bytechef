@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.bitbucket.property.BitbucketRepositoryObjectProperties;
 import com.bytechef.component.bitbucket.util.BitbucketUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class BitbucketListRepositoriesAction {
                 .label("Workspace")
                 .description("Workspace from which repositories are to be listed.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) BitbucketUtils::getWorkspaceOptions))
+                .options((OptionsFunction<String>) BitbucketUtils::getWorkspaceOptions))
         .output(
             outputSchema(
                 array()

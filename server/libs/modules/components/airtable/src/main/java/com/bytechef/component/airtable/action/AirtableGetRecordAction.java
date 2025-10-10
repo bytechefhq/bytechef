@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -44,14 +44,14 @@ public class AirtableGetRecordAction {
         .properties(string("baseId").label("Base ID")
             .description("ID of the base where table is located.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getBaseIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("tableId").label("Table ID")
                 .description("ID of the table where the record is located.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getTableIdOptions)
                 .optionsLookupDependsOn("baseId")
                 .metadata(
                     Map.of(
@@ -59,7 +59,7 @@ public class AirtableGetRecordAction {
             string("recordId").label("Record ID")
                 .description("ID of the record that will be retrieved.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getRecordIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) AirtableUtils::getRecordIdOptions)
                 .optionsLookupDependsOn("tableId", "baseId")
                 .metadata(
                     Map.of(

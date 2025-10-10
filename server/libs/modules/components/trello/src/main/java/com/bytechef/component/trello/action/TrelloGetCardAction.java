@@ -24,9 +24,9 @@ import static com.bytechef.component.trello.constant.TrelloConstants.ID;
 import static com.bytechef.component.trello.constant.TrelloConstants.ID_BOARD;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.trello.util.TrelloUtils;
@@ -43,11 +43,11 @@ public class TrelloGetCardAction {
             string(ID_BOARD)
                 .label("Board ID")
                 .description("ID of the board where card is located.")
-                .options((ActionOptionsFunction<String>) TrelloUtils::getBoardOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID)
                 .label("Card ID")
-                .options((ActionOptionsFunction<String>) TrelloUtils::getCardOptions)
+                .options((OptionsFunction<String>) TrelloUtils::getCardOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(true))
         .output(outputSchema(CARD_OUTPUT_PROPERTY))

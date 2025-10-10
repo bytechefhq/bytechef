@@ -37,8 +37,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.config.ApplicationProperties.Ai;
 
 import com.bytechef.component.ai.universal.text.util.AiTextUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.function.BiFunction;
 
@@ -71,7 +71,7 @@ public class AiTextConstants {
         (aiProvider, propertyService) -> string(PROVIDER)
             .label("Provider")
             .options(
-                (ActionOptionsFunction<String>) (
+                (OptionsFunction<String>) (
                     inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiTextUtils
                         .getProviderOptions(aiProvider, propertyService))
             .required(true);
@@ -79,7 +79,7 @@ public class AiTextConstants {
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("The model name to use.")
-        .options((ActionOptionsFunction<String>) AiTextUtils::getModelOptions)
+        .options((OptionsFunction<String>) AiTextUtils::getModelOptions)
         .optionsLookupDependsOn(PROVIDER)
         .displayCondition(
             "contains({'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'}, provider)".formatted(

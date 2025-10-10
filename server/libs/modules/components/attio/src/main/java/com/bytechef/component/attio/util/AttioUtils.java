@@ -39,12 +39,12 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
@@ -62,7 +62,7 @@ import java.util.Objects;
  */
 public class AttioUtils {
 
-    public static ActionOptionsFunction<String> getCompanyIdOptions(String attribute) {
+    public static OptionsFunction<String> getCompanyIdOptions(String attribute) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             Map<String, List<Map<String, Object>>> attributes = context.http(
                 http -> http.get("/objects/companies/attributes/%s/options".formatted(attribute)))
@@ -154,7 +154,7 @@ public class AttioUtils {
         return options;
     }
 
-    public static ActionOptionsFunction<String> getTargetRecordIdOptions(String targetObject) {
+    public static OptionsFunction<String> getTargetRecordIdOptions(String targetObject) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             String object;
             if (Objects.equals(targetObject, RECORD_TYPE)) {
@@ -381,12 +381,12 @@ public class AttioUtils {
                 string("stage")
                     .label("Deal Stage")
                     .description("The stage of the deal.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getDealStageIdOptions)
+                    .options((OptionsFunction<String>) AttioUtils::getDealStageIdOptions)
                     .required(isNewRecord),
                 string("owner")
                     .label("Deal Owner")
                     .description("The owner of the deal.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
+                    .options((OptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
                     .required(isNewRecord),
                 number(VALUE)
                     .label("Deal Value")
@@ -449,7 +449,7 @@ public class AttioUtils {
                 array(USERS)
                     .label("Users")
                     .description("The users in the workspace.")
-                    .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
+                    .options((OptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
                     .required(false)
                     .items(
                         string("user")

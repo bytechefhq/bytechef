@@ -83,7 +83,7 @@ public class AwsS3PutObjectAction {
 
             Path tempFilePath = Files.createTempFile(tempDirPath, "", ".tmp");
 
-            Files.copy((InputStream) context.file(file -> file.getStream(
+            Files.copy((InputStream) context.file(file -> file.getInputStream(
                 fileEntry)), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
 
             s3Client.putObject(

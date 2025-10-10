@@ -37,6 +37,5 @@ public interface QueryAugmenterFunction {
      * @return
      * @throws Exception
      */
-    QueryAugmenter apply(
-        Parameters inputParameters, Parameters connectionParameters) throws Exception;
+    QueryAugmenter apply(Parameters inputParameters, Parameters connectionParameters) throws Exception;
 }

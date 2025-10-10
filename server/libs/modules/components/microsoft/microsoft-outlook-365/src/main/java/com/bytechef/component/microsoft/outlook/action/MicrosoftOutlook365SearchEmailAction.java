@@ -29,10 +29,10 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
@@ -65,7 +65,7 @@ public class MicrosoftOutlook365SearchEmailAction {
             string(CATEGORY)
                 .label("Category")
                 .description("Messages in a certain category")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
         .output(outputSchema(array().items(FULL_MESSAGE_OUTPUT_PROPERTY)))
         .perform(MicrosoftOutlook365SearchEmailAction::perform)

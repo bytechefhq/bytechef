@@ -1,585 +1,585 @@
 {
-  "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "The Headless endpoint to use.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "headlessRequest",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+  "actions": [ {
+    "batch": null,
+    "deprecated": null,
+    "description": "The Headless endpoint to use.",
+    "help": null,
+    "metadata": null,
+    "name": "headlessRequest",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
     },
-    "perform" : { },
-    "processErrorResponse" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Application",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : { },
-      "minLength" : null,
-      "name" : "application",
-      "options" : null,
-      "optionsDataSource" : {
-        "options" : { },
-        "optionsLookupDependsOn" : null
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Application",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "application",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
       },
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : true,
-      "type" : "STRING"
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
     }, {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Endpoint",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : { },
-      "minLength" : null,
-      "name" : "endpoint",
-      "options" : null,
-      "optionsDataSource" : {
-        "options" : { },
-        "optionsLookupDependsOn" : [ "application" ]
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Endpoint",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "endpoint",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "application" ]
       },
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : true,
-      "type" : "STRING"
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
     }, {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "dynamicPropertiesDataSource" : {
-        "properties" : { },
-        "propertiesLookupDependsOn" : [ "application", "endpoint" ]
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "application", "endpoint" ]
       },
-      "expressionEnabled" : null,
-      "header" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "name" : "properties",
-      "required" : false,
-      "type" : "DYNAMIC_PROPERTIES"
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "name": "properties",
+      "required": false,
+      "type": "DYNAMIC_PROPERTIES"
     } ],
-    "title" : "Headless Request",
-    "workflowNodeDescription" : null
+    "title": "Headless Request",
+    "workflowNodeDescription": null
   }, {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "The Headless endpoint to use.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "jsonWsRequest",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+    "batch": null,
+    "deprecated": null,
+    "description": "The Headless endpoint to use.",
+    "help": null,
+    "metadata": null,
+    "name": "jsonWsRequest",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
     },
-    "perform" : { },
-    "processErrorResponse" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : "Context name of JSON web service you want to use.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Context Name",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : { },
-      "minLength" : null,
-      "name" : "contextName",
-      "options" : [ {
-        "description" : null,
-        "label" : "PORTAL",
-        "value" : "portal"
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Context name of JSON web service you want to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Context Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "contextName",
+      "options": [ {
+        "description": null,
+        "label": "PORTAL",
+        "value": "portal"
       }, {
-        "description" : null,
-        "label" : "ACCOUNT",
-        "value" : "account"
+        "description": null,
+        "label": "ACCOUNT",
+        "value": "account"
       }, {
-        "description" : null,
-        "label" : "ASSET",
-        "value" : "asset"
+        "description": null,
+        "label": "ASSET",
+        "value": "asset"
       }, {
-        "description" : null,
-        "label" : "ASSETLIST",
-        "value" : "assetlist"
+        "description": null,
+        "label": "ASSETLIST",
+        "value": "assetlist"
       }, {
-        "description" : null,
-        "label" : "AUDIT",
-        "value" : "audit"
+        "description": null,
+        "label": "AUDIT",
+        "value": "audit"
       }, {
-        "description" : null,
-        "label" : "BACKGROUNDTASK",
-        "value" : "backgroundtask"
+        "description": null,
+        "label": "BACKGROUNDTASK",
+        "value": "backgroundtask"
       }, {
-        "description" : null,
-        "label" : "BATCHENGINE",
-        "value" : "batchengine"
+        "description": null,
+        "label": "BATCHENGINE",
+        "value": "batchengine"
       }, {
-        "description" : null,
-        "label" : "BLOGS",
-        "value" : "blogs"
+        "description": null,
+        "label": "BLOGS",
+        "value": "blogs"
       }, {
-        "description" : null,
-        "label" : "CALENDAR",
-        "value" : "calendar"
+        "description": null,
+        "label": "CALENDAR",
+        "value": "calendar"
       }, {
-        "description" : null,
-        "label" : "COMMENT",
-        "value" : "comment"
+        "description": null,
+        "label": "COMMENT",
+        "value": "comment"
       }, {
-        "description" : null,
-        "label" : "COMMERCE",
-        "value" : "commerce"
+        "description": null,
+        "label": "COMMERCE",
+        "value": "commerce"
       }, {
-        "description" : null,
-        "label" : "CONTACT",
-        "value" : "contact"
+        "description": null,
+        "label": "CONTACT",
+        "value": "contact"
       }, {
-        "description" : null,
-        "label" : "CT",
-        "value" : "ct"
+        "description": null,
+        "label": "CT",
+        "value": "ct"
       }, {
-        "description" : null,
-        "label" : "DDL",
-        "value" : "ddl"
+        "description": null,
+        "label": "DDL",
+        "value": "ddl"
       }, {
-        "description" : null,
-        "label" : "DDM",
-        "value" : "ddm"
+        "description": null,
+        "label": "DDM",
+        "value": "ddm"
       }, {
-        "description" : null,
-        "label" : "DEPOT",
-        "value" : "depot"
+        "description": null,
+        "label": "DEPOT",
+        "value": "depot"
       }, {
-        "description" : null,
-        "label" : "DISPATCH",
-        "value" : "dispatch"
+        "description": null,
+        "label": "DISPATCH",
+        "value": "dispatch"
       }, {
-        "description" : null,
-        "label" : "FRAGMENT",
-        "value" : "fragment"
+        "description": null,
+        "label": "FRAGMENT",
+        "value": "fragment"
       }, {
-        "description" : null,
-        "label" : "JOURNAL",
-        "value" : "journal"
+        "description": null,
+        "label": "JOURNAL",
+        "value": "journal"
       }, {
-        "description" : null,
-        "label" : "KALEO",
-        "value" : "kaleo"
+        "description": null,
+        "label": "KALEO",
+        "value": "kaleo"
       }, {
-        "description" : null,
-        "label" : "KALEOFORMS",
-        "value" : "kaleoforms"
+        "description": null,
+        "label": "KALEOFORMS",
+        "value": "kaleoforms"
       }, {
-        "description" : null,
-        "label" : "KB",
-        "value" : "kb"
+        "description": null,
+        "label": "KB",
+        "value": "kb"
       }, {
-        "description" : null,
-        "label" : "LAYOUT",
-        "value" : "layout"
+        "description": null,
+        "label": "LAYOUT",
+        "value": "layout"
       }, {
-        "description" : null,
-        "label" : "LAYOUTUTILITYPAGE",
-        "value" : "layoututilitypage"
+        "description": null,
+        "label": "LAYOUTUTILITYPAGE",
+        "value": "layoututilitypage"
       }, {
-        "description" : null,
-        "label" : "LISTTYPE",
-        "value" : "listtype"
+        "description": null,
+        "label": "LISTTYPE",
+        "value": "listtype"
       }, {
-        "description" : null,
-        "label" : "MARKETPLACE",
-        "value" : "marketplace"
+        "description": null,
+        "label": "MARKETPLACE",
+        "value": "marketplace"
       }, {
-        "description" : null,
-        "label" : "MB",
-        "value" : "mb"
+        "description": null,
+        "label": "MB",
+        "value": "mb"
       }, {
-        "description" : null,
-        "label" : "NOTIFICATION",
-        "value" : "notification"
+        "description": null,
+        "label": "NOTIFICATION",
+        "value": "notification"
       }, {
-        "description" : null,
-        "label" : "OAUTHCLIENT",
-        "value" : "oauthclient"
+        "description": null,
+        "label": "OAUTHCLIENT",
+        "value": "oauthclient"
       }, {
-        "description" : null,
-        "label" : "OBJECT",
-        "value" : "object"
+        "description": null,
+        "label": "OBJECT",
+        "value": "object"
       }, {
-        "description" : null,
-        "label" : "PORTALLANGUAGEOVERRRIDE",
-        "value" : "portallanguageoverride"
+        "description": null,
+        "label": "PORTALLANGUAGEOVERRRIDE",
+        "value": "portallanguageoverride"
       }, {
-        "description" : null,
-        "label" : "REDIRECT",
-        "value" : "redirect"
+        "description": null,
+        "label": "REDIRECT",
+        "value": "redirect"
       }, {
-        "description" : null,
-        "label" : "REMOTEAPP",
-        "value" : "remoteapp"
+        "description": null,
+        "label": "REMOTEAPP",
+        "value": "remoteapp"
       }, {
-        "description" : null,
-        "label" : "SAP",
-        "value" : "sap"
+        "description": null,
+        "label": "SAP",
+        "value": "sap"
       }, {
-        "description" : null,
-        "label" : "SAVEDCONTENTENTRY",
-        "value" : "savedcontententry"
+        "description": null,
+        "label": "SAVEDCONTENTENTRY",
+        "value": "savedcontententry"
       }, {
-        "description" : null,
-        "label" : "SEGMENTS",
-        "value" : "segments"
+        "description": null,
+        "label": "SEGMENTS",
+        "value": "segments"
       }, {
-        "description" : null,
-        "label" : "SHARING",
-        "value" : "sharing"
+        "description": null,
+        "label": "SHARING",
+        "value": "sharing"
       }, {
-        "description" : null,
-        "label" : "SITENAVIGATION",
-        "value" : "sitenavigation"
+        "description": null,
+        "label": "SITENAVIGATION",
+        "value": "sitenavigation"
       }, {
-        "description" : null,
-        "label" : "STYLEBOOK",
-        "value" : "stylebook"
+        "description": null,
+        "label": "STYLEBOOK",
+        "value": "stylebook"
       }, {
-        "description" : null,
-        "label" : "SXP",
-        "value" : "sxp"
+        "description": null,
+        "label": "SXP",
+        "value": "sxp"
       }, {
-        "description" : null,
-        "label" : "TRANSLATION",
-        "value" : "translation"
+        "description": null,
+        "label": "TRANSLATION",
+        "value": "translation"
       }, {
-        "description" : null,
-        "label" : "TRASH",
-        "value" : "trash"
+        "description": null,
+        "label": "TRASH",
+        "value": "trash"
       }, {
-        "description" : null,
-        "label" : "WIKI",
-        "value" : "wiki"
+        "description": null,
+        "label": "WIKI",
+        "value": "wiki"
       } ],
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : true,
-      "type" : "STRING"
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
     }, {
-      "advancedOption" : null,
-      "controlType" : "SELECT",
-      "defaultValue" : null,
-      "description" : "ID of the service you want to access.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Service ID",
-      "maxValue" : null,
-      "metadata" : { },
-      "minValue" : null,
-      "name" : "service",
-      "options" : null,
-      "optionsDataSource" : {
-        "options" : { },
-        "optionsLookupDependsOn" : [ "contextName" ]
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the service you want to access.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Service ID",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "service",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "contextName" ]
       },
-      "placeholder" : null,
-      "required" : true,
-      "type" : "INTEGER"
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
     }, {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "dynamicPropertiesDataSource" : {
-        "properties" : { },
-        "propertiesLookupDependsOn" : [ "service" ]
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "service" ]
       },
-      "expressionEnabled" : null,
-      "header" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "name" : "parameters",
-      "required" : true,
-      "type" : "DYNAMIC_PROPERTIES"
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "name": "parameters",
+      "required": true,
+      "type": "DYNAMIC_PROPERTIES"
     } ],
-    "title" : "JSON WS Services",
-    "workflowNodeDescription" : null
+    "title": "JSON WS Services",
+    "workflowNodeDescription": null
   } ],
-  "clusterElements" : null,
-  "componentCategories" : [ {
-    "label" : "Productivity and Collaboration",
-    "name" : "productivity-and-collaboration"
+  "clusterElements": null,
+  "componentCategories": [ {
+    "label": "Productivity and Collaboration",
+    "name": "productivity-and-collaboration"
   } ],
-  "connection" : {
-    "authorizationRequired" : true,
-    "authorizations" : [ {
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "description" : null,
-      "detectOn" : null,
-      "name" : "api_key",
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : "api_token",
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Key",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "key",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+  "connection": {
+    "authorizationRequired": true,
+    "authorizations": [ {
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": null,
+      "name": "api_key",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": "api_token",
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Key",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "key",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       }, {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Value",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "value",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Value",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "value",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       }, {
-        "advancedOption" : null,
-        "controlType" : "SELECT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Add to",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "addTo",
-        "options" : [ {
-          "description" : null,
-          "label" : "Header",
-          "value" : "HEADER"
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Add to",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "addTo",
+        "options": [ {
+          "description": null,
+          "label": "Header",
+          "value": "HEADER"
         }, {
-          "description" : null,
-          "label" : "QueryParams",
-          "value" : "QUERY_PARAMETERS"
+          "description": null,
+          "label": "QueryParams",
+          "value": "QUERY_PARAMETERS"
         } ],
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       } ],
-      "refresh" : null,
-      "refreshOn" : null,
-      "refreshToken" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "title" : "API Key",
-      "tokenUrl" : null,
-      "type" : "API_KEY"
+      "refresh": null,
+      "refreshOn": null,
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": "API Key",
+      "tokenUrl": null,
+      "type": "API_KEY"
     }, {
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "description" : null,
-      "detectOn" : null,
-      "name" : "bearer_token",
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Token",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "token",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": null,
+      "name": "bearer_token",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Token",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "token",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       } ],
-      "refresh" : null,
-      "refreshOn" : null,
-      "refreshToken" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "title" : "Bearer Token",
-      "tokenUrl" : null,
-      "type" : "BEARER_TOKEN"
+      "refresh": null,
+      "refreshOn": null,
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": "Bearer Token",
+      "tokenUrl": null,
+      "type": "BEARER_TOKEN"
     }, {
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "description" : null,
-      "detectOn" : null,
-      "name" : "basic_auth",
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Username",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "username",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": null,
+      "name": "basic_auth",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Username",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "username",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       }, {
-        "advancedOption" : null,
-        "controlType" : "TEXT",
-        "defaultValue" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "exampleValue" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "label" : "Password",
-        "languageId" : null,
-        "maxLength" : null,
-        "metadata" : { },
-        "minLength" : null,
-        "name" : "password",
-        "options" : null,
-        "optionsDataSource" : null,
-        "optionsLoadedDynamically" : null,
-        "placeholder" : null,
-        "regex" : null,
-        "required" : true,
-        "type" : "STRING"
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": "Password",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "password",
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
       } ],
-      "refresh" : null,
-      "refreshOn" : null,
-      "refreshToken" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "title" : "Basic Auth",
-      "tokenUrl" : null,
-      "type" : "BASIC_AUTH"
+      "refresh": null,
+      "refreshOn": null,
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": "Basic Auth",
+      "tokenUrl": null,
+      "type": "BASIC_AUTH"
     } ],
-    "baseUri" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "controlType" : "TEXT",
-      "defaultValue" : null,
-      "description" : "If set, it will be combined Liferay API Endpoint attribute value.",
-      "displayCondition" : null,
-      "exampleValue" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "label" : "Base URI",
-      "languageId" : null,
-      "maxLength" : null,
-      "metadata" : { },
-      "minLength" : null,
-      "name" : "baseUri",
-      "options" : null,
-      "optionsDataSource" : null,
-      "optionsLoadedDynamically" : null,
-      "placeholder" : null,
-      "regex" : null,
-      "required" : null,
-      "type" : "STRING"
+    "baseUri": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "If set, it will be combined Liferay API Endpoint attribute value.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base URI",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "baseUri",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": null,
+      "type": "STRING"
     } ],
-    "test" : null,
-    "version" : 1
+    "test": null,
+    "version": 1
   },
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "Liferay is an open-source digital experience platform for enterprise content management (ECM) and portal development.",
-  "icon" : "path:assets/liferay.svg",
-  "metadata" : null,
-  "name" : "liferay",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Liferay",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Liferay is an open-source digital experience platform for enterprise content management (ECM) and portal development.",
+  "icon": "path:assets/liferay.svg",
+  "metadata": null,
+  "name": "liferay",
+  "resources": null,
+  "tags": null,
+  "title": "Liferay",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }

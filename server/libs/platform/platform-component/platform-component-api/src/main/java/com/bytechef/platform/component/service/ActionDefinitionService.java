@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -49,7 +48,7 @@ public interface ActionDefinitionService {
      *                             type @{@link com.bytechef.component.definition.Property.DynamicPropertiesProperty}
      * @param inputParameters      key-value collection of parameters required by business logic
      * @param lookupDependsOnPaths list of dependent property names
-     * @param connection           connection used to connect to outer source
+     * @param componentConnection  connection used to connect to outer source
      * @param context              additional technical data required by some actions
      * @return list of dynamically resolved properties
      * @throws {@link ConfigurationException} - if procession breaks within ByteChef system or
@@ -58,8 +57,8 @@ public interface ActionDefinitionService {
      */
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection,
-        ActionContext context);
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection, ActionContext context);
 
     OutputResponse executeMultipleConnectionsOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
@@ -90,27 +89,27 @@ public interface ActionDefinitionService {
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection connection, ActionContext context);
+        @Nullable ComponentConnection componentConnection, ActionContext context);
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        Context actionContext);
+        ActionContext context);
 
     OutputResponse executeSingleConnectionOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection connection, ActionContext context);
+        ComponentConnection componentConnection, ActionContext context);
 
     /**
      * Executes the action of particular component version which define perform function via
      * {@link com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction} interface. Duration is
      * unpredictable as work done by action may require connecting to outer APIs/microservices/platforms.
      *
-     * @param componentName    the name of component
-     * @param componentVersion the version
-     * @param actionName       action name
-     * @param inputParameters  key-value collection of parameters required by business logic
-     * @param connection       connection used to connect to outer sources
-     * @param context          additional technical data required by some actions
+     * @param componentName       the name of component
+     * @param componentVersion    the version
+     * @param actionName          action name
+     * @param inputParameters     key-value collection of parameters required by business logic
+     * @param componentConnection connection used to connect to outer sources
+     * @param context             additional technical data required by some actions
      * @return result of execution or throws exceptions
      * @throws {@link ExecutionException} - if procession breaks within ByteChef system or
      *                {@link com.bytechef.component.exception.ProviderException} - if external system is unavailable or
@@ -118,7 +117,7 @@ public interface ActionDefinitionService {
      */
     Object executeSingleConnectionPerform(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection connection, ActionContext context) throws ExecutionException;
+        @Nullable ComponentConnection componentConnection, ActionContext context) throws ExecutionException;
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,

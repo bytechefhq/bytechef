@@ -38,7 +38,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
-import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -143,7 +142,7 @@ public class AiAgentChatAction {
                 .toolCallbacks(
                     getToolCallbacks(
                         clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
-                        ((ActionContextAware) actionContext).isEditorEnvironment(), actionContext))
+                        actionContext.isEditorEnvironment()))
                 .call();
 
             return ModelUtils.getChatResponse(call, inputParameters, actionContext);
@@ -181,18 +180,23 @@ public class AiAgentChatAction {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
-
         try {
             return chatMemoryFunction.apply(
                 ParametersFactory.createParameters(clusterElement.getParameters()),
-                ParametersFactory.createParameters(
-                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                ParametersFactory.createParameters(clusterElement.getExtensions()),
-                componentConnections);
+                getConnectionParameters(componentConnections, clusterElement),
+                ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Parameters getConnectionParameters(
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
+
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
+
+        return ParametersFactory.createParameters(
+            componentConnection == null ? Map.of() : componentConnection.getParameters());
     }
 
     private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(Parameters inputParameters) {
@@ -212,15 +216,11 @@ public class AiAgentChatAction {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
-
         try {
             return ragFunction.apply(
                 ParametersFactory.createParameters(clusterElement.getParameters()),
-                ParametersFactory.createParameters(
-                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                ParametersFactory.createParameters(clusterElement.getExtensions()),
-                componentConnections);
+                getConnectionParameters(componentConnections, clusterElement),
+                ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -229,7 +229,7 @@ public class AiAgentChatAction {
     @SuppressFBWarnings("NP")
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment, ActionContext actionContext) {
+        boolean editorEnvironment) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -246,7 +246,7 @@ public class AiAgentChatAction {
                 getToolCallbackFunction(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElementDefinition.getName(), clusterElement.getParameters(), componentConnection,
-                    editorEnvironment, actionContext))
+                    editorEnvironment))
                 .inputType(Map.class)
                 .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
 
@@ -262,14 +262,10 @@ public class AiAgentChatAction {
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        ComponentConnection componentConnection, boolean editorEnvironment, ActionContext actionContext) {
-
-        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+        ComponentConnection componentConnection, boolean editorEnvironment) {
 
         return request -> clusterElementDefinitionFacade.executeTool(
-            componentName, componentVersion, clusterElementName, actionContextAware.getModeType(),
-            actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
-            actionContextAware.getJobId(), actionContextAware.getWorkflowId(),
-            MapUtils.concat(request, new HashMap<>(parameters)), componentConnection, editorEnvironment);
+            componentName, componentVersion, clusterElementName, MapUtils.concat(request, new HashMap<>(parameters)),
+            componentConnection, editorEnvironment);
     }
 }

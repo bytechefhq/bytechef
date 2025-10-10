@@ -23,9 +23,9 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -45,7 +45,7 @@ public class GoogleCalendarDeleteEventAction {
             string(EVENT_ID)
                 .label("Event ID")
                 .description("ID of the event to delete.")
-                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+                .options((OptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true))
         .perform(GoogleCalendarDeleteEventAction::perform);

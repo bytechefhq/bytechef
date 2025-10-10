@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class NiftyGetTrackedTimeReportAction {
         .properties(string("project_id").label("Project ID")
             .description("Id of the project to get the report for.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getProjectIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) NiftyUtils::getProjectIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),

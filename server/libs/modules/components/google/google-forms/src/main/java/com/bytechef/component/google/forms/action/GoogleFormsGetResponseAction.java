@@ -25,8 +25,8 @@ import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.createCustomResponse;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
@@ -50,7 +50,7 @@ public class GoogleFormsGetResponseAction {
             string(RESPONSE_ID)
                 .label("Response ID")
                 .description("ID of the response to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseIdOptions)
+                .options((OptionsFunction<String>) GoogleFormsUtils::getResponseIdOptions)
                 .optionsLookupDependsOn(FORM_ID)
                 .required(true))
         .output()

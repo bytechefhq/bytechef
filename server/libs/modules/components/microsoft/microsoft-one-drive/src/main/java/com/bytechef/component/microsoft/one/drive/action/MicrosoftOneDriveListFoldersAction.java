@@ -27,10 +27,10 @@ import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveU
 import static com.bytechef.microsoft.commons.MicrosoftUtils.ODATA_NEXT_LINK;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
@@ -53,7 +53,7 @@ public class MicrosoftOneDriveListFoldersAction {
                 .description(
                     "ID of the Folder from which you want to list folders. If no folder is specified, the root " +
                         "folder will be used.")
-                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(
             outputSchema(

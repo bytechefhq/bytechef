@@ -28,7 +28,7 @@ import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
 import java.util.List;
@@ -46,7 +46,7 @@ public class SlackSendApprovalMessageAction {
             string(CHANNEL)
                 .label("Channel")
                 .description("Channel, private group, or IM channel to send message to.")
-                .options((ActionOptionsFunction<String>) SlackUtils::getChannelOptions)
+                .options((OptionsFunction<String>) SlackUtils::getChannelOptions)
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))

@@ -46,10 +46,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -69,7 +69,7 @@ public class CopperCreateCompanyAction {
             string(ASSIGNEE_ID)
                 .label("Assignee ID")
                 .description("ID of the user that will be the owner of the company.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(EMAIL_DOMAIN)
                 .label("Email Domain")
@@ -78,7 +78,7 @@ public class CopperCreateCompanyAction {
             string(CONTACT_TYPE_ID)
                 .label("Contact Type ID")
                 .description("ID of the Contact type for the company.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),
             string(DETAILS)
                 .label("Details")
@@ -171,7 +171,7 @@ public class CopperCreateCompanyAction {
                 .description("Tags associated with the company")
                 .label("Tags")
                 .items(string())
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getTagsOptions)
                 .required(false))
         .output(outputSchema(
             object()

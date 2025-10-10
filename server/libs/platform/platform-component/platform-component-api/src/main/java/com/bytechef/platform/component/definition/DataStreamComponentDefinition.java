@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
+import static com.bytechef.component.definition.datastream.ItemProcessor.PROCESSOR;
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
 
@@ -29,6 +30,6 @@ public interface DataStreamComponentDefinition extends ClusterRootComponentDefin
 
     @Override
     default List<ClusterElementDefinition.ClusterElementType> getClusterElementTypes() {
-        return List.of(SOURCE, DESTINATION);
+        return List.of(SOURCE, PROCESSOR, DESTINATION);
     }
 }
