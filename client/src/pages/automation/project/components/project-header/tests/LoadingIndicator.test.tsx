@@ -1,14 +1,14 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import LoaderNotification from '@/pages/automation/project/components/project-header/components/LoaderNotification';
 import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {expect, it} from 'vitest';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 
 screen.debug();
 
 const renderLoaderNotification = (isFetching: number, isOnline: boolean) => {
     render(
         <TooltipProvider>
-            <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+            <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
         </TooltipProvider>
     );
 };
