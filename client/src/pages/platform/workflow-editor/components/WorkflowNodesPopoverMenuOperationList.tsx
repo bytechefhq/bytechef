@@ -43,6 +43,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
     multipleClusterElementsNode?: boolean;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
+    sourceNodeName?: string;
     trigger?: boolean;
 }
 
@@ -54,6 +55,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     multipleClusterElementsNode,
     setPopoverOpen,
     sourceNodeId,
+    sourceNodeName,
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
     const {setLatestComponentDefinition, workflow} = useWorkflowDataStore(
@@ -82,12 +84,15 @@ const WorkflowNodesPopoverMenuOperationList = ({
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
         }))
     );
-    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            setCurrentNode: state.setCurrentNode,
-        }))
-    );
+    const {currentNode, setCurrentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                currentNode: state.currentNode,
+                setCurrentNode: state.setCurrentNode,
+                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+            }))
+        );
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -224,6 +229,17 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 });
             }
 
+            if (workflowNodeDetailsPanelOpen && currentNode?.workflowNodeName === sourceNodeName) {
+                if (rootClusterElementNodeData) {
+                    setCurrentNode({
+                        ...rootClusterElementNodeData,
+                        clusterElements: updatedClusterElements.nestedClusterElements,
+                    });
+                }
+
+                setWorkflowNodeDetailsPanelOpen(false);
+            }
+
             saveWorkflowDefinition({
                 invalidateWorkflowQueries,
                 nodeData: updatedNodeData,
@@ -243,9 +259,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
             rootClusterElementNodeData,
             setRootClusterElementNodeData,
             currentNode,
+            workflowNodeDetailsPanelOpen,
+            sourceNodeName,
             invalidateWorkflowQueries,
             updateWorkflowMutation,
             setCurrentNode,
+            setWorkflowNodeDetailsPanelOpen,
             queryClient,
         ]
     );
