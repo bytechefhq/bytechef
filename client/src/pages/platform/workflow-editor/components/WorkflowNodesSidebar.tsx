@@ -2,7 +2,7 @@ import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
 
-import WorkflowNodesTabs from './WorkflowNodesTabs';
+import WorkflowNodesTabs from './workflow-nodes-tabs/WorkflowNodesTabs';
 
 const WorkflowNodesSidebar = ({
     data,
