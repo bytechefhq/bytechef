@@ -39,6 +39,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
 import com.bytechef.component.ai.universal.text.util.AiTextUtils;
@@ -150,6 +151,9 @@ public class ScoreAction implements AiTextAction {
                 Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
                 Map.of("content", userBuilder.toString(), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+        modelInputParametersMap.put("response",
+            Map.of("responseFormat", ChatModel.ResponseFormat.JSON,
+            "responseSchema", "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"criteriaName\":{\"type\":\"string\",\"title\":\"name\"},\"criteriaValue\":{\"type\":\"number\",\"title\":\"value\"}}},\"title\":\"criteria\"}"));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }
