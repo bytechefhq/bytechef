@@ -141,7 +141,7 @@ const Login = () => {
                                             <FormControl>
                                                 <Input
                                                     autoComplete="email"
-                                                    className="py-5"
+                                                    className="py-5 hover:border-stroke-brand-primary"
                                                     id="email"
                                                     type="email"
                                                     {...field}
@@ -166,7 +166,7 @@ const Login = () => {
                                                 <div className="relative">
                                                     <Input
                                                         aria-label="Password"
-                                                        className="py-5"
+                                                        className="py-5 hover:border-stroke-brand-primary"
                                                         id="password"
                                                         type={showPassword ? 'text' : 'password'}
                                                         {...field}

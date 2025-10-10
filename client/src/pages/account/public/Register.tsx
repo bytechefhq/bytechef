@@ -189,7 +189,11 @@ const Register = () => {
                                         <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                         <FormControl>
-                                            <Input className="py-5" type="email" {...field} />
+                                            <Input
+                                                className="py-5 hover:border-stroke-brand-primary"
+                                                type="email"
+                                                {...field}
+                                            />
                                         </FormControl>
 
                                         <FormMessage />
@@ -210,7 +214,7 @@ const Register = () => {
                                                     <div className="relative">
                                                         <Input
                                                             aria-label="Password"
-                                                            className="py-5"
+                                                            className="py-5 hover:border-stroke-brand-primary"
                                                             type={showPassword ? 'text' : 'password'}
                                                             {...field}
                                                         />
