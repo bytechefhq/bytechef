@@ -162,7 +162,13 @@ public class MondayNewItemInBoardTrigger {
                             }
                             case COUNTRY, DROPDOWN, EMAIL, HOUR, LINK, LONG_TEXT, TEXT, STATUS, WORLD_CLOCK ->
                                 transformedValues.put(id, columnValueMap.get(TEXT));
-                            case DATE -> transformedValues.put(id, LocalDate.parse((String) columnValueMap.get(TEXT)));
+                            case DATE -> {
+                                String text = (String) columnValueMap.get(TEXT);
+
+                                if (text != null && !text.isEmpty()) {
+                                    transformedValues.put(id, LocalDate.parse(text));
+                                }
+                            }
                             case LOCATION -> {
                                 Map<String, ?> value1 =
                                     context.json(json -> json.readMap((String) columnValueMap.get(VALUE)));
