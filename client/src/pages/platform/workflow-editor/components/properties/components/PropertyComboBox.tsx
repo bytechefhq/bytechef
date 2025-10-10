@@ -313,10 +313,7 @@ const PropertyComboBox = ({
                         {description && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <CircleQuestionMarkIcon
-                                        className="size-4 text-muted-foreground"
-                                        strokeWidth={1.75}
-                                    />
+                                    <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                                 </TooltipTrigger>
 
                                 <TooltipContent>{description}</TooltipContent>

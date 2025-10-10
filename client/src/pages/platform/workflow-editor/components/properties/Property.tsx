@@ -1091,10 +1091,7 @@ const Property = ({
                                         {description && (
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <CircleQuestionMarkIcon
-                                                        className="ml-1 size-4 text-muted-foreground"
-                                                        strokeWidth={1.75}
-                                                    />
+                                                    <CircleQuestionMarkIcon className="ml-1 size-4 text-muted-foreground" />
                                                 </TooltipTrigger>
 
                                                 <TooltipPortal>
