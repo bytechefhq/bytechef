@@ -3,13 +3,18 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
-import {OptionsDataSource} from '@/shared/middleware/platform/configuration';
-import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {GetClusterElementNodeOptionsRequest, OptionsDataSource} from '@/shared/middleware/platform/configuration';
+import {
+    useGetClusterElementNodeOptionsQuery,
+    useGetWorkflowNodeOptionsQuery,
+} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {PropertyAllType} from '@/shared/types';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/shallow';
 
+import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
@@ -49,6 +54,11 @@ const PropertyMultiSelect = ({
 }: PropertyMultiSelectProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const {rootClusterElementNodeData} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
+        }))
+    );
 
     const {description, label, name, placeholder, required} = property;
     const workflowNodeName = currentNode?.name;
@@ -77,6 +87,34 @@ const PropertyMultiSelect = ({
         [currentEnvironmentId, lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
+    const clusterElementQueryOptions: {
+        loadDependencyValueKey: string;
+        request: GetClusterElementNodeOptionsRequest;
+    } = useMemo(
+        () => ({
+            loadDependencyValueKey: lookupDependsOnValuesKey,
+            request: {
+                clusterElementType: currentNode?.clusterElementType || '',
+                clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
+                environmentId: currentEnvironmentId,
+                id: workflowId,
+                lookupDependsOnPaths,
+                propertyName: path!,
+                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || '',
+            },
+        }),
+        [
+            lookupDependsOnValuesKey,
+            currentEnvironmentId,
+            currentNode?.clusterElementType,
+            currentNode?.workflowNodeName,
+            workflowId,
+            lookupDependsOnPaths,
+            path,
+            rootClusterElementNodeData?.workflowNodeName,
+        ]
+    );
+
     const queryEnabled = useMemo(
         () =>
             !!currentNode &&
@@ -90,19 +128,34 @@ const PropertyMultiSelect = ({
 
     const {data: optionsData, isPending: isOptionsDataPending} = useGetWorkflowNodeOptionsQuery(
         queryOptions,
-        Boolean(queryEnabled)
+        Boolean(queryEnabled && !currentNode?.clusterElementType)
     );
 
+    const {data: clusterElementOptionsData, isPending: isClusterElementOptionsDataPending} =
+        useGetClusterElementNodeOptionsQuery(
+            clusterElementQueryOptions,
+            Boolean(queryEnabled && currentNode?.clusterElementType)
+        );
+
     const mappedOptionsData: MultiSelectOptionType[] | undefined = useMemo(() => {
-        if (!optionsData) {
-            return undefined;
+        if (clusterElementOptionsData) {
+            return clusterElementOptionsData.map((option) => ({
+                ...option,
+                label: option.label || '',
+                value: option.value ?? option.label,
+            }));
         }
-        return optionsData.map((option) => ({
-            ...option,
-            label: option.label || '',
-            value: option.value ?? option.label,
-        }));
-    }, [optionsData]);
+
+        if (optionsData) {
+            return optionsData.map((option) => ({
+                ...option,
+                label: option.label || '',
+                value: option.value ?? option.label,
+            }));
+        }
+
+        return undefined;
+    }, [optionsData, clusterElementOptionsData]);
 
     const missingConnection = useMemo(
         () =>
@@ -223,7 +276,7 @@ const PropertyMultiSelect = ({
                     }
                 }}
                 options={mappedOptionsData ?? options ?? []}
-                optionsLoading={isOptionsDataPending && !!queryEnabled}
+                optionsLoading={(isOptionsDataPending || isClusterElementOptionsDataPending) && !!queryEnabled}
                 placeholder={memoizedPlaceholder}
                 placeholderClassName={placeholderClassName}
                 value={value}
