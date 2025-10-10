@@ -34,10 +34,12 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
@@ -50,6 +52,36 @@ import java.util.Map;
 public class SimilaritySearchAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
+
+    private static final String RESPONSE_SCHEMA = """
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "ResultObject",
+          "type": "object",
+          "properties": {
+            "result": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "chunk": {
+                    "type": "string",
+                    "description": "Text content of the chunk"
+                  },
+                  "match_score": {
+                    "type": "number",
+                    "description": "Similarity or relevance score of the chunk"
+                  }
+                },
+                "required": ["chunk", "match_score"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["result"],
+          "additionalProperties": false
+        }
+        """;
 
     public SimilaritySearchAction(
         ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
@@ -85,7 +117,9 @@ public class SimilaritySearchAction implements AiTextAction {
                         .defaultValue(5),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(),
+                .output(
+                    (inputParameters, connectionParameters, context) -> BaseOutputDefinition.OutputResponse.of(
+                        context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA)))),
             provider, this, propertyService);
     }
 
@@ -100,11 +134,17 @@ public class SimilaritySearchAction implements AiTextAction {
             + "N: " + inputParameters.getInteger(NUM_RESULTS) + "\n"
             + "C: " + inputParameters.getInteger(CHUNK_SIZE);
 
-        modelInputParametersMap.put("messages",
+        modelInputParametersMap.put(
+            "messages",
             List.of(
                 Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
                 Map.of("content", userBuilder, ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+        modelInputParametersMap.put(
+            "response",
+            Map.of(
+                "responseFormat", ChatModel.ResponseFormat.JSON,
+                "responseSchema", RESPONSE_SCHEMA));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }

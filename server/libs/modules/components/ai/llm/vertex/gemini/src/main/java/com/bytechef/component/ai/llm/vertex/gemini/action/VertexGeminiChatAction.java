@@ -107,9 +107,7 @@ public class VertexGeminiChatAction {
     private VertexGeminiChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context, true);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }
