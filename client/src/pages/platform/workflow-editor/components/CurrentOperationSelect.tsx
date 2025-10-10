@@ -37,7 +37,7 @@ const OperationSelect = ({
             {description && (
                 <Tooltip>
                     <TooltipTrigger>
-                        <CircleQuestionMarkIcon />
+                        <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                     </TooltipTrigger>
 
                     <TooltipPortal>
@@ -105,7 +105,7 @@ const CurrentOperationSelect = ({
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <CircleQuestionMarkIcon />
+                                <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>

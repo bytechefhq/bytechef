@@ -40,12 +40,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     );
     const {
         clusterElementsCanvasOpen,
+        rootClusterElementNodeData,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
+            rootClusterElementNodeData: state.rootClusterElementNodeData,
             setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
             setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
             setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
@@ -103,7 +105,9 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         {
             environmentId: currentEnvironmentId,
             id: workflow.id!,
-            lastWorkflowNodeName: currentNode?.name,
+            lastWorkflowNodeName: currentNode?.clusterElementType
+                ? rootClusterElementNodeData?.workflowNodeName
+                : currentNode?.name,
         },
         dataPillPanelOpen && !!workflowNodes?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
     );

@@ -5,6 +5,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import CurrentOperationSelect from '@/pages/platform/workflow-editor/components/CurrentOperationSelect';
+import DescriptionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DescriptionTab';
+import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
+import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
+import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {
     ActionDefinition,
@@ -59,7 +64,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -78,19 +83,7 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import {
-    ConnectionTabSkeleton,
-    DescriptionTabSkeleton,
-    FieldsetSkeleton,
-    OutputTabSkeleton,
-    PropertiesTabSkeleton,
-} from './WorkflowEditorSkeletons';
-
-const Properties = lazy(() => import('@/pages/platform/workflow-editor/components/properties/Properties'));
-const DescriptionTab = lazy(() => import('./node-details-tabs/DescriptionTab'));
-const ConnectionTab = lazy(() => import('./node-details-tabs/connection-tab/ConnectionTab'));
-const OutputTab = lazy(() => import('./node-details-tabs/output-tab/OutputTab'));
-const CurrentOperationSelect = lazy(() => import('./CurrentOperationSelect'));
+import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -1162,35 +1155,33 @@ const WorkflowNodeDetailsPanel = ({
                         )}
 
                         {currentWorkflowNodeOperations && !operationDataMissing && (
-                            <Suspense fallback={<FieldsetSkeleton bottomBorder label="Actions" />}>
-                                <CurrentOperationSelect
-                                    clusterElementLabel={
-                                        currentNode.clusterElementType &&
-                                        getClusterElementsLabel(currentNode.clusterElementType)
-                                    }
-                                    description={
-                                        currentNode?.trigger
-                                            ? currentTriggerDefinition?.description
-                                            : !!currentNode?.clusterElementType &&
-                                                currentNode?.workflowNodeName !==
-                                                    rootClusterElementNodeData?.workflowNodeName
-                                              ? currentComponentDefinition?.description
-                                              : currentActionDefinition?.description
-                                    }
-                                    handleValueChange={handleOperationSelectChange}
-                                    operations={
-                                        (currentNode?.trigger
-                                            ? currentComponentDefinition?.triggers
-                                            : !!currentNode?.clusterElementType &&
-                                                currentNode?.workflowNodeName !==
-                                                    rootClusterElementNodeData?.workflowNodeName
-                                              ? filteredClusterElementOperations
-                                              : currentComponentDefinition?.actions)!
-                                    }
-                                    triggerSelect={currentNode?.trigger}
-                                    value={currentOperationName}
-                                />
-                            </Suspense>
+                            <CurrentOperationSelect
+                                clusterElementLabel={
+                                    currentNode.clusterElementType &&
+                                    getClusterElementsLabel(currentNode.clusterElementType)
+                                }
+                                description={
+                                    currentNode?.trigger
+                                        ? currentTriggerDefinition?.description
+                                        : !!currentNode?.clusterElementType &&
+                                            currentNode?.workflowNodeName !==
+                                                rootClusterElementNodeData?.workflowNodeName
+                                          ? currentComponentDefinition?.description
+                                          : currentActionDefinition?.description
+                                }
+                                handleValueChange={handleOperationSelectChange}
+                                operations={
+                                    (currentNode?.trigger
+                                        ? currentComponentDefinition?.triggers
+                                        : !!currentNode?.clusterElementType &&
+                                            currentNode?.workflowNodeName !==
+                                                rootClusterElementNodeData?.workflowNodeName
+                                          ? filteredClusterElementOperations
+                                          : currentComponentDefinition?.actions)!
+                                }
+                                triggerSelect={currentNode?.trigger}
+                                value={currentOperationName}
+                            />
                         )}
 
                         {tabDataExists && (
@@ -1225,14 +1216,12 @@ const WorkflowNodeDetailsPanel = ({
                             <div className="size-full max-w-workflow-node-details-panel-width">
                                 {activeTab === 'description' &&
                                     (nodeDefinition ? (
-                                        <Suspense fallback={<DescriptionTabSkeleton />}>
-                                            <DescriptionTab
-                                                invalidateWorkflowQueries={invalidateWorkflowQueries}
-                                                key={`${currentNode?.componentName}-${currentNode?.type}_description`}
-                                                nodeDefinition={nodeDefinition}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
-                                        </Suspense>
+                                        <DescriptionTab
+                                            invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_description`}
+                                            nodeDefinition={nodeDefinition}
+                                            updateWorkflowMutation={updateWorkflowMutation}
+                                        />
                                     ) : (
                                         <DescriptionTabSkeleton />
                                     ))}
@@ -1241,49 +1230,41 @@ const WorkflowNodeDetailsPanel = ({
                                     currentWorkflowNodeConnections.length > 0 &&
                                     currentNode &&
                                     currentComponentDefinition && (
-                                        <Suspense fallback={<ConnectionTabSkeleton />}>
-                                            <ConnectionTab
-                                                componentConnections={currentWorkflowNodeConnections}
-                                                key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
-                                                workflowId={workflow.id!}
-                                                workflowNodeName={currentNode?.workflowNodeName}
-                                                workflowTestConfigurationConnections={
-                                                    workflowTestConfigurationConnections
-                                                }
-                                            />
-                                        </Suspense>
+                                        <ConnectionTab
+                                            componentConnections={currentWorkflowNodeConnections}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
+                                            workflowId={workflow.id!}
+                                            workflowNodeName={currentNode?.workflowNodeName}
+                                            workflowTestConfigurationConnections={workflowTestConfigurationConnections}
+                                        />
                                     )}
 
                                 {activeTab === 'properties' &&
                                     (!operationDataMissing && currentOperationProperties?.length ? (
-                                        <Suspense fallback={<PropertiesTabSkeleton />}>
-                                            <Properties
-                                                customClassName="p-4"
-                                                displayConditionsQuery={displayConditionsQuery}
-                                                key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
-                                                operationName={currentOperationName}
-                                                properties={currentOperationProperties}
-                                            />
-                                        </Suspense>
+                                        <Properties
+                                            customClassName="p-4"
+                                            displayConditionsQuery={displayConditionsQuery}
+                                            key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
+                                            operationName={currentOperationName}
+                                            properties={currentOperationProperties}
+                                        />
                                     ) : (
                                         <PropertiesTabSkeleton />
                                     ))}
 
                                 {activeTab === 'output' && (
-                                    <Suspense fallback={<OutputTabSkeleton />}>
-                                        <OutputTab
-                                            connectionMissing={
-                                                (currentComponentDefinition?.connectionRequired ?? false) &&
-                                                !workflowTestConfigurationConnections?.length
-                                            }
-                                            currentNode={currentNode}
-                                            key={`${currentNode?.componentName}-${currentNode?.type}_output`}
-                                            variablePropertiesDefined={
-                                                currentTaskDispatcherDefinition?.variablePropertiesDefined
-                                            }
-                                            workflowId={workflow.id!}
-                                        />
-                                    </Suspense>
+                                    <OutputTab
+                                        connectionMissing={
+                                            (currentComponentDefinition?.connectionRequired ?? false) &&
+                                            !workflowTestConfigurationConnections?.length
+                                        }
+                                        currentNode={currentNode}
+                                        key={`${currentNode?.componentName}-${currentNode?.type}_output`}
+                                        variablePropertiesDefined={
+                                            currentTaskDispatcherDefinition?.variablePropertiesDefined
+                                        }
+                                        workflowId={workflow.id!}
+                                    />
                                 )}
                             </div>
                         </ScrollArea>

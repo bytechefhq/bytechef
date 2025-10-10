@@ -1,6 +1,5 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
-import LoaderNotification from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/LoaderNotification';
 import OutputPanelButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
@@ -15,6 +14,7 @@ import {EditIcon} from 'lucide-react';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
+import LoadingIndicator from '@/shared/components/LoadingIndicator';
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
@@ -74,7 +74,7 @@ const WorkflowBuilderHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
+                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <Button
                     className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"

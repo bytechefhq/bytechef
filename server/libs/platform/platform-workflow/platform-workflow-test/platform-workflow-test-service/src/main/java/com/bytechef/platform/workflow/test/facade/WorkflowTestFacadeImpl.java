@@ -112,9 +112,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
                 workflowId, workflowTrigger.getName(), environmentId);
 
-            Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
-
-            if (inputs.isEmpty() && sampleOutput != null) {
+            if (inputs.isEmpty()) {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
                     .id(-RANDOM.nextLong())
                     .startDate(Instant.now())
@@ -128,6 +126,12 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
                 Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
                     workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
+
+                Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
+
+                if (sampleOutput == null) {
+                    sampleOutput = Map.of();
+                }
 
                 triggerExecutionDTO = new TriggerExecutionDTO(
                     triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(),

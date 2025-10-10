@@ -9,7 +9,7 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
+import {CheckIcon, DotIcon, Eye, EyeOff, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
@@ -139,7 +139,7 @@ const Register = () => {
         <PublicLayoutContainer>
             <Card className="mx-auto max-w-sm rounded-xl p-6 text-start shadow-none">
                 <CardHeader className="p-0 pb-10">
-                    <CardTitle className="self-center text-xl font-bold text-content-neutral-primary">
+                    <CardTitle className="self-center text-xl font-semibold text-content-neutral-primary">
                         Create your account
                     </CardTitle>
 
@@ -189,7 +189,11 @@ const Register = () => {
                                         <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                         <FormControl>
-                                            <Input className="py-5" type="email" {...field} />
+                                            <Input
+                                                className="py-5 hover:border-stroke-brand-primary"
+                                                type="email"
+                                                {...field}
+                                            />
                                         </FormControl>
 
                                         <FormMessage />
@@ -210,7 +214,7 @@ const Register = () => {
                                                     <div className="relative">
                                                         <Input
                                                             aria-label="Password"
-                                                            className="py-5"
+                                                            className="py-5 hover:border-stroke-brand-primary"
                                                             type={showPassword ? 'text' : 'password'}
                                                             {...field}
                                                         />
@@ -267,19 +271,19 @@ const Register = () => {
                                                     {getValues('password') === '' && (
                                                         <>
                                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <XIcon size={15} />
+                                                                <DotIcon size={15} />
 
                                                                 <p>{passwordLengthMessage}</p>
                                                             </li>
 
                                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <XIcon size={15} />
+                                                                <DotIcon size={15} />
 
                                                                 <p>{passwordContainsNumberMessage}</p>
                                                             </li>
 
                                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <XIcon size={15} />
+                                                                <DotIcon size={15} />
 
                                                                 <p>{passwordContainsUppercaseMessage}</p>
                                                             </li>

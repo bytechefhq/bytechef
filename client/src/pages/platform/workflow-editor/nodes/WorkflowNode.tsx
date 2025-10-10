@@ -235,6 +235,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             hideTaskDispatchers={!!data.clusterElementType}
                             hideTriggerComponents
                             sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
+                            sourceNodeName={data.workflowNodeName}
                         >
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
@@ -301,6 +302,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     {data.operationName && (
                                         <pre className="text-sm text-black">{data.operationName}</pre>
                                     )}
+
+                                    {isNestedClusterRoot && (
+                                        <span className="text-xs text-gray-500">{data.workflowNodeName}</span>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -345,7 +350,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <pre className={twMerge('text-sm', isClusterElement && 'text-xs')}>{data.operationName}</pre>
                     )}
 
-                    {!isClusterElement && <span className="text-sm text-gray-500">{data.workflowNodeName}</span>}
+                    <span className="text-sm text-gray-500">{data.workflowNodeName}</span>
                 </div>
             )}
 
