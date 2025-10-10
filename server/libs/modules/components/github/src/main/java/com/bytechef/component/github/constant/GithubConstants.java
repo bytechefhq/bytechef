@@ -42,6 +42,10 @@ public class GithubConstants {
     public static final String REPOSITORY = "repository";
     public static final String STATE = "state";
     public static final String TITLE = "title";
+    public static final String HEAD = "head";
+    public static final String HEAD_REPO = "head_repo";
+    public static final String BASE = "base";
+    public static final String DRAFT = "draft";
 
     public static final List<ModifiableValueProperty<?, ?>> ISSUE_OUTPUT_PROPERTIES = List.of(
         string("url")
@@ -107,6 +111,13 @@ public class GithubConstants {
                 .description("The current number of open issues in the repository."),
             string("default_branch")
                 .description("The name of the default branch in the repository, typically 'main' or 'master'."));
+
+    public static final ModifiableObjectProperty PULL_REQUEST_OUTPUT_PROBERTY = object("pull_request")
+        .properties(
+            string("url")
+                .description("The URL of the created pull request."),
+            integer(ID)
+                .description("ID of the created pull request."));
 
     private GithubConstants() {
     }
