@@ -302,6 +302,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     {data.operationName && (
                                         <pre className="text-sm text-black">{data.operationName}</pre>
                                     )}
+
+                                    {isNestedClusterRoot && (
+                                        <span className="text-xs text-gray-500">{data.workflowNodeName}</span>
+                                    )}
                                 </div>
                             )}
                         </div>
