@@ -32,8 +32,9 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useProject = () => {
-    const {setWorkflow, workflow} = useWorkflowDataStore(
+    const {setIsWorkflowLoaded, setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
+            setIsWorkflowLoaded: state.setIsWorkflowLoaded,
             setWorkflow: state.setWorkflow,
             workflow: state.workflow,
         }))
@@ -70,7 +71,7 @@ export const useProject = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
-    const {data: currentWorkflow} = useGetProjectWorkflowQuery(
+    const {data: currentWorkflow, isLoading: isWorkflowLoading} = useGetProjectWorkflowQuery(
         +projectId!,
         +projectWorkflowId!,
         !!projectId && !!projectWorkflowId
@@ -209,14 +210,6 @@ export const useProject = () => {
     }, [projectWorkflowId]);
 
     useEffect(() => {
-        if (currentWorkflow) {
-            setWorkflow({...currentWorkflow});
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWorkflow]);
-
-    useEffect(() => {
         return () => {
             setProjectLeftSidebarOpen(false);
 
@@ -224,6 +217,21 @@ export const useProject = () => {
         };
     }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
 
+    // Reset loading state when workflow ID changes
+    useEffect(() => {
+        setIsWorkflowLoaded(false);
+    }, [projectWorkflowId, setIsWorkflowLoaded]);
+
+    // Use useEffect to handle workflow updates with proper synchronization
+    useEffect(() => {
+        if (currentWorkflow && !isWorkflowLoading) {
+            const timeoutId = setTimeout(() => {
+                setWorkflow({...currentWorkflow});
+            }, 0);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [currentWorkflow, isWorkflowLoading, setWorkflow]);
     return {
         bottomResizablePanelRef,
         categories,

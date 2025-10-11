@@ -25,6 +25,9 @@ interface WorkflowDataStateI {
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
 
+    isWorkflowLoaded: boolean;
+    setIsWorkflowLoaded: (loaded: boolean) => void;
+
     latestComponentDefinition: ComponentDefinitionBasic | null;
     setLatestComponentDefinition: (latestComponentDefinition: ComponentDefinitionBasic | null) => void;
 
@@ -63,6 +66,9 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 });
             },
 
+            isWorkflowLoaded: false,
+            setIsWorkflowLoaded: (loaded) => set({isWorkflowLoaded: loaded}),
+
             latestComponentDefinition: null,
             setLatestComponentDefinition: (latestComponentDefinition) =>
                 set((state) => ({...state, latestComponentDefinition})),
@@ -82,6 +88,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                     workflowNodes: [],
                     dataPills: [],
                     edges: createDefaultEdges(),
+                    isWorkflowLoaded: false,
                     nodes: createDefaultNodes(DEFAULT_CANVAS_WIDTH),
                     workflow: {
                         actionNames: [],
@@ -110,6 +117,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
                     return {
                         ...state,
+                        isWorkflowLoaded: true,
                         workflowNodes: workflowNodes.map((workflowNode) => {
                             const name = workflowNode.type!.split('/')[0];
                             const version = +workflowNode.type!.split('/')[1].replace('v', '');
@@ -125,6 +133,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         workflow: {
                             ...workflow,
                             nodeNames: workflowNodes.map((workflowNode) => workflowNode.name),
+                            __lastUpdated: Date.now(),
                         },
                     };
                 }),

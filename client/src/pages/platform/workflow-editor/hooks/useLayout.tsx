@@ -47,6 +47,7 @@ export default function useLayout({
     taskDispatcherDefinitions,
 }: UseLayoutProps) {
     let workflow = useWorkflowDataStore((state) => state.workflow);
+    const isWorkflowLoaded = useWorkflowDataStore((state) => state.isWorkflowLoaded);
 
     if (!workflow.tasks && readOnlyWorkflow) {
         workflow = {...workflow, ...readOnlyWorkflow};
@@ -399,7 +400,7 @@ export default function useLayout({
     });
 
     useEffect(() => {
-        if (!workflow) {
+        if (!workflow || (!isWorkflowLoaded && !readOnlyWorkflow)) {
             return;
         }
 
@@ -462,7 +463,7 @@ export default function useLayout({
         });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, tasks, triggers, workflow]);
+    }, [canvasWidth, tasks, triggers, workflow, isWorkflowLoaded]);
 
     useEffect(() => {
         if (canvasWidth > 0) {
