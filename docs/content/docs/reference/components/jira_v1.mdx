@@ -39,6 +39,57 @@ Version: 1
 ## Actions
 
 
+### Assign Issue
+Name: assignIssue
+
+`Assigns an existing issue to a specific user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue that will be assigned. | true |
+| accountId | Account ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the account user who will be assigned the issue. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Assign Issue",
+  "name" : "assignIssue",
+  "parameters" : {
+    "project" : "",
+    "issueId" : "",
+    "accountId" : ""
+  },
+  "type" : "jira/v1/assignIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| assigned | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "assigned" : false
+}
+```
+
+
 ### Create Issue
 Name: createIssue
 
