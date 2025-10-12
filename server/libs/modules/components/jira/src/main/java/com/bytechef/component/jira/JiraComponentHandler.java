@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.jira.action.JiraAssignIssueAction;
 import com.bytechef.component.jira.action.JiraCreateIssueAction;
 import com.bytechef.component.jira.action.JiraCreateIssueCommentAction;
 import com.bytechef.component.jira.action.JiraGetIssueAction;
@@ -35,6 +36,7 @@ import com.google.auto.service.AutoService;
 /**
  * @author Monika Kušter
  * @author Vihar Shah
+ * @author Artur Wood
  */
 @AutoService(ComponentHandler.class)
 public class JiraComponentHandler implements ComponentHandler {
@@ -49,11 +51,13 @@ public class JiraComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(JiraConnection.CONNECTION_DEFINITION)
         .actions(
+            JiraAssignIssueAction.ACTION_DEFINITION,
             JiraCreateIssueAction.ACTION_DEFINITION,
             JiraCreateIssueCommentAction.ACTION_DEFINITION,
             JiraGetIssueAction.ACTION_DEFINITION,
             JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(JiraAssignIssueAction.ACTION_DEFINITION),
             tool(JiraCreateIssueAction.ACTION_DEFINITION),
             tool(JiraCreateIssueCommentAction.ACTION_DEFINITION),
             tool(JiraGetIssueAction.ACTION_DEFINITION),
