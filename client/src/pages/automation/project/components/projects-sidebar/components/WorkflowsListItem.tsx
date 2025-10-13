@@ -72,7 +72,7 @@ const WorkflowsListItem = ({
     return (
         <li
             className={twMerge(
-                'w-80 cursor-pointer self-start rounded-md border border-transparent p-2.5 hover:bg-background',
+                'w-80 cursor-pointer self-start rounded-md border border-transparent p-3 hover:bg-background',
                 workflow.id === currentWorkflowId && 'border-stroke-brand-primary bg-background'
             )}
             key={workflow.id}
