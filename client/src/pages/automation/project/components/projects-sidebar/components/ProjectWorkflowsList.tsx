@@ -39,10 +39,10 @@ const ProjectWorkflowsList = ({
     return (
         <Fragment key={project.id}>
             <li className="max-w-full pb-2 last:pb-0">
-                <div className="flex w-80 items-center gap-1">
+                <div className="flex w-80 items-center justify-between">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <span className="inline-block w-56 overflow-hidden truncate rounded-md px-1 py-2 text-lg font-semibold">
+                            <span className="inline-block w-56 overflow-hidden truncate rounded-md px-1 py-2 text-lg font-medium">
                                 {project.name}
                             </span>
                         </TooltipTrigger>
@@ -59,7 +59,10 @@ const ProjectWorkflowsList = ({
                             <span>PUBLISHED</span>
                         </Badge>
                     ) : (
-                        <Badge className="flex space-x-1" variant="secondary">
+                        <Badge
+                            className="flex space-x-1 bg-surface-neutral-secondary text-content-neutral-primary"
+                            variant="secondary"
+                        >
                             <span>V{project.lastProjectVersion}</span>
 
                             <span>{project.lastStatus}</span>
@@ -82,7 +85,7 @@ const ProjectWorkflowsList = ({
                 </ul>
             </li>
 
-            <Separator />
+            <Separator className="border-stroke-neutral-secondary" />
         </Fragment>
     );
 };
