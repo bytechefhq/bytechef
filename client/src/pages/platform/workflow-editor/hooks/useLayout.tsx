@@ -399,10 +399,6 @@ export default function useLayout({
     });
 
     useEffect(() => {
-        if (!workflow) {
-            return;
-        }
-
         let layoutNodes = allNodes;
         let edges: Edge[] = taskEdges;
 
@@ -433,7 +429,6 @@ export default function useLayout({
             }));
 
             const lastEdge = edges[edges.length - 1];
-
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
                 edges.pop();
             }
@@ -462,7 +457,7 @@ export default function useLayout({
         });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, tasks, triggers, workflow]);
+    }, [canvasWidth, tasks, triggers]);
 
     useEffect(() => {
         if (canvasWidth > 0) {
