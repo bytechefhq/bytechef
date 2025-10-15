@@ -203,7 +203,7 @@ const ProjectsLeftSidebar = ({
                 )}
             </div>
 
-            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto px-4 [scrollbar-color:theme(colors.stroke-neutral-secondary)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]">
+            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto px-4">
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
