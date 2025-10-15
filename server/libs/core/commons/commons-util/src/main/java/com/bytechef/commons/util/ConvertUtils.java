@@ -25,6 +25,8 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,43 +83,40 @@ public class ConvertUtils {
 
         String trimmedString = str.trim();
 
-        try {
-            return Integer.parseInt(trimmedString);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+        Object value = null;
+
+        for (Function<String, Object> transformerFunction : parseFunctions) {
+            try {
+                value = transformerFunction.apply(trimmedString);
+            } catch (NumberFormatException | DateTimeParseException exception) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(exception.getMessage(), exception);
+                }
+
+                continue;
+            }
+
+            if (value != null) {
+                return value;
             }
         }
 
-        try {
-            return Double.parseDouble(trimmedString);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
+        if (trimmedString.equalsIgnoreCase("true")) {
+            return Boolean.TRUE;
         }
 
-        if (trimmedString.equalsIgnoreCase("true") || trimmedString.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(trimmedString);
-        }
-
-        try {
-            return LocalDateTime.parse(trimmedString);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
-        }
-
-        try {
-            return LocalDate.parse(trimmedString);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
+        if (trimmedString.equalsIgnoreCase("false")) {
+            return Boolean.FALSE;
         }
 
         return str;
+    }
+
+    private static final List<Function<String, Object>> parseFunctions;
+
+    static {
+        parseFunctions = List.of(
+            Integer::parseInt, Long::parseLong, Double::parseDouble, LocalDateTime::parse, LocalDate::parse);
     }
 
     @SuppressFBWarnings("EI")
