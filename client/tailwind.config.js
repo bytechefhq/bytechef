@@ -150,12 +150,12 @@ module.exports = {
                         primary: 'hsl(var(--stroke-parallel-primary))',
                         secondary: 'hsl(var(--stroke-parallel-secondary))',
                         tertiary: 'hsl(var(--stroke-parallel-tertiary))',
-                        neutral: {
-                            primary: 'hsl(var(--stroke-neutral-primary))',
-                            'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
-                            secondary: 'hsl(var(--stroke-neutral-secondary))',
-                            tertiary: 'hsl(var(--stroke-neutral-tertiary))',
-                        },
+                    },
+                    neutral: {
+                        primary: 'hsl(var(--stroke-neutral-primary))',
+                        'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
+                         secondary: 'hsl(var(--stroke-neutral-secondary))',
+                        tertiary: 'hsl(var(--stroke-neutral-tertiary))',
                     },
                     subflow: {
                         primary: 'hsl(var(--stroke-subflow-primary))',
