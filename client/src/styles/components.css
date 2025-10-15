@@ -45,6 +45,10 @@
         --surface-brand-secondary: 215 61% 94%;
         --surface-brand-secondary-hover: 212 80% 90%;
         --surface-brand-tertiary: 217 61% 52%;
+        --surface-destructive-primary: 0 72% 51%;
+        --surface-destructive-primary-hover: 0 74% 42%;
+        --surface-destructive-primary-active: 0 70% 35%;
+        --surface-destructive-secondary: 0 86% 97%;
         --surface-success-primary: 142 72% 29%;
         --surface-success-primary-hover: 143 64% 24%;
         --surface-success-primary-active: 144 61% 20%;
