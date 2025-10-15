@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class ConvertUtils {
 
@@ -74,8 +75,14 @@ public class ConvertUtils {
     }
 
     public static Object convertString(String str) {
+        if (str == null) {
+            return null;
+        }
+
+        String trimmedString = str.trim();
+
         try {
-            return Integer.parseInt(str);
+            return Integer.parseInt(trimmedString);
         } catch (NumberFormatException e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage(), e);
@@ -83,19 +90,19 @@ public class ConvertUtils {
         }
 
         try {
-            return Double.parseDouble(str);
+            return Double.parseDouble(trimmedString);
         } catch (NumberFormatException e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage(), e);
             }
         }
 
-        if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(str);
+        if (trimmedString.equalsIgnoreCase("true") || trimmedString.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(trimmedString);
         }
 
         try {
-            return LocalDateTime.parse(str);
+            return LocalDateTime.parse(trimmedString);
         } catch (DateTimeParseException e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage(), e);
@@ -103,7 +110,7 @@ public class ConvertUtils {
         }
 
         try {
-            return LocalDate.parse(str);
+            return LocalDate.parse(trimmedString);
         } catch (DateTimeParseException e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage(), e);
