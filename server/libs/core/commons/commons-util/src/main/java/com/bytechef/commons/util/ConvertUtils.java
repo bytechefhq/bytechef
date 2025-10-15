@@ -76,6 +76,15 @@ public class ConvertUtils {
         return objectMapper.convertValue(fromValue, toValueTypeRef);
     }
 
+    /**
+     * Converts the string value given with parameter to typed value. Conversion rellies on parse method of Integer,
+     * Long, Double, LocalDateTime and LocalDate methods. Boolean values are derived from case unsensitive true and
+     * false variants of value.
+     *
+     * @param str String representation of value
+     * @return value as Integer, Long, Double, LocalDateTime, LocalDate, Boolean, String or null if received method
+     *         argument is null
+     */
     public static Object convertString(String str) {
         if (str == null) {
             return null;
