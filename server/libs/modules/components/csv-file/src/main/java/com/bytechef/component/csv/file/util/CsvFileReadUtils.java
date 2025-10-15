@@ -76,12 +76,22 @@ public class CsvFileReadUtils {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
+        int currColumn = 1;
+
         for (Map.Entry<?, ?> entry : row.entrySet()) {
+            String strippedString = strip((String) entry.getKey(), enclosingCharacter);
+
+            if (strippedString.isEmpty()) {
+                strippedString = "column_" + currColumn;
+            }
+
             map.put(
-                strip((String) entry.getKey(), enclosingCharacter),
+                strippedString,
                 processValue(
                     (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
                     configuration.readAsString()));
+
+            currColumn++;
         }
 
         return map;
