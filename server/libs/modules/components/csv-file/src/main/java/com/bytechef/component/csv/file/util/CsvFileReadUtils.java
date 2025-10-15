@@ -25,6 +25,7 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
@@ -34,11 +35,11 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class CsvFileReadUtils {
 
@@ -154,7 +155,7 @@ public class CsvFileReadUtils {
             if (readAsString) {
                 value = valueString;
             } else {
-                value = valueOf(valueString);
+                value = ConvertUtils.convertString(valueString);
             }
         }
 
@@ -169,40 +170,4 @@ public class CsvFileReadUtils {
         return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 
-    @SuppressWarnings("PMD.EmptyCatchBlock")
-    public static Object valueOf(String string) {
-        Object value = null;
-
-        try {
-            value = Integer.parseInt(string);
-        } catch (NumberFormatException nfe) {
-            // ignore
-        }
-
-        if (value == null) {
-            try {
-                value = Long.parseLong(string);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-        }
-
-        if (value == null) {
-            try {
-                value = Double.parseDouble(string);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-        }
-
-        if (value == null) {
-            value = BooleanUtils.toBooleanObject(string);
-        }
-
-        if (value == null) {
-            value = string;
-        }
-
-        return value;
-    }
 }
