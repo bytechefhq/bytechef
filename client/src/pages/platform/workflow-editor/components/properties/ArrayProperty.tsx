@@ -326,7 +326,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 if (parameterItemType === 'BOOLEAN') {
                     return {
                         ...newSubProperty,
-                        defaultValue: 
+                        defaultValue:
                             parameterItemValue !== null && parameterItemValue !== undefined
                                 ? parameterItemValue.toString()
                                 : '',
