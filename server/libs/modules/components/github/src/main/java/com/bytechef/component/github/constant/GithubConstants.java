@@ -33,12 +33,14 @@ public class GithubConstants {
 
     public static final String ASSIGNEES = "assignees";
     public static final String BODY = "body";
+    public static final String EVENTS = "events";
     public static final String FILTER = "filter";
     public static final String ID = "id";
     public static final String ISSUE = "issue";
     public static final String LABELS = "labels";
     public static final String NAME = "name";
     public static final String OWNER = "owner";
+    public static final String PULL_REQUESTS = "pullRequests";
     public static final String REPOSITORY = "repository";
     public static final String STATE = "state";
     public static final String TITLE = "title";
