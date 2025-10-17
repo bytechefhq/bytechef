@@ -50,20 +50,32 @@ module.exports = {
                         'primary-active': 'hsl(var(--content-brand-primary-active))',
                         secondary: 'hsl(var(--content-brand-secondary))',
                     },
-                    destructive: 'hsl(var(--content-destructive))',
+                    destructive: {
+                        DEFAULT: 'hsl(var(--content-destructive))',
+                        primary: 'hsl(var(--content-destructive-primary))',
+                        secondary: 'hsl(var(--content-destructive-secondary))',
+                    },
                     neutral: {
                         primary: 'hsl(var(--content-neutral-primary))',
                         secondary: 'hsl(var(--content-neutral-secondary))',
                         'secondary-hover': 'hsl(var(--content-neutral-secondary-hover))',
                         tertiary: 'hsl(var(--content-neutral-tertiary))',
                     },
-                    'onsurface-primary': 'hsl(var(--content-onsurface-primary))',
-                    'onsurface-secondary': 'hsl(var(--content-onsurface-secondary))',
+                    onsurface: {
+                        primary: 'hsl(var(--content-onsurface-primary))',
+                        secondary: 'hsl(var(--content-onsurface-secondary))',
+                    },
                     onwarning: 'hsl(var(--content-onwarning))',
                     disabled: 'hsl(var(--content-disabled))',
-                    'canvas-dot': 'hsl(var(--content-canvas_dot))',
-                    success: 'hsl(var(--content-success-primary))',
-                    warning: 'hsl(var(--content-warning-primary))',
+                    canvas_dot: 'hsl(var(--content-canvas_dot))',
+                    success: {
+                        DEFAULT: 'hsl(var(--content-success))',
+                        primary: 'hsl(var(--content-success-primary))',
+                    },
+                    warning: {
+                        DEFAULT: 'hsl(var(--content-warning))',
+                        primary: 'hsl(var(--content-warning-primary))',
+                    },
                 },
                 destructive: {
                     DEFAULT: 'hsl(var(--destructive))',
@@ -121,8 +133,6 @@ module.exports = {
                         'secondary-hover': 'hsl(var(--stroke-destructive-secondary-hover))',
                     },
                     disabled: 'hsl(var(--stroke-disabled))',
-                    'onsurface-primary': 'hsl(var(--stroke-onsurface-primary))',
-                    'onsurface-primary-hover': 'hsl(var(--stroke-onsurface-primary-hover))',
                     each: {
                         primary: 'hsl(var(--stroke-each-primary))',
                         secondary: 'hsl(var(--stroke-each-secondary))',
@@ -146,16 +156,20 @@ module.exports = {
                         secondary: 'hsl(var(--stroke-map-secondary))',
                         tertiary: 'hsl(var(--stroke-map-tertiary))',
                     },
-                    parallel: {
-                        primary: 'hsl(var(--stroke-parallel-primary))',
-                        secondary: 'hsl(var(--stroke-parallel-secondary))',
-                        tertiary: 'hsl(var(--stroke-parallel-tertiary))',
-                    },
                     neutral: {
                         primary: 'hsl(var(--stroke-neutral-primary))',
                         'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
                         secondary: 'hsl(var(--stroke-neutral-secondary))',
                         tertiary: 'hsl(var(--stroke-neutral-tertiary))',
+                    },
+                    onsurface: {
+                        primary: 'hsl(var(--stroke-onsurface-primary))',
+                        'primary-hover': 'hsl(var(--stroke-onsurface-primary-hover))',
+                    },
+                    parallel: {
+                        primary: 'hsl(var(--stroke-parallel-primary))',
+                        secondary: 'hsl(var(--stroke-parallel-secondary))',
+                        tertiary: 'hsl(var(--stroke-parallel-tertiary))',
                     },
                     subflow: {
                         primary: 'hsl(var(--stroke-subflow-primary))',
@@ -199,6 +213,8 @@ module.exports = {
                     disabled: 'hsl(var(--surface-disabled))',
                     main: 'hsl(var(--surface-main))',
                     neutral: {
+                        primary: 'hsl(var(--surface-neutral-primary))',
+                        'primary-active': 'hsl(var(--surface-neutral-primary-active))',
                         'primary-hover': 'hsl(var(--surface-neutral-primary-hover))',
                         secondary: 'hsl(var(--surface-neutral-secondary))',
                         'secondary-active': 'hsl(var(--surface-neutral-secondary-active))',
@@ -206,6 +222,9 @@ module.exports = {
                         tertiary: 'hsl(var(--surface-neutral-tertiary))',
                         'tertiary-hover': 'hsl(var(--surface-neutral-tertiary-hover))',
                         transparent: 'hsl(var(--surface-neutral-transparent))',
+                    },
+                    overlay: {
+                        primary: 'hsl(var(--surface-overlay-primary))',
                     },
                     popover: {
                         canvas: 'hsl(var(--surface-popover-canvas))',
@@ -218,7 +237,6 @@ module.exports = {
                         'secondary-hover': 'hsl(var(--surface-success-secondary-hover))',
                     },
                     tooltip: 'hsl(var(--surface-tooltip))',
-                    'popover-canvas': 'hsl(var(--surface-popover-canvas))',
                     warning: {
                         primary: 'hsl(var(--surface-warning-primary))',
                         secondary: 'hsl(var(--surface-warning-secondary))',
