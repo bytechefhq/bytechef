@@ -20,70 +20,67 @@ import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.automation.execution.facade.ToolFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.modelcontextprotocol.server.McpServer;
-import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.WebMvcSseServerTransportProvider;
-import io.modelcontextprotocol.spec.McpSchema;
-import io.modelcontextprotocol.spec.McpServerTransportProvider;
+//import io.modelcontextprotocol.server.McpServer;
+//import io.modelcontextprotocol.server.McpSyncServer;
+//import io.modelcontextprotocol.spec.McpSchema;
+//import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.function.RouterFunction;
-import org.springframework.web.servlet.function.ServerResponse;
 
 /**
  * @author Ivica Cardic
  */
 // @Configuration TODO remove comment once Spring supports multiple MCP servers
 public class AutomationMcpServerConfiguration {
-
-    private final ToolFacade toolFacade;
-
-    @SuppressFBWarnings("EI")
-    public AutomationMcpServerConfiguration(ToolFacade toolFacade) {
-        this.toolFacade = toolFacade;
-    }
-
-    @Bean
-    WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
-        return new WebMvcSseServerTransportProvider(
-            objectMapper, "/api/automation/v1/mcp/message", "/api/automation/sse");
-    }
-
-    @Bean
-    RouterFunction<ServerResponse> routerFunction(WebMvcSseServerTransportProvider transportProvider) {
-        return transportProvider.getRouterFunction();
-    }
-
-    @Bean
-    McpSyncServer mcpServer(McpServerTransportProvider transportProvider) {
-        var capabilities = McpSchema.ServerCapabilities.builder()
-            .resources(false, true)
-            .tools(true)
-            .prompts(true)
-            .logging()
-            .build();
-
-        return McpServer.sync(transportProvider)
-            .serverInfo("bytechef-automation-mcp-server", "1.0.0")
-            .capabilities(capabilities)
-            .tools(McpToolUtils.toSyncToolSpecification(getToolCallbacks()))
-            .build();
-    }
-
-    public List<ToolCallback> getToolCallbacks() {
-        List<ToolCallback> toolCallbacks = new ArrayList<>();
-
-        List<ToolDTO> toolDTOs = toolFacade.getTools();
-
-        for (ToolDTO toolDTO : toolDTOs) {
-
-            toolCallbacks.add(toolFacade.getFunctionToolCallback(toolDTO));
-        }
-
-        return toolCallbacks;
-    }
-
+//
+//    private final ToolFacade toolFacade;
+//
+//    @SuppressFBWarnings("EI")
+//    public AutomationMcpServerConfiguration(ToolFacade toolFacade) {
+//        this.toolFacade = toolFacade;
+//    }
+//
+//    @Bean
+//    WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
+//        return new WebMvcSseServerTransportProvider(
+//            objectMapper, "/api/automation/v1/mcp/message", "/api/automation/sse");
+//    }
+//
+//    @Bean
+//    RouterFunction<ServerResponse> routerFunction(WebMvcSseServerTransportProvider transportProvider) {
+//        return transportProvider.getRouterFunction();
+//    }
+//
+//    @Bean
+//    McpSyncServer mcpServer(McpServerTransportProvider transportProvider) {
+//        var capabilities = McpSchema.ServerCapabilities.builder()
+//            .resources(false, true)
+//            .tools(true)
+//            .prompts(true)
+//            .logging()
+//            .build();
+//
+//        return McpServer.sync(transportProvider)
+//            .serverInfo("bytechef-automation-mcp-server", "1.0.0")
+//            .capabilities(capabilities)
+//            .tools(McpToolUtils.toSyncToolSpecification(getToolCallbacks()))
+//            .build();
+//    }
+//
+//    public List<ToolCallback> getToolCallbacks() {
+//        List<ToolCallback> toolCallbacks = new ArrayList<>();
+//
+//        List<ToolDTO> toolDTOs = toolFacade.getTools();
+//
+//        for (ToolDTO toolDTO : toolDTOs) {
+//
+//            toolCallbacks.add(toolFacade.getFunctionToolCallback(toolDTO));
+//        }
+//
+//        return toolCallbacks;
+//    }
+//
 }
