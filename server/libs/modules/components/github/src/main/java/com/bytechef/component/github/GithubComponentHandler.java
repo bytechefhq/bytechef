@@ -31,6 +31,7 @@ import com.bytechef.component.github.action.GithubGetIssueAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
 import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
+import com.bytechef.component.github.trigger.GithubEventsTrigger;
 import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
 import com.bytechef.component.github.trigger.GithubNewPullRequestTrigger;
 import com.google.auto.service.AutoService;
@@ -67,6 +68,7 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
             tool(GithubStarRepositoryAction.ACTION_DEFINITION))
         .triggers(
+            GithubEventsTrigger.TRIGGER_DEFINITION,
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
             GithubNewPullRequestTrigger.TRIGGER_DEFINITION);
 
