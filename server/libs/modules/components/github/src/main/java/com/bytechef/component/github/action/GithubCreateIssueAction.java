@@ -24,28 +24,32 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
-import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.github.util.GithubUtils;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ * @author Monika Kušter
+ */
 public class GithubCreateIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create Issue")
         .description("Create Issue in GitHub Repository")
         .properties(
+            OWNER_PROPERTY,
             string(REPOSITORY)
                 .label("Repository")
                 .description("Repository where new issue will be created.")
-                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true),
             string(TITLE)
                 .label("Title")
@@ -55,6 +59,7 @@ public class GithubCreateIssueAction {
             string(BODY)
                 .label("Description")
                 .description("The description of the issue.")
+                .controlType(ControlType.TEXT_AREA)
                 .required(false))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubCreateIssueAction::perform);
@@ -67,7 +72,8 @@ public class GithubCreateIssueAction {
 
         return context
             .http(http -> http.post(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
+                "/repos/" + inputParameters.getRequiredString(OWNER) + "/"
+                    + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
             .body(
                 Body.of(
                     TITLE, inputParameters.getRequiredString(TITLE),

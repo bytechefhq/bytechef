@@ -23,8 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import java.util.List;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 
 /**
  * @author Luka Ljubić
@@ -45,7 +44,7 @@ public class GithubConstants {
     public static final String STATE = "state";
     public static final String TITLE = "title";
 
-    public static final List<ModifiableValueProperty<?, ?>> ISSUE_OUTPUT_PROPERTIES = List.of(
+    public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object().properties(
         string("url")
             .description("The URL linking directly to the issue on GitHub."),
         string("repository_url")
@@ -85,30 +84,11 @@ public class GithubConstants {
         string(BODY)
             .description("The main content of the issue."));
 
-    public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object().properties(ISSUE_OUTPUT_PROPERTIES);
-
-    public static final ModifiableObjectProperty REPOSITORY_OUTPUT_PROPERTY = object("repository")
-        .properties(
-            integer(ID)
-                .description("ID of the repository."),
-            string("name")
-                .description("Name of the repository."),
-            string("full_name")
-                .description("The full name of the repository, including the owner's username."),
-            object("owner")
-                .properties(
-                    string("login")
-                        .description("The username of the repository owner."),
-                    integer(ID)
-                        .description("ID of the owner.")),
-            string("visibility")
-                .description("The visibility status of the repository, such as public or private."),
-            integer("forks")
-                .description("The total number of times the repository has been forked by other users."),
-            integer("open_issues")
-                .description("The current number of open issues in the repository."),
-            string("default_branch")
-                .description("The name of the default branch in the repository, typically 'main' or 'master'."));
+    public static final ModifiableStringProperty OWNER_PROPERTY = string(OWNER)
+        .label("User/Organization")
+        .description("The owner of the repository (user or organization).")
+        .exampleValue("bytechefhq")
+        .required(true);
 
     private GithubConstants() {
     }
