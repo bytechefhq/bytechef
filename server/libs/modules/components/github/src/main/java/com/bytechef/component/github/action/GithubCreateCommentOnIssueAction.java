@@ -24,8 +24,9 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -38,6 +39,7 @@ import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class GithubCreateCommentOnIssueAction {
 
@@ -45,13 +47,14 @@ public class GithubCreateCommentOnIssueAction {
         .title("Create Comment on Issue")
         .description("Adds a comment to the specified issue.")
         .properties(
+            OWNER_PROPERTY,
             string(REPOSITORY)
-                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .label("Repository")
+                .description("Repository where the issue is located.")
                 .required(true),
             string(ISSUE)
                 .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
-                .optionsLookupDependsOn(REPOSITORY)
+                .optionsLookupDependsOn(REPOSITORY, OWNER)
                 .label("Issue Number")
                 .description("The number of the issue to comment on.")
                 .required(true),
@@ -70,12 +73,12 @@ public class GithubCreateCommentOnIssueAction {
 
         return context
             .http(http -> http.post(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
+                "/repos/" + inputParameters.getRequiredString(OWNER) + "/"
+                    + inputParameters.getRequiredString(REPOSITORY)
                     + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/comments"))
             .body(Body.of(Map.of(BODY, inputParameters.getRequiredString(BODY))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
     }
 }
