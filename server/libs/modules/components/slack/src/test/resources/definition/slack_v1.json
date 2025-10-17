@@ -4441,8 +4441,8 @@
     "webhookEnable": null,
     "webhookRawBody": null,
     "webhookRequest": { },
-    "webhookValidate": { },
-    "webhookValidateOnEnable": null,
+    "webhookValidate": null,
+    "webhookValidateOnEnable": { },
     "workflowNodeDescription": null,
     "workflowSyncExecution": null
   } ],
