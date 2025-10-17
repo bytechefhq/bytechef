@@ -52,8 +52,7 @@ public class ClaudeCodeInitializeClaude {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {
 
-        String command = "echo \"" + inputParameters.getString("password") +
-            "\" | sudo -S npm install -g @anthropic-ai/claude-code";
+        String command = "npm install -g @anthropic-ai/claude-code";
 
         return ClaudeCodeUtil.execute(command);
     }

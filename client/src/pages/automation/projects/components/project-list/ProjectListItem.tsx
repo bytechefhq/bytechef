@@ -202,32 +202,27 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         pullProjectFromGitMutation.mutate({id: project.id!});
     };
 
-    const handleProjectListItemClick = useCallback(
-        (event: React.MouseEvent) => {
-            const target = event.target as HTMLElement;
+    const handleProjectListItemClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
 
-            const interactiveSelectors = [
-                '[data-interactive]',
-                '.dropdown-menu-item',
-                '[data-radix-dropdown-menu-item]',
-                '[data-radix-dropdown-menu-trigger]',
-                '[data-radix-collapsible-trigger]',
-            ].join(', ');
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+        ].join(', ');
 
-            if (target.closest(interactiveSelectors)) {
-                return;
-            }
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
 
-            if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
-                return;
-            }
+        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
 
-            if (project.projectWorkflowIds?.length) {
-                workflowsCollapsibleTriggerRef.current?.click();
-            }
-        },
-        [project.projectWorkflowIds]
-    );
+        workflowsCollapsibleTriggerRef.current?.click();
+    }, []);
 
     return (
         <>
