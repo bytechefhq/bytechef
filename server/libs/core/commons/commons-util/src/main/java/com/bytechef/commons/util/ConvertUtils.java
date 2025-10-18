@@ -25,11 +25,14 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class ConvertUtils {
 
@@ -73,44 +76,56 @@ public class ConvertUtils {
         return objectMapper.convertValue(fromValue, toValueTypeRef);
     }
 
+    /**
+     * Converts the string value given with parameter to typed value. Conversion rellies on parse method of Integer,
+     * Long, Double, LocalDateTime and LocalDate methods. Boolean values are derived from case unsensitive true and
+     * false variants of value.
+     *
+     * @param str String representation of value
+     * @return value as Integer, Long, Double, LocalDateTime, LocalDate, Boolean, String or null if received method
+     *         argument is null
+     */
     public static Object convertString(String str) {
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+        if (str == null) {
+            return null;
+        }
+
+        String trimmedString = str.trim();
+
+        Object value = null;
+
+        for (Function<String, Object> transformerFunction : parseFunctions) {
+            try {
+                value = transformerFunction.apply(trimmedString);
+            } catch (NumberFormatException | DateTimeParseException exception) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(exception.getMessage(), exception);
+                }
+
+                continue;
+            }
+
+            if (value != null) {
+                return value;
             }
         }
 
-        try {
-            return Double.parseDouble(str);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
+        if (trimmedString.equalsIgnoreCase("true")) {
+            return Boolean.TRUE;
         }
 
-        if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(str);
-        }
-
-        try {
-            return LocalDateTime.parse(str);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
-        }
-
-        try {
-            return LocalDate.parse(str);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
+        if (trimmedString.equalsIgnoreCase("false")) {
+            return Boolean.FALSE;
         }
 
         return str;
+    }
+
+    private static final List<Function<String, Object>> parseFunctions;
+
+    static {
+        parseFunctions = List.of(
+            Integer::parseInt, Long::parseLong, Double::parseDouble, LocalDateTime::parse, LocalDate::parse);
     }
 
     @SuppressFBWarnings("EI")
