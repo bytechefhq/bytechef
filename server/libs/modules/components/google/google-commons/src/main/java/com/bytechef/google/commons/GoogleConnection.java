@@ -49,7 +49,7 @@ public class GoogleConnection {
                     .oAuth2AuthorizationExtraQueryParameters(
                         Map.of("access_type", "offline", "prompt", "select_account consent"))
                     .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
-                    .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
+                    .refreshOn(401, "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                     .scopes(scopes)
                     .tokenUrl((connection, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL));
     }
