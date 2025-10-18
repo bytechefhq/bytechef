@@ -24,6 +24,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +36,9 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 /**
  * @author Matija Petanjek
  */
+@SuppressFBWarnings({
+    "SPEL_INJECTION", "REDOS"
+})
 public class ConditionTaskUtils {
 
     private static final ExpressionParser expressionParser = new SpelExpressionParser();

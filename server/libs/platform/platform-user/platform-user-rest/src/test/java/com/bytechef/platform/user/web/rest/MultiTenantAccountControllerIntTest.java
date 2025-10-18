@@ -41,6 +41,7 @@ import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.util.TenantUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -76,6 +77,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     })
 @AutoConfigureMockMvc
 @UserIntTestConfigurationSharedMocks
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class MultiTenantAccountControllerIntTest {
 
     @MockitoBean

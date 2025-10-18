@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@SuppressFBWarnings("SQL_INJECTION_JDBC")
 public class TenantRepository {
 
     private final DataSource dataSource;

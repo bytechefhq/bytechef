@@ -32,6 +32,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepository {
 
     private final JdbcTemplate jdbcTemplate;

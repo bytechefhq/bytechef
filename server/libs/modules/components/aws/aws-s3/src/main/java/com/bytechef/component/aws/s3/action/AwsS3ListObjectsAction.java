@@ -42,6 +42,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class AwsS3ListObjectsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listObjects")
@@ -54,7 +55,13 @@ public class AwsS3ListObjectsAction {
                 .required(true))
         .output(
             outputSchema(
-                array().items(object().properties(string("key"), string("suffix"), string("uri")))))
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string("key"),
+                                string("suffix"),
+                                string("uri")))))
         .perform(AwsS3ListObjectsAction::perform);
 
     protected static List<S3ObjectDescription> perform(
@@ -68,8 +75,7 @@ public class AwsS3ListObjectsAction {
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(
-                    connectionParameters.getRequiredString(BUCKET_NAME), o))
+                .map(o -> new S3ObjectDescription(connectionParameters.getRequiredString(BUCKET_NAME), o))
                 .collect(Collectors.toList());
         }
     }

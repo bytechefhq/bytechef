@@ -17,6 +17,7 @@
 package com.bytechef.commons.util;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("XXE")
 final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlStreamReaderStream.class);

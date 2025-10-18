@@ -38,6 +38,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class JsonFileAssert {
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()

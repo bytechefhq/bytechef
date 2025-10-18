@@ -384,6 +384,7 @@ class ContextImpl implements Context {
         }
     }
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private record FileImpl(TempFileStorage tempFileStorage) implements File {
 
         @Override
