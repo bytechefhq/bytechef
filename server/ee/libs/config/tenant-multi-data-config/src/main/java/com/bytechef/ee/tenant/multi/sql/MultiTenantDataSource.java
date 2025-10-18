@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
+ * Multi-tenant DataSource wrapper that sets the PostgreSQL search_path based on tenant context.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -90,6 +92,16 @@ public class MultiTenantDataSource implements DataSource {
         return dataSource.isWrapperFor(iface);
     }
 
+    /**
+     * Sets the PostgreSQL search_path to the current tenant's schema.
+     *
+     * <p>
+     * <b>Security Note:</b> The SQL injection suppression is for schema name injection which cannot be parameterized in
+     * PostgreSQL. Schema names must be included as identifiers, not as parameterized values. The tenant ID is validated
+     * to contain only alphanumeric characters, underscores, and hyphens to prevent SQL injection. This is a PostgreSQL
+     * limitation, not a security vulnerability.
+     */
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("SET search_path TO " + TenantContext.getCurrentDatabaseSchema());

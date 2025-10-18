@@ -29,8 +29,11 @@ import static com.bytechef.component.random.helper.constant.RandomHelperConstant
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
+ * Action for generating random strings in workflow automation.
+ *
  * @author Nikolina Spehar
  */
 public class RandomHelperRandomStringAction {
@@ -60,6 +63,23 @@ public class RandomHelperRandomStringAction {
     private RandomHelperRandomStringAction() {
     }
 
+    /**
+     * Generates a random string of the specified length using the provided character set.
+     *
+     * <p>
+     * <b>Security Note:</b> The use of {@link Math#random()} is intentional for this action. The Random String action
+     * is designed to generate random strings for workflow automation purposes, such as generating test data, creating
+     * non-sensitive identifiers, or adding randomness to workflow behavior. The PREDICTABLE_RANDOM suppression is
+     * appropriate because:
+     *
+     * <ul>
+     * <li>This action is explicitly for non-cryptographic random string generation</li>
+     * <li>The action description clearly states it "Generates a random string value" without security claims</li>
+     * <li>For security-sensitive operations (passwords, tokens, API keys), users should use appropriate cryptographic
+     * methods</li>
+     * </ul>
+     */
+    @SuppressFBWarnings("PREDICTABLE_RANDOM")
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         StringBuilder randomString = new StringBuilder();
 

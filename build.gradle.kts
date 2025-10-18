@@ -20,7 +20,7 @@ dependencyManagement {
 
 versionCatalogUpdate {
     keep {
-        versions.addAll("checkstyle", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
+        versions.addAll("checkstyle", "findsecbugs", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
     }
 }
 
@@ -31,7 +31,7 @@ subprojects {
 
     dependencyManagement {
         dependencies {
-            dependency("com.github.spotbugs:spotbugs-annotations:[4.9.3,)")
+            dependency("com.github.spotbugs:spotbugs-annotations:[${rootProject.libs.versions.spotbugs.get()},)")
         }
     }
 
@@ -40,6 +40,8 @@ subprojects {
 
         implementation("org.jspecify:jspecify")
         implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
+
+        spotbugsPlugins("com.h3xstream.findsecbugs:findsecbugs-plugin:${rootProject.libs.versions.findsecbugs.get()}")
 
         testCompileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
 

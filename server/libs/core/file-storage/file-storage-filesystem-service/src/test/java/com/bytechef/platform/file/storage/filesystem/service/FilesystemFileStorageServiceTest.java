@@ -18,6 +18,7 @@ package com.bytechef.platform.file.storage.filesystem.service;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemFileStorageServiceTest {
 
     private static final String TEST_STRING = "test string";

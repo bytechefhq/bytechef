@@ -43,6 +43,7 @@ import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -74,6 +75,7 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @UserIntTestConfigurationSharedMocks
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class AccountControllerIntTest {
 
     static final String TEST_USER_LOGIN = "test";

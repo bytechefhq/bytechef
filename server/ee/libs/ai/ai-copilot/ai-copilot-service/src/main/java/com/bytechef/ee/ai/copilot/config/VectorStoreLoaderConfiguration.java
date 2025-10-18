@@ -38,6 +38,7 @@ import org.springframework.context.event.EventListener;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class VectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";

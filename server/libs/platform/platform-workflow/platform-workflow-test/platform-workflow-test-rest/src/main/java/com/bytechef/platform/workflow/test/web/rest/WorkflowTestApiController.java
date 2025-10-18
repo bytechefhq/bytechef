@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
@@ -99,6 +100,9 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      * @return an {@link SseEmitter} instance that streams events such as start, error, and result to the client
      */
     @GetMapping(value = "/workflow-tests/{jobId}/attach", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @SuppressFBWarnings(
+        value = "CRLF_INJECTION_LOGS",
+        justification = "jobId is Long (no CRLF), exception messages sanitized with StringUtils.sanitize")
     public SseEmitter attachWorkflowTest(@PathVariable Long jobId) {
         final String key = TenantCacheKeyUtils.getKey(jobId);
         final SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
@@ -118,8 +122,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                         } catch (IOException exception) {
                             if (logger.isTraceEnabled()) {
                                 logger.trace(
-                                    "Failed to send buffered SSE event for job {}: {}", jobId, exception.getMessage(),
-                                    exception);
+                                    "Failed to send buffered SSE event for job {}: {}", jobId,
+                                    StringUtils.sanitize(exception.getMessage()), exception);
                             }
 
                             try {
@@ -128,7 +132,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                                 if (logger.isTraceEnabled()) {
                                     logger.trace(
                                         "Failed to send SSE error event for job {}: {}", jobId,
-                                        ioException.getMessage(), ioException);
+                                        StringUtils.sanitize(ioException.getMessage()), ioException);
                                 }
 
                                 break;

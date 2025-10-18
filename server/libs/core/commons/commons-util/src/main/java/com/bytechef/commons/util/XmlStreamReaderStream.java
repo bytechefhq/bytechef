@@ -16,6 +16,7 @@
 
 package com.bytechef.commons.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -48,17 +49,32 @@ import org.slf4j.LoggerFactory;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
+ * Streaming XML reader with secure configuration to prevent XXE attacks. Disables DTD processing and external entity
+ * resolution.
+ *
  * @author Ivica Cardic
  */
 final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlStreamReaderStream.class);
 
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private static final XMLInputFactory xmlInputFactory;
+
+    static {
+        xmlInputFactory = createSecureXmlInputFactory();
+    }
 
     private final XMLStreamReader xmlStreamReader;
     private final Stream<Map<String, ?>> stream;
 
+    /**
+     * Creates a new XML stream reader with secure configuration.
+     *
+     * <p>
+     * <b>Security Note:</b> The XXE_XMLSTREAMREADER suppression is safe because the XMLInputFactory is configured with
+     * DTD and external entity processing disabled via {@link #createSecureXmlInputFactory()}.
+     */
+    @SuppressFBWarnings("XXE_XMLSTREAMREADER")
     public XmlStreamReaderStream(InputStream inputStream, XmlMapper xmlMapper) throws XMLStreamException {
         this.xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
 
@@ -274,5 +290,27 @@ final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
                 }
             }
         }
+    }
+
+    /**
+     * Creates a secure XMLInputFactory with XXE protections enabled.
+     */
+    private static XMLInputFactory createSecureXmlInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+
+        // Disable DTD processing to prevent XXE
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+
+        // Disable external entities
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+        // Disable external references (additional protection)
+        try {
+            factory.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+        } catch (IllegalArgumentException e) {
+            logger.debug("Property javax.xml.stream.isSupportingExternalEntities not supported", e);
+        }
+
+        return factory;
     }
 }
