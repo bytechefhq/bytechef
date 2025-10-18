@@ -146,6 +146,63 @@ paths:
             application/json:
               schema:
                 type: "object"
+    patch:
+        tags:
+          - "records"
+        summary: "Update Record"
+        description: "Update an existing record in an Airtable table"
+        operationId: "updateRecord"
+        x-ai-agent-tool: true
+        parameters:
+          - name: "baseId"
+            description: "ID of the base where table is located."
+            in: "path"
+            required: true
+            schema:
+              title: "Base ID"
+              type: "string"
+              x-dynamic-options: true
+          - name: "tableId"
+            description: "ID of the table where the record is located."
+            in: "path"
+            required: true
+            schema:
+              title: "Table ID"
+              type: "string"
+              x-dynamic-options: true
+              x-dynamic-options-dependency:
+                - "baseId"
+          - name: "recordId"
+            description: "ID of the record that will be retrieved."
+            in: "path"
+            required: true
+            schema:
+              title: "Row ID"
+              type: "string"
+              x-dynamic-options: true
+              x-dynamic-options-dependency:
+                - "baseId"
+                - "tableId"
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  fields:
+                    x-dynamic-properties: true
+                    x-dynamic-properties-dependency:
+                      - "baseId"
+                      - "tableId"
+                      - "recordId"
+        responses:
+          "200":
+            description: "Successful operation"
+            x-dynamic-output: true
+            content:
+              application/json:
+                schema:
+                  type: "object"
 components:
   securitySchemes:
     api_key:
