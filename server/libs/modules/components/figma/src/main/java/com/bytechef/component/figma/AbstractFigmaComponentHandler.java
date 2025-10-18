@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.figma.action.FigmaGetCommentsAction;
 import com.bytechef.component.figma.action.FigmaPostCommentAction;
 import com.bytechef.component.figma.connection.FigmaConnection;
+import com.bytechef.component.figma.trigger.FigmaNewCommentTrigger;
 
 /**
  * Provides the base implementation for the REST based component.
@@ -41,7 +42,7 @@ public abstract class AbstractFigmaComponentHandler implements OpenApiComponentH
                     .connection(modifyConnection(FigmaConnection.CONNECTION_DEFINITION))
                     .clusterElements(modifyClusterElements(tool(FigmaGetCommentsAction.ACTION_DEFINITION),
                         tool(FigmaPostCommentAction.ACTION_DEFINITION)))
-                    .triggers(getTriggers());
+                    .triggers(FigmaNewCommentTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
