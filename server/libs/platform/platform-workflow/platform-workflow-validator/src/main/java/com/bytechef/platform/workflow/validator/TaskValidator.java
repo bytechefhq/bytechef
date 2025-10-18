@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.databind.JsonNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -31,6 +32,9 @@ import javax.annotation.Nullable;
  *
  * @author Marko Kriskovic
  */
+@SuppressFBWarnings({
+    "SPEL_INJECTION", "REDOS"
+})
 class TaskValidator {
 
     private static final Pattern TYPE_PATTERN = Pattern.compile("^[a-zA-Z0-9]+/v[0-9]+(/[a-zA-Z0-9]+)?$");

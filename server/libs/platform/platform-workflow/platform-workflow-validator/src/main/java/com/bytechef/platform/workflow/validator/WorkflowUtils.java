@@ -20,6 +20,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,9 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings({
+    "SPEL_INJECTION", "REDOS"
+})
 class WorkflowUtils {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.builder()
