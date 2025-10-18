@@ -5087,7 +5087,7 @@
         "type": "STRING"
       } ],
       "refresh": null,
-      "refreshOn": [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "refreshOn": [ 401, "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
       "refreshToken": null,
       "refreshUrl": { },
       "scopes": { },
