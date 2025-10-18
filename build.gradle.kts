@@ -1,3 +1,8 @@
+allprojects {
+    repositories {
+    mavenCentral()
+    }
+}
 plugins {
     alias(libs.plugins.com.github.ben.manes.versions)
     id("com.bytechef.java-common-conventions")
