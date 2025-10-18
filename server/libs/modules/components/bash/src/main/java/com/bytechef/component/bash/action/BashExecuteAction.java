@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,6 +42,7 @@ import org.zeroturnaround.exec.ProcessExecutor;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("COMMAND_INJECTION")
 public class BashExecuteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("execute")

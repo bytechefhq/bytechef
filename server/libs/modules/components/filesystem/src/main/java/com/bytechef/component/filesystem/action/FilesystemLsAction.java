@@ -29,6 +29,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.REC
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,6 +43,7 @@ import org.apache.commons.lang3.Validate;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemLsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("ls")
