@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@Order(3)
+@Order
 class DefaultComponentConnectionFactory
     implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 

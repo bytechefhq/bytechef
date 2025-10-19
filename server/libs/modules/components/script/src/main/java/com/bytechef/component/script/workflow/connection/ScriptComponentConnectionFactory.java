@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.workflow.connection;
+package com.bytechef.component.script.workflow.connection;
 
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactory;
+import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactoryResolver;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
