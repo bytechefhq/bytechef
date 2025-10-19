@@ -2,10 +2,11 @@ import LoadingDots from '@/components/LoadingDots';
 import {Skeleton} from '@/components/ui/skeleton';
 import {twMerge} from 'tailwind-merge';
 
-export const WorkflowNodeDetailsPanelSkeleton = () => (
+export const WorkflowNodeDetailsPanelSkeleton = ({className}: {className?: string}) => (
     <div
         className={twMerge(
-            'absolute bottom-6 right-[69px] top-2 z-10 flex w-screen max-w-workflow-node-details-panel-width flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background p-4'
+            'absolute bottom-6 right-[69px] top-2 z-10 flex w-screen max-w-workflow-node-details-panel-width flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background p-4',
+            className
         )}
     >
         <Skeleton className="h-8 w-3/4" />
