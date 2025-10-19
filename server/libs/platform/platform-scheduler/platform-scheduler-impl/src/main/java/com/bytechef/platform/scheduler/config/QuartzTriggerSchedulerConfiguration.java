@@ -19,55 +19,25 @@ package com.bytechef.platform.scheduler.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.scheduler.tenant.MultiTenantLocalDataSourceJobStore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Properties;
 import org.quartz.Scheduler;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
-import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 @ConditionalOnProperty(
     prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
-public class QuartzTriggerSchedulerConfiguration implements SchedulerFactoryBeanCustomizer {
-
-    private final ApplicationProperties.Tenant.Mode mode;
-    private final QuartzProperties quartzProperties;
-
-    @SuppressFBWarnings("EI")
-    public QuartzTriggerSchedulerConfiguration(
-        ApplicationProperties applicationProperties, QuartzProperties quartzProperties) {
-
-        this.mode = applicationProperties.getTenant()
-            .getMode();
-        this.quartzProperties = quartzProperties;
-    }
-
-    @Override
-    public void customize(SchedulerFactoryBean schedulerFactoryBean) {
-        schedulerFactoryBean.setJobFactory(jobFactory());
-
-        Properties properties = new Properties();
-
-        properties.putAll(quartzProperties.getProperties());
-
-        if (mode == ApplicationProperties.Tenant.Mode.MULTI) {
-            properties.put("org.quartz.jobStore.class", MultiTenantLocalDataSourceJobStore.class.getName());
-        }
-
-        schedulerFactoryBean.setQuartzProperties(properties);
-    }
+public class QuartzTriggerSchedulerConfiguration {
 
     @Bean
     JobFactory jobFactory() {

@@ -387,6 +387,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:ee:libs:platform:platform-security-web:platform-security-web-impl"))
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
