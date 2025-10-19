@@ -98,17 +98,17 @@ const ProjectHeader = ({
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <PublishPopover
-                    isPending={publishProjectMutationIsPending}
-                    onPublishProjectSubmit={handlePublishProjectSubmit}
-                />
-
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
+                />
+
+                <PublishPopover
+                    isPending={publishProjectMutationIsPending}
+                    onPublishProjectSubmit={handlePublishProjectSubmit}
                 />
             </div>
         </header>
