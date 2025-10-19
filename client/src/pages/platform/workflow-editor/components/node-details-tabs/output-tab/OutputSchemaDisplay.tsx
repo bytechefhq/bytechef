@@ -1,9 +1,16 @@
 import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {PropertyAllType} from '@/shared/types';
-import {ChevronDownIcon, PenIcon} from 'lucide-react';
+import {MoreHorizontalIcon} from 'lucide-react';
 
 interface OutputSchemaDisplayProps {
     connectionMissing: boolean;
@@ -40,33 +47,63 @@ const OutputSchemaDisplay = ({
             <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm text-gray-500">Output Schema</h3>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} size="sm" variant="outline">
-                            <PenIcon /> Define <ChevronDownIcon className="ml-0.5" />
+                <ButtonGroup>
+                    {!variablePropertiesDefined && (
+                        <Button
+                            disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                            onClick={handleTestOperationClick}
+                            variant="outline"
+                        >
+                            {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
                         </Button>
-                    </DropdownMenuTrigger>
+                    )}
 
-                    <DropdownMenuContent align="end" className="w-60 cursor-pointer">
-                        {!variablePropertiesDefined && (
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                disabled={connectionMissing}
-                                onClick={handleTestOperationClick}
+                    {variablePropertiesDefined && (
+                        <Button
+                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                            onClick={() => setShowUploadDialog(true)}
+                            variant="outline"
+                        >
+                            Upload Sample Output
+                        </Button>
+                    )}
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="More Options"
+                                asChild
+                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                size="icon"
+                                variant="outline"
                             >
-                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                            </DropdownMenuItem>
-                        )}
+                                <span>
+                                    <MoreHorizontalIcon />
+                                </span>
+                            </Button>
+                        </DropdownMenuTrigger>
 
-                        <DropdownMenuItem className="cursor-pointer" onClick={() => setShowUploadDialog(true)}>
-                            Upload Sample Output Data
-                        </DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuGroup>
+                                {!variablePropertiesDefined && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => setShowUploadDialog(true)}
+                                    >
+                                        Upload Sample Output
+                                    </DropdownMenuItem>
+                                )}
 
-                        <DropdownMenuItem className="cursor-pointer" onClick={handlePredefinedOutputSchemaClick}>
-                            Reset
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={handlePredefinedOutputSchemaClick}
+                                >
+                                    Reset
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </ButtonGroup>
             </div>
 
             <PropertyField
