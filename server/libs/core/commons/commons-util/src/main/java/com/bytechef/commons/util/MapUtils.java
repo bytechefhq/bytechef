@@ -72,7 +72,12 @@ public class MapUtils {
         Validate.notNull(map1, "'map1' must not be null");
         Validate.notNull(map2, "'map2' must not be null");
 
-        return Stream.concat(stream(map1), stream(map2))
+        return Stream
+            .concat(
+                stream(map1)
+                    .filter(entry -> entry.getValue() != null),
+                stream(map2)
+                    .filter(entry -> entry.getValue() != null))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
