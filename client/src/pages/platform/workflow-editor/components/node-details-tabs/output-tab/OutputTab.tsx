@@ -270,7 +270,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
                         >
                             <div
                                 className={twMerge(
-                                    'flex items-center justify-center',
+                                    'mt-1 flex items-center justify-center',
                                     !currentNode.trigger && 'w-full'
                                 )}
                             >
