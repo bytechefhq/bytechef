@@ -144,8 +144,7 @@ public class GoogleMapsGetRouteAction {
         Map<String, Object> destinationGeoLocation = getAddressGeolocation(
             context, inputParameters.getRequiredString(DESTINATION));
 
-        return context.http(
-            http -> http.post("https://routes.googleapis.com/directions/v2:computeRoutes"))
+        return context.http(http -> http.post("https://routes.googleapis.com/directions/v2:computeRoutes"))
             .configuration(responseType(ResponseType.JSON))
             .header("X-Goog-FieldMask", "*")
             .body(

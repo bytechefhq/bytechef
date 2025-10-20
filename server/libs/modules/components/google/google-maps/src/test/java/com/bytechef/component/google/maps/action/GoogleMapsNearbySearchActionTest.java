@@ -72,7 +72,6 @@ class GoogleMapsNearbySearchActionTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
-
             mockedGoogleMapsUtils
                 .when(() -> GoogleMapsUtils.getAddressGeolocation(contextArgumentCaptor.capture(),
                     stringArgumentCaptor.capture()))
@@ -82,7 +81,6 @@ class GoogleMapsNearbySearchActionTest {
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(Map.of(), result);
-
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(List.of("mockedAddress", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());
 

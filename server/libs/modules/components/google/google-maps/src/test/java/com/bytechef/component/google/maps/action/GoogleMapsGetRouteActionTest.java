@@ -82,7 +82,6 @@ class GoogleMapsGetRouteActionTest {
             .thenReturn(Map.of());
 
         try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
-
             mockedGoogleMapsUtils
                 .when(() -> GoogleMapsUtils.getAddressGeolocation(contextArgumentCaptor.capture(),
                     stringArgumentCaptor.capture()))
@@ -92,10 +91,9 @@ class GoogleMapsGetRouteActionTest {
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(Map.of(), result);
-
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of("origin", "destination", "X-Goog-FieldMask", "*"),
-                stringArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("origin", "destination", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());
 
             Body body = bodyArgumentCaptor.getValue();
 
