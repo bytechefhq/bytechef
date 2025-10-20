@@ -17,6 +17,7 @@
 package com.bytechef.component.google.maps.connection;
 
 import static com.bytechef.component.definition.Authorization.API_TOKEN;
+import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -41,7 +42,7 @@ public class GoogleMapsConnection {
                         .description("API key that can be found at Google Cloud Console.")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
-                    Map.of("key", List.of(connectionParameters.getRequiredString(API_TOKEN))))));
+                    Map.of(KEY, List.of(connectionParameters.getRequiredString(API_TOKEN))))));
 
     private GoogleMapsConnection() {
     }

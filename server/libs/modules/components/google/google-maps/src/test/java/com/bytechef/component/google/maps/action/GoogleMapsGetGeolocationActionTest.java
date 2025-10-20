@@ -68,8 +68,6 @@ class GoogleMapsGetGeolocationActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
         assertEquals(List.of(ADDRESS, urlEncodedAddress), stringArgumentCaptor.getAllValues());
-
     }
 }

@@ -43,12 +43,13 @@ class GoogleMapsUtilsTest {
     private final Executor mockedExecutor = mock(Http.Executor.class);
     private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of(
-        "results", List.of(
-            Map.of("geometry", Map.of("location", Map.of("lat", 0.0, "lng", 0.0)))));
+        "results", List.of(Map.of("geometry", Map.of("location", Map.of("lat", 0.0, "lng", 0.0)))));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testGetAddressGeolocation() {
+        String urlEncodedAddress = "urlEncodedAddress";
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -59,17 +60,13 @@ class GoogleMapsUtilsTest {
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
-
-        String urlEncodedAddress = "urlEncodedAddress";
         when(mockedContext.encoder(any()))
             .thenReturn(urlEncodedAddress);
 
-        String mockedAddress = "mockedAddress";
-        Map<String, Object> result = GoogleMapsUtils.getAddressGeolocation(mockedContext, mockedAddress);
+        Map<String, Object> result = GoogleMapsUtils.getAddressGeolocation(mockedContext, "mockedAddress");
         Map<String, Object> expected = Map.of(LATITUDE, 0.0, LONGITUDE, 0.0);
 
         assertEquals(expected, result);
-
         assertEquals(List.of(ADDRESS, urlEncodedAddress), stringArgumentCaptor.getAllValues());
     }
 }
