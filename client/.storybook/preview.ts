@@ -15,4 +15,22 @@ const preview: Preview = {
     tags: ['autodocs'],
 };
 
+const style = document.createElement('style');
+
+style.textContent = `
+    body {
+        overflow: auto !important;
+    }
+    
+    #root {
+        overflow: auto !important;
+    }
+    
+    .sb-show-main {
+        overflow: auto !important;
+    }
+`;
+
+document.head.appendChild(style);
+
 export default preview;
