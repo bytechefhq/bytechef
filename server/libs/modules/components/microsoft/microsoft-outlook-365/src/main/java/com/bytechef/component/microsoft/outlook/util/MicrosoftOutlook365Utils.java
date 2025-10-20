@@ -91,7 +91,7 @@ public class MicrosoftOutlook365Utils {
             getRecipients(messageBody, BCC_RECIPIENTS),
             (String) messageBody.get("bodyPreview"),
             bodyHtml,
-            getFileEntries(context, messageBody, id),
+            getFileEntries(context, id),
             (String) messageBody.get("webLink"));
     }
 
@@ -125,28 +125,25 @@ public class MicrosoftOutlook365Utils {
         return body.get(VALUE);
     }
 
-    private static List<FileEntry> getFileEntries(Context context, Map<?, ?> messageBody, String id) {
+    private static List<FileEntry> getFileEntries(Context context, String id) {
         List<FileEntry> fileEntries = new ArrayList<>();
 
-        if ((boolean) messageBody.get("hasAttachments")) {
-            Map<String, Object> attachmentsBody = context
-                .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, Object> attachmentsBody = context
+            .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-            if (attachmentsBody.get(VALUE) instanceof List<?> attachments) {
-                for (Object attachment : attachments) {
-                    if (attachment instanceof Map<?, ?> map) {
-                        String contentBytes = (String) map.get(CONTENT_BYTES);
-                        byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
+        if (attachmentsBody.get(VALUE) instanceof List<?> attachments) {
+            for (Object attachment : attachments) {
+                if (attachment instanceof Map<?, ?> map) {
+                    String contentBytes = (String) map.get(CONTENT_BYTES);
+                    byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
 
-                        FileEntry fileEntry = context.file(
-                            file -> file.storeContent((String) map.get(NAME),
-                                new ByteArrayInputStream(decodedBytes)));
+                    FileEntry fileEntry = context.file(
+                        file -> file.storeContent((String) map.get(NAME), new ByteArrayInputStream(decodedBytes)));
 
-                        fileEntries.add(fileEntry);
-                    }
+                    fileEntries.add(fileEntry);
                 }
             }
         }
