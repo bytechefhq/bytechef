@@ -20,19 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
-import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.List;
 import java.util.Map;
@@ -62,15 +56,9 @@ public class GithubListRepositoryIssuesAction {
     private GithubListRepositoryIssuesAction() {
     }
 
-    public static List<Map<String, Object>> perform(
+    public static List<Map<?, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.get(
-                "/repos/" + inputParameters.getRequiredString(OWNER) + "/" +
-                    inputParameters.getRequiredString(REPOSITORY) + "/issues"))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return GithubUtils.getRepositoryIssues(inputParameters, context);
     }
 }
