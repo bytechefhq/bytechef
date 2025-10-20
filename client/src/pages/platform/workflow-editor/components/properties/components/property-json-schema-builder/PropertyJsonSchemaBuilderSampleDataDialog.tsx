@@ -119,7 +119,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
                         </Suspense>
 
                         <div
-                            className="absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
+                            className="pointer-events-none absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
                             id="monaco-placeholder"
                         >
                             {EDITOR_PLACEHOLDER}
