@@ -19,36 +19,43 @@ package com.bytechef.component.github.action;
 import static com.bytechef.component.github.constant.GithubConstants.FILTER;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
-public class GithubListIssuesActionTest extends AbstractGithubActionTest {
+class GithubListIssuesActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILTER, "all", STATE, "all"));
-    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final Context mockedContext = mock(Context.class);
 
     @Test
     void testPerform() {
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseList);
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic
+                .when(() -> GithubUtils.getItems(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(List.of());
 
-        Object result = GithubListIssuesAction.perform(mockedParameters, mockedParameters, mockedContext);
+            List<Map<String, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responseList, result);
-
-        assertEquals(Map.of(FILTER, List.of("all"), STATE, List.of("all")), queryArgumentCaptor.getValue());
+            assertEquals(List.of(), result);
+            assertEquals(List.of("/issues", FILTER, "all", STATE, "all"), stringArgumentCaptor.getAllValues());
+        }
     }
 }
