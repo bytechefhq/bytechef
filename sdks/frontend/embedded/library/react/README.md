@@ -60,6 +60,25 @@
 4. On change inside the `sdk/index.tsx` the Bytechef dev server needs to be restarted to see the changes
    a. This is because of Vite's caching
 
+#### Troubleshooting
+
+Most common error is the `Incompatible React versions`:
+
+```
+Uncaught Error: Incompatible React versions: The "react" and "react-dom" packages must have the exact same version. Instead got:
+  - react:      19.2.0
+  - react-dom:  19.1.1
+```
+
+To fix this run these commands in both `client/` and `sdks/.../react/` (make sure both client servers are not running):
+
+```
+rm -rf node_modules
+rm package-lock.json
+npm cache clean --force
+npm install
+```
+
 ## 🤖 Scripts
 
 |      Script       | Function                                                                                                                               |
