@@ -48,7 +48,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope.ordinal(), scopeId, key,
                 type.ordinal())
-            .ifPresentOrElse(dataStorageRepository::delete, null);
+            .ifPresent(dataStorageRepository::delete);
     }
 
     @NonNull
