@@ -18,22 +18,23 @@ package com.bytechef.component.github.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.NAME;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,21 +47,26 @@ import org.mockito.ArgumentCaptor;
  */
 class GithubUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> contextFunctionArgumentCaptor =
+        ArgumentCaptor.forClass(ContextFunction.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(OWNER, "testOwner", REPOSITORY, "testRepo"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach()
     void beforeEach() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
+                .apply(mockedHttp));
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -69,126 +75,77 @@ class GithubUtilsTest {
     }
 
     @Test
-    void testGetContent() {
-        Map<String, String> content = Map.of("action", "opened");
-
-        when(mockedWebhookBody.getContent(any(TypeReference.class)))
-            .thenReturn(content);
-
-        assertEquals(content, GithubUtils.getContent(mockedWebhookBody));
-    }
-
-    @Test
     void testGetRepositoryOptions() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        Map<String, Object> items = new LinkedHashMap<>();
-        items.put("name", "taskName");
-        items.put("id", "123");
-        body.add(items);
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(List.of(Map.of(NAME, "taskName", ID, "123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> result = GithubUtils.getRepositoryOptions(
+            mockedParameters, null, Map.of(), "", mockedContext);
 
-        expectedOptions.add(option("taskName", "taskName"));
+        assertEquals(List.of(option("taskName", "taskName")), result);
+        assertEquals("/user/repos", stringArgumentCaptor.getValue());
 
-        assertEquals(expectedOptions,
-            GithubUtils.getRepositoryOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        Object[] query = queryArgumentCaptor.getValue();
+
+        assertEquals(List.of("per_page", 100, "page", 1), Arrays.asList(query));
     }
 
     @Test
     void testGetIssueOptions() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        Map<String, Object> items = new LinkedHashMap<>();
-        items.put("title", "taskName");
-        items.put("number", 123);
-        body.add(items);
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(
+                Map.of("login", "user"),
+                List.of(Map.of(TITLE, "taskName", "number", 123)));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> result = GithubUtils.getIssueOptions(mockedParameters, null, Map.of(), "", mockedContext);
 
-        expectedOptions.add(option("taskName", "123"));
+        assertEquals(List.of(option("123 - taskName", "123")), result);
+        assertEquals("/repos/testOwner/testRepo/issues", stringArgumentCaptor.getValue());
 
-        assertEquals(expectedOptions,
-            GithubUtils.getIssueOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        Object[] query = queryArgumentCaptor.getValue();
+
+        assertEquals(List.of("per_page", 100, "page", 1, "state", "open"), Arrays.asList(query));
     }
 
     @Test
     void testGetCollaborators() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        Map<String, Object> items = new LinkedHashMap<>();
-        items.put("name", "John Doe");
-        items.put("login", "jdTest123");
-        body.add(items);
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(
+                Map.of("login", "user"),
+                List.of(Map.of(NAME, "John Doe", "login", "jdTest123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> result = GithubUtils.getCollaborators(
+            mockedParameters, null, Map.of(), "", mockedContext);
 
-        expectedOptions.add(option("John Doe", "jdTest123"));
+        assertEquals(List.of(option("John Doe", "jdTest123")), result);
+        assertEquals("/repos/user/testRepo/collaborators", stringArgumentCaptor.getValue());
 
-        assertEquals(expectedOptions,
-            GithubUtils.getCollaborators(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        Object[] query = queryArgumentCaptor.getValue();
+
+        assertEquals(List.of("per_page", 100, "page", 1), Arrays.asList(query));
     }
 
     @Test
     void testGetLabels() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        body.add(Map.of("name", "Bug", "id", "12323123"));
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(
+                Map.of("login", "user"),
+                List.of(Map.of("name", "Bug", "id", "12323123")));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<String>> result = GithubUtils.getLabels(mockedParameters, null, Map.of(), "", mockedContext);
 
-        expectedOptions.add(option("Bug", "Bug"));
-
-        assertEquals(expectedOptions,
-            GithubUtils.getLabels(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        assertEquals(List.of(option("Bug", "Bug")), result);
+        assertEquals("/repos/user/testRepo/labels", stringArgumentCaptor.getValue());
     }
 
     @Test
     void testGetOwnerName() {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("login", "name");
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
+            .thenReturn(Map.of("login", "name"));
 
-        String actualOwnerName = GithubUtils.getOwnerName(mockedActionContext);
-        String expectedOwnerName = "name";
+        String actualOwnerName = GithubUtils.getOwnerName(mockedContext);
 
-        assertEquals(expectedOwnerName, actualOwnerName);
-    }
-
-    @Test
-    void testSubscribeWebhook() {
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(ID, 123));
-
-        Integer id = GithubUtils.subscribeWebhook("", "event", "webhookUrl", mockedTriggerContext);
-
-        assertEquals(123, id);
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> expectedBody = Map.of(
-            "events", List.of("event"),
-            "config", Map.of("url", "webhookUrl", "content_type", "json"));
-
-        assertEquals(expectedBody, body.getContent());
-    }
-
-    @Test
-    void testUnsubscribeWebhook() {
-        GithubUtils.unsubscribeWebhook("", 123, mockedTriggerContext);
-
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        assertEquals("name", actualOwnerName);
+        assertEquals("/user", stringArgumentCaptor.getValue());
     }
 }

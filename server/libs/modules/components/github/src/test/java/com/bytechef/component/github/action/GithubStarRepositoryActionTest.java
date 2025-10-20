@@ -16,7 +16,11 @@
 
 package com.bytechef.component.github.action;
 
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -28,12 +32,17 @@ import org.junit.jupiter.api.Test;
  */
 class GithubStarRepositoryActionTest extends AbstractGithubActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(OWNER, "testOwner", REPOSITORY, "testRepo"));
 
     @Test
-    void testPerform() {
-        Object result = GithubGetIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+    void testPerform() throws Exception {
+        when(mockedHttp.put(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
+        Object result = executePerformFunction(GithubStarRepositoryAction.ACTION_DEFINITION, mockedParameters);
 
         assertNull(result);
+        assertEquals("/user/starred/testOwner/testRepo", stringArgumentCaptor.getValue());
     }
 }
