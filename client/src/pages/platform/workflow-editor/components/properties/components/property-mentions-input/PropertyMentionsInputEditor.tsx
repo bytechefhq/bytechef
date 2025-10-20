@@ -254,7 +254,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (typeof value === 'string') {
-                if (controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA') {
+                if (controlType !== 'RICH_TEXT') {
                     value = decode(sanitizeHtml(value, {allowedTags: []}));
                 }
 
