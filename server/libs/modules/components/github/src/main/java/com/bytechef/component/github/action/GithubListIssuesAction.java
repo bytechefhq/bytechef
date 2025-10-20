@@ -21,16 +21,14 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.FILTER;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
+import static com.bytechef.component.github.util.GithubUtils.getItems;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -76,17 +74,11 @@ public class GithubListIssuesAction {
     private GithubListIssuesAction() {
     }
 
-    public static List<Map<String, Object>> perform(
+    public static List<Map<String, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.get("/issues"))
-            .queryParameters(
-                Map.of(
-                    FILTER, List.of(inputParameters.getRequiredString(FILTER)),
-                    STATE, List.of(inputParameters.getRequiredString(STATE))))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return getItems(
+            context, "/issues",
+            FILTER, inputParameters.getRequiredString(FILTER), STATE, inputParameters.getRequiredString(STATE));
     }
 }
