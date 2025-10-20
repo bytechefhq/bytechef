@@ -26,6 +26,6 @@ public class McpServerAuthorizeHttpRequestContributor implements AuthorizeHttpRe
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/sse");
+        return List.of("/api/mcp");
     }
 }

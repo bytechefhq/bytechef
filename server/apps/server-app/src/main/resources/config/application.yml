@@ -109,8 +109,7 @@ spring:
         protocol: streamable
         type: async
         streamable-http:
-          mcp-endpoint: /api/sse
-          keep-alive-interval: 30s
+          mcp-endpoint: /api/mcp
   application:
     name: server-app
   cache:
