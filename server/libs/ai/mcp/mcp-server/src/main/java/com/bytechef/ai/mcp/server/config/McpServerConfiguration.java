@@ -29,6 +29,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Configuration for ByteChef MCP Server using Streamable HTTP transport.
+ *
+ * This configuration provides MCP tools for project and workflow management through
+ * Spring AI's auto-configured Streamable HTTP MCP server. The server is automatically
+ * configured by spring-ai-starter-mcp-server-webmvc and exposes tools at /api/mcp.
+ *
  * @author Ivica Cardic
  */
 @Configuration
@@ -48,6 +54,11 @@ public class McpServerConfiguration {
         this.taskTools = taskTools;
     }
 
+    /**
+     * Provides tool callbacks for ByteChef automation tools.
+     * These tools are automatically registered with the MCP server by Spring AI's auto-configuration.
+     * The MCP server is exposed via Streamable HTTP at /api/mcp endpoint.
+     */
     @Bean
     ToolCallbackProvider toolCallbackProvider() {
         return ToolCallbackProvider.from(ToolCallbacks.from(projectTools, projectWorkflowTools, taskTools));

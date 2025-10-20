@@ -31,7 +31,7 @@ public class McpServerCsrfContributor implements CsrfContributor {
     public List<RequestMatcher> getIgnoringRequestMatchers() {
         return List.of(
             PathPatternRequestMatcher.withDefaults()
-                .matcher("/api/sse"),
+                .matcher("/api/mcp"),
             RegexRequestMatcher.regexMatcher("^/api/v[0-9]+/mcp/.+"));
     }
 }
