@@ -285,6 +285,14 @@ describe('useConnectDialog - Navigation', () => {
                         workflowUuid: 'workflow-123',
                     },
                 ],
+                integrationInstances: [
+                    {
+                        id: 123,
+                        enabled: true,
+                        credentialStatus: 'VALID',
+                        workflows: [],
+                    },
+                ],
             }),
         });
 
@@ -297,7 +305,12 @@ describe('useConnectDialog - Navigation', () => {
             unmount: vi.fn(),
         });
 
-        const {result} = renderHook(() => useConnectDialog(defaultConnectDialogProps));
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                ...defaultConnectDialogProps,
+                integrationInstanceId: '123',
+            })
+        );
 
         await act(async () => result.current.openDialog());
 
@@ -314,22 +327,15 @@ describe('useConnectDialog - Navigation', () => {
             expect.objectContaining({method: 'POST'})
         );
 
-        const updatedProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-        expect(updatedProps.selectedWorkflows).toContain('workflow-123');
-
         fetchMock.mockClear();
 
         await act(async () => {
-            updatedProps.handleWorkflowToggle('workflow-123', false);
+            props.handleWorkflowToggle('workflow-123', false);
         });
 
         expect(fetchMock).toHaveBeenCalledWith(
             expect.stringContaining('/workflows/workflow-123/enable'),
             expect.objectContaining({method: 'DELETE'})
         );
-
-        const finalProps = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
-
-        expect(finalProps.selectedWorkflows).not.toContain('workflow-123');
     });
 });

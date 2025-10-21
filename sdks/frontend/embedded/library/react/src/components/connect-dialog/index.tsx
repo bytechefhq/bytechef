@@ -366,7 +366,6 @@ export default function useConnectDialog({
                     setFormValues((prev: Record<string, string>) => ({...prev, [name]: value}));
                 },
             }),
-            // remove callback
             handleSubmit: (callback: (data: {[key: string]: unknown}) => void) => (event?: React.FormEvent) => {
                 if (event) {
                     event.preventDefault();
