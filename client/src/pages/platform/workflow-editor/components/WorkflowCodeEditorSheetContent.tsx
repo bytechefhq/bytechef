@@ -185,6 +185,10 @@ const WorkflowCodeEditorSheetContent = ({
                                 }
                             }}
                             onMount={(editor) => editor.focus()}
+                            options={{
+                                folding: true,
+                                foldingStrategy: 'indentation',
+                            }}
                             value={workflow.definition!}
                         />
                     </Suspense>
