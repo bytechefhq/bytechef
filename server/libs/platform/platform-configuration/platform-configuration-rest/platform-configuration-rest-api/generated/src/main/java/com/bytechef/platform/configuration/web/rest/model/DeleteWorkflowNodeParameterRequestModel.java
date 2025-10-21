@@ -17,51 +17,29 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * DeleteClusterElementParameterRequestModel
+ * DeleteWorkflowNodeParameterRequestModel
  */
 
-@JsonTypeName("deleteClusterElementParameter_request")
+@JsonTypeName("deleteWorkflowNodeParameter_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-21T12:06:41.161145+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
-public class DeleteClusterElementParameterRequestModel {
-
-  private Boolean fromAiInMetadata = false;
+public class DeleteWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
 
   private String path;
 
-  public DeleteClusterElementParameterRequestModel() {
+  public DeleteWorkflowNodeParameterRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public DeleteClusterElementParameterRequestModel(String path) {
+  public DeleteWorkflowNodeParameterRequestModel(String path) {
     this.path = path;
   }
 
-  public DeleteClusterElementParameterRequestModel fromAiInMetadata(Boolean fromAiInMetadata) {
-    this.fromAiInMetadata = fromAiInMetadata;
-    return this;
-  }
-
-  /**
-   * If fromAi should be included in metadata.
-   * @return fromAiInMetadata
-   */
-  
-  @Schema(name = "fromAiInMetadata", description = "If fromAi should be included in metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("fromAiInMetadata")
-  public Boolean getFromAiInMetadata() {
-    return fromAiInMetadata;
-  }
-
-  public void setFromAiInMetadata(Boolean fromAiInMetadata) {
-    this.fromAiInMetadata = fromAiInMetadata;
-  }
-
-  public DeleteClusterElementParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
+  public DeleteWorkflowNodeParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
     this.includeInMetadata = includeInMetadata;
     return this;
   }
@@ -81,7 +59,7 @@ public class DeleteClusterElementParameterRequestModel {
     this.includeInMetadata = includeInMetadata;
   }
 
-  public DeleteClusterElementParameterRequestModel path(String path) {
+  public DeleteWorkflowNodeParameterRequestModel path(String path) {
     this.path = path;
     return this;
   }
@@ -109,22 +87,20 @@ public class DeleteClusterElementParameterRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DeleteClusterElementParameterRequestModel deleteClusterElementParameterRequest = (DeleteClusterElementParameterRequestModel) o;
-    return Objects.equals(this.fromAiInMetadata, deleteClusterElementParameterRequest.fromAiInMetadata) &&
-        Objects.equals(this.includeInMetadata, deleteClusterElementParameterRequest.includeInMetadata) &&
-        Objects.equals(this.path, deleteClusterElementParameterRequest.path);
+    DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequest = (DeleteWorkflowNodeParameterRequestModel) o;
+    return Objects.equals(this.includeInMetadata, deleteWorkflowNodeParameterRequest.includeInMetadata) &&
+        Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromAiInMetadata, includeInMetadata, path);
+    return Objects.hash(includeInMetadata, path);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class DeleteClusterElementParameterRequestModel {\n");
-    sb.append("    fromAiInMetadata: ").append(toIndentedString(fromAiInMetadata)).append("\n");
+    sb.append("class DeleteWorkflowNodeParameterRequestModel {\n");
     sb.append("    includeInMetadata: ").append(toIndentedString(includeInMetadata)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("}");
