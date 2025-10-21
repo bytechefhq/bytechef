@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys */
 import {Meta, StoryObj} from '@storybook/react';
 import {CircleIcon, Download, PlusIcon, Save, SaveIcon, Settings, Trash2, XIcon} from 'lucide-react';
 
@@ -39,6 +38,7 @@ const customContent = {
 
 const meta = {
     title: 'Components/Button',
+    // eslint-disable-next-line sort-keys
     component: Button,
     parameters: {
         controls: {
@@ -52,6 +52,7 @@ const meta = {
         },
         layout: 'centered',
     },
+    // eslint-disable-next-line sort-keys
     argTypes: {
         children: {
             control: {type: 'select'},
@@ -97,7 +98,7 @@ const meta = {
             control: {type: 'select'},
             description:
                 'Size variant of the button - icon sizes are to be used along with the `icon` prop and **cannot** be used with label or custom content.',
-            options: ['xxs', 'xs', 'sm', 'default', 'lg', ...ICON_SIZES],
+            options: ['lg', 'default', 'sm', 'xs', 'xxs', ...ICON_SIZES],
             table: {
                 type: {summary: 'string'},
             },
@@ -120,6 +121,21 @@ const meta = {
             },
         },
     },
+    decorators: [
+        (Story, context) => {
+            const {variant} = context.args;
+
+            const isDestructiveOutlineVariant = variant === 'destructiveOutline';
+
+            return isDestructiveOutlineVariant ? (
+                <div className={'rounded-md bg-surface-destructive-primary p-1.5'}>
+                    <Story />
+                </div>
+            ) : (
+                <Story />
+            );
+        },
+    ],
     tags: ['autodocs'],
 } satisfies Meta<typeof Button>;
 
@@ -128,15 +144,13 @@ export default meta;
 type Story = StoryObj<typeof Button>;
 
 export const DefaultButton: Story = {
-    render: (args) => <Button {...args} />,
-
     args: {
+        children: undefined,
+        disabled: false,
+        icon: undefined,
+        label: 'Label 1',
         size: 'default',
         variant: 'default',
-        label: 'Label 1',
-        children: undefined,
-        icon: undefined,
-        disabled: false,
     },
     parameters: {
         docs: {
@@ -145,9 +159,17 @@ export const DefaultButton: Story = {
             },
         },
     },
+    render: (args) => <Button {...args} />,
 };
 
 export const TextButtonSizeVariants: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Different size variants of the button component that can be used either with label or with custom content, and can be used with or without an icon.',
+            },
+        },
+    },
     render: () => (
         <div className="flex items-center gap-4">
             <Button label="Large" size="lg" />
@@ -161,16 +183,16 @@ export const TextButtonSizeVariants: Story = {
             <Button label="xxs" size="xxs" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'Different size variants of the button component that can be used either with label or with custom content, and can be used with or without an icon.',
-            },
-        },
-    },
 };
 
 export const IconButtonSizeVariants: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Icon button size variants that are to be used without label or custom content and always with an icon.',
+            },
+        },
+    },
     render: () => (
         <div className="flex items-center gap-4">
             <Button icon={<CircleIcon />} size="icon" />
@@ -182,16 +204,16 @@ export const IconButtonSizeVariants: Story = {
             <Button icon={<CircleIcon />} size="iconXxs" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'Icon button size variants that are to be used without label or custom content and always with an icon.',
-            },
-        },
-    },
 };
 
 export const TextButtonStyleVariants: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'All text button styles available through the variant prop.',
+            },
+        },
+    },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
             <Button label="Default" size="sm" variant="default" />
@@ -213,16 +235,16 @@ export const TextButtonStyleVariants: Story = {
             <Button label="Link" size="sm" variant="link" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'All text button styles available through the variant prop.',
-            },
-        },
-    },
 };
 
 export const IconButtonStyleVariants: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'All icon button styles available through the variant prop.',
+            },
+        },
+    },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
             <Button icon={<CircleIcon />} size="icon" variant="default" />
@@ -244,16 +266,16 @@ export const IconButtonStyleVariants: Story = {
             <Button icon={<CircleIcon />} size="icon" variant="link" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'All icon button styles available through the variant prop.',
-            },
-        },
-    },
 };
 
 export const TextButtonsWithDifferentIcons: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Different sizes and variants of text buttons with various icons passed as a prop.',
+            },
+        },
+    },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
             <Button icon={<Save />} label="Save" size="lg" />
@@ -267,16 +289,16 @@ export const TextButtonsWithDifferentIcons: Story = {
             <Button icon={<Settings />} label="Settings" size="xxs" variant="outline" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'Different sizes and variants of text buttons with various icons passed as a prop.',
-            },
-        },
-    },
 };
 
 export const TextButtonsDisabledStates: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Disabled state for different text button variants.',
+            },
+        },
+    },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
             <Button disabled label="Default" />
@@ -298,16 +320,16 @@ export const TextButtonsDisabledStates: Story = {
             <Button disabled label="Link" variant="link" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'Disabled state for different text button variants.',
-            },
-        },
-    },
 };
 
 export const IconButtonsDisabledStates: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Disabled state for different icon button variants.',
+            },
+        },
+    },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
             <Button disabled icon={<CircleIcon />} />
@@ -329,11 +351,4 @@ export const IconButtonsDisabledStates: Story = {
             <Button disabled icon={<CircleIcon />} variant="link" />
         </div>
     ),
-    parameters: {
-        docs: {
-            description: {
-                story: 'Disabled state for different icon button variants.',
-            },
-        },
-    },
 };
