@@ -16,61 +16,54 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UpdateClusterElementParameterRequest
+ * @interface UpdateWorkflowNodeParameterRequest
  */
-export interface UpdateClusterElementParameterRequest {
-    /**
-     * If fromAi should be included in metadata.
-     * @type {boolean}
-     * @memberof UpdateClusterElementParameterRequest
-     */
-    fromAiInMetadata?: boolean;
+export interface UpdateWorkflowNodeParameterRequest {
     /**
      * If path and value type should be included in metadata.
      * @type {boolean}
-     * @memberof UpdateClusterElementParameterRequest
+     * @memberof UpdateWorkflowNodeParameterRequest
      */
     includeInMetadata?: boolean;
     /**
      * The workflow node parameter path.
      * @type {string}
-     * @memberof UpdateClusterElementParameterRequest
+     * @memberof UpdateWorkflowNodeParameterRequest
      */
     path: string;
     /**
      * The type of a property.
      * @type {string}
-     * @memberof UpdateClusterElementParameterRequest
+     * @memberof UpdateWorkflowNodeParameterRequest
      */
     type: string;
     /**
      * The value.
      * @type {object}
-     * @memberof UpdateClusterElementParameterRequest
+     * @memberof UpdateWorkflowNodeParameterRequest
      */
     value?: object;
 }
 
 /**
- * Check if a given object implements the UpdateClusterElementParameterRequest interface.
+ * Check if a given object implements the UpdateWorkflowNodeParameterRequest interface.
  */
-export function instanceOfUpdateClusterElementParameterRequest(value: object): value is UpdateClusterElementParameterRequest {
+export function instanceOfUpdateWorkflowNodeParameterRequest(value: object): value is UpdateWorkflowNodeParameterRequest {
     if (!('path' in value) || value['path'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
 
-export function UpdateClusterElementParameterRequestFromJSON(json: any): UpdateClusterElementParameterRequest {
-    return UpdateClusterElementParameterRequestFromJSONTyped(json, false);
+export function UpdateWorkflowNodeParameterRequestFromJSON(json: any): UpdateWorkflowNodeParameterRequest {
+    return UpdateWorkflowNodeParameterRequestFromJSONTyped(json, false);
 }
 
-export function UpdateClusterElementParameterRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateClusterElementParameterRequest {
+export function UpdateWorkflowNodeParameterRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateWorkflowNodeParameterRequest {
     if (json == null) {
         return json;
     }
     return {
         
-        'fromAiInMetadata': json['fromAiInMetadata'] == null ? undefined : json['fromAiInMetadata'],
         'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
         'type': json['type'],
@@ -78,18 +71,17 @@ export function UpdateClusterElementParameterRequestFromJSONTyped(json: any, ign
     };
 }
 
-export function UpdateClusterElementParameterRequestToJSON(json: any): UpdateClusterElementParameterRequest {
-    return UpdateClusterElementParameterRequestToJSONTyped(json, false);
+export function UpdateWorkflowNodeParameterRequestToJSON(json: any): UpdateWorkflowNodeParameterRequest {
+    return UpdateWorkflowNodeParameterRequestToJSONTyped(json, false);
 }
 
-export function UpdateClusterElementParameterRequestToJSONTyped(value?: UpdateClusterElementParameterRequest | null, ignoreDiscriminator: boolean = false): any {
+export function UpdateWorkflowNodeParameterRequestToJSONTyped(value?: UpdateWorkflowNodeParameterRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'fromAiInMetadata': value['fromAiInMetadata'],
         'includeInMetadata': value['includeInMetadata'],
         'path': value['path'],
         'type': value['type'],
