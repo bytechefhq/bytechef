@@ -3330,6 +3330,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -3413,7 +3414,8 @@
       "multipleElements": true,
       "name": "TOOLS",
       "required": false
-    }
+    },
+    "workflowNodeDescription": null
   }, {
     "description": "Creates a new issue.",
     "element": { },
@@ -3601,6 +3603,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -3778,7 +3781,8 @@
       "multipleElements": true,
       "name": "TOOLS",
       "required": false
-    }
+    },
+    "workflowNodeDescription": null
   }, {
     "description": "Adds a comment to an issue.",
     "element": { },
@@ -4666,6 +4670,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -4746,7 +4751,8 @@
       "multipleElements": true,
       "name": "TOOLS",
       "required": false
-    }
+    },
+    "workflowNodeDescription": null
   }, {
     "description": "Get issue details in selected project.",
     "element": { },
@@ -5530,6 +5536,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "SELECT",
@@ -5588,7 +5595,8 @@
       "multipleElements": true,
       "name": "TOOLS",
       "required": false
-    }
+    },
+    "workflowNodeDescription": null
   }, {
     "description": "Search for issues using JQL",
     "element": { },
@@ -6414,6 +6422,7 @@
       },
       "sampleOutput": null
     },
+    "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
       "controlType": "TEXT",
@@ -6463,7 +6472,8 @@
       "multipleElements": true,
       "name": "TOOLS",
       "required": false
-    }
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "label": "Project Management",
