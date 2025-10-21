@@ -68,7 +68,8 @@ public class GoogleDriveUtils {
         String nextPageToken = null;
 
         do {
-            FileList fileList = null;
+            FileList fileList;
+
             try {
                 fileList = drive.files()
                     .list()
@@ -99,5 +100,4 @@ public class GoogleDriveUtils {
 
         return fetchAllFiles(connectionParameters, query);
     }
-
 }
