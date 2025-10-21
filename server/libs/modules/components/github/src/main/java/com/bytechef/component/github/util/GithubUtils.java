@@ -84,8 +84,7 @@ public class GithubUtils {
     }
 
     public static String getOwnerName(Context context) {
-        Map<String, Object> body = context
-            .http(http -> http.get("/user"))
+        Map<String, Object> body = context.http(http -> http.get("/user"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -116,9 +115,9 @@ public class GithubUtils {
 
     public static List<Map<?, ?>> getRepositoryIssues(Parameters inputParameters, Context context) {
         List<Map<?, ?>> issues = new ArrayList<>();
-
         String url = "/repos/%s/%s/issues".formatted(
             inputParameters.getString(OWNER, getOwnerName(context)), inputParameters.getRequiredString(REPOSITORY));
+
         List<Map<String, ?>> items = getItems(context, url, "state", "open");
 
         for (Map<String, ?> item : items) {
@@ -145,21 +144,20 @@ public class GithubUtils {
                 allQueryParameters.addAll(Arrays.asList(queryParameters));
             }
 
-            Http.Response response = context
-                .http(http -> http.get(url))
+            Http.Response response = context.http(http -> http.get(url))
                 .queryParameters(allQueryParameters.toArray())
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute();
 
             items.addAll(response.getBody(new TypeReference<>() {}));
 
-            List<String> header = response.getHeader("link");
-            if (header != null && !header.isEmpty()) {
-                String link = header.getFirst();
+            List<String> linkHeader = response.getHeader("link");
+
+            if (linkHeader != null && !linkHeader.isEmpty()) {
+                String link = linkHeader.getFirst();
 
                 hasMoreItems = link != null && link.contains("rel=\"next\"");
             }
-
         } while (hasMoreItems);
 
         return items;

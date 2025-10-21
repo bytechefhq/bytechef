@@ -234,8 +234,9 @@ public class GithubEventsTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         context.http(
-            http -> http.delete("/repos/" + getOwnerName(context) + "/"
-                + inputParameters.getRequiredString(REPOSITORY) + "/hooks/" + outputParameters.getInteger(ID)))
+            http -> http.delete(
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/hooks/" +
+                    outputParameters.getInteger(ID)))
             .execute();
     }
 

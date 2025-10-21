@@ -78,7 +78,7 @@ public class GithubListIssuesAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return getItems(
-            context, "/issues",
-            FILTER, inputParameters.getRequiredString(FILTER), STATE, inputParameters.getRequiredString(STATE));
+            context, "/issues", FILTER, inputParameters.getRequiredString(FILTER), STATE,
+            inputParameters.getRequiredString(STATE));
     }
 }
