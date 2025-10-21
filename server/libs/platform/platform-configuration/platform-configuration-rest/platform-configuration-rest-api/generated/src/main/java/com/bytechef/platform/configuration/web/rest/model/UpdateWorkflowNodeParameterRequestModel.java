@@ -17,14 +17,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * UpdateClusterElementParameterRequestModel
+ * UpdateWorkflowNodeParameterRequestModel
  */
 
-@JsonTypeName("updateClusterElementParameter_request")
+@JsonTypeName("updateWorkflowNodeParameter_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-21T12:06:41.161145+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
-public class UpdateClusterElementParameterRequestModel {
-
-  private Boolean fromAiInMetadata = false;
+public class UpdateWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
 
@@ -34,39 +32,19 @@ public class UpdateClusterElementParameterRequestModel {
 
   private @Nullable Object value;
 
-  public UpdateClusterElementParameterRequestModel() {
+  public UpdateWorkflowNodeParameterRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public UpdateClusterElementParameterRequestModel(String path, String type) {
+  public UpdateWorkflowNodeParameterRequestModel(String path, String type) {
     this.path = path;
     this.type = type;
   }
 
-  public UpdateClusterElementParameterRequestModel fromAiInMetadata(Boolean fromAiInMetadata) {
-    this.fromAiInMetadata = fromAiInMetadata;
-    return this;
-  }
-
-  /**
-   * If fromAi should be included in metadata.
-   * @return fromAiInMetadata
-   */
-  
-  @Schema(name = "fromAiInMetadata", description = "If fromAi should be included in metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("fromAiInMetadata")
-  public Boolean getFromAiInMetadata() {
-    return fromAiInMetadata;
-  }
-
-  public void setFromAiInMetadata(Boolean fromAiInMetadata) {
-    this.fromAiInMetadata = fromAiInMetadata;
-  }
-
-  public UpdateClusterElementParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
+  public UpdateWorkflowNodeParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
     this.includeInMetadata = includeInMetadata;
     return this;
   }
@@ -86,7 +64,7 @@ public class UpdateClusterElementParameterRequestModel {
     this.includeInMetadata = includeInMetadata;
   }
 
-  public UpdateClusterElementParameterRequestModel path(String path) {
+  public UpdateWorkflowNodeParameterRequestModel path(String path) {
     this.path = path;
     return this;
   }
@@ -106,7 +84,7 @@ public class UpdateClusterElementParameterRequestModel {
     this.path = path;
   }
 
-  public UpdateClusterElementParameterRequestModel type(String type) {
+  public UpdateWorkflowNodeParameterRequestModel type(String type) {
     this.type = type;
     return this;
   }
@@ -126,7 +104,7 @@ public class UpdateClusterElementParameterRequestModel {
     this.type = type;
   }
 
-  public UpdateClusterElementParameterRequestModel value(@Nullable Object value) {
+  public UpdateWorkflowNodeParameterRequestModel value(@Nullable Object value) {
     this.value = value;
     return this;
   }
@@ -154,24 +132,22 @@ public class UpdateClusterElementParameterRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateClusterElementParameterRequestModel updateClusterElementParameterRequest = (UpdateClusterElementParameterRequestModel) o;
-    return Objects.equals(this.fromAiInMetadata, updateClusterElementParameterRequest.fromAiInMetadata) &&
-        Objects.equals(this.includeInMetadata, updateClusterElementParameterRequest.includeInMetadata) &&
-        Objects.equals(this.path, updateClusterElementParameterRequest.path) &&
-        Objects.equals(this.type, updateClusterElementParameterRequest.type) &&
-        Objects.equals(this.value, updateClusterElementParameterRequest.value);
+    UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequest = (UpdateWorkflowNodeParameterRequestModel) o;
+    return Objects.equals(this.includeInMetadata, updateWorkflowNodeParameterRequest.includeInMetadata) &&
+        Objects.equals(this.path, updateWorkflowNodeParameterRequest.path) &&
+        Objects.equals(this.type, updateWorkflowNodeParameterRequest.type) &&
+        Objects.equals(this.value, updateWorkflowNodeParameterRequest.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromAiInMetadata, includeInMetadata, path, type, value);
+    return Objects.hash(includeInMetadata, path, type, value);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateClusterElementParameterRequestModel {\n");
-    sb.append("    fromAiInMetadata: ").append(toIndentedString(fromAiInMetadata)).append("\n");
+    sb.append("class UpdateWorkflowNodeParameterRequestModel {\n");
     sb.append("    includeInMetadata: ").append(toIndentedString(includeInMetadata)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");

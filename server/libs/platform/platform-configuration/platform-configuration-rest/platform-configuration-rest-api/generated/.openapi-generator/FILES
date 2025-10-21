@@ -39,6 +39,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameter200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameterRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
@@ -75,6 +76,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefiniti
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UnifiedApiCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateClusterElementParameterRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ValuePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowFormatModel.java
