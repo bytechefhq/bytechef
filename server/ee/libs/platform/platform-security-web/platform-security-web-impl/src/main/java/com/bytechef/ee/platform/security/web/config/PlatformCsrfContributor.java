@@ -12,6 +12,7 @@ import static org.springframework.security.web.util.matcher.RegexRequestMatcher.
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.CsrfContributor;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,9 @@ public class PlatformCsrfContributor implements CsrfContributor {
 
     @Override
     public List<RequestMatcher> getIgnoringRequestMatchers() {
-        return List.of(regexMatcher("^/api/platform/v[0-9]+/.+"));
+        return List.of(
+            regexMatcher("^/api/platform/v[0-9]+/.+"),
+            // For CORS requests
+            request -> Objects.equals(request.getMethod(), "OPTIONS"));
     }
 }
