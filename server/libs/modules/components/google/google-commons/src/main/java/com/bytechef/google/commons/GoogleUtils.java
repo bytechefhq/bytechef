@@ -115,8 +115,8 @@ public class GoogleUtils {
             mimeType, isEqualMimetype, connectionParameters);
     }
 
-    public static OptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
-        String mimeType, boolean isEqualMimetype) {
+    public static com.bytechef.component.definition.TriggerDefinition.OptionsFunction<String>
+        getFileOptionsByMimeTypeForTriggers(String mimeType, boolean isEqualMimetype) {
 
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> getFileOptions(
             mimeType, isEqualMimetype, connectionParameters);
