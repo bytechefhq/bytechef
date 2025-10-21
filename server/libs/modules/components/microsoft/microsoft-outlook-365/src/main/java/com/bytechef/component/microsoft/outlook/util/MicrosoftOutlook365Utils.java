@@ -62,14 +62,14 @@ public class MicrosoftOutlook365Utils {
             return null;
         }
 
-        return recipients
-            .stream()
+        return recipients.stream()
             .map(recipient -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, recipient)))
             .toList();
     }
 
     public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody, String id) {
         String from = null;
+
         if (messageBody.get(FROM) instanceof Map<?, ?> fromMap &&
             fromMap.get(EMAIL_ADDRESS) instanceof Map<?, ?> emailAddressMap) {
 
@@ -77,22 +77,16 @@ public class MicrosoftOutlook365Utils {
         }
 
         String bodyHtml = null;
+
         if (messageBody.get(BODY) instanceof Map<?, ?> map) {
             bodyHtml = (String) map.get(CONTENT);
         }
 
         return new SimpleMessage(
-            (String) messageBody.get(ID),
-            (String) messageBody.get("conversationId"),
-            (String) messageBody.get(SUBJECT),
-            from,
-            getRecipients(messageBody, TO_RECIPIENTS),
-            getRecipients(messageBody, CC_RECIPIENTS),
-            getRecipients(messageBody, BCC_RECIPIENTS),
-            (String) messageBody.get("bodyPreview"),
-            bodyHtml,
-            getFileEntries(context, id),
-            (String) messageBody.get("webLink"));
+            (String) messageBody.get(ID), (String) messageBody.get("conversationId"), (String) messageBody.get(SUBJECT),
+            from, getRecipients(messageBody, TO_RECIPIENTS), getRecipients(messageBody, CC_RECIPIENTS),
+            getRecipients(messageBody, BCC_RECIPIENTS), (String) messageBody.get("bodyPreview"), bodyHtml,
+            getFileEntries(id, context), (String) messageBody.get("webLink"));
     }
 
     public static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
@@ -125,7 +119,7 @@ public class MicrosoftOutlook365Utils {
         return body.get(VALUE);
     }
 
-    private static List<FileEntry> getFileEntries(Context context, String id) {
+    private static List<FileEntry> getFileEntries(String id, Context context) {
         List<FileEntry> fileEntries = new ArrayList<>();
 
         Map<String, Object> attachmentsBody = context
