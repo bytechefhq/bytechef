@@ -16,7 +16,9 @@
 
 package com.bytechef.component.jira.action;
 
+import static com.bytechef.component.jira.constant.JiraConstants.ACCOUNT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -38,12 +39,11 @@ class JiraAssignIssueActionTest {
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of("accountId", "1"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ACCOUNT_ID, "1"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        boolean response = false;
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -52,16 +52,14 @@ class JiraAssignIssueActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(response);
 
-        Object result = JiraAssignIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Boolean result = JiraAssignIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals(response, result);
+        assertFalse(result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Object> expectedBody = Map.of("accountId", "1");
+        Map<String, Object> expectedBody = Map.of(ACCOUNT_ID, "1");
 
         assertEquals(expectedBody, body.getContent());
     }

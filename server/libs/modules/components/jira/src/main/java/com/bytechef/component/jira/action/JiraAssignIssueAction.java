@@ -26,8 +26,9 @@ import static com.bytechef.component.jira.constant.JiraConstants.ACCOUNT_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
 import java.util.Map;
@@ -44,18 +45,18 @@ public class JiraAssignIssueAction {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue that will be assigned.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(ACCOUNT_ID)
                 .label("Account ID")
                 .description("ID of the account user who will be assigned the issue.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true))
         .output(
@@ -65,12 +66,11 @@ public class JiraAssignIssueAction {
                         bool("assigned"))))
         .perform(JiraAssignIssueAction::perform);
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.put("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/assignee"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(
-                Map.of("accountId", inputParameters.getRequiredString(ACCOUNT_ID))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(Map.of("accountId", inputParameters.getRequiredString(ACCOUNT_ID))))
             .execute()
             .getStatusCode() == 204;
     }
