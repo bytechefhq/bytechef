@@ -254,12 +254,7 @@ const DialogContent = ({
             {!workflowsView && <p>{integration.description}</p>}
 
             {!workflowsView && form && (
-                <form
-                    id="form"
-                    onSubmit={(event) => {
-                        form.handleSubmit(() => {})(event);
-                    }}
-                >
+                <form id="form">
                     {properties?.map((property) => {
                         const field = form.register(property.name);
 
@@ -307,8 +302,7 @@ const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: Di
         )}
 
         {!workflowsView && (
-            // TODO: Refactor form.submit/handleClick so we don't use both
-            <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
+            <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button">
                 {isOAuth2 ? (
                     <span>
                         Authorize
