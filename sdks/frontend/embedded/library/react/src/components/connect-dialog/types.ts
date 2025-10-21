@@ -39,6 +39,7 @@ export interface IntegrationInstanceWorkflowType {
 }
 
 export interface IntegrationWorkflowType {
+    enabled?: boolean;
     inputs?: WorkflowInputType[];
     label?: string;
     workflowUuid: string;
