@@ -18,7 +18,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useState,useRef, useCallback} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
@@ -42,28 +42,28 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
 
     const deleteProjectDeploymentMutation = useDeleteProjectDeploymentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ProjectDeploymentKeys.projectDeployments });
-            queryClient.invalidateQueries({ queryKey: ProjectDeploymentTagKeys.projectDeploymentTags });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
         },
     });
 
     const updateProjectDeploymentTagsMutation = useUpdateProjectDeploymentTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ProjectDeploymentKeys.projectDeployments });
-            queryClient.invalidateQueries({ queryKey: ProjectDeploymentTagKeys.projectDeploymentTags });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
         },
     });
 
     const enableProjectDeploymentMutation = useEnableProjectDeploymentMutation({
         onSuccess: () => {
             captureProjectDeploymentEnabled();
-            queryClient.invalidateQueries({ queryKey: ProjectDeploymentKeys.projectDeployments });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
         },
     });
 
     const handleOnCheckedChange = (value: boolean) => {
         enableProjectDeploymentMutation.mutate(
-            { enable: value, id: projectDeployment.id! },
+            {enable: value, id: projectDeployment.id!},
             {
                 onSuccess: () => {
                     setProjectDeploymentEnabled(projectDeployment.id!, !projectDeployment.enabled);
@@ -73,13 +73,11 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         );
     };
 
-    // New: Ref to CollapsibleTrigger
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const handleCardClick = useCallback((event: React.MouseEvent) => {
         const target = event.target as HTMLElement;
 
-        // Prevent opening workflow when clicking interactive elements
         const interactiveSelectors = [
             '[data-interactive]',
             '.dropdown-menu-item',
@@ -99,8 +97,8 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     return (
         <>
             <div
-                className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50 cursor-pointer"
-                onClick={handleCardClick} // <-- make whole card clickable
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                onClick={handleCardClick}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
@@ -111,6 +109,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                         <TooltipTrigger>
                                             <span className="text-base font-semibold">{projectDeployment.name}</span>
                                         </TooltipTrigger>
+
                                         <TooltipContent>{projectDeployment.description}</TooltipContent>
                                     </Tooltip>
                                 ) : (
@@ -122,14 +121,15 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
-                                    ref={workflowsCollapsibleTriggerRef} // <-- ref here
                                     className="group mr-4 flex text-xs font-semibold text-muted-foreground"
+                                    ref={workflowsCollapsibleTriggerRef} // <-- ref here
                                 >
                                     <span className="mr-1">
                                         {projectDeployment.projectDeploymentWorkflows?.length === 1
                                             ? `1 workflow`
                                             : `${projectDeployment.projectDeploymentWorkflows?.length} workflows`}
                                     </span>
+
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
@@ -138,7 +138,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequest: { tags: tags || [] },
+                                                updateTagsRequest: {tags: tags || []},
                                             })}
                                             id={projectDeployment.id!}
                                             remainingTags={remainingTags}
@@ -156,6 +156,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                             <TooltipTrigger asChild>
                                 <Badge variant="secondary">V{projectDeployment.projectVersion}</Badge>
                             </TooltipTrigger>
+
                             <TooltipContent>The project version</TooltipContent>
                         </Tooltip>
 
@@ -164,6 +165,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                 <TooltipTrigger asChild>
                                     <EnvironmentBadge environmentId={projectDeployment.environmentId!} />
                                 </TooltipTrigger>
+
                                 <TooltipContent>The environment</TooltipContent>
                             </Tooltip>
                         </div>
@@ -171,11 +173,12 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <div className="flex items-center">
                                 {enableProjectDeploymentMutation.isPending && <LoadingIcon />}
+
                                 <Switch
                                     checked={projectDeployment.enabled}
                                     disabled={enableProjectDeploymentMutation.isPending}
                                     onCheckedChange={handleOnCheckedChange}
-                                    onClick={(e) => e.stopPropagation()} // preserve switch
+                                    onClick={(event) => event.stopPropagation()}
                                 />
                             </div>
 
@@ -189,21 +192,16 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                         <span className="text-xs">No executions</span>
                                     )}
                                 </TooltipTrigger>
+
                                 <TooltipContent>Last Execution Date</TooltipContent>
                             </Tooltip>
                         </div>
 
-                      <ProjectDeploymentListItemDropdownMenu
-    onDeleteClick={() => {
-        setShowDeleteDialog(true);
-    }}
-    onEditClick={() => {
-        setShowEditDialog(true);
-    }}
-    onUpdateProjectVersionClick={() => {
-        setShowUpdateProjectVersionDialog(true);
-    }}
-/>
+                        <ProjectDeploymentListItemDropdownMenu
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditDialog(true)}
+                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
+                        />
                     </div>
                 </div>
             </div>
@@ -213,7 +211,9 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     isPending={deleteProjectDeploymentMutation.isPending}
                     onCancelClick={() => setShowDeleteDialog(false)}
                     onDeleteClick={() => {
-                        if (projectDeployment.id) deleteProjectDeploymentMutation.mutate(projectDeployment.id);
+                        if (projectDeployment.id) {
+                            deleteProjectDeploymentMutation.mutate(projectDeployment.id);
+                        }
                     }}
                 />
             )}
