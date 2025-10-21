@@ -26,9 +26,9 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.updateEvent;
+import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;

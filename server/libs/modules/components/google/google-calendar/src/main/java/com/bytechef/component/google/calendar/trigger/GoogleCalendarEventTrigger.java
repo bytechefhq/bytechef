@@ -41,6 +41,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Channel;
@@ -136,7 +137,7 @@ public class GoogleCalendarEventTrigger {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        String calendarTimezone = GoogleCalendarUtils.getCalendarTimezone(calendar);
+        String calendarTimezone = GoogleUtils.getCalendarTimezone(calendar);
 
         List<Event> events;
         try {
