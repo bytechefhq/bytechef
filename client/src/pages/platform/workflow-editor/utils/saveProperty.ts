@@ -2,7 +2,7 @@ import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
     DeleteClusterElementParameter200Response,
     UpdateClusterElementParameterOperationRequest,
-    UpdateWorkflowNodeParameterRequest,
+    UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 
@@ -24,7 +24,7 @@ interface SavePropertyProps {
     updateWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response & {workflowNodeName?: string},
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterOperationRequest,
         unknown
     >;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -98,7 +98,7 @@ export default function saveProperty({
         {
             environmentId: environmentStore.getState().currentEnvironmentId,
             id: workflowId,
-            updateClusterElementParameterRequest: {
+            updateWorkflowNodeParameterRequest: {
                 includeInMetadata,
                 path: decodedPath,
                 type,

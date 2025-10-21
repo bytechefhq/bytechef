@@ -2,7 +2,7 @@ import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
-    DeleteWorkflowNodeParameterRequest,
+    DeleteWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 
@@ -16,7 +16,7 @@ export default function deleteProperty(
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterOperationRequest,
         unknown
     >,
     deleteClusterElementParameterMutation?: UseMutationResult<
@@ -73,7 +73,7 @@ export default function deleteProperty(
 
     deleteWorkflowNodeParameterMutation.mutate(
         {
-            deleteClusterElementParameterRequest: {
+            deleteWorkflowNodeParameterRequest: {
                 includeInMetadata,
                 path,
             },
