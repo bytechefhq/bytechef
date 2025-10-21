@@ -22,6 +22,7 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -36,10 +37,16 @@ import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponseException;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -50,12 +57,17 @@ import org.mockito.MockedStatic;
  */
 class GoogleUtilsTest {
 
-    private final ArgumentCaptor<String> fileIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final Context mockedContext = mock(Context.class);
     private final Drive.Files.Copy mockedCopy = mock(Drive.Files.Copy.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
+    private final Calendar mockedCalendar = mock(Calendar.class);
+    private final Calendar.Settings mockedSettings = mock(Calendar.Settings.class);
+    private final Calendar.Settings.List mockedSettingsList = mock(Calendar.Settings.List.class);
 
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", FOLDER_ID, "newFolderId"));
@@ -68,7 +80,7 @@ class GoogleUtilsTest {
     void testCopyFileOnGoogleDrive() throws IOException {
         when(mockedDrive.files())
             .thenReturn(mockedFiles);
-        when(mockedFiles.get(fileIdArgumentCaptor.capture()))
+        when(mockedFiles.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedGet);
         when(mockedGet.execute())
             .thenReturn(testFile);
@@ -91,6 +103,91 @@ class GoogleUtilsTest {
             assertEquals(Collections.singletonList("newFolderId"), resultFile.getParents());
             assertEquals("application/pdf", resultFile.getMimeType());
         }
+    }
+
+    @Test
+    void testFetchAllFiles() throws IOException {
+        when(mockedDrive.files())
+            .thenReturn(mockedFiles);
+        when(mockedFiles.list())
+            .thenReturn(mockedList);
+        when(mockedList.setQ(stringArgumentCaptor.capture()))
+            .thenReturn(mockedList);
+        when(mockedList.setPageSize(integerArgumentCaptor.capture()))
+            .thenReturn(mockedList);
+        when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+            .thenReturn(mockedList);
+        when(mockedList.execute())
+            .thenReturn(new FileList().setFiles(List.of(testFile))
+                .setNextPageToken(null));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(mockedParameters))
+                .thenReturn(mockedDrive);
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add("query");
+            strings.add(null);
+
+            List<File> files = GoogleUtils.fetchAllFiles(mockedParameters, "query");
+
+            assertEquals(List.of(testFile), files);
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(1000, integerArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void testGetCalendarTimezoneThrowsExceptionIfNotFound() throws IOException {
+        Settings settings = new Settings()
+            .setItems(List.of(new Setting().setId("other")
+                .setValue("value")))
+            .setNextPageToken(null);
+
+        when(mockedCalendar.settings())
+            .thenReturn(mockedSettings);
+        when(mockedSettings.list())
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.setMaxResults(integerArgumentCaptor.capture()))
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.setPageToken(stringArgumentCaptor.capture()))
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.execute())
+            .thenReturn(settings);
+
+        ProviderException exception = assertThrows(
+            ProviderException.class, () -> GoogleUtils.getCalendarTimezone(mockedCalendar));
+
+        assertEquals("Timezone setting not found.", exception.getMessage());
+        assertNull(stringArgumentCaptor.getValue());
+        assertEquals(250, integerArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetCalendarTimezone() throws IOException {
+        Settings settings = new Settings()
+            .setItems(List.of(new Setting().setId("timezone")
+                .setValue("test timezone")))
+            .setNextPageToken(null);
+
+        when(mockedCalendar.settings())
+            .thenReturn(mockedSettings);
+        when(mockedSettings.list())
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.setMaxResults(integerArgumentCaptor.capture()))
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.setPageToken(stringArgumentCaptor.capture()))
+            .thenReturn(mockedSettingsList);
+        when(mockedSettingsList.execute())
+            .thenReturn(settings);
+
+        String calendarTimezone = GoogleUtils.getCalendarTimezone(mockedCalendar);
+
+        assertEquals("test timezone", calendarTimezone);
+        assertNull(stringArgumentCaptor.getValue());
+        assertEquals(250, integerArgumentCaptor.getValue());
     }
 
     @Test

@@ -25,7 +25,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -40,7 +39,7 @@ class GoogleDriveNewFolderTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
-    void testPool() throws IOException {
+    void testPool() {
         try (MockedStatic<GoogleDriveUtils> googleDriveUtilsMockedStatic = mockStatic(GoogleDriveUtils.class)) {
             googleDriveUtilsMockedStatic
                 .when(() -> GoogleDriveUtils.getPollOutput(

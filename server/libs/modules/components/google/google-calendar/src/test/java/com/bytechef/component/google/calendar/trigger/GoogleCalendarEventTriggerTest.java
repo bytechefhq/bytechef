@@ -37,6 +37,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Channels;
@@ -169,13 +170,14 @@ class GoogleCalendarEventTriggerTest {
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
+            MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class);
             MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class)) {
             googleCalendarUtilsMockedStatic
                 .when(() -> GoogleCalendarUtils.createCustomEvent(
                     eventArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
-            googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
                 .thenReturn(timezone);
             googleServicesMockedStatic
                 .when(() -> GoogleCalendarUtils.convertLocalDateTimeToDateInTimezone(
@@ -210,8 +212,8 @@ class GoogleCalendarEventTriggerTest {
 
             assertEquals(event, eventArgumentCaptor.getValue());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(java.util.List.of("calendar_id", "updated", timezone, timezone),
-                stringArgumentCaptor.getAllValues());
+            assertEquals(
+                java.util.List.of("calendar_id", "updated", timezone, timezone), stringArgumentCaptor.getAllValues());
             assertEquals(true, booleanArgumentCaptor.getValue());
             assertEquals(new DateTime(java.sql.Timestamp.valueOf(localDateTime)), dateTimeArgumentCaptor.getValue());
             assertEquals(localDateTime, localDateTimeArgumentCaptor.getValue());
