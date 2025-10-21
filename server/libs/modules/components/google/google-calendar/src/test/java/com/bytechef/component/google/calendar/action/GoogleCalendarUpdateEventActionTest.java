@@ -28,10 +28,10 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,16 +56,17 @@ class GoogleCalendarUpdateEventActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() {
         String calendarTimezone = "Europe/Zagreb";
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
-            MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
+            MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
+            MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
 
             googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
-            googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
                 .thenReturn(calendarTimezone);
             googleCalendarUtilsMockedStatic
                 .when(() -> GoogleCalendarUtils.updateEvent(
@@ -87,8 +88,8 @@ class GoogleCalendarUpdateEventActionTest {
                 .thenReturn(new Event().setAttendees(objects)
                     .setSummary("summary"));
 
-            CustomEvent result =
-                GoogleCalendarUpdateEventAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            CustomEvent result = GoogleCalendarUpdateEventAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(mockedCustomEvent, result);
 
