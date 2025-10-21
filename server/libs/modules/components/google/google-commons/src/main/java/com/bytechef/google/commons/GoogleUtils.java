@@ -75,31 +75,6 @@ public class GoogleUtils {
         }
     }
 
-    public static OptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,
-            isEqualMimetype, connectionParameters);
-    }
-
-    public static OptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
-        String mimeType, boolean isEqualMimetype) {
-
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,
-            isEqualMimetype, connectionParameters);
-    }
-
-    private static List<Option<String>> getFileOptions(
-        String mimeType, boolean isEqualMimetype, Parameters connectionParameters) {
-
-        String operator = isEqualMimetype ? "=" : "!=";
-        String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
-
-        List<File> files = fetchAllFiles(connectionParameters, query);
-
-        return files.stream()
-            .map(folder -> option(folder.getName(), folder.getId()))
-            .collect(Collectors.toList());
-    }
-
     public static List<File> fetchAllFiles(Parameters connectionParameters, String query) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
@@ -135,28 +110,16 @@ public class GoogleUtils {
             .orElseThrow(() -> new ProviderException("Timezone setting not found."));
     }
 
-    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
-        List<Setting> allSettings = new ArrayList<>();
+    public static OptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> getFileOptions(
+            mimeType, isEqualMimetype, connectionParameters);
+    }
 
-        String nextPageToken = null;
+    public static OptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
+        String mimeType, boolean isEqualMimetype) {
 
-        do {
-            Settings settings;
-            try {
-                settings = calendar.settings()
-                    .list()
-                    .setMaxResults(250)
-                    .setPageToken(nextPageToken)
-                    .execute();
-            } catch (IOException e) {
-                throw translateGoogleIOException(e);
-            }
-
-            allSettings.addAll(settings.getItems());
-            nextPageToken = settings.getNextPageToken();
-        } while (nextPageToken != null);
-
-        return allSettings;
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> getFileOptions(
+            mimeType, isEqualMimetype, connectionParameters);
     }
 
     public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
@@ -183,5 +146,42 @@ public class GoogleUtils {
         }
 
         return new ProviderException(e);
+    }
+
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
+        List<Setting> allSettings = new ArrayList<>();
+
+        String nextPageToken = null;
+
+        do {
+            Settings settings;
+            try {
+                settings = calendar.settings()
+                    .list()
+                    .setMaxResults(250)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
+
+            allSettings.addAll(settings.getItems());
+            nextPageToken = settings.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allSettings;
+    }
+
+    private static List<Option<String>> getFileOptions(
+        String mimeType, boolean isEqualMimetype, Parameters connectionParameters) {
+
+        String operator = isEqualMimetype ? "=" : "!=";
+        String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
+
+        List<File> files = fetchAllFiles(connectionParameters, query);
+
+        return files.stream()
+            .map(folder -> option(folder.getName(), folder.getId()))
+            .collect(Collectors.toList());
     }
 }
