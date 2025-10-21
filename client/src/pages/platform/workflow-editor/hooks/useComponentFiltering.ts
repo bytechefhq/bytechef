@@ -1,5 +1,6 @@
 import {COMPONENT_CATEGORY_ICON} from '@/shared/constants';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useMemo, useState} from 'react';
 
 type ActiveViewType = 'all' | 'filtered';
@@ -22,6 +23,8 @@ export const useComponentFiltering = ({
         searchValue: '',
         selectedCategories: [],
     });
+
+    const ff_3158 = useFeatureFlagsStore()('ff-3158');
 
     const setSearchValue = useCallback((value: string) => {
         setFilterState((state) => ({...state, searchValue: value}));
@@ -148,17 +151,29 @@ export const useComponentFiltering = ({
         }
 
         if (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) {
-            return actionComponentDefinitions;
+            return actionComponentDefinitions.filter((component) => {
+                return !(!ff_3158 && component.name === 'claudeCode');
+            });
         }
 
         return actionComponentDefinitions.filter((component) => {
             const categoryLabels = getCategoryLabels(component);
 
+            if (!ff_3158 && component.name === 'claudeCode') {
+                return false;
+            }
+
             return filterState.selectedCategories.some((category: string) =>
                 categoryLabels.includes((category || '').toLowerCase())
             );
         });
-    }, [actionComponentDefinitions, filterState.activeView, filterState.selectedCategories, getCategoryLabels]);
+    }, [
+        actionComponentDefinitions,
+        ff_3158,
+        filterState.activeView,
+        filterState.selectedCategories,
+        getCategoryLabels,
+    ]);
 
     return {
         deselectAllCategories,
