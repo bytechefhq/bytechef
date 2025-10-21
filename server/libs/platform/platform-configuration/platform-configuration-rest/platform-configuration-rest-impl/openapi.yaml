@@ -1010,8 +1010,12 @@ paths:
               required:
                 - "path"
               properties:
+                fromAiInMetadata:
+                  description: "If fromAi should be included in metadata."
+                  type: "boolean"
+                  default: false
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1090,8 +1094,12 @@ paths:
                 - "path"
                 - "type"
               properties:
+                fromAiInMetadata:
+                  description: "If fromAi should be included in metadata."
+                  type: "boolean"
+                  default: false
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1427,7 +1435,7 @@ paths:
                 - "path"
               properties:
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1495,7 +1503,7 @@ paths:
                 - "type"
               properties:
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
