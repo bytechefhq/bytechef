@@ -26,7 +26,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -34,6 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
@@ -73,6 +73,6 @@ public class GoogleCalendarCreateQuickEventAction {
             throw translateGoogleIOException(e);
         }
 
-        return createCustomEvent(event, getCalendarTimezone(calendar));
+        return createCustomEvent(event, GoogleUtils.getCalendarTimezone(calendar));
     }
 }

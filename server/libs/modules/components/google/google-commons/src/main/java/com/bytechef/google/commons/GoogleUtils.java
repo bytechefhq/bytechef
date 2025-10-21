@@ -28,6 +28,9 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -35,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -119,6 +123,40 @@ public class GoogleUtils {
             nextPageToken = fileList.getNextPageToken();
         } while (nextPageToken != null);
         return files;
+    }
+
+    public static String getCalendarTimezone(Calendar calendar) {
+        List<Setting> settings = fetchAllCalendarSettings(calendar);
+
+        return settings.stream()
+            .filter(setting -> Objects.equals(setting.getId(), "timezone"))
+            .findFirst()
+            .map(Setting::getValue)
+            .orElseThrow(() -> new ProviderException("Timezone setting not found."));
+    }
+
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
+        List<Setting> allSettings = new ArrayList<>();
+
+        String nextPageToken = null;
+
+        do {
+            Settings settings;
+            try {
+                settings = calendar.settings()
+                    .list()
+                    .setMaxResults(250)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
+
+            allSettings.addAll(settings.getItems());
+            nextPageToken = settings.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allSettings;
     }
 
     public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
