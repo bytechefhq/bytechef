@@ -197,10 +197,10 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Full-text search across workflows in a project. Returns a list of workflows matching the search query in name or description.")
+        description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
     public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
-        @ToolParam(description = "The ID of the project (optional)") Long projectId) {
+        @ToolParam(required = false, description = "The ID of the project") Long projectId) {
 
         try {
             List<ProjectWorkflowDTO> allWorkflows =

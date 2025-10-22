@@ -67,7 +67,7 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to retrieve") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             return switch (type.toLowerCase()
@@ -119,7 +119,7 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to retrieve properties for") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             return switch (StringUtils.trim(type.toLowerCase())) {
@@ -145,8 +145,9 @@ public class TaskTools {
         @ToolParam(description = "The type of task: 'action', 'trigger', or 'taskDispatcher'") String type,
         @ToolParam(description = "The name of the task to retrieve output properties for") String name,
         @ToolParam(
-            description = "For actions/triggers: the component name. Not used for taskDispatchers (optional)") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
+            required = false,
+            description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             return switch (StringUtils.trim(type.toLowerCase())) {
@@ -172,7 +173,7 @@ public class TaskTools {
         @ToolParam(description = "The name of the task to generate definition for") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             return switch (StringUtils.trim(type.toLowerCase())) {
@@ -224,8 +225,9 @@ public class TaskTools {
         description = "List tasks in the project. Returns a list with their basic information. Can filter by type and limit results")
     public List<TaskMinimalInfo> listTasks(
         @ToolParam(
-            description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types (optional)") String type,
-        @ToolParam(description = "Limit on number of results returned (optional)") Integer limit) {
+            required = false,
+            description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types") String type,
+        @ToolParam(required = false, description = "Limit on number of results returned") Integer limit) {
 
         try {
             List<TaskMinimalInfo> allTasks = new ArrayList<>();
@@ -300,8 +302,9 @@ public class TaskTools {
     public List<TaskMinimalInfo> searchTasks(
         @ToolParam(description = "The search query to match against task names and descriptions") String query,
         @ToolParam(
-            description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types (optional)") String type,
-        @ToolParam(description = "Limit on number of results returned (optional, defaults to 30)") Integer limit) {
+            required = false,
+            description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types") String type,
+        @ToolParam(required = false, description = "Limit on number of results returned (defaults to 30)") Integer limit) {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();
@@ -386,7 +389,7 @@ public class TaskTools {
         @ToolParam(description = "The name of the task for validation") String name,
         @ToolParam(
             description = "For actions/triggers: the component name. Not used for taskDispatchers") String componentName,
-        @ToolParam(description = "The version (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             StringBuilder errors = new StringBuilder("[");
