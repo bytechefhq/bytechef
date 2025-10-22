@@ -31,14 +31,6 @@
       "name": "model",
       "options": [ {
         "description": null,
-        "label": "claude-2.0",
-        "value": "claude-2.0"
-      }, {
-        "description": null,
-        "label": "claude-2.1",
-        "value": "claude-2.1"
-      }, {
-        "description": null,
         "label": "claude-3-5-haiku-latest",
         "value": "claude-3-5-haiku-latest"
       }, {
@@ -67,8 +59,16 @@
         "value": "claude-opus-4-0"
       }, {
         "description": null,
+        "label": "claude-opus-4-1",
+        "value": "claude-opus-4-1"
+      }, {
+        "description": null,
         "label": "claude-sonnet-4-0",
         "value": "claude-sonnet-4-0"
+      }, {
+        "description": null,
+        "label": "claude-sonnet-4-5",
+        "value": "claude-sonnet-4-5"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -722,14 +722,6 @@
       "name": "model",
       "options": [ {
         "description": null,
-        "label": "claude-2.0",
-        "value": "claude-2.0"
-      }, {
-        "description": null,
-        "label": "claude-2.1",
-        "value": "claude-2.1"
-      }, {
-        "description": null,
         "label": "claude-3-5-haiku-latest",
         "value": "claude-3-5-haiku-latest"
       }, {
@@ -758,8 +750,16 @@
         "value": "claude-opus-4-0"
       }, {
         "description": null,
+        "label": "claude-opus-4-1",
+        "value": "claude-opus-4-1"
+      }, {
+        "description": null,
         "label": "claude-sonnet-4-0",
         "value": "claude-sonnet-4-0"
+      }, {
+        "description": null,
+        "label": "claude-sonnet-4-5",
+        "value": "claude-sonnet-4-5"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
