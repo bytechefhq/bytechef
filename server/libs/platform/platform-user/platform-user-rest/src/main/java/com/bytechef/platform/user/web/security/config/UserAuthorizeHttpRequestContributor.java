@@ -30,6 +30,6 @@ public class UserAuthorizeHttpRequestContributor implements AuthorizeHttpRequest
     public List<String> getApiPermitAllRequestMatcherPaths() {
         return List.of(
             "/api/activate", "/api/authenticate", "/api/account/reset-password/finish",
-            "/api/account/reset-password/init", "/api/register");
+            "/api/account/reset-password/init", "/api/register", "/api/send-activation-email");
     }
 }
