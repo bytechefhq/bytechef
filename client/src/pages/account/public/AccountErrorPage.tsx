@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {XCircleIcon} from 'lucide-react';
@@ -22,9 +22,7 @@ const AccountErrorPage = () => {
                 </CardHeader>
 
                 <Link to="/login">
-                    <Button className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active">
-                        Go back
-                    </Button>
+                    <Button label="Go back" />
                 </Link>
             </Card>
         </PublicLayoutContainer>

@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useResendEmail} from '@/pages/account/public/hooks/useResendEmail';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
@@ -35,19 +36,19 @@ const VerifyEmail = () => {
                     </CardDescription>
                 </CardHeader>
 
-                <div className="flex justify-center gap-1 text-sm">
+                <div className="flex items-center justify-center text-sm">
                     <span className="text-content-neutral-secondary">
                         {disabled ? `Mail sent. Wait ${countdown} sec to send again.` : `Didn't get an email?`}
                     </span>
 
                     {!disabled && (
-                        <button
-                            className="font-bold text-content-neutral-primary underline hover:text-content-neutral-secondary"
+                        <Button
+                            className="px-1"
                             disabled={disabled}
+                            label="Click to resend"
                             onClick={handleResendEmail}
-                        >
-                            Click to resend
-                        </button>
+                            variant="link"
+                        />
                     )}
                 </div>
             </Card>

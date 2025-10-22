@@ -1,11 +1,11 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordResetStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
+import {CheckIcon, DotIcon, EyeIcon, EyeOffIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useSearchParams} from 'react-router-dom';
@@ -101,18 +101,15 @@ const PasswordResetFinish = () => {
                                         />
 
                                         {getValues('newPassword') !== '' && (
-                                            <button
+                                            <Button
                                                 aria-label={showPassword ? 'Hide Password' : 'Show Password'}
-                                                className="absolute right-4 top-2 z-10"
+                                                className="absolute right-2 top-1 z-10"
+                                                icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
                                                 onClick={() => setShowPassword((show) => !show)}
+                                                size="iconSm"
                                                 type="button"
-                                            >
-                                                {showPassword ? (
-                                                    <EyeOff className="cursor-pointer text-content-neutral-primary" />
-                                                ) : (
-                                                    <Eye className="cursor-pointer text-content-neutral-primary" />
-                                                )}
-                                            </button>
+                                                variant="ghost"
+                                            />
                                         )}
                                     </div>
                                 </FormControl>
@@ -144,19 +141,19 @@ const PasswordResetFinish = () => {
                                     {getValues('newPassword') === '' && (
                                         <>
                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                <XIcon size={15} />
+                                                <DotIcon size={15} />
 
                                                 <p>{passwordLengthMessage}</p>
                                             </li>
 
                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                <XIcon size={15} />
+                                                <DotIcon size={15} />
 
                                                 <p>{passwordContainsNumberMessage}</p>
                                             </li>
 
                                             <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                <XIcon size={15} />
+                                                <DotIcon size={15} />
 
                                                 <p>{passwordContainsUppercaseMessage}</p>
                                             </li>
@@ -189,13 +186,7 @@ const PasswordResetFinish = () => {
                         )}
                     />
 
-                    <Button
-                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
-                        data-cy="submit"
-                        type="submit"
-                    >
-                        Reset password
-                    </Button>
+                    <Button className="w-full" data-cy="submit" label="Reset password" size="lg" type="submit" />
                 </form>
             </Form>
         );
