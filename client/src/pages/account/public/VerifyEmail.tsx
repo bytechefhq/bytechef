@@ -1,24 +1,28 @@
 import Button from '@/components/Button/Button';
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useResendEmail} from '@/pages/account/public/hooks/useResendEmail';
-import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {MailCheck} from 'lucide-react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 const STORAGE_KEY_PREFIX = 'verifyEmail_';
 
 const VerifyEmail = () => {
-    const {countdown, disabled, startCountdown} = useResendEmail(STORAGE_KEY_PREFIX, 60);
-
-    const register = useRegisterStore((state) => state.register);
+    const {countdown, disabled, resendActivationEmail, startCountdown} = useResendEmail(STORAGE_KEY_PREFIX, 60);
 
     const location = useLocation();
 
-    function handleResendEmail() {
-        register(location.state.email, location.state.password);
+    const navigate = useNavigate();
 
-        startCountdown();
+    function handleResendEmail() {
+        resendActivationEmail(location.state.email).then(
+            () => {
+                startCountdown();
+            },
+            () => {
+                navigate('/account-error', {state: {fromInternalFlow: true}});
+            }
+        );
     }
 
     return (
