@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Ivica Cardic
@@ -40,6 +41,7 @@ public class FileStorageWriteAction {
             string(CONTENT)
                 .label("Content")
                 .description("String to write to the file.")
+                .controlType(ControlType.TEXT_AREA)
                 .required(true),
             string(FILENAME)
                 .label("Filename")
