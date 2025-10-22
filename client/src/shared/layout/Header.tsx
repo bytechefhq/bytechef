@@ -22,14 +22,16 @@ const Header = ({
 }: HeaderProps) => (
     <header className={twMerge('px-4 py-3', centerTitle ? '2xl:mx-auto 2xl:w-4/5' : '3xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
-            <div
-                className={twMerge(
-                    'flex h-header-height flex-col justify-center text-lg tracking-tight text-foreground',
-                    position === 'sidebar' ? 'font-semibold' : '',
-                    titleClassName
-                )}
-            >
-                {title}
+            <div className="flex flex-col">
+                <div
+                    className={twMerge(
+                        'flex h-header-height flex-col justify-center text-lg tracking-tight text-foreground',
+                        position === 'sidebar' ? 'font-semibold' : '',
+                        titleClassName
+                    )}
+                >
+                    {title}
+                </div>
 
                 <div className="text-sm text-muted-foreground">{description}</div>
             </div>
