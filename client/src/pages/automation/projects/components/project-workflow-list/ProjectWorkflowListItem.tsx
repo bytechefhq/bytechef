@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -133,9 +133,7 @@ const ProjectWorkflowListItem = ({
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 cursor-pointer" />
-                        </Button>
+                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="p-0">
