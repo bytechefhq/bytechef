@@ -499,8 +499,9 @@ class WorkflowValidatorTest {
                 new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "component/v1/action1", List.of(
                 new PropertyInfo("configs", "ARRAY", null, false, true, null, List.of(
-                    new PropertyInfo("setting", "STRING", null, true, true, null, null),
-                    new PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)))));
+                    new PropertyInfo("ignored", "OBJECT", null, false, true, null, List.of(
+                        new PropertyInfo("setting", "STRING", null, true, true, null, null),
+                        new PropertyInfo("enabled", "BOOLEAN", null, false, true, null, null)))))));
 
         Map<String, PropertyInfo> taskOutputMap = Map.of(
             "component/v1/trigger1", trigger1);
@@ -1008,10 +1009,10 @@ class WorkflowValidatorTest {
 
         List<PropertyInfo> taskDefinition = List.of(
             new PropertyInfo(
-                "items", "ARRAY", null, false, true, null,
-                List.of(
-                    new PropertyInfo("name", "STRING", null, false, true, null, null),
-                    new PropertyInfo("age", "INTEGER", null, false, true, null, null))),
+                "items", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "OBJECT", null, false, true, null, List.of(
+                        new PropertyInfo("name", "STRING", null, false, true, null, null),
+                        new PropertyInfo("age", "INTEGER", null, false, true, null, null))))),
             new PropertyInfo("config", "OBJECT", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
@@ -1115,11 +1116,11 @@ class WorkflowValidatorTest {
             """;
 
         List<PropertyInfo> taskDefinition = List.of(
-            new PropertyInfo("items", "ARRAY", null, false, true, null,
-                List.of(
+            new PropertyInfo("items", "ARRAY", null, false, true, null, List.of(
+                new PropertyInfo("name", "OBJECT", null, true, true, null, List.of(
                     new PropertyInfo("name", "STRING", null, true, true, null, null),
                     new PropertyInfo("age", "INTEGER", null, true, true, null, null),
-                    new PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null))));
+                    new PropertyInfo("adult", "BOOLEAN", null, true, true, "items[index].age >= 18", null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();

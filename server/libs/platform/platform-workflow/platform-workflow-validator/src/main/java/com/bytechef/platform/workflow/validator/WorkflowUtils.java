@@ -68,25 +68,15 @@ class WorkflowUtils {
         return json.toString();
     }
 
-    public static boolean extractAndEvaluateCondition(String text, JsonNode actualParameters) {
-        if (StringUtils.isBlank(text)) {
+    public static boolean extractAndEvaluateCondition(String condition, JsonNode actualParameters) {
+        if (StringUtils.isBlank(condition)) {
             return true;
         }
-
-        Pattern pattern = Pattern.compile("@([^@]+)@");
-
-        Matcher matcher = pattern.matcher(text);
-
-        if (!matcher.find()) {
-            return true;
-        }
-
-        String condition = StringUtils.trim(matcher.group(1));
 
         try {
             return evaluateCondition(condition, actualParameters);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid logic for display condition: '@" + condition + "@'");
+            throw new RuntimeException("Invalid logic for display condition: '" + condition + "'");
         }
     }
 
@@ -590,27 +580,11 @@ class WorkflowUtils {
         return null;
     }
 
-    private static boolean shouldIncludePropertyWithCondition(String propertyValue, JsonNode actualParameters) {
-        // For inline property conditions, extract the condition from @...@ pattern
-        Pattern pattern = Pattern.compile("@([^@]+)@");
-
-        Matcher matcher = pattern.matcher(propertyValue);
-
-        if (matcher.find()) {
-            String condition = StringUtils.trim(matcher.group(1));
-
-            try {
-                return evaluateCondition(condition, actualParameters);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Invalid logic for display condition: '@" + condition + "@'");
-            }
-        }
-
-        // For object metadata conditions (no @...@ pattern), evaluate directly
+    private static boolean shouldIncludePropertyWithCondition(String condition, JsonNode actualParameters) {
         try {
-            return evaluateCondition(propertyValue, actualParameters);
+            return evaluateCondition(condition, actualParameters);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid logic for display condition: '" + propertyValue + "'");
+            throw new RuntimeException("Invalid logic for display condition: '" + condition + "'");
         }
     }
 
