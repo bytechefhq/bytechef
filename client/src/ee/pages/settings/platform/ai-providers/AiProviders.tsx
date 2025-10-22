@@ -13,7 +13,7 @@ const AiProviders = () => {
             <LayoutContainer
                 header={
                     <Header
-                        className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
+                        centerTitle
                         description="Enable providers used by Univerzal AI Connectors"
                         position="main"
                         title="AI Providers"
