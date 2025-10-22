@@ -33,30 +33,30 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class McpToolTransactionalEventListener {
 
-    private final McpAsyncServer mcpSyncServer;
+    private final McpAsyncServer mcpAsyncServer;
     private final ToolFacade toolFacade;
 
     @SuppressFBWarnings("EI")
-    public McpToolTransactionalEventListener(McpAsyncServer mcpSyncServer, ToolFacade toolFacade) {
-        this.mcpSyncServer = mcpSyncServer;
+    public McpToolTransactionalEventListener(McpAsyncServer mcpAsyncServer, ToolFacade toolFacade) {
+        this.mcpAsyncServer = mcpAsyncServer;
         this.toolFacade = toolFacade;
     }
 
     @TransactionalEventListener
     public void handleEvent(AfterSaveEvent<McpTool> mcpToolSaveEvent) {
-        mcpSyncServer.addTool(
+        mcpAsyncServer.addTool(
             McpToolUtils.toAsyncToolSpecification(
                 toolFacade.getFunctionToolCallback(
                     toolFacade.toToolDTO(mcpToolSaveEvent.getEntity()))));
-        mcpSyncServer.notifyToolsListChanged();
+        mcpAsyncServer.notifyToolsListChanged();
     }
 
     @TransactionalEventListener
     public void handleEvent(AfterDeleteEvent<McpTool> mcpToolDeleteEvent) {
         ToolDTO toolDTO = toolFacade.toToolDTO(mcpToolDeleteEvent.getEntity());
 
-        mcpSyncServer.removeTool(toolDTO.name());
+        mcpAsyncServer.removeTool(toolDTO.name());
 
-        mcpSyncServer.notifyToolsListChanged();
+        mcpAsyncServer.notifyToolsListChanged();
     }
 }
