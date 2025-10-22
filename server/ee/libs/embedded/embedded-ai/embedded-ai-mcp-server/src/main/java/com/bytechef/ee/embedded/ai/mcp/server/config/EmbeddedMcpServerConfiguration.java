@@ -7,27 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.config;
 
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.embedded.execution.facade.ToolFacade;
-import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.util.SecurityUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-//import io.modelcontextprotocol.server.McpServer;
-//import io.modelcontextprotocol.server.McpSyncServer;
-//import io.modelcontextprotocol.server.transport.WebMvcSseServerTransportProvider;
-//import io.modelcontextprotocol.spec.McpSchema;
-//import io.modelcontextprotocol.spec.McpServerTransportProvider;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import org.springframework.ai.mcp.McpToolUtils;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.function.FunctionToolCallback;
-import org.springframework.context.annotation.Bean;
 //import org.springframework.web.servlet.function.RouterFunction;
 //import org.springframework.web.servlet.function.ServerResponse;
 

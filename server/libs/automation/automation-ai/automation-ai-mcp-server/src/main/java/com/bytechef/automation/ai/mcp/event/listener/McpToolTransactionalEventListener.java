@@ -21,7 +21,6 @@ import com.bytechef.automation.execution.facade.ToolFacade;
 import com.bytechef.platform.mcp.domain.McpTool;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
-import io.modelcontextprotocol.server.McpSyncServer;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.data.relational.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
