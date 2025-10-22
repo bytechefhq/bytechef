@@ -89,7 +89,9 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
             'svg',
         ].join(', ');
 
-        if (target.closest(interactiveSelectors)) return;
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
 
         workflowsCollapsibleTriggerRef.current?.click();
     }, []);
@@ -122,7 +124,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                             <div className="flex items-center">
                                 <CollapsibleTrigger
                                     className="group mr-4 flex text-xs font-semibold text-muted-foreground"
-                                    ref={workflowsCollapsibleTriggerRef} // <-- ref here
+                                    ref={workflowsCollapsibleTriggerRef}
                                 >
                                     <span className="mr-1">
                                         {projectDeployment.projectDeploymentWorkflows?.length === 1
