@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
@@ -113,7 +113,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>New Project</Button>
+                                        <Button label="New Project" />
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
@@ -141,7 +141,7 @@ const Projects = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <ProjectDialog project={undefined} triggerNode={<Button>New Project</Button>} />
+                                <ProjectDialog project={undefined} triggerNode={<Button label="New Project" />} />
                             )
                         }
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
@@ -168,7 +168,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>Create Project</Button>
+                                        <Button label="Create Project" />
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
@@ -187,7 +187,7 @@ const Projects = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <ProjectDialog triggerNode={<Button>Create Project</Button>} />
+                                <ProjectDialog triggerNode={<Button label="Create Project" />} />
                             )
                         }
                         icon={<FolderIcon className="size-24 text-gray-300" />}
