@@ -25,6 +25,9 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -70,6 +73,8 @@ public class ComponentTools {
     private final ComponentDefinitionService componentDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final ConnectionService connectionService;
+
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
         {
@@ -91,10 +96,12 @@ public class ComponentTools {
 
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade) {
+        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
+        ConnectionService connectionService) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.connectionService = connectionService;
     }
 
     // Helper methods
@@ -535,12 +542,15 @@ public class ComponentTools {
 
                                 outputResponse = actionDefinitionFacade.executeOutput(
                                     componentDefinition.getName(), componentDefinition.getVersion(),
-                                    actionDefinition.getName(), Map.of(), null);
+                                    actionDefinition.getName(), Map.of(), Map.of());
                             } catch (Exception e) {
                                 try {
+                                    List<Connection> connections = connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
+                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0).getId());
+
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
-                                        null, null, null, null, null, true);
+                                        null, null, null, connectionIds, null, true);
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(
                                             output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
