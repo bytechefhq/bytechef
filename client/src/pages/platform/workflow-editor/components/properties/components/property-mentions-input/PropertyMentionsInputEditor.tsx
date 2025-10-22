@@ -23,6 +23,7 @@ import {Mention} from '@tiptap/extension-mention';
 import Paragraph from '@tiptap/extension-paragraph';
 import Placeholder from '@tiptap/extension-placeholder';
 import Text from '@tiptap/extension-text';
+import {TextSelection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
@@ -356,6 +357,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return content;
         }, []);
 
+        const moveCursorToEnd = useCallback((view: EditorView, pos: number) => {
+            const valueSize = view.state.doc.content.size;
+
+            if (valueSize > 0 && pos === 0) {
+                view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, valueSize)));
+            }
+        }, []);
+
         const editor = useEditor({
             coreExtensionOptions: {
                 clipboardTextSerializer: {
@@ -373,6 +382,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     path: path ?? '',
                     type: type ?? '',
                 },
+                handleClick: (view, pos) => moveCursorToEnd(view, pos),
                 handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
