@@ -127,14 +127,8 @@ class TaskValidator {
             return;
         }
 
-        try {
-            // Use the new PropertyInfo-based validation directly
-            PropertyValidator.validatePropertiesFromPropertyInfo(
-                taskParametersJsonNode, taskDefinition, "", taskParameters, errors, warnings);
-
-        } catch (RuntimeException e) {
-            handleDisplayConditionError(e, taskDefinition, taskParameters, errors, warnings);
-        }
+        PropertyValidator.validatePropertiesFromPropertyInfo(
+            taskParametersJsonNode, taskDefinition, "", taskParameters, errors, warnings);
     }
 
     /**
@@ -177,17 +171,6 @@ class TaskValidator {
             processTaskArrayProperty(parametersJsonNode, propertyInfo, context);
         }
     }
-
-    private static void handleDisplayConditionError(
-        RuntimeException exception, List<PropertyInfo> taskDefinition, String taskParameters, StringBuilder errors,
-        StringBuilder warnings) {
-
-        // Display condition errors are now handled within PropertyValidator
-        // If we get here, it's an unexpected error, so rethrow it
-        throw exception;
-    }
-
-
 
     /**
      * Strategy to determine if a task type supports nested tasks.

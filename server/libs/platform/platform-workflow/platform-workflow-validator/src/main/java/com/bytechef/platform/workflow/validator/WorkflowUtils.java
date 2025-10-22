@@ -21,15 +21,9 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
@@ -38,35 +32,8 @@ import org.springframework.lang.Nullable;
  */
 class WorkflowUtils {
 
-    private static final Pattern COMBINED_PATTERN = Pattern.compile(
-        "\"([^\"]+)\"\\s*:\\s*(?:(\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*\"metadata\"(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*})*})*})|\"([^\"]*?@[^@]+@[^\"]*?)\")");
-
     private static final Evaluator EVALUATOR = SpelEvaluator.builder()
         .build();
-
-    public static String convertPropertyInfoToJson(@Nullable List<PropertyInfo> propertyInfos) {
-        if (propertyInfos == null || propertyInfos.isEmpty()) {
-            return "{ \"parameters\": {} }";
-        }
-
-        // Remove the special case that flattens single object properties
-
-        StringBuilder json = new StringBuilder();
-
-        json.append("{ \"parameters\": {");
-
-        for (int i = 0; i < propertyInfos.size(); i++) {
-            if (i > 0) {
-                json.append(", ");
-            }
-
-            json.append(convertSinglePropertyToJson(propertyInfos.get(i)));
-        }
-
-        json.append("} }");
-
-        return json.toString();
-    }
 
     public static boolean extractAndEvaluateCondition(String condition, JsonNode actualParameters) {
         if (StringUtils.isBlank(condition)) {
@@ -162,31 +129,6 @@ class WorkflowUtils {
         }
 
         return currentJsonNode;
-    }
-
-    public static String processDisplayConditions(String taskDefinition, @Nullable String taskParameters) {
-        if (taskParameters == null) {
-            return taskDefinition;
-        }
-
-        try {
-            JsonNode parametersNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
-
-            return processMetadataObjectsRecursively(
-                taskDefinition,
-                parametersNode != null ? parametersNode : com.bytechef.commons.util.JsonUtils.readTree("{}"));
-        } catch (RuntimeException e) {
-            // Re-throw runtime exceptions from invalid display conditions
-            String message = e.getMessage();
-
-            if (message != null && message.startsWith("Invalid logic for display condition:")) {
-                throw e;
-            }
-
-            return taskDefinition;
-        } catch (Exception e) {
-            return taskDefinition;
-        }
     }
 
     private static String buildComplexArrayContent(PropertyInfo propertyInfo) {
@@ -386,36 +328,6 @@ class WorkflowUtils {
         }
     }
 
-    private static int getLastEndOfDuplicates(List<PropertyMatch> duplicates) {
-        return duplicates.stream()
-            .mapToInt(m -> m.end)
-            .max()
-            .orElse(0);
-    }
-
-    private static Map<String, List<PropertyMatch>> getPropertyWithCondition(String json) {
-        Matcher matcher = COMBINED_PATTERN.matcher(json);
-
-        Map<String, List<PropertyMatch>> propertyMatchesMap = new HashMap<>();
-
-        while (matcher.find()) {
-            String propertyName = matcher.group(1);
-            String objectValue = matcher.group(2);
-            String inlineValue = matcher.group(3);
-
-            String value = objectValue != null ? objectValue : inlineValue;
-
-            PropertyMatch propertyMatch = new PropertyMatch(matcher.start(), matcher.end(), propertyName, value);
-
-            List<PropertyMatch> propertyMatches = propertyMatchesMap.computeIfAbsent(
-                propertyName, k -> new ArrayList<>());
-
-            propertyMatches.add(propertyMatch);
-        }
-
-        return propertyMatchesMap;
-    }
-
     private static boolean hasComplexArrayStructure(PropertyInfo propertyInfo) {
         List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
 
@@ -474,134 +386,5 @@ class WorkflowUtils {
             throw new IllegalArgumentException(
                 "Invalid boolean value: '" + string + "'. Expected 'true' or 'false'");
         }
-    }
-
-    private static String processMetadataObjectsRecursively(String json, JsonNode actualParameters) {
-        Map<String, List<PropertyMatch>> propertyWithCondition = getPropertyWithCondition(json);
-
-        if (propertyWithCondition.isEmpty()) {
-            return json;
-        }
-
-        List<PropertyMatch> allPropertyMatches = new ArrayList<>();
-
-        for (List<PropertyMatch> propertyMatches : propertyWithCondition.values()) {
-            allPropertyMatches.addAll(propertyMatches);
-        }
-
-        allPropertyMatches.sort(Comparator.comparingInt(a -> a.start));
-
-        int lastEnd = 0;
-        Set<String> processedProperties = new HashSet<>();
-        StringBuilder result = new StringBuilder();
-
-        for (PropertyMatch match : allPropertyMatches) {
-            if (processedProperties.contains(match.propertyName)) {
-                continue;
-            }
-
-            result.append(json, lastEnd, match.start);
-
-            List<PropertyMatch> duplicatePropertyMatches = propertyWithCondition.get(match.propertyName);
-            PropertyMatch selectedPropertyMatch;
-
-            selectedPropertyMatch = selectBestMatch(duplicatePropertyMatches, actualParameters);
-
-            if (selectedPropertyMatch != null) {
-                if (selectedPropertyMatch.objectValue.startsWith("{")) {
-                    String processedContent = processMetadataObjectsRecursively(
-                        selectedPropertyMatch.objectValue, actualParameters);
-
-                    String cleanedObject = removeMetadataFromObjectString(processedContent);
-
-                    result.append("\"")
-                        .append(selectedPropertyMatch.propertyName)
-                        .append("\": ")
-                        .append(cleanedObject);
-                } else {
-                    String cleanedValue = StringUtils.trim(selectedPropertyMatch.objectValue.replaceAll("@[^@]+@", ""));
-
-                    // If the property had an inline condition and we got here, it means the condition was true
-                    // So we should mark it as required
-                    if (selectedPropertyMatch.objectValue.contains("@") && !cleanedValue.contains("(required)")) {
-                        cleanedValue += " (required)";
-                    }
-
-                    result.append("\"")
-                        .append(selectedPropertyMatch.propertyName)
-                        .append("\": \"")
-                        .append(cleanedValue)
-                        .append("\"");
-                }
-
-                lastEnd = selectedPropertyMatch.end;
-            } else {
-                lastEnd = getLastEndOfDuplicates(duplicatePropertyMatches);
-            }
-
-            processedProperties.add(match.propertyName);
-
-            for (PropertyMatch duplicate : duplicatePropertyMatches) {
-                if (duplicate.end > lastEnd) {
-                    lastEnd = duplicate.end;
-                }
-            }
-        }
-
-        result.append(json.substring(lastEnd));
-
-        return JsonUtils.cleanupJsonSyntax(result.toString());
-    }
-
-    private static String removeMetadataFromObjectString(String objectString) {
-        String result = objectString.replaceAll("\"metadata\"\\s*:\\s*\"[^\"]*\"\\s*,?\\s*", "");
-
-        result = JsonUtils.cleanupJsonSyntax(result);
-
-        return result.replaceAll("\\{\\s*}", "{}");
-    }
-
-    @Nullable
-    private static PropertyMatch selectBestMatch(List<PropertyMatch> duplicates, JsonNode actualParameters) {
-        for (PropertyMatch propertyMatch : duplicates) {
-            boolean shouldInclude;
-
-            if (propertyMatch.objectValue.startsWith("{")) {
-                shouldInclude = shouldIncludeObjectString(propertyMatch.objectValue, actualParameters);
-            } else {
-                shouldInclude = shouldIncludePropertyWithCondition(propertyMatch.objectValue, actualParameters);
-            }
-
-            if (shouldInclude) {
-                return propertyMatch;
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean shouldIncludePropertyWithCondition(String condition, JsonNode actualParameters) {
-        try {
-            return evaluateCondition(condition, actualParameters);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid logic for display condition: '" + condition + "'");
-        }
-    }
-
-    private static boolean shouldIncludeObjectString(String objectString, JsonNode actualParameters) {
-        Pattern metadataPattern = Pattern.compile("\"metadata\"\\s*:\\s*\"([^\"]*)\"");
-
-        Matcher matcher = metadataPattern.matcher(objectString);
-
-        if (!matcher.find()) {
-            return true;
-        }
-
-        String metadata = matcher.group(1);
-
-        return shouldIncludePropertyWithCondition(metadata, actualParameters);
-    }
-
-    private record PropertyMatch(int start, int end, String propertyName, String objectValue) {
     }
 }
