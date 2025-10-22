@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'mock') {
     renderApp();
 }
 
-const publicRoutes = ['/activate', '/login', '/register', '/password-reset', '/verify-email'];
+const publicRoutes = ['/activate', '/login', '/register', '/password-reset', '/password-reset/finish', '/verify-email'];
 
 async function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
