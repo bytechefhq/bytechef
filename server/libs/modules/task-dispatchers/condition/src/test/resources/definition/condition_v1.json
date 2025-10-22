@@ -13,7 +13,7 @@
     "exampleValue": null,
     "expressionEnabled": false,
     "hidden": null,
-    "label": "Raw expression",
+    "label": "Raw Expression",
     "metadata": { },
     "name": "rawExpression",
     "options": [ {
@@ -541,7 +541,7 @@
         "required": null,
         "type": "OBJECT"
       } ],
-      "label": "AND condition",
+      "label": "AND Condition",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
