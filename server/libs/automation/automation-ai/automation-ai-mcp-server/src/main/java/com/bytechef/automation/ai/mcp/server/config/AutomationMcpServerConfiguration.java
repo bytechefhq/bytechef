@@ -16,20 +16,6 @@
 
 package com.bytechef.automation.ai.mcp.server.config;
 
-import com.bytechef.automation.execution.dto.ToolDTO;
-import com.bytechef.automation.execution.facade.ToolFacade;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-//import io.modelcontextprotocol.server.McpServer;
-//import io.modelcontextprotocol.server.McpSyncServer;
-//import io.modelcontextprotocol.spec.McpSchema;
-//import io.modelcontextprotocol.spec.McpServerTransportProvider;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.ai.mcp.McpToolUtils;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.context.annotation.Bean;
-
 /**
  * @author Ivica Cardic
  */
