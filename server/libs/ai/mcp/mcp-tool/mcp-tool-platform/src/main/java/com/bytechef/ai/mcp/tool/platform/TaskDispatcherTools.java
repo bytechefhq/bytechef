@@ -90,7 +90,7 @@ public class TaskDispatcherTools {
         description = "Get comprehensive information about a specific task dispatcher. Returns detailed task dispatcher information including: name, description, and properties")
     public TaskDispatcherInfo getTaskDispatcher(
         @ToolParam(description = "The name of the task dispatcher to retrieve") String name,
-        @ToolParam(description = "The version of the task dispatcher (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the task dispatcher") Integer version) {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
@@ -129,7 +129,7 @@ public class TaskDispatcherTools {
         description = "Get the output property of a specific task dispatcher. Returns the structure of the output property")
     public PropertyInfo getTaskDispatcherOutput(
         @ToolParam(description = "The name of the task dispatcher to retrieve output properties for") String name,
-        @ToolParam(description = "The version of the task dispatcher (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the task dispatcher") Integer version) {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
@@ -167,7 +167,7 @@ public class TaskDispatcherTools {
         description = "Get all properties of a specific task dispatcher. Returns a hierarchical list of properties including nested properties")
     public List<PropertyInfo> getTaskDispatcherProperties(
         @ToolParam(description = "The name of the task dispatcher to retrieve properties for") String name,
-        @ToolParam(description = "The version of the task dispatcher (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the task dispatcher") Integer version) {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
@@ -232,7 +232,7 @@ public class TaskDispatcherTools {
         description = "Get the task dispatcher definition template for a specific task dispatcher. Returns a structured JSON with template and conditional parameters")
     public String getTaskDispatcherDefinition(
         @ToolParam(description = "The name of the task dispatcher to generate definition for") String name,
-        @ToolParam(description = "The version of the task dispatcher (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the task dispatcher") Integer version) {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =

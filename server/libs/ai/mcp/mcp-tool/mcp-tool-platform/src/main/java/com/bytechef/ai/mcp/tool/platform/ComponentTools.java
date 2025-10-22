@@ -109,7 +109,7 @@ public class ComponentTools {
         description = "Get comprehensive information about a specific component. Returns detailed project information including: name, description, triggers and actions")
     public ComponentInfo getComponent(
         @ToolParam(description = "The name of the component to retrieve in camel case") String componentName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -146,7 +146,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to retrieve in camel case") String triggerName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -185,7 +185,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to generate definition for in camel case") String triggerName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -366,7 +366,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to retrieve in camel case") String actionName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -441,7 +441,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to generate definition for in camel case") String actionName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -480,7 +480,7 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger or action to retrieve output properties for in camel case") String operationName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -591,7 +591,7 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger or action to retrieve properties for in camel case") String operationName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
