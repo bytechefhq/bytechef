@@ -22,9 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,104 @@ class PropertyValidator {
     private static final String REQUIRED_MARKER = "(required)";
 
     private PropertyValidator() {
+    }
+
+    /**
+     * Recursively validates properties in current parameters against their definition using PropertyInfo list.
+     */
+    public static void validatePropertiesFromPropertyInfo(
+        JsonNode taskParametersJsonNode, List<com.bytechef.platform.workflow.validator.model.PropertyInfo> propertyInfos,
+        String path, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        if (propertyInfos == null || propertyInfos.isEmpty()) {
+            // No definition, generate warnings for all properties
+            generateWarningsForAllProperties(taskParametersJsonNode, path, warnings);
+            return;
+        }
+
+        // Track which properties have been validated by at least one definition
+        Set<String> validatedProperties = new HashSet<>();
+
+        // First pass: validate properties whose display conditions are true
+        for (com.bytechef.platform.workflow.validator.model.PropertyInfo propertyInfo : propertyInfos) {
+            String fieldName = propertyInfo.name();
+            String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
+
+            // Evaluate display condition if present
+            boolean shouldInclude = true;
+            boolean hasInvalidDisplayCondition = false;
+            String malformedConditionMessage = null;
+
+            if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+                try {
+                    shouldInclude = WorkflowUtils.extractAndEvaluateCondition(
+                        propertyInfo.displayCondition(),
+                        com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters));
+                } catch (Exception e) {
+                    // Any exception during display condition evaluation means we should not include the property
+                    shouldInclude = false;
+
+                    // Check if this is truly a malformed condition that should generate a warning
+                    String message = e.getMessage();
+                    if (message != null && message.startsWith("Invalid logic for display condition:")) {
+                        String condition = propertyInfo.displayCondition();
+                        if (isMalformedDisplayCondition(condition)) {
+                            // Store the message to add AFTER property warnings
+                            malformedConditionMessage = message;
+                            hasInvalidDisplayCondition = true;
+                        }
+                    } else if (logger.isTraceEnabled()) {
+                        logger.trace(e.getMessage());
+                    }
+                }
+            }
+
+            // If condition is invalid, add property warnings first, then the condition warning
+            if (hasInvalidDisplayCondition) {
+                // Check if property exists and warn about it and all nested properties
+                if (taskParametersJsonNode.has(fieldName)) {
+                    StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
+
+                    // Generate warnings for nested properties if this is an object
+                    JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
+                    if (valueJsonNode.isObject()) {
+                        generateWarningsForAllProperties(valueJsonNode, propertyPath, warnings);
+                    }
+                }
+
+                // Now add the malformed condition warning AFTER property warnings
+                if (malformedConditionMessage != null) {
+                    StringUtils.appendWithNewline(malformedConditionMessage, warnings);
+                }
+                validatedProperties.add(fieldName); // Mark as processed
+                continue;
+            }
+
+            // If display condition is false, skip for now - we'll check if any other definition handles it
+            if (!shouldInclude) {
+                continue;
+            }
+
+            // Display condition is true, validate the property
+            validatedProperties.add(fieldName);
+            validatePropertyFromPropertyInfo(
+                taskParametersJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
+        }
+
+        // Second pass: check for properties in parameters that weren't validated by any definition
+        Iterator<String> fieldNamesIterator = taskParametersJsonNode.fieldNames();
+        fieldNamesIterator.forEachRemaining(fieldName -> {
+            if (!validatedProperties.contains(fieldName)) {
+                String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);
+                JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
+
+                StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
+
+                if (valueJsonNode.isObject()) {
+                    generateWarningsForAllProperties(valueJsonNode, propertyPath, warnings);
+                }
+            }
+        });
     }
 
     /**
@@ -130,21 +230,6 @@ class PropertyValidator {
         return rootNode;
     }
 
-    /**
-     * Extracts the display condition from a field definition text.
-     */
-    private static String extractDisplayCondition(String fieldDefText) {
-        Pattern pattern = Pattern.compile("@([^@]+)@");
-
-        Matcher matcher = pattern.matcher(fieldDefText);
-
-        if (matcher.find()) {
-            return org.apache.commons.lang3.StringUtils.trim(matcher.group(1));
-        }
-
-        return "";
-    }
-
     private static String formatValue(JsonNode jsonNode) {
         return jsonNode.isTextual() ? "'" + jsonNode.asText() + "'" : jsonNode.toString();
     }
@@ -205,13 +290,6 @@ class PropertyValidator {
             errors);
     }
 
-    /**
-     * Checks if a field definition has a display condition.
-     */
-    private static boolean hasDisplayCondition(String fieldDefinitionText) {
-        return fieldDefinitionText.contains("@") && fieldDefinitionText.matches(".*@[^@]+@.*");
-    }
-
     private static boolean isDataPillExpression(@Nullable String value) {
         return value != null && value.matches("\\$\\{[^}]+}");
     }
@@ -224,6 +302,45 @@ class PropertyValidator {
 
     private static boolean isEmptyContainer(JsonNode node) {
         return (node.isObject() && node.isEmpty()) || (node.isArray() && node.isEmpty());
+    }
+
+    /**
+     * Determines if a display condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
+     */
+    private static boolean isMalformedDisplayCondition(String condition) {
+        if (condition == null || condition.trim().isEmpty()) {
+            return false;
+        }
+
+        String cleanCondition = condition.trim();
+
+        // Pattern 1: Simple field comparisons (field == value, field != value, field >= value, etc.)
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*(==|!=|<=|>=|<|>)\\s*.*")) {
+            return false; // Valid comparison syntax
+        }
+
+        // Pattern 2: Function calls like contains({...}, field)
+        if (cleanCondition.matches("\\s*\\w+\\s*\\([^)]*\\).*")) {
+            return false; // Valid function call syntax
+        }
+
+        // Pattern 3: Boolean operations with AND/OR
+        if (cleanCondition.matches(".*\\s+(&&|\\|\\||and|or)\\s+.*")) {
+            return false; // Valid boolean operation syntax
+        }
+
+        // Pattern 4: Simple field references (including those with [index] placeholders)
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*")) {
+            return false; // Valid field reference
+        }
+
+        // Pattern 5: Literal values (true, false, numbers, strings)
+        if (cleanCondition.matches("\\s*(true|false|\\d+(\\.\\d+)?|'[^']*')\\s*")) {
+            return false; // Valid literal
+        }
+
+        // If none of the valid patterns match, it's likely malformed
+        return true;
     }
 
     private static boolean isLeapYear(int year) {
@@ -795,12 +912,12 @@ class PropertyValidator {
                     // Property is defined but check if it should be visible based on a display condition
                     String fieldDefinitionText = fieldDefinitionJsonNode.asText();
 
-                    if (hasDisplayCondition(fieldDefinitionText)) {
-                        String condition = extractDisplayCondition(fieldDefinitionText);
+                    if (fieldDefinitionJsonNode.get("displayCondition") != null) {
+                        String condition = fieldDefinitionJsonNode.get("displayCondition").asText();
                         String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 
                         boolean shouldShowProperty = WorkflowUtils.extractAndEvaluateCondition(
-                            "@" + resolvedCondition + "@", rootParametersJsonNode);
+                            resolvedCondition, rootParametersJsonNode);
 
                         if (!shouldShowProperty) {
                             // Property exists but display condition is false - generate warning
@@ -827,14 +944,14 @@ class PropertyValidator {
                     boolean isRequired = fieldDefinitionText.contains("(required)");
 
                     // Check display condition
-                    if (hasDisplayCondition(fieldDefinitionText)) {
-                        String condition = extractDisplayCondition(fieldDefinitionText);
+                    if (fieldDefinitionJsonNode.get("displayCondition") != null) {
+                        String condition = fieldDefinitionJsonNode.get("displayCondition").asText();
 
                         String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 
                         try {
                             shouldValidateProperty = WorkflowUtils.extractAndEvaluateCondition(
-                                "@" + resolvedCondition + "@", rootParametersJsonNode);
+                                resolvedCondition, rootParametersJsonNode);
                         } catch (Exception e) {
                             if (logger.isTraceEnabled()) {
                                 logger.trace(e.getMessage());
@@ -847,8 +964,6 @@ class PropertyValidator {
                         if (isRequired && !jsonNode.has(fieldName)) {
                             StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
                         } else if (jsonNode.has(fieldName)) {
-                            fieldDefinitionText = fieldDefinitionText.replaceAll("@[^@]*@", "");
-
                             JsonNode valueJsonNode = jsonNode.get(fieldName);
                             String expectedType = org.apache.commons.lang3.StringUtils.trim(
                                 fieldDefinitionText.replace("(required)", ""));
@@ -873,25 +988,9 @@ class PropertyValidator {
         JsonNode taskParametersJsonNode, String fieldName, String propertyDefinition, String propertyPath,
         String originalCurrentParameters, StringBuilder errors) {
 
-        if (propertyDefinition.contains("@")) {
-            try {
-                boolean shouldInclude = WorkflowUtils.extractAndEvaluateCondition(
-                    propertyDefinition, com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters));
-
-                if (!shouldInclude) {
-                    return; // Skip validation if condition is false
-                }
-            } catch (Exception e) {
-                errors.append(e.getMessage());
-            }
-        }
-
         boolean isRequired = propertyDefinition.contains(REQUIRED_MARKER);
         String expectedType = org.apache.commons.lang3.StringUtils.trim(
             propertyDefinition.replace(REQUIRED_MARKER, ""));
-
-        // Remove inline conditions from type definition
-        expectedType = org.apache.commons.lang3.StringUtils.trim(expectedType.replaceAll("@[^@]+@", ""));
 
         if (isRequired && !taskParametersJsonNode.has(fieldName)) {
             StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
@@ -999,6 +1098,458 @@ class PropertyValidator {
                         elementValue, propertyName, expectedTypes.toString(), actualType),
                     errors);
             }
+        }
+    }
+
+    /**
+     * Validates a single property using PropertyInfo.
+     */
+    private static void validatePropertyFromPropertyInfo(
+        JsonNode taskParametersJsonNode, com.bytechef.platform.workflow.validator.model.PropertyInfo propertyInfo,
+        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        String fieldName = propertyInfo.name();
+        String type = propertyInfo.type();
+        boolean isRequired = propertyInfo.required();
+
+        // Check if property exists
+        if (!taskParametersJsonNode.has(fieldName)) {
+            if (isRequired) {
+                StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
+            } else if ("OBJECT".equalsIgnoreCase(type)) {
+                // For optional objects that are not provided, check if any nested properties are required
+                List<com.bytechef.platform.workflow.validator.model.PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
+                if (nestedProperties != null) {
+                    for (com.bytechef.platform.workflow.validator.model.PropertyInfo nestedProp : nestedProperties) {
+                        if (nestedProp.required()) {
+                            String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedProp.name());
+                            StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(nestedPath), errors);
+                        }
+                    }
+                }
+            }
+            return;
+        }
+
+        JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
+
+        // Skip type validation for data pill expressions
+        if (valueJsonNode.isTextual() && isDataPillExpression(valueJsonNode.asText())) {
+            return;
+        }
+
+        // Validate based on type
+        if ("OBJECT".equalsIgnoreCase(type)) {
+            validateObjectPropertyFromPropertyInfo(
+                valueJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
+        } else if ("ARRAY".equalsIgnoreCase(type)) {
+            validateArrayPropertyFromPropertyInfo(
+                valueJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
+        } else {
+            // Simple type validation
+            validateSimpleType(valueJsonNode, type, propertyPath, errors);
+        }
+    }
+
+    /**
+     * Validates an object property using PropertyInfo.
+     */
+    private static void validateObjectPropertyFromPropertyInfo(
+        JsonNode valueJsonNode, com.bytechef.platform.workflow.validator.model.PropertyInfo propertyInfo,
+        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        // Null values are allowed for all types
+        if (valueJsonNode.isNull()) {
+            return;
+        }
+
+        if (!valueJsonNode.isObject()) {
+            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "object", actualType), errors);
+            return;
+        }
+
+        // Recursively validate nested properties
+        List<com.bytechef.platform.workflow.validator.model.PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
+        if (nestedProperties != null && !nestedProperties.isEmpty()) {
+            validatePropertiesFromPropertyInfo(
+                valueJsonNode, nestedProperties, propertyPath, originalCurrentParameters, errors, warnings);
+        } else {
+            // Generate warnings for all nested properties since they're not defined
+            Iterator<String> fieldNamesIterator = valueJsonNode.fieldNames();
+            fieldNamesIterator.forEachRemaining(curFieldName -> {
+                String fieldPath = buildPropertyPath(propertyPath, curFieldName);
+                StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(fieldPath), warnings);
+            });
+        }
+    }
+
+    /**
+     * Validates an array property using PropertyInfo.
+     */
+    private static void validateArrayPropertyFromPropertyInfo(
+        JsonNode valueJsonNode, com.bytechef.platform.workflow.validator.model.PropertyInfo propertyInfo,
+        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        // Null values are allowed for all types
+        if (valueJsonNode.isNull()) {
+            return;
+        }
+
+        if (!valueJsonNode.isArray()) {
+            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(propertyPath, "array", actualType), errors);
+            return;
+        }
+
+        List<com.bytechef.platform.workflow.validator.model.PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
+
+        if (nestedProperties == null || nestedProperties.isEmpty()) {
+            // No element definition, skip validation
+            return;
+        }
+
+        // Check if this is a TASK type array
+        if (nestedProperties.size() == 1 && "TASK".equalsIgnoreCase(nestedProperties.get(0).type())) {
+            TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
+            return;
+        }
+
+        // Check if it's a wrapped definition (single entry with nested properties)
+        boolean isWrappedDefinition = nestedProperties.size() == 1 &&
+            nestedProperties.get(0).nestedProperties() != null &&
+            !nestedProperties.get(0).nestedProperties().isEmpty();
+
+        if (isWrappedDefinition) {
+            com.bytechef.platform.workflow.validator.model.PropertyInfo wrapperInfo = nestedProperties.get(0);
+            String wrapperType = wrapperInfo.type();
+
+            if ("ARRAY".equalsIgnoreCase(wrapperType)) {
+                // Array of arrays - validate each element as an array
+                for (int i = 0; i < valueJsonNode.size(); i++) {
+                    JsonNode elementJsonNode = valueJsonNode.get(i);
+                    String elementPath = propertyPath + "[" + i + "]";
+
+                    // Create a temporary PropertyInfo for the array element
+                    com.bytechef.platform.workflow.validator.model.PropertyInfo elementInfo =
+                        new com.bytechef.platform.workflow.validator.model.PropertyInfo(
+                            null, "ARRAY", null, false, false, null, wrapperInfo.nestedProperties());
+
+                    validateArrayPropertyFromPropertyInfo(
+                        elementJsonNode, elementInfo, elementPath, originalCurrentParameters, errors, warnings);
+                }
+                return;
+            } else {
+                // Array of objects - extract the nested properties from the wrapper object
+                List<com.bytechef.platform.workflow.validator.model.PropertyInfo> objectProperties =
+                    wrapperInfo.nestedProperties();
+                validateObjectArrayFromPropertyInfo(
+                    valueJsonNode, objectProperties, propertyPath, originalCurrentParameters, errors, warnings);
+                return;
+            }
+        }
+
+        // For non-wrapped definitions, check the actual array content to determine the type
+        if (valueJsonNode.size() > 0) {
+            JsonNode firstElement = valueJsonNode.get(0);
+            if (firstElement.isObject()) {
+                // Array contains objects, so nestedProperties define object properties
+                validateObjectArrayFromPropertyInfo(
+                    valueJsonNode, nestedProperties, propertyPath, originalCurrentParameters, errors, warnings);
+            } else {
+                // Array contains primitives, so nestedProperties define union type options
+                validateUnionTypeArrayFromPropertyInfo(valueJsonNode, nestedProperties, propertyPath, errors);
+            }
+        }
+    }
+
+    /**
+     * Simplifies display conditions for union type validation by removing array path prefixes.
+     * Transforms conditions like "conditions[index][index].operation" to just "operation".
+     */
+    private static List<com.bytechef.platform.workflow.validator.model.PropertyInfo> simplifyDisplayConditionsForUnionType(
+        List<com.bytechef.platform.workflow.validator.model.PropertyInfo> properties, String arrayPath) {
+
+        List<com.bytechef.platform.workflow.validator.model.PropertyInfo> simplified = new ArrayList<>();
+
+        for (com.bytechef.platform.workflow.validator.model.PropertyInfo prop : properties) {
+            String displayCondition = prop.displayCondition();
+
+            // Simplify the display condition if it contains array path references
+            if (displayCondition != null && !displayCondition.isEmpty()) {
+                String simplifiedCondition = displayCondition;
+
+                // Extract the base array name from arrayPath (e.g., "conditions[0]" -> "conditions")
+                String baseArrayName = arrayPath.replaceAll("\\[\\d+\\]", "");
+
+                // Replace patterns like "baseArrayName[index][index]." with just ""
+                // This transforms "conditions[index][index].operation" to "operation"
+                simplifiedCondition = simplifiedCondition.replaceAll(
+                    baseArrayName.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]") +
+                    "\\[index\\]\\[index\\]\\.", "");
+
+                // Also handle single [index] in case of single-level arrays
+                simplifiedCondition = simplifiedCondition.replaceAll(
+                    baseArrayName.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]") +
+                    "\\[index\\]\\.", "");
+
+                com.bytechef.platform.workflow.validator.model.PropertyInfo simplifiedProp =
+                    new com.bytechef.platform.workflow.validator.model.PropertyInfo(
+                        prop.name(), prop.type(), prop.description(), prop.required(),
+                        prop.expressionEnabled(), simplifiedCondition, prop.nestedProperties());
+                simplified.add(simplifiedProp);
+            } else {
+                simplified.add(prop);
+            }
+        }
+
+        return simplified;
+    }
+
+    /**
+     * Validates union type object array where each object must match one of several schemas.
+     */
+    private static void validateUnionTypeObjectArray(
+        JsonNode arrayJsonNode, List<com.bytechef.platform.workflow.validator.model.PropertyInfo> unionTypes,
+        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode elementJsonNode = arrayJsonNode.get(i);
+            String elementPath = propertyPath + "[" + i + "]";
+
+            if (!elementJsonNode.isObject()) {
+                String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
+                StringUtils.appendWithNewline(
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+                continue;
+            }
+
+            // Try to find a matching union type schema
+            boolean foundMatch = false;
+            StringBuilder tempErrors = new StringBuilder();
+            StringBuilder tempWarnings = new StringBuilder();
+
+            for (com.bytechef.platform.workflow.validator.model.PropertyInfo unionType : unionTypes) {
+                // Try validating against this union type schema
+                StringBuilder currentErrors = new StringBuilder();
+                StringBuilder currentWarnings = new StringBuilder();
+
+                List<com.bytechef.platform.workflow.validator.model.PropertyInfo> schemaProperties = unionType.nestedProperties();
+                if (schemaProperties != null && !schemaProperties.isEmpty()) {
+                    // For union types in nested arrays, we need to simplify display conditions
+                    // Transform schemaProperties to remove array path prefixes from display conditions
+                    List<com.bytechef.platform.workflow.validator.model.PropertyInfo> simplifiedProperties =
+                        simplifyDisplayConditionsForUnionType(schemaProperties, propertyPath);
+
+                    // Evaluate in the context of the current element
+                    String elementContext = elementJsonNode.toString();
+                    validatePropertiesFromPropertyInfo(
+                        elementJsonNode, simplifiedProperties, elementPath, elementContext,
+                        currentErrors, currentWarnings);
+
+                    // If no errors, this schema matches
+                    if (currentErrors.isEmpty()) {
+                        foundMatch = true;
+                        // Keep the warnings from the matching schema
+                        if (!currentWarnings.isEmpty()) {
+                            warnings.append(currentWarnings);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // If no schema matched, it's an error
+            if (!foundMatch) {
+                // Generate a helpful error message listing the possible types
+                StringBuilder typeNames = new StringBuilder();
+                for (int j = 0; j < unionTypes.size(); j++) {
+                    if (j > 0) {
+                        typeNames.append(", ");
+                    }
+                    typeNames.append(unionTypes.get(j).name());
+                }
+                StringUtils.appendWithNewline(
+                    "Property '" + elementPath + "' does not match any of the expected union types: " + typeNames,
+                    errors);
+            }
+        }
+    }
+
+    /**
+     * Validates union type array elements using PropertyInfo.
+     */
+    private static void validateUnionTypeArrayFromPropertyInfo(
+        JsonNode arrayJsonNode, List<com.bytechef.platform.workflow.validator.model.PropertyInfo> allowedTypes,
+        String propertyPath, StringBuilder errors) {
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode valueJsonNode = arrayJsonNode.get(i);
+            boolean matchesAnyType = false;
+
+            // Check if an element matches any of the allowed types
+            for (com.bytechef.platform.workflow.validator.model.PropertyInfo typeInfo : allowedTypes) {
+                if (isTypeValid(valueJsonNode, typeInfo.type())) {
+                    matchesAnyType = true;
+                    break;
+                }
+            }
+
+            if (!matchesAnyType) {
+                String elementValue = formatValue(valueJsonNode);
+                String propertyName = PropertyUtils.extractPropertyNameFromPath(propertyPath);
+                String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
+
+                // Build expected types string (lowercase)
+                StringBuilder expectedTypes = new StringBuilder();
+                for (int j = 0; j < allowedTypes.size(); j++) {
+                    if (j > 0) {
+                        expectedTypes.append(" or ");
+                    }
+                    expectedTypes.append(allowedTypes.get(j).type().toLowerCase());
+                }
+
+                StringUtils.appendWithNewline(
+                    ValidationErrorUtils.arrayElementError(
+                        elementValue, propertyName, expectedTypes.toString(), actualType),
+                    errors);
+            }
+        }
+    }
+
+    /**
+     * Validates object array elements using PropertyInfo.
+     */
+    private static void validateObjectArrayFromPropertyInfo(
+        JsonNode arrayJsonNode, List<com.bytechef.platform.workflow.validator.model.PropertyInfo> elementProperties,
+        String propertyPath, String originalCurrentParameters, StringBuilder errors, StringBuilder warnings) {
+
+        // Check if this is a union type array (all elementProperties are OBJECT types with nestedProperties)
+        boolean isUnionTypeObjectArray = elementProperties.stream()
+            .allMatch(prop -> "OBJECT".equalsIgnoreCase(prop.type()) &&
+                             prop.nestedProperties() != null &&
+                             !prop.nestedProperties().isEmpty());
+
+        if (isUnionTypeObjectArray) {
+            // Handle union type object array - each object must match at least one of the schemas
+            validateUnionTypeObjectArray(arrayJsonNode, elementProperties, propertyPath, originalCurrentParameters, errors, warnings);
+            return;
+        }
+
+        // Get the root parameters for display condition evaluation
+        JsonNode rootParametersJsonNode = createRootParametersJsonNode(arrayJsonNode, propertyPath);
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode elementJsonNode = arrayJsonNode.get(i);
+            String elementPath = propertyPath + "[" + i + "]";
+
+            if (!elementJsonNode.isObject()) {
+                String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
+                StringUtils.appendWithNewline(
+                    ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+                continue;
+            }
+
+            // Check for extra properties (warnings)
+            final int currentIndex = i;
+            Iterator<String> fieldNamesIterator = elementJsonNode.fieldNames();
+
+            fieldNamesIterator.forEachRemaining(fieldName -> {
+                com.bytechef.platform.workflow.validator.model.PropertyInfo matchingProperty = elementProperties.stream()
+                    .filter(prop -> fieldName.equals(prop.name()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (matchingProperty == null) {
+                    // Property is not defined in schema at all
+                    StringUtils.appendWithNewline(
+                        "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition",
+                        warnings);
+                } else if (matchingProperty.displayCondition() != null && !matchingProperty.displayCondition().isEmpty()) {
+                    // Property is defined but check if it should be visible based on display condition
+                    String condition = matchingProperty.displayCondition();
+                    String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
+
+                    try {
+                        boolean shouldShowProperty = WorkflowUtils.extractAndEvaluateCondition(
+                            resolvedCondition, rootParametersJsonNode);
+
+                        if (!shouldShowProperty) {
+                            // Property exists but display condition is false - generate warning
+                            StringUtils.appendWithNewline(
+                                "Property '" + propertyPath + "[" + currentIndex + "]." + fieldName +
+                                    "' is not defined in task definition",
+                                warnings);
+                        }
+                    } catch (Exception e) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(e.getMessage());
+                        }
+                    }
+                }
+            });
+
+            // Validate each property in the element
+            for (com.bytechef.platform.workflow.validator.model.PropertyInfo propertyInfo : elementProperties) {
+                String fieldName = propertyInfo.name();
+                String fieldPath = elementPath + "." + fieldName;
+                boolean isRequired = propertyInfo.required();
+
+                // Check display condition
+                boolean shouldValidateProperty = true;
+                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+                    String condition = propertyInfo.displayCondition();
+                    String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
+
+                    try {
+                        shouldValidateProperty = WorkflowUtils.extractAndEvaluateCondition(
+                            resolvedCondition, rootParametersJsonNode);
+                    } catch (Exception e) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(e.getMessage());
+                        }
+                    }
+                }
+
+                if (shouldValidateProperty) {
+                    // Property should be validated based on the display condition
+                    if (isRequired && !elementJsonNode.has(fieldName)) {
+                        StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
+                    } else if (elementJsonNode.has(fieldName)) {
+                        JsonNode valueJsonNode = elementJsonNode.get(fieldName);
+
+                        // Skip type validation for data pill expressions
+                        if (valueJsonNode.isTextual() && isDataPillExpression(valueJsonNode.asText())) {
+                            continue;
+                        }
+
+                        validateSimpleType(valueJsonNode, propertyInfo.type(), fieldPath, errors);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Validates simple type (STRING, INTEGER, etc.) using PropertyInfo.
+     */
+    private static void validateSimpleType(
+        JsonNode valueJsonNode, String expectedType, String propertyPath, StringBuilder errors) {
+
+        // Handle format validation for date/time types
+        if (valueJsonNode.isTextual() && isDateTimeType(expectedType)) {
+            String formatError = validateDateTimeTypeWithError(
+                valueJsonNode.asText(), expectedType, propertyPath);
+
+            if (formatError != null) {
+                StringUtils.appendWithNewline(formatError, errors);
+            }
+        } else if (!isTypeValid(valueJsonNode, expectedType)) {
+            String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
+            // Convert type to lowercase for error messages
+            String normalizedExpectedType = expectedType.toLowerCase();
+            StringUtils.appendWithNewline(
+                ValidationErrorUtils.typeError(propertyPath, normalizedExpectedType, actualType), errors);
         }
     }
 }

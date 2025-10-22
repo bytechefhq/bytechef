@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
@@ -129,14 +128,9 @@ class TaskValidator {
         }
 
         try {
-            String originalTaskDefinition = WorkflowUtils.convertPropertyInfoToJson(taskDefinition);
-
-            String processedTaskDefinition = WorkflowUtils.processDisplayConditions(
-                originalTaskDefinition, taskParameters);
-
-            validateProcessedTaskDefinition(
-                taskParametersJsonNode, taskParameters, processedTaskDefinition, originalTaskDefinition, errors,
-                warnings);
+            // Use the new PropertyInfo-based validation directly
+            PropertyValidator.validatePropertiesFromPropertyInfo(
+                taskParametersJsonNode, taskDefinition, "", taskParameters, errors, warnings);
 
         } catch (RuntimeException e) {
             handleDisplayConditionError(e, taskDefinition, taskParameters, errors, warnings);
@@ -188,129 +182,12 @@ class TaskValidator {
         RuntimeException exception, List<PropertyInfo> taskDefinition, String taskParameters, StringBuilder errors,
         StringBuilder warnings) {
 
-        String message = exception.getMessage();
-
-        if (message != null && message.startsWith("Invalid logic for display condition:")) {
-            // Extract the condition from the error message to check if it's truly malformed
-            String condition = extractConditionFromMessage(message);
-
-            boolean isActuallyMalformed = isMalformedCondition(condition);
-
-            try {
-                String cleanedTaskDefinition = removeObjectsWithInvalidConditions(
-                    WorkflowUtils.convertPropertyInfoToJson(taskDefinition));
-
-                JsonNode taskDefinitionJsonNode = com.bytechef.commons.util.JsonUtils.readTree(cleanedTaskDefinition);
-
-                JsonNode parametersDefinitionJsonNode = taskDefinitionJsonNode.get("parameters");
-
-                if (parametersDefinitionJsonNode != null && parametersDefinitionJsonNode.isObject()) {
-                    JsonNode taskParametersJsonNode = com.bytechef.commons.util.JsonUtils.readTree(taskParameters);
-
-                    PropertyValidator.validatePropertiesRecursively(
-                        taskParametersJsonNode, parametersDefinitionJsonNode, "", cleanedTaskDefinition, taskParameters,
-                        errors, warnings);
-                }
-
-                // Add warning for truly malformed conditions even if cleanup succeeded
-                if (isActuallyMalformed) {
-                    StringUtils.appendWithNewline(message, warnings);
-                }
-            } catch (Exception ignored) {
-                // Add warning for truly malformed conditions when cleanup fails
-                if (isActuallyMalformed) {
-                    StringUtils.appendWithNewline(message, warnings);
-                }
-            }
-        } else {
-            throw exception;
-        }
+        // Display condition errors are now handled within PropertyValidator
+        // If we get here, it's an unexpected error, so rethrow it
+        throw exception;
     }
 
-    /**
-     * Extracts the condition from the error message.
-     */
-    private static String extractConditionFromMessage(String message) {
-        if (!message.startsWith("Invalid logic for display condition:")) {
-            return "";
-        }
 
-        int startQuote = message.indexOf('\'');
-
-        if (startQuote == -1) {
-            return "";
-        }
-
-        int endQuote = message.lastIndexOf('\'');
-
-        if (endQuote == startQuote) {
-            return "";
-        }
-
-        return message.substring(startQuote + 1, endQuote);
-    }
-
-    /**
-     * Determines if a condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
-     */
-    private static boolean isMalformedCondition(String condition) {
-        String trim = condition.trim();
-
-        if (trim.isEmpty()) {
-            return false;
-        }
-
-        // Clean the condition by removing @ markers if present
-        String cleanCondition = trim;
-
-        if (cleanCondition.startsWith("@") && cleanCondition.endsWith("@")) {
-            cleanCondition = cleanCondition.substring(1, cleanCondition.length() - 1);
-        }
-
-        // Basic syntax validation patterns for common expression types
-        // Valid patterns include: field comparisons, function calls, boolean operations
-
-        // Pattern 1: Simple field comparisons (field == value, field != value, field >= value, etc.)
-        // Supports field names with dots, brackets, and 'index' placeholder
-        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w.\\[\\]index]*\\s*(==|!=|<=|>=|<|>)\\s*.*")) {
-            return false; // Valid comparison syntax
-        }
-
-        // Pattern 2: Function calls like contains({...}, field)
-        if (cleanCondition.matches("\\s*\\w+\\s*\\([^)]*\\).*")) {
-            return false; // Valid function call syntax
-        }
-
-        // Pattern 3: Boolean operations with AND/OR
-        if (cleanCondition.matches(".*\\s+(&&|\\|\\||and|or)\\s+.*")) {
-            return false; // Valid boolean operation syntax
-        }
-
-        // Pattern 4: Simple field references (including those with [index] placeholders)
-        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w.\\[\\]index]*\\s*")) {
-            return false; // Valid field reference
-        }
-
-        // Pattern 5: Literal values (true, false, numbers, strings)
-        return !cleanCondition.matches("\\s*(true|false|\\d+(\\.\\d+)?|'[^']*')\\s*"); // Valid literal
-
-        // If none of the valid patterns match, it's likely malformed
-    }
-
-    /**
-     * Handles JsonProcessingException with context-aware error messages.
-     */
-    private static void handleJsonProcessingException(
-        JsonProcessingException exception, String json, StringBuilder errors) {
-
-        if (exception.getMessage() != null && json.contains("\"type\":") && json.contains("triggers")) {
-            errors.append("Trigger must be an object\n");
-        } else {
-            errors.append("Invalid JSON format: ");
-            errors.append(exception.getMessage());
-            errors.append("\n");
-        }
-    }
 
     /**
      * Strategy to determine if a task type supports nested tasks.
@@ -406,24 +283,6 @@ class TaskValidator {
         processNestedTaskArray(jsonNode, context);
     }
 
-    /**
-     * Removes objects with invalid display conditions from JSON.
-     */
-    private static String removeObjectsWithInvalidConditions(String json) {
-        try {
-            String result = json;
-
-            // Remove objects that have metadata (display conditions)
-            result = result.replaceAll("\"[^\"]+\"\\s*:\\s*\\{[^{}]*\"metadata\"\\s*:\\s*\"[^\"]*\"[^{}]*}", "");
-
-            // Clean up any resulting JSON syntax issues
-            result = JsonUtils.cleanupJsonSyntax(result);
-
-            return result;
-        } catch (Exception e) {
-            return json;
-        }
-    }
 
     private static void validateDataPills(
         JsonNode task, @Nullable List<PropertyInfo> taskDefinition, ValidationContext context) {
@@ -485,41 +344,12 @@ class TaskValidator {
             context.getErrors(), context.getWarnings(), context.getAllTasksMap(), nestedTaskDefinition, true);
     }
 
-    private static void validateProcessedTaskDefinition(
-        JsonNode taskParametersJsonNode, String taskParameters, String processedTaskDefinition,
-        String originalTaskDefinition, StringBuilder errors, StringBuilder warnings) {
-
-        try {
-            JsonNode taskDefinitionJsonNode = com.bytechef.commons.util.JsonUtils.readTree(processedTaskDefinition);
-
-            if (!JsonUtils.validateNodeIsObject(taskDefinitionJsonNode, "Task definition", errors)) {
-                return;
-            }
-
-            JsonNode parametersDefinitionJsonNode = taskDefinitionJsonNode.get("parameters");
-
-            if (parametersDefinitionJsonNode == null || !parametersDefinitionJsonNode.isObject()) {
-                errors.append("Task definition must have a 'parameters' object");
-
-                return;
-            }
-
-            // For array validation with display conditions, use the original definition
-            PropertyValidator.validatePropertiesRecursively(
-                taskParametersJsonNode, parametersDefinitionJsonNode, "", processedTaskDefinition,
-                originalTaskDefinition, taskParameters, errors, warnings);
-        } catch (Exception e) {
-            handleJsonProcessingException((JsonProcessingException) e.getCause(), processedTaskDefinition, errors);
-
-        }
-    }
 
     /**
-     * Validates that a required object field exists and is of the correct type.
+     * Validates that a required object field exists and is of correct type.
      */
-    private static void validateRequiredObjectField(
-        JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
-
+    private static void
+        validateRequiredObjectField(JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
             StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {
