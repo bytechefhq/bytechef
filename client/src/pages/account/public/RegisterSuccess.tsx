@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {CircleCheckBig} from 'lucide-react';
@@ -50,12 +50,7 @@ const RegisterSuccess = () => {
                 </CardHeader>
 
                 <Link to="/login">
-                    <Button
-                        className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
-                        disabled={loading}
-                    >
-                        {loading && <LoadingIcon />} Start
-                    </Button>
+                    <Button disabled={loading} icon={loading ? <LoadingIcon /> : undefined} label="Start" size="lg" />
                 </Link>
             </Card>
         </PublicLayoutContainer>
