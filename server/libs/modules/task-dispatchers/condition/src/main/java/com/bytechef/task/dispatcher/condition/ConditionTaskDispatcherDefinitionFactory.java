@@ -58,7 +58,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
         .icon("path:assets/condition.svg")
         .properties(
             bool(RAW_EXPRESSION)
-                .label("Raw expression")
+                .label("Raw Expression")
                 .description("Set condition as raw expression or list of conditions.")
                 .expressionEnabled(false)
                 .required(true)
@@ -71,7 +71,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .displayCondition("%s == false".formatted(RAW_EXPRESSION))
                 .items(
                     array()
-                        .label("AND condition")
+                        .label("AND Condition")
                         .placeholder("Add AND Condition")
                         .expressionEnabled(false)
                         .description("AND Condition array that contains expression items")
