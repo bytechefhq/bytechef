@@ -69,7 +69,8 @@ class PropertyValidator {
             boolean hasInvalidDisplayCondition = false;
             String malformedConditionMessage = null;
 
-            if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+            if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition()
+                .isEmpty()) {
                 try {
                     shouldInclude = WorkflowUtils.extractAndEvaluateCondition(
                         propertyInfo.displayCondition(),
@@ -299,7 +300,8 @@ class PropertyValidator {
      * Determines if a display condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
      */
     private static boolean isMalformedDisplayCondition(String condition) {
-        if (condition == null || condition.trim().isEmpty()) {
+        if (condition == null || condition.trim()
+            .isEmpty()) {
             return false;
         }
 
@@ -763,7 +765,8 @@ class PropertyValidator {
      * Validates a property definition and its value, handling required properties and type checking.
      */
     private static void validateStringTypeDefinition(
-        JsonNode taskParametersJsonNode, String fieldName, String propertyDefinition, String propertyPath, StringBuilder errors) {
+        JsonNode taskParametersJsonNode, String fieldName, String propertyDefinition, String propertyPath,
+        StringBuilder errors) {
 
         String expectedType = propertyDefinition;
 
@@ -875,6 +878,34 @@ class PropertyValidator {
     }
 
     /**
+     * Recursively reports all nested required properties as missing.
+     */
+    private static void reportMissingNestedRequiredProperties(
+        PropertyInfo propertyInfo, String propertyPath, StringBuilder errors) {
+
+        List<PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
+        if (nestedProperties == null || nestedProperties.isEmpty()) {
+            return;
+        }
+
+        for (PropertyInfo nestedProp : nestedProperties) {
+            // Only report required properties that don't have display conditions
+            // If a property has a display condition, we can't determine if it should be required
+            // without evaluating the condition in the context of actual data
+            if (nestedProp.required() && (nestedProp.displayCondition() == null || nestedProp.displayCondition()
+                .isEmpty())) {
+                String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedProp.name());
+                StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(nestedPath), errors);
+
+                // If this nested property is also an OBJECT, recursively report its nested required properties
+                if ("OBJECT".equalsIgnoreCase(nestedProp.type())) {
+                    reportMissingNestedRequiredProperties(nestedProp, nestedPath, errors);
+                }
+            }
+        }
+    }
+
+    /**
      * Validates a single property using PropertyInfo.
      */
     private static void validatePropertyFromPropertyInfo(
@@ -889,16 +920,10 @@ class PropertyValidator {
         if (!taskParametersJsonNode.has(fieldName)) {
             if (isRequired) {
                 StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
-            } else if ("OBJECT".equalsIgnoreCase(type)) {
-                // For optional objects that are not provided, check if any nested properties are required
-                List<PropertyInfo> nestedProperties = propertyInfo.nestedProperties();
-                if (nestedProperties != null) {
-                    for (PropertyInfo nestedProp : nestedProperties) {
-                        if (nestedProp.required()) {
-                            String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedProp.name());
-                            StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(nestedPath), errors);
-                        }
-                    }
+
+                // For required objects that are missing, also report all nested required properties
+                if ("OBJECT".equalsIgnoreCase(type)) {
+                    reportMissingNestedRequiredProperties(propertyInfo, propertyPath, errors);
                 }
             }
             return;
@@ -919,7 +944,6 @@ class PropertyValidator {
             validateArrayPropertyFromPropertyInfo(
                 valueJsonNode, propertyInfo, propertyPath, errors, warnings);
         } else {
-            // Simple type validation
             validateSimpleType(valueJsonNode, type, propertyPath, errors);
         }
     }
@@ -983,15 +1007,20 @@ class PropertyValidator {
         }
 
         // Check if this is a TASK type array
-        if (nestedProperties.size() == 1 && "TASK".equalsIgnoreCase(nestedProperties.get(0).type())) {
+        if (nestedProperties.size() == 1 && "TASK".equalsIgnoreCase(nestedProperties.get(0)
+            .type())) {
             TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
             return;
         }
 
         // Check if it's a wrapped definition (single entry with nested properties)
         boolean isWrappedDefinition = nestedProperties.size() == 1 &&
-            nestedProperties.get(0).nestedProperties() != null &&
-            !nestedProperties.get(0).nestedProperties().isEmpty();
+            nestedProperties.get(0)
+                .nestedProperties() != null
+            &&
+            !nestedProperties.get(0)
+                .nestedProperties()
+                .isEmpty();
 
         if (isWrappedDefinition) {
             PropertyInfo wrapperInfo = nestedProperties.get(0);
@@ -1037,8 +1066,8 @@ class PropertyValidator {
     }
 
     /**
-     * Simplifies display conditions for union type validation by removing array path prefixes.
-     * Transforms conditions like "conditions[index][index].operation" to just "operation".
+     * Simplifies display conditions for union type validation by removing array path prefixes. Transforms conditions
+     * like "conditions[index][index].operation" to just "operation".
      */
     private static List<PropertyInfo> simplifyDisplayConditionsForUnionType(
         List<PropertyInfo> properties, String arrayPath) {
@@ -1058,13 +1087,17 @@ class PropertyValidator {
                 // Replace patterns like "baseArrayName[index][index]." with just ""
                 // This transforms "conditions[index][index].operation" to "operation"
                 simplifiedCondition = simplifiedCondition.replaceAll(
-                    baseArrayName.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]") +
-                    "\\[index\\]\\[index\\]\\.", "");
+                    baseArrayName.replaceAll("\\[", "\\\\[")
+                        .replaceAll("\\]", "\\\\]") +
+                        "\\[index\\]\\[index\\]\\.",
+                    "");
 
                 // Also handle single [index] in case of single-level arrays
                 simplifiedCondition = simplifiedCondition.replaceAll(
-                    baseArrayName.replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]") +
-                    "\\[index\\]\\.", "");
+                    baseArrayName.replaceAll("\\[", "\\\\[")
+                        .replaceAll("\\]", "\\\\]") +
+                        "\\[index\\]\\.",
+                    "");
 
                 PropertyInfo simplifiedProp =
                     new PropertyInfo(
@@ -1138,7 +1171,8 @@ class PropertyValidator {
                     if (j > 0) {
                         typeNames.append(", ");
                     }
-                    typeNames.append(unionTypes.get(j).name());
+                    typeNames.append(unionTypes.get(j)
+                        .name());
                 }
                 StringUtils.appendWithNewline(
                     "Property '" + elementPath + "' does not match any of the expected union types: " + typeNames,
@@ -1177,7 +1211,9 @@ class PropertyValidator {
                     if (j > 0) {
                         expectedTypes.append(" or ");
                     }
-                    expectedTypes.append(allowedTypes.get(j).type().toLowerCase());
+                    expectedTypes.append(allowedTypes.get(j)
+                        .type()
+                        .toLowerCase());
                 }
 
                 StringUtils.appendWithNewline(
@@ -1198,8 +1234,9 @@ class PropertyValidator {
         // Check if this is a union type array (all elementProperties are OBJECT types with nestedProperties)
         boolean isUnionTypeObjectArray = elementProperties.stream()
             .allMatch(prop -> "OBJECT".equalsIgnoreCase(prop.type()) &&
-                             prop.nestedProperties() != null &&
-                             !prop.nestedProperties().isEmpty());
+                prop.nestedProperties() != null &&
+                !prop.nestedProperties()
+                    .isEmpty());
 
         if (isUnionTypeObjectArray) {
             // Handle union type object array - each object must match at least one of the schemas
@@ -1236,7 +1273,8 @@ class PropertyValidator {
                     StringUtils.appendWithNewline(
                         "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition",
                         warnings);
-                } else if (matchingProperty.displayCondition() != null && !matchingProperty.displayCondition().isEmpty()) {
+                } else if (matchingProperty.displayCondition() != null && !matchingProperty.displayCondition()
+                    .isEmpty()) {
                     // Property is defined but check if it should be visible based on display condition
                     String condition = matchingProperty.displayCondition();
                     String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
@@ -1268,7 +1306,8 @@ class PropertyValidator {
 
                 // Check display condition
                 boolean shouldValidateProperty = true;
-                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition().isEmpty()) {
+                if (propertyInfo.displayCondition() != null && !propertyInfo.displayCondition()
+                    .isEmpty()) {
                     String condition = propertyInfo.displayCondition();
                     String resolvedCondition = replaceIndexPlaceholder(condition, currentIndex);
 

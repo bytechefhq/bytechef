@@ -266,7 +266,6 @@ class TaskValidator {
         processNestedTaskArray(jsonNode, context);
     }
 
-
     private static void validateDataPills(
         JsonNode task, @Nullable List<PropertyInfo> taskDefinition, ValidationContext context) {
 
@@ -326,7 +325,6 @@ class TaskValidator {
             nestedTaskJsonNode, context.getTaskOutputs(), context.getTaskNames(), context.getTaskNameToTypeMap(),
             context.getErrors(), context.getWarnings(), context.getAllTasksMap(), nestedTaskDefinition, true);
     }
-
 
     /**
      * Validates that a required object field exists and is of correct type.

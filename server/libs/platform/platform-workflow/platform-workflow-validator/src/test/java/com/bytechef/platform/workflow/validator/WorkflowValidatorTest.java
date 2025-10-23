@@ -1495,7 +1495,7 @@ class WorkflowValidatorTest {
         List<PropertyInfo> taskDefinition = List.of(
             new PropertyInfo("enableFeature", "FLOAT", null, true, true, null, null),
             new PropertyInfo(
-                "featureConfig", "OBJECT", null, false, true, "50 > enableFeature",
+                "featureConfig", "OBJECT", null, true, true, "50 > enableFeature",
                 List.of(
                     new PropertyInfo("setting1", "STRING", null, true, true, null, null),
                     new PropertyInfo("setting2", "STRING", null, false, true, null, null))));
@@ -1525,17 +1525,22 @@ class WorkflowValidatorTest {
             new PropertyInfo("basicConfig", "OBJECT", null, false, true, "mode == 'basic'",
                 List.of(new PropertyInfo("name", "STRING", null, true, true, null, null))),
             new PropertyInfo(
-                "advancedConfig", "OBJECT", null, false, true, "mode == 'advanced'",
+                "advancedConfig", "OBJECT", null, true, true, "mode == 'advanced'",
                 List.of(
-                    new PropertyInfo("name", "STRING", null, true, true, null, null),
-                    new PropertyInfo("extra", "STRING", null, false, true, null, null))));
+                    new PropertyInfo("mandatory", "OBJECT", null, true, true, null, List.of(
+                        new PropertyInfo("name", "STRING", null, true, true, null, null))),
+                    new PropertyInfo("extra", "STRING", null, false, true, null, List.of(
+                        new PropertyInfo("name", "STRING", null, true, true, null, null))))));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
         TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: advancedConfig.name", errors.toString());
+        assertEquals("""
+            Missing required property: advancedConfig
+            Missing required property: advancedConfig.mandatory
+            Missing required property: advancedConfig.mandatory.name""", errors.toString());
         assertEquals("""
             Property 'basicConfig' is not defined in task definition
             Property 'basicConfig.name' is not defined in task definition""", warnings.toString());
@@ -1682,6 +1687,7 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersStringValueConditionWorksCorrectly() {
+        // here
         String taskParameters = """
             {
                 "format": "json",
@@ -3608,7 +3614,7 @@ class WorkflowValidatorTest {
             "component/v1/trigger1", List.of(
                 new PropertyInfo("name", "STRING", null, false, true, null, null)),
             "condition/v1", List.of(
-                new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("rawExpression", "BOOLEAN", null, true, true, null, null),
                 new PropertyInfo("conditions", "ARRAY", null, false, true, "rawExpression == false", List.of(
                     new PropertyInfo(null, "ARRAY", null, false, false, null, List.of(
                         new PropertyInfo("boolean", "OBJECT", null, false, false, null, List.of(
