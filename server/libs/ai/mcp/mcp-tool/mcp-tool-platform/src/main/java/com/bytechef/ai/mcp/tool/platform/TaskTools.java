@@ -304,7 +304,8 @@ public class TaskTools {
         @ToolParam(
             required = false,
             description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types") String type,
-        @ToolParam(required = false, description = "Limit on number of results returned (defaults to 30)") Integer limit) {
+        @ToolParam(
+            required = false, description = "Limit on number of results returned (defaults to 30)") Integer limit) {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();

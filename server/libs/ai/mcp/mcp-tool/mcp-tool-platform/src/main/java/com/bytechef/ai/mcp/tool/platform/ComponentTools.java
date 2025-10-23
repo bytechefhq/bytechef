@@ -75,7 +75,6 @@ public class ComponentTools {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final ConnectionService connectionService;
 
-
     private static final String DEFAULT_TRIGGER_DEFINITION = """
         {
             "label": "Function of the Trigger",
@@ -545,8 +544,10 @@ public class ComponentTools {
                                     actionDefinition.getName(), Map.of(), Map.of());
                             } catch (Exception e) {
                                 try {
-                                    List<Connection> connections = connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
-                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0).getId());
+                                    List<Connection> connections =
+                                        connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
+                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0)
+                                        .getId());
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
