@@ -44,7 +44,7 @@ class TaskValidator {
      */
     public static void validateAllTasks(ValidationContext context) {
         for (JsonNode taskJsonNode : context.getTasks()) {
-            validateTask(taskJsonNode.toString(), context.getErrors());
+            validateTaskStructure(taskJsonNode.toString(), context.getErrors());
 
             List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
 
@@ -59,7 +59,7 @@ class TaskValidator {
      * @param taskJson the task JSON string to validate
      * @param errors   StringBuilder to collect validation errors
      */
-    public static void validateTask(String taskJson, StringBuilder errors) {
+    public static void validateTaskStructure(String taskJson, StringBuilder errors) {
         JsonNode taskJsonNode = JsonUtils.parseJsonWithErrorHandling(taskJson, errors);
 
         if (taskJsonNode == null) {
@@ -74,7 +74,7 @@ class TaskValidator {
         FieldValidator.validateRequiredStringField(taskJsonNode, "label", errors);
         FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
         validateTaskTypeField(taskJsonNode, errors);
-        validateRequiredObjectField(taskJsonNode, "parameters", errors);
+        validateRequiredObjectField(taskJsonNode, errors);
     }
 
     /**
@@ -89,22 +89,21 @@ class TaskValidator {
                 String actualType = JsonUtils.getJsonNodeType(taskJsonNode);
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
-
-                continue;
             }
+            else {
+                validateTaskStructure(taskJsonNode.toString(), errors);
 
-            validateTask(taskJsonNode.toString(), errors);
+                // If task has parameters, validate them recursively if we have the task type
+                if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
+                    JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
-            // If task has parameters, validate them recursively if we have the task type
-            if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
-                JsonNode parametersJsonNode = taskJsonNode.get("parameters");
+                    // Basic parameter structure validation
+                    if (!parametersJsonNode.isObject()) {
+                        String actualType = JsonUtils.getJsonNodeType(parametersJsonNode);
 
-                // Basic parameter structure validation
-                if (!parametersJsonNode.isObject()) {
-                    String actualType = JsonUtils.getJsonNodeType(parametersJsonNode);
-
-                    StringUtils.appendWithNewline(
-                        ValidationErrorUtils.typeError(path + ".parameters", "object", actualType), errors);
+                        StringUtils.appendWithNewline(
+                            ValidationErrorUtils.typeError(path + ".parameters", "object", actualType), errors);
+                    }
                 }
             }
         }
@@ -199,7 +198,7 @@ class TaskValidator {
      */
     private static void processIndividualNestedTask(JsonNode nestedTask, ValidationContext context) {
         addNestedTaskToContext(nestedTask, context);
-        validateNestedTaskStructure(nestedTask, context);
+        validateTaskStructure(nestedTask, context);
         validateNestedTaskParameters(nestedTask, context);
         validateNestedTaskDataPills(nestedTask, context);
         processNestedTaskValidation(nestedTask, context);
@@ -272,22 +271,22 @@ class TaskValidator {
         if (taskDefinition != null && !taskDefinition.isEmpty()) {
             DataPillValidator.validateTaskDataPills(
                 task, context.getTaskOutputs(), context.getTaskNames(), context.getTaskNameToTypeMap(),
-                context.getErrors(), context.getWarnings(), context.getAllTasksMap(), taskDefinition, false, true);
+                context.getErrors(), context.getWarnings(), context.getAllTasksMap(), taskDefinition, false);
         }
     }
 
     /**
      * Validates the structure of a nested task.
      */
-    private static void validateNestedTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
-        validateTask(nestedTaskJsonNode.toString(), context.getErrors());
+    private static void validateTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
+        validateTaskStructure(nestedTaskJsonNode.toString(), context.getErrors());
     }
 
     /**
      * Validates parameters of a nested task.
      */
-    private static void validateNestedTaskParameters(JsonNode nestedTaskJsonNode, ValidationContext context) {
-        JsonNode typeJsonNode = nestedTaskJsonNode.get("type");
+    private static void validateNestedTaskParameters(JsonNode taskJsonNode, ValidationContext context) {
+        JsonNode typeJsonNode = taskJsonNode.get("type");
 
         String type = typeJsonNode.asText();
 
@@ -297,7 +296,7 @@ class TaskValidator {
 
         if (nestedTaskDefinition != null) {
             String nestedTaskParameters = "{}";
-            JsonNode parametersJsonNode = nestedTaskJsonNode.get("parameters");
+            JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
             if (parametersJsonNode != null && parametersJsonNode.isObject()) {
                 nestedTaskParameters = parametersJsonNode.toString();
@@ -320,7 +319,6 @@ class TaskValidator {
 
         List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(type);
 
-        // Skip task order validation for nested tasks
         DataPillValidator.validateTaskDataPills(
             nestedTaskJsonNode, context.getTaskOutputs(), context.getTaskNames(), context.getTaskNameToTypeMap(),
             context.getErrors(), context.getWarnings(), context.getAllTasksMap(), nestedTaskDefinition, true);
@@ -330,15 +328,15 @@ class TaskValidator {
      * Validates that a required object field exists and is of correct type.
      */
     private static void
-        validateRequiredObjectField(JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
-        if (!jsonNode.has(fieldName)) {
-            StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
+        validateRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
+        if (!jsonNode.has("parameters")) {
+            StringUtils.appendWithNewline("Missing required field: " + "parameters", errors);
         } else {
-            JsonNode fieldJsonNode = jsonNode.get(fieldName);
+            JsonNode fieldJsonNode = jsonNode.get("parameters");
 
             if (!fieldJsonNode.isObject()) {
                 StringUtils.appendWithNewline(
-                    "Field '" + fieldName + "' must be an object", errors);
+                    "Field '" + "parameters" + "' must be an object", errors);
             }
         }
     }

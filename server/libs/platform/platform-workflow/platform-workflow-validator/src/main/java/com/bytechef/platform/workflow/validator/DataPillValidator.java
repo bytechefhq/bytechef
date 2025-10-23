@@ -40,28 +40,13 @@ class DataPillValidator {
     }
 
     /**
-     * Validates data pills in a task's parameters, with access to all tasks for loop type validation and task
-     * definition for type checking.
-     */
-    public static void validateTaskDataPills(
-        JsonNode taskJsonNode, Map<String, PropertyInfo> taskOutput, List<String> taskNames,
-        Map<String, String> taskNameToTypeMap, StringBuilder errors, StringBuilder warnings,
-        Map<String, JsonNode> allTaskMap, List<PropertyInfo> taskDefinition, boolean skipTaskOrderValidation) {
-
-        validateTaskDataPills(
-            taskJsonNode, taskOutput, taskNames, taskNameToTypeMap, errors, warnings, allTaskMap, taskDefinition,
-            skipTaskOrderValidation, false);
-    }
-
-    /**
      * Validates data pills in a task's parameters, with access to all tasks for loop type validation, task definition
      * for type checking, and optional task order validation skipping.
      */
     public static void validateTaskDataPills(
         JsonNode taskJsonNode, Map<String, PropertyInfo> taskOutputMap, List<String> taskNames,
         Map<String, String> taskNameToTypeMap, StringBuilder errors, StringBuilder warnings,
-        Map<String, JsonNode> allTaskMap, List<PropertyInfo> taskDefinition, boolean skipTaskOrderValidation,
-        boolean skipNestedTaskValidation) {
+        Map<String, JsonNode> allTaskMap, List<PropertyInfo> taskDefinition, boolean skipTaskOrderValidation) {
 
         JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
@@ -76,7 +61,6 @@ class DataPillValidator {
         TaskValidationContext context = new TaskValidationContext();
 
         context.skipTaskOrderValidation = skipTaskOrderValidation;
-        context.skipNestedTaskValidation = skipNestedTaskValidation;
 
         findDataPillsInNode(
             parametersJsonNode, "", name, taskOutputMap, taskNames, taskNameToTypeMap, errors, warnings, context,
@@ -109,7 +93,7 @@ class DataPillValidator {
             }
         } else if (jsonNode.isArray()) {
             // Check if this array contains TASK type elements that should be skipped
-            if (context.skipNestedTaskValidation && isTaskTypeArray(currentPath, taskDefinition)) {
+            if (isTaskTypeArray(currentPath, taskDefinition)) {
                 // Skip validation of this array since it contains nested tasks that will be validated separately
                 return;
             }
@@ -594,6 +578,5 @@ class DataPillValidator {
     private static class TaskValidationContext {
         boolean stopProcessing = false;
         boolean skipTaskOrderValidation = false;
-        boolean skipNestedTaskValidation = false;
     }
 }

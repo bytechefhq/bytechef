@@ -128,7 +128,7 @@ public class WorkflowValidator {
 
         try {
             // First, validate the basic task structure
-            TaskValidator.validateTask(task, errors);
+            TaskValidator.validateTaskStructure(task, errors);
 
             // Extract task properties from the provided task JSON
             JsonNode taskJsonNode = com.bytechef.commons.util.JsonUtils.readTree(task);
@@ -327,7 +327,7 @@ public class WorkflowValidator {
                             }
 
                             // Validate the nested task structure
-                            TaskValidator.validateTask(nestedTaskJsonNode.toString(), errors);
+                            TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors);
 
                             // Recursively process nested tasks within this task
                             if (nestedTaskJsonNode.has("parameters")) {
@@ -408,7 +408,7 @@ public class WorkflowValidator {
                             }
 
                             // Validate the nested task structure
-                            TaskValidator.validateTask(nestedTaskJsonNode.toString(), errors);
+                            TaskValidator.validateTaskStructure(nestedTaskJsonNode.toString(), errors);
 
                             // Recursively process nested tasks within this task
                             if (nestedTaskJsonNode.has("parameters")) {
