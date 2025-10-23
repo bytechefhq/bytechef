@@ -89,7 +89,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
             'svg',
         ].join(', ');
 
-        if (target.closest(interactiveSelectors)) {
+        if (target.closest('[data-stop-propagation]')) {
             return;
         }
 
