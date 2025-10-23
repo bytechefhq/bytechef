@@ -534,7 +534,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         String string = errors.toString();
 
@@ -554,7 +554,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         String string = errors.toString();
 
@@ -573,7 +573,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Missing required field: label", errors.toString());
     }
@@ -590,7 +590,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Missing required field: type", errors.toString());
     }
@@ -607,7 +607,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Missing required field: name", errors.toString());
     }
@@ -625,7 +625,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Field 'label' must be a string", errors.toString());
     }
@@ -643,7 +643,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Field 'name' must be a string", errors.toString());
     }
@@ -661,7 +661,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Field 'type' must be a string", errors.toString());
     }
@@ -679,7 +679,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(validTask, errors);
+        TaskValidator.validateTaskStructure(validTask, errors);
 
         assertEquals("", errors.toString());
     }
@@ -704,7 +704,7 @@ class WorkflowValidatorTest {
 
             StringBuilder errors = new StringBuilder();
 
-            TaskValidator.validateTask(validTask, errors);
+            TaskValidator.validateTaskStructure(validTask, errors);
 
             assertEquals("", errors.toString(), "Type should be valid: " + type);
         }
@@ -722,7 +722,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Missing required field: parameters", errors.toString());
     }
@@ -740,7 +740,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Field 'parameters' must be an object", errors.toString());
     }
@@ -751,7 +751,7 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTask(invalidTask, errors);
+        TaskValidator.validateTaskStructure(invalidTask, errors);
 
         assertEquals("Task must be an object", errors.toString());
     }
@@ -1733,7 +1733,7 @@ class WorkflowValidatorTest {
         TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("", warnings.toString());
+        assertEquals("Invalid logic for display condition: 'enableAdvanced == true'", warnings.toString());
     }
 
     @Test
