@@ -64,6 +64,7 @@ class GoogleMapsGetRouteActionTest {
             ROUTING_PREFERENCE, "TRAFFIC_UNAWARE", COMPUTE_ALT_ROUTES, false, AVOID_TOLLS, false,
             AVOID_HIGHWAYS, false, AVOID_FERRIES, false, UNITS, "METRIC"));
     private final Response mockedResponse = mock(Response.class);
+    private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -79,7 +80,7 @@ class GoogleMapsGetRouteActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of());
+            .thenReturn(responseMap);
 
         try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
             mockedGoogleMapsUtils
@@ -90,7 +91,7 @@ class GoogleMapsGetRouteActionTest {
             Map<String, Object> result = GoogleMapsGetRouteAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(Map.of(), result);
+            assertEquals(responseMap, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(
                 List.of("origin", "destination", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());

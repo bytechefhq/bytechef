@@ -54,6 +54,7 @@ class GoogleMapsNearbySearchActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(INCLUDED_TYPES, List.of("keyword"), ADDRESS, "mockedAddress", RADIUS, 0.0));
     private final Response mockedResponse = mock(Response.class);
+    private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -69,18 +70,18 @@ class GoogleMapsNearbySearchActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of());
+            .thenReturn(responseMap);
 
         try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
             mockedGoogleMapsUtils
-                .when(() -> GoogleMapsUtils.getAddressGeolocation(contextArgumentCaptor.capture(),
-                    stringArgumentCaptor.capture()))
+                .when(() -> GoogleMapsUtils.getAddressGeolocation(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(Map.of(LATITUDE, 0.0, LONGITUDE, 0.0));
 
             Map<String, Object> result = GoogleMapsNearbySearchAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(Map.of(), result);
+            assertEquals(responseMap, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals(List.of("mockedAddress", "X-Goog-FieldMask", "*"), stringArgumentCaptor.getAllValues());
 
