@@ -37,6 +37,91 @@ Version: 1
 ## Actions
 
 
+### Get Address
+Name: getAddress
+
+`Get address from inputted geolocation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| latitude | Latitude | NUMBER | Latitude of the geolocation. | true |
+| longitude | Longitude | NUMBER | Longitude of the geolocation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Address",
+  "name" : "getAddress",
+  "parameters" : {
+    "latitude" : 0.0,
+    "longitude" : 0.0
+  },
+  "type" : "googleMaps/v1/getAddress"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| results | ARRAY <details> <summary> Items </summary> [&#123;[&#123;STRING\(long_name), STRING\(short_name), [STRING]\(types)&#125;]\(address_components), STRING\(formatted_address), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(location), STRING\(location_type), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(northeast), &#123;NUMBER\(lat), NUMBER\(lng)&#125;\(southwest)&#125;\(viewport)&#125;\(geometry), [&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\($location)]\(navigation_points), STRING\(place_id), &#123;STRING\(compound_code), STRING\(global_code)&#125;\(plus_code), [STRING]\(types)&#125;] </details> | When the geocoder returns results, it places them within a (JSON) results array. |
+| status | STRING | Status of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "results" : [ {
+    "address_components" : [ {
+      "long_name" : "",
+      "short_name" : "",
+      "types" : [ "" ]
+    } ],
+    "formatted_address" : "",
+    "geometry" : {
+      "location" : {
+        "lat" : 0.0,
+        "lng" : 0.0
+      },
+      "location_type" : "",
+      "viewport" : {
+        "northeast" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        },
+        "southwest" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        }
+      }
+    },
+    "navigation_points" : [ {
+      "latitude" : 0.0,
+      "longitude" : 0.0
+    } ],
+    "place_id" : "",
+    "plus_code" : {
+      "compound_code" : "",
+      "global_code" : ""
+    },
+    "types" : [ "" ]
+  } ],
+  "status" : ""
+}
+```
+
+
 ### Get Geolocation
 Name: getGeolocation
 
