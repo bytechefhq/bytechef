@@ -20,54 +20,48 @@ import static com.bytechef.component.google.maps.constant.GoogleMapsConstants.AD
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.google.maps.util.GoogleMapsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
 class GoogleMapsGetGeolocationActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(ADDRESS, "mockedAddress"));
-    private final Response mockedResponse = mock(Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ADDRESS, "mockedAddress"));
     private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
-
         String urlEncodedAddress = "urlEncodedAddress";
         when(mockedContext.encoder(any()))
             .thenReturn(urlEncodedAddress);
 
-        Map<String, Object> result = GoogleMapsGetGeolocationAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        try (MockedStatic<GoogleMapsUtils> mockedGoogleMapsUtils = mockStatic(GoogleMapsUtils.class)) {
+            mockedGoogleMapsUtils
+                .when(() -> GoogleMapsUtils.geocodeHttpRequest(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(responseMap);
 
-        assertEquals(responseMap, result);
-        assertEquals(List.of(ADDRESS, urlEncodedAddress), stringArgumentCaptor.getAllValues());
+            Map<String, Object> result = GoogleMapsGetGeolocationAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
+
+            assertEquals(responseMap, result);
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(List.of(ADDRESS, urlEncodedAddress), stringArgumentCaptor.getAllValues());
+        }
     }
 }
