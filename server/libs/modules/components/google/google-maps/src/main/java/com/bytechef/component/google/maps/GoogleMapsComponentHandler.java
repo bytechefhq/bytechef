@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.google.maps.action.GoogleMapsGetAddressAction;
 import com.bytechef.component.google.maps.action.GoogleMapsGetGeolocationAction;
 import com.bytechef.component.google.maps.action.GoogleMapsGetRouteAction;
 import com.bytechef.component.google.maps.action.GoogleMapsNearbySearchAction;
@@ -43,10 +44,12 @@ public class GoogleMapsComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .connection(GoogleMapsConnection.CONNECTION_DEFINITION)
         .clusterElements(
+            tool(GoogleMapsGetAddressAction.ACTION_DEFINITION),
             tool(GoogleMapsGetGeolocationAction.ACTION_DEFINITION),
             tool(GoogleMapsGetRouteAction.ACTION_DEFINITION),
             tool(GoogleMapsNearbySearchAction.ACTION_DEFINITION))
         .actions(
+            GoogleMapsGetAddressAction.ACTION_DEFINITION,
             GoogleMapsGetGeolocationAction.ACTION_DEFINITION,
             GoogleMapsGetRouteAction.ACTION_DEFINITION,
             GoogleMapsNearbySearchAction.ACTION_DEFINITION);

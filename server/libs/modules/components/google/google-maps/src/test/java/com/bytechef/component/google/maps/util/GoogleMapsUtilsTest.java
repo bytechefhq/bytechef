@@ -47,6 +47,27 @@ class GoogleMapsUtilsTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
+    void geocodeHttpRequest() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
+        String mockedKey = "mockedKey";
+        String mockedValue = "mockedValue";
+        Map<String, Object> result = GoogleMapsUtils.geocodeHttpRequest(mockedContext, mockedKey, mockedValue);
+
+        assertEquals(responseMap, result);
+        assertEquals(List.of(mockedKey, mockedValue), stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
     void testGetAddressGeolocation() {
         String urlEncodedAddress = "urlEncodedAddress";
 
