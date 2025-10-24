@@ -33,6 +33,14 @@ import java.util.Map;
  */
 public class GoogleMapsUtils {
 
+    public static Map<String, Object> geocodeHttpRequest(Context context, String key, String value) {
+        return context.http(http -> http.get("https://maps.googleapis.com/maps/api/geocode/json"))
+            .queryParameter(key, value)
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+    }
+
     public static Map<String, Object> getAddressGeolocation(Context context, String address) {
 
         Map<String, Object> geocoderInformation = context.http(
