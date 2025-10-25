@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @ComponentIntTest
 class CsvFileComponentHandlerIntTest {
@@ -154,6 +156,27 @@ class CsvFileComponentHandlerIntTest {
             new JSONArray(Files.contentOf(getFile("expected_output_header.json"), StandardCharsets.UTF_8)),
             new JSONArray((List<?>) outputs.get("readCsvFile")),
             true);
+    }
+
+    @Test
+    void testReadHeaderAndDelimiterAdvanced() throws JSONException {
+        File sampleFile = getFile("sample_header_semicolon_delimiter.csv");
+
+        Job job = componentJobTestExecutor.execute(
+            ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Map.of(
+                FILE_ENTRY,
+                tempFileStorage.storeFileContent(
+                    sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+                INCLUDE_EMPTY_CELLS, true, DELIMITER, ";",
+                HEADER_ROW, true));
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertThat(((Map<?, ?>) ((List<?>) outputs.get("readCsvFile")).getFirst()).size())
+            .isEqualTo(11);
     }
 
 //    @Test
