@@ -82,7 +82,7 @@ const PropertySelect = ({
                                     {leadingIcon}
                                 </div>
 
-                                <div className="ml-9">
+                                <div className="ml-9 text-foreground">
                                     <Value placeholder={placeholder} />
                                 </div>
                             </div>
