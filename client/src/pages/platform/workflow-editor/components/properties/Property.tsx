@@ -1245,7 +1245,7 @@ const Property = ({
                             name={name!}
                             onChange={(value) => handleJsonSchemaBuilderChange(value)}
                             schema={inputValue ? JSON.parse(inputValue) : undefined}
-                            title={`${label || name} Builder`}
+                            title={`${label || name}`}
                         />
                     )}
 
