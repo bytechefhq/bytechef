@@ -36,3 +36,7 @@ yarn-error.log*
 .vercel
 
 *storybook.log
+
+# yalc
+yalc.lock
+.yalc
