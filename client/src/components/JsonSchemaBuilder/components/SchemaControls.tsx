@@ -129,7 +129,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
                     >
                         <PlusIcon />
 
-                        {root && <span>Add a pill</span>}
+                        {root && <span>Add Data Pill</span>}
                     </Button>
                 )}
             </div>
