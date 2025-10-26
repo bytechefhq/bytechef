@@ -65,7 +65,7 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
 
     return (
         <Accordion
-            className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
+            className="w-full px-4 3xl:mx-auto 3xl:w-4/5"
             collapsible
             onValueChange={setOpenItem}
             type="single"

@@ -61,7 +61,7 @@ const AutomationWorkflows = () => {
         >
             <PageLoader loading={isConnectedUsersPageLoading || isConnectedUserProjectsLoading}>
                 {data?.connectedUserProjects && data?.connectedUserProjects?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
                         <ConnectedUserProjectList connectedUserProjects={data.connectedUserProjects} />
                     </div>
                 ) : (

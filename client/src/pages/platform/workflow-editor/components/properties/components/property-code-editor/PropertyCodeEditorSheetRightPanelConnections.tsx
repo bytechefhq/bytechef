@@ -184,7 +184,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                     </>
                 ) : (
                     <div className="flex flex-1 flex-col items-center">
-                        <div className="mt-16 w-full place-self-center px-2 2xl:mx-auto 2xl:w-4/5">
+                        <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
                             <div className="text-center">
                                 <span className="mx-auto inline-block">
                                     <LinkIcon className="size-6 text-gray-400" />

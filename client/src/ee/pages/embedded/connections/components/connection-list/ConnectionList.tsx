@@ -13,7 +13,7 @@ const ConnectionList = ({
     tags: Tag[];
 }) => {
     return (
-        <ul className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5" role="list">
+        <ul className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5" role="list">
             {connections.map((connection) => {
                 const connectionTagIds = connection.tags?.map((tag) => tag.id);
 
