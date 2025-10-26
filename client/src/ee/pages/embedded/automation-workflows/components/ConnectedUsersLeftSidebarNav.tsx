@@ -12,7 +12,7 @@ const ConnectedUsersLeftSidebarNav = ({
     return (
         <LeftSidebarNav
             body={
-                connectedUsers ? (
+                connectedUsers.length > 0 ? (
                     connectedUsers.map((user) => (
                         <LeftSidebarNavItem
                             icon={<UsersIcon className="mr-2 size-4" />}
@@ -26,7 +26,7 @@ const ConnectedUsersLeftSidebarNav = ({
                         />
                     ))
                 ) : (
-                    <span className="px-3 text-xs">No connected users.</span>
+                    <span className="px-2 text-xs">No connected users.</span>
                 )
             }
             title="Connected Users"

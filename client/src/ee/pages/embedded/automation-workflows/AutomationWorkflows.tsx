@@ -23,6 +23,7 @@ const AutomationWorkflows = () => {
         : undefined;
 
     const {data: connectedUsersPage, isLoading: isConnectedUsersPageLoading} = useGetConnectedUsersQuery({
+        environmentId: currentEnvironmentId,
         pageNumber: 0,
     });
 
@@ -52,9 +53,7 @@ const AutomationWorkflows = () => {
                 )
             }
             leftSidebarBody={
-                <>
-                    <ConnectedUsersLeftSidebarNav connectedUserId={connectedUserId} connectedUsers={connectedUsers} />
-                </>
+                <ConnectedUsersLeftSidebarNav connectedUserId={connectedUserId} connectedUsers={connectedUsers} />
             }
             leftSidebarHeader={<Header position="sidebar" title="Automation Workflows" />}
             leftSidebarWidth="64"
