@@ -138,7 +138,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
     const rows = reactTable.getRowModel().rows;
 
     return (
-        <div className="w-full space-y-4 px-4 text-sm 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full space-y-4 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
             <p>
                 Your secret API keys are listed below. Please note that we do not display your secret API keys again
                 after you generate them.
@@ -174,7 +174,8 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('enabled') && 'ml-6 flex'
+                                        cell.id.endsWith('enabled') && 'ml-6 flex',
+                                        cell.id.endsWith('name') && 'truncate xl:min-w-72'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

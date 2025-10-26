@@ -20,7 +20,7 @@ const Header = ({
     title,
     titleClassName,
 }: HeaderProps) => (
-    <header className={twMerge('px-4 py-3', centerTitle ? '2xl:mx-auto 2xl:w-4/5' : '3xl:w-4/5', className)}>
+    <header className={twMerge('px-4 py-3', centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
                 <div

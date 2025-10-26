@@ -155,7 +155,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const rows = reactTable.getRowModel().rows;
 
     return (
-        <div className="w-full space-y-8 px-4 text-sm 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full space-y-8 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
             <p>
                 Use your Signing Keys to sign requests made from the ByteChef SDK. <a href="#">Read our docs</a> for
                 more information.
@@ -186,7 +186,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('name') && 'min-w-36 max-w-44 truncate'
+                                        cell.id.endsWith('name') && 'truncate xl:min-w-72'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

@@ -15,7 +15,7 @@ const ProjectList = ({
     tags: Tag[];
 }) => {
     return (
-        <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
             {projects.map((project) => {
                 const projectTagIds = project.tags?.map((tag) => tag.id);
 

@@ -3,7 +3,7 @@ import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 
 const AppEventList = ({appEvents}: {appEvents: AppEvent[]}) => {
     return (
-        <ul className="w-full divide-y divide-gray-100 px-4 2xl:mx-auto 2xl:w-4/5" role="list">
+        <ul className="w-full divide-y divide-gray-100 px-4 3xl:mx-auto 3xl:w-4/5" role="list">
             {appEvents.map((appEvent) => {
                 return <AppEventListItem appEvent={appEvent} key={appEvent.id} />;
             })}

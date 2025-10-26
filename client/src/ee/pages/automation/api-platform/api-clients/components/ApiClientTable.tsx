@@ -133,7 +133,7 @@ const ApiClientTable = ({apiClients}: ApiClientTableProps) => {
     const rows = reactTable.getRowModel().rows;
 
     return (
-        <div className="w-full space-y-4 px-4 text-sm 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full space-y-4 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
             <p>
                 API clients and their secret API keys are listed below. Please note that we do not display your secret
                 API keys again after you generate them.

@@ -6,7 +6,7 @@ import IntegrationWorkflowList from '../integration-workflow-list/IntegrationWor
 
 const IntegrationList = ({integrations, tags}: {integrations: Integration[]; tags: Tag[]}) => {
     return (
-        <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
             {integrations.map((integration) => {
                 const integrationTagIds = integration.tags?.map((tag) => tag.id);
 

@@ -31,7 +31,7 @@ export default function Appearance() {
             leftSidebarOpen={false}
         >
             <Form {...form}>
-                <form className="space-y-8 p-4 2xl:mx-auto 2xl:w-4/5">
+                <form className="space-y-8 p-4 3xl:mx-auto 3xl:w-4/5">
                     <FormField
                         control={form.control}
                         name="theme"
