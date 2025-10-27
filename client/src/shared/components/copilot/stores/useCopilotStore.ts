@@ -5,6 +5,11 @@ import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+export enum MODE {
+    CHAT = 'CHAT',
+    BUILD = 'BUILD',
+}
+
 export enum Source {
     WORKFLOW_EDITOR,
     WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU,
@@ -15,13 +20,14 @@ export type ContextType = {
     source: Source;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
+    mode: MODE;
 };
 
 interface CopilotStateI {
     conversationId: string | undefined;
     generateConversationId: () => void;
 
-    context: ContextType | undefined;
+    context: ContextType;
     setContext: (context: ContextType | undefined) => void;
 
     copilotPanelOpen: boolean;
@@ -48,7 +54,9 @@ export const useCopilotStore = create<CopilotStateI>()(
             });
         },
 
-        context: undefined,
+        context: {
+            mode: MODE.CHAT,
+        },
         setContext: (context) =>
             set((state) => {
                 return {
