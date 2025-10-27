@@ -140,6 +140,8 @@ spring:
         initialize-schema: true
   application:
     name: server-app
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:
