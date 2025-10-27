@@ -29,18 +29,6 @@ management:
         step: 60
 
 spring:
-  ai:
-    openai:
-      api-key: ${bytechef.ai.openai.api-key}
-  autoconfigure:
-    exclude:
-      org.springframework.ai.autoconfigure.anthropic.AnthropicAutoConfiguration,
-      org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.huggingface.HuggingfaceChatAutoConfiguration,
-      org.springframework.ai.autoconfigure.mistralai.MistralAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration,
-      org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
-      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration
   application:
     name: runtime-job-app
   cache:
