@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
@@ -84,13 +84,12 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                                             onClose={() => {}}
                                             triggerNode={
                                                 <Button
-                                                    className="mt-auto p-2"
+                                                    icon={<PlusIcon />}
+                                                    size="icon"
                                                     title="Create a new connection"
                                                     type="button"
                                                     variant="outline"
-                                                >
-                                                    <PlusIcon className="size-5" />
-                                                </Button>
+                                                />
                                             }
                                             useCreateConnectionMutation={useCreateConnectionMutation}
                                             useGetConnectionTagsQuery={useGetConnectionTagsQuery}

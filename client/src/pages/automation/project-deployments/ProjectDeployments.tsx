@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -98,7 +98,7 @@ const ProjectDeployments = () => {
                                         environmentId: currentEnvironmentId,
                                     } as ProjectDeployment
                                 }
-                                triggerNode={<Button>New Deployment</Button>}
+                                triggerNode={<Button label="New Deployment" />}
                             />
                         }
                         title={<ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />}

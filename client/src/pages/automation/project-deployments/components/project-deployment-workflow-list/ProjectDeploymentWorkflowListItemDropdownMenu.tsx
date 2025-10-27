@@ -1,7 +1,8 @@
-import {Button} from '@/components/ui/button';
+import '@/shared/styles/dropdownMenu.css';
+import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon} from 'lucide-react';
 
 interface ProjectDeploymentWorkflowListItemDropDownProps {
     onEditClick: () => void;
@@ -15,17 +16,16 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
-                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                </Button>
+                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="p-0">
                 <DropdownMenuItem
+                    className="dropdown-menu-item"
                     disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
                     onClick={onEditClick}
                 >
-                    Edit
+                    <EditIcon /> Edit
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
