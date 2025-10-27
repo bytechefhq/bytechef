@@ -72,7 +72,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.domain.Page;
 
@@ -83,7 +85,6 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private static final AsyncTaskExecutor ASYNC_TASK_EXECUTOR = new JobSyncAsyncTaskExecutor();
     private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
 
     private final ContextService contextService;
@@ -95,20 +96,20 @@ public class JobSyncExecutor {
     private final WorkflowService workflowService;
 
     public JobSyncExecutor(
-        ContextService contextService, Evaluator evaluator, JobService jobService,
+        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this(
-            contextService, evaluator, jobService, new SyncMessageBroker(), List.of(), List.of(),
+            contextService, environment, evaluator, jobService, new SyncMessageBroker(), List.of(), List.of(),
             taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
             workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        ContextService contextService, Evaluator evaluator, JobService jobService, SyncMessageBroker syncMessageBroker,
-        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
+        SyncMessageBroker syncMessageBroker, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
@@ -146,7 +147,8 @@ public class JobSyncExecutor {
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         TaskWorker worker = new TaskWorker(
-            evaluator, eventPublisher, ASYNC_TASK_EXECUTOR, taskHandlerResolverChain, taskFileStorage);
+            evaluator, eventPublisher, new JobSyncAsyncTaskExecutor(environment), taskHandlerResolverChain,
+            taskFileStorage);
 
         syncMessageBroker.receive(
             TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
@@ -328,7 +330,15 @@ public class JobSyncExecutor {
 
     private static class JobSyncAsyncTaskExecutor implements AsyncTaskExecutor {
 
-        private static final Executor executor = Executors.newCachedThreadPool();
+        private final Executor executor;
+
+        private JobSyncAsyncTaskExecutor(Environment environment) {
+            if (Threading.VIRTUAL.isActive(environment)) {
+                executor = Executors.newVirtualThreadPerTaskExecutor();
+            } else {
+                executor = Executors.newCachedThreadPool();
+            }
+        }
 
         @Override
         public void execute(Runnable task) {

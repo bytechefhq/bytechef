@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
@@ -92,11 +93,12 @@ public class TaskDispatcherIntTestConfiguration {
 
     @Bean
     TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
-        ContextService contextService, CounterService counterService, JobService jobService,
+        ContextService contextService, CounterService counterService, Environment environment, JobService jobService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            contextService, counterService, jobService, taskExecutionService, taskFileStorage, workflowService);
+            contextService, counterService, environment, jobService, taskExecutionService, taskFileStorage,
+            workflowService);
     }
 
     @Bean

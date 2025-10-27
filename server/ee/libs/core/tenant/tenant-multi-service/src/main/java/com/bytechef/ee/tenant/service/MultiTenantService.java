@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
@@ -47,6 +48,8 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
     private static final Log log = LogFactory.getLog(MultiTenantService.class);
 
+    private static final ReentrantLock LOCK = new ReentrantLock();
+
     private final TenantRepository tenantRepository;
     private final DataSource dataSource;
     private final LiquibaseProperties liquibaseProperties;
@@ -62,20 +65,26 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     }
 
     @Override
-    public synchronized String createTenant() {
-        String tenantId = tenantRepository.findMaxTenantId();
+    public String createTenant() {
+        try {
+            LOCK.lock();
 
-        DecimalFormat decimalFormat = new DecimalFormat("000000");
+            String tenantId = tenantRepository.findMaxTenantId();
 
-        tenantId = decimalFormat.format(Integer.parseInt(tenantId) + 1);
+            DecimalFormat decimalFormat = new DecimalFormat("000000");
 
-        tenantRepository.createTenant(tenantId);
+            tenantId = decimalFormat.format(Integer.parseInt(tenantId) + 1);
 
-        initTenant(tenantId, "multitenant");
+            tenantRepository.createTenant(tenantId);
 
-        log.info("Tenant created: " + tenantId);
+            initTenant(tenantId, "multitenant");
 
-        return tenantId;
+            log.info("Tenant created: " + tenantId);
+
+            return tenantId;
+        } finally {
+            LOCK.unlock();
+        }
     }
 
     public void createTenant(String tenantId) {
