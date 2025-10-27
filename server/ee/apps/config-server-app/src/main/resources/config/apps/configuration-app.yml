@@ -6,6 +6,8 @@ management:
           include: readinessState,db
 
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
   graphql:
     schema:
       locations: classpath*:graphql/**/
