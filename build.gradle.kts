@@ -29,9 +29,18 @@ subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
     apply(plugin = "io.spring.dependency-management")
 
+    dependencyManagement {
+        dependencies {
+            dependency("com.github.spotbugs:spotbugs-annotations:[4.9.3,)")
+        }
+    }
+
     dependencies {
+        compileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
+
         implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
-        implementation(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
+
+        testCompileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
