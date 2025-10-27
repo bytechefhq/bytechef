@@ -78,13 +78,11 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
-    @SuppressFBWarnings("EI")
     public void setPrincipalAccessorRegistry(JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Autowired
-    @SuppressFBWarnings("EI")
     public void setRemoteTriggerDefinitionFacade(TriggerDefinitionFacade triggerDefinitionService) {
         this.remoteTriggerDefinitionFacade = triggerDefinitionService;
     }

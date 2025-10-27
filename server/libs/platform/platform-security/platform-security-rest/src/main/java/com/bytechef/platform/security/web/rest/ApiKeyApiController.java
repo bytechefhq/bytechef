@@ -53,7 +53,6 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel apiKeyModel) {
         return ResponseEntity.ok(
             new CreateApiKey200ResponseModel().secretKey(
@@ -87,7 +86,6 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateApiKey(Long id, ApiKeyModel appEventModel) {
         apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class));
 

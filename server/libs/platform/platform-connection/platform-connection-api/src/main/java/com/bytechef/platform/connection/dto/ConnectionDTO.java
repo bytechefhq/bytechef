@@ -68,7 +68,6 @@ public record ConnectionDTO(
         return new Builder();
     }
 
-    @SuppressFBWarnings("EI")
     public static final class Builder {
         private boolean active;
         private AuthorizationType authorizationType;

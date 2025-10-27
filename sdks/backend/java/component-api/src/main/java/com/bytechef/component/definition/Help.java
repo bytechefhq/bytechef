@@ -17,12 +17,10 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.definition.BaseHelp;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  *
  */
-@SuppressFBWarnings("EI")
 public interface Help extends BaseHelp {
 }

@@ -65,12 +65,7 @@ public class WorkspaceMcpServerGraphQlController {
         return true;
     }
 
-    @SuppressFBWarnings("EI")
     public record CreateMcpServerForWorkspaceInput(
-        String name,
-        ModeType type,
-        long environmentId,
-        Boolean enabled,
-        Long workspaceId) {
+        String name, ModeType type, long environmentId, Boolean enabled, Long workspaceId) {
     }
 }

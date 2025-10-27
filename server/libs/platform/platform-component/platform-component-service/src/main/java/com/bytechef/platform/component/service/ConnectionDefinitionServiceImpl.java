@@ -57,7 +57,6 @@ import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -84,7 +83,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    @SuppressFBWarnings("EI2")
     public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }

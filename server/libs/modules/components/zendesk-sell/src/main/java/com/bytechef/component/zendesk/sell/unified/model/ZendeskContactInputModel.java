@@ -17,14 +17,12 @@
 package com.bytechef.component.zendesk.sell.unified.model;
 
 import com.bytechef.component.definition.unified.crm.model.ProviderContactInputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 // CHECKSTYLE:OFF
 public class ZendeskContactInputModel extends HashMap<String, Object> implements ProviderContactInputModel {
 

@@ -21,7 +21,6 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
     private final Oauth2 oauth2;
 
-    @SuppressFBWarnings("EI")
     public OAuth2ServiceImpl(ApplicationProperties applicationProperties) {
         this.oauth2 = applicationProperties.getOauth2();
     }

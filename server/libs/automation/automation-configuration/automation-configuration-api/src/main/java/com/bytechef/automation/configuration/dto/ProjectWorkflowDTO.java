@@ -19,14 +19,12 @@ package com.bytechef.automation.configuration.dto;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public final class ProjectWorkflowDTO extends WorkflowDTO {
 
     private final int projectVersion;

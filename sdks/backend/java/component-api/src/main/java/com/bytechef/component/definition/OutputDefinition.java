@@ -20,14 +20,12 @@ import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseOutputFunction;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public final class OutputDefinition implements BaseOutputDefinition {
 
     private BaseOutputFunction output;

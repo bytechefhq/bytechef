@@ -47,7 +47,6 @@ import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
@@ -61,7 +60,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    @SuppressFBWarnings("EI2")
     public ActionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }

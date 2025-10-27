@@ -63,7 +63,6 @@ import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -83,7 +82,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private final ApplicationEventPublisher eventPublisher;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
         ApplicationEventPublisher eventPublisher, ComponentDefinitionRegistry componentDefinitionRegistry) {
 

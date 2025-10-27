@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.security.web.authentication;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -32,7 +31,6 @@ public class ApiKeyAuthenticationToken extends AbstractPublicApiAuthenticationTo
         this.secretKey = secretKey;
     }
 
-    @SuppressFBWarnings("EI")
     public ApiKeyAuthenticationToken(User user) {
         super(user);
     }

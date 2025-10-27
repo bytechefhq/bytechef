@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,6 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
 
     private final JdbcClient jdbcClient;
 
-    @SuppressFBWarnings("EI")
     public CustomProjectRepositoryImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
     }

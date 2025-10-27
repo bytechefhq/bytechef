@@ -17,12 +17,10 @@
 package com.bytechef.component.xero.unified.model;
 
 import com.bytechef.component.definition.unified.crm.model.ProviderAccountOutputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 // CHECKSTYLE:OFF
 public record XeroAccountOutputModel() implements ProviderAccountOutputModel {
 }

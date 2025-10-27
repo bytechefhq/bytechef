@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.lang.NonNull;
 
@@ -37,7 +38,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
      * Conceptually, these two variables describe the executor being in one of three states: - Active: shutdown == false
      * - Shutdown: runningTasks > 0 and shutdown == true - Terminated: runningTasks == 0 and shutdown == true
      */
-    private int runningTasks = 0;
+    private final AtomicInteger runningTasks = new AtomicInteger(0);
     private boolean shutdown = false;
 
     @Override
@@ -69,7 +70,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
             shutdown = true;
 
-            if (runningTasks == 0) {
+            if (runningTasks.get() == 0) {
                 LOCK.notifyAll();
             }
         } finally {
@@ -88,7 +89,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     @Override
     public boolean isTerminated() {
         try {
-            return shutdown && runningTasks == 0;
+            return shutdown && runningTasks.get() == 0;
         } finally {
             LOCK.unlock();
         }
@@ -100,7 +101,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
         try {
             while (true) {
-                if (shutdown && runningTasks == 0) {
+                if (shutdown && runningTasks.get() == 0) {
                     return true;
                 } else if (nanos <= 0) {
                     return false;
@@ -127,7 +128,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
                 throw new RejectedExecutionException("Executor already shutdown");
             }
 
-            runningTasks++;
+            runningTasks.incrementAndGet();
         } finally {
             LOCK.unlock();
         }
@@ -136,7 +137,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     /** Decrements the running task count. */
     private void endTask() {
         try {
-            int numRunning = --runningTasks;
+            int numRunning = runningTasks.decrementAndGet();
 
             if (numRunning == 0) {
                 LOCK.notifyAll();

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -55,7 +54,6 @@ public class ToolClient {
         this.environment = environment;
     }
 
-    @SuppressFBWarnings("NP")
     public Map<String, List<ToolModel>> getTools(String externalUserId) {
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()

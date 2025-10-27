@@ -17,14 +17,12 @@
 package com.bytechef.platform.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public abstract class BaseOption {
 
     protected String description;

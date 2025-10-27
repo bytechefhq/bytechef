@@ -28,7 +28,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.evaluator.Evaluator;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -49,7 +48,6 @@ public class TaskWorkerConfiguration {
 
     private final List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories;
 
-    @SuppressFBWarnings("EI")
     public TaskWorkerConfiguration(
         @Autowired(required = false) List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories) {
 

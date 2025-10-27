@@ -11,7 +11,6 @@ import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
 import com.bytechef.workflow.ProjectHandler;
 import com.bytechef.workflow.definition.ProjectDefinition;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;
@@ -45,7 +44,6 @@ class ProjectHandlerClassLoader extends IsolatingClassLoader<ProjectHandler> {
         this.cacheKey = cacheKey;
     }
 
-    @SuppressFBWarnings("DP")
     static ProjectHandlerClassLoader of(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         return new ProjectHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }

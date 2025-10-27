@@ -44,7 +44,6 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +63,6 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     private final Evaluator evaluator;
     private final TaskHandlerResolver taskHandlerResolver;
 
-    @SuppressFBWarnings("EI")
     public MapTaskDispatcherAdapterTaskHandler(
         CacheManager cacheManager, Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
 

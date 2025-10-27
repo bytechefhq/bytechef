@@ -10,7 +10,6 @@ package com.bytechef.ee.ai.copilot.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import com.bytechef.ee.ai.copilot.facade.AiCopilotFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
@@ -45,7 +44,6 @@ public class AiCopilotApiController {
         return aiCopilotFacade.chat(request.message, conversationId, request.context);
     }
 
-    @SuppressFBWarnings("EI")
     public record Request(String message, ContextDTO context) {
     }
 }
