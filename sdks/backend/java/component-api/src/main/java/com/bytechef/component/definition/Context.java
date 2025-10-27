@@ -203,6 +203,13 @@ public interface Context {
          * @param string
          * @return
          */
+        byte[] urlDecode(String string);
+
+        /**
+         *
+         * @param string
+         * @return
+         */
         String urlEncode(String string);
 
     }
