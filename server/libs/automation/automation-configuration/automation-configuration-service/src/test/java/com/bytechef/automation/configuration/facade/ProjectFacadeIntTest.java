@@ -359,15 +359,18 @@ public class ProjectFacadeIntTest {
 
         when(preBuiltTemplateService.getPrebuiltTemplateData(any(String.class))).thenReturn(projectZip);
 
-        List<ProjectTemplateDTO> templates = projectFacade.getPreBuiltProjectTemplates(null, null);
+        List<ProjectTemplateDTO> projectTemplateDTOs = projectFacade.getPreBuiltProjectTemplates(null, null);
 
-        assertThat(templates).isNotNull();
-        assertThat(templates).hasSize(1);
-        assertThat(templates.get(0)
-            .project()
-            .name()).isEqualTo("Catalog Project");
-        assertThat(templates.get(0)
-            .categories()).contains("sales");
+        assertThat(projectTemplateDTOs).isNotNull();
+        assertThat(projectTemplateDTOs).hasSize(1);
+
+        ProjectTemplateDTO projectTemplateDTO = projectTemplateDTOs.getFirst();
+
+        ProjectTemplateDTO.ProjectInfo project = projectTemplateDTO.project();
+
+        assertThat(project.name()).isEqualTo("Catalog Project");
+
+        assertThat(projectTemplateDTO.categories()).contains("sales");
     }
 
     @Test
@@ -578,10 +581,10 @@ public class ProjectFacadeIntTest {
         assertThat(projectTemplateDTO).isNotNull();
         assertThat(projectTemplateDTO.description()).isEqualTo("Shared description");
 
-        ProjectTemplateDTO.ProjectInfo project = projectTemplateDTO.project();
+        ProjectTemplateDTO.ProjectInfo projectInfo = projectTemplateDTO.project();
 
-        assertThat(project).isNotNull();
-        assertThat(project.name()).isEqualTo("Imported Project");
+        assertThat(projectInfo).isNotNull();
+        assertThat(projectInfo.name()).isEqualTo("Imported Project");
 
         assertThat(projectTemplateDTO.workflows()).hasSize(1);
         assertThat(projectTemplateDTO.components()).isNotNull();
