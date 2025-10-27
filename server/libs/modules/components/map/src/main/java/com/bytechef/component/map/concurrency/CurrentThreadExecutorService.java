@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     /** Lock used whenever accessing the state variables (runningTasks, shutdown) of the executor */
-    private final Object lock = new Object();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     /*
      * Conceptually, these two variables describe the executor being in one of three states: - Active: shutdown == false
@@ -51,23 +53,32 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     @Override
     public boolean isShutdown() {
-        synchronized (lock) {
+        try {
+            LOCK.lock();
+
             return shutdown;
+        } finally {
+            LOCK.unlock();
         }
     }
 
     @Override
     public void shutdown() {
-        synchronized (lock) {
+        try {
+            LOCK.lock();
+
             shutdown = true;
 
             if (runningTasks == 0) {
-                lock.notifyAll();
+                LOCK.notifyAll();
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 
     @Override
+    @NonNull
     public List<Runnable> shutdownNow() {
         shutdown();
 
@@ -76,8 +87,10 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     @Override
     public boolean isTerminated() {
-        synchronized (lock) {
+        try {
             return shutdown && runningTasks == 0;
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -85,7 +98,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
 
-        synchronized (lock) {
+        try {
             while (true) {
                 if (shutdown && runningTasks == 0) {
                     return true;
@@ -94,10 +107,12 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
                 } else {
                     long now = System.nanoTime();
 
-                    TimeUnit.NANOSECONDS.timedWait(lock, nanos);
+                    TimeUnit.NANOSECONDS.timedWait(LOCK, nanos);
                     nanos -= System.nanoTime() - now; // subtract the actual time we waited
                 }
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -107,23 +122,27 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
      * @throws RejectedExecutionException if the executor has been previously shutdown
      */
     private void startTask() {
-        synchronized (lock) {
+        try {
             if (shutdown) {
                 throw new RejectedExecutionException("Executor already shutdown");
             }
 
             runningTasks++;
+        } finally {
+            LOCK.unlock();
         }
     }
 
     /** Decrements the running task count. */
     private void endTask() {
-        synchronized (lock) {
+        try {
             int numRunning = --runningTasks;
 
             if (numRunning == 0) {
-                lock.notifyAll();
+                LOCK.notifyAll();
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 }

@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -85,6 +86,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private static final Logger logger = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
+    private static final ReentrantLock LOCK = new ReentrantLock();
     // Token is valid for one month
     private static final int TOKEN_VALIDITY_DAYS = 31;
     private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
@@ -112,7 +114,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     protected UserDetails processAutoLoginCookie(
         String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
 
-        synchronized (this) { // prevent 2 authentication requests from the same user in parallel
+        try {
+            LOCK.lock(); // prevent 2 authentication requests from the same user in parallel
+
             String login = null;
             String tenantId = cookieTokens[2];
             UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(cookieTokens[0]);
@@ -170,6 +174,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantId);
 
             return getUserDetailsService().loadUserByUsername(login);
+        } finally {
+            LOCK.unlock();
         }
     }
 

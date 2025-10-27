@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -49,6 +50,8 @@ import org.springframework.core.io.ByteArrayResource;
 public class GitWorkflowRepository implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepository.class);
+
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     private final GitWorkflowOperations gitWorkflowOperations;
 
@@ -75,7 +78,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     @Override
     public List<Workflow> findAll() {
-        synchronized (this) {
+        try {
+            LOCK.lock();
+
             HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
 
             return headFiles.workflowResources()
@@ -83,11 +88,15 @@ public class GitWorkflowRepository implements WorkflowRepository {
                 .map(GitWorkflowRepository::readWorkflow)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        } finally {
+            LOCK.unlock();
         }
     }
 
     public GitWorkflows findAllWithGitInfo() {
-        synchronized (this) {
+        try {
+            LOCK.lock();
+
             HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
 
             return new GitWorkflows(
@@ -97,12 +106,16 @@ public class GitWorkflowRepository implements WorkflowRepository {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()),
                 headFiles.gitInfo());
+        } finally {
+            LOCK.unlock();
         }
     }
 
     @Override
     public Optional<Workflow> findById(String id) {
-        synchronized (this) {
+        try {
+            LOCK.lock();
+
             Workflow workflow = null;
 
             String fileId = decode(id);
@@ -116,6 +129,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
             }
 
             return Optional.ofNullable(workflow);
+        } finally {
+            LOCK.unlock();
         }
     }
 
