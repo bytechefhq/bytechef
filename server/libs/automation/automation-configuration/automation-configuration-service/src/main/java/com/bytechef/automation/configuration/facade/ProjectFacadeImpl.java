@@ -267,9 +267,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         List<Workflow> workflows = getWorkflows(templateFiles);
 
-        List<ComponentDefinitionTuple> components = getComponentDefinitions(workflows);
+        List<ComponentDefinitionTuple> componentDefinitions = getComponentDefinitions(workflows);
 
-        ProjectTemplateDTO.ProjectInfo project = new ProjectTemplateDTO.ProjectInfo(
+        ProjectTemplateDTO.ProjectInfo newProjectInfo = new ProjectTemplateDTO.ProjectInfo(
             projectInfo.name, projectInfo.description);
         List<WorkflowInfo> workflowInfos = workflows.stream()
             .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getLabel(), workflow.getDescription()))
@@ -280,7 +280,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return new ProjectTemplateDTO(
             template.authorName, template.authorEmail, template.authorRole, template.authorSocialLinks,
-            categories, components, template.description, id, template.lastModifiedDate, project,
+            categories, componentDefinitions, template.description, id, template.lastModifiedDate, newProjectInfo,
             template.projectVersion, publicUrl, workflowInfos);
     }
 
@@ -298,11 +298,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         return projectTemplateDTO;
                     } else {
                         if (StringUtils.isNotEmpty(query)) {
-                            ProjectTemplateDTO.ProjectInfo project = projectTemplateDTO.project();
+                            ProjectTemplateDTO.ProjectInfo projectInfo = projectTemplateDTO.project();
 
                             if (StringUtils.containsIgnoreCase(projectTemplateDTO.description(), query) ||
-                                StringUtils.containsIgnoreCase(project.name(), query) ||
-                                StringUtils.containsIgnoreCase(project.description(), query)) {
+                                StringUtils.containsIgnoreCase(projectInfo.name(), query) ||
+                                StringUtils.containsIgnoreCase(projectInfo.description(), query)) {
 
                                 return projectTemplateDTO;
                             }
