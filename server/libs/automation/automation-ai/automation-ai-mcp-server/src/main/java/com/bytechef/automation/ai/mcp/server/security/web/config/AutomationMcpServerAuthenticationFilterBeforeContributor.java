@@ -19,7 +19,6 @@ package com.bytechef.automation.ai.mcp.server.security.web.config;
 import com.bytechef.automation.ai.mcp.server.security.web.filter.AutomationMcpServerAuthenticationFilter;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.security.web.config.FilterBeforeContributor;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Component;
 public class AutomationMcpServerAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     @Override
-    @SuppressFBWarnings("EI")
     public Filter getFilter(AuthenticationManager authenticationManager) {
         return new AutomationMcpServerAuthenticationFilter(authenticationManager);
     }

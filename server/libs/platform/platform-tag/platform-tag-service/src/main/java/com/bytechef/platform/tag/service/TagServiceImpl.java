@@ -19,7 +19,6 @@ package com.bytechef.platform.tag.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +39,6 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
 
-    @SuppressFBWarnings("EI2")
     public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
     }

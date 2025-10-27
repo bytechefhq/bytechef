@@ -18,7 +18,6 @@ package com.bytechef.component.definition;
 
 import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,7 +28,6 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_INTERFACE")
 public interface Property extends BaseProperty {
 
     /**

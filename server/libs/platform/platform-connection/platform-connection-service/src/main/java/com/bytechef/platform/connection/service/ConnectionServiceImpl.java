@@ -24,7 +24,6 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.ModeType;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     private final ConnectionRepository connectionRepository;
 
-    @SuppressFBWarnings("EI2")
     public ConnectionServiceImpl(ConnectionRepository connectionRepository) {
         this.connectionRepository = connectionRepository;
     }

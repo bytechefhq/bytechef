@@ -17,7 +17,6 @@
 package com.bytechef.platform.user.web.rest.exception;
 
 import com.bytechef.web.rest.error.AbstractResponseEntityExceptionHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,6 @@ import org.springframework.web.context.request.WebRequest;
 public class AccountResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccountResourceException.class)
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<Object> handleAccountResourceException(
         final AccountResourceException exception, final WebRequest request) {
 

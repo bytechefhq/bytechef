@@ -9,7 +9,6 @@ package com.bytechef.ee.ai.copilot.remote.web.rest.facade;
 
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import com.bytechef.ee.ai.copilot.facade.AiCopilotFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Map;
 import org.springframework.http.MediaType;
@@ -27,11 +26,11 @@ import reactor.core.publisher.Flux;
 @Hidden
 @RestController
 @RequestMapping("/remote/ai-copilot")
-public class RemoterAiCopilotFacadeController {
+public class RemoteAiCopilotFacadeController {
 
     private final AiCopilotFacade aiCopilotFacade;
 
-    public RemoterAiCopilotFacadeController(AiCopilotFacade aiCopilotFacade) {
+    public RemoteAiCopilotFacadeController(AiCopilotFacade aiCopilotFacade) {
         this.aiCopilotFacade = aiCopilotFacade;
     }
 
@@ -40,7 +39,6 @@ public class RemoterAiCopilotFacadeController {
         return aiCopilotFacade.chat(request.message, request.conversationId, request.context);
     }
 
-    @SuppressFBWarnings("EI")
     public record Request(String message, String conversationId, ContextDTO context) {
     }
 }

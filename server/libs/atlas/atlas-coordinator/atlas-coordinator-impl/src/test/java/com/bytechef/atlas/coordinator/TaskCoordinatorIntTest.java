@@ -95,6 +95,7 @@ public class TaskCoordinatorIntTest {
     private final Evaluator evaluator = SpelEvaluator.create();
 
     @Autowired
+    @Nullable
     private Environment environment;
 
     @Autowired

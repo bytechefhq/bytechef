@@ -9,7 +9,6 @@ package com.bytechef.runtime.job;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.runtime.job.executor.JobRunner;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -44,7 +43,6 @@ public class RuntimeJobApplication implements ApplicationRunner {
     }
 
     @Override
-    @SuppressFBWarnings("DM_EXIT")
     public void run(ApplicationArguments args) {
         List<String> workflow = args.getOptionValues("workflow");
 

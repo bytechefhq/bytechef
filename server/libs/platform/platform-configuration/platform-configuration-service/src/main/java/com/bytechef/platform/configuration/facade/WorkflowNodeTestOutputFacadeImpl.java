@@ -233,7 +233,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             environmentId);
     }
 
-    @SuppressFBWarnings("NP")
     private WorkflowNodeTestOutput saveTriggerWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId,
         long environmentId) {

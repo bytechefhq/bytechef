@@ -24,7 +24,6 @@ public class AutomationMcpServerConfiguration {
 //
 //    private final ToolFacade toolFacade;
 //
-//    @SuppressFBWarnings("EI")
 //    public AutomationMcpServerConfiguration(ToolFacade toolFacade) {
 //        this.toolFacade = toolFacade;
 //    }

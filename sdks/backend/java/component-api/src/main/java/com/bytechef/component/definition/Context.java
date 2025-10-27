@@ -18,7 +18,6 @@ package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Property.ValueProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -962,7 +961,6 @@ public interface Context {
             Response execute();
         }
 
-        @SuppressFBWarnings("EI")
         interface Response {
 
             Map<String, List<String>> getHeaders();

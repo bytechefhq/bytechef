@@ -16,12 +16,9 @@
 
 package com.bytechef.automation.configuration.dto;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public record SharedWorkflowDTO(
     String description, boolean exported, Integer projectVersion, String publicUrl) {
 

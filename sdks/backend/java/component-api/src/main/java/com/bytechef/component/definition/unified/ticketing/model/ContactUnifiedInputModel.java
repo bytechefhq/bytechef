@@ -17,7 +17,6 @@
 package com.bytechef.component.definition.unified.ticketing.model;
 
 import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -25,7 +24,6 @@ import java.util.Map;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public class ContactUnifiedInputModel implements UnifiedInputModel {
 
     @Override

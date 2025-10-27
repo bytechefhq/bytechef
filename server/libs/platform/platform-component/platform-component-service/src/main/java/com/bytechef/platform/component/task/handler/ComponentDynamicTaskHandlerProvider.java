@@ -11,7 +11,6 @@ import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerProvider;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +25,6 @@ public class ComponentDynamicTaskHandlerProvider implements DynamicTaskHandlerPr
 
     private final ActionDefinitionFacade actionDefinitionFacade;
 
-    @SuppressFBWarnings("EI")
     public ComponentDynamicTaskHandlerProvider(ActionDefinitionFacade actionDefinitionFacade) {
         this.actionDefinitionFacade = actionDefinitionFacade;
     }

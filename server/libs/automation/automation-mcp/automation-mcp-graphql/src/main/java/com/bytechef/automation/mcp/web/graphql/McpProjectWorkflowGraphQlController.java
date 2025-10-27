@@ -23,7 +23,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -45,11 +44,9 @@ public class McpProjectWorkflowGraphQlController {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowService workflowService;
 
-    @SuppressFBWarnings("EI")
     McpProjectWorkflowGraphQlController(
         McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        WorkflowService workflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
 
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;

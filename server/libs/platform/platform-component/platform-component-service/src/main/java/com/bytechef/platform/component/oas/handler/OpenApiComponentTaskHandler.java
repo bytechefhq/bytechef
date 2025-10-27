@@ -22,7 +22,6 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
@@ -32,7 +31,6 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
     private final String actionName;
     private final OpenApiComponentHandler openApiComponentHandler;
 
-    @SuppressFBWarnings("EI2")
     public OpenApiComponentTaskHandler(
         String actionName, ActionDefinitionFacade actionDefinitionFacade,
         OpenApiComponentHandler openApiComponentHandler) {

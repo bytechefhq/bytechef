@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.ai.copilot.workflow;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.util.Assert;
@@ -228,7 +227,6 @@ public class OrchestratorWorkersWorkflow {
      * @param analysis Detailed explanation of the task and how different approaches serve its aspects
      * @param tasks    List of subtasks identified by the orchestrator to be executed by workers
      */
-    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record OrchestratorResponse(String analysis, List<OrchestratorTask> tasks) {
         public OrchestratorResponse {
             tasks = List.copyOf(tasks);
