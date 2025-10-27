@@ -6,7 +6,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -162,7 +162,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     };
 
     const handleCopilotClick = () => {
-        setContext({parameters: {}, source: Source.WORKFLOW_EDITOR});
+        setContext({mode: MODE.CHAT, parameters: {}, source: Source.WORKFLOW_EDITOR});
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);

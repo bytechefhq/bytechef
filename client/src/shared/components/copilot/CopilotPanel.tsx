@@ -1,8 +1,9 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import {Button} from '@/components/ui/button';
+import {Select, SelectContent, SelectItem, SelectTrigger} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MODE, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {BotMessageSquareIcon, MessageSquareOffIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -49,7 +50,35 @@ const CopilotPanel = () => {
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>
 
-                <div className="flex">
+                <div className="flex items-center space-x-3">
+                    <Select
+                        onValueChange={(value) =>
+                            setContext({
+                                ...context,
+                                mode: value as MODE,
+                            })
+                        }
+                        value={context?.mode}
+                    >
+                        <SelectTrigger className="min-w-24">
+                            {context?.mode.charAt(0) + context?.mode.slice(1).toLowerCase()}
+                        </SelectTrigger>
+
+                        <SelectContent className="min-w-24">
+                            <SelectItem value={MODE.CHAT}>
+                                <span className="text-muted-foreground">
+                                    {MODE.CHAT.charAt(0) + MODE.CHAT.slice(1).toLowerCase()}
+                                </span>
+                            </SelectItem>
+
+                            <SelectItem value={MODE.BUILD}>
+                                <span className="text-muted-foreground">
+                                    {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
+                                </span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button onClick={handleCleanMessages} size="icon" variant="ghost">
