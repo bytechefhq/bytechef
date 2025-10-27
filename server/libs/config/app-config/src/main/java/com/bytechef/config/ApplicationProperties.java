@@ -383,42 +383,7 @@ public class ApplicationProperties {
             this.provider = provider;
         }
 
-        public static class Copilot {
-
-            public enum Provider {
-                OPENAI, ANTHROPIC
-            }
-
-            private boolean enabled;
-            private OpenAi openAi = new OpenAi();
-            private Provider provider = Provider.OPENAI;
-
-            public boolean isEnabled() {
-                return enabled;
-            }
-
-            public OpenAi getOpenAi() {
-                return openAi;
-            }
-
-            public Provider getProvider() {
-                return provider;
-            }
-
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
-            }
-
-            public void setOpenAi(OpenAi openAi) {
-                this.openAi = openAi;
-            }
-
-            public void setProvider(Provider provider) {
-                this.provider = provider;
-            }
-        }
-
-        public static class OpenAi {
+        public static class Anthropic {
 
             private String apiKey;
             private Chat chat = new Chat();
@@ -464,6 +429,195 @@ public class ApplicationProperties {
                     }
 
                     private Double temperature;
+
+                    public Double getTemperature() {
+                        return temperature;
+                    }
+
+                    public void setTemperature(Double temperature) {
+                        this.temperature = temperature;
+                    }
+                }
+            }
+        }
+
+        public static class Copilot {
+
+            public enum Provider {
+                OPENAI, ANTHROPIC
+            }
+
+            private Anthropic anthropic = new Anthropic();
+            private Chat chat = new Chat();
+            private Embedding embedding = new Embedding();
+            private boolean enabled;
+            private OpenAi openAi = new OpenAi();
+            private Vectorstore vectorstore = new Vectorstore();
+
+            public Anthropic getAnthropic() {
+                return anthropic;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            public Chat getChat() {
+                return chat;
+            }
+
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
+            public Embedding getEmbedding() {
+                return embedding;
+            }
+
+            public void setEmbedding(Embedding embedding) {
+                this.embedding = embedding;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public Vectorstore getVectorstore() {
+                return vectorstore;
+            }
+
+            public void setVectorstore(Vectorstore vectorstore) {
+                this.vectorstore = vectorstore;
+            }
+
+            public static class Chat {
+
+                private Provider provider = Provider.OPENAI;
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+            }
+
+            public static class Embedding {
+
+                private Provider provider = Provider.OPENAI;
+
+                public Provider getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(Provider provider) {
+                    this.provider = provider;
+                }
+            }
+
+            public static class Vectorstore {
+
+                private PgVector pgVector = new PgVector();
+
+                public PgVector getPgVector() {
+                    return pgVector;
+                }
+
+                public void setPgVector(PgVector pgVector) {
+                    this.pgVector = pgVector;
+                }
+
+                public static class PgVector {
+
+                    private String url;
+                    private String username;
+                    private String password;
+
+                    public String getUrl() {
+                        return url;
+                    }
+
+                    public void setUrl(String url) {
+                        this.url = url;
+                    }
+
+                    public String getUsername() {
+                        return username;
+                    }
+
+                    public void setUsername(String username) {
+                        this.username = username;
+                    }
+
+                    public String getPassword() {
+                        return password;
+                    }
+
+                    public void setPassword(String password) {
+                        this.password = password;
+                    }
+                }
+            }
+        }
+
+        public static class OpenAi {
+
+            private String apiKey;
+            private Chat chat = new Chat();
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public Chat getChat() {
+                return chat;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public void setChat(Chat chat) {
+                this.chat = chat;
+            }
+
+            public static class Chat {
+
+                private Options options = new Options();
+
+                public Options getOptions() {
+                    return options;
+                }
+
+                public void setOptions(Options options) {
+                    this.options = options;
+                }
+
+                public static class Options {
+
+                    private String model;
+                    private Double temperature;
+
+                    public String getModel() {
+                        return model;
+                    }
+
+                    public void setModel(String model) {
+                        this.model = model;
+                    }
 
                     public Double getTemperature() {
                         return temperature;

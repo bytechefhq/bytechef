@@ -9,16 +9,26 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.github.mizosoft.methanol.Methanol;
+import io.micrometer.observation.ObservationRegistry;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import javax.sql.DataSource;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.embedding.BatchingStrategy;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
+import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
+import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -33,19 +43,22 @@ public class AiCopilotConfiguration {
     private final String model;
     private final Double temperature;
     private final String openAiApiKey;
+    private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
 
     public AiCopilotConfiguration(ApplicationProperties applicationProperties) {
-        ApplicationProperties.Ai.OpenAi openAi = applicationProperties.getAi()
-            .getCopilot()
-            .getOpenAi();
+        ApplicationProperties.Ai.Copilot copilot = applicationProperties.getAi()
+            .getCopilot();
 
-        this.model = openAi.getChat()
-            .getOptions()
-            .getModel();
-        this.temperature = openAi.getChat()
-            .getOptions()
-            .getTemperature();
+        ApplicationProperties.Ai.OpenAi openAi = copilot.getOpenAi();
+
+        ApplicationProperties.Ai.OpenAi.Chat.Options options = openAi.getChat()
+            .getOptions();
+
+        this.model = options.getModel();
         this.openAiApiKey = openAi.getApiKey();
+        this.pgVector = copilot.getVectorstore()
+            .getPgVector();
+        this.temperature = options.getTemperature();
     }
 
     @Bean
@@ -82,5 +95,44 @@ public class AiCopilotConfiguration {
             .build();
 
         return ChatClient.builder(chatModel);
+    }
+
+    DataSource pgVectorDataSource() {
+        return DataSourceBuilder.create()
+            .type(org.postgresql.ds.PGSimpleDataSource.class)
+            .url(pgVector.getUrl())
+            .username(pgVector.getUsername())
+            .password(pgVector.getPassword())
+            .build();
+    }
+
+    JdbcTemplate pgVectorJdbcTemplate() {
+        return new JdbcTemplate(pgVectorDataSource());
+    }
+
+    @Bean
+    public PgVectorStore vectorStore(
+        EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy) {
+
+        var initializeSchema = properties.isInitializeSchema();
+
+        return PgVectorStore.builder(pgVectorJdbcTemplate(), embeddingModel)
+            .schemaName(properties.getSchemaName())
+            .idType(properties.getIdType())
+            .vectorTableName(properties.getTableName())
+            .vectorTableValidationsEnabled(properties.isSchemaValidation())
+            .dimensions(properties.getDimensions())
+            .distanceType(properties.getDistanceType())
+            .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
+            .indexType(properties.getIndexType())
+            .initializeSchema(initializeSchema)
+            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
+            .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
+            .batchingStrategy(batchingStrategy)
+            .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
+            .build();
     }
 }
