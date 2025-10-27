@@ -7,7 +7,17 @@
     </Match>
     <Match>
         <Bug pattern="EI_EXPOSE_REP"/>
-        <Package name="~com\.bytechef\.component.*" />
+        <Package name="~com\.bytechef\.component.*"/>
         <Method name="getDefinition"/>
+    </Match>
+    <Match>
+        <Bug pattern="HSM_HIDING_METHOD"/>
+        <Package name="~com\.bytechef\.component.*"/>
+    </Match>
+    <Match>
+        <Bug pattern="US_USELESS_SUPPRESSION_ON_CLASS"/>
+    </Match>
+    <Match>
+        <Bug pattern="US_USELESS_SUPPRESSION_ON_METHOD"/>
     </Match>
 </FindBugsFilter>
