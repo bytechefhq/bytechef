@@ -37,7 +37,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.11.31",
+    "@assistant-ui/react": "^0.11.33",
     "@assistant-ui/react-markdown": "^0.11.2",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
@@ -65,7 +65,7 @@
     "@tiptap/suggestion": "^2.14.0",
     "@types/d3": "^7.4.3",
     "@uidotdev/usehooks": "^2.4.1",
-    "@xyflow/react": "^12.8.6",
+    "@xyflow/react": "^12.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -80,7 +80,7 @@
     "monaco-editor": "^0.54.0",
     "monaco-yaml": "^5.4.0",
     "motion": "^12.23.24",
-    "posthog-js": "^1.276.0",
+    "posthog-js": "^1.279.3",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
     "react-day-picker": "^9.11.1",
@@ -109,8 +109,9 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
     "@dagrejs/dagre": "^1.1.5",
-    "@graphql-codegen/cli": "^6.0.0",
+    "@graphql-codegen/cli": "^6.0.1",
     "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@storybook/addon-docs": "^9.1.13",
     "@storybook/addon-links": "^9.1.13",
     "@storybook/addon-onboarding": "^9.1.13",
     "@storybook/react-vite": "^9.1.13",
@@ -124,8 +125,8 @@
     "@types/node": "^22.15.29",
     "@types/react-dom": "^19.2.2",
     "@types/sanitize-html": "^2.16.0",
-    "@typescript-eslint/eslint-plugin": "^8.46.1",
-    "@typescript-eslint/parser": "^8.46.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/coverage-v8": "^3.2.4",
@@ -155,8 +156,7 @@
     "vite": "^7.1.11",
     "vite-bundle-analyzer": "^1.2.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
-    "@storybook/addon-docs": "^9.1.13"
+    "vitest": "^3.2.4"
   },
   "msw": {
     "workerDirectory": "public"
