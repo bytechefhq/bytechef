@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.linkedin.action.LinkedInCreatePostAction;
+import com.bytechef.component.linkedin.action.LinkedInDeletePostAction;
 import com.bytechef.component.linkedin.connection.LinkedInConnection;
 import com.google.auto.service.AutoService;
 
@@ -39,8 +40,12 @@ public final class LinkedInComponentHandler implements ComponentHandler {
         .icon("path:assets/linkedin.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.SOCIAL_MEDIA)
         .connection(LinkedInConnection.CONNECTION_DEFINITION)
-        .actions(LinkedInCreatePostAction.ACTION_DEFINITION)
-        .clusterElements(tool(LinkedInCreatePostAction.ACTION_DEFINITION));
+        .actions(
+            LinkedInCreatePostAction.ACTION_DEFINITION,
+            LinkedInDeletePostAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(LinkedInCreatePostAction.ACTION_DEFINITION),
+            tool(LinkedInDeletePostAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
