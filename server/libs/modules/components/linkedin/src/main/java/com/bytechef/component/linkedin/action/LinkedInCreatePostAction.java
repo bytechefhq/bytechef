@@ -18,14 +18,21 @@ package com.bytechef.component.linkedin.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.ARTICLE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.AUTHOR;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.COMMENTARY;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.CONTENT_TYPE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.DESCRIPTION;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.DOCUMENT;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.ID;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.SOURCE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.THUMBNAIL;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.TITLE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.VISIBILITY;
 
@@ -34,7 +41,9 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linkedin.util.LinkedInUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,35 +59,59 @@ public class LinkedInCreatePostAction {
                 .label("Text")
                 .description("The user generated commentary for the post.")
                 .required(true),
+            string(CONTENT_TYPE)
+                .label("Content Type")
+                .description("Type of content to be posted.")
+                .options(
+                    option("Article", ARTICLE),
+                    option("Document", DOCUMENT),
+                    option("Images", IMAGES))
+                .required(false),
             string(VISIBILITY)
                 .label("Visibility")
                 .description("Visibility restrictions on content.")
                 .options(
                     option("Public", "PUBLIC", "Anyone can view this."),
-                    option("Connections only", "CONNECTIONS", "Represents 1st degree network of owner."),
-                    option("Logged In", "LOGGED_IN", "Viewable by logged in members only."),
-                    option("Container", "CONTAINER",
-                        "Visibility is delegated to the owner of the container entity. For example, posts within a group are delegated to the groups authorization API for visibility authorization."))
+                    option("Connections only", "CONNECTIONS", "Represents 1st degree network of owner."))
                 .required(true),
-            fileEntry(IMAGE)
-                .label("Image")
+            array(IMAGES)
+                .label("Images")
                 .description("The image to be posted.")
-                .required(false),
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, IMAGES))
+                .items(fileEntry(IMAGE))
+                .required(true),
             string(SOURCE)
                 .label("Article URL")
                 .description("A URL of the article. Typically the URL that was ingested to maintain URL parameters.")
-                .required(false),
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .required(true),
             string(TITLE)
                 .label("Article Title")
                 .description("Custom or saved title of the article.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
                 .maxLength(400)
                 .required(false),
             string(DESCRIPTION)
                 .label("Article Description")
                 .description("Custom or saved description of the article.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
                 .maxLength(4086)
-                .required(false))
-        .output()
+                .required(false),
+            fileEntry(THUMBNAIL)
+                .label("Article Thumbnail")
+                .description("The thumbnail image to be associated with the article.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .required(false),
+            fileEntry(DOCUMENT)
+                .label("Document")
+                .description("The document to be posted.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, DOCUMENT))
+                .required(true),
+            string(TITLE)
+                .label("Document Title")
+                .description("The title of the document.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, DOCUMENT))
+                .required(true))
         .perform(LinkedInCreatePostAction::perform);
 
     private LinkedInCreatePostAction() {
@@ -89,7 +122,7 @@ public class LinkedInCreatePostAction {
 
         Map<String, Object> content = buildContent(inputParameters, context, personUrn);
 
-        return context.http(http -> http.post("/rest/posts"))
+        context.http(http -> http.post("/rest/posts"))
             .body(
                 Http.Body.of(
                     AUTHOR, personUrn,
@@ -99,8 +132,9 @@ public class LinkedInCreatePostAction {
                     VISIBILITY, inputParameters.getRequiredString(VISIBILITY),
                     "content", content))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody();
+            .execute();
+
+        return null;
     }
 
     private static String getPersonUrn(Parameters connectionParameters, Context context) {
@@ -120,31 +154,58 @@ public class LinkedInCreatePostAction {
     private static Map<String, Object> buildContent(Parameters inputParameters, Context context, String personUrn) {
         Map<String, Object> content = null;
 
-        FileEntry image = inputParameters.getFileEntry(IMAGE);
+        String contentType = inputParameters.getString(CONTENT_TYPE);
+        if (contentType != null && !contentType.isEmpty()) {
+            content = new HashMap<>();
 
-        if (image != null) {
-            Map<String, Object> upload = LinkedInUtils.uploadImage(context, image, personUrn);
+            switch (contentType) {
+                case IMAGES -> {
+                    List<FileEntry> images = inputParameters.getRequiredList(IMAGES, FileEntry.class);
+                    if (!images.isEmpty())
+                        if (images.size() == 1) {
+                            FileEntry image = images.getFirst();
 
-            if (upload.get("value") instanceof Map<?, ?> map) {
-                content = new HashMap<>();
+                            String id = LinkedInUtils.uploadContent(context, image, personUrn, contentType);
 
-                content.put("media", Map.of("id", (String) map.get(IMAGE)));
+                            content.put("media", Map.of(ID, id));
+                        } else {
+                            List<Map<String, String>> imagesList = new ArrayList<>();
+
+                            for (FileEntry image : images) {
+                                String id = LinkedInUtils.uploadContent(context, image, personUrn, contentType);
+
+                                imagesList.add(Map.of(ID, id));
+                            }
+
+                            content.put("multiImage", Map.of(IMAGES, imagesList));
+                        }
+                }
+                case ARTICLE -> {
+                    String source = inputParameters.getRequiredString(SOURCE);
+
+                    Map<String, Object> articleMap = new HashMap<>();
+
+                    articleMap.put(SOURCE, source);
+                    articleMap.put(TITLE, inputParameters.getString(TITLE));
+                    articleMap.put(DESCRIPTION, inputParameters.getString(DESCRIPTION));
+
+                    FileEntry thumbnail = inputParameters.getFileEntry(THUMBNAIL);
+
+                    if (thumbnail != null) {
+                        String id = LinkedInUtils.uploadContent(context, thumbnail, personUrn, contentType);
+
+                        articleMap.put(THUMBNAIL, id);
+                    }
+
+                    content.put(ARTICLE, articleMap);
+                }
+                case DOCUMENT -> {
+                    FileEntry document = inputParameters.getRequiredFileEntry(DOCUMENT);
+                    String id = LinkedInUtils.uploadContent(context, document, personUrn, contentType);
+
+                    content.put("media", Map.of(ID, id, TITLE, inputParameters.getRequiredString(TITLE)));
+                }
             }
-        }
-
-        String source = inputParameters.getString(SOURCE);
-        if (source != null) {
-            if (content == null) {
-                content = new HashMap<>();
-            }
-
-            Map<String, Object> articleMap = new HashMap<>();
-
-            articleMap.put(SOURCE, source);
-            articleMap.put(TITLE, inputParameters.getString(TITLE));
-            articleMap.put(DESCRIPTION, inputParameters.getString(DESCRIPTION));
-
-            content.put("article", articleMap);
         }
 
         return content;

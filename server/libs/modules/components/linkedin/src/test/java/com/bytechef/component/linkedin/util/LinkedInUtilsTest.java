@@ -16,6 +16,8 @@
 
 package com.bytechef.component.linkedin.util;
 
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -48,7 +50,7 @@ class LinkedInUtilsTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testUploadImage() {
+    void testUploadContent() {
         when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
                 .apply(mockedHttp));
@@ -66,13 +68,12 @@ class LinkedInUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        Map<String, Object> values = Map.of("value", Map.of("uploadUrl", "uploadUrl"));
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(values);
+            .thenReturn(Map.of("value", Map.of("uploadUrl", "uploadUrl", IMAGE, "imageUrn")));
 
-        Map<String, Object> result = LinkedInUtils.uploadImage(mockedContext, mockedFileEntry, "urn");
+        String result = LinkedInUtils.uploadContent(mockedContext, mockedFileEntry, "urn", IMAGES);
 
-        assertEquals(values, result);
+        assertEquals("imageUrn", result);
         assertEquals(
             List.of("/v2/images", "action", "initializeUpload", "uploadUrl", "Content-Type", "multipart/form-data"),
             stringArgumentCaptor.getAllValues());

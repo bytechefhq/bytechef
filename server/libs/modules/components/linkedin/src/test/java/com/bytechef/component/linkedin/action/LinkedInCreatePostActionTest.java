@@ -22,12 +22,11 @@ import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Json;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.AUTHOR;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.COMMENTARY;
-import static com.bytechef.component.linkedin.constant.LinkedInConstants.DESCRIPTION;
-import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
-import static com.bytechef.component.linkedin.constant.LinkedInConstants.SOURCE;
-import static com.bytechef.component.linkedin.constant.LinkedInConstants.TITLE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.CONTENT_TYPE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.VISIBILITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -75,7 +74,6 @@ class LinkedInCreatePostActionTest {
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Http mockedHttp = mock(Http.class);
     private final Json mockedJson = mock(Json.class);
-    private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -84,22 +82,19 @@ class LinkedInCreatePostActionTest {
     void testPerform() throws Exception {
         when(mockedParameters.getRequiredString(COMMENTARY))
             .thenReturn("some comment");
+        when(mockedParameters.getString(CONTENT_TYPE))
+            .thenReturn(IMAGES);
         when(mockedParameters.getRequiredString(VISIBILITY))
             .thenReturn("PUBLIC");
-        when(mockedParameters.getFileEntry(IMAGE))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getString(SOURCE))
-            .thenReturn("url");
-        when(mockedParameters.getString(TITLE))
-            .thenReturn("test");
-        when(mockedParameters.getString(DESCRIPTION))
-            .thenReturn("test");
+        when(mockedParameters.getRequiredList(IMAGES, FileEntry.class))
+            .thenReturn(List.of(mockedFileEntry));
 
         try (MockedStatic<LinkedInUtils> githubUtilsMockedStatic = mockStatic(LinkedInUtils.class)) {
             githubUtilsMockedStatic
-                .when(() -> LinkedInUtils.uploadImage(contextArgumentCaptor.capture(),
-                    fileEntryArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(Map.of("value", Map.of(IMAGE, "imageId")));
+                .when(() -> LinkedInUtils.uploadContent(
+                    contextArgumentCaptor.capture(), fileEntryArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture()))
+                .thenReturn("imageId");
 
             Optional<PerformFunction> performFunction = LinkedInCreatePostAction.ACTION_DEFINITION.getPerform();
 
@@ -133,18 +128,16 @@ class LinkedInCreatePostActionTest {
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
-            when(mockedResponse.getBody())
-                .thenReturn(mockedObject);
 
-            Object result = singleConnectionPerformFunction.apply(mockedParameters, mockedConnectionParameters,
-                mockedActionContext);
+            Object result = singleConnectionPerformFunction.apply(
+                mockedParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertEquals(mockedObject, result);
+            assertNull(result);
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
             assertEquals(
                 List.of(
                     "eyJpc3MiOiJodHRwczovL3d3dy5saW5rZWRpbi5jb20vb2F1dGgiLCJhdWQiOiI4NjNjMDA4a3NjNTlnbiIsImlhdCI6MTc2MTI5MTkyOSwiZXhwIjoxNzYxMjk1NTI5LCJzdWIiOiJGODlpY2tERUhNIiwibmFtZSI6Ik1vbmlrYSBLdcWhdGVyIiwiZ2l2ZW5fbmFtZSI6Ik1vbmlrYSIsImZhbWlseV9uYW1lIjoiS3XFoXRlciIsInBpY3R1cmUiOiJodHRwczovL21lZGlhLmxpY2RuLmNvbS9kbXMvaW1hZ2UvdjIvQzRFMDNBUUVmOUNEYktfODZ1dy9wcm9maWxlLWRpc3BsYXlwaG90by1zaHJpbmtfMTAwXzEwMC9wcm9maWxlLWRpc3BsYXlwaG90by1zaHJpbmtfMTAwXzEwMC8wLzE2NjE4NzcxNTcxMjE_ZT0xNzYyOTkyMDAwJnY9YmV0YSZ0PWNCQ3RlMjhVR0cyOUFBOWdBb3ZXYkRNUkJpTWlZWW5vdm9WcHgxOGVZb28iLCJlbWFpbCI6ImRvbWl0ZXJtb25pa2FAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJ0cnVlIiwibG9jYWxlIjoiZW5fVVMifQ",
-                    "urn:li:person:null", "/rest/posts"),
+                    "urn:li:person:null", IMAGES, "/rest/posts"),
                 stringArgumentCaptor.getAllValues());
 
             Http.Body body = bodyArgumentCaptor.getValue();
@@ -155,8 +148,7 @@ class LinkedInCreatePostActionTest {
                 "distribution", Map.of("feedDistribution", "MAIN_FEED"),
                 "lifecycleState", "PUBLISHED",
                 VISIBILITY, "PUBLIC",
-                "content", Map.of("media", Map.of("id", "imageId"), "article",
-                    Map.of(SOURCE, "url", TITLE, "test", DESCRIPTION, "test")));
+                "content", Map.of("media", Map.of("id", "imageId")));
 
             assertEquals(expectedBody, body.getContent());
         }
