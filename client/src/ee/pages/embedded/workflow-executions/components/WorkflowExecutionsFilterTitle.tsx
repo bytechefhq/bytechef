@@ -21,9 +21,7 @@ const WorkflowExecutionsFilterTitle = ({
                 </>
             )}
 
-            {!filterData.status && (
-                <span className="text-sm uppercase text-muted-foreground">none</span>
-            )}
+            {!filterData.status && <span className="text-sm uppercase text-muted-foreground">none</span>}
         </div>
     );
 };
