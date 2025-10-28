@@ -32,6 +32,8 @@ const McpServersFilterTitle = ({
                     </Badge>
                 </>
             )}
+
+            {!searchParams.get('tagId') && <span className="text-sm uppercase text-muted-foreground">none</span>}
         </div>
     );
 };
