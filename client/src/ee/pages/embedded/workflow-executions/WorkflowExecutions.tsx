@@ -360,7 +360,7 @@ export const WorkflowExecutions = () => {
             footer={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <Footer position="main">
+                    <Footer centerTitle position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
@@ -375,6 +375,7 @@ export const WorkflowExecutions = () => {
                 workflowExecutions &&
                 workflowExecutions.length > 0 && (
                     <Header
+                        centerTitle
                         position="main"
                         title={
                             <WorkflowExecutionsFilterTitle
