@@ -13,7 +13,6 @@ import {ApiCollectionTagKeys} from '@/ee/shared/mutations/automation/apiCollecti
 import {useDeleteApiCollectionMutation} from '@/ee/shared/mutations/automation/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -157,16 +156,6 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
                             <TooltipContent>The project version</TooltipContent>
                         </Tooltip>
-
-                        <div className="flex min-w-28 justify-end">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={apiCollection.projectDeployment!.environmentId!} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-                        </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />

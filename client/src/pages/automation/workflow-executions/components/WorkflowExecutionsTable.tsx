@@ -1,7 +1,6 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -21,8 +20,6 @@ const getDuration = (info: CellContext<WorkflowExecution, JobBasic | undefined>)
 const columnHelper = createColumnHelper<WorkflowExecution>();
 
 const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
-    const {data: environmentsQuery} = useEnvironmentsQuery();
-
     const reactTable = useReactTable<WorkflowExecution>({
         columns: [
             columnHelper.accessor((row) => row.job, {
@@ -50,13 +47,6 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
                     return pv != null ? `V${pv}` : '';
                 },
                 header: 'Version',
-            }),
-            columnHelper.accessor('projectDeployment', {
-                cell: (info) =>
-                    environmentsQuery?.environments?.find(
-                        (environment) => +environment!.id! === info.getValue()?.environmentId
-                    )?.name,
-                header: 'Environment',
             }),
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => getDuration(info),

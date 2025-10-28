@@ -11,7 +11,6 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiKeyDialog from '@/pages/settings/platform/api-keys/components/ApiKeyDialog';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {ApiKey} from '@/shared/middleware/platform/security';
 import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
 import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
@@ -81,10 +80,6 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
             columnHelper.accessor('secretKey', {
                 cell: (info) => info.getValue() ?? '',
                 header: 'Secret Key',
-            }),
-            columnHelper.accessor('environmentId', {
-                cell: (info) => <EnvironmentBadge environmentId={info.getValue()!} />,
-                header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
@@ -175,7 +170,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
                                         cell.id.endsWith('enabled') && 'ml-6 flex',
-                                        cell.id.endsWith('name') && 'truncate xl:min-w-72'
+                                        cell.id.endsWith('name') && 'truncate xl:min-w-80'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

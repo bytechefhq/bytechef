@@ -26,7 +26,6 @@ import {
     useUpdateConnectionMutation,
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -134,14 +133,6 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                         </div>
 
                         <div className="flex items-center justify-end gap-x-6">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={+connection.environmentId!} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-
                             <div className="flex min-w-52 flex-col items-end gap-y-4">
                                 {connection.credentialStatus === 'VALID' ? (
                                     <Badge className="uppercase" variant={connection.active ? 'success' : 'secondary'}>
