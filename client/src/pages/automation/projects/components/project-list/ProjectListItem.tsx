@@ -228,7 +228,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         <>
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
-                onClick={(event) => handleProjectListItemClick(event)}
+                onClick={(event) => {
+                    if (!project.projectWorkflowIds) {
+                        handleProjectListItemClick(event);
+                    }
+                }}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
