@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.ARTICLE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.AUTHOR;
@@ -53,7 +54,7 @@ public class LinkedInCreatePostAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
-        .description("")
+        .description("Create a post on LinkedIn.")
         .properties(
             string(COMMENTARY)
                 .label("Text")
@@ -112,17 +113,18 @@ public class LinkedInCreatePostAction {
                 .description("The title of the document.")
                 .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, DOCUMENT))
                 .required(true))
+        .output(outputSchema(string().description("Post ID such as urn:li:share:{id} or urn:li:ugcPost:{id})")))
         .perform(LinkedInCreatePostAction::perform);
 
     private LinkedInCreatePostAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String personUrn = getPersonUrn(connectionParameters, context);
 
         Map<String, Object> content = buildContent(inputParameters, context, personUrn);
 
-        context.http(http -> http.post("/rest/posts"))
+        Http.Response response = context.http(http -> http.post("/rest/posts"))
             .body(
                 Http.Body.of(
                     AUTHOR, personUrn,
@@ -134,7 +136,7 @@ public class LinkedInCreatePostAction {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
-        return null;
+        return response.getFirstHeader("x-restli-id");
     }
 
     private static String getPersonUrn(Parameters connectionParameters, Context context) {
