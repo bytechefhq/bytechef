@@ -21,11 +21,17 @@ package com.bytechef.component.linkedin.constant;
  */
 public class LinkedInConstants {
 
+    public static final String ARTICLE = "article";
     public static final String AUTHOR = "author";
     public static final String COMMENTARY = "commentary";
+    public static final String CONTENT_TYPE = "contentType";
     public static final String DESCRIPTION = "description";
+    public static final String DOCUMENT = "document";
+    public static final String ID = "id";
     public static final String IMAGE = "image";
+    public static final String IMAGES = "images";
     public static final String SOURCE = "source";
+    public static final String THUMBNAIL = "thumbnail";
     public static final String TITLE = "title";
     public static final String VISIBILITY = "visibility";
 

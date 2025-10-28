@@ -16,10 +16,15 @@
 
 package com.bytechef.component.linkedin.util;
 
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.DOCUMENT;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
+
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.Map;
 
 /**
@@ -30,24 +35,43 @@ public class LinkedInUtils {
     private LinkedInUtils() {
     }
 
-    public static Map<String, Object> uploadImage(Context context, FileEntry image, String personUrn) {
-        Map<String, Object> body = context.http(http -> http.post("/v2/images"))
-            .queryParameter("action", "initializeUpload")
-            .body(Http.Body.of("initializeUploadRequest", Map.of("owner", personUrn)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+    public static String uploadContent(Context context, FileEntry fileEntry, String personUrn, String contentType) {
+        Map<String, Object> body = initializeUpload(context, contentType, personUrn);
 
         if (body.get("value") instanceof Map<?, ?> map) {
             String uploadUrl = (String) map.get("uploadUrl");
 
             context.http(http -> http.put(uploadUrl))
                 .header("Content-Type", "multipart/form-data")
-                .body(Http.Body.of(Map.of("file", image), Http.BodyContentType.FORM_DATA))
+                .body(Http.Body.of(Map.of("file", fileEntry), Http.BodyContentType.FORM_DATA))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute();
+
+            switch (contentType) {
+                case DOCUMENT -> {
+                    return (String) map.get(DOCUMENT);
+                }
+                case IMAGES -> {
+                    return (String) map.get(IMAGE);
+                }
+            }
         }
 
-        return body;
+        throw new ProviderException("Failed to upload image to LinkedIn.");
+    }
+
+    private static Map<String, Object> initializeUpload(Context context, String contentType, String personUrn) {
+        String url = switch (contentType) {
+            case IMAGES -> "/v2/images";
+            case DOCUMENT -> "/rest/documents";
+            default -> throw new ProviderException("Unsupported content type: " + contentType);
+        };
+
+        return context.http(http -> http.post(url))
+            .queryParameter("action", "initializeUpload")
+            .body(Http.Body.of("initializeUploadRequest", Map.of("owner", personUrn)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
