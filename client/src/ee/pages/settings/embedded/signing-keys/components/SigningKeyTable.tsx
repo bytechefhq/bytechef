@@ -85,7 +85,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
             columnHelper.accessor('keyId', {
                 cell: (info) => (
                     <div className="group flex items-center gap-0.5">
-                        <span>{info.getValue()}</span>
+                        <span className="max-w-64 truncate">{info.getValue()}</span>
 
                         <Button
                             className="invisible group-hover:visible"
@@ -111,6 +111,10 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                 cell: (info) =>
                     `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
                 header: 'Last Used Date',
+            }),
+            columnHelper.accessor('createdBy', {
+                cell: (info) => `${info.getValue()}`,
+                header: 'Created By',
             }),
             columnHelper.display({
                 cell: (info) => (
