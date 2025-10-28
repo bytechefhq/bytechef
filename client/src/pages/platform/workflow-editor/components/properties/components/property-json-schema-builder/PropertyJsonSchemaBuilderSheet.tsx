@@ -35,7 +35,7 @@ const PropertyJsonSchemaBuilderSheet = ({
                 <Tabs className="flex size-full flex-col" defaultValue="designer">
                     <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <div className="flex flex-col">
-                            <SheetTitle>{`${title} Builder` || 'JSON Schema Builder'}</SheetTitle>
+                            <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
 
                             <SheetDescription>{`Define desired structure for the ${title}.`}</SheetDescription>
                         </div>
