@@ -112,7 +112,9 @@ const DesktopSidebarBottomMenu = () => {
     const handleWorkspaceValueChange = (value: string) => {
         setCurrentWorkspaceId(+value);
 
-        navigate('/automation/projects');
+        if (currentType === ModeType.AUTOMATION) {
+            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+        }
     };
 
     useEffect(() => {
