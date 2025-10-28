@@ -36,7 +36,11 @@ const ProjectDeploymentListItemAlertDialog = ({
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onCancelClick}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-destructive" disabled={isPending} onClick={onDeleteClick}>
+                    <AlertDialogAction
+                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                        disabled={isPending}
+                        onClick={onDeleteClick}
+                    >
                         {isPending && <LoadingIcon />}
                         Delete
                     </AlertDialogAction>

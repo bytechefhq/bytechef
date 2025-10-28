@@ -20,7 +20,7 @@ export const environmentStore = createStore<EnvironmentStateI>()(
     devtools(
         persist(
             (set) => ({
-                currentEnvironmentId: 0,
+                currentEnvironmentId: DEVELOPMENT_ENVIRONMENT,
                 clearCurrentEnvironmentId: () => {
                     set(() => ({
                         currentEnvironmentId: DEVELOPMENT_ENVIRONMENT,

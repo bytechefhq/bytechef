@@ -5,7 +5,10 @@ import {devtools} from 'zustand/middleware';
 
 import type {ExtractState} from 'zustand/vanilla';
 
-export type EditionType = 'CE' | 'EE';
+export enum EditionType {
+    CE = 'CE',
+    EE = 'EE',
+}
 
 export interface ApplicationInfoI {
     ai: {
