@@ -399,7 +399,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         className="dropdown-menu-item"
                                         onClick={() => setShowProjectShareDialog(true)}
                                     >
-                                        <Share2Icon /> Share Project
+                                        <Share2Icon /> Share
                                     </DropdownMenuItem>
                                 )}
 
@@ -423,7 +423,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
                                         }
                                     >
-                                        <DownloadIcon /> Export Project
+                                        <DownloadIcon /> Export
                                     </DropdownMenuItem>
                                 )}
 
