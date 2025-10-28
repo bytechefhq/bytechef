@@ -1,36 +1,38 @@
 {
-  "actions" : null,
-  "clusterElements" : [ {
-    "description" : "Combines documents retrieved based on multiple queries and from multiple data sources\nby concatenating them into a single collection of documents. In case of duplicate\ndocuments, the first occurrence is kept. The score of each document is kept as is.\n",
-    "element" : { },
-    "help" : null,
-    "name" : "concatenationDocumentJoiner",
-    "outputDefinition" : null,
-    "properties" : null,
-    "title" : "Concatenation Document Joiner",
-    "type" : {
-      "key" : "documentJoiner",
-      "label" : "Document Joiner",
-      "multipleElements" : false,
-      "name" : "DOCUMENT_JOINER",
-      "required" : false
-    }
+  "actions": null,
+  "clusterElements": [ {
+    "description": "Combines documents retrieved based on multiple queries and from multiple data sources\nby concatenating them into a single collection of documents. In case of duplicate\ndocuments, the first occurrence is kept. The score of each document is kept as is.\n",
+    "element": { },
+    "help": null,
+    "name": "concatenationDocumentJoiner",
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Concatenation Document Joiner",
+    "type": {
+      "key": "documentJoiner",
+      "label": "Document Joiner",
+      "multipleElements": false,
+      "name": "DOCUMENT_JOINER",
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
-  "componentCategories" : [ {
-    "label" : "Artificial Intelligence",
-    "name" : "artificial-intelligence"
+  "componentCategories": [ {
+    "label": "Artificial Intelligence",
+    "name": "artificial-intelligence"
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "Document Joiner.",
-  "icon" : "path:assets/document-joiner.svg",
-  "metadata" : null,
-  "name" : "documentJoiner",
-  "resources" : null,
-  "tags" : null,
-  "title" : "Document Joiner",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Document Joiner.",
+  "icon": "path:assets/document-joiner.svg",
+  "metadata": null,
+  "name": "documentJoiner",
+  "resources": null,
+  "tags": null,
+  "title": "Document Joiner",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }

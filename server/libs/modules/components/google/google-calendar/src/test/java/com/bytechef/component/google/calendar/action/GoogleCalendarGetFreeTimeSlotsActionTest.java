@@ -30,7 +30,6 @@ import com.bytechef.component.google.calendar.action.GoogleCalendarGetFreeTimeSl
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
@@ -53,7 +52,7 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() {
         List<CustomEvent> customEvents = createCustomEvents();
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
@@ -108,7 +107,7 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
     }
 
     @Test
-    void testPerformWhenThereIsNoFreeTime() throws IOException {
+    void testPerformWhenThereIsNoFreeTime() {
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
             mockStatic(GoogleCalendarUtils.class)) {
 

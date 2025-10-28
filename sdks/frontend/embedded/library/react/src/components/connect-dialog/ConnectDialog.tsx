@@ -52,7 +52,6 @@ interface DialogProps {
     isOpen: boolean;
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
-    selectedWorkflows: string[];
     mergedWorkflows: MergedWorkflowType[];
 }
 
@@ -68,7 +67,6 @@ const ConnectDialog = ({
     isOpen,
     properties,
     registerFormSubmit,
-    selectedWorkflows,
     mergedWorkflows,
 }: DialogProps) => {
     useEffect(() => {
@@ -106,7 +104,6 @@ const ConnectDialog = ({
                         integration={integration}
                         properties={properties}
                         registerFormSubmit={registerFormSubmit}
-                        selectedWorkflows={selectedWorkflows}
                         mergedWorkflows={mergedWorkflows}
                     />
                 ) : (
@@ -155,7 +152,6 @@ const DialogHeader = ({closeDialog, integration}: DialogHeaderProps) => (
 interface DialogWorkflowsContainerProps {
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
     handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
-    selectedWorkflows: string[];
     mergedWorkflows: MergedWorkflowType[];
 }
 
@@ -163,7 +159,6 @@ const DialogWorkflowsContainer = ({
     handleWorkflowToggle,
     handleWorkflowInputChange,
     mergedWorkflows,
-    selectedWorkflows,
 }: DialogWorkflowsContainerProps) => {
     return (
         <div data-testid="workflows-container" className={styles.workflowsContainer}>
@@ -175,7 +170,7 @@ const DialogWorkflowsContainer = ({
 
             <ul className={styles.workflowsList}>
                 {mergedWorkflows.map((mergedWorkflow) => {
-                    const {inputs, workflowUuid, label} = mergedWorkflow;
+                    const {enabled = false, inputs, workflowUuid, label} = mergedWorkflow;
 
                     return (
                         <li key={workflowUuid}>
@@ -184,12 +179,12 @@ const DialogWorkflowsContainer = ({
 
                                 <Toggle
                                     id={workflowUuid}
-                                    pressed={selectedWorkflows.includes(workflowUuid)}
+                                    pressed={enabled}
                                     onPressedChange={(pressed) => handleWorkflowToggle(workflowUuid, pressed)}
                                 />
                             </div>
 
-                            {selectedWorkflows.includes(workflowUuid) && (
+                            {enabled && (
                                 <div className={styles.workflowInputsContainer}>
                                     <span>INPUTS</span>
 
@@ -234,7 +229,6 @@ interface DialogContentProps {
     integration: IntegrationType;
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
-    selectedWorkflows: string[];
     mergedWorkflows: MergedWorkflowType[];
 }
 
@@ -246,7 +240,6 @@ const DialogContent = ({
     integration,
     properties,
     registerFormSubmit,
-    selectedWorkflows,
     mergedWorkflows,
 }: DialogContentProps) => {
     // Register the form's submit handler when the component mounts
@@ -261,9 +254,7 @@ const DialogContent = ({
             {!workflowsView && <p>{integration.description}</p>}
 
             {!workflowsView && form && (
-                <form id="form" onSubmit={(event) => {
-                    form.handleSubmit(() => {})(event);
-                }}>
+                <form id="form">
                     {properties?.map((property) => {
                         const field = form.register(property.name);
 
@@ -290,7 +281,6 @@ const DialogContent = ({
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
                     mergedWorkflows={mergedWorkflows}
-                    selectedWorkflows={selectedWorkflows}
                 />
             )}
         </main>
@@ -312,7 +302,7 @@ const DialogFooter = ({workflowsView = false, handleClick, isOAuth2 = false}: Di
         )}
 
         {!workflowsView && (
-            <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button" form="form">
+            <button autoFocus onClick={handleClick} className={styles.buttonPrimary} type="button">
                 {isOAuth2 ? (
                     <span>
                         Authorize

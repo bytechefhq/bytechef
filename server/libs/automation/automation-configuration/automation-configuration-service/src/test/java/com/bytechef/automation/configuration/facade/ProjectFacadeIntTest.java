@@ -565,7 +565,7 @@ public class ProjectFacadeIntTest {
 
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(projectZip));
 
         String projectUuid = "11111111-2222-3333-4444-555555555557";
@@ -651,7 +651,7 @@ public class ProjectFacadeIntTest {
         SharedTemplate sharedTemplate = new SharedTemplate();
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(projectZip));
 
         String projectUuid = "11111111-2222-3333-4444-555555555555";
@@ -839,7 +839,7 @@ public class ProjectFacadeIntTest {
         SharedTemplate sharedTemplate = new SharedTemplate();
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(projectZip));
 
         String projectUuid = "dc8040d8-52dc-41ed-8507-3b2cf652d3cc";
@@ -880,7 +880,7 @@ public class ProjectFacadeIntTest {
         SharedTemplate sharedTemplate = new SharedTemplate();
         sharedTemplate.setTemplate(templateFileEntry);
 
-        when(sharedTemplateFileStorage.getFileStream(any(FileEntry.class)))
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
             .thenReturn(new ByteArrayInputStream(zipData));
 
         String projectUuid = "11111111-2222-3333-4444-555555555556";

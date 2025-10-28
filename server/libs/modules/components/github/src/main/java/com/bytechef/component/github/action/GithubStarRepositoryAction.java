@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 
 import com.bytechef.component.definition.Context;
@@ -36,11 +37,7 @@ public class GithubStarRepositoryAction {
         .title("Star Repository")
         .description("Stars a repository for the authenticated user.")
         .properties(
-            string(OWNER)
-                .label("Owner")
-                .description("The account owner of the repository. The name is not case sensitive.")
-                .exampleValue("bytechefhq")
-                .required(true),
+            OWNER_PROPERTY,
             string(REPOSITORY)
                 .label("Repository")
                 .description(

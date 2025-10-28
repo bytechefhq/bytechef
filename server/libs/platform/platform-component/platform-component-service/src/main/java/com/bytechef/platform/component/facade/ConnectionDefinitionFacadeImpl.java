@@ -53,9 +53,9 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection) {
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
         return connectionDefinitionService.executeBaseUri(
-            componentName, connection, contextFactory.createContext(componentName, connection));
+            componentName, componentConnection, contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override

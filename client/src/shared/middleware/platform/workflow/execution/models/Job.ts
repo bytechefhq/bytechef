@@ -224,7 +224,7 @@ export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'curr
 
     return {
         
-        'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),
+        'endDate': value['endDate'] == null ? value['endDate'] : value['endDate'].toISOString(),
         'error': ExecutionErrorToJSON(value['error']),
         'taskExecutions': value['taskExecutions'] == null ? undefined : ((value['taskExecutions'] as Array<any>).map(TaskExecutionToJSON)),
     };

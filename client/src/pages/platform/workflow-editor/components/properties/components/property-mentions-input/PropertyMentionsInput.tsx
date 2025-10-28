@@ -20,6 +20,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -29,19 +30,10 @@ import {CircleQuestionMarkIcon, EqualIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import PropertyMentionsInputEditorFacade from './PropertyMentionsInputEditorFacade';
-
 const PropertyMentionsInputEditorSheet = lazy(
     () =>
         import(
             '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet'
-        )
-);
-
-const PropertyMentionsInputEditor = lazy(
-    () =>
-        import(
-            '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor'
         )
 );
 
@@ -177,7 +169,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                 {description && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <CircleQuestionMarkIcon />
+                                            <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                                         </TooltipTrigger>
 
                                         <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>
@@ -235,34 +227,24 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             className
                         )}
                     >
-                        <Suspense
-                            fallback={
-                                <PropertyMentionsInputEditorFacade
-                                    className="px-2 py-[0.44rem]"
-                                    placeholder={placeholder}
-                                    ref={ref}
-                                />
-                            }
-                        >
-                            <PropertyMentionsInputEditor
-                                className="px-2 py-[0.44rem]"
-                                componentDefinitions={componentDefinitions}
-                                controlType={controlType}
-                                dataPills={dataPills}
-                                elementId={elementId}
-                                isFormulaMode={isFormulaMode}
-                                onChange={(value) => handleEditorValueChange(value)}
-                                onFocus={onFocus}
-                                path={path}
-                                placeholder={placeholder}
-                                ref={ref}
-                                setIsFormulaMode={setIsFormulaMode}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                type={type}
-                                value={value || defaultValue}
-                                workflow={workflow}
-                            />
-                        </Suspense>
+                        <PropertyMentionsInputEditor
+                            className="px-2 py-[0.44rem]"
+                            componentDefinitions={componentDefinitions}
+                            controlType={controlType}
+                            dataPills={dataPills}
+                            elementId={elementId}
+                            isFormulaMode={isFormulaMode}
+                            onChange={(value) => handleEditorValueChange(value)}
+                            onFocus={onFocus}
+                            path={path}
+                            placeholder={placeholder}
+                            ref={ref}
+                            setIsFormulaMode={setIsFormulaMode}
+                            taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            type={type}
+                            value={value || defaultValue}
+                            workflow={workflow}
+                        />
                     </div>
                 </div>
             </fieldset>

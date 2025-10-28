@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.discord.util.DiscordUtils;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class DiscordSendChannelMessageAction {
         .properties(string("channelId").label("Channel ID")
             .description("ID of the channel where to send the message.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) DiscordUtils::getChannelIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) DiscordUtils::getChannelIdOptions)
             .optionsLookupDependsOn("guildId")
             .metadata(
                 Map.of(

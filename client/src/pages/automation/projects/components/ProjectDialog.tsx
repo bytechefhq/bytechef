@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -278,12 +278,10 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>

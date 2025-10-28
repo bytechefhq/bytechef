@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
@@ -65,12 +66,12 @@ public class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public ActionContext createActionContext(
-        String componentName, int componentVersion, String actionName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
-        @Nullable String workflowId, @Nullable ComponentConnection connection, boolean editorEnvironment) {
+        String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
+        @Nullable ComponentConnection componentConnection, @Nullable ModeType type, boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            actionName, componentName, componentVersion, connection, this,
+            actionName, componentName, componentVersion, componentConnection, this,
             getDataStorage(workflowId, editorEnvironment), editorEnvironment, eventPublisher,
             getHttpClientExecutor(editorEnvironment), jobId, jobPrincipalId, jobPrincipalWorkflowId, type, publicUrl,
             getTempFileStorage(editorEnvironment),
@@ -78,34 +79,37 @@ public class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public Context createContext(String componentName, @Nullable ComponentConnection connection) {
-        return createContext(componentName, connection, false);
+    public Context createContext(String componentName, @Nullable ComponentConnection componentConnection) {
+        return new ContextImpl(
+            componentName, -1, null, componentConnection, false, getHttpClientExecutor(false),
+            getTempFileStorage(false));
     }
 
     @Override
-    public Context createContext(
-        String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment) {
+    public ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        return new ContextImpl(
-            componentName, -1, null, connection, getHttpClientExecutor(editorEnvironment),
-            getTempFileStorage(editorEnvironment));
+        return new ClusterElementContextImpl(
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment,
+            getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment));
     }
 
     @Override
     public TriggerContext createTriggerContext(
-        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable String workflowUuid, @Nullable ComponentConnection connection,
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable ModeType type,
         boolean editorEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, connection, getDataStorage(workflowUuid, editorEnvironment),
+            componentName, componentVersion, componentConnection, getDataStorage(workflowUuid, editorEnvironment),
             editorEnvironment, getTempFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment),
             jobPrincipalId, triggerName, type, workflowUuid);
     }
 
-    private DataStorage getDataStorage(String workflowReference, boolean editorEnvironment) {
+    private DataStorage getDataStorage(String workflowUuid, boolean editorEnvironment) {
         if (editorEnvironment) {
-            return new InMemoryDataStorage(workflowReference, cacheManager);
+            return new InMemoryDataStorage(workflowUuid, cacheManager);
         }
 
         return dataStorage;

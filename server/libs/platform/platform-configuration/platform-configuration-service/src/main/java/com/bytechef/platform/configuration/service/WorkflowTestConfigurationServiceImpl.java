@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,7 +168,11 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
         Map<String, String> inputs = new HashMap<>(workflowTestConfiguration.getInputs());
 
-        inputs.put(key, value);
+        if (StringUtils.isEmpty(value)) {
+            inputs.remove(key);
+        } else {
+            inputs.put(key, value);
+        }
 
         workflowTestConfiguration.setInputs(inputs);
 

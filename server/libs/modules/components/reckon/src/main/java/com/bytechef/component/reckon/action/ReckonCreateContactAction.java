@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.reckon.util.ReckonUtils;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class ReckonCreateContactAction {
         .properties(string("bookId").label("Book ID")
             .description("ID of the book where new contact will be created.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ReckonUtils::getBookIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) ReckonUtils::getBookIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

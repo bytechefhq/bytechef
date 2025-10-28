@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
@@ -84,23 +84,20 @@ export const PasswordResetInit = () => {
                             />
 
                             <Button
-                                className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                                className="w-full"
                                 data-cy="submit"
+                                label="Send link to email"
+                                size="lg"
                                 type="submit"
-                            >
-                                Send link to email
-                            </Button>
+                            />
                         </form>
                     </Form>
 
-                    <div className="flex justify-center gap-1 text-sm">
+                    <div className="flex items-center justify-center gap-1 text-sm">
                         <span className="text-content-neutral-secondary">Remember your password?</span>
 
-                        <Link
-                            className="font-semibold text-content-neutral-primary underline hover:text-content-neutral-secondary"
-                            to="/login"
-                        >
-                            Log in
+                        <Link to="/login">
+                            <Button className="px-1" label="Log in" variant="link" />
                         </Link>
                     </div>
                 </CardContent>

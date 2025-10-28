@@ -52,7 +52,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     {description && (
                         <Tooltip>
                             <TooltipTrigger>
-                                <CircleQuestionMarkIcon />
+                                <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                             </TooltipTrigger>
 
                             <TooltipContent>{description}</TooltipContent>

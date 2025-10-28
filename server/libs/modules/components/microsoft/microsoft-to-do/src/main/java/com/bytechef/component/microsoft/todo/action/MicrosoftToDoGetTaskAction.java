@@ -23,10 +23,10 @@ import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConsta
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.todo.util.MicrosoftToDoUtils;
@@ -44,12 +44,12 @@ public class MicrosoftToDoGetTaskAction {
             string(TASK_LIST_ID)
                 .label("Task List ID")
                 .description("ID of the task list where the task will be created.")
-                .options((ActionOptionsFunction<String>) MicrosoftToDoUtils::getTaskListIdOptions)
+                .options((OptionsFunction<String>) MicrosoftToDoUtils::getTaskListIdOptions)
                 .required(true),
             string(TASK_ID)
                 .label("Task ID")
                 .description("ID of the task to retrieve.")
-                .options((ActionOptionsFunction<String>) MicrosoftToDoUtils::getTaskIdOptions)
+                .options((OptionsFunction<String>) MicrosoftToDoUtils::getTaskIdOptions)
                 .optionsLookupDependsOn(TASK_LIST_ID)
                 .required(true))
         .output(outputSchema(OUTPUT_TASK_PROPERTY))

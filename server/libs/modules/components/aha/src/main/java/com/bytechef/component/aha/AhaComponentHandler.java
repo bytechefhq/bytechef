@@ -25,12 +25,12 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.aha.util.AhaUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
                     string(PRODUCT_ID)
                         .label("Product ID")
                         .description("ID of the product to which the release belongs.")
-                        .options((ActionOptionsFunction<String>) AhaUtils::getProductIdOptions)
+                        .options((OptionsFunction<String>) AhaUtils::getProductIdOptions)
                         .required(true));
 
                 modifiableActionDefinition.properties(properties);

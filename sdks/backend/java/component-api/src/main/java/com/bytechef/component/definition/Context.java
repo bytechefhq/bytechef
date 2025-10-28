@@ -21,6 +21,7 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
@@ -64,6 +65,13 @@ public interface Context {
      * @param <R>
      */
     <R> R http(ContextFunction<Http, R> httpFunction);
+
+    /**
+     * Determines whether the current environment is the editor environment.
+     *
+     * @return true if the current environment is an editor environment, false otherwise.
+     */
+    boolean isEditorEnvironment();
 
     /**
      *
@@ -189,6 +197,14 @@ public interface Context {
          * @return
          */
         String base64EncodeToString(byte[] bytes);
+
+        /**
+         *
+         * @param string
+         * @return
+         */
+        String urlEncode(String string);
+
     }
 
     /**
@@ -201,7 +217,21 @@ public interface Context {
          * @param fileEntry
          * @return
          */
-        InputStream getStream(FileEntry fileEntry);
+        long getContentLength(FileEntry fileEntry);
+
+        /**
+         *
+         * @param fileEntry
+         * @return
+         */
+        InputStream getInputStream(FileEntry fileEntry);
+
+        /**
+         *
+         * @param fileEntry
+         * @return
+         */
+        OutputStream getOutputStream(FileEntry fileEntry);
 
         /**
          *

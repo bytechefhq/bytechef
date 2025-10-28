@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import javax.annotation.Nullable;
@@ -27,7 +27,9 @@ import javax.annotation.Nullable;
  */
 public interface ActionContextAware extends ActionContext {
 
-    Context createContext(String componentName, @Nullable ComponentConnection connection);
+    ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String componentOperationName,
+        @Nullable ComponentConnection componentConnection);
 
     String getActionName();
 
@@ -40,6 +42,4 @@ public interface ActionContextAware extends ActionContext {
     ModeType getModeType();
 
     String getWorkflowId();
-
-    boolean isEditorEnvironment();
 }

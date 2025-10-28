@@ -29,9 +29,9 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.OWNER;
 import static com.bytechef.component.nutshell.util.NutshellUtils.addIfPresent;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.nutshell.util.NutshellUtils;
@@ -53,7 +53,7 @@ public class NutshellCreateLeadAction {
                 .description("Description of the lead, which is also set as the name of the lead")
                 .required(true),
             string(OWNER)
-                .options((ActionOptionsFunction<String>) NutshellUtils::getUserOptions)
+                .options((OptionsFunction<String>) NutshellUtils::getUserOptions)
                 .label("Assignee")
                 .description("The user to whom the lead is assigned")
                 .required(false))

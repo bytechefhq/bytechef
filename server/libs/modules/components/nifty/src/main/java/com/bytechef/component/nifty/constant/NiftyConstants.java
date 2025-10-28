@@ -18,8 +18,8 @@ package com.bytechef.component.nifty.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.nifty.util.NiftyUtils;
 
 /**
@@ -35,7 +35,7 @@ public class NiftyConstants {
     public static final ModifiableStringProperty PROJECT_PROPERTY = string(PROJECT)
         .label("Project ID")
         .description("ID of the project within which the task will be created.")
-        .options((ActionOptionsFunction<String>) NiftyUtils::getProjectIdOptions)
+        .options((OptionsFunction<String>) NiftyUtils::getProjectIdOptions)
         .required(true);
 
     private NiftyConstants() {

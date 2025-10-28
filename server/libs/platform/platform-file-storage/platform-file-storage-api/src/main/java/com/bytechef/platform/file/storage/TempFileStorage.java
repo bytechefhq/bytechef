@@ -18,13 +18,18 @@ package com.bytechef.platform.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Ivica Cardic
  */
 public interface TempFileStorage {
 
-    InputStream getFileStream(FileEntry fileEntry);
+    long getContentLength(FileEntry fileEntry);
+
+    InputStream getInputStream(FileEntry fileEntry);
+
+    OutputStream getOutputStream(FileEntry fileEntry);
 
     String readFileToString(FileEntry fileEntry);
 

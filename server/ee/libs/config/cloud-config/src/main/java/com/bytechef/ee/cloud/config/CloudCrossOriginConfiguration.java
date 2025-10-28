@@ -16,34 +16,37 @@
 
 package com.bytechef.ee.cloud.config;
 
+import java.util.List;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Configuration class that sets up cross-origin resource sharing (CORS) for the application.
  *
- * This configuration allows the application to accept cross-origin requests from specific origins, enhancing security
- * by restricting access to predefined domains.
- *
- * It specifies the allowed origins for HTTP requests to the configured endpoints. Requests originating from other
- * domains will be blocked unless explicitly defined here.
- *
- * This is useful when the application must handle client requests from web or external services running on different
- * domains.
- *
- * Annotated with {@code @Configuration} to denote that this class contains application configuration related to
- * cross-origin policies.
- *
- * Annotated with {@code @CrossOrigin} to specify the list of allowed origins. The origins defined here are: -
- * https://app.bytechef.io - https://test.app.bytechef.io
- *
  * @author Ivica Cardic
  */
 @Configuration
-@CrossOrigin(origins = {
-    "https://app.bytechef.io", "https://test.app.bytechef.io"
-})
 @Profile("cloud")
 public class CloudCrossOriginConfiguration {
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedOrigins(List.of("https://app.bytechef.io"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/actuator/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
+
+        return new CorsFilter(source);
+    }
 }

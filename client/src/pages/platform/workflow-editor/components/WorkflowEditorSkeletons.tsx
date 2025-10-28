@@ -2,10 +2,11 @@ import LoadingDots from '@/components/LoadingDots';
 import {Skeleton} from '@/components/ui/skeleton';
 import {twMerge} from 'tailwind-merge';
 
-export const WorkflowNodeDetailsPanelSkeleton = () => (
+export const WorkflowNodeDetailsPanelSkeleton = ({className}: {className?: string}) => (
     <div
         className={twMerge(
-            'absolute bottom-6 right-[69px] top-2 z-10 flex w-screen max-w-workflow-node-details-panel-width flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background p-4'
+            'absolute bottom-6 right-[69px] top-2 z-10 flex w-screen max-w-workflow-node-details-panel-width flex-col gap-2 overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background p-4',
+            className
         )}
     >
         <Skeleton className="h-8 w-3/4" />
@@ -76,29 +77,11 @@ export const DataPillPanelSkeleton = () => (
     </div>
 );
 
-export const ConnectionTabSkeleton = () => (
-    <div className="p-4">
-        <FieldsetSkeleton label="Connection" />
-    </div>
-);
-
 export const PropertiesTabSkeleton = () => (
     <div className="flex flex-col gap-4 p-4">
         {Array.from({length: 4}).map((_, index) => (
             <PropertySkeleton key={index} />
         ))}
-    </div>
-);
-
-export const OutputTabSkeleton = () => (
-    <div className="flex flex-col gap-4 p-4">
-        <Skeleton className="h-8 w-1/2" />
-
-        <Skeleton className="h-6 w-full" />
-
-        <Skeleton className="h-6 w-3/4" />
-
-        <Skeleton className="h-6 w-1/2" />
     </div>
 );
 

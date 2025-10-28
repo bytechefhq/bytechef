@@ -20,7 +20,13 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateClusterElementParameterRequest {
     /**
-     * If path and value type should be included in metadata 
+     * If fromAi should be included in metadata.
+     * @type {boolean}
+     * @memberof UpdateClusterElementParameterRequest
+     */
+    fromAiInMetadata?: boolean;
+    /**
+     * If path and value type should be included in metadata.
      * @type {boolean}
      * @memberof UpdateClusterElementParameterRequest
      */
@@ -64,6 +70,7 @@ export function UpdateClusterElementParameterRequestFromJSONTyped(json: any, ign
     }
     return {
         
+        'fromAiInMetadata': json['fromAiInMetadata'] == null ? undefined : json['fromAiInMetadata'],
         'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
         'type': json['type'],
@@ -82,6 +89,7 @@ export function UpdateClusterElementParameterRequestToJSONTyped(value?: UpdateCl
 
     return {
         
+        'fromAiInMetadata': value['fromAiInMetadata'],
         'includeInMetadata': value['includeInMetadata'],
         'path': value['path'],
         'type': value['type'],

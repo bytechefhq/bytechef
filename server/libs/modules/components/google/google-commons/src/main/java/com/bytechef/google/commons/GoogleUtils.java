@@ -21,14 +21,16 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.exception.ProviderException;
 import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Setting;
+import com.google.api.services.calendar.model.Settings;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -72,31 +75,6 @@ public class GoogleUtils {
         }
     }
 
-    public static ActionOptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,
-            isEqualMimetype, connectionParameters);
-    }
-
-    public static TriggerOptionsFunction<String> getFileOptionsByMimeTypeForTriggers(
-        String mimeType, boolean isEqualMimetype) {
-
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,
-            isEqualMimetype, connectionParameters);
-    }
-
-    private static List<Option<String>> getFileOptions(
-        String mimeType, boolean isEqualMimetype, Parameters connectionParameters) {
-
-        String operator = isEqualMimetype ? "=" : "!=";
-        String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
-
-        List<File> files = fetchAllFiles(connectionParameters, query);
-
-        return files.stream()
-            .map(folder -> option(folder.getName(), folder.getId()))
-            .collect(Collectors.toList());
-    }
-
     public static List<File> fetchAllFiles(Parameters connectionParameters, String query) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
@@ -120,6 +98,28 @@ public class GoogleUtils {
             nextPageToken = fileList.getNextPageToken();
         } while (nextPageToken != null);
         return files;
+    }
+
+    public static String getCalendarTimezone(Calendar calendar) {
+        List<Setting> settings = fetchAllCalendarSettings(calendar);
+
+        return settings.stream()
+            .filter(setting -> Objects.equals(setting.getId(), "timezone"))
+            .findFirst()
+            .map(Setting::getValue)
+            .orElseThrow(() -> new ProviderException("Timezone setting not found."));
+    }
+
+    public static OptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> getFileOptions(
+            mimeType, isEqualMimetype, connectionParameters);
+    }
+
+    public static com.bytechef.component.definition.TriggerDefinition.OptionsFunction<String>
+        getFileOptionsByMimeTypeForTriggers(String mimeType, boolean isEqualMimetype) {
+
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> getFileOptions(
+            mimeType, isEqualMimetype, connectionParameters);
     }
 
     public static ProviderException processErrorResponse(int statusCode, Object body, Context context) {
@@ -146,5 +146,42 @@ public class GoogleUtils {
         }
 
         return new ProviderException(e);
+    }
+
+    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
+        List<Setting> allSettings = new ArrayList<>();
+
+        String nextPageToken = null;
+
+        do {
+            Settings settings;
+            try {
+                settings = calendar.settings()
+                    .list()
+                    .setMaxResults(250)
+                    .setPageToken(nextPageToken)
+                    .execute();
+            } catch (IOException e) {
+                throw translateGoogleIOException(e);
+            }
+
+            allSettings.addAll(settings.getItems());
+            nextPageToken = settings.getNextPageToken();
+        } while (nextPageToken != null);
+
+        return allSettings;
+    }
+
+    private static List<Option<String>> getFileOptions(
+        String mimeType, boolean isEqualMimetype, Parameters connectionParameters) {
+
+        String operator = isEqualMimetype ? "=" : "!=";
+        String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
+
+        List<File> files = fetchAllFiles(connectionParameters, query);
+
+        return files.stream()
+            .map(folder -> option(folder.getName(), folder.getId()))
+            .collect(Collectors.toList());
     }
 }

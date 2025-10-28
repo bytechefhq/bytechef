@@ -112,7 +112,7 @@ public class XlsxFileReadAction {
         boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
         String sheetName = inputParameters.getString(SHEET_NAME);
 
-        try (InputStream inputStream = context.file(file -> file.getStream(fileEntry))) {
+        try (InputStream inputStream = context.file(file -> file.getInputStream(fileEntry))) {
             String extension = fileEntry.getExtension();
 
             FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());

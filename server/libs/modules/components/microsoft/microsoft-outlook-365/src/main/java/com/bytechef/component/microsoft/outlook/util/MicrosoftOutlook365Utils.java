@@ -62,14 +62,14 @@ public class MicrosoftOutlook365Utils {
             return null;
         }
 
-        return recipients
-            .stream()
+        return recipients.stream()
             .map(recipient -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, recipient)))
             .toList();
     }
 
     public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody, String id) {
         String from = null;
+
         if (messageBody.get(FROM) instanceof Map<?, ?> fromMap &&
             fromMap.get(EMAIL_ADDRESS) instanceof Map<?, ?> emailAddressMap) {
 
@@ -77,22 +77,16 @@ public class MicrosoftOutlook365Utils {
         }
 
         String bodyHtml = null;
+
         if (messageBody.get(BODY) instanceof Map<?, ?> map) {
             bodyHtml = (String) map.get(CONTENT);
         }
 
         return new SimpleMessage(
-            (String) messageBody.get(ID),
-            (String) messageBody.get("conversationId"),
-            (String) messageBody.get(SUBJECT),
-            from,
-            getRecipients(messageBody, TO_RECIPIENTS),
-            getRecipients(messageBody, CC_RECIPIENTS),
-            getRecipients(messageBody, BCC_RECIPIENTS),
-            (String) messageBody.get("bodyPreview"),
-            bodyHtml,
-            getFileEntries(context, messageBody, id),
-            (String) messageBody.get("webLink"));
+            (String) messageBody.get(ID), (String) messageBody.get("conversationId"), (String) messageBody.get(SUBJECT),
+            from, getRecipients(messageBody, TO_RECIPIENTS), getRecipients(messageBody, CC_RECIPIENTS),
+            getRecipients(messageBody, BCC_RECIPIENTS), (String) messageBody.get("bodyPreview"), bodyHtml,
+            getFileEntries(id, context), (String) messageBody.get("webLink"));
     }
 
     public static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
@@ -125,28 +119,25 @@ public class MicrosoftOutlook365Utils {
         return body.get(VALUE);
     }
 
-    private static List<FileEntry> getFileEntries(Context context, Map<?, ?> messageBody, String id) {
+    private static List<FileEntry> getFileEntries(String id, Context context) {
         List<FileEntry> fileEntries = new ArrayList<>();
 
-        if ((boolean) messageBody.get("hasAttachments")) {
-            Map<String, Object> attachmentsBody = context
-                .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, Object> attachmentsBody = context
+            .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-            if (attachmentsBody.get(VALUE) instanceof List<?> attachments) {
-                for (Object attachment : attachments) {
-                    if (attachment instanceof Map<?, ?> map) {
-                        String contentBytes = (String) map.get(CONTENT_BYTES);
-                        byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
+        if (attachmentsBody.get(VALUE) instanceof List<?> attachments) {
+            for (Object attachment : attachments) {
+                if (attachment instanceof Map<?, ?> map) {
+                    String contentBytes = (String) map.get(CONTENT_BYTES);
+                    byte[] decodedBytes = context.encoder(encoder -> encoder.base64Decode(contentBytes));
 
-                        FileEntry fileEntry = context.file(
-                            file -> file.storeContent((String) map.get(NAME),
-                                new ByteArrayInputStream(decodedBytes)));
+                    FileEntry fileEntry = context.file(
+                        file -> file.storeContent((String) map.get(NAME), new ByteArrayInputStream(decodedBytes)));
 
-                        fileEntries.add(fileEntry);
-                    }
+                    fileEntries.add(fileEntry);
                 }
             }
         }

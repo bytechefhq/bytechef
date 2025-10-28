@@ -28,8 +28,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
@@ -52,34 +52,34 @@ public class ShopifyCreateOrderAction {
         .properties(
             object("order")
                 .properties(
-                    array("line_items").items(object().properties(
-                        string("fulfillment_status").label("Fulfillment Status")
+                    array("line_items").items(object()
+                        .properties(string("fulfillment_status").label("Fulfillment Status")
                             .description("How far along an order is in terms line items fulfilled.")
                             .options(option("Null", "null"), option("Fulfilled", "fulfilled"), option("Partial",
                                 "partial"), option("Not_eligible", "not_eligible"))
                             .required(false),
-                        string("grams").label("Grams")
-                            .description("The weight of the item in grams.")
-                            .required(false),
-                        number("price").label("Price")
-                            .description(
-                                "The price of the item before discounts have been applied in the shop currency.")
-                            .required(false),
-                        integer("product_id").label("Product ID")
-                            .description("The ID of the product that the line item belongs to.")
-                            .required(false)
-                            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getProductIdOptions),
-                        integer("variant_id").label("Variant ID")
-                            .description("The ID of the product variant.")
-                            .required(false)
-                            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getVariantIdOptions)
-                            .optionsLookupDependsOn("order.line_items[index].product_id"),
-                        integer("quantity").label("Quantity")
-                            .description("The number of items that were purchased.")
-                            .required(false),
-                        string("title").label("Title")
-                            .description("The title of the product.")
-                            .required(false))
+                            string("grams").label("Grams")
+                                .description("The weight of the item in grams.")
+                                .required(false),
+                            number("price").label("Price")
+                                .description(
+                                    "The price of the item before discounts have been applied in the shop currency.")
+                                .required(false),
+                            integer("product_id").label("Product ID")
+                                .description("The ID of the product that the line item belongs to.")
+                                .required(false)
+                                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getProductIdOptions),
+                            integer("variant_id").label("Variant ID")
+                                .description("The ID of the product variant.")
+                                .required(false)
+                                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getVariantIdOptions)
+                                .optionsLookupDependsOn("order.line_items[index].product_id"),
+                            integer("quantity").label("Quantity")
+                                .description("The number of items that were purchased.")
+                                .required(false),
+                            string("title").label("Title")
+                                .description("The title of the product.")
+                                .required(false))
                         .description(
                             "The list of line item objects, each containing information about an item in the order."))
                         .placeholder("Add to Line Items")

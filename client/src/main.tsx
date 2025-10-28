@@ -46,6 +46,8 @@ if (process.env.NODE_ENV === 'mock') {
     renderApp();
 }
 
+const publicRoutes = ['/activate', '/login', '/register', '/password-reset', '/password-reset/finish', '/verify-email'];
+
 async function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
@@ -57,7 +59,7 @@ async function renderApp() {
 
     await applicationInfoStore.getState().getApplicationInfo();
 
-    if (!authenticationStore.getState().sessionHasBeenFetched) {
+    if (!publicRoutes.includes(window.location.pathname) && !authenticationStore.getState().sessionHasBeenFetched) {
         const result = await authenticationStore.getState().getAccount();
 
         if (!result && window.location.pathname !== '/login') {

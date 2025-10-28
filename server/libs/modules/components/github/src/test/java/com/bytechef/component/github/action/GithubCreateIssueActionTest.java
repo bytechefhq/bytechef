@@ -17,6 +17,8 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,23 +33,27 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 class GithubCreateIssueActionTest extends AbstractGithubActionTest {
 
-    private final Map<String, Object> parameterMap = Map.of(TITLE, "name", BODY, "description");
-    private final Parameters mockedParameters = MockParametersFactory.create(parameterMap);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", TITLE, "name", BODY, "description"));
 
     @Test
-    void testPerform() {
+    void testPerform() throws Exception {
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of());
 
-        Map<String, Object> result = GithubCreateIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = executePerformFunction(GithubCreateIssueAction.ACTION_DEFINITION, mockedParameters);
 
-        assertEquals(responseMap, result);
+        assertEquals(Map.of(), result);
+        assertEquals("/repos/testOwner/testRepo/issues", stringArgumentCaptor.getValue());
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(parameterMap, body.getContent());
+        assertEquals(Map.of(TITLE, "name", BODY, "description"), body.getContent());
     }
 }

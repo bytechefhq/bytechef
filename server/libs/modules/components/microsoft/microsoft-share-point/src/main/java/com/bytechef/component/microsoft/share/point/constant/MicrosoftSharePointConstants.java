@@ -18,8 +18,8 @@ package com.bytechef.component.microsoft.share.point.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 
 /**
@@ -44,7 +44,7 @@ public class MicrosoftSharePointConstants {
 
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
         .label("Site ID")
-        .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
+        .options((OptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
         .required(true);
 
     private MicrosoftSharePointConstants() {

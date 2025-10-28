@@ -24,11 +24,11 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.TEXT;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.chat.util.GoogleChatUtils;
@@ -47,7 +47,7 @@ public class GoogleChatCreateMessageAction {
             string(SPACE)
                 .label("Space")
                 .description("Space in which the message will be created.")
-                .options((ActionOptionsFunction<String>) GoogleChatUtils::getSpaceOptions)
+                .options((OptionsFunction<String>) GoogleChatUtils::getSpaceOptions)
                 .required(true),
             string(TEXT)
                 .label("Message Text")

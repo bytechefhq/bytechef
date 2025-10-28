@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@Order(3)
-public class DefaultComponentConnectionFactory
+@Order
+class DefaultComponentConnectionFactory
     implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     @Override

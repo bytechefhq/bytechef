@@ -80,6 +80,11 @@ export type ComponentType = {
     workflowNodeName: string;
 };
 
+export type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
+    taskDispatcher: boolean;
+    trigger: boolean;
+};
+
 export type ClickedDefinitionType = {
     taskDispatcher?: boolean;
     trigger?: boolean;

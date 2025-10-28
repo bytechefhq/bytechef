@@ -16,6 +16,10 @@
 
 package com.bytechef.platform.component.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Property.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -31,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +103,16 @@ public class SqlUtils {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<Option<String>> getTypeOptions() {
+        List<Type> types = List.of(
+            Type.ARRAY, Type.BOOLEAN, Type.DATE, Type.DATE_TIME, Type.INTEGER, Type.NUMBER, Type.OBJECT, Type.STRING,
+            Type.TIME);
+
+        return types.stream()
+            .map(type -> option(type.name(), type.name()))
+            .collect(Collectors.toList());
     }
 
     /**

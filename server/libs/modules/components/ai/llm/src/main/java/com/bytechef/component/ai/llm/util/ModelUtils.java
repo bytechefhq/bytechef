@@ -49,7 +49,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -77,11 +77,22 @@ public class ModelUtils {
     @SuppressFBWarnings("NP")
     @Nullable
     public static Object getChatResponse(
-        ChatClient.CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
+        CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
+
+        return getChatResponse(callResponseSpec, parameters, true, context);
+    }
+
+    @SuppressFBWarnings("NP")
+    @Nullable
+    public static Object getChatResponse(
+        CallResponseSpec callResponseSpec, Parameters parameters, boolean responseFormatRequired, Context context) {
 
         Object response = null;
-        ResponseFormat responseFormat = parameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+        ResponseFormat responseFormat = TEXT;
+
+        if (responseFormatRequired) {
+            responseFormat = parameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+        }
 
         if (responseFormat == TEXT) {
             try {
@@ -121,24 +132,34 @@ public class ModelUtils {
     }
 
     public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext) {
+        return getMessages(inputParameters, actionContext, true);
+    }
+
+    public static List<Message> getMessages(
+        Parameters inputParameters, ActionContext actionContext, boolean messageFormatRequired) {
+
         List<ChatModel.Message> chatModelMessages = new ArrayList<>();
 
-        String format = inputParameters.getRequiredString(FORMAT);
+        if (messageFormatRequired) {
+            String format = inputParameters.getRequiredString(FORMAT);
 
-        if (format.equals(Format.SIMPLE.name())) {
-            String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
+            if (format.equals(Format.SIMPLE.name())) {
+                String userPrompt = inputParameters.getRequiredString(USER_PROMPT);
 
-            ChatModel.Message userMessage = new ChatModel.Message(
-                userPrompt, inputParameters.getList(ATTACHMENTS, FileEntry.class), Role.USER);
+                ChatModel.Message userMessage = new ChatModel.Message(
+                    userPrompt, inputParameters.getList(ATTACHMENTS, FileEntry.class), Role.USER);
 
-            chatModelMessages.add(userMessage);
+                chatModelMessages.add(userMessage);
 
-            String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
+                String systemPrompt = inputParameters.getString(SYSTEM_PROMPT);
 
-            if (systemPrompt != null && !systemPrompt.isEmpty()) {
-                ChatModel.Message systeMMessage = new ChatModel.Message(systemPrompt, null, Role.SYSTEM);
+                if (systemPrompt != null && !systemPrompt.isEmpty()) {
+                    ChatModel.Message systeMMessage = new ChatModel.Message(systemPrompt, null, Role.SYSTEM);
 
-                chatModelMessages.add(systeMMessage);
+                    chatModelMessages.add(systeMMessage);
+                }
+            } else {
+                chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
             }
         } else {
             chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});

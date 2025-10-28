@@ -39,6 +39,9 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
@@ -60,12 +63,14 @@ class ComponentToolsTest {
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     private ComponentTools componentTools;
+    @Mock
+    private ConnectionService connectionService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade);
+            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService);
     }
 
     @Test
@@ -261,7 +266,7 @@ class ComponentToolsTest {
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
-            eq(componentName), eq(version), eq(actionName), anyMap(), isNull()))
+            eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenReturn(outputResponse);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
@@ -269,7 +274,7 @@ class ComponentToolsTest {
         assertNotNull(result);
         assertEquals("dynamicActionResult", result.name());
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
-            isNull());
+            anyMap());
     }
 
     @Test
@@ -293,23 +298,28 @@ class ComponentToolsTest {
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
-            eq(componentName), eq(version), eq(actionName), anyMap(), isNull()))
+            eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
+
+        Connection connection = mock(Connection.class);
+        when(connection.getId()).thenReturn(123L);
+        when(connectionService.getConnections(componentName, version, ModeType.AUTOMATION))
+            .thenReturn(List.of(connection));
 
         Map<String, Object> performResult = Map.of("data", "test");
         when(actionDefinitionFacade.executePerform(
             eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), isNull(), eq(true)))
+            anyMap(), isNull(), eq(true)))
                 .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
 
         assertNotNull(result);
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
-            isNull());
+            anyMap());
         verify(actionDefinitionFacade).executePerform(
             eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), isNull(), eq(true));
+            anyMap(), isNull(), eq(true));
     }
 
     @Test
@@ -333,13 +343,11 @@ class ComponentToolsTest {
             .thenReturn(componentDefinition);
 
         when(actionDefinitionFacade.executeOutput(
-            eq(componentName), eq(version), eq(actionName), anyMap(), isNull()))
+            eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        when(actionDefinitionFacade.executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), isNull(), eq(true)))
-                .thenThrow(new RuntimeException("Connection required"));
+        when(connectionService.getConnections(componentName, version, ModeType.AUTOMATION))
+            .thenThrow(new RuntimeException("Connection required"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> componentTools.getOutputProperty(componentName, actionName, version));

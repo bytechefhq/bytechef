@@ -45,6 +45,7 @@ const ProjectsLeftSidebar = ({
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const {toast} = useToast();
     const navigate = useNavigate();
 
@@ -131,6 +132,16 @@ const ProjectsLeftSidebar = ({
         }
     }, [selectedProjectId, refetchProjects]);
 
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchInputRef.current) {
+                searchInputRef.current.focus();
+            }
+        }, 50);
+
+        return () => clearTimeout(timeoutId);
+    }, [selectedProjectId]);
+
     return (
         <aside className="flex h-full flex-col items-center gap-2 bg-surface-main pt-0.5">
             <div className="flex flex-col gap-2 px-4">
@@ -144,6 +155,7 @@ const ProjectsLeftSidebar = ({
                 )}
 
                 <WorkflowsListFilter
+                    ref={searchInputRef}
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
                     setSortBy={setSortBy}
@@ -195,7 +207,7 @@ const ProjectsLeftSidebar = ({
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
-                    <ul className="flex flex-col items-center gap-2">
+                    <ul className="flex flex-col items-center gap-4">
                         {selectedProjectId === 0 &&
                             (projects || []).map((project) => (
                                 <ProjectWorkflowsList

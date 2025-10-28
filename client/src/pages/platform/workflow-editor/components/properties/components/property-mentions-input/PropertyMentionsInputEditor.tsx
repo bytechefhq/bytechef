@@ -28,16 +28,8 @@ import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tip
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {
-    ForwardedRef,
-    MutableRefObject,
-    ReactElement,
-    forwardRef,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -45,9 +37,6 @@ import {useShallow} from 'zustand/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {MentionStorage} from './MentionStorage.extension';
-
-const defaultIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>';
 
 interface PropertyMentionsInputEditorProps {
     className?: string;
@@ -91,9 +80,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
-        const [renderToStaticMarkup, setRenderToStaticMarkup] = useState<((element: ReactElement) => string) | null>(
-            null
-        );
 
         const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
@@ -105,31 +91,21 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     componentName = workflow.workflowTriggerComponentNames?.[0] || '';
                 }
 
-                const upperCaseComponentName = componentName.toUpperCase();
-
-                if (Object.keys(TYPE_ICONS).includes(upperCaseComponentName)) {
-                    const reactIcon = TYPE_ICONS[upperCaseComponentName as keyof typeof TYPE_ICONS];
-
-                    const svgString = renderToStaticMarkup ? renderToStaticMarkup(reactIcon) : '';
-
-                    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
-                }
-
                 if (TASK_DISPATCHER_NAMES.includes(componentName)) {
-                    return (
-                        taskDispatcherDefinitions.find((component) => component.name === componentName)?.icon ||
-                        defaultIcon
-                    );
+                    return taskDispatcherDefinitions.find((component) => component.name === componentName)?.icon;
                 }
 
-                return componentDefinitions.find((component) => component.name === componentName)?.icon || defaultIcon;
+                const componentIcon = componentDefinitions.find((component) => component.name === componentName)?.icon;
+
+                if (componentIcon) {
+                    return componentIcon;
+                }
+
+                const svgString = renderToStaticMarkup(TYPE_ICONS.STRING);
+
+                return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
             },
-            [
-                componentDefinitions,
-                renderToStaticMarkup,
-                taskDispatcherDefinitions,
-                workflow.workflowTriggerComponentNames,
-            ]
+            [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
 
         const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
@@ -278,7 +254,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (typeof value === 'string') {
-                if (controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA') {
+                if (controlType !== 'RICH_TEXT') {
                     value = decode(sanitizeHtml(value, {allowedTags: []}));
                 }
 
@@ -429,13 +405,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
         }
-
-        // Load the function when component mounts
-        useEffect(() => {
-            import('react-dom/server').then(({renderToStaticMarkup}) => {
-                setRenderToStaticMarkup(() => renderToStaticMarkup);
-            });
-        }, []);
 
         useEffect(() => {
             if (editor) {

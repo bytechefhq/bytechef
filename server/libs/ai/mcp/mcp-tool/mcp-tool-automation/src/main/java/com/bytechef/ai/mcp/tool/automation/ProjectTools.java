@@ -132,10 +132,10 @@ public class ProjectTools {
         description = "Create a new project with workflows. Returns the created project information including id, name, description, and status.")
     public ProjectInfo createProject(
         @ToolParam(description = "The name of the new project") String name,
-        @ToolParam(description = "The description of the new project (optional)") String description,
-        @ToolParam(description = "The category ID for the project (optional)") Long categoryId,
-        @ToolParam(description = "The workspace ID for the project (optional)") Long workspaceId,
-        @ToolParam(description = "The tag IDs to associate with the project (optional)") List<Long> tagIds) {
+        @ToolParam(required = false, description = "The description of the new project") String description,
+        @ToolParam(required = false, description = "The category ID for the project") Long categoryId,
+        @ToolParam(required = false, description = "The workspace ID for the project") Long workspaceId,
+        @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds) {
 
         try {
             Project.Builder projectBuilder = Project.builder()
@@ -184,10 +184,10 @@ public class ProjectTools {
         description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status.")
     public ProjectInfo updateProject(
         @ToolParam(description = "The ID of the project to update") long projectId,
-        @ToolParam(description = "The new name of the project (optional)") String name,
-        @ToolParam(description = "The new description of the project (optional)") String description,
-        @ToolParam(description = "The new category ID for the project (optional)") Long categoryId,
-        @ToolParam(description = "The new tag IDs to associate with the project (optional)") List<Long> tagIds) {
+        @ToolParam(required = false, description = "The new name of the project") String name,
+        @ToolParam(required = false, description = "The new description of the project") String description,
+        @ToolParam(required = false, description = "The new category ID for the project") Long categoryId,
+        @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds) {
 
         try {
             Project existingProject = projectService.getProject(projectId);
@@ -224,7 +224,9 @@ public class ProjectTools {
 
     @Tool(
         description = "Delete a project and all its workflows. Returns a confirmation message.")
-    public String deleteProject(@ToolParam(description = "The ID of the project to delete") long projectId) {
+    public String deleteProject(
+        @ToolParam(description = "The ID of the project to delete") long projectId) {
+
         try {
             Project project = projectService.getProject(projectId);
             String projectName = project.getName();
@@ -333,7 +335,7 @@ public class ProjectTools {
         description = "Publish a project version for deployment. Returns the published project version information.")
     public ProjectPublishInfo publishProject(
         @ToolParam(description = "The ID of the project to publish") long projectId,
-        @ToolParam(description = "The description for this published version (optional)") String description) {
+        @ToolParam(required = false, description = "The description for this published version") String description) {
 
         try {
             int publishedVersion = projectService.publishProject(projectId, description, false);

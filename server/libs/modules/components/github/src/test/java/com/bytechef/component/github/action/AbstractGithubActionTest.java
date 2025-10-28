@@ -16,15 +16,19 @@
 
 package com.bytechef.component.github.action;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
+import com.bytechef.component.definition.Parameters;
+import java.util.Optional;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -32,22 +36,36 @@ import org.mockito.ArgumentCaptor;
  */
 abstract class AbstractGithubActionTest {
 
-    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    protected ActionContext mockedContext = mock(ActionContext.class);
-    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Http.Response mockedResponse = mock(Http.Response.class);
-    protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
-    protected List<Map<String, Object>> responseList = List.of(Map.of("result", List.of("123", "abc")));
+    protected final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> contextFunctionArgumentCaptor =
+        ArgumentCaptor.forClass(ContextFunction.class);
+    protected final ActionContext mockedActionContext = mock(ActionContext.class);
+    protected final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected final Http mockedHttp = mock(Http.class);
+    protected final Http.Response mockedResponse = mock(Http.Response.class);
+    protected final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
+    protected Object executePerformFunction(
+        ModifiableActionDefinition modifiableActionDefinition, Parameters mockedParameters) throws Exception {
+
+        Optional<PerformFunction> performFunction = modifiableActionDefinition.getPerform();
+
+        assertTrue(performFunction.isPresent());
+
+        SingleConnectionPerformFunction singleConnectionPerformFunction =
+            (SingleConnectionPerformFunction) performFunction.get();
+
+        when(mockedActionContext.http(contextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
+                .apply(mockedHttp));
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+
+        return singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
     }
 }

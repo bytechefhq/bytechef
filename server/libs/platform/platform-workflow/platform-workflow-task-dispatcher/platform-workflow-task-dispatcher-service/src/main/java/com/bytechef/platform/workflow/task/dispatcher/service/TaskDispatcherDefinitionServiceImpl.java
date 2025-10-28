@@ -22,7 +22,6 @@ import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,7 +51,8 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
         return taskDispatcherDefinition.getOutputDefinition()
             .flatMap(OutputDefinition::getOutput)
-            .map(f -> (OutputFunction) f)
+            .map(
+                f -> (com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition.OutputFunction) f)
             .map(outputFunction -> {
                 try {
                     return outputFunction.apply(inputParameters);

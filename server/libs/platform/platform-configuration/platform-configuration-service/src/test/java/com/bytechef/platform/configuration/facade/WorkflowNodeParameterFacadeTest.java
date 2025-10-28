@@ -168,7 +168,8 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false,
+                false, 0);
 
             // Then
             assertNotNull(result);
@@ -215,7 +216,8 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When/Then - This should throw a ConfigurationException due to missing cluster element
             assertThrows(ConfigurationException.class, () -> workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0));
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false,
+                false, 0));
         }
     }
 
@@ -289,7 +291,8 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false,
+                false, 0);
 
             // Then
             assertNotNull(result);
@@ -1295,7 +1298,7 @@ public class WorkflowNodeParameterFacadeTest {
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata, 0);
+                parameterPath, value, type, false, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -1614,7 +1617,7 @@ public class WorkflowNodeParameterFacadeTest {
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata, 0);
+                parameterPath, value, type, false, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -2136,7 +2139,7 @@ public class WorkflowNodeParameterFacadeTest {
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, value, type, includeInMetadata, 0);
+                parameterPath, value, type, false, includeInMetadata, 0);
 
             // Then
             assertNotNull(result);
@@ -2307,10 +2310,174 @@ public class WorkflowNodeParameterFacadeTest {
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, parameterPath,
-                false, 0);
+                false, false, 0);
 
             // Then
             assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateClusterElementParameterFromAiInMetadataAddsPath() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String clusterElementTypeName = "loop";
+        String clusterElementWorkflowNodeName = "loopTask";
+        String parameterPath = "items[0].name";
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> clusterElementMetadata = new HashMap<>();
+            Map<String, Object> clusterElementMap = new HashMap<>();
+
+            clusterElementMap.put("name", clusterElementWorkflowNodeName);
+            clusterElementMap.put("type", "loop/v1/loop");
+            clusterElementMap.put("parameters", new HashMap<>());
+            clusterElementMap.put("metadata", clusterElementMetadata);
+
+            Map<String, Object> clusterElements = new HashMap<>();
+
+            clusterElements.put(clusterElementTypeName, clusterElementMap);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", new HashMap<>());
+            task.put("metadata", new HashMap<>());
+            task.put("clusterElements", clusterElements);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", List.of(task));
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            ParameterResultDTO result = workflowNodeParameterFacade.updateClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
+                parameterPath, "value", "STRING", true, false, 0);
+
+            assertNotNull(result);
+
+            Map<String, ?> metadata = result.metadata();
+
+            assertNotNull(metadata);
+
+            Object uiObj = metadata.get("ui");
+
+            assertNotNull(uiObj);
+
+            @SuppressWarnings("unchecked")
+            List<String> fromAi = (List<String>) ((Map<String, Object>) uiObj).get("fromAi");
+
+            assertNotNull(fromAi);
+            assertTrue(fromAi.contains(parameterPath));
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testDeleteClusterElementParameterFromAiInMetadataRemovesPath() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        String clusterElementTypeName = "loop";
+        String clusterElementWorkflowNodeName = "loopTask";
+        String parameterPath = "config.value";
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> ui = new HashMap<>();
+
+            ui.put("fromAi", new ArrayList<>(List.of(parameterPath)));
+
+            Map<String, Object> clusterElementMetadata = new HashMap<>();
+
+            clusterElementMetadata.put("ui", ui);
+
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> mutableConfig = new HashMap<>();
+
+            mutableConfig.put("value", "x");
+
+            parameters.put("config", mutableConfig);
+
+            Map<String, Object> clusterElementMap = new HashMap<>();
+
+            clusterElementMap.put("name", clusterElementWorkflowNodeName);
+            clusterElementMap.put("type", "loop/v1/loop");
+            clusterElementMap.put("parameters", parameters);
+            clusterElementMap.put("metadata", clusterElementMetadata);
+
+            Map<String, Object> clusterElements = new HashMap<>();
+
+            clusterElements.put(clusterElementTypeName, clusterElementMap);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "component/v1/action");
+            task.put("parameters", new HashMap<>());
+            task.put("metadata", new HashMap<>());
+            task.put("clusterElements", clusterElements);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", List.of(task));
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+            when(clusterElementDefinitionService.getClusterElementDefinition(anyString(), anyInt(), anyString()))
+                .thenReturn(clusterElementDefinition);
+            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+                .thenReturn(Map.of());
+
+            ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
+                parameterPath, true, false, 0);
+
+            assertNotNull(result);
+
+            Map<String, ?> metadata = result.metadata();
+
+            assertNotNull(metadata);
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uiAfter = (Map<String, Object>) metadata.get("ui");
+
+            assertNotNull(uiAfter);
+
+            @SuppressWarnings("unchecked")
+            List<String> fromAi = (List<String>) uiAfter.get("fromAi");
+
+            assertNotNull(fromAi);
+            assertFalse(fromAi.contains(parameterPath));
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }

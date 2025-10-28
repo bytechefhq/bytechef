@@ -39,11 +39,13 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.universal.text.constant.AiTextConstants;
 import com.bytechef.component.ai.universal.text.util.AiTextUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
@@ -56,6 +58,36 @@ import java.util.Map;
 public class ScoreAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
+
+    private static final String RESPONSE_SCHEMA = """
+        {
+           "$schema": "https://json-schema.org/draft/2020-12/schema",
+           "title": "CriteriaList",
+           "type": "object",
+           "properties": {
+             "criteria": {
+               "type": "array",
+               "items": {
+                 "type": "object",
+                 "properties": {
+                   "criteriaName": {
+                     "type": "string",
+                     "description": "Name of the evaluation criteria"
+                   },
+                   "criteriaValue": {
+                     "type": "number",
+                     "description": "Numeric value or score for the criteria"
+                   }
+                 },
+                 "required": ["criteriaName", "criteriaValue"],
+                 "additionalProperties": false
+               }
+             }
+           },
+           "required": ["criteria"],
+           "additionalProperties": false
+         }
+        """;
 
     public ScoreAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
         this.actionDefinition = getActionDefinition(provider, propertyService);
@@ -103,7 +135,9 @@ public class ScoreAction implements AiTextAction {
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(),
+                .output(
+                    (inputParameters, connectionParameters, context) -> OutputResponse.of(
+                        context.outputSchema(outputSchema -> outputSchema.getOutputSchema(RESPONSE_SCHEMA)))),
             provider, this, propertyService);
     }
 
@@ -150,6 +184,11 @@ public class ScoreAction implements AiTextAction {
                 Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
                 Map.of("content", userBuilder.toString(), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+        modelInputParametersMap.put(
+            "response",
+            Map.of(
+                "responseFormat", ChatModel.ResponseFormat.JSON,
+                "responseSchema", RESPONSE_SCHEMA));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }

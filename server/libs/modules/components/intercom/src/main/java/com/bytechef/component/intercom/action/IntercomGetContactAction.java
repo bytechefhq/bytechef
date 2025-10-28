@@ -23,9 +23,9 @@ import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.intercom.util.IntercomUtils;
@@ -43,7 +43,7 @@ public class IntercomGetContactAction {
             string(ID)
                 .label("Contact ID")
                 .required(true)
-                .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
+                .options((OptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(IntercomGetContactAction::perform);
 

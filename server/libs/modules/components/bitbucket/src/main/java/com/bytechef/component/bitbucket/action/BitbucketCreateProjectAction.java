@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.bitbucket.util.BitbucketUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -50,7 +50,7 @@ public class BitbucketCreateProjectAction {
         .properties(string("workspace").label("Workspace")
             .description("Workspace where the project will be added.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) BitbucketUtils::getWorkspaceOptions)
+            .options((ActionDefinition.OptionsFunction<String>) BitbucketUtils::getWorkspaceOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

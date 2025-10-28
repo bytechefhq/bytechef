@@ -21,10 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DESTINATION_ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
@@ -42,12 +42,12 @@ public class MicrosoftOutlook365MoveEmailAction {
             string(ID)
                 .label("Message ID")
                 .description("ID of the message to move.")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true),
             string(DESTINATION_ID)
                 .label("Folder ID")
                 .description("The destination folder ID.")
-                .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getFolderIdOptions)
+                .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getFolderIdOptions)
                 .required(true))
         .output()
         .perform(MicrosoftOutlook365MoveEmailAction::perform)

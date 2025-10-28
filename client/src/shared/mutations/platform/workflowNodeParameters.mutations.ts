@@ -1,9 +1,9 @@
 import {
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
-    DeleteWorkflowNodeParameterRequest,
+    DeleteWorkflowNodeParameterOperationRequest,
     UpdateClusterElementParameterOperationRequest,
-    UpdateWorkflowNodeParameterRequest,
+    UpdateWorkflowNodeParameterOperationRequest,
     WorkflowNodeParameterApi,
 } from '@/shared/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
@@ -11,14 +11,14 @@ import {useMutation} from '@tanstack/react-query';
 interface DeleteWorkflowNodeParameterProps {
     onSuccess?: (
         result: DeleteClusterElementParameter200Response,
-        variables: DeleteWorkflowNodeParameterRequest
+        variables: DeleteWorkflowNodeParameterOperationRequest
     ) => void;
-    onError?: (error: Error, variables: DeleteWorkflowNodeParameterRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowNodeParameterOperationRequest) => void;
 }
 
 export const useDeleteWorkflowNodeParameterMutation = (mutationProps?: DeleteWorkflowNodeParameterProps) =>
     useMutation({
-        mutationFn: (request: DeleteWorkflowNodeParameterRequest) => {
+        mutationFn: (request: DeleteWorkflowNodeParameterOperationRequest) => {
             return new WorkflowNodeParameterApi().deleteWorkflowNodeParameter(request);
         },
         onError: mutationProps?.onError,
@@ -45,14 +45,14 @@ export const useDeleteClusterElementParameterMutation = (mutationProps?: DeleteC
 interface UpdateWorkflowNodeParameterProps {
     onSuccess?: (
         result: DeleteClusterElementParameter200Response,
-        variables: UpdateWorkflowNodeParameterRequest
+        variables: UpdateWorkflowNodeParameterOperationRequest
     ) => void;
-    onError?: (error: Error, variables: UpdateWorkflowNodeParameterRequest) => void;
+    onError?: (error: Error, variables: UpdateWorkflowNodeParameterOperationRequest) => void;
 }
 
 export const useUpdateWorkflowNodeParameterMutation = (mutationProps?: UpdateWorkflowNodeParameterProps) =>
     useMutation({
-        mutationFn: (request: UpdateWorkflowNodeParameterRequest) => {
+        mutationFn: (request: UpdateWorkflowNodeParameterOperationRequest) => {
             return new WorkflowNodeParameterApi().updateWorkflowNodeParameter(request);
         },
         onError: mutationProps?.onError,

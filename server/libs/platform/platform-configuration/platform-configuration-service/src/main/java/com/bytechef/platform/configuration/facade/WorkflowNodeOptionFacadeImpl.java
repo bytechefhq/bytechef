@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -48,6 +49,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
     private final Evaluator evaluator;
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
@@ -57,6 +59,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @SuppressFBWarnings("EI")
     public WorkflowNodeOptionFacadeImpl(
         Evaluator evaluator, ActionDefinitionFacade actionDefinitionFacade,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
@@ -64,6 +67,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
         this.evaluator = evaluator;
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
@@ -109,8 +113,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
         WorkflowNodeType clusterElementWorkflowNodeType = WorkflowNodeType.ofType(clusterElement.getType());
 
-        // Fix, cluster element tools are not necessarily the same as actions
-        return actionDefinitionFacade.executeOptions(
+        return clusterElementDefinitionFacade.executeOptions(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
             evaluator.evaluate(

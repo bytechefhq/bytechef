@@ -26,10 +26,10 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.SHOW_COMPLETED;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
@@ -48,7 +48,7 @@ public class GoogleTasksListTasksAction {
             string(LIST_ID)
                 .label("List ID")
                 .description("ID of the list where tasks are stored.")
-                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .options((OptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true),
             bool(SHOW_COMPLETED)
                 .label("Show completed")

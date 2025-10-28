@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {DialogCloseButton, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
@@ -58,6 +58,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
 
                     <div className="flex justify-end">
                         <Button
+                            label="Publish"
                             onClick={() =>
                                 publishProjectMutation.mutate({
                                     id: project.id!,
@@ -66,9 +67,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                                     },
                                 })
                             }
-                        >
-                            Publish
-                        </Button>
+                        />
                     </div>
                 </div>
             </DialogContent>

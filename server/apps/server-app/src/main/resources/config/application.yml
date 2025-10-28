@@ -106,9 +106,10 @@ spring:
     mcp:
       server:
         name: bytechef-mcp-server
-        sse-endpoint: /api/sse
-        sse-message-endpoint: /api/v1/mcp/message
-        request-timeout: 300000
+        protocol: streamable
+        type: async
+        streamable-http:
+          mcp-endpoint: /api/mcp
   application:
     name: server-app
   cache:

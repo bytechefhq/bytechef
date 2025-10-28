@@ -1,4 +1,4 @@
-import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {Sheet} from '@/components/ui/sheet';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {Suspense, lazy} from 'react';
 
@@ -26,21 +26,15 @@ const WorkflowCodeEditorSheet = ({
     workflowTestConfiguration,
 }: WorkflowCodeEditorSheetProps) => (
     <Sheet onOpenChange={onSheetOpenClose} open={sheetOpen}>
-        <SheetContent
-            className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
-            onFocusOutside={(event) => event.preventDefault()}
-            onPointerDownOutside={(event) => event.preventDefault()}
-        >
-            <Suspense fallback={<WorkflowCodeEditorSheetSkeleton />}>
-                <WorkflowCodeEditorSheetContent
-                    invalidateWorkflowQueries={invalidateWorkflowQueries}
-                    runDisabled={runDisabled}
-                    testConfigurationDisabled={testConfigurationDisabled}
-                    workflow={workflow}
-                    workflowTestConfiguration={workflowTestConfiguration}
-                />
-            </Suspense>
-        </SheetContent>
+        <Suspense fallback={<WorkflowCodeEditorSheetSkeleton />}>
+            <WorkflowCodeEditorSheetContent
+                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                runDisabled={runDisabled}
+                testConfigurationDisabled={testConfigurationDisabled}
+                workflow={workflow}
+                workflowTestConfiguration={workflowTestConfiguration}
+            />
+        </Suspense>
     </Sheet>
 );
 

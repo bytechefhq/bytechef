@@ -72,6 +72,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static final Pattern ARRAY_INDEXES_PATTERN =
         Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
+    private static final String FROM_AI = "fromAi";
     private static final String METADATA = "metadata";
     private static final String UI = "ui";
 
@@ -105,7 +106,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String parameterPath, boolean includeInMetadata, long environmentId) {
+        String clusterElementWorkflowNodeName, String parameterPath, boolean fromAiInMetadata,
+        boolean includeInMetadata, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -136,6 +138,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
+
+        if (fromAiInMetadata) {
+            List<String> fromAiPaths = getFromAiPaths(metadataMap);
+
+            fromAiPaths.remove(parameterPath);
+        }
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
@@ -259,7 +267,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
-        boolean includeInMetadata, long environmentId) {
+        boolean fromAiInMetadata, boolean includeInMetadata, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -290,6 +298,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
+
+        if (fromAiInMetadata) {
+            List<String> fromAiPaths = getFromAiPaths(metadataMap);
+
+            fromAiPaths.add(parameterPath);
+        }
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
@@ -1144,6 +1158,27 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         return dynamicPropertyTypesMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getFromAiPaths(Map<String, Object> metadataMap) {
+        Map<String, Object> uiMap = (Map<String, Object>) metadataMap.get(UI);
+
+        if (uiMap == null) {
+            uiMap = new HashMap<>();
+
+            metadataMap.put(UI, uiMap);
+        }
+
+        List<String> fromAi = (List<String>) uiMap.get(FROM_AI);
+
+        if (fromAi == null) {
+            fromAi = new ArrayList<>();
+
+            uiMap.put(FROM_AI, fromAi);
+        }
+
+        return fromAi;
     }
 
     private void setDynamicPropertyTypeItem(String path, String type, Map<String, Object> metadataMap) {

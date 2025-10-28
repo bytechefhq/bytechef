@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.coda.util.CodaUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -49,14 +49,14 @@ public class CodaUpdateRowAction {
         .properties(string("docId").label("Doc ID")
             .description("ID of the doc.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) CodaUtils::getDocIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) CodaUtils::getDocIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("tableId").label("Table ID")
                 .description("ID or name of the table.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CodaUtils::getTableIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) CodaUtils::getTableIdOptions)
                 .optionsLookupDependsOn("docId")
                 .metadata(
                     Map.of(
@@ -64,7 +64,7 @@ public class CodaUpdateRowAction {
             string("rowId").label("Row ID")
                 .description("ID or name of the row.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CodaUtils::getRowIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) CodaUtils::getRowIdOptions)
                 .optionsLookupDependsOn("docId", "tableId")
                 .metadata(
                     Map.of(
@@ -72,7 +72,7 @@ public class CodaUpdateRowAction {
             object("row").properties(array("cells").items(object().properties(string("column").label("Column")
                 .description("Column ID.")
                 .required(true)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CodaUtils::getColumnOptions)
+                .options((ActionDefinition.OptionsFunction<String>) CodaUtils::getColumnOptions)
                 .optionsLookupDependsOn("docId", "tableId"),
                 string("value").label("Value")
                     .description("A Coda result or entity expressed as a string.")

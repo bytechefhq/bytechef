@@ -19,7 +19,7 @@ const ApiKeys = () => {
             <LayoutContainer
                 header={
                     <Header
-                        className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
+                        centerTitle
                         position="main"
                         right={
                             apiKeys && apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />

@@ -13,7 +13,6 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.platform.component.definition.AppEventComponentDefinition.NEW_EVENT;
 
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -48,7 +47,7 @@ public class AppEventTrigger {
             integer(APP_EVENT_ID)
                 .label("App Event Id")
                 .description("The Id of an app event.")
-                .options((OptionsDataSource.TriggerOptionsFunction<Long>) this::getOptions))
+                .options((TriggerDefinition.OptionsFunction<Long>) this::getOptions))
         .output(this::output)
         .webhookRequest(this::webhookRequest);
 

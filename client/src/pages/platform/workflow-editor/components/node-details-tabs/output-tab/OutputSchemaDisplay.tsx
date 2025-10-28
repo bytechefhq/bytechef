@@ -1,12 +1,16 @@
 import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {Skeleton} from '@/components/ui/skeleton';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
+import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {PropertyAllType} from '@/shared/types';
-import {ChevronDownIcon, PenIcon} from 'lucide-react';
-import {Suspense, lazy} from 'react';
-
-const PropertyField = lazy(() => import('../../PropertyField'));
-const SchemaProperties = lazy(() => import('../../SchemaProperties'));
+import {MoreHorizontalIcon} from 'lucide-react';
 
 interface OutputSchemaDisplayProps {
     connectionMissing: boolean;
@@ -43,70 +47,94 @@ const OutputSchemaDisplay = ({
             <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm text-gray-500">Output Schema</h3>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} size="sm" variant="outline">
-                            <PenIcon /> Define <ChevronDownIcon className="ml-0.5" />
+                <ButtonGroup>
+                    {!variablePropertiesDefined && (
+                        <Button
+                            disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                            onClick={handleTestOperationClick}
+                            variant="outline"
+                        >
+                            {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
                         </Button>
-                    </DropdownMenuTrigger>
+                    )}
 
-                    <DropdownMenuContent align="end" className="w-60 cursor-pointer">
-                        {!variablePropertiesDefined && (
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                disabled={connectionMissing}
-                                onClick={handleTestOperationClick}
+                    {variablePropertiesDefined && (
+                        <Button
+                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                            onClick={() => setShowUploadDialog(true)}
+                            variant="outline"
+                        >
+                            Upload Sample Output
+                        </Button>
+                    )}
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="More Options"
+                                asChild
+                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                size="icon"
+                                variant="outline"
                             >
-                                {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                            </DropdownMenuItem>
-                        )}
+                                <span>
+                                    <MoreHorizontalIcon />
+                                </span>
+                            </Button>
+                        </DropdownMenuTrigger>
 
-                        <DropdownMenuItem className="cursor-pointer" onClick={() => setShowUploadDialog(true)}>
-                            Upload Sample Output Data
-                        </DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuGroup>
+                                {!variablePropertiesDefined && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => setShowUploadDialog(true)}
+                                    >
+                                        Upload Sample Output
+                                    </DropdownMenuItem>
+                                )}
 
-                        <DropdownMenuItem className="cursor-pointer" onClick={handlePredefinedOutputSchemaClick}>
-                            Reset
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={handlePredefinedOutputSchemaClick}
+                                >
+                                    Reset
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </ButtonGroup>
             </div>
 
-            <Suspense fallback={<Skeleton className="mb-4 h-6 w-1/2" />}>
-                <PropertyField
-                    copiedValue={copiedValue}
-                    copyToClipboard={copyToClipboard}
-                    label={currentNode.name}
-                    property={outputSchema}
-                    sampleOutput={sampleOutput}
-                    valueToCopy={`$\{${currentNode.name}}`}
-                    workflowNodeName={currentNode.name}
-                />
-            </Suspense>
+            <PropertyField
+                copiedValue={copiedValue}
+                copyToClipboard={copyToClipboard}
+                label={currentNode.name}
+                property={outputSchema}
+                sampleOutput={sampleOutput}
+                valueToCopy={`$\{${currentNode.name}}`}
+                workflowNodeName={currentNode.name}
+            />
 
             {hasProperties && sampleOutput && (
-                <Suspense fallback={<Skeleton className="mb-4 h-6 w-1/2" />}>
-                    <SchemaProperties
-                        copiedValue={copiedValue}
-                        copyToClipboard={copyToClipboard}
-                        properties={(outputSchema as PropertyAllType).properties!}
-                        sampleOutput={sampleOutput}
-                        workflowNodeName={currentNode.name}
-                    />
-                </Suspense>
+                <SchemaProperties
+                    copiedValue={copiedValue}
+                    copyToClipboard={copyToClipboard}
+                    properties={(outputSchema as PropertyAllType).properties!}
+                    sampleOutput={sampleOutput}
+                    workflowNodeName={currentNode.name}
+                />
             )}
 
             {hasItems && sampleOutput && (
                 <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
-                    <Suspense fallback={<Skeleton className="mb-4 h-6 w-1/2" />}>
-                        <SchemaProperties
-                            copiedValue={copiedValue}
-                            copyToClipboard={copyToClipboard}
-                            properties={(outputSchema as PropertyAllType).items!}
-                            sampleOutput={sampleOutput}
-                            workflowNodeName={currentNode.name}
-                        />
-                    </Suspense>
+                    <SchemaProperties
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
+                        properties={(outputSchema as PropertyAllType).items!}
+                        sampleOutput={sampleOutput}
+                        workflowNodeName={currentNode.name}
+                    />
                 </div>
             )}
         </div>

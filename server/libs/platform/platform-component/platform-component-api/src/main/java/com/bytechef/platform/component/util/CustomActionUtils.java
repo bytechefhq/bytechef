@@ -108,14 +108,12 @@ public class CustomActionUtils {
                             RequestMethod.PATCH.name(), RequestMethod.POST.name(),
                             RequestMethod.PUT.name(), METHOD))
                     .options(
-                        option("None", ""),
                         option("JSON", BodyContentType.JSON.name()),
                         option("XML", BodyContentType.XML.name()),
                         option("Form-Data", BodyContentType.FORM_DATA.name()),
                         option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
                         option("Raw", BodyContentType.RAW.name()),
-                        option("Binary", BodyContentType.BINARY.name()))
-                    .defaultValue(""),
+                        option("Binary", BodyContentType.BINARY.name())),
                 object(BODY_CONTENT)
                     .label("Body Content - JSON")
                     .description("Body Parameters to send.")
@@ -210,7 +208,8 @@ public class CustomActionUtils {
             .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
             .queryParameters(
                 MapUtils.toMap(queryParameters, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
-            .body(getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
+            .body(
+                getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class, null), inputParameters))
             .execute();
     }
 

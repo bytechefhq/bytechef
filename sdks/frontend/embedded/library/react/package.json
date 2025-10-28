@@ -29,8 +29,8 @@
     ],
     "types": "./dist/main.d.ts",
     "peerDependencies": {
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0"
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0"
     },
     "author": "Kresimir Coko <kresimir.coko@bytechef.io>",
     "license": "MIT",

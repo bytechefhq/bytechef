@@ -313,7 +313,7 @@ const PropertyComboBox = ({
                         {description && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <CircleQuestionMarkIcon />
+                                    <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                                 </TooltipTrigger>
 
                                 <TooltipContent>{description}</TooltipContent>
@@ -334,7 +334,7 @@ const PropertyComboBox = ({
                 </div>
             )}
 
-            <Popover modal={true} onOpenChange={setOpen} open={open}>
+            <Popover modal onOpenChange={setOpen} open={open}>
                 <PopoverTrigger asChild onBlur={onBlur}>
                     <Button
                         aria-expanded={open}

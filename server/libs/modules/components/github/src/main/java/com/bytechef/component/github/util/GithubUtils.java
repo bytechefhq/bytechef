@@ -19,22 +19,19 @@ package com.bytechef.component.github.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.NAME;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Luka Ljubić
@@ -46,62 +43,48 @@ public class GithubUtils {
     }
 
     public static List<Option<String>> getCollaborators(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/collaborators"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String url = "/repos/%s/%s/collaborators".formatted(
+            getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        return getOptions(body, NAME, "login");
-    }
+        List<Map<String, ?>> collaborators = getItems(context, url);
 
-    public static Map<String, Object> getContent(WebhookBody body) {
-        Map<String, Object> content = body.getContent(new TypeReference<>() {});
-
-        if (Objects.equals(content.get("action"), "opened")) {
-            return content;
-        }
-
-        return null;
+        return getOptions(collaborators, "login");
     }
 
     public static List<Option<String>> getIssueOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Option<String>> options = new ArrayList<>();
 
-        return getOptions(body, TITLE, "number");
+        List<Map<?, ?>> issues = getRepositoryIssues(inputParameters, context);
+
+        for (Map<?, ?> issue : issues) {
+            String number = String.valueOf(issue.get("number"));
+
+            options.add(option(number + " - " + issue.get(TITLE), number));
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getLabels(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Map<String, Object>> body = context
-            .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
-                    + "/labels"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String url = "/repos/%s/%s/labels".formatted(
+            getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        return getOptions(body, NAME, NAME);
+        List<Map<String, ?>> labels = getItems(context, url);
+
+        return getOptions(labels, NAME);
     }
 
     public static String getOwnerName(Context context) {
-        Map<String, Object> body = context
-            .http(http -> http.get("/user"))
+        Map<String, Object> body = context.http(http -> http.get("/user"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -110,46 +93,73 @@ public class GithubUtils {
     }
 
     public static List<Option<String>> getRepositoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get("/user/repos"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Map<String, ?>> repos = getItems(context, "/user/repos");
 
-        return getOptions(body, NAME, NAME);
+        return getOptions(repos, NAME);
     }
 
-    private static List<Option<String>> getOptions(List<Map<String, Object>> body, String label, String value) {
+    private static List<Option<String>> getOptions(List<Map<String, ?>> body, String value) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object item : body) {
             if (item instanceof Map<?, ?> map) {
-                options.add(option((String) map.get(label), String.valueOf(map.get(value))));
+                options.add(option((String) map.get(NAME), String.valueOf(map.get(value))));
             }
         }
+
         return options;
     }
 
-    public static Integer subscribeWebhook(String repository, String event, String webhookUrl, TriggerContext context) {
-        Map<String, Object> body = context
-            .http(http -> http.post("/repos/" + getOwnerName(context) + "/" + repository + "/hooks"))
-            .body(
-                Http.Body.of(
-                    "events", List.of(event),
-                    "config", Map.of("url", webhookUrl, "content_type", "json")))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+    public static List<Map<?, ?>> getRepositoryIssues(Parameters inputParameters, Context context) {
+        List<Map<?, ?>> issues = new ArrayList<>();
+        String url = "/repos/%s/%s/issues".formatted(
+            inputParameters.getString(OWNER, getOwnerName(context)), inputParameters.getRequiredString(REPOSITORY));
 
-        return (Integer) body.get(ID);
+        List<Map<String, ?>> items = getItems(context, url, "state", "open");
+
+        for (Map<String, ?> item : items) {
+            Object pullRequest = item.get("pull_request");
+
+            if (pullRequest == null) {
+                issues.add(item);
+            }
+        }
+
+        return issues;
     }
 
-    public static void unsubscribeWebhook(String repository, Integer webhookId, TriggerContext context) {
-        context
-            .http(http -> http.delete("/repos/" + getOwnerName(context) + "/" + repository + "/hooks/" + webhookId))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute();
+    public static List<Map<String, ?>> getItems(Context context, String url, Object... queryParameters) {
+        List<Map<String, ?>> items = new ArrayList<>();
+
+        int page = 1;
+        boolean hasMoreItems = false;
+
+        do {
+            List<Object> allQueryParameters = new ArrayList<>(List.of("per_page", 100, "page", page++));
+
+            if (queryParameters != null && queryParameters.length % 2 == 0) {
+                allQueryParameters.addAll(Arrays.asList(queryParameters));
+            }
+
+            Http.Response response = context.http(http -> http.get(url))
+                .queryParameters(allQueryParameters.toArray())
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute();
+
+            items.addAll(response.getBody(new TypeReference<>() {}));
+
+            List<String> linkHeader = response.getHeader("link");
+
+            if (linkHeader != null && !linkHeader.isEmpty()) {
+                String link = linkHeader.getFirst();
+
+                hasMoreItems = link != null && link.contains("rel=\"next\"");
+            }
+        } while (hasMoreItems);
+
+        return items;
     }
 }

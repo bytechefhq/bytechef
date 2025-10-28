@@ -118,8 +118,8 @@ export function DatePropertyToJSONTyped(value?: DateProperty | null, ignoreDiscr
 
     return {
         ...ValuePropertyToJSONTyped(value, true),
-        'defaultValue': value['defaultValue'] == null ? undefined : ((value['defaultValue']).toISOString().substring(0,10)),
-        'exampleValue': value['exampleValue'] == null ? undefined : ((value['exampleValue']).toISOString().substring(0,10)),
+        'defaultValue': value['defaultValue'] == null ? value['defaultValue'] : value['defaultValue'].toISOString().substring(0,10),
+        'exampleValue': value['exampleValue'] == null ? value['exampleValue'] : value['exampleValue'].toISOString().substring(0,10),
         'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionToJSON)),
         'optionsDataSource': OptionsDataSourceToJSON(value['optionsDataSource']),
     };

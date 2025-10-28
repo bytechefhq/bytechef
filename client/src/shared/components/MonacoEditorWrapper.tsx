@@ -11,7 +11,7 @@ interface MonacoEditorProps {
     defaultLanguage: string;
     onChange: (value: string | undefined) => void;
     onMount: (editor: StandaloneCodeEditorType) => void;
-    options?: Record<string, object>;
+    options?: editor.IStandaloneEditorConstructionOptions;
     value?: string;
 }
 

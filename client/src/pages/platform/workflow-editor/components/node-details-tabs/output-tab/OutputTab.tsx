@@ -5,6 +5,9 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
+import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
+import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import DialogLoader from '@/shared/components/DialogLoader';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
@@ -22,12 +25,8 @@ import {NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {AlertCircleIcon, ClipboardIcon} from 'lucide-react';
-import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
+import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-const OutputTabSampleDataDialog = lazy(() => import('./OutputTabSampleDataDialog'));
-const OutputSchemaCreationControls = lazy(() => import('./OutputSchemaCreationControls'));
-const OutputSchemaDisplay = lazy(() => import('./OutputSchemaDisplay'));
 
 interface OutputTabProps {
     connectionMissing: boolean;
@@ -271,7 +270,7 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
                         >
                             <div
                                 className={twMerge(
-                                    'flex items-center justify-center',
+                                    'mt-1 flex items-center justify-center',
                                     !currentNode.trigger && 'w-full'
                                 )}
                             >

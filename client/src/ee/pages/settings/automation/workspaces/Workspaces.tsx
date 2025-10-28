@@ -16,8 +16,7 @@ const Workspaces = () => {
             <LayoutContainer
                 header={
                     <Header
-                        className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
-                        position="main"
+                        centerTitle
                         right={
                             workspaces &&
                             workspaces.length > 0 && <WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />

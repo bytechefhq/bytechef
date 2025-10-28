@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
@@ -91,7 +91,11 @@ const WorkflowCodeEditorSheetContent = ({
     };
 
     return (
-        <>
+        <SheetContent
+            className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
+            onFocusOutside={(event) => event.preventDefault()}
+            onPointerDownOutside={(event) => event.preventDefault()}
+        >
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 border-b border-b-border/50 p-3">
                 <SheetTitle>Edit Workflow</SheetTitle>
 
@@ -185,6 +189,10 @@ const WorkflowCodeEditorSheetContent = ({
                                 }
                             }}
                             onMount={(editor) => editor.focus()}
+                            options={{
+                                folding: true,
+                                foldingStrategy: 'indentation',
+                            }}
                             value={workflow.definition!}
                         />
                     </Suspense>
@@ -218,7 +226,7 @@ const WorkflowCodeEditorSheetContent = ({
                     workflowTestConfiguration={workflowTestConfiguration}
                 />
             )}
-        </>
+        </SheetContent>
     );
 };
 

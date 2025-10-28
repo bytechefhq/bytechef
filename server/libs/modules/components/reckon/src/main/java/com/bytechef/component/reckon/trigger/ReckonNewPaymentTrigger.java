@@ -28,9 +28,9 @@ import static com.bytechef.component.reckon.constant.ReckonConstants.ID;
 import static com.bytechef.component.reckon.constant.ReckonConstants.NAME;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.reckon.util.ReckonUtils;
@@ -47,7 +47,7 @@ public class ReckonNewPaymentTrigger {
         .properties(
             string(BOOK_ID)
                 .label("Book")
-                .options((TriggerOptionsFunction<String>) ReckonUtils::getBookIdOptions)
+                .options((OptionsFunction<String>) ReckonUtils::getBookIdOptions)
                 .required(true))
         .output(
             outputSchema(

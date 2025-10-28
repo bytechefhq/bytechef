@@ -21,35 +21,52 @@ import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mayank Madan
+ * @author Monika Kušter
  */
 class GithubAddAssigneesToIssueActionTest extends AbstractGithubActionTest {
+
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", ASSIGNEES, List.of("githubUsername", "githubUsername2")));
+    protected final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
 
     @Test
-    void testPerform() {
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+    void testPerform() throws Exception {
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
+                .thenReturn("testOwner");
 
-        Map<String, Object> result =
-            GithubAddAssigneesToIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(responseMap);
 
-        assertEquals(responseMap, result);
+            Object result = executePerformFunction(GithubAddAssigneesToIssueAction.ACTION_DEFINITION, mockedParameters);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+            assertEquals(responseMap, result);
+            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
+            assertEquals("/repos/testOwner/testRepo/issues/testIssue/assignees", stringArgumentCaptor.getValue());
 
-        assertEquals(Map.of(ASSIGNEES, List.of("githubUsername", "githubUsername2")), body.getContent());
+            Http.Body body = bodyArgumentCaptor.getValue();
+
+            assertEquals(Map.of(ASSIGNEES, List.of("githubUsername", "githubUsername2")), body.getContent());
+        }
     }
 }

@@ -1,7 +1,7 @@
 import ComboBox from './ComboBox';
 import {comboBoxItemsMock} from './ComboBox.mock';
 
-import type {Meta, StoryObj} from '@storybook/react';
+import type {Meta, StoryObj} from '@storybook/react-vite';
 
 const meta: Meta<typeof ComboBox> = {
     component: ComboBox,

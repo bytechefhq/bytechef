@@ -35,8 +35,8 @@ public class GoogleConnection {
 
     public static ModifiableConnectionDefinition createConnection(Authorization.ScopesFunction scopes) {
         return connection()
-            .authorizations(authorization(
-                AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .authorizations(
+                authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")
                     .properties(
                         string(CLIENT_ID)
@@ -45,11 +45,11 @@ public class GoogleConnection {
                         string(CLIENT_SECRET)
                             .label("Client Secret")
                             .required(true))
-                    .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
+                    .authorizationUrl((connection, context) -> GoogleOAuthConstants.AUTHORIZATION_SERVER_URL)
                     .oAuth2AuthorizationExtraQueryParameters(
                         Map.of("access_type", "offline", "prompt", "select_account consent"))
                     .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
-                    .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
+                    .refreshOn(401, "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                     .scopes(scopes)
                     .tokenUrl((connection, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL));
     }

@@ -251,7 +251,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 throw new IllegalStateException("Shared template is not available");
             }
 
-            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                 data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);
@@ -348,7 +348,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             if (sharedTemplate.getTemplate() == null) {
                 sharedProjectDTO = new SharedProjectDTO(false);
             } else {
-                try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+                try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                     TemplateFiles templateFiles = readTemplate(inputStream.readAllBytes(), true);
 
                     Template template = JsonUtils.read(templateFiles.templateJson, Template.class);
@@ -400,7 +400,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         if (sharedProject) {
             SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
 
-            try (InputStream inputStream = sharedTemplateFileStorage.getFileStream(sharedTemplate.getTemplate())) {
+            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
                 data = inputStream.readAllBytes();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to import shared project", e);

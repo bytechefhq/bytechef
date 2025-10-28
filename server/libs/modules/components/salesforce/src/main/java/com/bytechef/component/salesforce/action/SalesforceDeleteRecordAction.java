@@ -22,9 +22,9 @@ import static com.bytechef.component.salesforce.constant.SalesforceConstants.ID;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJECT;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.salesforce.util.SalesforceUtils;
 
@@ -39,12 +39,12 @@ public class SalesforceDeleteRecordAction {
         .properties(
             string(OBJECT)
                 .label("Salesforce Object")
-                .options((ActionOptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
+                .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true),
             string(ID)
                 .label("Record ID")
                 .description("ID of the object to delete.")
-                .options((ActionOptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
+                .options((OptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
                 .optionsLookupDependsOn(OBJECT)
                 .required(true))
         .perform(SalesforceDeleteRecordAction::perform);

@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -48,7 +48,7 @@ public class ClickupCreateListAction {
         .properties(string("folderId").label("Folder ID")
             .description("ID of the folder where new list will be created.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
+            .options((ActionDefinition.OptionsFunction<String>) ClickupUtils::getFolderIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
