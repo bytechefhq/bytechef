@@ -1,9 +1,9 @@
-import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
     DeleteWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';

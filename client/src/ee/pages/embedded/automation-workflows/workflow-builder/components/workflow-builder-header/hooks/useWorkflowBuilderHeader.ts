@@ -1,7 +1,6 @@
 import {usePublishConnectedUserProjectWorkflowMutation} from '@/ee/shared/mutations/embedded/connectedUserProjectWorkflows.mutations';
 import {ConnectedUserProjectWorkflowKeys} from '@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries';
 import {useToast} from '@/hooks/use-toast';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -9,6 +8,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';

@@ -12,7 +12,7 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => {
     };
 });
 
-vi.mock('@/pages/automation/stores/useEnvironmentStore', () => {
+vi.mock('@/shared/stores/useEnvironmentStore', () => {
     return {
         environmentStore: {
             getState: vi.fn(() => ({setEnvironments: vi.fn()})),
@@ -23,7 +23,7 @@ vi.mock('@/pages/automation/stores/useEnvironmentStore', () => {
 // We don't need to mock EnvironmentApi because we'll stub QueryClient.fetchQuery directly
 
 const authModule = await import('@/shared/stores/useAuthenticationStore');
-const envStoreModule = await import('@/pages/automation/stores/useEnvironmentStore');
+const envStoreModule = await import('@/shared/stores/useEnvironmentStore');
 
 describe('loadEnvironmentsIfAuthenticated', () => {
     let queryClient: QueryClient;

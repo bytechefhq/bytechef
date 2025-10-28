@@ -1,6 +1,5 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -12,6 +11,7 @@ import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {DesktopSidebar} from '@/shared/layout/desktop-sidebar/DesktopSidebar';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {

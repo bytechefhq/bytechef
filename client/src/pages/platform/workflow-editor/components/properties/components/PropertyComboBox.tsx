@@ -5,11 +5,11 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
 } from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';

@@ -4,7 +4,6 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
 import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
@@ -21,6 +20,7 @@ import {
     useGetWorkflowNodeOutputQuery,
 } from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useCheckWorkflowNodeTestOutputExistsQuery} from '@/shared/queries/platform/workflowNodeTestOutputs.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';

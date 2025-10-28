@@ -27,12 +27,12 @@ import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embed
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';

@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -30,6 +29,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';

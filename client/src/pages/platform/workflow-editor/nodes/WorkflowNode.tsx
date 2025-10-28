@@ -1,11 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';

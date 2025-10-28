@@ -2,12 +2,12 @@ import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/Multi
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {GetClusterElementNodeOptionsRequest, OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {
     useGetClusterElementNodeOptionsQuery,
     useGetWorkflowNodeOptionsQuery,
 } from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PropertyAllType} from '@/shared/types';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';

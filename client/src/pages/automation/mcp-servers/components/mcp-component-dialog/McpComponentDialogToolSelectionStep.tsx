@@ -1,13 +1,13 @@
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 import {ClusterElementDefinitionBasic, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo, useRef} from 'react';
 
 interface SelectedToolI {

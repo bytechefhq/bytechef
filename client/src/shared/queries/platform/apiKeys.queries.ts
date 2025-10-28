@@ -1,7 +1,6 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
-
 /* eslint-disable sort-keys */
 import {ApiKey, ApiKeyApi} from '@/shared/middleware/platform/security';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiKeyKeys = {

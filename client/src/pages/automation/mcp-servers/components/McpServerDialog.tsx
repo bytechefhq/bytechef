@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {McpServer, ModeType, useCreateMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';

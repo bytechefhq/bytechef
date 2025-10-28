@@ -1,4 +1,3 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -11,6 +10,7 @@ import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 

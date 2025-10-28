@@ -6,8 +6,8 @@ import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from 
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';

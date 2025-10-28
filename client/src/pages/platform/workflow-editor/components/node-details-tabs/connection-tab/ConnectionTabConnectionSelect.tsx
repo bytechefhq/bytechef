@@ -2,7 +2,6 @@ import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -18,6 +17,7 @@ import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connect
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';

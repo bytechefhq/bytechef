@@ -5,9 +5,9 @@ import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/autom
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
