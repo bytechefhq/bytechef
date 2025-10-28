@@ -15,6 +15,7 @@ import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectHeaderProps {
@@ -74,7 +75,12 @@ const ProjectHeader = ({
     }
 
     return (
-        <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
+        <header
+            className={twMerge(
+                'flex items-center justify-between bg-surface-main px-3 py-2.5',
+                projectLeftSidebarOpen && 'pl-0 pr-3'
+            )}
+        >
             <div className="flex items-center">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
 

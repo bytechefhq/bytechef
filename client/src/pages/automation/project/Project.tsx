@@ -63,7 +63,6 @@ const Project = () => {
                     currentWorkflowId={workflow.id!}
                     onProjectClick={handleProjectClick}
                     projectId={projectId}
-                    updateWorkflowMutation={updateWorkflowMutation}
                 />
             )}
 
