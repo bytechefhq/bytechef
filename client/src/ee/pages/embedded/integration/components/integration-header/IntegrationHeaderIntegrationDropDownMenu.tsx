@@ -97,7 +97,13 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleFileChange}
+                ref={hiddenFileInputRef}
+                type="file"
+            />
         </>
     );
 };

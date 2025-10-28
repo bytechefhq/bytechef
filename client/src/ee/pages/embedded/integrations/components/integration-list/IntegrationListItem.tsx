@@ -176,7 +176,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                             : `${integration.integrationWorkflowIds?.length} workflows`}
                                     </div>
 
-                                    <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.preventDefault()}>
@@ -335,7 +335,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                 />
             )}
 
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleFileChange}
+                ref={hiddenFileInputRef}
+                type="file"
+            />
         </>
     );
 };
