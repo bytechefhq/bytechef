@@ -19,7 +19,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -135,14 +134,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         </div>
 
                         <div className="flex items-center justify-end gap-x-6">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={+connection.environmentId!} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-
                             <div className="flex min-w-52 flex-col items-end gap-y-4">
                                 {connection.credentialStatus === 'VALID' ? (
                                     <Badge className="uppercase" variant={connection.active ? 'success' : 'secondary'}>
