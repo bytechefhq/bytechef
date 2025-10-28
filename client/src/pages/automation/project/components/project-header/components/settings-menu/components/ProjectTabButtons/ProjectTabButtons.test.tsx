@@ -72,14 +72,14 @@ describe('ProjectTabButtons Export Functionality', () => {
     it('should render export button', () => {
         renderProjectTabButtons();
 
-        const exportButton = screen.getByText('Export Project');
+        const exportButton = screen.getByText('Export');
         expect(exportButton).toBeInTheDocument();
     });
 
     it('should have correct export URL when export button is clicked', async () => {
         renderProjectTabButtons();
 
-        const exportButton = screen.getByText('Export Project');
+        const exportButton = screen.getByText('Export');
         expect(exportButton).toBeInTheDocument();
 
         // Click the export button
@@ -97,7 +97,7 @@ describe('ProjectTabButtons Export Functionality', () => {
 
         renderProjectTabButtons(customProps);
 
-        const exportButton = screen.getByText('Export Project');
+        const exportButton = screen.getByText('Export');
         await userEvent.click(exportButton);
 
         expect(window.location.href).toBe('/api/automation/internal/projects/456/export');
@@ -106,7 +106,7 @@ describe('ProjectTabButtons Export Functionality', () => {
     it('should call onCloseDropdownMenuClick when export button is clicked', async () => {
         renderProjectTabButtons();
 
-        const exportButton = screen.getByText('Export Project');
+        const exportButton = screen.getByText('Export');
         await userEvent.click(exportButton);
 
         // The handleButtonClick function should trigger onCloseDropdownMenuClick
@@ -118,7 +118,7 @@ describe('ProjectTabButtons Export Functionality', () => {
 
         expect(screen.getByText('Edit')).toBeInTheDocument();
         expect(screen.getByText('Duplicate')).toBeInTheDocument();
-        expect(screen.getByText('Export Project')).toBeInTheDocument();
+        expect(screen.getByText('Export')).toBeInTheDocument();
         expect(screen.getByText('Project History')).toBeInTheDocument();
         expect(screen.getByText('Delete')).toBeInTheDocument();
     });
