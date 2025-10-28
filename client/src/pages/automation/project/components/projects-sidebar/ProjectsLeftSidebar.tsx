@@ -9,6 +9,7 @@ import WorkflowsListFilter from '@/pages/automation/project/components/projects-
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
 import WorkflowsListSkeleton from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListSkeleton';
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
+import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -109,39 +110,6 @@ const ProjectsLeftSidebar = ({
                 definition,
             },
         });
-    };
-
-    const handleImportProject = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-
-        if (!file) {
-            return;
-        }
-
-        const formData = new FormData();
-
-        formData.append('file', file);
-
-        try {
-            const response = await fetch(`/api/automation/internal/workspaces/${currentWorkspaceId}/projects/import`, {
-                body: formData,
-                method: 'POST',
-            });
-
-            if (response.ok) {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectKeys.projects,
-                });
-            } else {
-                console.error('Failed to import project');
-            }
-        } catch (error) {
-            console.error('Error importing project:', error);
-        }
-
-        if (event.target) {
-            event.target.value = '';
-        }
     };
 
     const handleImportWorkflow = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -354,7 +322,7 @@ const ProjectsLeftSidebar = ({
             <input
                 accept=".zip"
                 className="hidden"
-                onChange={handleImportProject}
+                onChange={(event) => handleImportProject(event, currentWorkspaceId, queryClient)}
                 ref={projectHiddenFileInputRef}
                 type="file"
             />
