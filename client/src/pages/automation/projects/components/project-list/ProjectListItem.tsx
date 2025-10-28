@@ -175,9 +175,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         });
     };
 
-    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const file = e.target.files[0];
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const file = event.target.files[0];
 
             /* eslint-disable @typescript-eslint/no-explicit-any */
             const definition = await (typeof (file as any).text === 'function'
