@@ -60,7 +60,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     return (
         <Collapsible key={connectedUserIntegrationInstance.id}>
             {componentDefinition && (
-                <div className="flex w-full items-center justify-between px-2 hover:bg-muted/50">
+                <div className="flex w-full items-center justify-between hover:bg-muted/50">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div className="flex flex-1 items-center gap-1">
