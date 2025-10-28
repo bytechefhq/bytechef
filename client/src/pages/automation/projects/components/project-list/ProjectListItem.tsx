@@ -236,17 +236,14 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         <>
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
-                onClick={(event) => {
-                    if (!project.projectWorkflowIds) {
-                        handleProjectListItemClick(event);
-                    }
-                }}
+                onClick={(event) => handleProjectListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
                                 <Link
+                                    onClick={(event) => event.stopPropagation()}
                                     to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
                                 >
                                     {project.description ? (
