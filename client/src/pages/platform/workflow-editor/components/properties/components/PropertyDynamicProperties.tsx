@@ -1,5 +1,4 @@
 import {Skeleton} from '@/components/ui/skeleton';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
@@ -7,6 +6,7 @@ import {
     useGetClusterElementDynamicPropertiesQuery,
     useGetWorkflowNodeDynamicPropertiesQuery,
 } from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo, useState} from 'react';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';

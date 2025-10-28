@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
@@ -11,6 +10,7 @@ import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/us
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {LinkIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';

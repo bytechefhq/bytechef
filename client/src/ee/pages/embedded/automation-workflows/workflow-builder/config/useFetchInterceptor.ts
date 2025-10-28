@@ -1,7 +1,7 @@
 import {useToast} from '@/hooks/use-toast';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useState} from 'react';
 
 export default function useFetchInterceptor() {

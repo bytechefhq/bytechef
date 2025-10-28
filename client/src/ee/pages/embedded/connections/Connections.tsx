@@ -10,11 +10,11 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 

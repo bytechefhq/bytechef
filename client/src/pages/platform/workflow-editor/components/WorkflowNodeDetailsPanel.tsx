@@ -4,7 +4,6 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import CurrentOperationSelect from '@/pages/platform/workflow-editor/components/CurrentOperationSelect';
 import DescriptionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DescriptionTab';
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
@@ -51,6 +50,7 @@ import {
     useGetWorkflowNodeParameterDisplayConditionsQuery,
 } from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
     BranchCaseType,
     ComponentPropertiesType,

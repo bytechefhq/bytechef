@@ -2,7 +2,6 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
@@ -16,6 +15,7 @@ import {
     useGetConnectionTagsQuery,
     useGetWorkspaceConnectionsQuery,
 } from '@/shared/queries/automation/connections.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
