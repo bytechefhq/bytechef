@@ -38,7 +38,7 @@ const ConnectedUserSheetPanelIntegrationList = ({
             })}
         </div>
     ) : (
-        <div className="px-2 py-4 text-sm">No active integrations.</div>
+        <div className="py-4 text-sm">No active integrations.</div>
     );
 };
 
