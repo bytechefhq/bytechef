@@ -44,7 +44,6 @@ const Project = lazy(() => import('@/pages/automation/project/Project'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
 const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
-
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
@@ -145,6 +144,18 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'git-configuration',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <ApiKeys />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'api-keys',
+        },
     ],
     navItems: [
         {
@@ -153,6 +164,10 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'git-configuration',
             title: 'Git Configuration',
+        },
+        {
+            href: 'api-keys',
+            title: 'API Keys',
         },
     ],
 };
@@ -200,16 +215,6 @@ const platformSettingsRoutes = {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <LazyLoadWrapper>
-                        <ApiKeys />
-                    </LazyLoadWrapper>
-                </PrivateRoute>
-            ),
-            path: 'api-keys',
-        },
-        {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <LazyLoadWrapper>
                         <Notifications />
                     </LazyLoadWrapper>
                 </PrivateRoute>
@@ -232,10 +237,6 @@ const platformSettingsRoutes = {
         {
             href: `api-connectors`,
             title: 'API Connectors',
-        },
-        {
-            href: 'api-keys',
-            title: 'API Keys',
         },
         {
             href: 'notifications',
@@ -701,6 +702,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                             path: 'signing-keys',
                                         },
                                         ...platformSettingsRoutes.children,
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <ApiKeys />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-keys',
+                                        },
                                     ],
                                     element: (
                                         <Settings
