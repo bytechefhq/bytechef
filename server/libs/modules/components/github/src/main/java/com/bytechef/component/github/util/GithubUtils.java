@@ -60,12 +60,14 @@ public class GithubUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Map<?, ?>> issues = getRepositoryIssues(inputParameters, context);
+        if (searchText != null) {
+            List<Map<String, ?>> issues = searchIssues(inputParameters, context, searchText);
 
-        for (Map<?, ?> issue : issues) {
-            String number = String.valueOf(issue.get("number"));
+            for (Map<?, ?> issue : issues) {
+                String number = String.valueOf(issue.get("number"));
 
-            options.add(option(number + " - " + issue.get(TITLE), number));
+                options.add(option(number + " - " + issue.get(TITLE), number));
+            }
         }
 
         return options;
@@ -113,6 +115,16 @@ public class GithubUtils {
         }
 
         return options;
+    }
+
+    public static List<Map<String,?>> searchIssues(Parameters inputParameters, Context context, String searchText) {
+        String s = searchText + " in:title";
+        String s1 = "repo:" + inputParameters.getString(OWNER, getOwnerName(context)) + "/"
+            + inputParameters.getRequiredString(REPOSITORY);
+        String s2 = "state:open";
+        String s3 = "is:issue";
+
+        return getItems(context, "/search/issues", false, "q", s + " " + s1 + " " + s2 + " " + s3);
     }
 
     public static List<Map<?, ?>> getRepositoryIssues(Parameters inputParameters, Context context) {
