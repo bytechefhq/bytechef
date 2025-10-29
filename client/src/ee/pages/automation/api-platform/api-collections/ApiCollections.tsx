@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
@@ -77,7 +77,7 @@ const ApiCollections = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
+                        right={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
                         title={<ApiCollectionsFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
@@ -111,7 +111,7 @@ const ApiCollections = () => {
                     </div>
                 ) : (
                     <EmptyList
-                        button={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
+                        button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
                         icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any API Collections created yet."
                         title="No API Collections"

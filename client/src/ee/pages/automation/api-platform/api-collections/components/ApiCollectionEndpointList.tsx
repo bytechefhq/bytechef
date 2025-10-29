@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -80,7 +80,7 @@ const ApiCollectionEndpointList = ({
                                 contextPath={contextPath}
                                 projectId={projectId}
                                 projectVersion={projectVersion}
-                                triggerNode={<Button>Create API Endpoint</Button>}
+                                triggerNode={<Button label="Create API Endpoint" />}
                             />
                         }
                         icon={<WorkflowIcon className="size-24 text-gray-300" />}
