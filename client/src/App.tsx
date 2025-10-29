@@ -150,6 +150,8 @@ function App() {
 
     const queryClient = useQueryClient();
 
+    useFetchInterceptor();
+
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
@@ -196,8 +198,6 @@ function App() {
     } else if (location.pathname.includes('/embedded/')) {
         navigation = filteredEmbeddedNavigation;
     }
-
-    useFetchInterceptor();
 
     useEffect(() => {
         if (account) {
