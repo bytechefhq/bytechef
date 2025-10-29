@@ -204,10 +204,6 @@ function App() {
     }, [analytics]);
 
     useEffect(() => {
-        helpHub.init();
-    }, [helpHub]);
-
-    useEffect(() => {
         if (account) {
             helpHub.boot(account);
             helpHub.addRouter();

@@ -1,30 +1,21 @@
 import {UserI} from '@/shared/models/user.model';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {init} from 'commandbar';
 import {useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useShallow} from 'zustand/react/shallow';
 
 export interface HelpHubI {
     addRouter(): void;
     boot(account: UserI): void;
-    init(): void;
     open(): void;
     shutdown(): void;
 }
 
 export const useHelpHub = (): HelpHubI => {
-    const initRef = useRef(false);
-    const bootRef = useRef(false);
-
-    const {application, helpHub} = useApplicationInfoStore(
-        useShallow((state) => ({
-            application: state.application,
-            helpHub: state.helpHub,
-        }))
-    );
+    const application = useApplicationInfoStore((state) => state.application);
 
     const navigate = useNavigate();
+
+    const bootRef = useRef(false);
 
     return {
         addRouter: () => {
@@ -47,17 +38,6 @@ export const useHelpHub = (): HelpHubI => {
                     email: account.email,
                     name: `${account.firstName} ${account.lastName}`,
                 });
-            }
-        },
-        init: () => {
-            if (initRef.current) {
-                return;
-            }
-
-            if (helpHub.enabled && helpHub.commandBar.orgId) {
-                init(helpHub.commandBar.orgId);
-
-                initRef.current = true;
             }
         },
         open: () => {

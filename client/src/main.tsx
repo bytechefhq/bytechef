@@ -12,6 +12,7 @@ import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
+import {init} from 'commandbar';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
@@ -58,6 +59,10 @@ async function renderApp() {
     const router = isEmbeddedWorkflowBuilder ? getEmbeddedRouter() : getMainRouter(queryClient);
 
     await applicationInfoStore.getState().getApplicationInfo();
+
+    if (applicationInfoStore.getState().helpHub.enabled && applicationInfoStore.getState().helpHub.commandBar.orgId) {
+        init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
+    }
 
     if (!publicRoutes.includes(window.location.pathname) && !authenticationStore.getState().sessionHasBeenFetched) {
         const result = await authenticationStore.getState().getAccount();
