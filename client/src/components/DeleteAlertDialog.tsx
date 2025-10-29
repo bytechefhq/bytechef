@@ -30,7 +30,10 @@ const DeleteAlertDialog = ({onCancel, onDelete, open}: DeleteAlertDialogProps) =
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-red-600" onClick={onDelete}>
+                    <AlertDialogAction
+                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                        onClick={onDelete}
+                    >
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>
