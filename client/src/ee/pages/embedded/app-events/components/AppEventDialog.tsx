@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -158,12 +158,10 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>

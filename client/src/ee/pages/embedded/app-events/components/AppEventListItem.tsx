@@ -1,3 +1,5 @@
+import '@/shared/styles/dropdownMenu.css';
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -8,7 +10,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,7 +23,7 @@ import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 interface AppEventListItemProps {
@@ -72,18 +73,21 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                        </Button>
+                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="p-0">
+                        <DropdownMenuItem className="dropdown-menu-item" onClick={() => setShowEditDialog(true)}>
+                            <EditIcon /> Edit
+                        </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="m-0" />
 
-                        <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                            Delete
+                        <DropdownMenuItem
+                            className="dropdown-menu-item-destructive"
+                            onClick={() => setShowDeleteDialog(true)}
+                        >
+                            <Trash2Icon /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -102,7 +106,10 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                        <AlertDialogAction className="bg-destructive" onClick={handleAlertDeleteDialogClick}>
+                        <AlertDialogAction
+                            className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                            onClick={handleAlertDeleteDialogClick}
+                        >
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
