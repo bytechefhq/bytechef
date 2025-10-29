@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -405,14 +405,14 @@ const IntegrationInstanceConfigurationDialog = ({
                         {activeStepIndex === 0 && (
                             <>
                                 <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
+                                    <Button label="Cancel" variant="outline" />
                                 </DialogClose>
 
                                 {(((!integrationInstanceConfiguration?.id ||
                                     (workflows && workflows.length > 0 && updateIntegrationVersion)) &&
                                     oAuth2Authorization) ||
                                     (workflows && workflows.length > 0 && !oAuth2Authorization)) && (
-                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                 )}
 
                                 {(((!workflows || workflows?.length == 0) && !oAuth2Authorization) ||
@@ -423,26 +423,29 @@ const IntegrationInstanceConfigurationDialog = ({
                                             createIntegrationInstanceConfigurationMutation.isPending ||
                                             updateIntegrationInstanceConfigurationMutation.isPending
                                         }
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    >
-                                        {createIntegrationInstanceConfigurationMutation.isPending ||
-                                            (updateIntegrationInstanceConfigurationMutation.isPending && (
+                                        icon={
+                                            createIntegrationInstanceConfigurationMutation.isPending ||
+                                            updateIntegrationInstanceConfigurationMutation.isPending ? (
                                                 <LoadingIcon />
-                                            ))}
-                                        Save
-                                    </Button>
+                                            ) : undefined
+                                        }
+                                        label="Save"
+                                        onClick={handleSubmit(handleSaveClick)}
+                                    />
                                 )}
                             </>
                         )}
 
                         {activeStepIndex === 1 && oAuth2Authorization && !updateIntegrationVersion && (
                             <>
-                                <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
-                                    Previous
-                                </Button>
+                                <Button
+                                    label="Previous"
+                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                    variant="outline"
+                                />
 
                                 {workflows && workflows?.length > 0 && (
-                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                 )}
 
                                 {!workflows ||
@@ -452,14 +455,15 @@ const IntegrationInstanceConfigurationDialog = ({
                                                 createIntegrationInstanceConfigurationMutation.isPending ||
                                                 updateIntegrationInstanceConfigurationMutation.isPending
                                             }
-                                            onClick={handleSubmit(handleSaveClick)}
-                                        >
-                                            {createIntegrationInstanceConfigurationMutation.isPending ||
-                                                (updateIntegrationInstanceConfigurationMutation.isPending && (
+                                            icon={
+                                                createIntegrationInstanceConfigurationMutation.isPending ||
+                                                updateIntegrationInstanceConfigurationMutation.isPending ? (
                                                     <LoadingIcon />
-                                                ))}
-                                            Save
-                                        </Button>
+                                                ) : undefined
+                                            }
+                                            label="Save"
+                                            onClick={handleSubmit(handleSaveClick)}
+                                        />
                                     ))}
                             </>
                         )}
@@ -470,23 +474,26 @@ const IntegrationInstanceConfigurationDialog = ({
                             workflows &&
                             workflows?.length > 0 && (
                                 <>
-                                    <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
-                                        Previous
-                                    </Button>
+                                    <Button
+                                        label="Previous"
+                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                        variant="outline"
+                                    />
 
                                     <Button
                                         disabled={
                                             createIntegrationInstanceConfigurationMutation.isPending ||
                                             updateIntegrationInstanceConfigurationMutation.isPending
                                         }
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    >
-                                        {createIntegrationInstanceConfigurationMutation.isPending ||
-                                            (updateIntegrationInstanceConfigurationMutation.isPending && (
+                                        icon={
+                                            createIntegrationInstanceConfigurationMutation.isPending ||
+                                            updateIntegrationInstanceConfigurationMutation.isPending ? (
                                                 <LoadingIcon />
-                                            ))}
-                                        Save
-                                    </Button>
+                                            ) : undefined
+                                        }
+                                        label="Save"
+                                        onClick={handleSubmit(handleSaveClick)}
+                                    />
                                 </>
                             )}
                     </DialogFooter>
