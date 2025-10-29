@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
@@ -114,7 +114,7 @@ const IntegrationInstanceConfigurations = () => {
                                             environmentId: currentEnvironmentId,
                                         } as IntegrationInstanceConfiguration
                                     }
-                                    triggerNode={<Button>New Instance Configuration</Button>}
+                                    triggerNode={<Button label="New Instance Configuration" />}
                                 />
                             )
                         }
@@ -284,7 +284,7 @@ const IntegrationInstanceConfigurations = () => {
                                         environmentId: currentEnvironmentId,
                                     } as IntegrationInstanceConfiguration
                                 }
-                                triggerNode={<Button>Create Instance Configuration</Button>}
+                                triggerNode={<Button label="Create Instance Configuration" />}
                             />
                         }
                         icon={<Settings2Icon className="size-24 text-gray-300" />}
