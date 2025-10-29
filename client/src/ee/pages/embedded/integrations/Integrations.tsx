@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
 import IntegrationsLeftSidebarNav from '@/ee/pages/embedded/integrations/components/IntegrationsLeftSidebarNav';
@@ -65,7 +65,7 @@ const Integrations = () => {
                                             );
                                         }
                                     }}
-                                    triggerNode={<Button>New Integration</Button>}
+                                    triggerNode={<Button label="New Integration" />}
                                 />
                             )
                         }
@@ -95,7 +95,7 @@ const Integrations = () => {
                                         );
                                     }
                                 }}
-                                triggerNode={<Button>Create Integration</Button>}
+                                triggerNode={<Button label="Create Integration" />}
                             />
                         }
                         icon={<SquareIcon className="size-24 text-gray-300" />}
