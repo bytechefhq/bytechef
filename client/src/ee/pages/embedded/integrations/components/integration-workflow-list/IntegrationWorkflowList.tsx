@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowListItem';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
@@ -126,7 +126,7 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
                             <WorkflowDialog
                                 createWorkflowMutation={createIntegrationWorkflowMutation}
                                 integrationId={integration.id}
-                                triggerNode={<Button>Create Workflow</Button>}
+                                triggerNode={<Button label="Create Workflow" />}
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />
                         }
