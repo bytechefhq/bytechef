@@ -17,19 +17,44 @@
 package com.bytechef.component.example.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.util.List;
 
 public class ExampleDummyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummyAction")
         .title("Title")
         .description("Description")
-        .properties()
+        .properties(
+            string("name")
+                .label("Name")
+                .required(true),
+            string("hiddenProperty")
+                .hidden(true)
+                .defaultValue("test"),
+            dynamicProperties("dynamicProperties")
+                .propertiesLookupDependsOn("name")
+                .properties(
+                    (PropertiesFunction) (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
+
+                        ModifiableStringProperty property = string("property")
+                            .label("Property 1")
+                            .required(true);
+
+                        ModifiableStringProperty hiddenProperty2 = string("hiddenProperty2")
+                            .hidden(true)
+                            .defaultValue("dynamic hidden");
+
+                        return List.of(property, hiddenProperty2);
+                    }))
         .output(outputSchema(string()))
         .perform(ExampleDummyAction::perform);
 
