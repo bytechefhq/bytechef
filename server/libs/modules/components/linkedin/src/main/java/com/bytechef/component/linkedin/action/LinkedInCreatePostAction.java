@@ -184,22 +184,23 @@ public class LinkedInCreatePostAction {
     }
 
     private static Map<String, Object> buildContent(Parameters inputParameters, Context context, String personUrn) {
-        Map<String, Object> content = null;
-
+        Map<String, Object> contentMap = null;
         String contentType = inputParameters.getString(CONTENT_TYPE);
+
         if (contentType != null && !contentType.isEmpty()) {
-            content = new HashMap<>();
+            contentMap = new HashMap<>();
 
             switch (contentType) {
                 case IMAGES -> {
                     List<FileEntry> images = inputParameters.getRequiredList(IMAGES, FileEntry.class);
+
                     if (!images.isEmpty())
                         if (images.size() == 1) {
                             FileEntry image = images.getFirst();
 
                             String id = LinkedInUtils.uploadContent(context, image, personUrn, contentType);
 
-                            content.put("media", Map.of(ID, id));
+                            contentMap.put("media", Map.of(ID, id));
                         } else {
                             List<Map<String, String>> imagesList = new ArrayList<>();
 
@@ -209,7 +210,7 @@ public class LinkedInCreatePostAction {
                                 imagesList.add(Map.of(ID, id));
                             }
 
-                            content.put("multiImage", Map.of(IMAGES, imagesList));
+                            contentMap.put("multiImage", Map.of(IMAGES, imagesList));
                         }
                 }
                 case ARTICLE -> {
@@ -229,18 +230,19 @@ public class LinkedInCreatePostAction {
                         articleMap.put(THUMBNAIL, id);
                     }
 
-                    content.put(ARTICLE, articleMap);
+                    contentMap.put(ARTICLE, articleMap);
                 }
                 case DOCUMENT -> {
                     FileEntry document = inputParameters.getRequiredFileEntry(DOCUMENT);
+
                     String id = LinkedInUtils.uploadContent(context, document, personUrn, DOCUMENT);
 
-                    content.put("media", Map.of(ID, id, TITLE, inputParameters.getRequiredString(TITLE)));
+                    contentMap.put("media", Map.of(ID, id, TITLE, inputParameters.getRequiredString(TITLE)));
                 }
                 default -> throw new IllegalArgumentException("Unsupported content type: " + contentType);
             }
         }
 
-        return content;
+        return contentMap;
     }
 }
