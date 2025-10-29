@@ -378,10 +378,16 @@ export const getLayoutedElements = async ({
 
     edges = filteredEdges.reduce(
         (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
-            const edgeKey = `${edge.source}=>${edge.target}`;
+            const {source, target} = edge;
+
+            const targetHandle = edge.targetHandle ? `-${edge.targetHandle}` : '';
+            const sourceHandle = edge.sourceHandle ? `-${edge.sourceHandle}` : '';
+
+            const edgeKey = `${source}=>${target}${targetHandle}${sourceHandle}`;
 
             if (!uniqueEdges.map.has(edgeKey)) {
                 uniqueEdges.map.set(edgeKey, true);
+
                 uniqueEdges.edges.push(edge);
             }
 
