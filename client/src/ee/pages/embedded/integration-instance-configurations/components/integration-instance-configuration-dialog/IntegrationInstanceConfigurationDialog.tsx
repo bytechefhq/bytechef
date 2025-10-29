@@ -261,6 +261,10 @@ const IntegrationInstanceConfigurationDialog = ({
         }
     };
 
+    const isSaving =
+        !!createIntegrationInstanceConfigurationMutation.isPending ||
+        !!updateIntegrationInstanceConfigurationMutation.isPending;
+
     useEffect(() => {
         if (workflows) {
             let integrationInstanceConfigurationWorkflows: IntegrationInstanceConfigurationWorkflow[] = [];
@@ -419,16 +423,8 @@ const IntegrationInstanceConfigurationDialog = ({
                                     (integrationInstanceConfiguration?.id && !updateIntegrationVersion) ||
                                     (workflows && workflows.length === 0 && updateIntegrationVersion)) && (
                                     <Button
-                                        disabled={
-                                            createIntegrationInstanceConfigurationMutation.isPending ||
-                                            updateIntegrationInstanceConfigurationMutation.isPending
-                                        }
-                                        icon={
-                                            createIntegrationInstanceConfigurationMutation.isPending ||
-                                            updateIntegrationInstanceConfigurationMutation.isPending ? (
-                                                <LoadingIcon />
-                                            ) : undefined
-                                        }
+                                        disabled={isSaving}
+                                        icon={isSaving ? <LoadingIcon /> : undefined}
                                         label="Save"
                                         onClick={handleSubmit(handleSaveClick)}
                                     />
@@ -451,16 +447,8 @@ const IntegrationInstanceConfigurationDialog = ({
                                 {!workflows ||
                                     (workflows?.length === 0 && (
                                         <Button
-                                            disabled={
-                                                createIntegrationInstanceConfigurationMutation.isPending ||
-                                                updateIntegrationInstanceConfigurationMutation.isPending
-                                            }
-                                            icon={
-                                                createIntegrationInstanceConfigurationMutation.isPending ||
-                                                updateIntegrationInstanceConfigurationMutation.isPending ? (
-                                                    <LoadingIcon />
-                                                ) : undefined
-                                            }
+                                            disabled={isSaving}
+                                            icon={isSaving ? <LoadingIcon /> : undefined}
                                             label="Save"
                                             onClick={handleSubmit(handleSaveClick)}
                                         />
@@ -481,16 +469,8 @@ const IntegrationInstanceConfigurationDialog = ({
                                     />
 
                                     <Button
-                                        disabled={
-                                            createIntegrationInstanceConfigurationMutation.isPending ||
-                                            updateIntegrationInstanceConfigurationMutation.isPending
-                                        }
-                                        icon={
-                                            createIntegrationInstanceConfigurationMutation.isPending ||
-                                            updateIntegrationInstanceConfigurationMutation.isPending ? (
-                                                <LoadingIcon />
-                                            ) : undefined
-                                        }
+                                        disabled={isSaving}
+                                        icon={isSaving ? <LoadingIcon /> : undefined}
                                         label="Save"
                                         onClick={handleSubmit(handleSaveClick)}
                                     />
