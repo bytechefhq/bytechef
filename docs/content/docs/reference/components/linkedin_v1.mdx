@@ -1,0 +1,150 @@
+---
+title: "LinkedIn"
+description: "."
+---
+
+
+Categories: Communication, Social Media
+
+
+Type: linkedin/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Post
+Name: createPost
+
+`Create a post on LinkedIn.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| author | Post As | STRING <details> <summary> Options </summary> PERSON, ORGANIZATION </details> | Choose whether to post as a Person or Organization. | true |
+| urn | null | STRING | Organization URN | true |
+| commentary | Text | STRING | The user generated commentary for the post. | true |
+| contentType | Media Category | STRING <details> <summary> Options </summary> ARTICLE, DOCUMENT, IMAGES </details> | Type of media to be posted. | false |
+| visibility | Visibility | STRING <details> <summary> Options </summary> PUBLIC, CONNECTIONS </details> | Visibility restrictions on content. | true |
+| images | Images | ARRAY <details> <summary> Items </summary> [FILE_ENTRY\($image)] </details> | Images to be posted. | true |
+| source | Article URL | STRING | A URL of the article. Typically the URL that was ingested to maintain URL parameters. | true |
+| title | Article Title | STRING | Custom or saved title of the article. | false |
+| description | Article Description | STRING | Custom or saved description of the article. | false |
+| thumbnail | Article Thumbnail | FILE_ENTRY | The thumbnail image to be associated with the article. | false |
+| document | Document | FILE_ENTRY | The document to be posted. | true |
+| title | Document Title | STRING | The title of the document. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "author" : "",
+    "urn" : "",
+    "commentary" : "",
+    "contentType" : "",
+    "visibility" : "",
+    "images" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "source" : "",
+    "title" : "",
+    "description" : "",
+    "thumbnail" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "document" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "linkedin/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Delete Post
+Name: deletePost
+
+`Delete a post from LinkedIn.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urn | URN | STRING | ugcPostUrn|shareUrn | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Post",
+  "name" : "deletePost",
+  "parameters" : {
+    "urn" : ""
+  },
+  "type" : "linkedin/v1/deletePost"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
