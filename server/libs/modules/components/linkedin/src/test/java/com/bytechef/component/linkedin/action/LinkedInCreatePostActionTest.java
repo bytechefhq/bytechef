@@ -26,7 +26,6 @@ import static com.bytechef.component.linkedin.constant.LinkedInConstants.CONTENT
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.VISIBILITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -39,6 +38,7 @@ import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerfor
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.linkedin.action.LinkedInCreatePostAction.Author;
 import com.bytechef.component.linkedin.util.LinkedInUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -80,11 +80,13 @@ class LinkedInCreatePostActionTest {
 
     @Test
     void testPerform() throws Exception {
+        when(mockedParameters.getRequiredString(AUTHOR))
+            .thenReturn(Author.PERSON.name());
         when(mockedParameters.getRequiredString(COMMENTARY))
             .thenReturn("some comment");
         when(mockedParameters.getString(CONTENT_TYPE))
             .thenReturn(IMAGES);
-        when(mockedParameters.getRequiredString(VISIBILITY))
+        when(mockedParameters.getString(VISIBILITY, "PUBLIC"))
             .thenReturn("PUBLIC");
         when(mockedParameters.getRequiredList(IMAGES, FileEntry.class))
             .thenReturn(List.of(mockedFileEntry));
@@ -128,16 +130,18 @@ class LinkedInCreatePostActionTest {
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
+            when(mockedResponse.getFirstHeader(stringArgumentCaptor.capture()))
+                .thenReturn("abc");
 
             Object result = singleConnectionPerformFunction.apply(
                 mockedParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertNull(result);
+            assertEquals("abc", result);
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
             assertEquals(
                 List.of(
                     "eyJpc3MiOiJodHRwczovL3d3dy5saW5rZWRpbi5jb20vb2F1dGgiLCJhdWQiOiI4NjNjMDA4a3NjNTlnbiIsImlhdCI6MTc2MTI5MTkyOSwiZXhwIjoxNzYxMjk1NTI5LCJzdWIiOiJGODlpY2tERUhNIiwibmFtZSI6Ik1vbmlrYSBLdcWhdGVyIiwiZ2l2ZW5fbmFtZSI6Ik1vbmlrYSIsImZhbWlseV9uYW1lIjoiS3XFoXRlciIsInBpY3R1cmUiOiJodHRwczovL21lZGlhLmxpY2RuLmNvbS9kbXMvaW1hZ2UvdjIvQzRFMDNBUUVmOUNEYktfODZ1dy9wcm9maWxlLWRpc3BsYXlwaG90by1zaHJpbmtfMTAwXzEwMC9wcm9maWxlLWRpc3BsYXlwaG90by1zaHJpbmtfMTAwXzEwMC8wLzE2NjE4NzcxNTcxMjE_ZT0xNzYyOTkyMDAwJnY9YmV0YSZ0PWNCQ3RlMjhVR0cyOUFBOWdBb3ZXYkRNUkJpTWlZWW5vdm9WcHgxOGVZb28iLCJlbWFpbCI6ImRvbWl0ZXJtb25pa2FAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJ0cnVlIiwibG9jYWxlIjoiZW5fVVMifQ",
-                    "urn:li:person:null", IMAGES, "/rest/posts"),
+                    "urn:li:person:null", IMAGES, "/rest/posts", "x-restli-id"),
                 stringArgumentCaptor.getAllValues());
 
             Http.Body body = bodyArgumentCaptor.getValue();

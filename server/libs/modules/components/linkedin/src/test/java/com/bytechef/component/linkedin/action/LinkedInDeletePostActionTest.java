@@ -19,7 +19,7 @@ package com.bytechef.component.linkedin.action;
 import static com.bytechef.component.definition.Context.ContextFunction;
 import static com.bytechef.component.definition.Context.Encoder;
 import static com.bytechef.component.definition.Context.Http;
-import static com.bytechef.component.linkedin.action.LinkedInDeletePostAction.URN;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.URN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -60,8 +60,6 @@ class LinkedInUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -75,7 +73,7 @@ class LinkedInUtilsTest {
 
         assertEquals("imageUrn", result);
         assertEquals(
-            List.of("/v2/images", "action", "initializeUpload", "uploadUrl", "Content-Type", "multipart/form-data"),
+            List.of("/v2/images", "action", "initializeUpload", "uploadUrl"),
             stringArgumentCaptor.getAllValues());
         assertEquals(
             List.of(

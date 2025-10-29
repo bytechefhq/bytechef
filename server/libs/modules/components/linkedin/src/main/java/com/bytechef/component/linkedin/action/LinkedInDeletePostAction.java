@@ -19,6 +19,7 @@ package com.bytechef.component.linkedin.action;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.URN;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -28,7 +29,6 @@ import com.bytechef.component.definition.Parameters;
  */
 public class LinkedInDeletePostAction {
 
-    public static final String URN = "urn";
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deletePost")
         .title("Delete Post")
         .description("Delete a post from LinkedIn.")

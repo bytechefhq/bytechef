@@ -33,6 +33,7 @@ public class LinkedInConstants {
     public static final String SOURCE = "source";
     public static final String THUMBNAIL = "thumbnail";
     public static final String TITLE = "title";
+    public static final String URN = "urn";
     public static final String VISIBILITY = "visibility";
 
     private LinkedInConstants() {

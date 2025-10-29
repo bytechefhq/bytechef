@@ -35,6 +35,7 @@ import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.SOURCE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.THUMBNAIL;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.TITLE;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.URN;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.VISIBILITY;
 
 import com.bytechef.component.definition.Context;
@@ -42,6 +43,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.linkedin.util.LinkedInUtils;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,21 +54,41 @@ import java.util.Map;
  */
 public class LinkedInCreatePostAction {
 
+    protected enum Author {
+        PERSON, ORGANIZATION
+    }
+
+    protected enum ContentType {
+        ARTICLE, DOCUMENT, IMAGES
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
         .description("Create a post on LinkedIn.")
         .properties(
+            string(AUTHOR)
+                .label("Post As")
+                .description("Choose whether to post as a Person or Organization.")
+                .options(
+                    option("Person", Author.PERSON.name()),
+                    option("Organization", Author.ORGANIZATION.name()))
+                .defaultValue(Author.PERSON.name())
+                .required(true),
+            string(URN)
+                .description("Organization URN")
+                .displayCondition("%s == '%s'".formatted(AUTHOR, Author.ORGANIZATION.name()))
+                .required(true),
             string(COMMENTARY)
                 .label("Text")
                 .description("The user generated commentary for the post.")
                 .required(true),
             string(CONTENT_TYPE)
-                .label("Content Type")
-                .description("Type of content to be posted.")
+                .label("Media Category")
+                .description("Type of media to be posted.")
                 .options(
-                    option("Article", ARTICLE),
-                    option("Document", DOCUMENT),
-                    option("Images", IMAGES))
+                    option("Article", ContentType.ARTICLE.name()),
+                    option("Document", ContentType.DOCUMENT.name()),
+                    option("Images", ContentType.IMAGES.name()))
                 .required(false),
             string(VISIBILITY)
                 .label("Visibility")
@@ -74,44 +96,45 @@ public class LinkedInCreatePostAction {
                 .options(
                     option("Public", "PUBLIC", "Anyone can view this."),
                     option("Connections only", "CONNECTIONS", "Represents 1st degree network of owner."))
+                .displayCondition("%s == '%s'".formatted(AUTHOR, Author.PERSON.name()))
                 .required(true),
             array(IMAGES)
                 .label("Images")
-                .description("The image to be posted.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, IMAGES))
+                .description("Images to be posted.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.IMAGES.name()))
                 .items(fileEntry(IMAGE))
                 .required(true),
             string(SOURCE)
                 .label("Article URL")
                 .description("A URL of the article. Typically the URL that was ingested to maintain URL parameters.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.ARTICLE.name()))
                 .required(true),
             string(TITLE)
                 .label("Article Title")
                 .description("Custom or saved title of the article.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.ARTICLE.name()))
                 .maxLength(400)
                 .required(false),
             string(DESCRIPTION)
                 .label("Article Description")
                 .description("Custom or saved description of the article.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.ARTICLE.name()))
                 .maxLength(4086)
                 .required(false),
             fileEntry(THUMBNAIL)
                 .label("Article Thumbnail")
                 .description("The thumbnail image to be associated with the article.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ARTICLE))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.ARTICLE.name()))
                 .required(false),
             fileEntry(DOCUMENT)
                 .label("Document")
                 .description("The document to be posted.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, DOCUMENT))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.DOCUMENT.name()))
                 .required(true),
             string(TITLE)
                 .label("Document Title")
                 .description("The title of the document.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, DOCUMENT))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.DOCUMENT.name()))
                 .required(true))
         .output(outputSchema(string().description("Post ID such as urn:li:share:{id} or urn:li:ugcPost:{id})")))
         .perform(LinkedInCreatePostAction::perform);
@@ -120,18 +143,25 @@ public class LinkedInCreatePostAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String personUrn = getPersonUrn(connectionParameters, context);
+        String urn;
+        String author = inputParameters.getRequiredString(AUTHOR);
 
-        Map<String, Object> content = buildContent(inputParameters, context, personUrn);
+        if (author.equals(Author.ORGANIZATION.name())) {
+            urn = "urn:li:organization:" + inputParameters.getRequiredString(URN);
+        } else {
+            urn = getPersonUrn(connectionParameters, context);
+        }
+
+        Map<String, Object> content = buildContent(inputParameters, context, urn);
 
         Http.Response response = context.http(http -> http.post("/rest/posts"))
             .body(
                 Http.Body.of(
-                    AUTHOR, personUrn,
+                    AUTHOR, urn,
                     COMMENTARY, inputParameters.getRequiredString(COMMENTARY),
                     "distribution", Map.of("feedDistribution", "MAIN_FEED"),
                     "lifecycleState", "PUBLISHED",
-                    VISIBILITY, inputParameters.getRequiredString(VISIBILITY),
+                    VISIBILITY, inputParameters.getString(VISIBILITY, "PUBLIC"),
                     "content", content))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
@@ -144,9 +174,9 @@ public class LinkedInCreatePostAction {
 
         String[] chunks = idToken.split("\\.");
 
-        byte[] encoder1 = context.encoder(encoder -> encoder.urlDecode(chunks[1]));
+        byte[] decoded = context.encoder(encoder -> encoder.urlDecode(chunks[1]));
 
-        String payload = new String(encoder1);
+        String payload = new String(decoded, StandardCharsets.UTF_8);
 
         Map<String, ?> json1 = context.json(json -> json.readMap(payload));
 
@@ -174,7 +204,7 @@ public class LinkedInCreatePostAction {
                             List<Map<String, String>> imagesList = new ArrayList<>();
 
                             for (FileEntry image : images) {
-                                String id = LinkedInUtils.uploadContent(context, image, personUrn, contentType);
+                                String id = LinkedInUtils.uploadContent(context, image, personUrn, IMAGES);
 
                                 imagesList.add(Map.of(ID, id));
                             }
@@ -194,7 +224,7 @@ public class LinkedInCreatePostAction {
                     FileEntry thumbnail = inputParameters.getFileEntry(THUMBNAIL);
 
                     if (thumbnail != null) {
-                        String id = LinkedInUtils.uploadContent(context, thumbnail, personUrn, contentType);
+                        String id = LinkedInUtils.uploadContent(context, thumbnail, personUrn, IMAGES);
 
                         articleMap.put(THUMBNAIL, id);
                     }
@@ -203,10 +233,11 @@ public class LinkedInCreatePostAction {
                 }
                 case DOCUMENT -> {
                     FileEntry document = inputParameters.getRequiredFileEntry(DOCUMENT);
-                    String id = LinkedInUtils.uploadContent(context, document, personUrn, contentType);
+                    String id = LinkedInUtils.uploadContent(context, document, personUrn, DOCUMENT);
 
                     content.put("media", Map.of(ID, id, TITLE, inputParameters.getRequiredString(TITLE)));
                 }
+                default -> throw new IllegalArgumentException("Unsupported content type: " + contentType);
             }
         }
 
