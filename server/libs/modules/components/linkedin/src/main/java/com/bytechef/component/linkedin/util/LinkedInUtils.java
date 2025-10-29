@@ -36,9 +36,9 @@ public class LinkedInUtils {
     }
 
     public static String uploadContent(Context context, FileEntry fileEntry, String personUrn, String contentType) {
-        Map<String, Object> body = initializeUpload(context, contentType, personUrn);
+        Map<String, Object> bodyMap = initializeUpload(context, contentType, personUrn);
 
-        if (body.get("value") instanceof Map<?, ?> map) {
+        if (bodyMap.get("value") instanceof Map<?, ?> map) {
             String uploadUrl = (String) map.get("uploadUrl");
 
             context.http(http -> http.put(uploadUrl))
