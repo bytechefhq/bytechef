@@ -15,14 +15,13 @@ const VerifyEmail = () => {
     const navigate = useNavigate();
 
     function handleResendEmail() {
-        resendActivationEmail(location.state.email).then(
-            () => {
+        resendActivationEmail(location.state.email)
+            .then(() => {
                 startCountdown();
-            },
-            () => {
+            })
+            .catch(() => {
                 navigate('/account-error', {state: {fromInternalFlow: true}});
-            }
-        );
+            });
     }
 
     return (
