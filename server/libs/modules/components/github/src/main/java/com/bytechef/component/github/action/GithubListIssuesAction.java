@@ -74,7 +74,7 @@ public class GithubListIssuesAction {
     private GithubListIssuesAction() {
     }
 
-    public static List<Map<String, ?>> perform(
+    public static List<Map<?, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return getItems(

@@ -55,6 +55,7 @@ public class GithubGetIssueAction {
                 .description("The number of the issue you want to get details from.")
                 .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY, OWNER)
+                .optionsLoadedDynamically(true)
                 .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubGetIssueAction::perform);

@@ -52,7 +52,7 @@ class GithubListIssuesActionTest {
                     stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
-            List<Map<String, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
+            List<Map<?, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
             assertEquals(List.of("/issues", FILTER, "all", STATE, "all"), stringArgumentCaptor.getAllValues());

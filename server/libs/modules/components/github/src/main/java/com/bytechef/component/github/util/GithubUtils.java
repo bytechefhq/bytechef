@@ -49,7 +49,7 @@ public class GithubUtils {
         String url = "/repos/%s/%s/collaborators".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> collaborators = getItems(context, url);
+        List<Map<?, ?>> collaborators = getItems(context, url);
 
         return getOptions(collaborators, "login");
     }
@@ -60,12 +60,14 @@ public class GithubUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Map<?, ?>> issues = getRepositoryIssues(inputParameters, context);
+        if (searchText != null) {
+            List<Map<?, ?>> issues = searchIssues(inputParameters, context, searchText);
 
-        for (Map<?, ?> issue : issues) {
-            String number = String.valueOf(issue.get("number"));
+            for (Map<?, ?> issue : issues) {
+                String number = String.valueOf(issue.get("number"));
 
-            options.add(option(number + " - " + issue.get(TITLE), number));
+                options.add(option(number + " - " + issue.get(TITLE), number));
+            }
         }
 
         return options;
@@ -78,7 +80,7 @@ public class GithubUtils {
         String url = "/repos/%s/%s/labels".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> labels = getItems(context, url);
+        List<Map<?, ?>> labels = getItems(context, url);
 
         return getOptions(labels, NAME);
     }
@@ -96,12 +98,12 @@ public class GithubUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        List<Map<String, ?>> repos = getItems(context, "/user/repos");
+        List<Map<?, ?>> repos = getItems(context, "/user/repos");
 
         return getOptions(repos, NAME);
     }
 
-    private static List<Option<String>> getOptions(List<Map<String, ?>> body, String value) {
+    private static List<Option<String>> getOptions(List<Map<?, ?>> body, String value) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object item : body) {
@@ -113,14 +115,24 @@ public class GithubUtils {
         return options;
     }
 
+    public static List<Map<?, ?>> searchIssues(Parameters inputParameters, Context context, String searchText) {
+        String s = searchText + " in:title";
+        String s1 = "repo:" + inputParameters.getString(OWNER, getOwnerName(context)) + "/"
+            + inputParameters.getRequiredString(REPOSITORY);
+        String s2 = "state:open";
+        String s3 = "is:issue";
+
+        return getItems(context, "/search/issues", "q", s + " " + s1 + " " + s2 + " " + s3);
+    }
+
     public static List<Map<?, ?>> getRepositoryIssues(Parameters inputParameters, Context context) {
         List<Map<?, ?>> issues = new ArrayList<>();
         String url = "/repos/%s/%s/issues".formatted(
             inputParameters.getString(OWNER, getOwnerName(context)), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> items = getItems(context, url, "state", "open");
+        List<Map<?, ?>> items = getItems(context, url, "state", "open");
 
-        for (Map<String, ?> item : items) {
+        for (Map<?, ?> item : items) {
             Object pullRequest = item.get("pull_request");
 
             if (pullRequest == null) {
@@ -131,8 +143,8 @@ public class GithubUtils {
         return issues;
     }
 
-    public static List<Map<String, ?>> getItems(Context context, String url, Object... queryParameters) {
-        List<Map<String, ?>> items = new ArrayList<>();
+    public static List<Map<?, ?>> getItems(Context context, String url, Object... queryParameters) {
+        List<Map<?, ?>> items = new ArrayList<>();
 
         int page = 1;
         boolean hasMoreItems = false;
@@ -149,7 +161,15 @@ public class GithubUtils {
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute();
 
-            items.addAll(response.getBody(new TypeReference<>() {}));
+            Map<String, ?> body = response.getBody(new TypeReference<>() {});
+
+            if (body.get("items") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+                        items.add(map);
+                    }
+                }
+            }
 
             List<String> linkHeader = response.getHeader("link");
 
