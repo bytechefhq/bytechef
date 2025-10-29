@@ -10,13 +10,13 @@ import {
     ControlType,
     DeleteClusterElementParameter200Response,
     DeleteClusterElementParameterOperationRequest,
-    DeleteWorkflowNodeParameterRequest,
+    DeleteWorkflowNodeParameterOperationRequest,
     GetClusterElementParameterDisplayConditions200Response,
     Option,
     OptionsDataSource,
     PropertiesDataSource,
     UpdateClusterElementParameterOperationRequest,
-    UpdateWorkflowNodeParameterRequest,
+    UpdateWorkflowNodeParameterOperationRequest,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
@@ -109,7 +109,7 @@ type UsePropertyReturnType = {
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterOperationRequest,
         unknown
     >;
     description?: string;
@@ -171,7 +171,7 @@ type UsePropertyReturnType = {
     updateWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response & {workflowNodeName?: string},
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterOperationRequest,
         unknown
     >;
     workflow: Workflow;
