@@ -42,7 +42,6 @@ public class LinkedInUtils {
             String uploadUrl = (String) map.get("uploadUrl");
 
             context.http(http -> http.put(uploadUrl))
-                .header("Content-Type", "multipart/form-data")
                 .body(Http.Body.of(Map.of("file", fileEntry), Http.BodyContentType.FORM_DATA))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute();
@@ -54,6 +53,7 @@ public class LinkedInUtils {
                 case IMAGES -> {
                     return (String) map.get(IMAGE);
                 }
+                default -> throw new IllegalArgumentException("Unsupported content type: " + contentType);
             }
         }
 
