@@ -374,7 +374,7 @@ class ContextImpl implements Context {
         }
 
         @Override
-        public byte[] urlDecode(String string) {
+        public byte[] urlDecodeBase64FromString(String string) {
             return EncodingUtils.urlDecodeBase64FromString(string);
         }
 

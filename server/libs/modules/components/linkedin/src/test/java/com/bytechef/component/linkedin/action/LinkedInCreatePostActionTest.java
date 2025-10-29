@@ -112,7 +112,7 @@ class LinkedInCreatePostActionTest {
             when(mockedActionContext.encoder(encoderFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> encoderFunctionArgumentCaptor.getValue()
                     .apply(mockedEncoder));
-            when(mockedEncoder.urlDecode(stringArgumentCaptor.capture()))
+            when(mockedEncoder.urlDecodeBase64FromString(stringArgumentCaptor.capture()))
                 .thenReturn(bytes);
 
             when(mockedActionContext.json(jsonFunctionArgumentCaptor.capture()))

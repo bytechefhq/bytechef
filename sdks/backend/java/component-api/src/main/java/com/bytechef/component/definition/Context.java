@@ -203,7 +203,7 @@ public interface Context {
          * @param string
          * @return
          */
-        byte[] urlDecode(String string);
+        byte[] urlDecodeBase64FromString(String string);
 
         /**
          *

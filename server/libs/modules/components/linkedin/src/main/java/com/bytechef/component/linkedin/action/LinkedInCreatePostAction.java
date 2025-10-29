@@ -174,7 +174,7 @@ public class LinkedInCreatePostAction {
 
         String[] chunks = idToken.split("\\.");
 
-        byte[] decoded = context.encoder(encoder -> encoder.urlDecode(chunks[1]));
+        byte[] decoded = context.encoder(encoder -> encoder.urlDecodeBase64FromString(chunks[1]));
 
         String payload = new String(decoded, StandardCharsets.UTF_8);
 
