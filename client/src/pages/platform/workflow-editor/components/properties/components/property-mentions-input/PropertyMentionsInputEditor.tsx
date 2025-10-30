@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
@@ -18,6 +19,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ClusterElementItemType, DataPillType} from '@/shared/types';
+import {Extension, mergeAttributes} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
 import Paragraph from '@tiptap/extension-paragraph';
@@ -25,9 +27,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Text from '@tiptap/extension-text';
 import {TextSelection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
-import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
+import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
+import {SparklesIcon, XIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
@@ -37,6 +40,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
+import {FromAI} from './FromAI.extension';
 import {MentionStorage} from './MentionStorage.extension';
 
 interface PropertyMentionsInputEditorProps {
@@ -45,7 +49,9 @@ interface PropertyMentionsInputEditorProps {
     controlType?: string;
     dataPills: DataPillType[];
     elementId?: string;
+    handleFromAiClick?: (fromAi: boolean) => void;
     isFormulaMode?: boolean;
+    isFromAI?: boolean;
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
@@ -65,12 +71,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             controlType,
             dataPills,
             elementId,
+            handleFromAiClick,
             isFormulaMode,
+            isFromAI,
             onChange,
             onFocus,
             path,
             placeholder,
             setIsFormulaMode,
+            // setIsFromAI,
             taskDispatcherDefinitions,
             type,
             value,
@@ -145,6 +154,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
+                ...(memoizedClusterElementTask
+                    ? [
+                          FromAI.configure({
+                              setFromAI: () => {},
+                          }),
+                      ]
+                    : []),
                 FormulaMode.configure({
                     saveNullValue: () => {
                         if (
@@ -225,9 +241,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, [
             controlType,
             getComponentIcon,
+            memoizedClusterElementTask,
             path,
             placeholder,
             setIsFormulaMode,
+            // setIsFromAI,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
@@ -266,7 +284,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }
             }
 
+            if (isFromAI) {
+                value = `fromAI(${path}, 'description')`;
+            }
+
             saveProperty({
+                fromAI: isFromAI,
                 includeInMetadata: true,
                 path,
                 type,
@@ -412,6 +435,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return getContent(editorValue);
         }, [editorValue, getContent]);
 
+        const fromAIExtension = useMemo(
+            () => editor?.extensionManager.extensions.find((extension) => extension.name === 'fromAI'),
+            [editor]
+        );
+
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
         }
@@ -485,6 +513,31 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [editor, value, isFormulaMode, setIsFormulaMode]);
 
+        // Set fromAI based on value and sync with editor storage
+        useEffect(() => {
+            if (!editor) {
+                return;
+            }
+
+            // if (typeof value === 'string' && value.startsWith('fromAI(') && setIsFromAI && isFromAI !== false) {
+            // setIsFromAI(true);
+            // }
+
+            if (isFromAI !== undefined && editor.commands.setFromAI) {
+                editor.commands.setFromAI(isFromAI);
+
+                if (editor.storage.fromAI) {
+                    editor.storage.fromAI.fromAI = isFromAI;
+                }
+            }
+        }, [editor, value, isFromAI]);
+
+        useEffect(() => {
+            if (editor && isFromAI !== undefined) {
+                editor.setEditable(!isFromAI);
+            }
+        }, [editor, isFromAI]);
+
         // Cleanup function to save mention input value on unmount
         useEffect(() => {
             return () => saveMentionInputValue.flush();
@@ -493,12 +546,33 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         return (
             <>
                 <EditorContent
+                    className={twMerge(isFromAI && 'pointer-events-none cursor-not-allowed')}
+                    disabled={isFromAI}
                     editor={editor}
                     id={elementId}
                     onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
                     value={editorValue}
                 />
 
+                {fromAIExtension &&
+                    (isFromAI ? (
+                        <Button
+                            icon={<XIcon />}
+                            // onClick={() => setIsFromAI && setIsFromAI(false)}
+                            onClick={() => handleFromAiClick && handleFromAiClick(false)}
+                            size="icon"
+                            title="Stop AI generation"
+                            variant="destructiveGhost"
+                        />
+                    ) : (
+                        <Button
+                            icon={<SparklesIcon />}
+                            onClick={() => handleFromAiClick && handleFromAiClick(true)}
+                            size="icon"
+                            title="Generate content with AI"
+                            variant="ghost"
+                        />
+                    ))}
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>
         );

@@ -68,18 +68,18 @@ async function renderApp() {
     }
 
     root.render(
-        <StrictMode>
-            <ThemeProvider defaultTheme="light">
-                <QueryClientProvider client={queryClient}>
-                    <ConditionalPostHogProvider>
-                        <TooltipProvider>
-                            <RouterProvider router={router} />
-                        </TooltipProvider>
-                    </ConditionalPostHogProvider>
+        // <StrictMode>
+        <ThemeProvider defaultTheme="light">
+            <QueryClientProvider client={queryClient}>
+                <ConditionalPostHogProvider>
+                    <TooltipProvider>
+                        <RouterProvider router={router} />
+                    </TooltipProvider>
+                </ConditionalPostHogProvider>
 
-                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-                </QueryClientProvider>
-            </ThemeProvider>
-        </StrictMode>
+                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+            </QueryClientProvider>
+        </ThemeProvider>
+        // </StrictMode>
     );
 }

@@ -74,6 +74,7 @@ const Property = ({
         getFetchedState,
         handleCodeEditorChange,
         handleDeleteCustomPropertyClick,
+        handleFromAiClick,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -86,6 +87,7 @@ const Property = ({
         isDisplayConditionsPending,
         isFetchingCurrentDisplayCondition,
         isFormulaMode,
+        isFromAI,
         isNumericalInput,
         isValidControlType,
         label,
@@ -170,12 +172,14 @@ const Property = ({
                 mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR'
             ) && (
                 <PropertyMentionsInput
-                    controlType={controlType || 'TEXT'}
+                    controlType={controlType}
                     defaultValue={defaultValue}
                     deletePropertyButton={deletePropertyButton}
                     description={description}
+                    handleFromAiClick={handleFromAiClick}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                     isFormulaMode={isFormulaMode}
+                    isFromAI={isFromAI}
                     label={label || name}
                     leadingIcon={typeIcon}
                     path={memoizedPath}

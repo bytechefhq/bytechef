@@ -118,6 +118,7 @@ type UsePropertyReturnType = {
     errorMessage: string;
     expressionEnabled?: boolean;
     formattedOptions: Array<Option>;
+    handleFromAiClick: () => void;
     handleCodeEditorChange: (value?: string) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
@@ -133,6 +134,7 @@ type UsePropertyReturnType = {
     isDisplayConditionsPending: boolean;
     isFetchingCurrentDisplayCondition: boolean;
     isFormulaMode: boolean;
+    isFromAI: boolean;
     isNumericalInput: boolean;
     isValidControlType: boolean;
     label?: string;
@@ -380,6 +382,18 @@ export const useProperty = ({
         displayConditionIndexes.forEach((index) => {
             displayCondition = displayCondition!.replace(`[index]`, `[${index}]`);
         });
+    }
+
+    const isFromAI = useMemo(() => {
+        if (!currentComponent?.metadata?.ui?.fromAI || !memoizedPath) {
+            return false;
+        }
+
+        return currentComponent.metadata.ui.fromAI.includes(memoizedPath);
+    }, [currentComponent?.metadata?.ui?.fromAI, memoizedPath]);
+
+    if (path) {
+        console.log(memoizedPath, 'currentComponent: ', currentComponent);
     }
 
     const memoizedWorkflowTask = useMemo(() => {
@@ -755,6 +769,43 @@ export const useProperty = ({
         ]
     );
 
+    const handleFromAiClick = useCallback(
+        (fromAi: boolean) => {
+            console.log('handleFromAiClick: ', fromAi);
+            if (fromAi) {
+                if (editorRef.current) {
+                    editorRef.current.commands.setContent(`fromAI(${property.name}, 'description')`);
+                    editorRef.current.setEditable(false);
+
+                    if (!memoizedPath) {
+                        return;
+                    }
+                }
+            } else if (memoizedPath && workflow.id) {
+                saveProperty({
+                    fromAI: false,
+                    includeInMetadata: custom,
+                    path: memoizedPath,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    value: propertyParameterValue,
+                    workflowId: workflow.id,
+                });
+            }
+        },
+        [
+            custom,
+            memoizedPath,
+            property.name,
+            propertyParameterValue,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
+    );
+
     // set default mentionInput state
     useEffect(() => {
         if (control || mentionInput) {
@@ -1088,6 +1139,7 @@ export const useProperty = ({
         expressionEnabled,
         formattedOptions: formattedOptions || [],
         getFetchedState,
+        handleFromAiClick,
         handleCodeEditorChange,
         handleDeleteCustomPropertyClick,
         handleInputChange,
@@ -1103,6 +1155,7 @@ export const useProperty = ({
         isDisplayConditionsPending,
         isFetchingCurrentDisplayCondition,
         isFormulaMode,
+        isFromAI,
         isNumericalInput: isNumericalInput || false,
         isValidControlType: isValidControlType || false,
         label,
