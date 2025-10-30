@@ -1,13 +1,14 @@
 import PageLoader from '@/components/PageLoader';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
-import {useEffect, useRef, useState} from 'react';
+import {lazy, useEffect, useRef, useState} from 'react';
+
+const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
     const {project, projectDeployment, workflow} = workflowExecution;
