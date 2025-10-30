@@ -49,9 +49,8 @@ class WorkflowUtils {
         // convert condition to SpEL condition
         map.put("convertedExpression", "=" + condition);
 
-        Map<String, Object> actualParametersMap = actualParameters != null
-            ? com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new TypeReference<>() {})
-            : Map.of();
+        Map<String, Object> actualParametersMap =
+            com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new TypeReference<>() {});
 
         try {
             Map<String, Object> evaluated = EVALUATOR.evaluate(map, actualParametersMap);
@@ -65,10 +64,6 @@ class WorkflowUtils {
     }
 
     private static boolean parseBoolean(String string) {
-        if (string == null) {
-            throw new IllegalArgumentException("String cannot be null");
-        }
-
         if ("true".equalsIgnoreCase(string)) {
             return true;
         } else if ("false".equalsIgnoreCase(string)) {

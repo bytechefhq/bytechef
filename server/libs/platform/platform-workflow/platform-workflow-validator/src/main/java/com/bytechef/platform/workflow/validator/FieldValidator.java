@@ -33,7 +33,7 @@ class FieldValidator {
     /**
      * Validates that a required string field exists and is of correct type.
      */
-    public static void validateRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
+    public static void appendErrorRequiredStringField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
         if (!jsonNode.has(fieldName)) {
             StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {

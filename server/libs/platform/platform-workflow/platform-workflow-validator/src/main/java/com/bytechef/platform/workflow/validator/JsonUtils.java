@@ -30,15 +30,6 @@ class JsonUtils {
     private JsonUtils() {
     }
 
-    public static String cleanupJsonSyntax(String json) {
-        return json
-            .replaceAll(",\\s*,", ",")
-            .replaceAll(",\\s*}", "}")
-            .replaceAll(",\\s*]", "]")
-            .replaceAll("\\{\\s*,", "{")
-            .replaceAll("\\[\\s*,", "[");
-    }
-
     /**
      * Gets the type of JsonNode as a lowercase string. Centralized implementation to replace duplicated getJsonNodeType
      * methods.
@@ -86,7 +77,7 @@ class JsonUtils {
     /**
      * Validates that a JsonNode is an object.
      */
-    public static boolean validateNodeIsObject(@Nullable JsonNode jsonNode, String nodeType, StringBuilder errors) {
+    public static boolean appendErrorNodeIsObject(@Nullable JsonNode jsonNode, String nodeType, StringBuilder errors) {
         if (jsonNode == null) {
             return false;
         }
