@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from '@storybook/react';
+import {Decorator, Meta, StoryObj} from '@storybook/react-vite';
 import {CircleIcon, Download, PlusIcon, Save, SaveIcon, Settings, Trash2, XIcon} from 'lucide-react';
 
 import Button from './Button';
@@ -122,8 +122,8 @@ const meta = {
         },
     },
     decorators: [
-        (Story, context) => {
-            const {variant} = context.args;
+        ((Story, context) => {
+            const {variant} = (context.args ?? {}) as {variant?: string};
 
             const isDestructiveOutlineVariant = variant === 'destructiveOutline';
 
@@ -134,7 +134,7 @@ const meta = {
             ) : (
                 <Story />
             );
-        },
+        }) as Decorator,
     ],
     tags: ['autodocs'],
 } satisfies Meta<typeof Button>;
@@ -159,7 +159,7 @@ export const DefaultButton: Story = {
             },
         },
     },
-    render: (args) => <Button {...args} />,
+    render: (args: React.ComponentProps<typeof Button>) => <Button {...args} />,
 };
 
 export const TextButtonSizeVariants: Story = {
