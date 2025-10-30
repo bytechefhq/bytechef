@@ -5,8 +5,7 @@ import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance
 import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {useEffect} from 'react';
-import {Control, UseFormSetValue} from 'react-hook-form';
-import {FormState} from 'react-hook-form/dist/types/form';
+import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 

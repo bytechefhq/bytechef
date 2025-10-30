@@ -1,8 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {ChangeEvent, useRef, useState} from 'react';
-import {FieldValues} from 'react-hook-form';
-import {FieldPath} from 'react-hook-form/dist/types';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 
 const OpenApiSpecificationField = <T extends FieldValues, K extends FieldPath<T>>({
     field,

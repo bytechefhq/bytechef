@@ -4,8 +4,7 @@ import {twMerge} from 'tailwind-merge';
 import './CreatableSelect.css';
 
 import {TriangleAlertIcon} from 'lucide-react';
-import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 import {GroupBase} from 'react-select';
 
 export type SelectOptionType = {
