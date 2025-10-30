@@ -690,8 +690,13 @@ const ConnectionDialog = ({
                         <div className="px-6 pt-4">
                             <ConnectionParameters
                                 authorizationParameters={connection.authorizationParameters}
+                                authorizationType={connection.authorizationType}
+                                baseUri={connection.baseUri}
                                 connectionDefinition={connectionDefinition}
                                 connectionParameters={connection.connectionParameters}
+                                customAction={componentDefinition?.actions?.some(
+                                    (action) => action.name === 'customAction'
+                                )}
                             />
                         </div>
                     )}
