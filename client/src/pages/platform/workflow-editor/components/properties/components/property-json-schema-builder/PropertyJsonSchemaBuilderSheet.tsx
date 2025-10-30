@@ -3,7 +3,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
 import {Suspense, lazy} from 'react';

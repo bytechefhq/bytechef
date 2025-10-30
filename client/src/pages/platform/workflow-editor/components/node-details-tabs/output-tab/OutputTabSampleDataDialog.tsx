@@ -8,9 +8,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import {MonacoEditorLoader, StandaloneCodeEditorType} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {Suspense, lazy, useEffect, useState} from 'react';
+
+import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 

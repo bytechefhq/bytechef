@@ -15,7 +15,7 @@ import {Input} from '@/components/ui/input';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
-import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, Suspense, lazy, useState} from 'react';
 import {useForm} from 'react-hook-form';
