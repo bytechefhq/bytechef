@@ -1,6 +1,7 @@
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {PostHog} from 'posthog-js';
 import {ReactNode, Suspense, lazy, useEffect, useState} from 'react';
+
+import type {PostHog} from 'posthog-js';
 
 const PostHogProvider = lazy(() => import('posthog-js/react').then((module) => ({default: module.PostHogProvider})));
 
@@ -30,6 +31,11 @@ export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProvide
             });
         }
     }, [posthog, analytics.postHog.apiKey, analytics.postHog.host]);
+
+    // In tests, disable PostHog entirely to avoid loading the SDK in JSDOM
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+        return <PostHogFallback>{children}</PostHogFallback>;
+    }
 
     if (!analytics.enabled || !analytics.postHog.apiKey || !analytics.postHog.host) {
         return <PostHogFallback>{children}</PostHogFallback>;
