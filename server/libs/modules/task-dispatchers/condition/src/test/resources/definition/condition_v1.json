@@ -549,7 +549,7 @@
       "name": null,
       "options": null,
       "placeholder": "Add AND Condition",
-      "required": null,
+      "required": true,
       "type": "ARRAY"
     } ],
     "label": "OR Conditions",
@@ -580,7 +580,7 @@
     "optionsLoadedDynamically": null,
     "placeholder": "Write expression, e.g. =1 + 1 == 2",
     "regex": null,
-    "required": null,
+    "required": true,
     "type": "STRING"
   } ],
   "resources": null,
