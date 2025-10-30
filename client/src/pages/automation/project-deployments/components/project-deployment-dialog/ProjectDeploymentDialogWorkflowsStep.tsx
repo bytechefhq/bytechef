@@ -1,7 +1,6 @@
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
-import {Control, UseFormSetValue} from 'react-hook-form';
-import {FormState} from 'react-hook-form/dist/types/form';
+import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 
 export interface ProjectDeploymentDialogWorkflowsStepProps {
     control: Control<ProjectDeployment>;

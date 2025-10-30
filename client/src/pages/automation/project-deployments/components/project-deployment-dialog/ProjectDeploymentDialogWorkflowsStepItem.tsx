@@ -4,8 +4,7 @@ import ProjectDeploymentDialogWorkflowsStepItemConnections from '@/pages/automat
 import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {ComponentConnection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
-import {Control, UseFormSetValue} from 'react-hook-form';
-import {FormState} from 'react-hook-form/dist/types/form';
+import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 

@@ -4,8 +4,7 @@ import Properties from '@/pages/platform/workflow-editor/components/properties/P
 import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useGetOAuth2PropertiesQuery} from '@/shared/queries/platform/oauth2.queries';
 import {Dispatch, SetStateAction} from 'react';
-import {Control} from 'react-hook-form';
-import {FormState} from 'react-hook-form/dist/types/form';
+import {Control, FormState} from 'react-hook-form';
 
 const IntegrationInstanceConfigurationDialogOauth2Step = ({
     componentName,

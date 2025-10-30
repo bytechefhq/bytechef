@@ -2,8 +2,7 @@ import Properties from '@/pages/platform/workflow-editor/components/properties/P
 import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {ControlType, PropertyType} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
-import {FieldValues} from 'react-hook-form/dist/types';
-import {Control, FormState} from 'react-hook-form/dist/types/form';
+import {Control, FieldValues, FormState} from 'react-hook-form';
 
 export interface ProjectDeploymentDialogWorkflowsStepItemConfigurationProps {
     control: Control<ProjectDeployment>;

@@ -1,7 +1,7 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ControllerRenderProps} from 'react-hook-form';
 
 const IntegrationInstanceConfigurationDialogBasicStepTagsSelect = ({
     field,

@@ -1,9 +1,7 @@
 import {Avatar, AvatarImage} from '@/components/ui/avatar';
 import {Button} from '@/components/ui/button';
 import {ChangeEvent, useRef, useState} from 'react';
-import {FieldValues} from 'react-hook-form';
-import {FieldPath} from 'react-hook-form/dist/types';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 
 const IconField = <T extends FieldValues, K extends FieldPath<T>>({field}: {field: ControllerRenderProps<T, K>}) => {
     const hiddenInputRef = useRef<HTMLInputElement>(null);

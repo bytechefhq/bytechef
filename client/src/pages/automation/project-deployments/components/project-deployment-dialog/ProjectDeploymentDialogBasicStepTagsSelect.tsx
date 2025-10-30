@@ -1,7 +1,7 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ControllerRenderProps} from 'react-hook-form';
 
 const ProjectDeploymentDialogBasicStepTagsSelect = ({
     field,
