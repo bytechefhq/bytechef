@@ -200,10 +200,6 @@ function App() {
     useFetchInterceptor();
 
     useEffect(() => {
-        analytics.init();
-    }, [analytics]);
-
-    useEffect(() => {
         if (account) {
             helpHub.boot(account);
             helpHub.addRouter();
