@@ -48,7 +48,7 @@ class TaskValidator {
 
             List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
 
-            processNestedTaskValidation(taskJsonNode, context);
+            processTaskDispatcher(taskJsonNode, context);
             validateDataPills(taskJsonNode, taskDefinition, context);
         }
     }
@@ -66,15 +66,15 @@ class TaskValidator {
             return;
         }
 
-        if (!JsonUtils.validateNodeIsObject(taskJsonNode, "Task", errors)) {
+        if (!JsonUtils.appendErrorNodeIsObject(taskJsonNode, "Task", errors)) {
             return;
         }
 
         // Validate required task fields
-        FieldValidator.validateRequiredStringField(taskJsonNode, "label", errors);
-        FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
-        validateTaskTypeField(taskJsonNode, errors);
-        validateRequiredObjectField(taskJsonNode, errors);
+        FieldValidator.appendErrorRequiredStringField(taskJsonNode, "label", errors);
+        FieldValidator.appendErrorRequiredStringField(taskJsonNode, "name", errors);
+        appendErrorTaskTypeField(taskJsonNode, errors);
+        appendErrorRequiredObjectField(taskJsonNode, errors);
     }
 
     /**
@@ -89,8 +89,7 @@ class TaskValidator {
                 String actualType = JsonUtils.getJsonNodeType(taskJsonNode);
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
-            }
-            else {
+            } else {
                 validateTaskStructure(taskJsonNode.toString(), errors);
 
                 // If task has parameters, validate them recursively if we have the task type
@@ -122,7 +121,7 @@ class TaskValidator {
 
         JsonNode taskParametersJsonNode = JsonUtils.parseJsonWithErrorHandling(taskParameters, errors);
 
-        if (!JsonUtils.validateNodeIsObject(taskParametersJsonNode, "Current task parameters", errors)) {
+        if (!JsonUtils.appendErrorNodeIsObject(taskParametersJsonNode, "Current task parameters", errors)) {
             return;
         }
 
@@ -174,7 +173,7 @@ class TaskValidator {
     /**
      * Strategy to determine if a task type supports nested tasks.
      */
-    private static boolean isLoopTaskType(String taskType) {
+    private static boolean isTaskDispatcher(String taskType) {
         return taskType.matches("^\\w+/\\w+$");
     }
 
@@ -201,7 +200,7 @@ class TaskValidator {
         validateTaskStructure(nestedTask, context);
         validateNestedTaskParameters(nestedTask, context);
         validateNestedTaskDataPills(nestedTask, context);
-        processNestedTaskValidation(nestedTask, context);
+        processTaskDispatcher(nestedTask, context);
     }
 
     /**
@@ -220,7 +219,7 @@ class TaskValidator {
     /**
      * Main entry point for nested task processing. Uses the strategy pattern to handle different nested task scenarios.
      */
-    private static void processNestedTaskValidation(JsonNode task, ValidationContext context) {
+    private static void processTaskDispatcher(JsonNode task, ValidationContext context) {
         if (!task.has("parameters")) {
             return;
         }
@@ -230,7 +229,7 @@ class TaskValidator {
         String taskType = task.get("type")
             .asText();
 
-        if (!isLoopTaskType(taskType)) {
+        if (!isTaskDispatcher(taskType)) {
             return;
         }
 
@@ -269,9 +268,7 @@ class TaskValidator {
         JsonNode task, @Nullable List<PropertyInfo> taskDefinition, ValidationContext context) {
 
         if (taskDefinition != null && !taskDefinition.isEmpty()) {
-            DataPillValidator.validateTaskDataPills(
-                task, context.getTaskOutputs(), context.getTaskNames(), context.getTaskNameToTypeMap(),
-                context.getErrors(), context.getWarnings(), context.getAllTasksMap(), taskDefinition, false);
+            DataPillValidator.validateTaskDataPills(task, context, taskDefinition, false);
         }
     }
 
@@ -320,15 +317,14 @@ class TaskValidator {
         List<PropertyInfo> nestedTaskDefinition = taskDefinitionsMap.get(type);
 
         DataPillValidator.validateTaskDataPills(
-            nestedTaskJsonNode, context.getTaskOutputs(), context.getTaskNames(), context.getTaskNameToTypeMap(),
-            context.getErrors(), context.getWarnings(), context.getAllTasksMap(), nestedTaskDefinition, true);
+            nestedTaskJsonNode, context, nestedTaskDefinition, true);
     }
 
     /**
      * Validates that a required object field exists and is of correct type.
      */
     private static void
-        validateRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
+        appendErrorRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
         if (!jsonNode.has("parameters")) {
             StringUtils.appendWithNewline("Missing required field: " + "parameters", errors);
         } else {
@@ -368,7 +364,7 @@ class TaskValidator {
     /**
      * Validates task type field against required pattern.
      */
-    private static void validateTaskTypeField(JsonNode taskJsonNode, StringBuilder errors) {
+    private static void appendErrorTaskTypeField(JsonNode taskJsonNode, StringBuilder errors) {
         if (!taskJsonNode.has("type")) {
             StringUtils.appendWithNewline("Missing required field: type", errors);
         } else {

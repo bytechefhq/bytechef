@@ -169,15 +169,15 @@ public class WorkflowValidator {
             return;
         }
 
-        if (!JsonUtils.validateNodeIsObject(workflowNodeJsonNode, "Workflow", errors)) {
+        if (!JsonUtils.appendErrorNodeIsObject(workflowNodeJsonNode, "Workflow", errors)) {
             return;
         }
 
         // Validate required workflow fields
-        FieldValidator.validateRequiredStringField(workflowNodeJsonNode, "label", errors);
-        FieldValidator.validateRequiredStringField(workflowNodeJsonNode, "description", errors);
+        FieldValidator.appendErrorRequiredStringField(workflowNodeJsonNode, "label", errors);
+        FieldValidator.appendErrorRequiredStringField(workflowNodeJsonNode, "description", errors);
         validateWorkflowTriggerFields(workflowNodeJsonNode, errors);
-        validateRequiredArrayField(workflowNodeJsonNode, "tasks", errors);
+        validateRequiredArrayField(workflowNodeJsonNode, errors);
 
     }
 
@@ -453,14 +453,14 @@ public class WorkflowValidator {
     /**
      * Validates that a required array field exists and is of the correct type.
      */
-    private static void validateRequiredArrayField(JsonNode jsonNode, String fieldName, StringBuilder errors) {
-        if (!jsonNode.has(fieldName)) {
-            StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
+    private static void validateRequiredArrayField(JsonNode jsonNode, StringBuilder errors) {
+        if (!jsonNode.has("tasks")) {
+            StringUtils.appendWithNewline("Missing required field: " + "tasks", errors);
         } else {
-            JsonNode fieldJsonNode = jsonNode.get(fieldName);
+            JsonNode fieldJsonNode = jsonNode.get("tasks");
 
             if (!fieldJsonNode.isArray()) {
-                StringUtils.appendWithNewline("Field '" + fieldName + "' must be an array", errors);
+                StringUtils.appendWithNewline("Field '" + "tasks" + "' must be an array", errors);
             }
         }
     }

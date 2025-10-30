@@ -44,9 +44,8 @@ class DataPillValidator {
      * for type checking, and optional task order validation skipping.
      */
     public static void validateTaskDataPills(
-        JsonNode taskJsonNode, Map<String, PropertyInfo> taskOutputMap, List<String> taskNames,
-        Map<String, String> taskNameToTypeMap, StringBuilder errors, StringBuilder warnings,
-        Map<String, JsonNode> allTaskMap, List<PropertyInfo> taskDefinition, boolean skipTaskOrderValidation) {
+        JsonNode taskJsonNode, ValidationContext context, List<PropertyInfo> taskDefinition,
+        boolean skipTaskOrderValidation) {
 
         JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
@@ -58,13 +57,14 @@ class DataPillValidator {
 
         String name = nameJsonNode.asText();
 
-        TaskValidationContext context = new TaskValidationContext();
+        TaskValidationContext taskContext = new TaskValidationContext();
 
-        context.skipTaskOrderValidation = skipTaskOrderValidation;
+        taskContext.skipTaskOrderValidation = skipTaskOrderValidation;
 
         findDataPillsInNode(
-            parametersJsonNode, "", name, taskOutputMap, taskNames, taskNameToTypeMap, errors, warnings, context,
-            allTaskMap, taskDefinition);
+            parametersJsonNode, "", name, context.getTaskOutputs(), context.getTaskNames(),
+            context.getTaskNameToTypeMap(), context.getErrors(), context.getWarnings(), taskContext,
+            context.getAllTasksMap(), taskDefinition);
 
     }
 
