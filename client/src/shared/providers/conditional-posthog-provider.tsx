@@ -21,6 +21,16 @@ export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProvide
         }
     }, [analytics.enabled, analytics.postHog.apiKey, analytics.postHog.host]);
 
+    useEffect(() => {
+        if (posthog && analytics.postHog.apiKey && analytics.postHog.host) {
+            posthog.init(analytics.postHog.apiKey, {
+                api_host: analytics.postHog.host,
+                capture_pageview: false,
+                person_profiles: 'identified_only',
+            });
+        }
+    }, [posthog, analytics.postHog.apiKey, analytics.postHog.host]);
+
     if (!analytics.enabled || !analytics.postHog.apiKey || !analytics.postHog.host) {
         return <PostHogFallback>{children}</PostHogFallback>;
     }

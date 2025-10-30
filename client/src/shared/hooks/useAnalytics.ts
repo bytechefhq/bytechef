@@ -22,16 +22,14 @@ export interface AnalyticsI {
     captureProjectWorkflowTested(): void;
     captureUserSignedUp(email: string): void;
     identify(account: UserI): void;
-    init(): void;
     reset(): void;
 }
 
 export const useAnalytics = (): AnalyticsI => {
-    const initRef = useRef(false);
     const identifyRef = useRef(false);
     const posthogRef = useRef<PostHog | null>(null);
 
-    const {analytics, application} = useApplicationInfoStore(
+    const {application} = useApplicationInfoStore(
         useShallow((state) => ({
             analytics: state.analytics,
             application: state.application,
@@ -97,25 +95,6 @@ export const useAnalytics = (): AnalyticsI => {
                     email: account.email,
                     name: `${account.firstName} ${account.lastName}`,
                 });
-            }
-        },
-        init: async () => {
-            if (initRef.current) {
-                return;
-            }
-
-            if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
-                const posthog = await getPostHog();
-
-                if (posthog) {
-                    posthog.init(analytics.postHog.apiKey, {
-                        api_host: analytics.postHog.host,
-                        capture_pageview: false,
-                        person_profiles: 'identified_only',
-                    });
-
-                    initRef.current = true;
-                }
             }
         },
         reset: async () => {
