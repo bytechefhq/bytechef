@@ -14,11 +14,17 @@ const customRender = (ui: ReactElement, options = {}) =>
     });
 
 export const windowResizeObserver = () => {
-    window.ResizeObserver = vi.fn(() => ({
-        disconnect: vi.fn(),
-        observe: vi.fn(),
-        unobserve: vi.fn(),
-    }));
+    class MockResizeObserver {
+        disconnect() {}
+        /* eslint-disable @typescript-eslint/no-unused-vars */
+        observe(_target?: Element, _options?: ResizeObserverOptions) {}
+        /* eslint-disable @typescript-eslint/no-unused-vars */
+        unobserve(_target?: Element) {}
+    }
+
+    // Assign as constructor-compatible classes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 };
 
 export const resetAll = () => {
