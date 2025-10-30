@@ -685,6 +685,24 @@ class WorkflowValidatorTest {
     }
 
     @Test
+    void validateTaskStructureDifferentOrderNoErrors() {
+        String validTask = """
+            {
+                "parameters": {},
+                "name": "testTask",
+                "type": "component/v1/action",
+                "label": "Test Task"
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+
+        TaskValidator.validateTaskStructure(validTask, errors);
+
+        assertEquals("", errors.toString());
+    }
+
+    @Test
     void validateTaskStructureValidTypePatternsNoErrors() {
         String[] validTypes = {
             "component/v1",
@@ -763,6 +781,30 @@ class WorkflowValidatorTest {
                 "name": "John",
                 "age": 30,
                 "active": true
+            }
+            """;
+
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("name", "STRING", null, true, true, null, null),
+            new PropertyInfo("age", "NUMBER", null, false, true, null, null),
+            new PropertyInfo("active", "BOOLEAN", null, false, true, null, null));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateTaskParametersDifferentOrderNoErrors() {
+        String taskParameters = """
+            {
+                "active": true,
+                "age": 30,
+                "name": "John"
             }
             """;
 
@@ -2446,6 +2488,31 @@ class WorkflowValidatorTest {
                     }
                 ],
                 "tasks": []
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+
+        WorkflowValidator.validateWorkflowStructure(validWorkflow, errors);
+
+        assertEquals("", errors.toString());
+    }
+
+    @Test
+    void validateWorkflowStructureDifferentOrderNoErrors() {
+        String validWorkflow = """
+            {
+                "tasks": [],
+                "description": "workflowDescription",
+                "label": "workflowName",
+                "triggers": [
+                    {
+                        "type": "manual/v1/manual",
+                        "name": "trigger_1",
+                        "label": "Manual"
+                    }
+                ],
+                "inputs": []
             }
             """;
 
