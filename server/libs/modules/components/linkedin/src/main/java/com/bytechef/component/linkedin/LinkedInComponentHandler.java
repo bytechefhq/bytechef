@@ -36,7 +36,9 @@ public final class LinkedInComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("linkedin")
         .title("LinkedIn")
-        .description(".")
+        .description(
+            "LinkedIn is a professional networking platform that enables users to connect with colleagues, discover " +
+                "job opportunities, and share industry-related content.")
         .customAction(true)
         .icon("path:assets/linkedin.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.SOCIAL_MEDIA)
