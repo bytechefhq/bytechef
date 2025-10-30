@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.linkedin.action.LinkedInCreatePostAction;
 import com.bytechef.component.linkedin.action.LinkedInDeletePostAction;
 import com.bytechef.component.linkedin.connection.LinkedInConnection;
+import com.bytechef.component.linkedin.trigger.LinkedInNewPostTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -43,6 +44,7 @@ public final class LinkedInComponentHandler implements ComponentHandler {
         .actions(
             LinkedInCreatePostAction.ACTION_DEFINITION,
             LinkedInDeletePostAction.ACTION_DEFINITION)
+        .triggers(LinkedInNewPostTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(LinkedInCreatePostAction.ACTION_DEFINITION),
             tool(LinkedInDeletePostAction.ACTION_DEFINITION));
