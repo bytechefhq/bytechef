@@ -144,10 +144,17 @@ const Projects = () => {
                                             project={undefined}
                                             triggerNode={
                                                 <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                                                    <PlusIcon className="mr-2 size-4" /> Create New Project
+                                                    <PlusIcon className="mr-2 size-4" /> From Scratch
                                                 </DropdownMenuItem>
                                             }
                                         />
+
+                                        {ff_1041 && (
+                                            <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                                <LayoutTemplateIcon className="mr-2 size-4" />
+                                                From Template
+                                            </DropdownMenuItem>
+                                        )}
 
                                         <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                                             <UploadIcon className="mr-2 size-4" /> Import Project

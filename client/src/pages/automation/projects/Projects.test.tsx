@@ -107,7 +107,7 @@ describe('Projects Import Functionality', () => {
         await userEvent.click(createButton);
 
         await waitFor(() => {
-            expect(screen.getByText('Create New Project')).toBeInTheDocument();
+            expect(screen.getByText('From Scratch')).toBeInTheDocument();
             expect(screen.getByText('Import Project')).toBeInTheDocument();
         });
     });
