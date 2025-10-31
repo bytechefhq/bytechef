@@ -23,6 +23,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TIMEOUT;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE_OPTIONS;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -35,15 +36,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
-import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Optional;
 
 /**
@@ -67,47 +67,58 @@ public class DataStorageAwaitGetValueAction {
             string(TYPE)
                 .label("Type")
                 .description("The value type.")
-                .options(DataStorageConstants.TYPE_OPTIONS),
+                .options(TYPE_OPTIONS)
+                .required(true),
             array(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.ARRAY)),
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
+                .required(false),
             bool(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN)),
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
+                .required(false),
             date(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.DATE)),
+                .displayCondition("type == '%s'".formatted(ValueType.DATE))
+                .required(false),
             dateTime(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME)),
+                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME))
+                .required(false),
             integer(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.INTEGER)),
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
+                .required(false),
             nullable(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.NULL)),
+                .displayCondition("type == '%s'".formatted(ValueType.NULL))
+                .required(false),
             number(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.NUMBER)),
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
+                .required(false),
             object(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.OBJECT)),
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
+                .required(false),
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.STRING)),
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
+                .required(false),
             time(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.TIME)),
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
+                .required(false),
             integer(TIMEOUT)
                 .label("Timeout")
                 .description(
@@ -119,17 +130,16 @@ public class DataStorageAwaitGetValueAction {
         .output(DataStorageAwaitGetValueAction::output)
         .perform(DataStorageAwaitGetValueAction::perform);
 
-    protected static BaseOutputDefinition.OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Property.ValueProperty<?> property = DataStorageUtils.getValueProperty(
+        ValueProperty<?> property = DataStorageUtils.getValueProperty(
             inputParameters.getRequired(TYPE, ValueType.class));
 
-        return BaseOutputDefinition.OutputResponse.of(property, null);
+        return OutputResponse.of(property, null);
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws InterruptedException {
 
         Class<?> type = DataStorageUtils.getType(inputParameters);
