@@ -38,10 +38,11 @@ public class DataStorageConstants {
     public static final String VALUE_TO_ADD = "valueToAdd";
 
     public static final List<Option<String>> SCOPE_OPTIONS = List.of(
-        option("Current Execution", "CURRENT_EXECUTION"),
-        option("Workflow", "WORKFLOW"),
-        option("Deployment", "PRINCIPAL"),
-        option("Account", "ACCOUNT"));
+        option("Current Execution", "CURRENT_EXECUTION", "The value is accessible only within the current execution."),
+        option("Workflow", "WORKFLOW", "The value is shared across all executions of the same workflow."),
+        option("Deployment", "PRINCIPAL", "The value is shared across all workflows within the same deployment."),
+        option("Account", "ACCOUNT",
+            "The value is shared across all deployments and workflows under the same account."));
 
     public static final List<Option<String>> TYPE_OPTIONS = List.of(
         option("Array", ValueType.ARRAY.name()),
