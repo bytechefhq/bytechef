@@ -25,19 +25,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -129,7 +129,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": true,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -447,19 +447,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -486,7 +486,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": true,
       "type": "INTEGER"
     } ],
     "title": "Atomic Increment",
@@ -544,19 +544,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -626,7 +626,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": true,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -647,7 +647,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "advancedOption": null,
@@ -671,7 +671,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": null,
@@ -688,7 +688,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "DATE"
     }, {
       "advancedOption": null,
@@ -705,7 +705,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "DATE_TIME"
     }, {
       "advancedOption": null,
@@ -724,7 +724,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": null,
@@ -739,7 +739,7 @@
       "metadata": { },
       "name": "defaultValue",
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NULL"
     }, {
       "advancedOption": null,
@@ -761,7 +761,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "additionalProperties": null,
@@ -781,7 +781,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "advancedOption": null,
@@ -803,7 +803,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -820,7 +820,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "TIME"
     }, {
       "advancedOption": null,
@@ -892,19 +892,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -965,19 +965,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -1040,19 +1040,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -1118,19 +1118,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -1447,19 +1447,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -1529,7 +1529,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": true,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1776,19 +1776,19 @@
       "minLength": null,
       "name": "scope",
       "options": [ {
-        "description": null,
+        "description": "The value is accessible only within the current execution.",
         "label": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
-        "description": null,
+        "description": "The value is shared across all executions of the same workflow.",
         "label": "Workflow",
         "value": "WORKFLOW"
       }, {
-        "description": null,
+        "description": "The value is shared across all workflows within the same deployment.",
         "label": "Deployment",
         "value": "PRINCIPAL"
       }, {
-        "description": null,
+        "description": "The value is shared across all deployments and workflows under the same account.",
         "label": "Account",
         "value": "ACCOUNT"
       } ],
@@ -1877,7 +1877,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": true,
       "type": "STRING"
     }, {
       "advancedOption": null,
