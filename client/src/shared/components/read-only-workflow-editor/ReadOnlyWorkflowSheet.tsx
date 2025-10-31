@@ -1,8 +1,10 @@
 import PageLoader from '@/components/PageLoader';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {ReactFlowProvider} from '@xyflow/react';
+import {Suspense, lazy} from 'react';
+
+const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
 
 import useReadOnlyWorkflow from './hooks/useReadOnlyWorkflow';
 
@@ -40,12 +42,14 @@ const ReadOnlyWorkflowSheet = () => {
                         loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
                     >
                         {componentDefinitions && taskDispatcherDefinitions && workflow && (
-                            <WorkflowEditor
-                                componentDefinitions={componentDefinitions}
-                                invalidateWorkflowQueries={() => {}}
-                                readOnlyWorkflow={workflow}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            />
+                            <Suspense>
+                                <WorkflowEditor
+                                    componentDefinitions={componentDefinitions}
+                                    invalidateWorkflowQueries={() => {}}
+                                    readOnlyWorkflow={workflow}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                />
+                            </Suspense>
                         )}
                     </PageLoader>
                 </ReactFlowProvider>
