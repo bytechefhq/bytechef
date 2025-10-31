@@ -2,7 +2,6 @@ import PageLoader from '@/components/PageLoader';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowEditor from '@/pages/platform/workflow-editor/components/WorkflowEditor';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
@@ -54,10 +53,8 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                 <SheetTitle>
                     <span>
-                        {project?.name}/{workflow?.label}/
+                        {project?.name} / {workflow?.label}
                     </span>
-
-                    <EnvironmentBadge environmentId={projectDeployment.environmentId!} />
                 </SheetTitle>
 
                 <SheetCloseButton />
