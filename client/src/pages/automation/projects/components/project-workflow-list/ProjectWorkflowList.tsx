@@ -3,6 +3,7 @@ import EmptyList from '@/components/EmptyList';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {useToast} from '@/hooks/use-toast';
+import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -17,7 +18,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {LayoutTemplateIcon, PlusIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
-import {ChangeEvent, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const ProjectWorkflowList = ({project}: {project: Project}) => {
@@ -78,24 +79,6 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
             });
         },
     });
-
-    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const file = event.target.files[0];
-
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            const definition = await (typeof (file as any).text === 'function'
-                ? (file as Blob).text()
-                : new Response(file).text());
-
-            importProjectWorkflowMutation.mutate({
-                id: project.id!,
-                workflow: {
-                    definition,
-                },
-            });
-        }
-    };
 
     return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (
         <div className="space-y-3 py-2">
@@ -224,7 +207,7 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
                 accept=".json,.yaml,.yml"
                 alt="file"
                 className="hidden"
-                onChange={handleFileChange}
+                onChange={(event) => handleImportWorkflow(event, project.id!, importProjectWorkflowMutation)}
                 ref={hiddenFileInputRef}
                 type="file"
             />
