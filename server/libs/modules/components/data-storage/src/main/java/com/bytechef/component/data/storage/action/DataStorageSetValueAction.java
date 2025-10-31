@@ -68,7 +68,8 @@ public class DataStorageSetValueAction {
             string(TYPE)
                 .label("Type")
                 .description("The value type.")
-                .options(TYPE_OPTIONS),
+                .options(TYPE_OPTIONS)
+                .required(true),
             array(VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
