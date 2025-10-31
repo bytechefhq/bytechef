@@ -144,7 +144,7 @@ const PropertyCodeEditorSheet = ({
                             <ResizableHandle className="bg-muted" />
 
                             <ResizablePanel defaultSize={25}>
-                                <div className="relative size-full overflow-y-auto p-4">
+                                <div className="relative size-full overflow-y-auto p-4 text-sm">
                                     {!scriptIsRunning ? (
                                         scriptTestExecution ? (
                                             scriptTestExecution.output ? (
@@ -160,7 +160,7 @@ const PropertyCodeEditorSheet = ({
                                                     <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>
                                                 )
                                             ) : scriptTestExecution.error ? (
-                                                <div className="space-y-4 text-sm">
+                                                <div className="space-y-4">
                                                     <div className="space-y-2">
                                                         <div className="font-semibold text-destructive">Error</div>
 
