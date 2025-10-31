@@ -10,10 +10,8 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                 <SheetTitle>
                     <span>
-                        {integration?.name}/{workflow?.label}/
+                        {integration?.name} / {workflow?.label}
                     </span>
-
-                    <EnvironmentBadge environmentId={integrationInstance.environmentId!} />
                 </SheetTitle>
 
                 <SheetCloseButton />
