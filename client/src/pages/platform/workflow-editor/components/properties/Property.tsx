@@ -220,32 +220,38 @@ const Property = ({
         }))
     );
 
-    if (!path && name) {
-        path = name;
-    }
+    const memoizedPath = useMemo(() => {
+        let computedPath = path;
 
-    if (control) {
-        path = `${controlPath}.${name}`;
-    }
+        if (!computedPath && name) {
+            computedPath = name;
+        }
 
-    if (path === objectName) {
-        path = `${path}.${name}`;
-    }
+        if (control) {
+            computedPath = `${controlPath}.${name}`;
+        }
 
-    if (objectName && !path?.includes(objectName)) {
-        path = `${objectName}.${path}`;
-    }
+        if (computedPath === objectName) {
+            computedPath = `${computedPath}.${name}`;
+        }
 
-    if (path) {
-        path = decodePath(path);
-    }
+        if (objectName && !computedPath?.includes(objectName)) {
+            computedPath = `${objectName}.${computedPath}`;
+        }
+
+        if (computedPath) {
+            computedPath = decodePath(computedPath);
+        }
+
+        return computedPath;
+    }, [path, name, control, controlPath, objectName]);
 
     if (displayCondition) {
         const displayConditionIndexes: number[] = [];
         const bracketedNumberRegex = /\[(\d+)\]/g;
         let match;
 
-        while ((match = bracketedNumberRegex.exec(path!)) !== null) {
+        while ((match = bracketedNumberRegex.exec(memoizedPath!)) !== null) {
             displayConditionIndexes.push(parseInt(match[1], 10));
         }
 
@@ -259,7 +265,7 @@ const Property = ({
             !currentComponent ||
             !workflow ||
             !name ||
-            !path ||
+            !memoizedPath ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
         ) {
             return;
@@ -271,7 +277,7 @@ const Property = ({
 
         saveProperty({
             includeInMetadata: custom,
-            path,
+            path: memoizedPath,
             successCallback: () => (isSavingRef.current = false),
             type,
             updateClusterElementParameterMutation,
@@ -285,7 +291,7 @@ const Property = ({
         if (
             !currentComponent ||
             !name ||
-            !path ||
+            !memoizedPath ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
             !workflow.id
         ) {
@@ -294,7 +300,7 @@ const Property = ({
 
         saveProperty({
             includeInMetadata: custom,
-            path,
+            path: memoizedPath,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
@@ -320,7 +326,7 @@ const Property = ({
         if (
             !currentComponent ||
             !name ||
-            !path ||
+            !memoizedPath ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
             !workflow.id
         ) {
@@ -329,7 +335,7 @@ const Property = ({
 
         saveProperty({
             includeInMetadata: property.custom,
-            path,
+            path: memoizedPath,
             successCallback: () => setInputValue(JSON.stringify(value)),
             type,
             updateClusterElementParameterMutation,
@@ -434,14 +440,14 @@ const Property = ({
         if (
             !currentComponent ||
             !name ||
-            !path ||
+            !memoizedPath ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
             !workflow.id
         ) {
             return;
         }
 
-        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
+        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, memoizedPath);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -454,7 +460,7 @@ const Property = ({
         }
 
         saveProperty({
-            path,
+            path: memoizedPath,
             successCallback: () => {
                 setInputValue('');
                 setMentionInputValue('');
@@ -476,7 +482,7 @@ const Property = ({
                 !currentComponent ||
                 !workflow.id ||
                 !name ||
-                !path ||
+                !memoizedPath ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
             ) {
                 return;
@@ -519,7 +525,7 @@ const Property = ({
 
                     saveProperty({
                         includeInMetadata: custom,
-                        path,
+                        path: memoizedPath,
                         type,
                         updateClusterElementParameterMutation,
                         updateWorkflowNodeParameterMutation,
@@ -530,7 +536,7 @@ const Property = ({
                     deleteProperty(
                         custom,
                         workflow.id,
-                        path,
+                        memoizedPath,
                         deleteWorkflowNodeParameterMutation!,
                         deleteClusterElementParameterMutation
                     );
@@ -541,7 +547,7 @@ const Property = ({
 
             saveProperty({
                 includeInMetadata: custom,
-                path,
+                path: memoizedPath,
                 type,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
@@ -555,7 +561,7 @@ const Property = ({
             deleteClusterElementParameterMutation,
             deleteWorkflowNodeParameterMutation,
             mentionInputValue,
-            path,
+            memoizedPath,
             property.defaultValue,
             propertyParameterValue,
             type,
@@ -570,7 +576,7 @@ const Property = ({
             if (
                 !currentComponent ||
                 !workflow.id ||
-                !path ||
+                !memoizedPath ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
             ) {
                 return;
@@ -588,7 +594,7 @@ const Property = ({
 
             saveProperty({
                 includeInMetadata: custom,
-                path,
+                path: memoizedPath,
                 type,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
@@ -599,7 +605,7 @@ const Property = ({
         [
             currentComponent,
             custom,
-            path,
+            memoizedPath,
             propertyParameterValue,
             type,
             updateClusterElementParameterMutation,
@@ -609,10 +615,12 @@ const Property = ({
     );
 
     const memoizedWorkflowTask = useMemo(() => {
-        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
-        );
-    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+        if (!currentNode?.name || !workflow.triggers || !workflow.tasks) {
+            return null;
+        }
+
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find((node) => node.name === currentNode.name);
+    }, [currentNode?.name, workflow.triggers, workflow.tasks]);
 
     const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
         if (!currentNode?.name || !workflow.definition) {
@@ -680,15 +688,15 @@ const Property = ({
 
     // set error state
     useEffect(() => {
-        if (formState && name && path) {
+        if (formState && name && memoizedPath) {
             setHasError(
-                formState.touchedFields[path] &&
-                    formState.touchedFields[path]![name] &&
-                    formState.errors[path] &&
-                    (formState.errors[path] as never)[name]
+                formState.touchedFields[memoizedPath] &&
+                    formState.touchedFields[memoizedPath]![name] &&
+                    formState.errors[memoizedPath] &&
+                    (formState.errors[memoizedPath] as never)[name]
             );
         }
-    }, [formState, name, path]);
+    }, [formState, name, memoizedPath]);
 
     // set propertyParameterValue on initial render
     useEffect(() => {
@@ -699,14 +707,14 @@ const Property = ({
         const {parameters} = currentComponent;
 
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
-            if (!path) {
+            if (!memoizedPath) {
                 setPropertyParameterValue(parameters[name]);
 
                 return;
             }
 
             const encodedParameters = encodeParameters(parameters);
-            const encodedPath = encodePath(path);
+            const encodedPath = encodePath(memoizedPath);
 
             const paramValue = resolvePath(encodedParameters, encodedPath);
 
@@ -727,14 +735,14 @@ const Property = ({
         if (
             hidden &&
             currentComponent &&
-            path &&
+            memoizedPath &&
             objectName === undefined &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
+            resolvePath(currentComponent.parameters ?? {}, memoizedPath) !== defaultValue
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
-                    path,
+                    path: memoizedPath,
                     type,
                     updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
@@ -883,7 +891,7 @@ const Property = ({
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
-        if (!workflow.definition || !currentNode?.name || !name || !path) {
+        if (!workflow.definition || !currentNode?.name || !name || !memoizedPath) {
             return;
         }
 
@@ -891,7 +899,7 @@ const Property = ({
             (memoizedWorkflowTask?.parameters || memoizedClusterElementTask?.parameters) ?? {}
         );
 
-        const encodedPath = encodePath(path);
+        const encodedPath = encodePath(memoizedPath);
 
         setPropertyParameterValue(resolvePath(encodedParameters, encodedPath));
 
@@ -922,13 +930,13 @@ const Property = ({
             type === 'NULL' &&
             propertyParameterValue === undefined &&
             currentComponent &&
-            path &&
+            memoizedPath &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
                     includeInMetadata: custom,
-                    path,
+                    path: memoizedPath,
                     type,
                     updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
@@ -1011,7 +1019,7 @@ const Property = ({
                     isFormulaMode={isFormulaMode}
                     label={label || name}
                     leadingIcon={typeIcon}
-                    path={path}
+                    path={memoizedPath}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
@@ -1077,11 +1085,11 @@ const Property = ({
                         </div>
                     )}
 
-                    {controlType === 'ARRAY_BUILDER' && path && (
+                    {controlType === 'ARRAY_BUILDER' && memoizedPath && (
                         <ArrayProperty
                             onDeleteClick={handleDeleteCustomPropertyClick}
                             parentArrayItems={parentArrayItems}
-                            path={path}
+                            path={memoizedPath}
                             property={property}
                         />
                     )}
@@ -1092,16 +1100,16 @@ const Property = ({
                             arrayName={arrayName}
                             onDeleteClick={handleDeleteCustomPropertyClick}
                             operationName={operationName}
-                            path={path}
+                            path={memoizedPath}
                             property={property}
                         />
                     )}
 
-                    {control && (isValidControlType || isNumericalInput) && path && (
+                    {control && (isValidControlType || isNumericalInput) && memoizedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            name={path}
+                            name={memoizedPath}
                             render={({field}) => (
                                 <PropertyInput
                                     description={description}
@@ -1119,11 +1127,11 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'SELECT' && type !== 'BOOLEAN' && path && (
+                    {control && controlType === 'SELECT' && type !== 'BOOLEAN' && memoizedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            name={path}
+                            name={memoizedPath}
                             render={({field: {name, onChange}}) => (
                                 <PropertySelect
                                     description={description}
@@ -1144,11 +1152,11 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'SELECT' && type === 'BOOLEAN' && path && (
+                    {control && controlType === 'SELECT' && type === 'BOOLEAN' && memoizedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            name={path}
+                            name={memoizedPath}
                             render={({field: {name, onChange}}) => (
                                 <PropertySelect
                                     description={description}
@@ -1170,11 +1178,11 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlType === 'TEXT_AREA' && path && (
+                    {control && controlType === 'TEXT_AREA' && memoizedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            name={path}
+                            name={memoizedPath}
                             render={({field}) => (
                                 <PropertyTextArea
                                     description={description}
@@ -1204,12 +1212,12 @@ const Property = ({
                             maxLength={maxLength}
                             min={minValue}
                             minLength={minLength}
-                            name={path}
+                            name={memoizedPath}
                             onChange={handleInputChange}
                             placeholder={
                                 isNumericalInput && minValue && maxValue
                                     ? `From ${minValue} to ${maxValue}`
-                                    : placeholder || `Type a ${isNumericalInput ? 'number' : 'something'} ...`
+                                    : placeholder || `Type ${isNumericalInput ? 'a number' : 'something...'}`
                             }
                             ref={inputRef}
                             required={required}
@@ -1266,7 +1274,7 @@ const Property = ({
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
                             options={(formattedOptions as Array<Option>) || undefined || []}
                             optionsDataSource={optionsDataSource}
-                            path={path}
+                            path={memoizedPath}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             value={selectValue}
@@ -1322,7 +1330,7 @@ const Property = ({
                             onChange={(value) => handleMultiSelectChange(value)}
                             options={formattedOptions as MultiSelectOptionType[]}
                             optionsDataSource={optionsDataSource}
-                            path={path}
+                            path={memoizedPath}
                             property={property}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             value={multiSelectValue}
@@ -1345,7 +1353,7 @@ const Property = ({
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}
-                    path={path}
+                    path={memoizedPath}
                 />
             )}
 
