@@ -163,7 +163,7 @@ const ProjectsLeftSidebar = ({
                                     <DropdownMenuTrigger asChild>
                                         <TooltipTrigger asChild>
                                             <Button
-                                                aria-label="Sort by"
+                                                aria-label="New project"
                                                 className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                                 variant="outline"
                                             >
@@ -203,8 +203,12 @@ const ProjectsLeftSidebar = ({
                             <ProjectDialog
                                 project={undefined}
                                 triggerNode={
-                                    <Button>
-                                        <PlusIcon className="mr-2 size-4" />
+                                    <Button
+                                        aria-label="New project"
+                                        className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                        variant="outline"
+                                    >
+                                        <PlusIcon />
                                     </Button>
                                 }
                             />
