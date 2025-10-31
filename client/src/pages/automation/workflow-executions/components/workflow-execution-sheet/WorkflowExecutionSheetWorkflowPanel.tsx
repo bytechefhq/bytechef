@@ -9,7 +9,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 import {useEffect, useRef, useState} from 'react';
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
-    const {project, projectDeployment, workflow} = workflowExecution;
+    const {project, workflow} = workflowExecution;
     const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_WIDTH);
 
     const rootDivRef = useRef<HTMLDivElement>(null);
