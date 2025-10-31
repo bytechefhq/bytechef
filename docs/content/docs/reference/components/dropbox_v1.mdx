@@ -158,9 +158,9 @@ Name: createTextFile
 | path | Path | STRING | The path of the new paper file. Root is /. | true |
 | filename | Filename | STRING | Name of the paper file | true |
 | text | Text | STRING | The text to write into the file. | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 #### Example JSON Structure
 ```json
@@ -195,7 +195,7 @@ Type: OBJECT
 | path_display | STRING | The display-friendly version of the file's path, preserving original casing for readability. |
 | id | STRING | ID of the file within Dropbox. |
 | size | INTEGER | The size of the file in bytes, representing the total amount of data it contains. |
-| is_downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the file can be directly downloaded from Dropbox. |
+| is_downloadable | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the file can be directly downloaded from Dropbox. |
 | content_hash | STRING | A hash value representing the content of the file, used for verifying data integrity. |
 
 
@@ -499,9 +499,9 @@ Name: uploadFile
 | fileEntry | File Entry | FILE_ENTRY | The object property which contains a reference to the file to be written. | true |
 | path | Destination Path | STRING | The path to which the file should be written. | true |
 | filename | Filename | STRING | Name of the file. Needs to have the appropriate extension. | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 #### Example JSON Structure
 ```json
@@ -541,7 +541,7 @@ Type: OBJECT
 | path_display | STRING | The cased path to be used for display purposes only. |
 | id | STRING | ID of the folder. |
 | size | INTEGER | The file size in bytes. |
-| is_downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | If file can be downloaded directly. |
+| is_downloadable | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If file can be downloaded directly. |
 | content_hash | STRING | A hash of the file content. |
 
 

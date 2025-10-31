@@ -46,8 +46,8 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> claude-2.0, claude-2.1, claude-3-5-haiku-latest, claude-3-5-sonnet-latest, claude-3-7-sonnet-latest, claude-3-haiku-20240307, claude-3-opus-latest, claude-3-sonnet-20240229, claude-opus-4-0, claude-sonnet-4-0 </details> | ID of the model to use. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, ADVANCED </details> | Format of providing the prompt to the model. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>claude-3-5-haiku-latest</span>, <span>claude-3-5-sonnet-latest</span>, <span>claude-3-7-sonnet-latest</span>, <span>claude-3-haiku-20240307</span>, <span>claude-3-opus-latest</span>, <span>claude-3-sonnet-20240229</span>, <span>claude-opus-4-0</span>, <span>claude-opus-4-1</span>, <span>claude-sonnet-4-0</span>, <span>claude-sonnet-4-5</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |

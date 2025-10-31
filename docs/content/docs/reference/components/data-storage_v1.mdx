@@ -26,11 +26,11 @@ Name: appendValueToList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace for appending a value. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace for appending a value. | true |
 | key | Key | STRING | The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NULL</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | true |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under given key. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The value to set under given key. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The value to set under given key. | true |
 | value | Value | DATE | The value to set under given key. | true |
 | value | Value | DATE_TIME | The value to set under given key. | true |
 | value | Value | INTEGER | The value to set under given key. | true |
@@ -39,7 +39,7 @@ Name: appendValueToList
 | value | Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The value to set under given key. | true |
 | value | Value | STRING | The value to set under given key. | true |
 | value | Value | TIME | The value to set under given key. | true |
-| appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> true, false </details> | When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists. | false |
+| appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists. | false |
 
 #### Example JSON Structure
 ```json
@@ -74,8 +74,8 @@ Name: atomicIncrement
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to increment. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to obtain a value from. | true |
-| valueToAdd | Value to Add | INTEGER | The value that can be added to the existing numeric value, which may have a negative value. | false |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to obtain a value from. | true |
+| valueToAdd | Value to Add | INTEGER | The value that can be added to the existing numeric value, which may have a negative value. | true |
 
 #### Example JSON Structure
 ```json
@@ -114,10 +114,10 @@ Name: awaitGetValue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to wait for. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to obtain a value from. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | false |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to obtain a value from. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NULL</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | true |
 | defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | false |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | false |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | false |
@@ -161,7 +161,7 @@ Name: deleteValue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to delete, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 
 #### Example JSON Structure
 ```json
@@ -193,7 +193,7 @@ Name: deleteValueFromlist
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a list to delete value from, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | index | Index | INTEGER | The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered. | true |
 
 #### Example JSON Structure
@@ -226,7 +226,7 @@ Name: getAllEntries
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to get keys from. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to get keys from. | true |
 
 #### Example JSON Structure
 ```json
@@ -257,10 +257,10 @@ Name: getValue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to get, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | false |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NULL</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | false |
 | defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | false |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | false |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | false |
 | defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | false |
@@ -302,10 +302,10 @@ Name: setValue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | false |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NULL</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | true |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under the specified key. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The value to set under the specified key. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The value to set under the specified key. | true |
 | value | Value | DATE | The value to set under the specified key. | true |
 | value | Value | DATE_TIME | The value to set under the specified key. | true |
 | value | Value | INTEGER | The value to set under the specified key. | true |
@@ -347,11 +347,11 @@ Name: setValueInList
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> <span title="The value is accessible only within the current execution.">CURRENT_EXECUTION</span>, <span title="The value is shared across all executions of the same workflow.">WORKFLOW</span>, <span title="The value is shared across all workflows within the same deployment.">PRINCIPAL</span>, <span title="The value is shared across all deployments and workflows under the same account.">ACCOUNT</span> </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | index | Index | INTEGER | The index in a list to set a value under. The previous value will be overridden. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NULL</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | true |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under the specified list's key. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The value to set under the specified list's key. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The value to set under the specified list's key. | true |
 | value | Value | DATE | The value to set under the specified list's key. | true |
 | value | Value | DATE_TIME | The value to set under the specified list's key. | true |
 | value | Value | INTEGER | The value to set under the specified key. | true |

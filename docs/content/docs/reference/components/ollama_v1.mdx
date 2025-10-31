@@ -46,8 +46,8 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> codellama, dolphin-phi, gemma, gemma3, llama2, llama2-uncensored, llama3, llama3.1, llama3.2, llama3.2-vision, llama3.2-vision:90b, llama3.2:1b, llama3.2:3b, llava, mistral, mistral-nemo, moondream, mxbai-embed-large, neural-chat, nomic-embed-text, orca-mini, phi, phi3, qwen2.5, qwen2.5:3b, qwen2.5vl, qwen3:4b, qwen3:7b, qwq, starling-lm </details> | ID of the model to use. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, ADVANCED </details> | Format of providing the prompt to the model. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>codellama</span>, <span>dolphin-phi</span>, <span>gemma</span>, <span>gemma3</span>, <span>llama2</span>, <span>llama2-uncensored</span>, <span>llama3</span>, <span>llama3.1</span>, <span>llama3.2</span>, <span>llama3.2-vision</span>, <span>llama3.2-vision:90b</span>, <span>llama3.2:1b</span>, <span>llama3.2:3b</span>, <span>llava</span>, <span>mistral</span>, <span>mistral-nemo</span>, <span>moondream</span>, <span>mxbai-embed-large</span>, <span>neural-chat</span>, <span>nomic-embed-text</span>, <span>orca-mini</span>, <span>phi</span>, <span>phi3</span>, <span>qwen2.5</span>, <span>qwen2.5:3b</span>, <span>qwen2.5vl</span>, <span>qwen3:4b</span>, <span>qwen3:7b</span>, <span>qwq</span>, <span>starling-lm</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
@@ -62,17 +62,17 @@ Name: ask
 | presencePenalty | Presence Penalty | NUMBER | Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics. | false |
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
 | seed | Seed | INTEGER | Keeping the same seed would output the same response. | false |
-| useNuma | Use NUMA | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to use NUMA. | false |
+| useNuma | Use NUMA | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to use NUMA. | false |
 | numCtx | Num CTX | INTEGER | Sets the size of the context window used to generate the next token. | false |
 | numBatch | Num batch | INTEGER | Prompt processing maximum batch size. | false |
 | numGpu | Num GPU | INTEGER | The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable. 1 here indicates that NumGPU should be set dynamically | false |
 | mainGpu | Main GPU | INTEGER | When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results. | false |
-| lowVram | Low VRAM | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
-| f16kv | F16 KV | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
-| logitsAll | Logits all | BOOLEAN <details> <summary> Options </summary> true, false </details> | Return logits for all the tokens, not just the last one. To enable completions to return logprobs, this must be true. | false |
-| vocabOnly | Vocab only | BOOLEAN <details> <summary> Options </summary> true, false </details> | Load only the vocabulary, not the weights. | false |
-| useMmap | Use MMap | BOOLEAN <details> <summary> Options </summary> true, false </details> | By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you’re not using mlock. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all. | false |
-| useMlock | Use MLock | BOOLEAN <details> <summary> Options </summary> true, false </details> | Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM. | false |
+| lowVram | Low VRAM | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
+| f16kv | F16 KV | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
+| logitsAll | Logits all | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return logits for all the tokens, not just the last one. To enable completions to return logprobs, this must be true. | false |
+| vocabOnly | Vocab only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Load only the vocabulary, not the weights. | false |
+| useMmap | Use MMap | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you’re not using mlock. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all. | false |
+| useMlock | Use MLock | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM. | false |
 | numThread | Num thread | INTEGER | Sets the number of threads to use during computation. By default, Ollama will detect this for optimal performance. It is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores). 0 = let the runtime decide | false |
 | numKeep | Nul keep | INTEGER |  | null |
 | tfsz | Tfs Z | NUMBER | Tail-free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting. | false |
@@ -82,8 +82,8 @@ Name: ask
 | mirostat | Mirostat | INTEGER | Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0) | false |
 | mirostatTau | Mirostat Tau | NUMBER | Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text. | false |
 | mirostatEta | Mirostat Eta | NUMBER | Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive. | false |
-| penalizeNewLine | Penalize new line | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
-| truncate | Truncate | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
+| penalizeNewLine | Penalize new line | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
+| truncate | Truncate | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | null |
 
 #### Example JSON Structure
 ```json

@@ -50,12 +50,12 @@ Name: createCoupon
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | code | Code | STRING | Coupon code. | true |
 | amount | Amount | STRING | The amount of discount. Should always be numeric, even if setting a percentage. | true |
-| discount_type | Discount Type | STRING <details> <summary> Options </summary> percent, fixed_cart, fixed_product </details> | Determines the type of discount that will be applied. | true |
+| discount_type | Discount Type | STRING <details> <summary> Options </summary> <span>percent</span>, <span>fixed_cart</span>, <span>fixed_product</span> </details> | Determines the type of discount that will be applied. | true |
 | description | Description | STRING | Coupon description. | false |
 | date_expires | Date Expires | DATE_TIME | The date the coupon expires, in the site's timezone. | false |
-| individual_use | Individual Use | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the coupon can only be used individually. Other applied coupons will be removed from the cart. | false |
+| individual_use | Individual Use | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the coupon can only be used individually. Other applied coupons will be removed from the cart. | false |
 | product_ids | Product Ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon can be used on. | false |
-| exclude_sale_items | Exclude Sale Items | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, this coupon will not be applied to items that have sale prices. | false |
+| exclude_sale_items | Exclude Sale Items | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, this coupon will not be applied to items that have sale prices. | false |
 | minimum_amount | Minimum Amount | STRING | Minimum order amount that needs to be in the cart before coupon applies. | false |
 | maximum_amount | Maximum Amount | STRING | Maximum order amount allowed when using the coupon. | false |
 
@@ -103,16 +103,16 @@ Type: OBJECT
 | date_expires | STRING | The date the coupon expires, in the site's timezone. |
 | date_expires_gmt | STRING | The date the coupon expires, as GMT. |
 | usage_count | INTEGER | Number of times the coupon has been used already. |
-| individual_use | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, the coupon can only be used individually. |
+| individual_use | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the coupon can only be used individually. |
 | product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon can be used on. |
 | excluded_product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon cannot be used on. |
 | usage_limit | INTEGER | How many times the coupon can be used in total. |
 | usage_limit_per_user | INTEGER | How many times the coupon can be used per customer. |
 | limit_usage_to_x_items | INTEGER | Max number of items in the cart the coupon can be applied to. |
-| free_shipping | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true and if the free shipping method requires a coupon, this coupon will enable free shipping. |
+| free_shipping | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true and if the free shipping method requires a coupon, this coupon will enable free shipping. |
 | product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon applies to. |
 | excluded_product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon does not apply to. |
-| exclude_sale_items | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, this coupon will not be applied to items that have sale prices. |
+| exclude_sale_items | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, this coupon will not be applied to items that have sale prices. |
 | minimum_amount | STRING | Minimum order amount that needs to be in the cart before coupon applies. |
 | maximum_amount | STRING | Maximum order amount allowed when using the coupon. |
 | email_restrictions | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses that can use this coupon. |
@@ -248,7 +248,7 @@ Type: OBJECT
 | username | STRING | Customer login name. |
 | billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | List of billing address data. |
 | shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | List of shipping address data. |
-| is_paying_customer | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is the customer a paying customer? |
+| is_paying_customer | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is the customer a paying customer? |
 | avatar_url | STRING | Avatar URL. |
 | meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
 | _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
@@ -323,12 +323,12 @@ Name: createOrder
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer_id | Customer Id | STRING | User ID who owns the order. 0 for guests. | true |
 | line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(product_id), INTEGER\(quantity)&#125;] </details> | Line items data. | true |
-| status | Status | STRING <details> <summary> Options </summary> pending, processing, on-hold, completed, cancelled, refunded, failed </details> | Order status. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>pending</span>, <span>processing</span>, <span>on-hold</span>, <span>completed</span>, <span>cancelled</span>, <span>refunded</span>, <span>failed</span> </details> | Order status. | false |
 | customer_note | Customer Note | STRING | Note left by customer during checkout. | false |
 | billing | Billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | List of billing address data. | false |
 | shipping | Shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(phone)&#125; </details> | List of shipping address data. | false |
 | payment_method | Payment Method | STRING | Payment method ID. | false |
-| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> true, false </details> | Define if the order is paid. It will set the status to processing and reduce stock items. | false |
+| set_paid | Set Paid | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Define if the order is paid. It will set the status to processing and reduce stock items. | false |
 
 #### Example JSON Structure
 ```json
@@ -405,7 +405,7 @@ Type: OBJECT
 | cart_tax | STRING | Sum of line item taxes only. |
 | total | STRING | Grand total. |
 | total_tax | STRING | Sum of all taxes. |
-| prices_include_tax | BOOLEAN <details> <summary> Options </summary> true, false </details> | True the prices included tax during checkout. |
+| prices_include_tax | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True the prices included tax during checkout. |
 | customer_id | INTEGER | User ID who owns the order. 0 for guests. Default is 0. |
 | customer_ip_address | STRING | Customer's IP address. |
 | customer_user_agent | STRING | User agent of the customer. |
@@ -576,11 +576,11 @@ Name: createProduct
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Product name. | true |
 | regular_price | Regular Price | STRING | Product regular price. | true |
-| type | Type | STRING <details> <summary> Options </summary> simple, grouped, external, variable </details> | Product type. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>simple</span>, <span>grouped</span>, <span>external</span>, <span>variable</span> </details> | Product type. | false |
 | description | Description | STRING | Product description. | false |
-| manage_stock | Manage Stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | Stock management at product level. | false |
+| manage_stock | Manage Stock | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Stock management at product level. | false |
 | stock_quantity | Stock Quantity | INTEGER | Stock quantity. | false |
-| stock_status | Stock Status | STRING <details> <summary> Options </summary> instock, outofstock, onbackorder </details> | Controls the stock status of the product. | false |
+| stock_status | Stock Status | STRING <details> <summary> Options </summary> <span>instock</span>, <span>outofstock</span>, <span>onbackorder</span> </details> | Controls the stock status of the product. | false |
 | weight | Weight | STRING | Product weight (kg). | false |
 | dimensions | Dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | Product dimensions. | false |
 | categories | Categories | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of categories. | false |
@@ -638,7 +638,7 @@ Type: OBJECT
 | date_modified_gmt | STRING | The date the product was last modified, as GMT. |
 | type | STRING | Product type. |
 | status | STRING | Product status. |
-| featured | BOOLEAN <details> <summary> Options </summary> true, false </details> | Featured product. |
+| featured | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Featured product. |
 | catalog_visibility | STRING | Catalog visibility. |
 | description | STRING | Product description. |
 | short_description | STRING | Product short description. |
@@ -651,11 +651,11 @@ Type: OBJECT
 | date_on_sale_to | STRING | End date of sale price, in the site's timezone. |
 | date_on_sale_to_gmt | STRING | End date of sale price, as GMT. |
 | price_html | STRING | Price formatted in HTML. |
-| on_sale | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product is on sale. |
-| purchasable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product can be bought. |
+| on_sale | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows if the product is on sale. |
+| purchasable | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows if the product can be bought. |
 | total_sales | INTEGER | Amount of sales. |
-| virtual | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the product is virtual. Default is false. |
-| downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the product is downloadable. Default is false. |
+| virtual | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the product is virtual. Default is false. |
+| downloadable | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the product is downloadable. Default is false. |
 | downloads | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name), STRING\(file)&#125;] </details> | List of downloadable files. |
 | download_limit | INTEGER | Number of times downloadable files can be downloaded after purchase. |
 | download_expiry | INTEGER | Number of days until access to downloadable files expires. |
@@ -663,20 +663,20 @@ Type: OBJECT
 | button_text | STRING | Product external button text. Only for external products. |
 | tax_status | STRING | Tax status |
 | tax_class | STRING | Tax class. |
-| manage_stock | BOOLEAN <details> <summary> Options </summary> true, false </details> | Stock management at product level. |
+| manage_stock | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Stock management at product level. |
 | stock_quantity | INTEGER | Stock quantity. |
 | stock_status | STRING | Controls the stock status of the product. |
 | backorders | STRING | If managing stock, this controls if backorders are allowed. |
-| backorders_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if backorders are allowed. |
-| backordered | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product is on backordered. |
-| sold_individually | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow one item to be bought in a single order. |
+| backorders_allowed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows if backorders are allowed. |
+| backordered | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows if the product is on backordered. |
+| sold_individually | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow one item to be bought in a single order. |
 | weight | STRING | Product weight. |
 | dimensions | OBJECT <details> <summary> Properties </summary> &#123;STRING\(length), STRING\(width), STRING\(height)&#125; </details> | Product dimensions. |
-| shipping_required | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows if the product need to be shipped. |
-| shipping_taxable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Shows whether or not the product shipping is taxable. |
+| shipping_required | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows if the product need to be shipped. |
+| shipping_taxable | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Shows whether or not the product shipping is taxable. |
 | shipping_class | STRING | Shipping class slug. |
 | shipping_class_id | INTEGER | Shipping class ID. |
-| reviews_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow reviews. |
+| reviews_allowed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow reviews. |
 | average_rating | STRING | Reviews average rating. |
 | rating_count | INTEGER | Amount of reviews that the product have. |
 | related_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of related products IDs. |

@@ -79,7 +79,7 @@ Type: OBJECT
 | update_at | INTEGER | The time in milliseconds a post was last updated. |
 | edit_at | INTEGER | The time in milliseconds a post was last edited. |
 | delete_at | INTEGER | The time in milliseconds a post was deleted. |
-| is_pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if post is pinned to the channel it is in. |
+| is_pinned | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if post is pinned to the channel it is in. |
 | user_id | STRING | ID of the user. |
 | channel_id | STRING | ID of the channel. |
 | root_id | STRING | Post ID if post is created as a comment on another post. |
@@ -93,7 +93,7 @@ Type: OBJECT
 | reply_count | INTEGER | Number of replies to this message. |
 | last_reply_at | INTEGER | The time in milliseconds of the most recent reply. |
 | participants | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
-| is_following | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| is_following | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 | metadata | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(type), STRING\(url), &#123;&#125;\(data)&#125;]\(embeds), [&#123;STRING\(id), STRING\(creator_id), STRING\(name), INTEGER\(create_at), INTEGER\(update_at), INTEGER\(delete_at)&#125;]\(emojis), [&#123;STRING\(id), STRING\(user_id), STRING\(post_id), INTEGER\(create_at), INTEGER\(update_at), INTEGER\(delete_at), STRING\(name), STRING\(extension), INTEGER\(size), STRING\(mime_type), INTEGER\(width), INTEGER\(height), BOOLEAN\(has_preview_image)&#125;]\(files), [&#123;INTEGER\(height), INTEGER\(width)&#125;]\(images), [&#123;STRING\(user_id), STRING\(post_id), STRING\(emoji_name), INTEGER\(create_at)&#125;]\(reactions)&#125; </details> | Additional information used to display the post. |
 
 

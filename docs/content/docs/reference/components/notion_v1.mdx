@@ -81,8 +81,8 @@ Type: OBJECT
 | created_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(object), STRING\(id)&#125; </details> | The user who created the page. |
 | last_edited_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(object), STRING\(id)&#125; </details> | The user who last edited the page. |
 | parent | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(page_id)&#125; </details> | The parent of the page. |
-| archived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the page is archived. |
-| in_trash | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the page is in the trash. |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the page is archived. |
+| in_trash | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the page is in the trash. |
 | properties | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(type), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;BOOLEAN\(bold), BOOLEAN\(italic), BOOLEAN\(strikethrough), BOOLEAN\(underline), BOOLEAN\(code), STRING\(color)&#125;\(annotations), STRING\(plain_text)&#125;]\(title)&#125;\(title)&#125; </details> | The properties of the page. |
 | url | STRING | The URL of the page. |
 | request_id | STRING | The ID of the request. |
@@ -179,8 +179,8 @@ Type: OBJECT
 | url | STRING | The URL of the database. |
 | title | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;BOOLEAN\(bold), BOOLEAN\(italic), BOOLEAN\(strikethrough), BOOLEAN\(underline), BOOLEAN\(code), STRING\(color)&#125;\(annotations), STRING\(plain_text)&#125;] </details> |  |
 | parent | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(page_id)&#125; </details> | The parent of the database. |
-| archived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the database is archived. |
-| is_inline | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the database is archived. |
+| is_inline | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 | public_url | STRING | The public URL of the database. |
 
 
@@ -261,8 +261,8 @@ Type: OBJECT
 | created_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(object), STRING\(id)&#125; </details> | The user who created the page. |
 | last_edited_by | OBJECT <details> <summary> Properties </summary> &#123;STRING\(object), STRING\(id)&#125; </details> | The user who last edited the page. |
 | parent | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(page_id)&#125; </details> | The parent of the page. |
-| archived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the page is archived. |
-| in_trash | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the page is in the trash. |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the page is archived. |
+| in_trash | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the page is in the trash. |
 | properties | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(type), [&#123;STRING\(type), &#123;STRING\(content)&#125;\(text), &#123;BOOLEAN\(bold), BOOLEAN\(italic), BOOLEAN\(strikethrough), BOOLEAN\(underline), BOOLEAN\(code), STRING\(color)&#125;\(annotations), STRING\(plain_text)&#125;]\(title)&#125;\(title)&#125; </details> | The properties of the page. |
 | url | STRING | The URL of the page. |
 | request_id | STRING | The ID of the request. |

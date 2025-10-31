@@ -50,13 +50,13 @@ Name: createEvent
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendar | Calendar ID | STRING |  | true |
 | subject | Subject | STRING | The subject of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | true |
 | start | Start Date | DATE | The start date of the event. | true |
 | end | End Date | DATE | The end date of the event. | true |
 | start | Start Date Time | DATE_TIME | The start time of the event. | true |
 | end | End Date Time | DATE_TIME | The end time of the event. | true |
 | attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
-| isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is the event an online meeting? | false |
+| isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is the event an online meeting? | false |
 | reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | The number of minutes before the event start time that the reminder alert occurs. | false |
 
 #### Example JSON Structure
@@ -95,9 +95,9 @@ Type: OBJECT
 | startTime | DATE_TIME | Start time of the event. |
 | endTime | DATE_TIME | End time of the event. |
 | attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees for the event. |
-| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the event is an online meeting. |
+| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the event is an online meeting. |
 | onlineMeetingUrl | STRING | URL for an online meeting. |
-| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> | The number of minutes before the event start time that the reminder alert occurs. |
+| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The number of minutes before the event start time that the reminder alert occurs. |
 
 
 
@@ -197,9 +197,9 @@ Items Type: OBJECT
 | startTime | DATE_TIME | Start time of the event. |
 | endTime | DATE_TIME | End time of the event. |
 | attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees for the event. |
-| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the event is an online meeting. |
+| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the event is an online meeting. |
 | onlineMeetingUrl | STRING | URL for an online meeting. |
-| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> | The number of minutes before the event start time that the reminder alert occurs. |
+| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The number of minutes before the event start time that the reminder alert occurs. |
 
 
 
@@ -288,7 +288,7 @@ Name: getMail
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message Id | STRING | Id of the message. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | The format to return the message in. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
 
 #### Example JSON Structure
 ```json
@@ -354,7 +354,7 @@ Name: replyToEmail
 | id | Message ID | STRING | Id of the message to reply to. | true |
 | bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
 | ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
-| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | The type of the content. | false |
+| contentType | Content Type | STRING <details> <summary> Options </summary> <span>TEXT</span>, <span>HTML</span> </details> | The type of the content. | false |
 | content | HTML Content | STRING | Body text of the email in HTML format. | false |
 | content | Text Content | STRING | Body text of the email. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
@@ -438,12 +438,12 @@ Items Type: OBJECT
 | conversationIndex | STRING | Indicates the position of the message within the conversation. |
 | createdDateTime | STRING | The date and time the message was created. |
 | from | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125; </details> | The owner of the mailbox from which the message is sent. |
-| hasAttachments | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the message has attachments. |
+| hasAttachments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the message has attachments. |
 | id | STRING | ID of the message. |
 | importance | STRING | The importance of the message: low, normal, high. |
-| isDeliveryReceiptRequested | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether a delivery receipt is requested for the message. |
-| isDraft | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet. |
-| isReadReceiptRequested | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether a read receipt is requested for the message. |
+| isDeliveryReceiptRequested | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether a delivery receipt is requested for the message. |
+| isDraft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet. |
+| isReadReceiptRequested | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether a read receipt is requested for the message. |
 | lastModifiedDateTime | STRING | The date and time the message was last changed. |
 | parentFolderId | STRING | The unique identifier for the message's parent mailFolder. |
 | receivedDateTime | STRING | The date and time the message was received. |
@@ -586,7 +586,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, FULL </details> | The format to return the message in. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
 
 
 #### Output

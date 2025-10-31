@@ -96,7 +96,12 @@ open class FindJsonFilesTask : DefaultTask() {
                     "$type <details> <summary> Depends On </summary> $propertiesLookupDependsOn </details>"
                 }
             } else if (!options.isNullOrEmpty()) {
-                val optionsString = options?.joinToString(", ") { it.value.toString() }?.escapeHtml()
+                val optionsString = options?.joinToString(", ") {
+                    if (it.description != null)
+                        "<span title=\"${it.description}\">${it.value.toString().escapeHtml()}</span>"
+                    else
+                        "<span>${it.value.toString().escapeHtml()}</span>"
+                }
                 "$type <details> <summary> Options </summary> $optionsString </details>"
             } else if (!optionsDataSource?.optionsLookupDependsOn.isNullOrEmpty()) {
                 val optionsString = optionsDataSource?.optionsLookupDependsOn?.joinToString(", ")

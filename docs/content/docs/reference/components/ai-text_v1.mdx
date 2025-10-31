@@ -56,7 +56,18 @@ Name: classifyText
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+___Sample Output:___
+
+```sample category```
+
+
+
+Type: STRING
+
+
+
+
 
 
 
@@ -96,7 +107,18 @@ Name: sentimentAnalysis
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+___Sample Output:___
+
+```sample category```
+
+
+
+Type: STRING
+
+
+
+
 
 
 
@@ -162,7 +184,7 @@ Name: summarizeText
 | model | Model | STRING | ID of the model to use. | true |
 | model | URL | STRING | Url of the inference endpoint. | true |
 | text | Text | STRING | The text that is to be summarized. | true |
-| format | Format | STRING <details> <summary> Options </summary> STRUCTURED_SUMMARY, BRIEF_TITLE, CONCISE_SENTENCE, BULLETED_LIST, CUSTOM_PROMPT </details> | In what format do you wish the text summarized? | true |
+| format | Format | STRING <details> <summary> Options </summary> <span>STRUCTURED_SUMMARY</span>, <span>BRIEF_TITLE</span>, <span>CONCISE_SENTENCE</span>, <span>BULLETED_LIST</span>, <span>CUSTOM_PROMPT</span> </details> | In what format do you wish the text summarized? | true |
 | prompt | Custom Prompt | STRING | Write your prompt for summarizing text. | true |
 | maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
 | temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
@@ -187,7 +209,18 @@ Name: summarizeText
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+___Sample Output:___
+
+```sample summarized text```
+
+
+
+Type: STRING
+
+
+
+
 
 
 
@@ -276,7 +309,7 @@ Name: textGeneration
 
 ___Sample Output:___
 
-```Generated text.```
+```sample generated text.```
 
 
 

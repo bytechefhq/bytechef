@@ -25,7 +25,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| region | Region | STRING <details> <summary> Options </summary> zoho.eu, zoho.com, zoho.com.au, zoho.jp, zoho.in, zohocloud.ca </details> |  | true |
+| region | Region | STRING <details> <summary> Options </summary> <span>zoho.eu</span>, <span>zoho.com</span>, <span>zoho.com.au</span>, <span>zoho.jp</span>, <span>zoho.in</span>, <span>zohocloud.ca</span> </details> |  | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
 
@@ -164,7 +164,7 @@ Name: listUsers
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> AllUsers, ActiveUsers, DeactiveUsers, ConfirmedUsers, NotConfirmedUsers, DeletedUsers, ActiveConfirmedUsers, AdminUsers, ActiveConfirmedAdmins, CurrentUser </details> | What type of user to return in list. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span title="All users (both active and inactive).">AllUsers</span>, <span title="Only active users.">ActiveUsers</span>, <span title="Users who have been deactivated.">DeactiveUsers</span>, <span title="Users who have confirmed their accounts.">ConfirmedUsers</span>, <span title="Users who have not confirmed their accounts.">NotConfirmedUsers</span>, <span title="Users who have been deleted.">DeletedUsers</span>, <span title="Users who are both active and confirmed.">ActiveConfirmedUsers</span>, <span title="Retrieves users with Administrator privileges.">AdminUsers</span>, <span title="Retrieves active and confirmed administrators.">ActiveConfirmedAdmins</span>, <span title="Currently logged-in CRM user.">CurrentUser</span> </details> | What type of user to return in list. | true |
 
 #### Example JSON Structure
 ```json

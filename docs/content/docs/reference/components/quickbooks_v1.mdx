@@ -25,7 +25,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | The base URL for Quickbooks. | true |
+| base | Base | STRING <details> <summary> Options </summary> <span>https://sandbox-quickbooks.api.intuit.com</span>, <span>https://quickbooks.api.intuit.com</span> </details> | The base URL for Quickbooks. | true |
 | companyId | Company Id | STRING | To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID. | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
@@ -172,7 +172,7 @@ Name: createItem
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Name of the item. | true |
-| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | Type of item. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>INVENTORY</span>, <span>SERVICE</span>, <span>NON_INVENTORY</span> </details> | Type of item. | true |
 | account | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> type </details> |  | null |
 | expenseAccountRef | Expense Account | STRING |  | true |
 | qtyOnHand | Quantity on Hand | NUMBER | Current quantity of the inventory items available for sale. | true |

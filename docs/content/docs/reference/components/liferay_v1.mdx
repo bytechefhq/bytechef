@@ -1,0 +1,132 @@
+---
+title: "Liferay"
+description: "Liferay is an open-source digital experience platform for enterprise content management (ECM) and portal development."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: liferay/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | Value | STRING |  | true |
+| addTo | Add to | STRING <details> <summary> Options </summary> <span>HEADER</span>, <span>QUERY_PARAMETERS</span> </details> |  | true |
+
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+### Basic Auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Headless Request
+Name: headlessRequest
+
+`The Headless endpoint to use.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| application | Application | STRING |  | true |
+| endpoint | Endpoint | STRING <details> <summary> Depends On </summary> application </details> |  | true |
+| properties | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> application, endpoint </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Headless Request",
+  "name" : "headlessRequest",
+  "parameters" : {
+    "application" : "",
+    "endpoint" : "",
+    "properties" : { }
+  },
+  "type" : "liferay/v1/headlessRequest"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### JSON WS Services
+Name: jsonWsRequest
+
+`The Headless endpoint to use.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contextName | Context Name | STRING <details> <summary> Options </summary> <span>portal</span>, <span>account</span>, <span>asset</span>, <span>assetlist</span>, <span>audit</span>, <span>backgroundtask</span>, <span>batchengine</span>, <span>blogs</span>, <span>calendar</span>, <span>comment</span>, <span>commerce</span>, <span>contact</span>, <span>ct</span>, <span>ddl</span>, <span>ddm</span>, <span>depot</span>, <span>dispatch</span>, <span>fragment</span>, <span>journal</span>, <span>kaleo</span>, <span>kaleoforms</span>, <span>kb</span>, <span>layout</span>, <span>layoututilitypage</span>, <span>listtype</span>, <span>marketplace</span>, <span>mb</span>, <span>notification</span>, <span>oauthclient</span>, <span>object</span>, <span>portallanguageoverride</span>, <span>redirect</span>, <span>remoteapp</span>, <span>sap</span>, <span>savedcontententry</span>, <span>segments</span>, <span>sharing</span>, <span>sitenavigation</span>, <span>stylebook</span>, <span>sxp</span>, <span>translation</span>, <span>trash</span>, <span>wiki</span> </details> | Context name of JSON web service you want to use. | true |
+| service | Service ID | INTEGER <details> <summary> Depends On </summary> contextName </details> | ID of the service you want to access. | true |
+| parameters | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> service </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "JSON WS Services",
+  "name" : "jsonWsRequest",
+  "parameters" : {
+    "contextName" : "",
+    "service" : 1,
+    "parameters" : { }
+  },
+  "type" : "liferay/v1/jsonWsRequest"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+

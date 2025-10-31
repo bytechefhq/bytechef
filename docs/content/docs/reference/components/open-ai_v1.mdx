@@ -46,8 +46,8 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> chatgpt-4o-latest, gpt-3.5-turbo, gpt-3.5-turbo-instruct, gpt-4, gpt-4-turbo, gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-audio-preview, gpt-4o-mini, gpt-4o-mini-audio-preview, gpt-4o-mini-realtime-preview, gpt-4o-mini-search-preview, gpt-4o-realtime-preview, gpt-4o-search-preview, gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano, o1, o1-mini, o1-pro, o3, o3-mini, o4-mini </details> | ID of the model to use. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, ADVANCED </details> | Format of providing the prompt to the model. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>chatgpt-4o-latest</span>, <span>gpt-3.5-turbo</span>, <span>gpt-3.5-turbo-instruct</span>, <span>gpt-4</span>, <span>gpt-4-turbo</span>, <span>gpt-4.1</span>, <span>gpt-4.1-mini</span>, <span>gpt-4.1-nano</span>, <span>gpt-4o</span>, <span>gpt-4o-audio-preview</span>, <span>gpt-4o-mini</span>, <span>gpt-4o-mini-audio-preview</span>, <span>gpt-4o-mini-realtime-preview</span>, <span>gpt-4o-mini-search-preview</span>, <span>gpt-4o-realtime-preview</span>, <span>gpt-4o-search-preview</span>, <span>gpt-5</span>, <span>gpt-5-chat-latest</span>, <span>gpt-5-mini</span>, <span>gpt-5-nano</span>, <span>o1</span>, <span>o1-mini</span>, <span>o1-pro</span>, <span>o3</span>, <span>o3-mini</span>, <span>o4-mini</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
@@ -123,13 +123,13 @@ Name: createImage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> dall-e-2, dall-e-3 </details> | The model to use for image generation. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>dall-e-2</span>, <span>dall-e-3</span> </details> | The model to use for image generation. | true |
 | imageMessages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(content), NUMBER\(weight)&#125;] </details> | A list of messages comprising the conversation so far. | true |
-| size | Size | STRING <details> <summary> Options </summary> DALL_E_2_256x256, DALL_E_2_512x512, _1024x1024, DALL_E_3_1792x1024, DALL_E_3_1024x1792 </details> | The size of the generated images. | true |
+| size | Size | STRING <details> <summary> Options </summary> <span>DALL_E_2_256x256</span>, <span>DALL_E_2_512x512</span>, <span>_1024x1024</span>, <span>DALL_E_3_1792x1024</span>, <span>DALL_E_3_1024x1792</span> </details> | The size of the generated images. | true |
 | n | Number of Responses | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | false |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | The format in which the generated images are returned. | false |
-| quality | Quality | STRING <details> <summary> Options </summary> STANDARD, HD </details> | The quality of the image that will be generated. | false |
-| style | Style | STRING <details> <summary> Options </summary> VIVID, NATURAL </details> | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3. | false |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> <span>URL</span>, <span>B64_JSON</span> </details> | The format in which the generated images are returned. | false |
+| quality | Quality | STRING <details> <summary> Options </summary> <span>STANDARD</span>, <span>HD</span> </details> | The quality of the image that will be generated. | false |
+| style | Style | STRING <details> <summary> Options </summary> <span>VIVID</span>, <span>NATURAL</span> </details> | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3. | false |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
 #### Example JSON Structure
@@ -189,10 +189,10 @@ Name: createSpeech
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> gpt-4o-mini-tts, tts-1, tts-1-hd </details> | Text-to-Speech model which will generate the audio. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>gpt-4o-mini-tts</span>, <span>tts-1</span>, <span>tts-1-hd</span> </details> | Text-to-Speech model which will generate the audio. | true |
 | input | Input | STRING | The text to generate audio for. | true |
-| voice | Voice | STRING <details> <summary> Options </summary> ALLOY, ASH, BALLAD, CORAL, ECHO, FABLE, NOVA, ONYX, SAGE, SHIMMER, VERSE </details> | The voice to use when generating the audio. | true |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> AAC, FLAC, MP3, OPUS, PCM, WAV </details> | The format to audio in. | false |
+| voice | Voice | STRING <details> <summary> Options </summary> <span>ALLOY</span>, <span>ASH</span>, <span>BALLAD</span>, <span>CORAL</span>, <span>ECHO</span>, <span>FABLE</span>, <span>NOVA</span>, <span>ONYX</span>, <span>SAGE</span>, <span>SHIMMER</span>, <span>VERSE</span> </details> | The voice to use when generating the audio. | true |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> <span>AAC</span>, <span>FLAC</span>, <span>MP3</span>, <span>OPUS</span>, <span>PCM</span>, <span>WAV</span> </details> | The format to audio in. | false |
 | speed | Speed | NUMBER | The speed of the generated audio. | false |
 
 #### Example JSON Structure
@@ -251,10 +251,10 @@ Name: createTranscription
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | file | File Entry | FILE_ENTRY | The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm. | true |
-| model | Model | STRING <details> <summary> Options </summary> whisper-1 </details> | ID of the model to use. | true |
-| language | Language | STRING <details> <summary> Options </summary> AF, AR, HY, AZ, BE, BS, BG, CA, ZH, HR, CS, DA, NL, EL, ET, EN, FI, FR, GL, DE, HE, HI, HU, IS, ID, IT, JA, KK, KN, KO, LT, LV, MA, MK, MR, MS, NE, NO, FA, PL, PT, RO, RU, SK, SL, SR, ES, SV, SW, TA, TL, TH, TR, UK, UR, VI, CY </details> | The language of the input audio. | false |
+| model | Model | STRING <details> <summary> Options </summary> <span>whisper-1</span> </details> | ID of the model to use. | true |
+| language | Language | STRING <details> <summary> Options </summary> <span>AF</span>, <span>AR</span>, <span>HY</span>, <span>AZ</span>, <span>BE</span>, <span>BS</span>, <span>BG</span>, <span>CA</span>, <span>ZH</span>, <span>HR</span>, <span>CS</span>, <span>DA</span>, <span>NL</span>, <span>EL</span>, <span>ET</span>, <span>EN</span>, <span>FI</span>, <span>FR</span>, <span>GL</span>, <span>DE</span>, <span>HE</span>, <span>HI</span>, <span>HU</span>, <span>IS</span>, <span>ID</span>, <span>IT</span>, <span>JA</span>, <span>KK</span>, <span>KN</span>, <span>KO</span>, <span>LT</span>, <span>LV</span>, <span>MA</span>, <span>MK</span>, <span>MR</span>, <span>MS</span>, <span>NE</span>, <span>NO</span>, <span>FA</span>, <span>PL</span>, <span>PT</span>, <span>RO</span>, <span>RU</span>, <span>SK</span>, <span>SL</span>, <span>SR</span>, <span>ES</span>, <span>SV</span>, <span>SW</span>, <span>TA</span>, <span>TL</span>, <span>TH</span>, <span>TR</span>, <span>UK</span>, <span>UR</span>, <span>VI</span>, <span>CY</span> </details> | The language of the input audio. | false |
 | prompt | Prompt | STRING | An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language. | false |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> JSON, SRT, TEXT, VERBOSE_JSON, VTT </details> | The format of the transcript output | true |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> <span>JSON</span>, <span>SRT</span>, <span>TEXT</span>, <span>VERBOSE_JSON</span>, <span>VTT</span> </details> | The format of the transcript output | true |
 | temperature | Temperature | NUMBER | The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.  | false |
 
 #### Example JSON Structure

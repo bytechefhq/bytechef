@@ -48,7 +48,7 @@ Name: addContactToList
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | listid | List ID | INTEGER | The ID of the list to assign this contact to. | true |
 | email | Email | STRING | The email of the contact. | true |
-| status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The status of the contact. | true |
+| status | Status | STRING <details> <summary> Options </summary> <span>active</span>, <span>disactive</span> </details> | The status of the contact. | true |
 
 #### Example JSON Structure
 ```json
@@ -83,7 +83,7 @@ Name: updateContact
 | listid | List ID | STRING | The ID of the list with contact. | true |
 | id | Contact ID | STRING <details> <summary> Depends On </summary> listid </details> | The ID of the contact. | true |
 | email | Email | STRING | The updated email of the contact. | false |
-| status | Status | STRING <details> <summary> Options </summary> active, disactive </details> | The updated status of the contact. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>active</span>, <span>disactive</span> </details> | The updated status of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -122,10 +122,10 @@ Name: createEmailMarketingCampaign
 | from_name | From Name | STRING | The from name of the campaign. | true |
 | reply_to | Reply To | STRING | The reply to email of the campaign. | true |
 | body | Body | STRING | Message body. | true |
-| type | Type | STRING <details> <summary> Options </summary> standard, automated </details> | The type of the campaign. | false |
-| isscheduled | Is Scheduled | BOOLEAN <details> <summary> Options </summary> true, false </details> | The flag to schedule the campaign for the future. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>standard</span>, <span>automated</span> </details> | The type of the campaign. | false |
+| isscheduled | Is Scheduled | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The flag to schedule the campaign for the future. | false |
 | scheduled_datetime | Scheduled Date | DATE | The date to schedule the campaign. | false |
-| isdraft | Is Draft | BOOLEAN <details> <summary> Options </summary> true, false </details> | The flag to set the campaign to draft. | false |
+| isdraft | Is Draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The flag to set the campaign to draft. | false |
 | lists | Lists | ARRAY <details> <summary> Items </summary> [STRING] </details> | IDs of list campaign recipients. | false |
 
 #### Example JSON Structure
@@ -249,7 +249,7 @@ Name: createSocialMediaMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | message | Message | STRING | The post message to be sent. | true |
-| channel | Channel | STRING <details> <summary> Options </summary> facebook, twitter, linkedin </details> | The channel which the post will be sent to. | true |
+| channel | Channel | STRING <details> <summary> Options </summary> <span>facebook</span>, <span>twitter</span>, <span>linkedin</span> </details> | The channel which the post will be sent to. | true |
 | channel_id | Social Media Account | STRING <details> <summary> Depends On </summary> channel </details> | The social media account which will create the post. | true |
 
 #### Example JSON Structure

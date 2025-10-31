@@ -78,7 +78,7 @@ Type: OBJECT
 | ts | INTEGER |  |
 | channel | STRING |  |
 | message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(alias), STRING\(msg), []\(attachments), BOOLEAN\(parseUrls), BOOLEAN\(groupable), STRING\(ts), &#123;STRING\(_id), STRING\(username), STRING\(name)&#125;\(u), STRING\(rid), STRING\(_id), STRING\(_updateAt), []\(urls), []\(mentions), []\(channels), []\(md)&#125; </details> |  |
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 
 
 
@@ -152,7 +152,7 @@ Type: OBJECT
 | ts | INTEGER |  |
 | channel | STRING |  |
 | message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(alias), STRING\(msg), []\(attachments), BOOLEAN\(parseUrls), BOOLEAN\(groupable), STRING\(ts), &#123;STRING\(_id), STRING\(username), STRING\(name)&#125;\(u), STRING\(rid), STRING\(_id), STRING\(_updateAt), []\(urls), []\(mentions), []\(channels), []\(md)&#125; </details> |  |
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 
 
 
@@ -198,8 +198,8 @@ Name: createChannel
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Channel Name | STRING | The name of the channel. | true |
 | members | Members | ARRAY <details> <summary> Items </summary> [STRING] </details> | An array of the users to be added to the channel when it is created. | false |
-| readOnly | Read Only | BOOLEAN <details> <summary> Options </summary> true, false </details> | Set if the channel is read only or not. | false |
-| excludeSelf | Exclude Self | BOOLEAN <details> <summary> Options </summary> true, false </details> | If set to true, the user calling the endpoint is not automatically added as a member of the channel. | false |
+| readOnly | Read Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Set if the channel is read only or not. | false |
+| excludeSelf | Exclude Self | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true, the user calling the endpoint is not automatically added as a member of the channel. | false |
 
 #### Example JSON Structure
 ```json
@@ -228,7 +228,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | channel | OBJECT <details> <summary> Properties </summary> &#123;STRING\(_id), STRING\(fname), STRING\(_updateAt), &#123;&#125;\(customFields), STRING\(name), STRING\(t), INTEGER\(msgs), INTEGER\(usersCount), &#123;STRING\(_id), STRING\(username), STRING\(name)&#125;\(u), STRING\(ts), BOOLEAN\(ro), BOOLEAN\(default), BOOLEAN\(sysMes)&#125; </details> |  |
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 
 
 

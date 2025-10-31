@@ -46,7 +46,7 @@ Name: createBoard
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | board_name | Board Name | STRING | Name of the new board. | true |
-| board_kind | Board Kind | STRING <details> <summary> Options </summary> private, public, share </details> | The type of board to create. | true |
+| board_kind | Board Kind | STRING <details> <summary> Options </summary> <span>private</span>, <span>public</span>, <span>share</span> </details> | The type of board to create. | true |
 | description | Description | STRING | Detailed description of the new board. | false |
 
 #### Example JSON Structure
@@ -102,7 +102,7 @@ Name: createColumn
 | workspace_id | Workspace ID | STRING |  | true |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where the new column should be created. | true |
 | title | Title | STRING | The new column's title. | true |
-| column_type | Column Type | STRING <details> <summary> Options </summary> auto_number, board_relation, button, checkbox, color_picker, country, creation_log, date, dependency, doc, dropdown, email, file, formula, hour, item_assignees, item_id, last_updated, link, location, long_text, mirror, name, numbers, people, phone, progress, rating, status, subtasks, tags, team, text, timeline, time_tracking, vote, week, world_clock, unsupported </details> | The type of column to create. | true |
+| column_type | Column Type | STRING <details> <summary> Options </summary> <span>auto_number</span>, <span>board_relation</span>, <span>button</span>, <span>checkbox</span>, <span>color_picker</span>, <span>country</span>, <span>creation_log</span>, <span>date</span>, <span>dependency</span>, <span>doc</span>, <span>dropdown</span>, <span>email</span>, <span>file</span>, <span>formula</span>, <span>hour</span>, <span>item_assignees</span>, <span>item_id</span>, <span>last_updated</span>, <span>link</span>, <span>location</span>, <span>long_text</span>, <span>mirror</span>, <span>name</span>, <span>numbers</span>, <span>people</span>, <span>phone</span>, <span>progress</span>, <span>rating</span>, <span>status</span>, <span>subtasks</span>, <span>tags</span>, <span>team</span>, <span>text</span>, <span>timeline</span>, <span>time_tracking</span>, <span>vote</span>, <span>week</span>, <span>world_clock</span>, <span>unsupported</span> </details> | The type of column to create. | true |
 
 #### Example JSON Structure
 ```json

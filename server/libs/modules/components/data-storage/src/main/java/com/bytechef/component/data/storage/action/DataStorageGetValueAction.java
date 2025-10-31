@@ -129,8 +129,7 @@ public class DataStorageGetValueAction {
         }
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws ClassNotFoundException {
 
         Class<?> type = DataStorageUtils.getType(inputParameters);

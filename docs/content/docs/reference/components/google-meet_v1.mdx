@@ -47,7 +47,7 @@ Name: createMeetingSpace
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| accessType | Access Type | STRING <details> <summary> Options </summary> ACCESS_TYPE_UNSPECIFIED, OPEN, TRUSTED, RESTRICTED </details> | Access type of the meeting space that determines who can join without knocking. | false |
+| accessType | Access Type | STRING <details> <summary> Options </summary> <span title="Default value specified by the user's organization.">ACCESS_TYPE_UNSPECIFIED</span>, <span title="Anyone with the join information can join without knocking.">OPEN</span>, <span title="Members of the host's organization, invited external users, and dial-in users can join without knocking. Everyone else must knock.">TRUSTED</span>, <span title="Only invitees can join without knocking. Everyone else must knock.">RESTRICTED</span> </details> | Access type of the meeting space that determines who can join without knocking. | false |
 
 #### Example JSON Structure
 ```json

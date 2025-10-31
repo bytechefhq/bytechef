@@ -149,7 +149,7 @@ Name: createEvent
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
 | summary | Title | STRING | Title of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | true |
 | start | Start Date | DATE | The start date of the event. | true |
 | end | End Date | DATE | The end date of the event. | true |
 | start | Start Date Time | DATE_TIME | The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
@@ -158,11 +158,11 @@ Name: createEvent
 | location | Location | STRING | Geographic location of the event as free-form text. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  | false |
 | attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
-| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can invite others to the event. | false |
-| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can modify the event. | false |
-| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can see who the event's attendees are. | false |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
-| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the default reminders of the calendar apply to the event. | true |
+| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether attendees other than the organizer can invite others to the event. | false |
+| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether attendees other than the organizer can modify the event. | false |
+| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether attendees other than the organizer can see who the event's attendees are. | false |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> <span title="Notifications are sent to all guests.">all</span>, <span title="Notifications are sent to non-Google Calendar guests only.">externalOnly</span>, <span title="No notifications are sent.">none</span> </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the default reminders of the calendar apply to the event. | true |
 | reminders | Reminders | ARRAY <details> <summary> Items </summary> [&#123;STRING\(method), INTEGER\(minutes)&#125;] </details> |  | false |
 
 #### Example JSON Structure
@@ -283,7 +283,7 @@ Name: createQuickEvent
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | calendarId | Calendar Identifier | STRING |  | true |
 | text | Text | STRING | The text describing the event to be created. | true |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> <span title="Notifications are sent to all guests.">all</span>, <span title="Notifications are sent to non-Google Calendar guests only.">externalOnly</span>, <span title="No notifications are sent.">none</span> </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
 
 #### Example JSON Structure
 ```json
@@ -583,7 +583,7 @@ Name: updateEvent
 | calendarId | Calendar Identifier | STRING |  | true |
 | eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to update. | true |
 | summary | Title | STRING | New title of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
 | start | Start Date | DATE | New start date of the event. | true |
 | end | End Date | DATE | New end date of the event. | true |
 | start | Start Date Time | DATE_TIME | New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |

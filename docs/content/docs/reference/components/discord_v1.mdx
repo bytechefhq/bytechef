@@ -49,7 +49,7 @@ Name: sendChannelMessage
 | guildId | Guild ID | STRING |  | true |
 | channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | ID of the channel where to send the message. | true |
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
-| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if this is a TTS message | false |
 
 #### Example JSON Structure
 ```json
@@ -80,7 +80,7 @@ Type: OBJECT
 | type | INTEGER | Type of the message. |
 | id | STRING | ID of the message. |
 | content | STRING | Contents of the message. |
-| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this was a TTS message. |
+| tts | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this was a TTS message. |
 | mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(username)&#125;] </details> | Users specifically mentioned in the message. |
 | mention_roles | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name)&#125;] </details> | Roles specifically mentioned in this message. |
 | attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(filename), STRING\(title), STRING\(description), STRING\(content_type), INTEGER\(size), STRING\(url), STRING\(proxy_url)&#125;] </details> | Any attached files. |
@@ -89,8 +89,8 @@ Type: OBJECT
 | components | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | Sent if the message contains components like buttons, action rows, or other interactive components. |
 | channel_id | STRING | ID of the channel the message was sent in. |
 | author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(username)&#125; </details> | The author of this message. |
-| pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message is pinned. |
-| mention_everyone | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message mentions everyone. |
+| pinned | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message is pinned. |
+| mention_everyone | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message mentions everyone. |
 
 
 
@@ -145,7 +145,7 @@ Name: createChannel
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
 | name | Name | STRING | The name of the new channel | true |
-| type | Type | INTEGER <details> <summary> Options </summary> 0, 2, 4 </details> |  | false |
+| type | Type | INTEGER <details> <summary> Options </summary> <span title="a text channel within a server">0</span>, <span title="a voice channel within a server">2</span>, <span title="an organizational category that contains up to 50 channels">4</span> </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -183,7 +183,7 @@ Type: OBJECT
 | topic | STRING | Topic of the channel. |
 | position | INTEGER | Sorting position of the channel (channels with the same position are sorted by id) |
 | permission_overwrites | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), INTEGER\(type), STRING\(allow), STRING\(deny)&#125;] </details> | Explicit permission overwrites for members and roles. |
-| nsfw | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the channel is marked as NSFW (Not Safe For Work). |
+| nsfw | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the channel is marked as NSFW (Not Safe For Work). |
 
 
 
@@ -224,7 +224,7 @@ Name: sendDirectMessage
 | guildId | Guild ID | STRING |  | true |
 | recipient_id | Recipient | STRING <details> <summary> Depends On </summary> guildId </details> | The recipient to open a DM channel with. | true |
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
-| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if this is a TTS message | false |
 
 #### Example JSON Structure
 ```json
@@ -255,7 +255,7 @@ Type: OBJECT
 | type | INTEGER | Type of the message. |
 | id | STRING | ID of the message. |
 | content | STRING | Contents of the message. |
-| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this was a TTS message. |
+| tts | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this was a TTS message. |
 | mentions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(username)&#125;] </details> | Users specifically mentioned in the message. |
 | mention_roles | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name)&#125;] </details> | Roles specifically mentioned in this message. |
 | attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(filename), STRING\(title), STRING\(description), STRING\(content_type), INTEGER\(size), STRING\(url), STRING\(proxy_url)&#125;] </details> | Any attached files. |
@@ -264,8 +264,8 @@ Type: OBJECT
 | components | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | Sent if the message contains components like buttons, action rows, or other interactive components. |
 | channel_id | STRING | ID of the channel the message was sent in. |
 | author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(username)&#125; </details> | The author of this message. |
-| pinned | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message is pinned. |
-| mention_everyone | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this message mentions everyone. |
+| pinned | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message is pinned. |
+| mention_everyone | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this message mentions everyone. |
 
 
 

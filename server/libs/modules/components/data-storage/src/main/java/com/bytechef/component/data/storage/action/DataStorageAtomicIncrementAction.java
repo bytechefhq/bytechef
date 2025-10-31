@@ -60,7 +60,8 @@ public class DataStorageAtomicIncrementAction {
                 .label("Value to Add")
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
-                .defaultValue(1))
+                .defaultValue(1)
+                .required(true))
         .output(outputSchema(integer()))
         .perform(DataStorageAtomicIncrementAction::perform);
 

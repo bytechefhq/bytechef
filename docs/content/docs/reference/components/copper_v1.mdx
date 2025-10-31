@@ -49,7 +49,7 @@ Name: createActivity
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | activity_type | Activity Type ID | STRING | Id of activity type for this activity. | true |
 | details | Details | STRING | Text body of this activity. | true |
-| type | Parent Type | STRING <details> <summary> Options </summary> lead, person, company, opportunity </details> | Parent type to associate this activity with. | true |
+| type | Parent Type | STRING <details> <summary> Options </summary> <span>lead</span>, <span>person</span>, <span>company</span>, <span>opportunity</span> </details> | Parent type to associate this activity with. | true |
 | id | Parent ID | STRING <details> <summary> Depends On </summary> type </details> | ID of the parent this activity will be associated with. | true |
 
 #### Example JSON Structure
@@ -363,9 +363,9 @@ Name: createTask
 | due_date | Due Date | DATE | The due date of the task. | false |
 | reminder_date | Reminder Date | DATE | The reminder date of the task. | false |
 | details | Description | STRING | Description of the task. | false |
-| priority | Priority | STRING <details> <summary> Options </summary> None, Low, Medium, High </details> | The priority of the task. | true |
+| priority | Priority | STRING <details> <summary> Options </summary> <span>None</span>, <span>Low</span>, <span>Medium</span>, <span>High</span> </details> | The priority of the task. | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> Open, Completed </details> | The status of the task. | true |
+| status | Status | STRING <details> <summary> Options </summary> <span>Open</span>, <span>Completed</span> </details> | The status of the task. | true |
 
 #### Example JSON Structure
 ```json

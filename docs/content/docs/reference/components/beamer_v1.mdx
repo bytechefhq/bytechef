@@ -138,7 +138,7 @@ Name: createPost
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | title | Title | STRING | Title of the new post. | true |
 | content | Content | STRING | Content of the new post. | true |
-| category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | Category of the new post. | true |
+| category | Category | STRING <details> <summary> Options </summary> <span>new</span>, <span>improvement</span>, <span>fix</span>, <span>comingsoon</span>, <span>announcement</span>, <span>other</span> </details> | Category of the new post. | true |
 | userEmail | User Email | STRING | Email of the user that is creating the new post. | false |
 
 #### Example JSON Structure
@@ -408,17 +408,17 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| autoOpen | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the post is auto opened. |
+| autoOpen | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the post is auto opened. |
 | category | STRING | Category of the post. |
 | clicks | INTEGER | How many clicks does the post have. |
 | date | DATE | Date when the post was created. |
-| feedbackEnabled | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the users can give feedback on the post. |
+| feedbackEnabled | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the users can give feedback on the post. |
 | feedbacks | INTEGER | How many feedbacks does the post have. |
 | negativeReactions | INTEGER | How many negative reactions does the post have |
 | neutralReactions | INTEGER | How many neutral reactions does the post have |
 | positiveReactions | INTEGER | How many positive reactions does the post have |
-| published | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the post is published. |
-| reactionsEnabled | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the reactions are enabled. |
+| published | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the post is published. |
+| reactionsEnabled | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the reactions are enabled. |
 | translations | ARRAY <details> <summary> Items </summary> [&#123;STRING\(category), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(postUrl), STRING\(title)&#125;, INTEGER\($uniqueViews), INTEGER\($views)] </details> |  |
 
 

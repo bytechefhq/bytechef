@@ -130,32 +130,32 @@ Type: OBJECT
 | product_description | STRING | A description of the product. |
 | created_at | STRING | Creation timestamp in ISO 8601 format. |
 | effective_membership_level | INTEGER | Level of membership assigned to this organization. |
-| has_group_types | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether group types are enabled. |
+| has_group_types | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether group types are enabled. |
 | live_events_token | STRING | Token used for accessing live events. |
 | updated_at | STRING | Last updated timestamp in ISO 8601 format. |
 | uuid | STRING | Universally unique identifier for this record. |
 | api_token | STRING | API token used for authentication. |
 | app_urls | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of application URLs. |
 | slack_incoming_webhook | STRING | Slack webhook URL for incoming messages. |
-| anonymize_ips | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether IPs are anonymized. |
-| completed_snippet_onboarding | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the snippet onboarding has been completed. |
-| ingested_event | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if any event has been ingested. |
+| anonymize_ips | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether IPs are anonymized. |
+| completed_snippet_onboarding | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the snippet onboarding has been completed. |
+| ingested_event | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if any event has been ingested. |
 | test_account_filters | STRING | Filters used to define test accounts. |
-| test_account_filters_default_checked | BOOLEAN <details> <summary> Options </summary> true, false </details> | Default checked state for test account filters. |
+| test_account_filters_default_checked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Default checked state for test account filters. |
 | path_cleaning_filters | STRING | Filters used to clean paths in analytics. |
-| is_demo | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether this is a demo account. |
+| is_demo | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this is a demo account. |
 | timezone | STRING | Timezone of the account. |
 | data_attributes | STRING | Additional data attributes. |
 | person_display_name_properties | ARRAY <details> <summary> Items </summary> [STRING] </details> | Properties used to display person's name. |
 | correlation_config | STRING | Configuration for correlation analysis. |
-| autocapture_opt_out | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether autocapture is disabled. |
-| autocapture_exceptions_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether exceptions are autocaptured. |
-| autocapture_web_vitals_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether web vitals are autocaptured. |
+| autocapture_opt_out | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether autocapture is disabled. |
+| autocapture_exceptions_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether exceptions are autocaptured. |
+| autocapture_web_vitals_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether web vitals are autocaptured. |
 | autocapture_web_vitals_allowed_metrics | STRING | Metrics allowed for web vitals autocapture. |
 | autocapture_exceptions_errors_to_ignore | STRING | List of error types to ignore in exceptions. |
-| capture_console_log_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether console log capturing is enabled. |
-| capture_performance_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether performance capturing is enabled. |
-| session_recording_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether session recording is enabled. |
+| capture_console_log_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether console log capturing is enabled. |
+| capture_performance_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether performance capturing is enabled. |
+| session_recording_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether session recording is enabled. |
 | session_recording_sample_rate | STRING | Sample rate for session recording. |
 | session_recording_minimum_duration_milliseconds | INTEGER | Minimum duration for recorded sessions in milliseconds. |
 | session_recording_linked_flag | STRING | Flag linking session recordings. |
@@ -163,19 +163,19 @@ Type: OBJECT
 | session_recording_masking_config | STRING | Masking configuration for session recordings. |
 | session_replay_config | STRING | Configuration for session replay. |
 | survey_config | STRING | Configuration for surveys. |
-| access_control | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether access control is enabled. |
+| access_control | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether access control is enabled. |
 | week_start_day | INTEGER | Defines the first day of the week. |
 | primary_dashboard | INTEGER | ID of the primary dashboard. |
 | live_events_columns | ARRAY <details> <summary> Items </summary> [STRING] </details> | Columns shown in live events. |
 | recording_domains | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of domains where recording is allowed. |
 | person_on_events_querying_enabled | STRING | Whether person querying on events is enabled. |
-| inject_web_apps | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether web apps should be injected. |
+| inject_web_apps | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether web apps should be injected. |
 | extra_settings | STRING | Any extra settings not covered elsewhere. |
 | modifiers | STRING | Current modifiers in use. |
 | default_modifiers | STRING | Default modifier settings. |
 | has_completed_onboarding_for | STRING | Features the user has completed onboarding for. |
-| surveys_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether surveys are enabled. |
-| heatmaps_opt_in | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether heatmaps are enabled. |
+| surveys_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether surveys are enabled. |
+| heatmaps_opt_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether heatmaps are enabled. |
 | product_intents | STRING | Product intents settings. |
 | flags_persistence_default | STRING | Default setting for flags persistence. |
 

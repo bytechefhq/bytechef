@@ -25,7 +25,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| region | Region | STRING <details> <summary> Options </summary> zoho.eu, zoho.com, zoho.com.au, zoho.jp, zoho.in, zohocloud.ca </details> |  | true |
+| region | Region | STRING <details> <summary> Options </summary> <span>zoho.eu</span>, <span>zoho.com</span>, <span>zoho.com.au</span>, <span>zoho.jp</span>, <span>zoho.in</span>, <span>zohocloud.ca</span> </details> |  | true |
 | organization_id | Organization Id | STRING |  | true |
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
@@ -133,7 +133,7 @@ Name: createInvoice
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer_id | Customer ID | STRING | ID of the customer the invoice has to be created. | true |
-| use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, create custom invoice number, if false, use auto invoice number generation. | true |
+| use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, create custom invoice number, if false, use auto invoice number generation. | true |
 | invoice_number | Invoice Number | STRING | Number of invoice. | true |
 | line_items | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(item_id), NUMBER\(quantity)&#125;] </details> | Items in invoice. | true |
 | date | Invoice Date | DATE | The date of the invoice. | false |
@@ -198,7 +198,7 @@ Name: createItem
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Item Name | STRING | Name of the item. | true |
 | rate | Rate | NUMBER | Per unit price of an item. | true |
-| product_type | Product Type | STRING <details> <summary> Options </summary> goods, service </details> | Specify the type of an item. | true |
+| product_type | Product Type | STRING <details> <summary> Options </summary> <span>goods</span>, <span>service</span> </details> | Specify the type of an item. | true |
 | description | Description | STRING | Description for the item. | false |
 
 #### Example JSON Structure

@@ -46,8 +46,8 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> codestral-latest, devstral-small-latest, magistral-medium-latest, magistral-small-latest, ministral-3b-latest, ministral-8b-latest, mistral-large-latest, mistral-medium-latest, mistral-small-latest, open-mistral-nemo, pixtral-12b-2409, pixtral-large-latest </details> | ID of the model to use. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, ADVANCED </details> | Format of providing the prompt to the model. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>codestral-latest</span>, <span>devstral-small-latest</span>, <span>magistral-medium-latest</span>, <span>magistral-small-latest</span>, <span>ministral-3b-latest</span>, <span>ministral-8b-latest</span>, <span>mistral-large-latest</span>, <span>mistral-medium-latest</span>, <span>mistral-small-latest</span>, <span>open-mistral-nemo</span>, <span>pixtral-12b-2409</span>, <span>pixtral-large-latest</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
@@ -58,7 +58,7 @@ Name: ask
 | topP | Top P | NUMBER | An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. | false |
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
 | seed | Seed | INTEGER | Keeping the same seed would output the same response. | false |
-| safePrompt | Safe prompt | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should the prompt be safe for work? | false |
+| safePrompt | Safe prompt | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Should the prompt be safe for work? | false |
 
 #### Example JSON Structure
 ```json
@@ -118,7 +118,7 @@ Name: ocr
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | model | Model | STRING | Model to use. | true |
-| type | Type | STRING <details> <summary> Options </summary> image_url, document_url, file </details> | Type of the document to run OCR on. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>image_url</span>, <span>document_url</span>, <span>file</span> </details> | Type of the document to run OCR on. | true |
 | url | Image URL | STRING | Url of the image to run OCR on. | true |
 | file_id | File ID | STRING | File ID of the document to run OCR on. | true |
 | url | Document URL | STRING | Url of the document to run OCR on. | true |
@@ -193,7 +193,7 @@ Name: uploadFile
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| purpose | Purpose | STRING <details> <summary> Options </summary> fine-tune, batch, ocr </details> | Model to use. | false |
+| purpose | Purpose | STRING <details> <summary> Options </summary> <span>fine-tune</span>, <span>batch</span>, <span>ocr</span> </details> | Model to use. | false |
 | file | File | FILE_ENTRY | The file to be uploaded. | true |
 
 #### Example JSON Structure

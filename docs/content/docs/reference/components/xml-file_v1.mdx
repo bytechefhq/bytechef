@@ -27,7 +27,7 @@ Name: read
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File Entry | FILE_ENTRY | The object property which contains a reference to the XML file to read from. | true |
-| isArray | Is Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | The object input is array? | false |
+| isArray | Is Array | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The object input is array? | false |
 | path | Path | STRING | The path where the array is e.g 'data'. Leave blank to use the top level object. | false |
 | pageSize | Page Size | INTEGER | The amount of child elements to return in a page. | false |
 | pageNumber | Page Number | INTEGER | The page number to get. | false |
@@ -69,7 +69,7 @@ Name: write
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | The value type. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | The value type. | false |
 | source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object to write to the file. | true |
 | source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The aray to write to the file. | true |
 | filename | Filename | STRING | Filename to set for binary data. By default, "file.xml" will be used. | true |

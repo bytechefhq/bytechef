@@ -48,14 +48,14 @@ Name: addMemberToList
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | listId | List ID | STRING | The unique ID for the list. | true |
-| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
+| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
 | email_address | Email Address | STRING | Email address for a subscriber. | true |
-| status | Status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. | true |
-| email_type | Email Type | STRING <details> <summary> Options </summary> html, text </details> | Type of email this member asked to get ('html' or 'text'). | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>subscribed</span>, <span>unsubscribed</span>, <span>cleaned</span>, <span>pending</span>, <span>transactional</span> </details> | Subscriber's current status. | true |
+| email_type | Email Type | STRING <details> <summary> Options </summary> <span>html</span>, <span>text</span> </details> | Type of email this member asked to get ('html' or 'text'). | false |
 | merge_fields | Merge Fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | A dictionary of merge fields where the keys are the merge tags. | false |
 | interests | Interests | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The key of this object's properties is the ID of the interest in question. | false |
 | language | Language | STRING | If set/detected, the subscriber's language. | false |
-| vip | Vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | VIP status for subscriber. | false |
+| vip | Vip | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | VIP status for subscriber. | false |
 | location | Location | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(latitude), NUMBER\(longitude)&#125; </details> | Subscriber location information. | false |
 | marketing_permissions | Marketing Permissions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(marketing_permission_id), BOOLEAN\(enabled)&#125;] </details> | The marketing permissions for the subscriber. | false |
 | ip_signup | Ip Signup | STRING | IP address the subscriber signed up from. | false |
@@ -102,7 +102,7 @@ Name: addMemberToList
 
 ___Sample Output:___
 
-```{source=string, consents_to_one_to_one_messaging=true, email_client=string, unique_email_id=string, tags_count=0, list_id=string, full_name=string, merge_fields={property2=, property1=}, stats={ecommerce_data={total_revenue=0, number_of_orders=0, currency_code=USD}, avg_click_rate=0, avg_open_rate=0}, contact_id=string, last_note={created_at=2019-08-24T14:15:22, note=string, created_by=string, note_id=0}, email_address=string, status=subscribed, unsubscribe_reason=string, timestamp_opt=2019-08-24T14:15:22, ip_opt=string, location={timezone=string, country_code=string, gmtoff=0, longitude=0, region=string, latitude=0, dstoff=0}, ip_signup=string, tags=[{id=0, name=string}], marketing_permissions=[{text=string, marketing_permission_id=string, enabled=true}], email_type=string, language=string, interests={property2=true, property1=true}, timestamp_signup=2019-08-24T14:15:22, id=string, _links=[{rel=string, method=GET, targetSchema=string, schema=string, href=string}], web_id=0, member_rating=0, vip=true, last_changed=2019-08-24T14:15:22}```
+```{timestamp_opt=2019-08-24T14:15:22, unsubscribe_reason=string, status=subscribed, email_address=string, last_note={note=string, created_at=2019-08-24T14:15:22, note_id=0, created_by=string}, contact_id=string, stats={ecommerce_data={currency_code=USD, number_of_orders=0, total_revenue=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property2=, property1=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{rel=string, href=string, schema=string, targetSchema=string, method=GET}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property2=true, property1=true}, language=string, email_type=string, marketing_permissions=[{enabled=true, marketing_permission_id=string, text=string}], tags=[{name=string, id=0}], ip_signup=string, location={longitude=0, gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0, region=string}, ip_opt=string}```
 
 
 
@@ -120,9 +120,9 @@ Type: OBJECT
 | full_name | STRING | The contact's full name. |
 | web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://&#123;dc&#125;.admin.mailchimp.com/lists/members/view?id=&#123;web_id&#125;. |
 | email_type | STRING | Type of email this member asked to get ('html' or 'text'). |
-| status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. |
+| status | STRING <details> <summary> Options </summary> <span>subscribed</span>, <span>unsubscribed</span>, <span>cleaned</span>, <span>pending</span>, <span>transactional</span> </details> | Subscriber's current status. |
 | unsubscribe_reason | STRING | A subscriber's reason for unsubscribing. |
-| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether a contact consents to 1:1 messaging. |
+| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether a contact consents to 1:1 messaging. |
 | merge_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure. |
 | interests | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The key of this object's properties is the ID of the interest in question. |
 | stats | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(avg_open_rate), NUMBER\(avg_click_rate), &#123;NUMBER\(total_revenue), NUMBER\(number_of_orders), STRING\(currency_code)&#125;\(ecommerce_data)&#125; </details> | Open and click rates for this subscriber. |
@@ -133,7 +133,7 @@ Type: OBJECT
 | member_rating | INTEGER | Star rating for this member, between 1 and 5. |
 | last_changed | STRING | The date and time the member's info was last changed in ISO 8601 format. |
 | language | STRING | If set/detected, the subscriber's language. |
-| vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | VIP status for subscriber. |
+| vip | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | VIP status for subscriber. |
 | email_client | STRING | The list member's email client. |
 | location | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(latitude), NUMBER\(longitude), INTEGER\(gmtoff), INTEGER\(dstoff), STRING\(country_code), STRING\(timezone), STRING\(region)&#125; </details> | Subscriber location information. |
 | marketing_permissions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(marketing_permission_id), STRING\(text), BOOLEAN\(enabled)&#125;] </details> | The marketing permissions for the subscriber. |

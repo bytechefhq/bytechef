@@ -50,7 +50,7 @@ Name: createIncident
 | title | Title | STRING | A short description of the nature, symptoms, cause, or effect of the incident. | true |
 | service | Service | STRING | The incident will be created on this service. | true |
 | priority | Priority | STRING | Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them. | false |
-| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | The urgency level of this incident. | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> <span>high</span>, <span>low</span> </details> | The urgency level of this incident. | false |
 | details | Details | STRING | Details about the incident. | false |
 | assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | Assign the incident to these assignees. | false |
 | incident_key | Incident Key | STRING | A string which identifies the incident. | false |
@@ -277,12 +277,12 @@ Name: updateIncident
 | From | From | STRING | The email address of a valid user associated with the account making the request. | true |
 | incidentId | Incident ID | STRING | ID of the incident to which the note will be added. | true |
 | incident_type | Incident Type | STRING | Incident type. | true |
-| status | Status | STRING <details> <summary> Options </summary> resolved, acknowledged </details> | The new status of the incident. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>resolved</span>, <span>acknowledged</span> </details> | The new status of the incident. | false |
 | assignments | Assignments | ARRAY <details> <summary> Items </summary> [STRING\($assignee)] </details> | Assign the incident to these assignees. | false |
 | resolution | Resolution | STRING | The resolution for this incident. | false |
 | title | Title | STRING | A short description of the nature, symptoms, cause, or effect of the incident. | false |
 | priority | Priority | STRING | Priority of the incident. Priorities must be enabled in your PagerDuty account in order to use them. | false |
-| urgency | Urgency | STRING <details> <summary> Options </summary> high, low </details> | The urgency level of this incident. | false |
+| urgency | Urgency | STRING <details> <summary> Options </summary> <span>high</span>, <span>low</span> </details> | The urgency level of this incident. | false |
 | escalation_policy | Escalation Policy | STRING | Delegate this incident to the specified escalation policy. Cannot be specified if an assignee is given. | false |
 
 #### Example JSON Structure

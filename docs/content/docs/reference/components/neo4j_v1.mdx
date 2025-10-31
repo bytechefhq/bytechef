@@ -28,11 +28,11 @@ Version: 1
 | uri | URI | STRING | URI for connecting to the Neo4j instance. | true |
 | username | Username | STRING | Username for authentication with Neo4j. | true |
 | password | Password | STRING | Password for authentication with Neo4j. | true |
-| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the required schema | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the required schema | false |
 | databaseName | Database Name | STRING | The name of the Neo4j database to use. | false |
 | indexName | Index Name | STRING | The name of the index to store the vectors. | false |
 | embeddingDimension | Embedding Dimension | INTEGER | The number of dimensions in the vector. | false |
-| distanceType | Distance Type | STRING <details> <summary> Options </summary> COSINE, EUCLIDEAN </details> | The distance function to use. | false |
+| distanceType | Distance Type | STRING <details> <summary> Options </summary> <span title="Suitable for most use cases. Measures cosine similarity between vectors.">COSINE</span>, <span title=" Euclidean distance between vectors. Lower values indicate higher similarity.">EUCLIDEAN</span> </details> | The distance function to use. | false |
 | label | Label | STRING | The label used for document nodes. | false |
 | embeddingProperty | Embedding Property | STRING | The property name used to store embeddings. | false |
 
