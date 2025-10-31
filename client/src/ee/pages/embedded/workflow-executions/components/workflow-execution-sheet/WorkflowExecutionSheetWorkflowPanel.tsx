@@ -1,9 +1,8 @@
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
-    const {integration, integrationInstance, workflow} = workflowExecution;
+    const {integration, workflow} = workflowExecution;
 
     return (
         <div className="flex size-full flex-col">
