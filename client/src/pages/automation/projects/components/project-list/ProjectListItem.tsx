@@ -166,15 +166,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         },
     });
 
-    const handleImportProjectWorkflowClick = (definition: string) => {
-        importProjectWorkflowMutation.mutate({
-            id: project.id!,
-            workflow: {
-                definition,
-            },
-        });
-    };
-
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const file = event.target.files[0];
@@ -184,7 +175,12 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 ? (file as Blob).text()
                 : new Response(file).text());
 
-            handleImportProjectWorkflowClick(definition);
+            importProjectWorkflowMutation.mutate({
+                id: project.id!,
+                workflow: {
+                    definition,
+                },
+            });
         }
     };
 
@@ -288,35 +284,37 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button size="xs" variant="outline">
-                                            New workflow
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                {project.projectWorkflowIds?.length && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button size="xs" variant="outline">
+                                                New workflow
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                            <PlusIcon /> From Scratch
-                                        </DropdownMenuItem>
-
-                                        {ff_1041 && (
-                                            <DropdownMenuItem onClick={() => navigate(`./${project.id}/templates`)}>
-                                                <LayoutTemplateIcon /> From Template
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
+                                                <PlusIcon /> From Scratch
                                             </DropdownMenuItem>
-                                        )}
 
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                if (hiddenFileInputRef.current) {
-                                                    hiddenFileInputRef.current.click();
-                                                }
-                                            }}
-                                        >
-                                            <UploadIcon /> Import Workflow
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                            {ff_1041 && (
+                                                <DropdownMenuItem onClick={() => navigate(`./${project.id}/templates`)}>
+                                                    <LayoutTemplateIcon /> From Template
+                                                </DropdownMenuItem>
+                                            )}
+
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    if (hiddenFileInputRef.current) {
+                                                        hiddenFileInputRef.current.click();
+                                                    }
+                                                }}
+                                            >
+                                                <UploadIcon /> Import Workflow
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (
