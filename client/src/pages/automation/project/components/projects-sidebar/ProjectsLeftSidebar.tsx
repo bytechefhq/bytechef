@@ -10,6 +10,7 @@ import WorkflowsListItem from '@/pages/automation/project/components/projects-si
 import WorkflowsListSkeleton from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListSkeleton';
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
+import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -21,7 +22,7 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
-import {ChangeEvent, RefObject, useEffect, useMemo, useRef, useState} from 'react';
+import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
 
@@ -102,28 +103,6 @@ const ProjectsLeftSidebar = ({
             });
         },
     });
-
-    const handleImportProjectWorkflowClick = (definition: string) => {
-        importProjectWorkflowMutation.mutate({
-            id: selectedProjectId,
-            workflow: {
-                definition,
-            },
-        });
-    };
-
-    const handleImportWorkflow = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const file = e.target.files[0];
-
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            const definition = await (typeof (file as any).text === 'function'
-                ? (file as Blob).text()
-                : new Response(file).text());
-
-            handleImportProjectWorkflowClick(definition);
-        }
-    };
 
     useEffect(() => {
         setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading);
@@ -314,7 +293,7 @@ const ProjectsLeftSidebar = ({
                 accept=".json,.yaml,.yml"
                 alt="file"
                 className="hidden"
-                onChange={handleImportWorkflow}
+                onChange={(event) => handleImportWorkflow(event, selectedProjectId, importProjectWorkflowMutation)}
                 ref={workflowHiddenFileInputRef}
                 type="file"
             />
