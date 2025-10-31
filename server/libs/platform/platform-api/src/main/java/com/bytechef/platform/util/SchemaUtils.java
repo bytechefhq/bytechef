@@ -36,7 +36,6 @@ import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
 import com.bytechef.platform.constant.PlatformConstants;
 import com.bytechef.platform.domain.OutputResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -136,7 +135,6 @@ public class SchemaUtils {
             outputFactoryFunction, propertyFactoryFunction);
     }
 
-    @SuppressFBWarnings("DLS")
     private static Object getSampleOutput(BaseProperty definitionProperty) {
         if (definitionProperty instanceof BaseProperty.BaseValueProperty<?> valueProperty) {
             if (OptionalUtils.isPresent(valueProperty.getExampleValue())) {

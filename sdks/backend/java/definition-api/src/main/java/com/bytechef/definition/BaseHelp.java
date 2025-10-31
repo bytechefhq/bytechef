@@ -16,13 +16,11 @@
 
 package com.bytechef.definition;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public interface BaseHelp {
 
     /**

@@ -72,7 +72,6 @@ public final class WorkflowTaskDTO {
         this.type = type;
     }
 
-    @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
         WorkflowTask workflowTask, boolean clusterRoot, ClusterElementMap clusterElements,
         List<ComponentConnection> connections) {

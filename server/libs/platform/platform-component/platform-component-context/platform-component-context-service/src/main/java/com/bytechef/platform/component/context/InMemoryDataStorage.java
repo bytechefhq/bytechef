@@ -36,11 +36,11 @@ class InMemoryDataStorage implements DataStorage {
     private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
 
     private final CacheManager cacheManager;
-    private final String workflowReference;
+    private final String workflowUuid;
 
-    InMemoryDataStorage(String workflowReference, CacheManager cacheManager) {
+    InMemoryDataStorage(String workflowUuid, CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-        this.workflowReference = workflowReference;
+        this.workflowUuid = workflowUuid;
     }
 
     @Override
@@ -103,6 +103,6 @@ class InMemoryDataStorage implements DataStorage {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
 
         return cache.get(
-            TenantCacheKeyUtils.getKey(workflowReference, componentName, scope, scopeId, type), HashMap::new);
+            TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId, type), HashMap::new);
     }
 }

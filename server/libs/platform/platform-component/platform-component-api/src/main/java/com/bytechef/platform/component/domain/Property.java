@@ -20,7 +20,6 @@ import com.bytechef.component.definition.Property.Type;
 import com.bytechef.platform.domain.BaseProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 
 /**
@@ -45,7 +44,6 @@ import java.util.Objects;
     @JsonSubTypes.Type(value = StringProperty.class, name = "STRING"),
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
-@SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
 public abstract class Property extends BaseProperty {
 
     protected Type type;

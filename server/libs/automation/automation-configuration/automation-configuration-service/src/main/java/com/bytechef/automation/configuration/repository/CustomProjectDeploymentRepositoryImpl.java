@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -29,7 +28,6 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
     private final JdbcClient jdbcClient;
 
-    @SuppressFBWarnings("EI")
     public CustomProjectDeploymentRepositoryImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
     }

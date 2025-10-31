@@ -25,7 +25,6 @@ import com.bytechef.component.chat.trigger.ChatNewRequestTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +41,6 @@ public class ChatComponentHandler implements ComponentHandler {
         .actions(ChatResponseToRequestAction.ACTION_DEFINITION);
 
     @Override
-    @SuppressFBWarnings("EI")
     public ComponentDefinition getDefinition() {
         return COMPONENT_DEFINITION;
     }

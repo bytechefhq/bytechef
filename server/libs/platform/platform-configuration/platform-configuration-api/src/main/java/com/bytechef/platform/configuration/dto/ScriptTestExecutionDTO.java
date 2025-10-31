@@ -17,11 +17,9 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.error.ExecutionError;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public record ScriptTestExecutionDTO(ExecutionError error, Object output) {
 }

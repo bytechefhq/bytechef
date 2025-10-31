@@ -20,7 +20,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +38,6 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     private final ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
 
-    @SuppressFBWarnings("EI")
     public ProjectDeploymentWorkflowServiceImpl(
         ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository) {
 

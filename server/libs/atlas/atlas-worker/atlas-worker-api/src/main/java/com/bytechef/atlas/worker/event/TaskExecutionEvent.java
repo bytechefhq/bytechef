@@ -36,7 +36,6 @@ public class TaskExecutionEvent extends AbstractEvent
     private TaskExecutionEvent() {
     }
 
-    @SuppressFBWarnings("EI")
     public TaskExecutionEvent(TaskExecution taskExecution) {
         this(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecution);
     }

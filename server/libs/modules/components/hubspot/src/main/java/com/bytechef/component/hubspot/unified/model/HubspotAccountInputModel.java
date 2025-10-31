@@ -17,7 +17,6 @@
 package com.bytechef.component.hubspot.unified.model;
 
 import com.bytechef.component.definition.unified.crm.model.ProviderAccountInputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +24,6 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 // CHECKSTYLE:OFF
 public class HubspotAccountInputModel extends HashMap<String, Object> implements ProviderAccountInputModel {
 

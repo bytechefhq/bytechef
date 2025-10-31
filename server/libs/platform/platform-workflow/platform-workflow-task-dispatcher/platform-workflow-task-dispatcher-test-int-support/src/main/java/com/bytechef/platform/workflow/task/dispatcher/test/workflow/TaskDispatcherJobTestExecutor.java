@@ -39,11 +39,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 
 public class TaskDispatcherJobTestExecutor {
 
     private final ContextService contextService;
     private final CounterService counterService;
+    private final Environment environment;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
@@ -51,11 +53,12 @@ public class TaskDispatcherJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
-        ContextService contextService, CounterService counterService, JobService jobService,
+        ContextService contextService, CounterService counterService, Environment environment, JobService jobService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
+        this.environment = environment;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -81,7 +84,7 @@ public class TaskDispatcherJobTestExecutor {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, SpelEvaluator.create(), jobService, syncMessageBroker,
+            contextService, environment, SpelEvaluator.create(), jobService, syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService),
             List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(

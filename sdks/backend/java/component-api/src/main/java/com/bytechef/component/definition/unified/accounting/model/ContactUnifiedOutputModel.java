@@ -17,7 +17,6 @@
 package com.bytechef.component.definition.unified.accounting.model;
 
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -26,7 +25,6 @@ import java.util.Map;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implements UnifiedOutputModel {
 
     @Override

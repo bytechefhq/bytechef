@@ -9,7 +9,6 @@ package com.bytechef.ee.ai.copilot.remote.client.facade;
 
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import com.bytechef.ee.ai.copilot.facade.AiCopilotFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +31,6 @@ public class RemoteAiCopilotFacadeClient implements AiCopilotFacade {
     private final WebClient loadBalancedWebClient;
     private String baseUrl;
 
-    @SuppressFBWarnings("EI")
     public RemoteAiCopilotFacadeClient(
         @Value("${ai.copilot.base-url}") String baseUrl,
         @Autowired(
@@ -67,7 +65,6 @@ public class RemoteAiCopilotFacadeClient implements AiCopilotFacade {
             .exchangeToFlux(response -> response.bodyToFlux(new ParameterizedTypeReference<>() {}));
     }
 
-    @SuppressFBWarnings("EI")
     public record Request(String message, String conversationId, ContextDTO context) {
     }
 }

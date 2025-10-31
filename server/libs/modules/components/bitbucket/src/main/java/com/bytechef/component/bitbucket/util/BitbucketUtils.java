@@ -39,6 +39,7 @@ import java.util.Map;
  */
 public class BitbucketUtils extends AbstractBitbucketUtils {
 
+    @SuppressWarnings("unchecked")
     public static List<Map<String, Object>> getPaginationList(Context context, String url) {
         List<Map<String, Object>> list = new ArrayList<>();
 

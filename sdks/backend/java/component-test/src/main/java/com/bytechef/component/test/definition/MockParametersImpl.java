@@ -20,7 +20,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.core.type.TypeReference;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -41,7 +40,6 @@ public final class MockParametersImpl implements Parameters {
 
     private final Map<String, Object> map;
 
-    @SuppressFBWarnings("EI")
     public MockParametersImpl(Map<String, ?> map) {
         this.map = Collections.unmodifiableMap(map);
     }

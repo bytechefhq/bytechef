@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -64,6 +65,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private static final Logger log = LoggerFactory.getLogger(JGitWorkflowOperations.class);
 
     private static final String LATEST = "latest";
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     private final String branch;
     private final List<String> extensions;
@@ -152,62 +154,68 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     @Override
     @SuppressFBWarnings("REC_CATCH_EXCEPTION")
-    public synchronized String write(List<WorkflowResource> workflowResources, String commitMessage) {
-        Repository repository = getRepository();
-
-        Git git = new Git(repository);
-
+    public String write(List<WorkflowResource> workflowResources, String commitMessage) {
         try {
-            RevWalk revWalk = new RevWalk(repository);
+            LOCK.lock();
 
-            try (TreeWalk treeWalk = new TreeWalk(repository)) {
-                RevCommit commitToCheck = revWalk.parseCommit(repository.resolve("HEAD"));
+            Repository repository = getRepository();
 
-                treeWalk.addTree(commitToCheck.getTree());
-                treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
-                treeWalk.addTree(new FileTreeIterator(repository));
-                treeWalk.setRecursive(true);
+            Git git = new Git(repository);
 
-                while (treeWalk.next()) {
-                    git.rm()
-                        .addFilepattern(treeWalk.getPathString())
+            try {
+                RevWalk revWalk = new RevWalk(repository);
+
+                try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                    RevCommit commitToCheck = revWalk.parseCommit(repository.resolve("HEAD"));
+
+                    treeWalk.addTree(commitToCheck.getTree());
+                    treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
+                    treeWalk.addTree(new FileTreeIterator(repository));
+                    treeWalk.setRecursive(true);
+
+                    while (treeWalk.next()) {
+                        git.rm()
+                            .addFilepattern(treeWalk.getPathString())
+                            .call();
+                    }
+                }
+
+                for (WorkflowResource workflowResource : workflowResources) {
+                    File workflowFile = new File(repositoryDir, Objects.requireNonNull(workflowResource.getFilename()));
+
+                    Path path = workflowFile.toPath();
+
+                    Files.copy(
+                        workflowResource.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                    git.add()
+                        .addFilepattern(".")
                         .call();
                 }
-            }
 
-            for (WorkflowResource workflowResource : workflowResources) {
-                File workflowFile = new File(repositoryDir, Objects.requireNonNull(workflowResource.getFilename()));
-
-                Path path = workflowFile.toPath();
-
-                Files.copy(
-                    workflowResource.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-
-                git.add()
-                    .addFilepattern(".")
+                git.commit()
+                    .setMessage(commitMessage)
                     .call();
+
+                RevCommit latestRevCommit = new Git(repository)
+                    .log()
+                    .setMaxCount(1)
+                    .call()
+                    .iterator()
+                    .next();
+
+                String latestCommitHash = latestRevCommit.getName();
+
+                git.push()
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+                    .call();
+
+                return latestCommitHash;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-
-            git.commit()
-                .setMessage(commitMessage)
-                .call();
-
-            RevCommit latestRevCommit = new Git(repository)
-                .log()
-                .setMaxCount(1)
-                .call()
-                .iterator()
-                .next();
-
-            String latestCommitHash = latestRevCommit.getName();
-
-            git.push()
-                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-                .call();
-
-            return latestCommitHash;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -262,26 +270,32 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
-    private synchronized Repository getRepository() {
-        clear();
+    private Repository getRepository() {
+        try {
+            LOCK.lock();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Cloning repository: {}", url);
-        }
+            clear();
 
-        CloneCommand cloneCommand = Git.cloneRepository()
-            .setURI(url)
-            .setBranch(branch)
-            .setDirectory(repositoryDir);
+            if (log.isDebugEnabled()) {
+                log.debug("Cloning repository: {}", url);
+            }
 
-        if (username != null && password != null) {
-            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
-        }
+            CloneCommand cloneCommand = Git.cloneRepository()
+                .setURI(url)
+                .setBranch(branch)
+                .setDirectory(repositoryDir);
 
-        try (Git git = cloneCommand.call()) {
-            return git.getRepository();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (username != null && password != null) {
+                cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+            }
+
+            try (Git git = cloneCommand.call()) {
+                return git.getRepository();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            LOCK.unlock();
         }
     }
 

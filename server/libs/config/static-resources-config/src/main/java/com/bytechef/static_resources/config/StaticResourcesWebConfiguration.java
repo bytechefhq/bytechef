@@ -18,7 +18,6 @@ package com.bytechef.static_resources.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Resources;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +37,6 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     private final Resources resources;
 
-    @SuppressFBWarnings("EI")
     public StaticResourcesWebConfiguration(ApplicationProperties applicationProperties) {
         this.resources = applicationProperties.getResources();
     }

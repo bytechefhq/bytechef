@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,13 +32,13 @@ import java.util.concurrent.TimeUnit;
 public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     /** Lock used whenever accessing the state variables (runningTasks, shutdown) of the executor */
-    private final Object lock = new Object();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     /*
      * Conceptually, these two variables describe the executor being in one of three states: - Active: shutdown == false
      * - Shutdown: runningTasks > 0 and shutdown == true - Terminated: runningTasks == 0 and shutdown == true
      */
-    private int runningTasks = 0;
+    private final AtomicInteger runningTasks = new AtomicInteger(0);
     private boolean shutdown = false;
 
     @Override
@@ -51,23 +54,32 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     @Override
     public boolean isShutdown() {
-        synchronized (lock) {
+        try {
+            LOCK.lock();
+
             return shutdown;
+        } finally {
+            LOCK.unlock();
         }
     }
 
     @Override
     public void shutdown() {
-        synchronized (lock) {
+        try {
+            LOCK.lock();
+
             shutdown = true;
 
-            if (runningTasks == 0) {
-                lock.notifyAll();
+            if (runningTasks.get() == 0) {
+                LOCK.notifyAll();
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 
     @Override
+    @NonNull
     public List<Runnable> shutdownNow() {
         shutdown();
 
@@ -76,8 +88,10 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     @Override
     public boolean isTerminated() {
-        synchronized (lock) {
-            return shutdown && runningTasks == 0;
+        try {
+            return shutdown && runningTasks.get() == 0;
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -85,19 +99,21 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
 
-        synchronized (lock) {
+        try {
             while (true) {
-                if (shutdown && runningTasks == 0) {
+                if (shutdown && runningTasks.get() == 0) {
                     return true;
                 } else if (nanos <= 0) {
                     return false;
                 } else {
                     long now = System.nanoTime();
 
-                    TimeUnit.NANOSECONDS.timedWait(lock, nanos);
+                    TimeUnit.NANOSECONDS.timedWait(LOCK, nanos);
                     nanos -= System.nanoTime() - now; // subtract the actual time we waited
                 }
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -107,23 +123,27 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
      * @throws RejectedExecutionException if the executor has been previously shutdown
      */
     private void startTask() {
-        synchronized (lock) {
+        try {
             if (shutdown) {
                 throw new RejectedExecutionException("Executor already shutdown");
             }
 
-            runningTasks++;
+            runningTasks.incrementAndGet();
+        } finally {
+            LOCK.unlock();
         }
     }
 
     /** Decrements the running task count. */
     private void endTask() {
-        synchronized (lock) {
-            int numRunning = --runningTasks;
+        try {
+            int numRunning = runningTasks.decrementAndGet();
 
             if (numRunning == 0) {
-                lock.notifyAll();
+                LOCK.notifyAll();
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 }

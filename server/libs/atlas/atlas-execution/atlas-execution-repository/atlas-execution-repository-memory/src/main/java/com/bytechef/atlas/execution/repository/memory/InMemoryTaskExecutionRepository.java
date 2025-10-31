@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.Validate;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -39,10 +40,11 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private static final String TASK_EXECUTION_CACHE =
-        InMemoryTaskExecutionRepository.class.getName() + ".taskExecution";
+    private static final ReentrantLock LOCK = new ReentrantLock();
     private static final String JOB_TASK_EXECUTIONS_CACHE =
         InMemoryTaskExecutionRepository.class.getName() + ".jobTaskExecutions";
+    private static final String TASK_EXECUTION_CACHE =
+        InMemoryTaskExecutionRepository.class.getName() + ".taskExecution";
     private static final String PARENT_TASK_EXECUTIONS_CACHE =
         InMemoryTaskExecutionRepository.class.getName() + ".parentTaskExecutions";
 
@@ -146,7 +148,9 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             cache.put(TenantCacheKeyUtils.getKey(taskExecution.getId()), clonedTaskExecution);
 
-            synchronized (cacheManager) {
+            try {
+                LOCK.lock();
+
                 cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
                 String key = TenantCacheKeyUtils.getKey(taskExecution.getJobId());
 
@@ -178,6 +182,8 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
                     cache.put(key, taskExecutions);
                 }
+            } finally {
+                LOCK.unlock();
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);

@@ -20,7 +20,6 @@ import com.bytechef.ai.toolkit.Environment;
 import com.bytechef.ai.toolkit.ToolClient;
 import com.bytechef.ai.toolkit.model.FunctionModel;
 import com.bytechef.ai.toolkit.model.ToolModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,6 @@ class ToolCallbackProviderImpl implements ToolCallbackProvider {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ToolCallback[] getToolCallbacks() {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 

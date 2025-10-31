@@ -90,7 +90,6 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleIllegalArgumentExceptionException(
         final IllegalArgumentException illegalArgumentException, final WebRequest request) {
 

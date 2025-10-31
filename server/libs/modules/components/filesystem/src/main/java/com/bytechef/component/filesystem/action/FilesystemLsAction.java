@@ -29,7 +29,6 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.REC
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -108,7 +107,6 @@ public class FilesystemLsAction {
 
     public record FileInfo(String filename, String relativePath, long size) {
 
-        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         public FileInfo {
             Validate.notNull(filename, "fileName is required");
             Validate.notNull(relativePath, "relativePath is required");

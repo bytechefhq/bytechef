@@ -17,13 +17,11 @@
 package com.bytechef.component.pipedrive.unified.model;
 
 import com.bytechef.component.definition.unified.crm.model.ProviderAccountInputModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 // CHECKSTYLE:OFF
 public class PipedriveAccountInputModel extends HashMap<String, Object> implements ProviderAccountInputModel {
 

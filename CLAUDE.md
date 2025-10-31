@@ -75,7 +75,7 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 21 with Spring Boot 3.5.3
+- **Backend**: Java 25 with Spring Boot 3.5.6
 - **Frontend**: React 19 with TypeScript, Vite, TailwindCSS
 - **Database**: PostgreSQL with Liquibase migrations
 - **Message Broker**: Redis (default), supports RabbitMQ, Kafka, JMS, AMQP
@@ -302,7 +302,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 ### Common Issues
 - **Port conflicts**: Check if ports 5432, 6379, 1025 are in use
-- **Java version**: Ensure Java 21+ is installed and JAVA_HOME is set
+- **Java version**: Ensure Java 25+ is installed and JAVA_HOME is set
 - **Docker**: Make sure Docker is running for infrastructure services
 - **Database schema**: Use `docker compose down -v` to reset database
 

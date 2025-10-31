@@ -387,7 +387,6 @@ public final class TaskExecution
         return Status.values()[status];
     }
 
-    @SuppressFBWarnings("EI")
     public WorkflowTask getWorkflowTask() {
         return workflowTask;
     }
@@ -538,6 +537,7 @@ public final class TaskExecution
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
+
         private Instant endDate;
         private ExecutionError error;
         private Long id;

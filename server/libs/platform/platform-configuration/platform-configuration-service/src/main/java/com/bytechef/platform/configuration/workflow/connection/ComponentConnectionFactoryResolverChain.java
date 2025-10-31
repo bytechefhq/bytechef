@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.workflow.connection;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Primary;
@@ -29,7 +28,6 @@ class ComponentConnectionFactoryResolverChain implements ComponentConnectionFact
 
     private final List<ComponentConnectionFactoryResolver> componentConnectionFactoryResolvers;
 
-    @SuppressFBWarnings("EI")
     public ComponentConnectionFactoryResolverChain(
         List<ComponentConnectionFactoryResolver> componentConnectionFactoryResolvers) {
 

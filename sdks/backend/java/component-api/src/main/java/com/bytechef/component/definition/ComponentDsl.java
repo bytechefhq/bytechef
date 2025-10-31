@@ -1399,7 +1399,6 @@ public final class ComponentDsl {
         }
 
         @Override
-        @SuppressFBWarnings("EI")
         public Optional<Resources> getResources() {
             return Optional.ofNullable(resources);
         }
@@ -3884,7 +3883,6 @@ public final class ComponentDsl {
         }
     }
 
-    @SuppressFBWarnings("EI")
     private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
 
         @Override

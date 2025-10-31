@@ -17,12 +17,10 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.platform.domain.BaseOption;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public class Option extends BaseOption {
 
     private Option() {

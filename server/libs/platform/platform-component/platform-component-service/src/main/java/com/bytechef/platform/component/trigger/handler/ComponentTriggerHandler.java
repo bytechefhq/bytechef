@@ -18,14 +18,12 @@ package com.bytechef.platform.component.trigger.handler;
 
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.workflow.worker.trigger.handler.AbstractTriggerHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
 public class ComponentTriggerHandler extends AbstractTriggerHandler {
 
-    @SuppressFBWarnings("EI")
     public ComponentTriggerHandler(
         String componentName, int componentVersion, String triggerName,
         TriggerDefinitionFacade triggerDefinitionFacade) {

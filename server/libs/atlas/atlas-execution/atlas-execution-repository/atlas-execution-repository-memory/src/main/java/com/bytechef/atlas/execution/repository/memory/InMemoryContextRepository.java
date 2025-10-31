@@ -27,6 +27,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -36,6 +37,7 @@ import org.springframework.cache.CacheManager;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
+    private static final ReentrantLock LOCK = new ReentrantLock();
     private static final String CACHE = InMemoryContextRepository.class.getName() + ".context";
 
     private final CacheManager cacheManager;
@@ -64,7 +66,9 @@ public class InMemoryContextRepository implements ContextRepository {
     public Context save(Context context) {
         String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
 
-        synchronized (cacheManager) {
+        try {
+            LOCK.lock();
+
             Deque<FileEntry> stack = getStack(key);
 
             if (context.isNew()) {
@@ -76,6 +80,8 @@ public class InMemoryContextRepository implements ContextRepository {
             Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
             cache.put(key, stack);
+        } finally {
+            LOCK.unlock();
         }
 
         return context;

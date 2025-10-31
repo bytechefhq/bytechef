@@ -33,7 +33,6 @@ import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -477,7 +476,6 @@ public class UserServiceImpl implements UserService {
             });
     }
 
-    @SuppressFBWarnings("NP")
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE))
             .evict(TenantCacheKeyUtils.getKey(user.getLogin()));

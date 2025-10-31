@@ -30,7 +30,6 @@ import com.bytechef.platform.security.web.config.FilterBeforeContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -88,7 +87,6 @@ public class SecurityConfiguration {
     private final RememberMeServices rememberMeServices;
     private final Security security;
 
-    @SuppressFBWarnings("EI")
     public SecurityConfiguration(
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler, RememberMeServices rememberMeServices) {

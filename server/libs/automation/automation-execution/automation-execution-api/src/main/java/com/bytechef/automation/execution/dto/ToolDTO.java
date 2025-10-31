@@ -7,13 +7,10 @@
 
 package com.bytechef.automation.execution.dto;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public record ToolDTO(String name, String description, String parameters, Long connectionId) {
 }

@@ -17,12 +17,10 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.platform.domain.BaseResources;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public class Resources extends BaseResources {
 
     protected Resources() {

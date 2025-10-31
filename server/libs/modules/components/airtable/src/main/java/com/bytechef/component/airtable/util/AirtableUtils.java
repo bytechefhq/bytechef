@@ -221,11 +221,9 @@ public class AirtableUtils extends AbstractAirtableUtils {
             .toList();
     }
 
-    @SuppressFBWarnings("EI")
     protected record AirtableChoice(String id, String name, String color) {
     }
 
-    @SuppressFBWarnings("EI")
     protected record AirtableField(
         String id, String name, String description, String type, AirtableOptions options) {
     }

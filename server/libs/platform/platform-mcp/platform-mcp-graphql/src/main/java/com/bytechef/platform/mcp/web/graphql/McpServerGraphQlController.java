@@ -105,15 +105,12 @@ public class McpServerGraphQlController {
         return mcpServerFacade.getMcpServerTags(mcpServers);
     }
 
-    @SuppressFBWarnings("EI")
     public record TagInput(Long id, String name) {
     }
 
-    @SuppressFBWarnings("EI")
     public record McpServerInput(String name, ModeType type, long environmentId, Boolean enabled) {
     }
 
-    @SuppressFBWarnings("EI")
     public record McpServerUpdateInput(String name, Boolean enabled) {
     }
 }

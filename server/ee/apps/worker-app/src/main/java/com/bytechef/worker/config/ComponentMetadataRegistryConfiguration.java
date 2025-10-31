@@ -11,7 +11,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +31,6 @@ public class ComponentMetadataRegistryConfiguration {
     private final ComponentDefinitionService componentDefinitionService;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
-    @SuppressFBWarnings("EI2")
     public ComponentMetadataRegistryConfiguration(
         @Qualifier("componentDefinitionService") ComponentDefinitionService componentDefinitionService,
         ServiceMetadataRegistry serviceMetadataRegistry) {

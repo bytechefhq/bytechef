@@ -26,7 +26,6 @@ import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -126,7 +125,6 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    @SuppressFBWarnings("EI")
     public Optional<Resources> getResources() {
         return Optional.ofNullable(resources);
     }

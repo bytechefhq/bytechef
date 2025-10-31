@@ -18,7 +18,6 @@ package com.bytechef.atlas.execution.dto;
 
 import com.bytechef.atlas.execution.domain.Job.Webhook;
 import com.bytechef.message.Prioritizable;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,22 +41,18 @@ public class JobParametersDTO {
     private JobParametersDTO() {
     }
 
-    @SuppressFBWarnings("EI2")
     public JobParametersDTO(String workflowId) {
         this(workflowId, Map.of());
     }
 
-    @SuppressFBWarnings("EI2")
     public JobParametersDTO(String workflowId, Map<String, ?> inputs) {
         this(workflowId, inputs, Map.of());
     }
 
-    @SuppressFBWarnings("EI2")
     public JobParametersDTO(String workflowId, Map<String, ?> inputs, Map<String, ?> metadata) {
         this(workflowId, null, inputs, null, null, List.of(), metadata);
     }
 
-    @SuppressFBWarnings("EI2")
     public JobParametersDTO(String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs) {
         this(workflowId, parentTaskExecutionId, inputs, null, null, List.of(), Map.of());
     }

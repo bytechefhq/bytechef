@@ -12,7 +12,7 @@ The Runtime Job Application (`RuntimeJobApplication`) is a command-line applicat
 
 ## Prerequisites
 
-- Java 21 or higher
+- Java 25 or higher
 - Access to workflow JSON files
 - Connection credentials for external services (if required by workflows)
 

@@ -33,17 +33,14 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
     private static final String ISOLATING_CLASS_LOADER_CACHE =
         IsolatingClassLoader.class.getName() + ".isolatingClassLoader";
-
-    private final CacheManager cacheManager;
-
     private static final String[] PACKAGE_PREFIXES = {
         "java.", "jdk.", "com.bytechef."
     };
-
     private static final String[] RESOURCE_PREFIXES = Arrays.stream(PACKAGE_PREFIXES)
         .map(p -> p.replace('.', '/'))
         .toArray(String[]::new);
 
+    private final CacheManager cacheManager;
     private final BiFunction<String, IsolatingClassLoader<T>, T> cacheMappingFunction;
 
     protected IsolatingClassLoader(

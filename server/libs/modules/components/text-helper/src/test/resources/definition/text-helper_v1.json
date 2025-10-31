@@ -1522,6 +1522,10 @@
         "value": "WST"
       }, {
         "description": null,
+        "label": "XAD",
+        "value": "XAD"
+      }, {
+        "description": null,
         "label": "XAF",
         "value": "XAF"
       }, {
@@ -1552,6 +1556,10 @@
         "description": null,
         "label": "XCD",
         "value": "XCD"
+      }, {
+        "description": null,
+        "label": "XCG",
+        "value": "XCG"
       }, {
         "description": null,
         "label": "XDR",
@@ -1620,6 +1628,10 @@
         "description": null,
         "label": "ZWD",
         "value": "ZWD"
+      }, {
+        "description": null,
+        "label": "ZWG",
+        "value": "ZWG"
       }, {
         "description": null,
         "label": "ZWL",

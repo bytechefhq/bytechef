@@ -124,7 +124,6 @@ public class McpComponentGraphQlController {
                 mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())));
     }
 
-    @SuppressFBWarnings("EI")
     public record McpComponentInput(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
     }
 

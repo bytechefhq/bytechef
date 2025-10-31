@@ -21,7 +21,6 @@ import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthen
 import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.tenant.util.TenantUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +55,6 @@ public abstract class AbstractApiAuthenticationFilter extends OncePerRequestFilt
     private final AuthenticationManager authenticationManager;
     private final RequestMatcher requestMatcher;
 
-    @SuppressFBWarnings("EI")
     public AbstractApiAuthenticationFilter(String pathPatternRegex, AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));

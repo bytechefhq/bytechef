@@ -35,7 +35,6 @@ import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.ZoneId;
 import java.util.Map;
 
@@ -90,7 +89,6 @@ public class ScheduleIntervalTrigger {
 
     private final TriggerScheduler triggerScheduler;
 
-    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ScheduleIntervalTrigger(TriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }

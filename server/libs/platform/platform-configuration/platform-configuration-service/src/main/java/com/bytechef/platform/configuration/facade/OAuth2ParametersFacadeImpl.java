@@ -20,7 +20,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,6 @@ public class OAuth2ParametersFacadeImpl implements OAuth2ParametersFacade {
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final OAuth2Service oAuth2Service;
 
-    @SuppressFBWarnings("EI")
     public OAuth2ParametersFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, OAuth2Service oAuth2Service) {
 

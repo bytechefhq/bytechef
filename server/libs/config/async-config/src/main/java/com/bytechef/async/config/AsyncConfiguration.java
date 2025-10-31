@@ -33,7 +33,6 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -61,15 +60,15 @@ public class AsyncConfiguration implements AsyncConfigurer {
     public Executor getAsyncExecutor() {
         log.debug("Creating Async Task Executor");
 
-        ThreadPoolTaskExecutor executor = new TenantThreadPoolTaskExecutor();
+        TenantThreadPoolTaskExecutor executor = new TenantThreadPoolTaskExecutor();
 
         TaskExecutionProperties.Pool pool = taskExecutionProperties.getPool();
 
         executor.setCorePoolSize(pool.getCoreSize());
         executor.setMaxPoolSize(pool.getMaxSize());
         executor.setQueueCapacity(pool.getQueueCapacity());
-        executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
         executor.setVirtualThreads(Threading.VIRTUAL.isActive(environment));
+        executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
 
         return executor;
     }

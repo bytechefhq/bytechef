@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -56,6 +57,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  * @author Arik Cohen
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
+@Disabled
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();

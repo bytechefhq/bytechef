@@ -1305,7 +1305,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    @SuppressFBWarnings("EI")
     private record WorkflowNodeStructure(
         OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties,
         Set<String> missingRequiredProperties) {

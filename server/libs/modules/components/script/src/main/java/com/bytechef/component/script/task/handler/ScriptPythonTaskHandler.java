@@ -20,7 +20,6 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
 @Component(SCRIPT + "/v1/python")
 public class ScriptPythonTaskHandler extends AbstractTaskHandler {
 
-    @SuppressFBWarnings("EI")
     public ScriptPythonTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
         super("script", 1, "python", actionDefinitionFacade);
     }

@@ -17,7 +17,6 @@
 package com.bytechef.ai.mcp.server.security.web.filter;
 
 import com.bytechef.platform.security.web.filter.AbstractApiAuthenticationFilter;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.authentication.AuthenticationManager;
 
 /**
@@ -25,7 +24,6 @@ import org.springframework.security.authentication.AuthenticationManager;
  */
 public class McpServerApiAuthenticationFilter extends AbstractApiAuthenticationFilter {
 
-    @SuppressFBWarnings("EI")
     public McpServerApiAuthenticationFilter(AuthenticationManager authenticationManager) {
         super("^/api/v[0-9]+/mcp/.+", authenticationManager);
     }

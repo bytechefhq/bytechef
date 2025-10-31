@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.Resources;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -142,7 +141,6 @@ public class JdbcComponentDsl {
         }
 
         @Override
-        @SuppressFBWarnings("EI")
         public Optional<Resources> getResources() {
             return Optional.ofNullable(resources);
         }
@@ -163,7 +161,6 @@ public class JdbcComponentDsl {
         }
     }
 
-    @SuppressFBWarnings("EI")
     private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
 
         @Override
