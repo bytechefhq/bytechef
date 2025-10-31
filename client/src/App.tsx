@@ -143,11 +143,8 @@ function App() {
     );
 
     const analytics = useAnalytics();
-
     const helpHub = useHelpHub();
-
     const location = useLocation();
-
     const queryClient = useQueryClient();
 
     useFetchInterceptor();
