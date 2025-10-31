@@ -80,7 +80,7 @@ Type: OBJECT
 | modified | STRING | The date the post was last modified, in the site's timezone. |
 | modified_gmt | STRING | The date the post was last modified, in GMT. |
 | slug | STRING | An alphanumeric identifier for the post unique to its type. |
-| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | The publication status of the post. |
 | type | STRING | Type of the object (post). |
 | link | STRING | URL to the post. |
 | title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
@@ -88,9 +88,9 @@ Type: OBJECT
 | excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
 | author | INTEGER | The ID for the author of the post. |
 | featured_media | INTEGER | The ID of the featured media for the post. |
-| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
-| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
-| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| comment_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Weather the post is pinned to the top of the page. |
 | template | STRING | The theme file used to display the post. |
 | format | STRING | The format of the post. |
 | meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
@@ -201,11 +201,11 @@ Name: updatePost
 | postId | Post ID | STRING | ID of the post that will be fetched. | true |
 | title | Title | STRING | Title of the post. | false |
 | content | Content | STRING | Content of the post, uses the WordPress Text Editor which supports HTML. | false |
-| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | Status of the post. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | Status of the post. | false |
 | slug | Slug | STRING | Slug of the post identifier. | false |
 | categories | Categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. | false |
-| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | Enable comments on the post. | false |
-| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | Enable pinging on the post. | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable comments on the post. | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable pinging on the post. | false |
 
 #### Example JSON Structure
 ```json
@@ -245,7 +245,7 @@ Type: OBJECT
 | modified_gmt | STRING | The date the post was last modified, in GMT. |
 | password | STRING | Password for accessing the post. |
 | slug | STRING | An alphanumeric identifier for the post unique to its type. |
-| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | The publication status of the post. |
 | type | STRING | Type of the object (post). |
 | link | STRING | URL to the post. |
 | title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
@@ -253,9 +253,9 @@ Type: OBJECT
 | excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(raw), STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
 | author | INTEGER | The ID for the author of the post. |
 | featured_media | INTEGER | The ID of the featured media for the post. |
-| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
-| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
-| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| comment_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Weather the post is pinned to the top of the page. |
 | template | STRING | The theme file used to display the post. |
 | format | STRING | The format of the post. |
 | meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
@@ -398,11 +398,11 @@ Name: createPost
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | title | Title | STRING | Title of the post about to be created. | true |
 | content | Content | STRING | Content of the post about to be created. Uses the WordPress Text Editor which supports HTML. | true |
-| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | Status of the post about to be added. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | Status of the post about to be added. | false |
 | slug | Slug | STRING | Slug of the post identifier. | false |
 | categories | Categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. | false |
-| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | Enable comments on the post. | false |
-| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | Enable pinging on the post. | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable comments on the post. | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable pinging on the post. | false |
 
 #### Example JSON Structure
 ```json
@@ -441,7 +441,7 @@ Type: OBJECT
 | modified_gmt | STRING | The date the post was last modified, in GMT. |
 | password | STRING | Password for accessing the post. |
 | slug | STRING | An alphanumeric identifier for the post unique to its type. |
-| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | The publication status of the post. |
 | type | STRING | Type of the object (post). |
 | link | STRING | URL to the post. |
 | title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
@@ -449,9 +449,9 @@ Type: OBJECT
 | excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(raw), STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
 | author | INTEGER | The ID for the author of the post. |
 | featured_media | INTEGER | The ID of the featured media for the post. |
-| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
-| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
-| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| comment_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Weather the post is pinned to the top of the page. |
 | template | STRING | The theme file used to display the post. |
 | format | STRING | The format of the post. |
 | meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
@@ -570,10 +570,10 @@ Name: createPage
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | title | Title | STRING | Title of the page about to be added. | true |
 | content | Content | STRING | Content of the page about to be added. Uses the WordPress Text Editor which supports HTML. | true |
-| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | Status of the page about to be added. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | Status of the page about to be added. | false |
 | slug | Slug | STRING | Slug of the page identifier. | false |
-| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | Enable comments on the page. | false |
-| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | Enable pinging on the page. | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable comments on the page. | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Enable pinging on the page. | false |
 
 #### Example JSON Structure
 ```json
@@ -611,7 +611,7 @@ Type: OBJECT
 | modified_gmt | STRING | The date the page was last modified, in GMT. |
 | password | STRING | Password for accessing the page. |
 | slug | STRING | An alphanumeric identifier for the page unique to its type. |
-| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the page. |
+| status | STRING <details> <summary> Options </summary> <span>publish</span>, <span>future</span>, <span>draft</span>, <span>pending</span>, <span>private</span> </details> | The publication status of the page. |
 | type | STRING | Type of the object (page). |
 | link | STRING | URL to the page. |
 | title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the page. |
@@ -621,8 +621,8 @@ Type: OBJECT
 | featured_media | INTEGER | The ID of the featured media for the page. |
 | parent | INTEGER | The ID of the parent page, if any. |
 | menu_order | INTEGER | The order of the page in menus. |
-| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the page. |
-| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
+| comment_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether comments are allowed for the page. |
+| ping_status | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span> </details> | Whether pingbacks or trackbacks are allowed. |
 | template | STRING | The theme file used to display the page. |
 | meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the page. |
 | permalink_template | STRING | Permalink template of the page. |
@@ -765,7 +765,7 @@ Type: OBJECT
 | featured_media | INTEGER | The ID of the featured media for the post. |
 | comment_status | STRING | Whether comments are allowed for the post. |
 | ping_status | STRING | Whether pingbacks or trackbacks are allowed. |
-| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| sticky | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Weather the post is pinned to the top of the page. |
 | template | STRING | The theme file used to display the post. |
 | format | STRING | The format of the post. |
 | meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |

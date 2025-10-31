@@ -415,8 +415,8 @@ Name: listIssues
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filter | Filter | STRING <details> <summary> Options </summary> assigned, created, mentioned, subscribed, repos, all </details> | Specifies the types of issues to return. | true |
-| state | State | STRING <details> <summary> Options </summary> open, closed, all </details> | Indicates the state of the issues to return. | true |
+| filter | Filter | STRING <details> <summary> Options </summary> <span title="Issues assigned to the authenticated user.">assigned</span>, <span title="Issues created by the authenticated user.">created</span>, <span title="Issues mentioning the authenticated user.">mentioned</span>, <span title="Issues the authenticated user is subscribed to updates for.">subscribed</span>, <span title="All issues from repositories that the authenticated user has explicit access to.">repos</span>, <span title="All issues related to the authenticated user.">all</span> </details> | Specifies the types of issues to return. | true |
+| state | State | STRING <details> <summary> Options </summary> <span title="Open issues.">open</span>, <span title="Closed issues.">closed</span>, <span title="All issues.">all</span> </details> | Indicates the state of the issues to return. | true |
 
 #### Example JSON Structure
 ```json

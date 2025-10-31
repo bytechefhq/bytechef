@@ -49,8 +49,8 @@ Name: createCompany
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | companyname | Company Name | STRING |  | true |
-| isPublished | Is Published | INTEGER <details> <summary> Options </summary> 1, 0 </details> | Will the company be published after creation. | true |
-| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
+| isPublished | Is Published | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>0</span> </details> | Will the company be published after creation. | true |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
 
 #### Example JSON Structure
 ```json
@@ -78,7 +78,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the company. |
-| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the company is published. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the company is published. |
 | dateAdded | DATE | Date/time company was created. |
 | createdBy | INTEGER | ID of the user that created the company. |
 | createdByUser | STRING | Name of the user that created the company. |
@@ -118,7 +118,7 @@ Name: createContact
 | firstname | First Name | STRING |  | true |
 | lastname | Last Name | STRING |  | true |
 | email | Email | STRING |  | true |
-| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
+| overwriteWithBlank | Overwrite With Blank | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, then empty values are set to fields.Otherwise empty values are skipped. | false |
 
 #### Example JSON Structure
 ```json
@@ -147,7 +147,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the contact. |
-| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact is published. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the contact is published. |
 | dateAdded | DATE | Date/time contact was created. |
 | createdBy | INTEGER | ID of the user that created the contact. |
 | createdByUser | STRING | Name of the user that created the contact. |
@@ -228,7 +228,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the company. |
-| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the company is published. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the company is published. |
 | dateAdded | DATE | Date/time company was created. |
 | createdBy | INTEGER | ID of the user that created the company. |
 | createdByUser | STRING | Name of the user that created the company. |
@@ -291,7 +291,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | ID of the contact. |
-| isPublished | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact is published. |
+| isPublished | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the contact is published. |
 | dateAdded | DATE | Date/time contact was created. |
 | createdBy | INTEGER | ID of the user that created the contact. |
 | createdByUser | STRING | Name of the user that created the contact. |

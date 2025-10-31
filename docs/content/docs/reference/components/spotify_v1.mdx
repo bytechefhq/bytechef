@@ -134,8 +134,8 @@ Name: createPlaylist
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | The name for the new playlist. | true |
 | description | Description | STRING | The description for the new playlist. | false |
-| public | Public | BOOLEAN <details> <summary> Options </summary> true, false </details> | The public status for the new playlist. | true |
-| collaborative | Collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the playlist is collaborative or not. | true |
+| public | Public | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The public status for the new playlist. | true |
+| collaborative | Collaborative | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the playlist is collaborative or not. | true |
 
 #### Example JSON Structure
 ```json
@@ -163,7 +163,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the owner allows other users to modify the playlist. |
+| collaborative | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the owner allows other users to modify the playlist. |
 | description | STRING | The playlist description. |
 | external_urls | OBJECT <details> <summary> Properties </summary> &#123;STRING\(spotify)&#125; </details> | Known external URLs for this playlist. |
 | href | STRING | A link to the Web API endpoint providing full details of the playlist. |
@@ -172,7 +172,7 @@ Type: OBJECT
 | type | STRING | The object type: 'playlist'. |
 | uri | STRING | The Spotify URI for the playlist. |
 | owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(href), STRING\(id), STRING\(type), STRING\(uri)&#125; </details> | The user who owns the playlist. |
-| public | BOOLEAN <details> <summary> Options </summary> true, false </details> | The playlist's public/private status. |
+| public | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The playlist's public/private status. |
 
 
 

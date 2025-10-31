@@ -99,8 +99,8 @@ Type: OBJECT
 | email_cc_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of ticket CCs user IDs. |
 | forum_topic_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of forum ID topics. |
 | problem_id | INTEGER | ID of the problem the ticket is linked to. |
-| has_incidents | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket has related incidents. |
-| is_public | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket is public. |
+| has_incidents | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket has related incidents. |
+| is_public | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket is public. |
 | due_at | STRING | Due date for the ticket, if any. |
 | tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of tags associated with the ticket. |
 | custom_fields | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(value)&#125;] </details> | Custom field values associated with the ticket. |
@@ -112,9 +112,9 @@ Type: OBJECT
 | followup_ids | ARRAY <details> <summary> Items </summary> [] </details> | Array of follow up IDs. |
 | ticket_form_id | INTEGER | Ticket form ID. |
 | brand_id | INTEGER | Brand ID. |
-| allow_channelback | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether channelback is allowed for the ticket. |
-| allow_attachments | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attachments are allowed for the ticket. |
-| from_messaging_channel | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the ticket originated from a messaging channel. |
+| allow_channelback | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether channelback is allowed for the ticket. |
+| allow_attachments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether attachments are allowed for the ticket. |
+| from_messaging_channel | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the ticket originated from a messaging channel. |
 
 
 
@@ -226,8 +226,8 @@ Type: OBJECT
 | url | STRING | URL of the created organization. |
 | id | STRING | Organization ID. |
 | name | STRING | Organization name. |
-| shared_tickets | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organization can share tickets. |
-| shared_comments | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organization can share comments. |
+| shared_tickets | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the organization can share tickets. |
+| shared_comments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the organization can share comments. |
 | external_id | INTEGER | External ID of the organization. |
 | created_at | STRING | Date when the organization was created. |
 | updated_at | STRING | Date when the organization was last updated. |
@@ -272,10 +272,10 @@ Name: createTicket
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | subject | Subject | STRING | Subject of the ticket. | false |
-| type | Type | STRING <details> <summary> Options </summary> problem, incident, question, task </details> | Type of the ticket. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>problem</span>, <span>incident</span>, <span>question</span>, <span>task</span> </details> | Type of the ticket. | false |
 | comment | Comment | STRING | Comment of the ticket. | true |
-| priority | Priority | STRING <details> <summary> Options </summary> low, normal, high, urgent </details> | Priority of the ticket. | false |
-| status | Status | STRING <details> <summary> Options </summary> new, open, pending, hold, solved, closed </details> | Status of the ticket. | false |
+| priority | Priority | STRING <details> <summary> Options </summary> <span>low</span>, <span>normal</span>, <span>high</span>, <span>urgent</span> </details> | Priority of the ticket. | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>new</span>, <span>open</span>, <span>pending</span>, <span>hold</span>, <span>solved</span>, <span>closed</span> </details> | Status of the ticket. | false |
 
 #### Example JSON Structure
 ```json
@@ -328,8 +328,8 @@ Type: OBJECT
 | email_cc_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of ticket CCs user IDs. |
 | forum_topic_ids | ARRAY <details> <summary> Items </summary> [] </details> | List of forum ID topics. |
 | problem_id | INTEGER | ID of the problem the ticket is linked to. |
-| has_incidents | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket has related incidents. |
-| is_public | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket is public. |
+| has_incidents | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket has related incidents. |
+| is_public | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket is public. |
 | due_at | STRING | Due date for the ticket, if any. |
 | tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of tags associated with the ticket. |
 | custom_fields | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(value)&#125;] </details> | Custom field values associated with the ticket. |
@@ -341,9 +341,9 @@ Type: OBJECT
 | followup_ids | ARRAY <details> <summary> Items </summary> [] </details> | Array of follow up IDs. |
 | ticket_form_id | INTEGER | Ticket form ID. |
 | brand_id | INTEGER | Brand ID. |
-| allow_channelback | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether channelback is allowed for the ticket. |
-| allow_attachments | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attachments are allowed for the ticket. |
-| from_messaging_channel | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the ticket originated from a messaging channel. |
+| allow_channelback | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether channelback is allowed for the ticket. |
+| allow_attachments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether attachments are allowed for the ticket. |
+| from_messaging_channel | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the ticket originated from a messaging channel. |
 
 
 
@@ -451,7 +451,7 @@ Type: OBJECT
 | form_id | STRING | Form ID. |
 | group_id | STRING | ID of the group associated with the ticket. |
 | id | STRING | Ticket ID. |
-| is_public | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the ticket is public. |
+| is_public | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket is public. |
 | organization_id | STRING | ID of the organization associated with the requester. |
 | priority | STRING | Priority of the ticket. |
 | requester_id | STRING | ID of the user who requested the ticket. |

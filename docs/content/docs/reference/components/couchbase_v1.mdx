@@ -33,9 +33,9 @@ Version: 1
 | scopeName | Scope Name | STRING | The name of the Couchbase scope, parent of the collection. Search queries will be executed in the scope context. | false |
 | collectionName | Collection Name | STRING | The name of the Couchbase collection to store the Documents. | false |
 | dimensions | Dimensions | INTEGER | The number of dimensions in the vector. | false |
-| similarity | Similarity | STRING <details> <summary> Options </summary> l2_norm, dot_product </details> | The similarity function to use. | true |
-| optimization | Optimization | STRING <details> <summary> Options </summary> latency, recall </details> | The index optimization strategy to use. | false |
-| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the schema. | false |
+| similarity | Similarity | STRING <details> <summary> Options </summary> <span>l2_norm</span>, <span>dot_product</span> </details> | The similarity function to use. | true |
+| optimization | Optimization | STRING <details> <summary> Options </summary> <span>latency</span>, <span>recall</span> </details> | The index optimization strategy to use. | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the schema. | false |
 
 
 

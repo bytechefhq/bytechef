@@ -50,8 +50,8 @@ Name: createTask
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
 | title | Title | STRING | Title of the task. | true |
-| importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | Importance of the task | false |
-| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | Set to true if an alert is set to remind the user of the task. | false |
+| importance | Importance | STRING <details> <summary> Options </summary> <span>low</span>, <span>normal</span>, <span>high</span> </details> | Importance of the task | false |
+| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Set to true if an alert is set to remind the user of the task. | false |
 
 #### Example JSON Structure
 ```json
@@ -81,7 +81,7 @@ Type: OBJECT
 |:------------:|:------------:|:-------------------:|
 | @odata.etag | STRING |  |
 | importance | STRING | Importance of the task. |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether an alert is set to reminder the user of the task. |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether an alert is set to reminder the user of the task. |
 | status | STRING | State or progress of the task. |
 | title | STRING | Title of the task. |
 | categories | STRING | The categories associated with the task. |
@@ -154,8 +154,8 @@ Type: OBJECT
 | @odata.etag | STRING |  |
 | id | STRING |  |
 | displayName | STRING |  |
-| isOwner | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| isShared | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| isOwner | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| isShared | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 | wellKnownListName | STRING |  |
 
 
@@ -213,7 +213,7 @@ Type: OBJECT
 |:------------:|:------------:|:-------------------:|
 | @odata.etag | STRING |  |
 | importance | STRING | Importance of the task. |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether an alert is set to reminder the user of the task. |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether an alert is set to reminder the user of the task. |
 | status | STRING | State or progress of the task. |
 | title | STRING | Title of the task. |
 | categories | STRING | The categories associated with the task. |

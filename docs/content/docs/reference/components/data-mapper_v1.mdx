@@ -26,7 +26,7 @@ Name: mapObjectsToArray
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | Type of the input. Cam be an object or an array of objects. | true |
+| inputType | Input Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | Type of the input. Cam be an object or an array of objects. | true |
 | input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | An input object containing one or more properties. | true |
 | input | Input | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | An input array containing one or more objects. | true |
 | fieldKey | Field Key | STRING | Property key of each newly created object in the array. Its property value will be a property key from the input. | true |
@@ -63,13 +63,13 @@ Name: mapObjectsToObject
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | The input type. | true |
+| inputType | Input Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | The input type. | true |
 | input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | An object containing one or more properties. | true |
 | input | Input | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | An array containing one or more objects. | true |
 | mappings | Mapping | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to), BOOLEAN\(requiredField)&#125;] </details> | An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping. | true |
-| includeUnmapped | Include Unmapped | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields from the original object that do not have mappings be included in the new object? | false |
-| includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields that have null values be included in the new object? | false |
-| includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields with empty string values be included in the new object? | false |
+| includeUnmapped | Include Unmapped | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Should fields from the original object that do not have mappings be included in the new object? | false |
+| includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Should fields that have null values be included in the new object? | false |
+| includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Should fields with empty string values be included in the new object? | false |
 
 #### Example JSON Structure
 ```json
@@ -177,10 +177,10 @@ Name: replaceAllSpecifiedValues
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | The input type. | true |
+| inputType | Input Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | The input type. | true |
 | input | Input | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | An object containing one or more properties. | true |
 | input | Input | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | An array containing one or more objects. | true |
-| type | Value Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | The value type of 'from' and 'to' property values. | true |
+| type | Value Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type of 'from' and 'to' property values. | true |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;[]\(from), []\(to)&#125;] </details> | An array of objects that contains properties 'from' and 'to'. | false |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;BOOLEAN\(from), BOOLEAN\(to)&#125;] </details> | An array of objects that contains properties 'from' and 'to'. | false |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [&#123;DATE\(from), DATE\(to)&#125;] </details> | An array of objects that contains properties 'from' and 'to'. | false |
@@ -262,9 +262,9 @@ Name: replaceValue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| type | Value Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | The value type. | true |
+| type | Value Type | STRING <details> <summary> Options </summary> <span>ARRAY</span>, <span>BOOLEAN</span>, <span>DATE</span>, <span>DATE_TIME</span>, <span>INTEGER</span>, <span>NUMBER</span>, <span>OBJECT</span>, <span>STRING</span>, <span>TIME</span> </details> | The value type. | true |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value you want to replace. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The value you want to replace. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The value you want to replace. | true |
 | value | Value | DATE | The value you want to replace. | true |
 | value | Value | DATE_TIME | The value you want to replace. | true |
 | value | Value | INTEGER | The value you want to replace. | true |
@@ -273,7 +273,7 @@ Name: replaceValue
 | value | Value | STRING | The value you want to replace. | true |
 | value | Value | TIME | The value you want to replace. | true |
 | defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | If there is no existing mapping, assign this value as default. | true |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If there is no existing mapping, assign this value as default. | true |
 | defaultValue | Default Value | DATE | If there is no existing mapping, assign this value as default. | true |
 | defaultValue | Default Value | DATE_TIME | If there is no existing mapping, assign this value as default. | true |
 | defaultValue | Default Value | INTEGER | If there is no existing mapping, assign this value as default. | true |

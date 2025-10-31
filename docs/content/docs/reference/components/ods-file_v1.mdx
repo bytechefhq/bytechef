@@ -28,11 +28,11 @@ Name: read
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File Entry | FILE_ENTRY | The object property which contains a reference to the ODS file to read from. | true |
 | sheetName | Sheet Name | STRING | The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen. | false |
-| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | The first row of the file contains the header names. | false |
-| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> true, false </details> | When reading from file the empty cells will be filled with an empty string. | false |
+| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The first row of the file contains the header names. | false |
+| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When reading from file the empty cells will be filled with an empty string. | false |
 | pageSize | Page Size | INTEGER | The amount of child elements to return in a page. | false |
 | pageNumber | Page Number | INTEGER | The page number to get. | false |
-| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | false |
+| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | false |
 
 #### Example JSON Structure
 ```json

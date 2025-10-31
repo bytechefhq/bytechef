@@ -48,10 +48,10 @@ Name: getMetrics
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | target | Target | STRING | The target of the search: a domain or a URL. | true |
 | date | Date | STRING | A date to report metrics on in YYYY-MM-DD format. | true |
-| volume_mode | Volume Mode | STRING <details> <summary> Options </summary> monthly, average </details> | The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value. | false |
-| protocol | Protocol | STRING <details> <summary> Options </summary> both, http, https </details> | The protocol of your target | false |
-| output | Output | STRING <details> <summary> Options </summary> json, csv, xml, php </details> | The output format. | false |
-| mode | Mode | STRING <details> <summary> Options </summary> exact, prefix, domain, subdomains </details> | The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value. | false |
+| volume_mode | Volume Mode | STRING <details> <summary> Options </summary> <span>monthly</span>, <span>average</span> </details> | The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value. | false |
+| protocol | Protocol | STRING <details> <summary> Options </summary> <span>both</span>, <span>http</span>, <span>https</span> </details> | The protocol of your target | false |
+| output | Output | STRING <details> <summary> Options </summary> <span>json</span>, <span>csv</span>, <span>xml</span>, <span>php</span> </details> | The output format. | false |
+| mode | Mode | STRING <details> <summary> Options </summary> <span>exact</span>, <span>prefix</span>, <span>domain</span>, <span>subdomains</span> </details> | The search volume calculation mode: monthly or average. It affects volume, traffic, and traffic value. | false |
 
 #### Example JSON Structure
 ```json
@@ -160,7 +160,7 @@ Name: getPageContent
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | target_url | Target URL | STRING | The URL of the page to retrieve content for. | true |
 | project_id | Project ID | STRING | The unique identifier of the project. Only projects with verified ownership are supported. | true |
-| select | Select | STRING <details> <summary> Options </summary> crawl_datetime, page_text, raw_html, rendered_html </details> | A comma-separated list of columns to return. | true |
+| select | Select | STRING <details> <summary> Options </summary> <span>crawl_datetime</span>, <span>page_text</span>, <span>raw_html</span>, <span>rendered_html</span> </details> | A comma-separated list of columns to return. | true |
 
 #### Example JSON Structure
 ```json

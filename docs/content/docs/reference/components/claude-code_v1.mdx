@@ -1,0 +1,152 @@
+---
+title: "Claude Code"
+description: "Allows you to chat with Claude Code and added MCP tools"
+---
+
+
+
+Type: claudeCode/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Initialize Claude Code
+Name: initializeClaude
+
+`Run this first to install Claude Code to ByteChef terminal`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| password | Password | STRING | The password to your bash, so you can give permission to sudo | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Initialize Claude Code",
+  "name" : "initializeClaude",
+  "parameters" : {
+    "password" : ""
+  },
+  "type" : "claudeCode/v1/initializeClaude"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```Sample result```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Add MCP Server
+Name: addMCP
+
+`Adds an MCP server and all its tools to Claude Code via http protocol`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| label | Label | STRING | The name of the MCP server | true |
+| url | URL | STRING | The URL of the MCP server | true |
+| authenticationType | Authentication Type | INTEGER <details> <summary> Options </summary> <span>0</span>, <span>1</span>, <span>2</span> </details> | The type of authentication to use for connecting to the MCP server | true |
+| Authentication | Authentication | STRING | The access token/API key to use for authentication | true |
+| Authentication | Authentication | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(value)&#125;] </details> | The custom headers to use for authentication | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add MCP Server",
+  "name" : "addMCP",
+  "parameters" : {
+    "label" : "",
+    "url" : "",
+    "authenticationType" : 1,
+    "Authentication" : [ {
+      "name" : "",
+      "value" : ""
+    } ]
+  },
+  "type" : "claudeCode/v1/addMCP"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```Sample result```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Chat
+Name: chat
+
+`Chat with Claude with registered tools`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| script | Message | STRING | Command to send to Claude | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Chat",
+  "name" : "chat",
+  "parameters" : {
+    "script" : ""
+  },
+  "type" : "claudeCode/v1/chat"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```Sample result```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+

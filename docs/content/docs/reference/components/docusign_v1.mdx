@@ -28,7 +28,7 @@ Version: 1
 | clientId | Integration Key | STRING | DocuSign app integration key. | true |
 | clientSecret | Secret Key | STRING | DocuSign app secret key. | true |
 | accountId | API Account ID | STRING | DocuSign API account ID. | true |
-| environment | Environment | STRING <details> <summary> Options </summary> demo, www, eu </details> | Environment of the connection. | true |
+| environment | Environment | STRING <details> <summary> Options </summary> <span>demo</span>, <span>www</span>, <span>eu</span> </details> | Environment of the connection. | true |
 | baseUri | Account Base URI | STRING | DocuSign account base URI. | true |
 
 
@@ -51,7 +51,7 @@ Name: createEnvelope
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | documents | Documents | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(documentFile), STRING\(name), INTEGER\(documentId)&#125;\($document)] </details> | The documents to be signed. | true |
-| status | Status | STRING <details> <summary> Options </summary> sent, created </details> | The status of the envelope. | true |
+| status | Status | STRING <details> <summary> Options </summary> <span>sent</span>, <span>created</span> </details> | The status of the envelope. | true |
 | emailSubject | Email Subject | STRING | The subject of the email used to send the envelope. | true |
 | signers | Signer Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | The recipients of the envelope that have to sign the documents inside it. | true |
 | carbonCopies | Cc Recipients | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(email), INTEGER\(recipientId)&#125;\($recipient)] </details> | The recipients of the envelope that can only view the documents inside it. | false |

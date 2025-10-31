@@ -50,11 +50,11 @@ Name: createRepository
 | workspace | Workspace | STRING | Workspace in which repository will be created. | true |
 | repo_slug | Repository Slug | STRING | Repository slug that is used as identifier for the repository. | true |
 | name | Name | STRING | The name of the repository. | true |
-| scm | Source Control Management. | STRING <details> <summary> Options </summary> git </details> | Specifies the version control system that your repository will use. | true |
+| scm | Source Control Management. | STRING <details> <summary> Options </summary> <span>git</span> </details> | Specifies the version control system that your repository will use. | true |
 | project | Project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key)&#125; </details> | Parent project of the repository. | true |
-| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the repository is private or not. | false |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the repository is private or not. | false |
 | description | Description | STRING | The description of repository. | false |
-| fork_policy | Fork Policy | STRING <details> <summary> Options </summary> allow_forks, no_public_forks, no_forks </details> | Specifies the fork policy for the repository. | false |
+| fork_policy | Fork Policy | STRING <details> <summary> Options </summary> <span>allow_forks</span>, <span>no_public_forks</span>, <span>no_forks</span> </details> | Specifies the fork policy for the repository. | false |
 | language | Language | STRING | Main programming language of the repository | false |
 
 #### Example JSON Structure
@@ -94,7 +94,7 @@ Type: OBJECT
 | links | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(href), STRING\(name)&#125;\(self), &#123;STRING\(href), STRING\(name)&#125;\(html), &#123;STRING\(href), STRING\(name)&#125;\(avatar), &#123;STRING\(href), STRING\(name)&#125;\(pullrequests), &#123;STRING\(href), STRING\(name)&#125;\(commits), &#123;STRING\(href), STRING\(name)&#125;\(forks), &#123;STRING\(href), STRING\(name)&#125;\(watchers), &#123;STRING\(href), STRING\(name)&#125;\(downloads), [&#123;STRING\(href), STRING\(name)&#125;]\(clone), &#123;STRING\(href), STRING\(name)&#125;\(hooks)&#125; </details> | A collection of relevant resource links. |
 | uuid | STRING | The globally unique identifier for the repository. |
 | full_name | STRING | The full name of the repository (workspace/repo_slug). |
-| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the repository is private. |
+| is_private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the repository is private. |
 | scm | STRING | The source control system (only "git" is supported). |
 | owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The user or team that owns the repository. |
 | name | STRING | The display name of the repository. |
@@ -103,8 +103,8 @@ Type: OBJECT
 | updated_on | STRING | Timestamp of the last repository update. |
 | size | INTEGER | Total size of the repository in bytes. |
 | language | STRING | The primary programming language of the repository. |
-| has_issues | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the issue tracker is enabled. |
-| has_wiki | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the wiki is enabled. |
+| has_issues | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the issue tracker is enabled. |
+| has_wiki | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the wiki is enabled. |
 | fork_policy | STRING | Repository fork policy. |
 | project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | Project that the repository belongs to. |
 | mainbranch | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The default branch of the repository. |
@@ -197,7 +197,7 @@ Name: createProject
 | name | Name | STRING | The name of the project. | true |
 | key | Key | STRING | Key of the project (eg. AT, for a project named Atlassian). Project keys must start with a letter and may only consist of ASCII letters, numbers and underscores (A-Z, a-z, 0-9, _). | true |
 | description | Description | STRING | The description of project. | false |
-| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is private or not. | false |
+| is_private | Is Private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the project is private or not. | false |
 
 #### Example JSON Structure
 ```json
@@ -284,10 +284,10 @@ Items Type: OBJECT
 | owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The workspace or user who owns the project. |
 | name | STRING | Human-readable name of the project. |
 | description | STRING | Description of the project. |
-| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the project is private. |
+| is_private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the project is private. |
 | created_on | DATE_TIME | Timestamp of when the project was created. |
 | updated_on | DATE_TIME | Timestamp of the last update to the project. |
-| has_publicly_visible_repos | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the project contains any public repositories. |
+| has_publicly_visible_repos | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the project contains any public repositories. |
 
 
 
@@ -362,7 +362,7 @@ Items Type: OBJECT
 | links | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(href), STRING\(name)&#125;\(self), &#123;STRING\(href), STRING\(name)&#125;\(html), &#123;STRING\(href), STRING\(name)&#125;\(avatar), &#123;STRING\(href), STRING\(name)&#125;\(pullrequests), &#123;STRING\(href), STRING\(name)&#125;\(commits), &#123;STRING\(href), STRING\(name)&#125;\(forks), &#123;STRING\(href), STRING\(name)&#125;\(watchers), &#123;STRING\(href), STRING\(name)&#125;\(downloads), [&#123;STRING\(href), STRING\(name)&#125;]\(clone), &#123;STRING\(href), STRING\(name)&#125;\(hooks)&#125; </details> | A collection of relevant resource links. |
 | uuid | STRING | The globally unique identifier for the repository. |
 | full_name | STRING | The full name of the repository (workspace/repo_slug). |
-| is_private | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the repository is private. |
+| is_private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the repository is private. |
 | scm | STRING | The source control system (only "git" is supported). |
 | owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The user or team that owns the repository. |
 | name | STRING | The display name of the repository. |
@@ -371,8 +371,8 @@ Items Type: OBJECT
 | updated_on | STRING | Timestamp of the last repository update. |
 | size | INTEGER | Total size of the repository in bytes. |
 | language | STRING | The primary programming language of the repository. |
-| has_issues | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the issue tracker is enabled. |
-| has_wiki | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the wiki is enabled. |
+| has_issues | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the issue tracker is enabled. |
+| has_wiki | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the wiki is enabled. |
 | fork_policy | STRING | Repository fork policy. |
 | project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | Project that the repository belongs to. |
 | mainbranch | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type)&#125; </details> | The default branch of the repository. |

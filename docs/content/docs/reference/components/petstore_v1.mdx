@@ -61,7 +61,7 @@ Name: addPet
 | category | Category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  | false |
 | photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store | false |
 
 #### Example JSON Structure
 ```json
@@ -102,7 +102,7 @@ Type: OBJECT
 | category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  |
 | photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 | tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+| status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store |
 
 
 
@@ -140,7 +140,7 @@ Name: updatePet
 | category | Category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  | false |
 | photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store | false |
 
 #### Example JSON Structure
 ```json
@@ -181,7 +181,7 @@ Type: OBJECT
 | category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  |
 | photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 | tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+| status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store |
 
 
 
@@ -214,7 +214,7 @@ Name: findPetsByStatus
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | Status values that need to be considered for filter | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | Status values that need to be considered for filter | false |
 
 #### Example JSON Structure
 ```json
@@ -246,7 +246,7 @@ Items Type: OBJECT
 | category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  |
 | photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 | tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+| status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store |
 
 
 
@@ -312,7 +312,7 @@ Items Type: OBJECT
 | category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  |
 | photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 | tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+| status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store |
 
 
 
@@ -408,7 +408,7 @@ Type: OBJECT
 | category | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> |  |
 | photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 | tags | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+| status | STRING <details> <summary> Options </summary> <span>available</span>, <span>pending</span>, <span>sold</span> </details> | pet status in the store |
 
 
 
@@ -566,8 +566,8 @@ Name: placeOrder
 | petId | Pet Id | INTEGER |  | false |
 | quantity | Quantity | INTEGER |  | false |
 | shipDate | Ship Date | DATE_TIME |  | false |
-| status | Status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status | false |
-| complete | Complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+| status | Status | STRING <details> <summary> Options </summary> <span>placed</span>, <span>approved</span>, <span>delivered</span> </details> | Order Status | false |
+| complete | Complete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
 
 #### Example JSON Structure
 ```json
@@ -601,8 +601,8 @@ Type: OBJECT
 | petId | INTEGER |  |
 | quantity | INTEGER |  |
 | shipDate | DATE_TIME |  |
-| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
-| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| status | STRING <details> <summary> Options </summary> <span>placed</span>, <span>approved</span>, <span>delivered</span> </details> | Order Status |
+| complete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 
 
 
@@ -688,8 +688,8 @@ Type: OBJECT
 | petId | INTEGER |  |
 | quantity | INTEGER |  |
 | shipDate | DATE_TIME |  |
-| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
-| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| status | STRING <details> <summary> Options </summary> <span>placed</span>, <span>approved</span>, <span>delivered</span> </details> | Order Status |
+| complete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 
 
 

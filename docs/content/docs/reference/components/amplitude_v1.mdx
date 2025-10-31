@@ -26,7 +26,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | api_key | API Key | STRING | The API key for the Amplitude project | true |
-| region | Region | STRING <details> <summary> Options </summary> api2, api.eu </details> | Environment region you wish to access the API in. | true |
+| region | Region | STRING <details> <summary> Options </summary> <span>api2</span>, <span>api.eu</span> </details> | Environment region you wish to access the API in. | true |
 
 
 
@@ -48,7 +48,7 @@ Name: createAttributionEvent
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | event_type | Event Type | STRING | The event info. Prefix with brackets [YOUR COMPANY]. | true |
-| platform | Platform | STRING <details> <summary> Options </summary> ios, android </details> | Platform which the event  will occur on. | true |
+| platform | Platform | STRING <details> <summary> Options </summary> <span>ios</span>, <span>android</span> </details> | Platform which the event  will occur on. | true |
 | identifier | Identifier | OBJECT <details> <summary> Properties </summary> &#123;STRING\(key), STRING\(value)&#125; </details> | Identifier of the platform. | true |
 | user_properties | User Properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($property)] </details> | A dictionary of attribution properties prefixed with brackets [YOUR COMPANY]. | false |
 
@@ -95,7 +95,7 @@ Name: createOrUpdateUser
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | ID | STRING <details> <summary> Options </summary> user_id, device_id </details> | Choose to create or update a user or a device. | true |
+| id | ID | STRING <details> <summary> Options </summary> <span>user_id</span>, <span>device_id</span> </details> | Choose to create or update a user or a device. | true |
 | device_id | Device ID | STRING | A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. | true |
 | user_id | User ID | STRING | Unique user ID specified by you. If you send a request with a user ID that's not in the Amplitude system, new user will be created (e.g. email address). | true |
 | user_properties | User Properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;\($property)] </details> | A dictionary of attribution properties prefixed with brackets [YOUR COMPANY]. | false |

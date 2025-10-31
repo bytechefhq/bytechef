@@ -47,11 +47,11 @@ Name: createPost
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| author | Post As | STRING <details> <summary> Options </summary> PERSON, ORGANIZATION </details> | Choose whether to post as a Person or Organization. | true |
+| author | Post As | STRING <details> <summary> Options </summary> <span>PERSON</span>, <span>ORGANIZATION</span> </details> | Choose whether to post as a Person or Organization. | true |
 | urn | null | STRING | Organization URN | true |
 | commentary | Text | STRING | The user generated commentary for the post. | true |
-| contentType | Media Category | STRING <details> <summary> Options </summary> ARTICLE, DOCUMENT, IMAGES </details> | Type of media to be posted. | false |
-| visibility | Visibility | STRING <details> <summary> Options </summary> PUBLIC, CONNECTIONS </details> | Visibility restrictions on content. | true |
+| contentType | Media Category | STRING <details> <summary> Options </summary> <span>ARTICLE</span>, <span>DOCUMENT</span>, <span>IMAGES</span> </details> | Type of media to be posted. | false |
+| visibility | Visibility | STRING <details> <summary> Options </summary> <span title="Anyone can view this.">PUBLIC</span>, <span title="Represents 1st degree network of owner.">CONNECTIONS</span> </details> | Visibility restrictions on content. | true |
 | images | Images | ARRAY <details> <summary> Items </summary> [FILE_ENTRY\($image)] </details> | Images to be posted. | true |
 | source | Article URL | STRING | A URL of the article. Typically the URL that was ingested to maintain URL parameters. | true |
 | title | Article Title | STRING | Custom or saved title of the article. | false |

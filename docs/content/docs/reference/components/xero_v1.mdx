@@ -50,7 +50,7 @@ Name: createBill
 | ContactID | Contact ID | STRING | ID of the contact to create the bill for. | true |
 | Date | Date | DATE | Date of the bill. If no date is specified, the current date will be used. | true |
 | DueDate | Due Date | DATE | Date bill is due. If no date is specified, the current date will be used. | false |
-| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> <span>Exclusive</span>, <span>Inclusive</span>, <span>NoTax</span> </details> |  | false |
 | LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), NUMBER\(Quantity), NUMBER\(UnitAmount), STRING\(AccountCode)&#125;\($LineItem)] </details> | Line items on the bill. | true |
 | CurrencyCode | Currency | STRING | Currency that bill is raised in. | false |
 | Reference | Invoice Reference | STRING | Reference number of the bill. | false |
@@ -136,7 +136,7 @@ Name: createContact
 | Name | Name | STRING | Full name of a contact or organisation. | true |
 | CompanyNumber | Company Number | STRING | Company registration number. | false |
 | AccountNumber | Account Number | STRING | Unique account number to identify, reference and search for the contact. | false |
-| ContactStatus | Contact Status | STRING <details> <summary> Options </summary> ACTIVE, ARCHIVED, GDPRREQUEST </details> | Current status of a contact. | false |
+| ContactStatus | Contact Status | STRING <details> <summary> Options </summary> <span title="The Contact is active and can be used in transactions.">ACTIVE</span>, <span title="The Contact is archived and can no longer be used in transactions.">ARCHIVED</span>, <span title="The Contact is the subject of a GDPR erasure request and can no longer be used in transctions.">GDPRREQUEST</span> </details> | Current status of a contact. | false |
 | FirstName | First Name | STRING | First name of primary person. | false |
 | LastName | Last Name | STRING | Last name of primary person. | false |
 | EmailAddress | Email Address | STRING | Email address of contact person. | false |
@@ -247,7 +247,7 @@ Name: createSalesInvoice
 | ContactID | Contact ID | STRING | ID of the contact to create the invoice for. | true |
 | Date | Date | DATE | Date invoice was issued. If no date is specified, the current date will be used. | false |
 | DueDate | Due Date | DATE | Date invoice is due. If no date is specified, the current date will be used. | false |
-| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> <span>Exclusive</span>, <span>Inclusive</span>, <span>NoTax</span> </details> |  | false |
 | LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
 | CurrencyCode | Currency Code | STRING | Currency code that invoice is raised in. | false |
 | Reference | Invoice Reference | STRING | Reference number of the invoice. | false |
@@ -333,7 +333,7 @@ Name: createQuote
 | ContactID | Contact ID | STRING | ID of the contact that the quote is being raised for. | true |
 | Date | Date | DATE | Date quote was issued. | true |
 | LineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)&#125;] </details> | Line items on the invoice. | true |
-| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> Exclusive, Inclusive, NoTax </details> |  | false |
+| LineAmountTypes | Line Amount Type | STRING <details> <summary> Options </summary> <span>Exclusive</span>, <span>Inclusive</span>, <span>NoTax</span> </details> |  | false |
 | ExpiryDate | Expiry Date | DATE | Date quote expires | false |
 | CurrencyCode | Currency Code | STRING | The currency code that quote has been raised in. | false |
 | QuoteNumber | Quote Number | STRING | Unique alpha numeric code identifying a quote. | false |
