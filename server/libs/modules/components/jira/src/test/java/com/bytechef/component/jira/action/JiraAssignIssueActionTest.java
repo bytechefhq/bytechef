@@ -18,7 +18,7 @@ package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.jira.constant.JiraConstants.ACCOUNT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,9 +53,9 @@ class JiraAssignIssueActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        Boolean result = JiraAssignIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = JiraAssignIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertFalse(result);
+        assertNull(result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
