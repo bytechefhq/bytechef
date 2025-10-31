@@ -81,9 +81,9 @@ Type: OBJECT
 | createdDateTime | DATE_TIME | The date and time when the channel was created. |
 | displayName | STRING | Name of the channel that will appear to the user in Microsoft Teams. |
 | description | STRING | Description of the channel. |
-| isFavoriteByDefault | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the channel is marked as favorite by default. |
+| isFavoriteByDefault | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the channel is marked as favorite by default. |
 | webUrl | STRING | URL to access the channel in a web browser. |
-| isArchived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the channel is archived. |
+| isArchived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the channel is archived. |
 
 
 
@@ -113,7 +113,7 @@ Name: sendChannelMessage
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | teamId | Team ID | STRING | ID of the team where the channel is located. | true |
 | channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | Channel to send message to. | true |
-| contentType | Message Text Format | STRING <details> <summary> Options </summary> text, html </details> |  | true |
+| contentType | Message Text Format | STRING <details> <summary> Options </summary> <span>text</span>, <span>html</span> </details> |  | true |
 | content | Message Text | STRING |  | true |
 
 #### Example JSON Structure
@@ -175,7 +175,7 @@ Name: sendChatMessage
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | chatId | Chat ID | STRING |  | true |
-| contentType | Message Text Format | STRING <details> <summary> Options </summary> text, html </details> |  | true |
+| contentType | Message Text Format | STRING <details> <summary> Options </summary> <span>text</span>, <span>html</span> </details> |  | true |
 | content | Message Text | STRING |  | true |
 
 #### Example JSON Structure

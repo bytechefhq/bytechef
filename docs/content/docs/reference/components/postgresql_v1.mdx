@@ -79,7 +79,7 @@ Name: insert
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to insert data to. | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table field names where corresponding values would be inserted. | false |
+| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be inserted. | false |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
@@ -119,7 +119,7 @@ Name: update
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to update data in. | true |
 | condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table field names where corresponding values would be updated. | false |
+| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be updated. | false |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
@@ -234,7 +234,7 @@ Type: POLLING
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to update data in. | true |
 | orderBy | Colum To Order By | STRING | Use something like a created timestamp or an auto-incrementing ID. | true |
-| orderDirection | Order Direction | STRING <details> <summary> Options </summary> ASC, DESC </details> | The direction to sort by such that the newest rows are fetched first. | true |
+| orderDirection | Order Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> | The direction to sort by such that the newest rows are fetched first. | true |
 
 
 #### Output

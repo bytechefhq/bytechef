@@ -99,7 +99,7 @@ Name: createInvoice
 | bookId | Book ID | STRING | ID of the book where new invoice will be created. | true |
 | customer | Customer | STRING | The customer that is being invoiced. | true |
 | invoiceDate | Invoice Date | DATE | The date of the invoice. | true |
-| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | The amount tax status of the amounts in the invoice. | true |
+| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> <span>NonTaxed</span>, <span>Inclusive</span>, <span>Exclusive</span> </details> | The amount tax status of the amounts in the invoice. | true |
 | lineItems | Line Items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(lineNumber)&#125;] </details> | The individual items that make up the invoice. | true |
 
 #### Example JSON Structure

@@ -50,10 +50,10 @@ Name: getFullResult
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | input | Query | STRING | Query that will be answered. | true |
 | format | Format | ARRAY <details> <summary> Items </summary> [STRING] </details> | The desired format for individual result pods. | false |
-| output | Output | STRING <details> <summary> Options </summary> xml, json </details> | The desired format for full results. | false |
+| output | Output | STRING <details> <summary> Options </summary> <span>xml</span>, <span>json</span> </details> | The desired format for full results. | false |
 | ip | IP | STRING | Specifies a custom query location based on an IP address. | false |
 | mag | Magnification | STRING | Specify magnification of objects within a pod. | false |
-| units | Units | STRING <details> <summary> Options </summary> metric, imperial </details> | What system of units to use for measurements and quantities. | false |
+| units | Units | STRING <details> <summary> Options </summary> <span>metric</span>, <span>imperial</span> </details> | What system of units to use for measurements and quantities. | false |
 | width | Width | STRING | Specify an approximate width limit for text and tables. | false |
 | scanner | Scanner | STRING | Specifies that only pods produced by the given scanner should be returned. e.g. "Numeric", "Data", "Traveling". | false |
 | latlong | Latitude Longitude | STRING | Specifies a custom query location based on a latitude/longitude pair. e.g. "40.42,-3.71", "40.11, -88.24", "0,0". | false |
@@ -63,10 +63,10 @@ Name: getFullResult
 | podtitle | Pod Title | STRING | Specifies a pod title to include in the result. e.g. "Basic+Information", "Image", "Alternative representations". | false |
 | assumption | Assumption | STRING | Specifies an assumption, such as the meaning of a word or the value of a formula variable. e.g. "*C.pi-_*Movie", "DateOrder_**Day.Month.Year--". | false |
 | plotwidth | Plot Width | STRING | Specify an approximate width limit for plots and graphics. e.g. "100", "200". | false |
-| ignorecase | Ignore Case | BOOLEAN <details> <summary> Options </summary> true, false </details> | Force Wolfram Alpha to ignore case in queries. | false |
+| ignorecase | Ignore Case | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Force Wolfram Alpha to ignore case in queries. | false |
 | podtimeout | Pod Timeout | STRING | The number of seconds to allow Wolfram Alpha to spend in the "format" stage for any one pod e.g. "0.5", "5.0". | false |
-| reinterpret | Reinterpret | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow Wolfram Alpha to reinterpret queries that would otherwise not be understood. | false |
-| translation | Translation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Allow Wolfram Alpha to try to translate simple queries into English. | false |
+| reinterpret | Reinterpret | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow Wolfram Alpha to reinterpret queries that would otherwise not be understood. | false |
+| translation | Translation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow Wolfram Alpha to try to translate simple queries into English. | false |
 | scantimeout | Scan Timeout | STRING | The number of seconds to allow Wolfram Alpha to compute results in the "scan" stage of processing. e.g. "0.5", "5.0". | false |
 | parsetimeout | Parse Timeout | STRING | The number of seconds to allow Wolfram Alpha to spend in the "parsing" stage of processing. e.g. "0.5", "5.0". | false |
 | totaltimeout | Total Timeout | STRING | The total number of seconds to allow Wolfram Alpha to spend on a query. e.g. "0.5", "5.0". | false |

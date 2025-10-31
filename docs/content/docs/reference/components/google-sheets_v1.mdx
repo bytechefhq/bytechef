@@ -49,7 +49,7 @@ Name: clearSheet
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 
 #### Example JSON Structure
 ```json
@@ -325,7 +325,7 @@ Name: findRowByNum
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get from the sheet. | true |
 
 #### Example JSON Structure
@@ -361,7 +361,7 @@ Name: getRows
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 
 #### Example JSON Structure
 ```json
@@ -395,8 +395,8 @@ Name: insertMultipleRows
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
-| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | How the input data should be interpreted. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> <span title="The values the user has entered will not be parsed and will be stored as-is.">RAW</span>, <span title="The values will be parsed as if the user typed them into the UI. Numbers will stay as numbers, but strings may be converted to numbers, dates, etc. following the same rules that are applied when entering text into a cell via the Google Sheets UI.">USER_ENTERED</span> </details> | How the input data should be interpreted. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | rows | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
 #### Example JSON Structure
@@ -433,8 +433,8 @@ Name: insertRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
-| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> RAW, USER_ENTERED </details> | How the input data should be interpreted. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| valueInputOption | Value Input Option | STRING <details> <summary> Options </summary> <span title="The values the user has entered will not be parsed and will be stored as-is.">RAW</span>, <span title="The values will be parsed as if the user typed them into the UI. Numbers will stay as numbers, but strings may be converted to numbers, dates, etc. following the same rules that are applied when entering text into a cell via the Google Sheets UI.">USER_ENTERED</span> </details> | How the input data should be interpreted. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
 #### Example JSON Structure
@@ -526,8 +526,8 @@ Name: updateRow
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
 | rowNumber | Row Number | INTEGER | The row number to update. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
-| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to update the whole row or just specific columns. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
+| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to update the whole row or just specific columns. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
 #### Example JSON Structure
@@ -570,7 +570,7 @@ Type: DYNAMIC_WEBHOOK
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet | STRING | The spreadsheet to apply the updates to. | true |
-| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the first row is header. | true |
 | sheetName | Sheet | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet | true |
 
 

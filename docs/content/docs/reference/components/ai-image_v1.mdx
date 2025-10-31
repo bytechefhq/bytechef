@@ -31,10 +31,10 @@ Name: generateImage
 | model | Model | STRING | ID of the model to use. | true |
 | prompt | Prompt | STRING | Write your prompt for generating an image. | true |
 | n | Number of Responses | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | false |
-| size | Size | STRING <details> <summary> Options </summary> DALL_E_2_256x256, DALL_E_2_512x512, _1024x1024, DALL_E_3_1792x1024, DALL_E_3_1024x1792 </details> | The size of the generated images. | true |
+| size | Size | STRING <details> <summary> Options </summary> <span>DALL_E_2_256x256</span>, <span>DALL_E_2_512x512</span>, <span>_1024x1024</span>, <span>DALL_E_3_1792x1024</span>, <span>DALL_E_3_1024x1792</span> </details> | The size of the generated images. | true |
 | height | Height | INTEGER | Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies. | true |
 | width | Width | INTEGER | Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies. | true |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | The format in which the generated images are returned. | false |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> <span>URL</span>, <span>B64_JSON</span> </details> | The format in which the generated images are returned. | false |
 
 #### Example JSON Structure
 ```json

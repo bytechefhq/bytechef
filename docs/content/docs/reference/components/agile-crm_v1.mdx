@@ -121,14 +121,14 @@ Type: OBJECT
 | browserId | ARRAY <details> <summary> Items </summary> [] </details> | The browser ID of the contact. |
 | lead_source_id | INTEGER | The lead source ID of the contact. |
 | lead_status_id | INTEGER | The lead status ID of the contact. |
-| is_lead_converted | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the lead converted the contact. |
+| is_lead_converted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the lead converted the contact. |
 | lead_converted_time | INTEGER | The time when the lead converted the contact. |
-| is_duplicate_existed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the duplicate of the contact exists . |
+| is_duplicate_existed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the duplicate of the contact exists . |
 | trashed_time | INTEGER | The time when the contact was trashed. |
 | restored_time | INTEGER | The time when the contact was restored. |
-| is_duplicate_verification_failed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the duplicate of the contact verification failed. |
-| is_client_import | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was imported. |
-| concurrent_save_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was saved as concurrent. |
+| is_duplicate_verification_failed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the duplicate of the contact verification failed. |
+| is_client_import | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the contact was imported. |
+| concurrent_save_allowed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the contact was saved as concurrent. |
 | owner | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125; </details> | The owner of the contact. |
 
 
@@ -245,7 +245,7 @@ Type: OBJECT
 |:------------:|:------------:|:-------------------:|
 | colorName | STRING | Color of the deal in display. |
 | id | NUMBER | ID of the deal. |
-| apply_discount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the discount is applied. |
+| apply_discount | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the discount is applied. |
 | discount_value | NUMBER | The discount value of the deal. |
 | discount_amt | NUMBER | The discount amount of the deal. |
 | discount_type | STRING | The discount type of the deal. |
@@ -265,13 +265,13 @@ Type: OBJECT
 | notes_ids | ARRAY <details> <summary> Items </summary> [] </details> | The notes ID. |
 | note_created_time | INTEGER | The time when the deal note was created. |
 | pipeline_id | NUMBER | The ID of the pipeline. |
-| archived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the deal is archived. |
+| archived | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the deal is archived. |
 | won_date | INTEGER | The date when the deal was won. |
 | lost_reason_id | INTEGER | The ID of the lost reason. |
 | deal_source_id | INTEGER | The ID of the deal source. |
 | total_deal_value | NUMBER | The total value of the deal. |
 | updated_time | INTEGER | The time when the deal was updated. |
-| isCurrencyUpdateRequired | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the deal currency requires updating. |
+| isCurrencyUpdateRequired | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the deal currency requires updating. |
 | currency_conversion_value | NUMBER | The currency conversion value. |
 | tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the deal. |
 | tagsWithTime | ARRAY <details> <summary> Items </summary> [] </details> | Tags with time of the deal. |
@@ -342,8 +342,8 @@ Name: createTask
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | subject | Subject | STRING | The subject of the task. | true |
-| type | Task Type | STRING <details> <summary> Options </summary> CALL, EMAIL, FOLLOW_UP, MEETING, MILESTONE, SEND, TWEET, OTHER </details> | The type of the task. | true |
-| priority_type | Priority | STRING <details> <summary> Options </summary> HIGH, NORMAL, LOW </details> | The priority of the task. | true |
+| type | Task Type | STRING <details> <summary> Options </summary> <span>CALL</span>, <span>EMAIL</span>, <span>FOLLOW_UP</span>, <span>MEETING</span>, <span>MILESTONE</span>, <span>SEND</span>, <span>TWEET</span>, <span>OTHER</span> </details> | The type of the task. | true |
+| priority_type | Priority | STRING <details> <summary> Options </summary> <span>HIGH</span>, <span>NORMAL</span>, <span>LOW</span> </details> | The priority of the task. | true |
 | due | Due Date | DATE_TIME | The due date of the task. | true |
 
 #### Example JSON Structure
@@ -379,7 +379,7 @@ Type: OBJECT
 | task_completed_time | INTEGER | The time when task was completed. |
 | task_start_time | INTEGER | The time when task was started. |
 | created_time | INTEGER | The time when task was created. |
-| is_complete | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the task is completed. |
+| is_complete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task is completed. |
 | contacts | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(type), INTEGER\(created_time), INTEGER\(updated_time)&#125;] </details> | Contacts that are connected to the task. |
 | subject | STRING | The subject of the task. |
 | entity_type | STRING | The entity type. |

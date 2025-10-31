@@ -26,7 +26,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | projectId | Project Id | STRING | Google Cloud Platform project ID | true |
-| location | Location | STRING <details> <summary> Options </summary> asia-east1, asia-east2, asia-northeast1, asia-northeast3, asia-south1, asia-southeast1, australia-southeast1, europe-central2, europe-north1, europe-southwest1, europe-west1, europe-west2, europe-west3, europe-west4, europe-west6, europe-west8, europe-west9, me-central1, me-central2, me-west1, northamerica-northeast1, southamerica-east1, us-central1, us-east1, us-east4, us-east5, us-south1, us-west1, us-west4 </details> | Region | true |
+| location | Location | STRING <details> <summary> Options </summary> <span>asia-east1</span>, <span>asia-east2</span>, <span>asia-northeast1</span>, <span>asia-northeast3</span>, <span>asia-south1</span>, <span>asia-southeast1</span>, <span>australia-southeast1</span>, <span>europe-central2</span>, <span>europe-north1</span>, <span>europe-southwest1</span>, <span>europe-west1</span>, <span>europe-west2</span>, <span>europe-west3</span>, <span>europe-west4</span>, <span>europe-west6</span>, <span>europe-west8</span>, <span>europe-west9</span>, <span>me-central1</span>, <span>me-central2</span>, <span>me-west1</span>, <span>northamerica-northeast1</span>, <span>southamerica-east1</span>, <span>us-central1</span>, <span>us-east1</span>, <span>us-east4</span>, <span>us-east5</span>, <span>us-south1</span>, <span>us-west1</span>, <span>us-west4</span> </details> | Region | true |
 
 
 
@@ -47,8 +47,8 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> gemini-1.5-flash-002, gemini-1.5-pro-002, gemini-2.0-flash, gemini-2.0-flash-lite, gemini-2.5-flash-preview-04-17, gemini-2.5-pro-preview-05-06 </details> | ID of the model to use. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, ADVANCED </details> | Format of providing the prompt to the model. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>gemini-1.5-flash-002</span>, <span>gemini-1.5-pro-002</span>, <span>gemini-2.0-flash</span>, <span>gemini-2.0-flash-lite</span>, <span>gemini-2.5-flash-preview-04-17</span>, <span>gemini-2.5-pro-preview-05-06</span> </details> | ID of the model to use. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |

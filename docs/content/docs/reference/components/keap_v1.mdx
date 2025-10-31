@@ -104,8 +104,8 @@ Type: OBJECT
 | company_name | STRING |  |
 | custom_fields | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(content), INTEGER\(id)&#125;] </details> |  |
 | email_address | STRING |  |
-| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |  |
+| email_opted_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| email_status | STRING <details> <summary> Options </summary> <span>UnengagedMarketable</span>, <span>SingleOptIn</span>, <span>DoubleOptin</span>, <span>Confirmed</span>, <span>UnengagedNonMarketable</span>, <span>NonMarketable</span>, <span>Lockdown</span>, <span>Bounce</span>, <span>HardBounce</span>, <span>Manual</span>, <span>Admin</span>, <span>System</span>, <span>ListUnsubscribe</span>, <span>Feedback</span>, <span>Spam</span>, <span>Invalid</span>, <span>Deactivated</span> </details> |  |
 | fax_number | OBJECT <details> <summary> Properties </summary> &#123;STRING\(number), STRING\(type)&#125; </details> |  |
 | id | INTEGER |  |
 | notes | STRING |  |
@@ -160,7 +160,7 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| completed | Completed | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+| completed | Completed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | false |
 | completion_date | Completion Date | DATE_TIME |  | false |
 | contact | BasicContact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(first_name), INTEGER\(id), STRING\(last_name)&#125; </details> |  | false |
 | creation_date | Creation Date | DATE_TIME |  | false |
@@ -218,7 +218,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| completed | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| completed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 | completion_date | DATE_TIME |  |
 | contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(first_name), INTEGER\(id), STRING\(last_name)&#125; </details> |  |
 | creation_date | DATE_TIME |  |
@@ -294,7 +294,7 @@ Name: createContact
 | preferred_name | Preferred Name | STRING |  | false |
 | prefix | Prefix | STRING |  | false |
 | social_accounts | Social Accounts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> |  | false |
-| source_type | Source Type | STRING <details> <summary> Options </summary> APPOINTMENT, FORMAPIHOSTED, FORMAPIINTERNAL, WEBFORM, INTERNALFORM, LANDINGPAGE, IMPORT, MANUAL, API, OTHER, UNKNOWN </details> |  | false |
+| source_type | Source Type | STRING <details> <summary> Options </summary> <span>APPOINTMENT</span>, <span>FORMAPIHOSTED</span>, <span>FORMAPIINTERNAL</span>, <span>WEBFORM</span>, <span>INTERNALFORM</span>, <span>LANDINGPAGE</span>, <span>IMPORT</span>, <span>MANUAL</span>, <span>API</span>, <span>OTHER</span>, <span>UNKNOWN</span> </details> |  | false |
 | spouse_name | Spouse Name | STRING |  | false |
 | suffix | Suffix | STRING |  | false |
 | time_zone | Time Zone | STRING |  | false |
@@ -390,8 +390,8 @@ Type: OBJECT
 | custom_fields | ARRAY <details> <summary> Items </summary> [&#123;&#123;&#125;\(content), INTEGER\(id)&#125;] </details> |  |
 | date_created | DATE_TIME |  |
 | email_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(email), STRING\(field)&#125;] </details> |  |
-| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |  |
+| email_opted_in | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| email_status | STRING <details> <summary> Options </summary> <span>UnengagedMarketable</span>, <span>SingleOptIn</span>, <span>DoubleOptin</span>, <span>Confirmed</span>, <span>UnengagedNonMarketable</span>, <span>NonMarketable</span>, <span>Lockdown</span>, <span>Bounce</span>, <span>HardBounce</span>, <span>Manual</span>, <span>Admin</span>, <span>System</span>, <span>ListUnsubscribe</span>, <span>Feedback</span>, <span>Spam</span>, <span>Invalid</span>, <span>Deactivated</span> </details> |  |
 | family_name | STRING |  |
 | fax_numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(number), STRING\(type)&#125;] </details> |  |
 | given_name | STRING |  |
@@ -409,7 +409,7 @@ Type: OBJECT
 | prefix | STRING |  |
 | relationships | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), INTEGER\(linked_contact_id), INTEGER\(relationship_type_id)&#125;] </details> |  |
 | social_accounts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> |  |
-| source_type | STRING <details> <summary> Options </summary> APPOINTMENT, FORMAPIHOSTED, FORMAPIINTERNAL, WEBFORM, INTERNALFORM, LANDINGPAGE, IMPORT, MANUAL, API, OTHER, UNKNOWN </details> |  |
+| source_type | STRING <details> <summary> Options </summary> <span>APPOINTMENT</span>, <span>FORMAPIHOSTED</span>, <span>FORMAPIINTERNAL</span>, <span>WEBFORM</span>, <span>INTERNALFORM</span>, <span>LANDINGPAGE</span>, <span>IMPORT</span>, <span>MANUAL</span>, <span>API</span>, <span>OTHER</span>, <span>UNKNOWN</span> </details> |  |
 | spouse_name | STRING |  |
 | suffix | STRING |  |
 | tag_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |

@@ -27,7 +27,7 @@ Version: 1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | accessKeyId | Access Key ID | STRING |  | true |
 | secretAccessKey | Secret Access Key | STRING |  | true |
-| region | | STRING <details> <summary> Options </summary> us-east-1, us-east-2, us-west-1, us-west-2, ca-central-1, ap-east-1, ap-south-1, ap-south-2, ap-northeast-3, ap-northeast-2, ap-southeast-1, ap-southeast-2, ap-southeast-3, ap-southeast-4, ap-northeast-1, me-south-1, me-central-1, eu-central-1, eu-central-2, eu-west-1, eu-west-2, eu-south-1, eu-south-2, eu-west-3, eu-north-1, af-south-1, sa-east-1, cn-north-1, cn-northwest-1 </details> |  | true |
+| region | | STRING <details> <summary> Options </summary> <span>us-east-1</span>, <span>us-east-2</span>, <span>us-west-1</span>, <span>us-west-2</span>, <span>ca-central-1</span>, <span>ap-east-1</span>, <span>ap-south-1</span>, <span>ap-south-2</span>, <span>ap-northeast-3</span>, <span>ap-northeast-2</span>, <span>ap-southeast-1</span>, <span>ap-southeast-2</span>, <span>ap-southeast-3</span>, <span>ap-southeast-4</span>, <span>ap-northeast-1</span>, <span>me-south-1</span>, <span>me-central-1</span>, <span>eu-central-1</span>, <span>eu-central-2</span>, <span>eu-west-1</span>, <span>eu-west-2</span>, <span>eu-south-1</span>, <span>eu-south-2</span>, <span>eu-west-3</span>, <span>eu-north-1</span>, <span>af-south-1</span>, <span>sa-east-1</span>, <span>cn-north-1</span>, <span>cn-northwest-1</span> </details> |  | true |
 | bucketName | Bucket | STRING |  | true |
 
 
@@ -239,7 +239,7 @@ Name: putObject
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File Entry | FILE_ENTRY | The object property which contains a reference to the file that needs to be written to AWS S3. | true |
 | key | Key | STRING | Key is most likely the name of the file. | true |
-| acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | The canned ACL to apply to the object. | false |
+| acl | ACL | STRING <details> <summary> Options </summary> <span>authenticated-read</span>, <span>aws-exec-read</span>, <span>bucket-owner-read</span>, <span>bucket-owner-full-control</span>, <span>private</span>, <span>public-read</span>, <span>public-read-write</span> </details> | The canned ACL to apply to the object. | false |
 
 #### Example JSON Structure
 ```json

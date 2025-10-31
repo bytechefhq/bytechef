@@ -50,7 +50,7 @@ Name: createTask
 | content | Content | STRING | Task content. It may contain some markdown-formatted text and hyperlinks. | true |
 | description | Description | STRING | A description for the task. This value may contain some markdown-formatted text and hyperlinks. | false |
 | project_id | Project ID | STRING | Task project ID. If not set, task is put to user's Inbox. | false |
-| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Task priority from 1 (normal) to 4 (urgent). | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span> </details> | Task priority from 1 (normal) to 4 (urgent). | false |
 
 #### Example JSON Structure
 ```json
@@ -139,8 +139,8 @@ Name: createProject
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Name of the project. | true |
-| color | Color | STRING <details> <summary> Options </summary> beryy_red, red, orange, yellow, olive_green, lime_green, green, mint_green, teal, sky_blue, light_blue, blue, grape, violet, lavender, magenta, salmon, charcoal, grey, taupe </details> |  | false |
-| is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is a favorite. | false |
+| color | Color | STRING <details> <summary> Options </summary> <span>beryy_red</span>, <span>red</span>, <span>orange</span>, <span>yellow</span>, <span>olive_green</span>, <span>lime_green</span>, <span>green</span>, <span>mint_green</span>, <span>teal</span>, <span>sky_blue</span>, <span>light_blue</span>, <span>blue</span>, <span>grape</span>, <span>violet</span>, <span>lavender</span>, <span>magenta</span>, <span>salmon</span>, <span>charcoal</span>, <span>grey</span>, <span>taupe</span> </details> |  | false |
+| is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the project is a favorite. | false |
 
 #### Example JSON Structure
 ```json

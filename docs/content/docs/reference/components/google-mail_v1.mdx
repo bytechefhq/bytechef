@@ -131,7 +131,7 @@ Name: getMail
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message ID | STRING | The ID of the message to retrieve. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
 #### Example JSON Structure
@@ -165,7 +165,7 @@ Name: getThread
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Thread ID | STRING | The ID of the thread to retrieve. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
 #### Example JSON Structure
@@ -322,9 +322,9 @@ Name: searchEmail
 | from | From | STRING | The address sending the mail | false |
 | to | To | STRING | The address receiving the new mail | false |
 | subject | Subject | STRING | Words in the subject line | false |
-| category | Category | STRING <details> <summary> Options </summary> primary, social, promotions, updates, forums, reservations, purchases </details> | Messages in a certain category | false |
+| category | Category | STRING <details> <summary> Options </summary> <span>primary</span>, <span>social</span>, <span>promotions</span>, <span>updates</span>, <span>forums</span>, <span>reservations</span>, <span>purchases</span> </details> | Messages in a certain category | false |
 | labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. | false |
-| includeSpamTrash | Include Spam Trash | BOOLEAN <details> <summary> Options </summary> true, false </details> | Include messages from SPAM and TRASH in the results. | false |
+| includeSpamTrash | Include Spam Trash | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Include messages from SPAM and TRASH in the results. | false |
 
 #### Example JSON Structure
 ```json
@@ -460,7 +460,7 @@ Type: STATIC_WEBHOOK
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | topicName | Topic Name | STRING | Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog. | true |
-| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns only email message ID and labels; does not return the email headers, body, or payload.">MINIMAL</span>, <span title="Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">FULL</span>, <span title="Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.">RAW</span>, <span title="Returns only email message ID, labels, and email headers.">metadata</span> </details> | The format to return the message in. | false |
 
 
 #### Output

@@ -99,7 +99,7 @@ Name: get
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | port | Port | INTEGER | Defines the port to connect to the email server. | true |
-| protocol | Protocol | STRING <details> <summary> Options </summary> imap, pop3 </details> | Protocol defines communication procedure. IMAP allows receiving emails. POP3 is older protocol for receiving emails. | true |
+| protocol | Protocol | STRING <details> <summary> Options </summary> <span title="IMAP is used to receive email">imap</span>, <span title="POP3 is used to receive email">pop3</span> </details> | Protocol defines communication procedure. IMAP allows receiving emails. POP3 is older protocol for receiving emails. | true |
 | from | From Email | STRING | From who the email was sent. | true |
 | subject | Subject contains | STRING | Filters email messages where subject contains this keyword. Character matching is case insensitive. | true |
 
@@ -135,7 +135,7 @@ Items Type: OBJECT
 | content | STRING |  |
 | contentType | STRING |  |
 | from | STRING |  |
-| hasAttachments | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| hasAttachments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
 | subject | STRING |  |
 
 

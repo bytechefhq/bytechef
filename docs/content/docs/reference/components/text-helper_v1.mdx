@@ -27,7 +27,7 @@ Name: base64EncodeDecode
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING | The text to be Base64 encode or decode. | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | Select whether to encode or decode the text. | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> <span>ENCODE</span>, <span>DECODE</span> </details> | Select whether to encode or decode the text. | true |
 
 #### Example JSON Structure
 ```json
@@ -142,9 +142,9 @@ Name: extractContentFromHtml
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | content | HTML Content | STRING | HTML content to extract content from. | true |
 | querySelector | CSS Selector | STRING | The CSS selector to search for. | true |
-| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | The data to return. | true |
+| returnValue | Return Value | STRING <details> <summary> Options </summary> <span title="Get the attribute value like 'class' from an element.">ATTRIBUTE</span>, <span title="Get the HTML content that the element contains.">HTML</span>, <span title="Get the text content of the element.">TEXT</span> </details> | The data to return. | true |
 | attribute | Attribute | STRING | The name of the attribute to return the value of | true |
-| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | false |
+| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | false |
 
 #### Example JSON Structure
 ```json
@@ -221,7 +221,7 @@ Name: formatCurrency
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| currency | Currency | STRING <details> <summary> Options </summary> ADP, AED, AFA, AFN, ALL, AMD, ANG, AOA, ARS, ATS, AUD, AWG, AYM, AZM, AZN, BAM, BBD, BDT, BEF, BGL, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYB, BYN, BYR, BZD, CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CSD, CUC, CUP, CVE, CYP, CZK, DEM, DJF, DKK, DOP, DZD, EEK, EGP, ERN, ESP, ETB, EUR, FIM, FJD, FKP, FRF, GBP, GEL, GHC, GHS, GIP, GMD, GNF, GRD, GTQ, GWP, GYD, HKD, HNL, HRK, HTG, HUF, IDR, IEP, ILS, INR, IQD, IRR, ISK, ITL, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LTL, LUF, LVL, LYD, MAD, MDL, MGA, MGF, MKD, MMK, MNT, MOP, MRO, MRU, MTL, MUR, MVR, MWK, MXN, MXV, MYR, MZM, MZN, NAD, NGN, NIO, NLG, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PTE, PYG, QAR, ROL, RON, RSD, RUB, RUR, RWF, SAR, SBD, SCR, SDD, SDG, SEK, SGD, SHP, SIT, SKK, SLE, SLL, SOS, SRD, SRG, SSP, STD, STN, SVC, SYP, SZL, THB, TJS, TMM, TMT, TND, TOP, TPE, TRL, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, USS, UYI, UYU, UZS, VEB, VED, VEF, VES, VND, VUV, WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XFO, XFU, XOF, XPD, XPF, XPT, XSU, XTS, XUA, XXX, YER, YUM, ZAR, ZMK, ZMW, ZWD, ZWL, ZWN, ZWR </details> | The type of currency you wish to use. | true |
+| currency | Currency | STRING <details> <summary> Options </summary> <span>ADP</span>, <span>AED</span>, <span>AFA</span>, <span>AFN</span>, <span>ALL</span>, <span>AMD</span>, <span>ANG</span>, <span>AOA</span>, <span>ARS</span>, <span>ATS</span>, <span>AUD</span>, <span>AWG</span>, <span>AYM</span>, <span>AZM</span>, <span>AZN</span>, <span>BAM</span>, <span>BBD</span>, <span>BDT</span>, <span>BEF</span>, <span>BGL</span>, <span>BGN</span>, <span>BHD</span>, <span>BIF</span>, <span>BMD</span>, <span>BND</span>, <span>BOB</span>, <span>BOV</span>, <span>BRL</span>, <span>BSD</span>, <span>BTN</span>, <span>BWP</span>, <span>BYB</span>, <span>BYN</span>, <span>BYR</span>, <span>BZD</span>, <span>CAD</span>, <span>CDF</span>, <span>CHE</span>, <span>CHF</span>, <span>CHW</span>, <span>CLF</span>, <span>CLP</span>, <span>CNY</span>, <span>COP</span>, <span>COU</span>, <span>CRC</span>, <span>CSD</span>, <span>CUC</span>, <span>CUP</span>, <span>CVE</span>, <span>CYP</span>, <span>CZK</span>, <span>DEM</span>, <span>DJF</span>, <span>DKK</span>, <span>DOP</span>, <span>DZD</span>, <span>EEK</span>, <span>EGP</span>, <span>ERN</span>, <span>ESP</span>, <span>ETB</span>, <span>EUR</span>, <span>FIM</span>, <span>FJD</span>, <span>FKP</span>, <span>FRF</span>, <span>GBP</span>, <span>GEL</span>, <span>GHC</span>, <span>GHS</span>, <span>GIP</span>, <span>GMD</span>, <span>GNF</span>, <span>GRD</span>, <span>GTQ</span>, <span>GWP</span>, <span>GYD</span>, <span>HKD</span>, <span>HNL</span>, <span>HRK</span>, <span>HTG</span>, <span>HUF</span>, <span>IDR</span>, <span>IEP</span>, <span>ILS</span>, <span>INR</span>, <span>IQD</span>, <span>IRR</span>, <span>ISK</span>, <span>ITL</span>, <span>JMD</span>, <span>JOD</span>, <span>JPY</span>, <span>KES</span>, <span>KGS</span>, <span>KHR</span>, <span>KMF</span>, <span>KPW</span>, <span>KRW</span>, <span>KWD</span>, <span>KYD</span>, <span>KZT</span>, <span>LAK</span>, <span>LBP</span>, <span>LKR</span>, <span>LRD</span>, <span>LSL</span>, <span>LTL</span>, <span>LUF</span>, <span>LVL</span>, <span>LYD</span>, <span>MAD</span>, <span>MDL</span>, <span>MGA</span>, <span>MGF</span>, <span>MKD</span>, <span>MMK</span>, <span>MNT</span>, <span>MOP</span>, <span>MRO</span>, <span>MRU</span>, <span>MTL</span>, <span>MUR</span>, <span>MVR</span>, <span>MWK</span>, <span>MXN</span>, <span>MXV</span>, <span>MYR</span>, <span>MZM</span>, <span>MZN</span>, <span>NAD</span>, <span>NGN</span>, <span>NIO</span>, <span>NLG</span>, <span>NOK</span>, <span>NPR</span>, <span>NZD</span>, <span>OMR</span>, <span>PAB</span>, <span>PEN</span>, <span>PGK</span>, <span>PHP</span>, <span>PKR</span>, <span>PLN</span>, <span>PTE</span>, <span>PYG</span>, <span>QAR</span>, <span>ROL</span>, <span>RON</span>, <span>RSD</span>, <span>RUB</span>, <span>RUR</span>, <span>RWF</span>, <span>SAR</span>, <span>SBD</span>, <span>SCR</span>, <span>SDD</span>, <span>SDG</span>, <span>SEK</span>, <span>SGD</span>, <span>SHP</span>, <span>SIT</span>, <span>SKK</span>, <span>SLE</span>, <span>SLL</span>, <span>SOS</span>, <span>SRD</span>, <span>SRG</span>, <span>SSP</span>, <span>STD</span>, <span>STN</span>, <span>SVC</span>, <span>SYP</span>, <span>SZL</span>, <span>THB</span>, <span>TJS</span>, <span>TMM</span>, <span>TMT</span>, <span>TND</span>, <span>TOP</span>, <span>TPE</span>, <span>TRL</span>, <span>TRY</span>, <span>TTD</span>, <span>TWD</span>, <span>TZS</span>, <span>UAH</span>, <span>UGX</span>, <span>USD</span>, <span>USN</span>, <span>USS</span>, <span>UYI</span>, <span>UYU</span>, <span>UZS</span>, <span>VEB</span>, <span>VED</span>, <span>VEF</span>, <span>VES</span>, <span>VND</span>, <span>VUV</span>, <span>WST</span>, <span>XAF</span>, <span>XAG</span>, <span>XAU</span>, <span>XBA</span>, <span>XBB</span>, <span>XBC</span>, <span>XBD</span>, <span>XCD</span>, <span>XDR</span>, <span>XFO</span>, <span>XFU</span>, <span>XOF</span>, <span>XPD</span>, <span>XPF</span>, <span>XPT</span>, <span>XSU</span>, <span>XTS</span>, <span>XUA</span>, <span>XXX</span>, <span>YER</span>, <span>YUM</span>, <span>ZAR</span>, <span>ZMK</span>, <span>ZMW</span>, <span>ZWD</span>, <span>ZWL</span>, <span>ZWN</span>, <span>ZWR</span> </details> | The type of currency you wish to use. | true |
 | amount | Amount | NUMBER | The amount to be formatted. | true |
 | decimalDigits | Decimal Digits | INTEGER | Digits you would like after your decimal. | true |
 | decimalSeparator | Decimal Separator | STRING | The character you would like to use as a decimal separator. | true |
@@ -376,7 +376,7 @@ Name: replace
 | text | Text | STRING |  | true |
 | searchValue | Search Value | STRING | Can be plain text or a regex expression. | true |
 | replaceValue | Replace Value | STRING | Leave blank to remove the search value. | false |
-| replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+| replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -609,7 +609,7 @@ Name: urlEncodeDecode
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | Text | STRING | The text to be URL encode or decode. | true |
-| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | Select whether to encode or decode the text. | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> <span>ENCODE</span>, <span>DECODE</span> </details> | Select whether to encode or decode the text. | true |
 
 #### Example JSON Structure
 ```json

@@ -77,14 +77,14 @@ Type: OBJECT
 | destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
 | cancellationReason | STRING | Cancellation reason of the booking cancellation. |
 | seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
-| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seats show attendees. |
 | iCalUID | STRING | UID of the iCal. |
 | iCalSequence | INTEGER | Sequence of the iCal. |
-| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the organizer email is hidden. |
 | customReplyToEmail | STRING | Custom reply to the email. |
 | eventTitle | STRING | Event title of the booking. |
 | eventDescription | STRING | Event description of the booking. |
-| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether booking requires confirmation. |
 | price | INTEGER | Price of the booking. |
 | currency | STRING | Currency of the price of the booking. |
 | status | STRING | Status of the booking |
@@ -130,13 +130,13 @@ Type: OBJECT
 | type | STRING | Type of the booking. |
 | description | STRING | Description of the booking. |
 | eventTypeId | INTEGER | ID of the event type of the booking. |
-| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar notes are hidden. |
-| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar event details are hidden. |
-| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the calendar notes are hidden. |
+| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the calendar event details are hidden. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the organizer email is hidden. |
 | schedulingType | STRING | Scheduling type of the booking |
 | seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
-| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
-| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show availability count. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seats show attendees. |
+| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seats show availability count. |
 | customReplyToEmail | STRING | Custom reply to the email. |
 | organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
 | attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
@@ -147,7 +147,7 @@ Type: OBJECT
 | destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
 | iCalUID | STRING | UID of the iCal. |
 | iCalSequence | INTEGER | Sequence of the iCal. |
-| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether booking requires confirmation. |
 | oneTimePassword | STRING | One time password of the booking. |
 | uid | STRING | UID of the booking. |
 | conferenceData | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(requestId)&#125;\(createRequest)&#125; </details> | Conference data of the booking. |
@@ -240,13 +240,13 @@ Type: OBJECT
 | type | STRING | Type of the booking. |
 | description | STRING | Description of the booking. |
 | eventTypeId | INTEGER | ID of the event type of the booking. |
-| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar notes are hidden. |
-| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the calendar event details are hidden. |
-| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the organizer email is hidden. |
+| hideCalendarNotes | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the calendar notes are hidden. |
+| hideCalendarEventDetails | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the calendar event details are hidden. |
+| hideOrganizerEmail | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the organizer email is hidden. |
 | schedulingType | STRING | Scheduling type of the booking |
 | seatsPerTimeSlot | INTEGER | How many seats are available in the booking timeslot. |
-| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show attendees. |
-| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the seats show availability count. |
+| seatsShowAttendees | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seats show attendees. |
+| seatsShowAvailabilityCount | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seats show availability count. |
 | customReplyToEmail | STRING | Custom reply to the email. |
 | organizer | OBJECT <details> <summary> Properties </summary> &#123;&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\(personRecord)&#125; </details> | Organizer of the booking. |
 | attendees | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(email), STRING\(username), STRING\(timezone), &#123;STRING\(locale)&#125;\(language), STRING\(timeFormat), INTEGER\(utcOffset)&#125;\($personRecord)] </details> | Attendees of the booking. |
@@ -257,7 +257,7 @@ Type: OBJECT
 | destinationCalendar | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(integration), STRING\(externalId), STRING\(primaryEmail), INTEGER\(userId), INTEGER\(eventTypeId), INTEGER\(credentialId), INTEGER\(delegationCredentialId), INTEGER\(domainWideDelegationCredentialId)&#125;\($calendar)] </details> | Destination calendar of the booking. |
 | iCalUID | STRING | UID of the iCal. |
 | iCalSequence | INTEGER | Sequence of the iCal. |
-| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether booking requires confirmation. |
+| requiresConfirmation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether booking requires confirmation. |
 | oneTimePassword | STRING | One time password of the booking. |
 | uid | STRING | UID of the booking. |
 | videoCallData | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), INTEGER\(id), STRING\(password), STRING\(uri)&#125; </details> | Video call data of the booking. |

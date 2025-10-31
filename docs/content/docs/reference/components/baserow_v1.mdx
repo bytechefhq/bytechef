@@ -47,7 +47,7 @@ Name: createRow
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tableId | Table ID | INTEGER | ID of the table where the row must be created in. | true |
-| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
+| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
 #### Example JSON Structure
@@ -114,7 +114,7 @@ Name: getRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tableId | Table ID | INTEGER | ID of the table where you want to get the row from. | true |
 | rowId | Row ID | INTEGER | ID of the row to get. | true |
-| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
+| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
 #### Example JSON Structure
 ```json
@@ -149,7 +149,7 @@ Name: listRows
 | tableId | Table ID | INTEGER | ID of the table where you want to get the rows from. | true |
 | size | Size | INTEGER | The maximum number of rows to retrieve. | false |
 | order_by | Order By | STRING | If provided rows will be order by specific field. Use - sign for descending ordering. | false |
-| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
+| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
 #### Example JSON Structure
 ```json
@@ -184,7 +184,7 @@ Name: updateRow
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tableId | Table ID | INTEGER | ID of the table containing the row to be updated. | true |
 | rowId | Row ID | INTEGER | ID of the row to be updated. | true |
-| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
+| user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
 #### Example JSON Structure

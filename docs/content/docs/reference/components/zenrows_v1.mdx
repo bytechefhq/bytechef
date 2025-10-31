@@ -1,0 +1,177 @@
+---
+title: "ZenRows"
+description: "ZenRows is a web scraping service with an advanced toolkit and APIs that simplify data extraction from bot-protected websites."
+---
+
+
+Categories: Analytics
+
+
+Type: zenrows/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### api_key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| value | API Key | STRING | API key can be found in Settings -&gt; API Key. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Scrape URL
+Name: scrapeUrl
+
+`Extracts HTML data from a given URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | URL of the site that will be scraped. | true |
+| original_status | Original Status | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return the original HTTP status code from the target page. Useful for debugging in case of errors. | false |
+| js_render | JS Render | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable JavaScript rendering with a headless browser. Essential for modern web apps, SPAs, and sites with dynamic content. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scrape URL",
+  "name" : "scrapeUrl",
+  "parameters" : {
+    "url" : "",
+    "original_status" : false,
+    "js_render" : false
+  },
+  "type" : "zenrows/v1/scrapeUrl"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Scrape URL Autoparse
+Name: scrapeUrlAutoparse
+
+`Get a JSON with the page's data. For most popular websites only.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | URL of the site that will be scraped. | true |
+| original_status | Original Status | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return the original HTTP status code from the target page. Useful for debugging in case of errors. | false |
+| js_render | JS Render | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable JavaScript rendering with a headless browser. Essential for modern web apps, SPAs, and sites with dynamic content. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scrape URL Autoparse",
+  "name" : "scrapeUrlAutoparse",
+  "parameters" : {
+    "url" : "",
+    "original_status" : false,
+    "js_render" : false
+  },
+  "type" : "zenrows/v1/scrapeUrlAutoparse"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Scrape URL With CSS Selectors
+Name: scrapeUrlWithCssSelectors
+
+`Extracts specific data from a given URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | URL of the site that will be scraped. | true |
+| css_extractor | CSS Extractor | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;] </details> | Key-value pairs that will be scraped, where key is arbitrary parameter name and value is CSS element that you want to scrape. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scrape URL With CSS Selectors",
+  "name" : "scrapeUrlWithCssSelectors",
+  "parameters" : {
+    "url" : "",
+    "css_extractor" : [ {
+      "key" : "",
+      "value" : ""
+    } ]
+  },
+  "type" : "zenrows/v1/scrapeUrlWithCssSelectors"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Find API Key
+
+1. Navigate to your dashboard.
+2. Click on **Settings**.
+3. Here you can see your API key.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/2b69b7ce-2596-49d2-aeda-bb74a9c52f70?type=1&controls=on" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
