@@ -29,9 +29,9 @@ import static com.bytechef.component.liferay.constant.LiferayConstants.SERVICE;
 import static com.bytechef.component.liferay.util.LiferayUtils.getContextNameOptions;
 import static com.bytechef.component.liferay.util.LiferayUtils.getServiceHttpData;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.liferay.strategy.GetLiferayHttpMethod;
 import com.bytechef.component.liferay.strategy.LiferayHttpMethod;
@@ -57,7 +57,7 @@ public class LiferayJsonWsRequestAction {
                 .label("Service ID")
                 .description("ID of the service you want to access.")
                 .optionsLookupDependsOn(CONTEXT_NAME)
-                .options((ActionOptionsFunction<Long>) LiferayUtils::getServiceOptions)
+                .options((OptionsFunction<Long>) LiferayUtils::getServiceOptions)
                 .required(true),
             PARAMETERS_DYNAMIC_PROPERTY)
         .output()

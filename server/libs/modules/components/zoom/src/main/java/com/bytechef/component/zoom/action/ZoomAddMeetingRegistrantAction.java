@@ -28,8 +28,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.zoom.util.ZoomUtils;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class ZoomAddMeetingRegistrantAction {
         .properties(integer("meetingId").label("Meeting ID")
             .description("ID of the meeting where the registrant will be added.")
             .required(true)
-            .options((OptionsDataSource.ActionOptionsFunction<Long>) ZoomUtils::getMeetingIdOptions)
+            .options((ActionDefinition.OptionsFunction<Long>) ZoomUtils::getMeetingIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

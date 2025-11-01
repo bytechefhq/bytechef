@@ -1,0 +1,246 @@
+---
+title: "LinkedIn"
+description: "LinkedIn is a professional networking platform that enables users to connect with colleagues, discover job opportunities, and share industry-related content."
+---
+
+
+Categories: Communication, Social Media
+
+
+Type: linkedin/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Post
+Name: createPost
+
+`Create a post on LinkedIn.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| author | Post As | STRING <details> <summary> Options </summary> PERSON, ORGANIZATION </details> | Choose whether to post as a Person or Organization. | true |
+| urn | null | STRING | Organization URN | true |
+| commentary | Text | STRING | The user generated commentary for the post. | true |
+| contentType | Media Category | STRING <details> <summary> Options </summary> ARTICLE, DOCUMENT, IMAGES </details> | Type of media to be posted. | false |
+| visibility | Visibility | STRING <details> <summary> Options </summary> PUBLIC, CONNECTIONS </details> | Visibility restrictions on content. | true |
+| images | Images | ARRAY <details> <summary> Items </summary> [FILE_ENTRY\($image)] </details> | Images to be posted. | true |
+| source | Article URL | STRING | A URL of the article. Typically the URL that was ingested to maintain URL parameters. | true |
+| title | Article Title | STRING | Custom or saved title of the article. | false |
+| description | Article Description | STRING | Custom or saved description of the article. | false |
+| thumbnail | Article Thumbnail | FILE_ENTRY | The thumbnail image to be associated with the article. | false |
+| document | Document | FILE_ENTRY | The document to be posted. | true |
+| title | Document Title | STRING | The title of the document. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "author" : "",
+    "urn" : "",
+    "commentary" : "",
+    "contentType" : "",
+    "visibility" : "",
+    "images" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "source" : "",
+    "title" : "",
+    "description" : "",
+    "thumbnail" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "document" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "linkedin/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Delete Post
+Name: deletePost
+
+`Delete a post from LinkedIn.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urn | URN | STRING | ugcPostUrn|shareUrn | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Post",
+  "name" : "deletePost",
+  "parameters" : {
+    "urn" : ""
+  },
+  "type" : "linkedin/v1/deletePost"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+## Triggers
+
+
+### New Post
+Name: newPost
+
+`Triggers when a new post is created in a specific organization.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urn | Organization URN | STRING | URN of the organization to monitor for new posts. | true |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| isReshareDisabledByAuthor | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether resharing of the post has been disabled by the author. |
+| createdAt | INTEGER | Time at which the resource was created in milliseconds since epoch. |
+| lifecycleState | STRING | The state of the content. |
+| lastModifiedAt | INTEGER | Time at which the resource was last modified in milliseconds since epoch. |
+| visibility | STRING | Visibility restrictions on content. |
+| publishedAt | INTEGER | The time at which the content was published represented in epoch time. |
+| author | STRING | URN of the author of the content. |
+| id | STRING | Unique ID for the object. |
+| distribution | OBJECT <details> <summary> Properties </summary> &#123;STRING\(feedDistribution), [STRING]\(thirdPartyDistributionChannels)&#125; </details> | Distribution of the post both in LinkedIn and externally. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(description), STRING\(thumbnail), STRING\(source), STRING\(title)&#125;\(article), &#123;STRING\(id), STRING\(title), STRING\(altText)&#125;\(media), &#123;[&#123;STRING\(id), STRING\(title), STRING\(altText)&#125;]\(images), STRING\(altText)&#125;\(multiImage)&#125; </details> | The posted content. |
+| commentary | STRING | The user generated commentary for the post. |
+| lifecycleStateInfo | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(isEditedByAuthor)&#125; </details> | Additional information about the lifecycle state for PUBLISH_REQUESTED or PUBLISH_FAILED. |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Post",
+  "name" : "newPost",
+  "parameters" : {
+    "urn" : ""
+  },
+  "type" : "linkedin/v1/newPost"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+To integrate LinkedIn with ByteChef, you will need a LinkedIn account and access to a LinkedIn Company Page.
+
+1. Go to the `https://www.linkedin.com/developers`.
+2. Click on **My apps**.
+3. Click on **Create app**.
+4. Fill in the required fields:
+    - **App name**: Enter a name for your application (e.g., `bytechef integration`).
+    - **LinkedIn Page**: Enter a LinkedIn Company Page or use the Create a new LinkedIn Page link to create one on-the-fly.
+    - **App logo**: Upload an image for your application.
+     - **Legal agreement**: Check the box to agree to the Legal agreement.
+5. Click on **Create app**.
+6. This should open the Products tab. Select the products/APIs you want to enable for your app.
+7. Request access for the **Share on LinkedIn**
+8. Request access for the **Sign In with LinkedIn using OpenID Connect**
+9. Go to the **Auth** tab.
+10. Specify the URL where users will be redirected after authorization (e.g., `https://app.bytechef.io/callback`)
+11. Copy the **Client ID** and **Client Secret** for later use.
+
+<div style={{ position: 'relative', height: 0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.02672956% + 32px)' }}>
+    <iframe src="https://www.guidejar.com/embed/w1vC0F2FhnUDnhSWXJ66?type=1&controls=on" width="100%" height="100%" style={{ height: '100%', position: 'absolute', inset: 0 }} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+To post as an organization, you need to verify your app as being associated with this company.
+
+1. Go to the **Settings** tab.
+2. Click **Verify**.
+3. Click **Generate URL**.
+4. Copy URL and send it to a Company Page admin for verfication.
+5. Once verification is complete, return to the **Products** tab and enable the **Advertising API** to allow posting as an organization.

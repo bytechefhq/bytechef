@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogCloseButton,
@@ -64,6 +64,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
 
                     <div className="flex justify-end">
                         <Button
+                            label="Publish"
                             onClick={() =>
                                 publishIntegrationMutation.mutate({
                                     id: integration.id!,
@@ -72,9 +73,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                                     },
                                 })
                             }
-                        >
-                            Publish
-                        </Button>
+                        />
                     </div>
                 </div>
             </DialogContent>

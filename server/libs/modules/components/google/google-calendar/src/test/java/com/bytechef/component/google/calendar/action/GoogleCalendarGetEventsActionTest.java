@@ -24,7 +24,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,7 +39,7 @@ class GoogleCalendarGetEventsActionTest {
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() {
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
             mockStatic(GoogleCalendarUtils.class)) {
 

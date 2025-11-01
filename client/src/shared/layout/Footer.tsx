@@ -9,7 +9,7 @@ interface FooterProps {
 }
 
 const Footer = ({centerTitle, children, className, position = 'sidebar', right}: PropsWithChildren<FooterProps>) => (
-    <footer className={twMerge('p-4', centerTitle ? '2xl:mx-auto 2xl:w-4/5' : '3xl:w-4/5', className)}>
+    <footer className={twMerge('p-4', centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(

@@ -2,6 +2,8 @@ dependencies {
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.ai:spring-ai-commons")
+    implementation("org.springframework.ai:spring-ai-pgvector-store")
+    implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.ai:spring-ai-advisors-vector-store")
     implementation("org.springframework.ai:spring-ai-openai")

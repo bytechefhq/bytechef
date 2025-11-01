@@ -1,5 +1,4 @@
 import {useToast} from '@/hooks/use-toast';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -13,6 +12,7 @@ import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.
 import {ProjectVersionKeys} from '@/shared/queries/automation/projectVersions.queries';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';

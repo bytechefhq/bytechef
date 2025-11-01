@@ -54,9 +54,11 @@ public class LiferayPropertiesUtils {
     public static PropertiesContainer createPropertiesForParameters(
         String application, String endpoint, ActionContext context) {
 
-        String url = "/o/" + application + "/openapi.json";
+        String applicationOpenApiUrl = "/o/" + application + "/openapi.json";
+        String applicationEndpointCacheKey = application + "/" + endpoint;
 
-        return PROPERTIES_CONTAINER_CACHE.get(url, cacheKey -> getPropertiesContainer(url, endpoint, context));
+        return PROPERTIES_CONTAINER_CACHE.get(
+            applicationEndpointCacheKey, key -> getPropertiesContainer(applicationOpenApiUrl, endpoint, context));
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(

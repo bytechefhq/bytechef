@@ -3,12 +3,12 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanel';
-import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -144,7 +144,7 @@ const PropertyCodeEditorSheet = ({
                             <ResizableHandle className="bg-muted" />
 
                             <ResizablePanel defaultSize={25}>
-                                <div className="relative size-full overflow-y-auto p-4">
+                                <div className="relative size-full overflow-y-auto p-4 text-sm">
                                     {!scriptIsRunning ? (
                                         scriptTestExecution ? (
                                             scriptTestExecution.output ? (
@@ -160,7 +160,7 @@ const PropertyCodeEditorSheet = ({
                                                     <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>
                                                 )
                                             ) : scriptTestExecution.error ? (
-                                                <div className="space-y-4 text-sm">
+                                                <div className="space-y-4">
                                                     <div className="space-y-2">
                                                         <div className="font-semibold text-destructive">Error</div>
 

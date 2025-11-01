@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
@@ -11,6 +10,7 @@ import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/us
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {LinkIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -184,7 +184,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                     </>
                 ) : (
                     <div className="flex flex-1 flex-col items-center">
-                        <div className="mt-16 w-full place-self-center px-2 2xl:mx-auto 2xl:w-4/5">
+                        <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
                             <div className="text-center">
                                 <span className="mx-auto inline-block">
                                     <LinkIcon className="size-6 text-gray-400" />

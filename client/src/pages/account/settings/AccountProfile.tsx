@@ -10,7 +10,7 @@ const AccountProfile = () => {
             header={<Header centerTitle={true} position="main" title="Your profile" />}
             leftSidebarOpen={false}
         >
-            <div className="w-full p-4 2xl:mx-auto 2xl:w-4/5">
+            <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">
                 <div className="max-w-xl divide-y divide-muted">
                     <AccountProfileDetails />
 

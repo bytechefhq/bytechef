@@ -2,8 +2,7 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ControlType, PropertyType, Workflow} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
-import {FieldValues} from 'react-hook-form/dist/types';
-import {Control, FormState} from 'react-hook-form/dist/types/form';
+import {Control, FieldValues, FormState} from 'react-hook-form';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepItemConfigurationProps {
     control: Control<IntegrationInstanceConfiguration>;

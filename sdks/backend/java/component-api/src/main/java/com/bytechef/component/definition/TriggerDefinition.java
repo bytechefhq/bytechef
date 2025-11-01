@@ -186,7 +186,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+    Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
     /**
      * @return
@@ -338,6 +338,27 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
+    interface OptionsFunction<T> extends OptionsDataSource.BaseOptionsFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param lookupDependsOnPaths
+         * @param searchText
+         * @param context
+         * @return
+         * @throws Exception
+         */
+        List<? extends Option<T>> apply(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+            String searchText, TriggerContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
     interface PollFunction {
 
         /**
@@ -358,6 +379,26 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
+    interface PropertiesFunction extends PropertiesDataSource.BasePropertiesFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param lookupDependsOnPaths
+         * @param context
+         * @return
+         * @throws Exception
+         */
+        List<? extends Property.ValueProperty<?>> apply(
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+            TriggerContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
     interface ProcessErrorResponseFunction {
 
         /**
@@ -367,14 +408,14 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        ProviderException apply(int statusCode, Object body, Context context) throws Exception;
+        ProviderException apply(int statusCode, Object body, TriggerContext context) throws Exception;
     }
 
     /**
      *
      */
     @FunctionalInterface
-    interface TriggerWorkflowNodeDescriptionFunction {
+    interface WorkflowNodeDescriptionFunction {
 
         /**
          * @param inputParameters
@@ -387,7 +428,7 @@ public interface TriggerDefinition {
     /**
      *
      */
-    interface TriggerOutputFunction extends BaseOutputFunction {
+    interface OutputFunction extends BaseOutputFunction {
 
         /**
          * @param inputParameters

@@ -163,7 +163,9 @@ public class CsvFileReadUtils {
 
     public static String strip(String valueString, char enclosingCharacter) {
         valueString = valueString.strip();
+
         valueString = StringUtils.removeStart(valueString, enclosingCharacter);
+
         return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 

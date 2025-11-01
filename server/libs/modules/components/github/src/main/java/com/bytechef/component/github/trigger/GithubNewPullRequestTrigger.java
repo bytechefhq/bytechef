@@ -17,29 +17,23 @@
 package com.bytechef.component.github.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.PULL_REQUESTS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY_OUTPUT_PROPERTY;
-import static com.bytechef.component.github.constant.GithubConstants.TITLE;
-import static com.bytechef.component.github.util.GithubUtils.getContent;
-import static com.bytechef.component.github.util.GithubUtils.subscribeWebhook;
+import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
-import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,70 +44,44 @@ public class GithubNewPullRequestTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newPullRequest")
         .title("New Pull Request")
         .description("Triggers when a new pull request is created.")
-        .type(TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerType.POLLING)
         .properties(
             string(REPOSITORY)
                 .label("Repository")
-                .options((TriggerOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .options((OptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        integer("number")
-                            .description("Number uniquely identifying the pull request within its repository."),
-                        object("pull_request")
-                            .properties(
-                                integer(ID)
-                                    .description("ID of the pull request."),
-                                string("state")
-                                    .description("The current state of the pull request, such as open or closed."),
-                                string(TITLE)
-                                    .description("The title of the pull request, summarizing its purpose or changes."),
-                                string(BODY)
-                                    .description("The main content of the pull request."),
-                                integer("commits")
-                                    .description("The total number of commits included in the pull request.")),
-                        object("sender")
-                            .description("Information about the author of the pull request.")
-                            .properties(
-                                string("login")
-                                    .description("The username of the person who created the pull request."),
-                                integer(ID)
-                                    .description("ID of the sender.")),
-                        string("action")
-                            .description(
-                                "The action performed on the pull request, such as opened, closed, or synchronized."),
-                        REPOSITORY_OUTPUT_PROPERTY)))
-        .webhookEnable(GithubNewPullRequestTrigger::webhookEnable)
-        .webhookDisable(GithubNewPullRequestTrigger::webhookDisable)
-        .webhookRequest(GithubNewPullRequestTrigger::webhookRequest);
+        .output()
+        .poll(GithubNewPullRequestTrigger::poll);
 
     private GithubNewPullRequestTrigger() {
     }
 
-    protected static WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+    public static PollOutput poll(
+        Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
+        TriggerContext context) {
 
-        return new WebhookEnableOutput(
-            Map.of(ID,
-                subscribeWebhook(inputParameters.getRequiredString(REPOSITORY), "pull_request", webhookUrl, context)),
-            null);
-    }
+        List<Integer> previousPullRequests = closureParameters.getList(PULL_REQUESTS, Integer.class, List.of());
+        List<Integer> allPullRequests = new ArrayList<>();
 
-    protected static void webhookDisable(
-        Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-        String workflowExecutionId, TriggerContext context) {
+        List<Map<String, ?>> pullRequests = context.http(http -> http.get(
+            "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/pulls"))
+            .queryParameters("sort", "created", "direction", "desc")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        GithubUtils.unsubscribeWebhook(
-            inputParameters.getRequiredString(REPOSITORY), outputParameters.getInteger(ID), context);
-    }
+        List<Map<String, ?>> newPullRequests = new ArrayList<>();
 
-    protected static Map<String, Object> webhookRequest(
-        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        for (Map<String, ?> pullRequest : pullRequests) {
+            Integer id = (Integer) pullRequest.get(ID);
 
-        return getContent(body);
+            allPullRequests.add(id);
+
+            if (!previousPullRequests.contains(id)) {
+                newPullRequests.add(pullRequest);
+            }
+        }
+
+        return new PollOutput(newPullRequests, Map.of(PULL_REQUESTS, allPullRequests), false);
     }
 }

@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
-public class ClusterRootComponentConnectionFactory
+class ClusterRootComponentConnectionFactory
     implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ClusterRootComponentConnectionFactory.class);
@@ -61,7 +61,7 @@ public class ClusterRootComponentConnectionFactory
                     componentDefinition.getVersion(), componentDefinition.isConnectionRequired()));
         }
 
-        componentConnections.addAll(getWorkflowConnections(ClusterElementMap.of(extensions), workflowNodeName));
+        componentConnections.addAll(getComponentConnections(ClusterElementMap.of(extensions), workflowNodeName));
 
         return componentConnections;
     }
@@ -71,7 +71,7 @@ public class ClusterRootComponentConnectionFactory
         return Optional.ofNullable(componentDefinition.isClusterRoot() ? this : null);
     }
 
-    private List<ComponentConnection> getWorkflowConnections(
+    private List<ComponentConnection> getComponentConnections(
         ClusterElementMap clusterElementMap, String workflowNodeName) {
 
         Set<ComponentConnection> componentConnections = new HashSet<>();
@@ -93,7 +93,7 @@ public class ClusterRootComponentConnectionFactory
 
             for (ClusterElement clusterElement : clusterElements) {
                 try {
-                    ComponentConnection componentConnection = getWorkflowConnection(
+                    ComponentConnection componentConnection = getComponentConnection(
                         workflowNodeName, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
                         clusterElement.getComponentVersion());
 
@@ -107,14 +107,14 @@ public class ClusterRootComponentConnectionFactory
                 }
 
                 componentConnections.addAll(
-                    getWorkflowConnections(ClusterElementMap.of(clusterElement.getExtensions()), workflowNodeName));
+                    getComponentConnections(ClusterElementMap.of(clusterElement.getExtensions()), workflowNodeName));
             }
         }
 
         return new ArrayList<>(componentConnections);
     }
 
-    private ComponentConnection getWorkflowConnection(
+    private ComponentConnection getComponentConnection(
         String workflowNodeName, String workflowConnectionKey, String componentName, int componentVersion) {
 
         ComponentConnection componentConnection = null;

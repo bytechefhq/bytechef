@@ -30,9 +30,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -51,14 +51,14 @@ public class AITableFindRecordsAction {
                 .label("Field Names")
                 .description("The returned record results are limited to the specified fields.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) AITableUtils::getFieldNamesOptions)
+                .options((OptionsFunction<String>) AITableUtils::getFieldNamesOptions)
                 .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             array(RECORD_IDS)
                 .label("Record IDs")
                 .description("The IDs of the records to find.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
+                .options((OptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             integer(MAX_RECORDS)

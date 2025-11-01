@@ -1,8 +1,8 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
     AppendMessage,
     AssistantRuntimeProvider,

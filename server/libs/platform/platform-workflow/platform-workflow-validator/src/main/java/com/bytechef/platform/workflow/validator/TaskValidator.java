@@ -231,7 +231,7 @@ class TaskValidator {
      * Extracts the condition from the error message.
      */
     private static String extractConditionFromMessage(String message) {
-        if (message == null || !message.startsWith("Invalid logic for display condition:")) {
+        if (!message.startsWith("Invalid logic for display condition:")) {
             return "";
         }
 
@@ -254,13 +254,14 @@ class TaskValidator {
      * Determines if a condition is malformed (has invalid syntax) vs. valid syntax that fails evaluation.
      */
     private static boolean isMalformedCondition(String condition) {
-        if (condition == null || condition.trim()
-            .isEmpty()) {
+        String trim = condition.trim();
+
+        if (trim.isEmpty()) {
             return false;
         }
 
         // Clean the condition by removing @ markers if present
-        String cleanCondition = condition.trim();
+        String cleanCondition = trim;
 
         if (cleanCondition.startsWith("@") && cleanCondition.endsWith("@")) {
             cleanCondition = cleanCondition.substring(1, cleanCondition.length() - 1);
@@ -271,7 +272,7 @@ class TaskValidator {
 
         // Pattern 1: Simple field comparisons (field == value, field != value, field >= value, etc.)
         // Supports field names with dots, brackets, and 'index' placeholder
-        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*(==|!=|<=|>=|<|>)\\s*.*")) {
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w.\\[\\]index]*\\s*(==|!=|<=|>=|<|>)\\s*.*")) {
             return false; // Valid comparison syntax
         }
 
@@ -286,17 +287,14 @@ class TaskValidator {
         }
 
         // Pattern 4: Simple field references (including those with [index] placeholders)
-        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w\\.\\[\\]index]*\\s*")) {
+        if (cleanCondition.matches("\\s*[a-zA-Z_][\\w.\\[\\]index]*\\s*")) {
             return false; // Valid field reference
         }
 
         // Pattern 5: Literal values (true, false, numbers, strings)
-        if (cleanCondition.matches("\\s*(true|false|\\d+(\\.\\d+)?|'[^']*')\\s*")) {
-            return false; // Valid literal
-        }
+        return !cleanCondition.matches("\\s*(true|false|\\d+(\\.\\d+)?|'[^']*')\\s*"); // Valid literal
 
         // If none of the valid patterns match, it's likely malformed
-        return true;
     }
 
     /**
@@ -517,10 +515,11 @@ class TaskValidator {
     }
 
     /**
-     * Validates that a required object field exists and is of correct type.
+     * Validates that a required object field exists and is of the correct type.
      */
-    private static void
-        validateRequiredObjectField(JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
+    private static void validateRequiredObjectField(
+        JsonNode jsonNode, @Nullable String fieldName, StringBuilder errors) {
+
         if (!jsonNode.has(fieldName)) {
             StringUtils.appendWithNewline("Missing required field: " + fieldName, errors);
         } else {

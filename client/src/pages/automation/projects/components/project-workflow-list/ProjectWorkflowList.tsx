@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -72,9 +72,7 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
         <div className="border-b border-b-gray-100 py-3 pl-4">
             {workflows && workflows.length > 0 ? (
                 <>
-                    <div className="mb-1 flex items-center justify-between">
-                        <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
-                    </div>
+                    <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
 
                     <ul className="divide-y divide-gray-100">
                         {workflows
@@ -125,7 +123,7 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
                             <WorkflowDialog
                                 createWorkflowMutation={createProjectWorkflowMutation}
                                 projectId={project.id}
-                                triggerNode={<Button>Create Workflow</Button>}
+                                triggerNode={<Button label="Create Workflow" />}
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />
                         }

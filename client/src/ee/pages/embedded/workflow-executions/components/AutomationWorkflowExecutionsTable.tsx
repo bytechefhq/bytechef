@@ -2,7 +2,6 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {JobBasic, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -27,8 +26,6 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
         }))
     );
 
-    const {data: environmentsQuery} = useEnvironmentsQuery();
-
     const reactTable = useReactTable<WorkflowExecution>({
         columns: [
             columnHelper.accessor((row) => row.job, {
@@ -42,14 +39,6 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
             columnHelper.accessor('project', {
                 cell: (info) => info.getValue()?.name.replace('__EMBEDDED__', ''),
                 header: 'Connected user',
-            }),
-
-            columnHelper.accessor('projectDeployment', {
-                cell: (info) =>
-                    environmentsQuery?.environments?.find(
-                        (environment) => +environment!.id! === info.getValue()?.environmentId
-                    )?.name,
-                header: 'Environment',
             }),
             columnHelper.accessor((row) => row.job, {
                 cell: (info) => getDuration(info),
@@ -83,7 +72,7 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
     };
 
     return (
-        <div className="w-full px-4 2xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             <Table>
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (

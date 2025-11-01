@@ -25,6 +25,9 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -70,6 +73,7 @@ public class ComponentTools {
     private final ComponentDefinitionService componentDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final ConnectionService connectionService;
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
         {
@@ -91,10 +95,12 @@ public class ComponentTools {
 
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade) {
+        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
+        ConnectionService connectionService) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.connectionService = connectionService;
     }
 
     // Helper methods
@@ -102,7 +108,7 @@ public class ComponentTools {
         description = "Get comprehensive information about a specific component. Returns detailed project information including: name, description, triggers and actions")
     public ComponentInfo getComponent(
         @ToolParam(description = "The name of the component to retrieve in camel case") String componentName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -139,7 +145,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to retrieve in camel case") String triggerName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -178,7 +184,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the trigger in camel case") String componentName,
         @ToolParam(description = "The name of the trigger to generate definition for in camel case") String triggerName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -359,7 +365,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to retrieve in camel case") String actionName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -434,7 +440,7 @@ public class ComponentTools {
         @ToolParam(
             description = "The name of the component that contains the action in camel case") String componentName,
         @ToolParam(description = "The name of the action to generate definition for in camel case") String actionName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -473,7 +479,7 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger or action to retrieve output properties for in camel case") String operationName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
@@ -535,12 +541,17 @@ public class ComponentTools {
 
                                 outputResponse = actionDefinitionFacade.executeOutput(
                                     componentDefinition.getName(), componentDefinition.getVersion(),
-                                    actionDefinition.getName(), Map.of(), null);
+                                    actionDefinition.getName(), Map.of(), Map.of());
                             } catch (Exception e) {
                                 try {
+                                    List<Connection> connections =
+                                        connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
+                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0)
+                                        .getId());
+
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
-                                        null, null, null, null, null, true);
+                                        null, null, null, connectionIds, null, true);
                                     if (output != null) {
                                         outputResponse = SchemaUtils.toOutput(
                                             output, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
@@ -581,7 +592,7 @@ public class ComponentTools {
             description = "The name of the component that contains the trigger or action in camel case") String componentName,
         @ToolParam(
             description = "The name of the trigger or action to retrieve properties for in camel case") String operationName,
-        @ToolParam(description = "The version of the component (optional)") Integer version) {
+        @ToolParam(required = false, description = "The version of the component") Integer version) {
 
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);

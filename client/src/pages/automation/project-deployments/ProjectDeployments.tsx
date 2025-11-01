@@ -1,8 +1,7 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
@@ -14,6 +13,7 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/compo
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -98,7 +98,7 @@ const ProjectDeployments = () => {
                                         environmentId: currentEnvironmentId,
                                     } as ProjectDeployment
                                 }
-                                triggerNode={<Button>New Deployment</Button>}
+                                triggerNode={<Button label="New Deployment" />}
                             />
                         }
                         title={<ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />}
@@ -169,7 +169,7 @@ const ProjectDeployments = () => {
                 loading={projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading}
             >
                 {projectDeployments && projectDeployments?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,

@@ -1,14 +1,14 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDialog';
 import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList';
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ZapIcon} from 'lucide-react';
 
 const AppEvents = () => {
@@ -29,7 +29,7 @@ const AppEvents = () => {
                                 appEvents &&
                                 appEvents.length > 0 && (
                                     <AppEventDialog
-                                        triggerNode={!currentEnvironmentId ? <Button>New App Event</Button> : <></>}
+                                        triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
                                     />
                                 )
                             }
@@ -61,7 +61,7 @@ const AppEvents = () => {
                     <EmptyList
                         button={
                             <AppEventDialog
-                                triggerNode={!currentEnvironmentId ? <Button>New App Event</Button> : <></>}
+                                triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
                             />
                         }
                         icon={<ZapIcon className="size-24 text-gray-300" />}

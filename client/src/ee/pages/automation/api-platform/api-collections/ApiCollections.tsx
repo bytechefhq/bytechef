@@ -1,12 +1,11 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
@@ -14,6 +13,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Link2Icon} from 'lucide-react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
@@ -77,7 +77,7 @@ const ApiCollections = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
+                        right={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
                         title={<ApiCollectionsFilterTitle filterData={filterData} projects={projects} tags={tags} />}
                     />
                 )
@@ -98,7 +98,7 @@ const ApiCollections = () => {
                 loading={apiCollectionsIsLoading || projectsIsLoading || tagsIsLoading}
             >
                 {apiCollections && apiCollections?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
@@ -111,7 +111,7 @@ const ApiCollections = () => {
                     </div>
                 ) : (
                     <EmptyList
-                        button={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
+                        button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}
                         icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any API Collections created yet."
                         title="No API Collections"

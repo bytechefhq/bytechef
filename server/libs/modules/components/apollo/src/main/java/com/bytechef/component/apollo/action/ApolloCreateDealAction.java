@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.apollo.util.ApolloUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -54,7 +54,7 @@ public class ApolloCreateDealAction {
             string("owner_id").label("Owner ID")
                 .description("The ID for the deal owner within your team's Apollo account.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getOwnerIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) ApolloUtils::getOwnerIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
@@ -62,7 +62,7 @@ public class ApolloCreateDealAction {
                 .description(
                     "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getAccountIdOptions)
+                .options((ActionDefinition.OptionsFunction<String>) ApolloUtils::getAccountIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),

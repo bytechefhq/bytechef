@@ -1,9 +1,9 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {SPACE} from '@/shared/constants';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef, useState} from 'react';

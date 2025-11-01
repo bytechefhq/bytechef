@@ -14,7 +14,6 @@ import {
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
@@ -172,16 +171,6 @@ const IntegrationInstanceConfigurationListItem = ({
 
                             <TooltipContent>The integration version</TooltipContent>
                         </Tooltip>
-
-                        <div className="flex min-w-28 justify-end">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={integrationInstanceConfiguration.environmentId!} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-                        </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <div className="flex items-center">

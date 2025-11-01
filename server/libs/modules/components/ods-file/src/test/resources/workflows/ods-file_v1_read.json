@@ -1,22 +1,22 @@
 {
-  "label" : "ODS File - READ operation",
-  "inputs" : [ {
-    "name" : "fileEntry",
-    "label" : "File property",
-    "type" : "FILE_ENTRY",
-    "required" : true
+  "label": "ODS File - READ operation",
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "readOdsFile",
-    "value" : "${readOdsFile}"
+  "outputs": [ {
+    "name": "readOdsFile",
+    "value": "${readOdsFile}"
   } ],
-  "tasks" : [ {
-    "name" : "readOdsFile",
-    "label" : "Read from the ODS file",
-    "type" : "odsFile/v1/read",
-    "parameters" : {
-      "fileEntry" : "${fileEntry}",
-      "includeEmptyCells" : true
+  "tasks": [ {
+    "name": "readOdsFile",
+    "label": "Read from the ODS file",
+    "type": "odsFile/v1/read",
+    "parameters": {
+      "fileEntry": "${fileEntry}",
+      "includeEmptyCells": true
     }
   } ]
 }

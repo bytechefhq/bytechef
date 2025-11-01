@@ -8,10 +8,12 @@ import {
     FormType,
     IntegrationInstanceType,
     IntegrationType,
+    IntegrationWorkflowType,
     MergedWorkflowType,
     PropertyType,
     RegisterFormSubmitFunction,
     TokenPayloadI,
+    WorkflowInputType,
 } from './types';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
@@ -113,7 +115,7 @@ export default function useConnectDialog({
     const [isOpen, setIsOpen] = useState(false);
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
-    const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
+    const [enabledOverrides, setEnabledOverrides] = useState<Record<string, boolean | undefined>>({});
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
         integrationInstanceId ? Number(integrationInstanceId) : undefined
@@ -132,44 +134,40 @@ export default function useConnectDialog({
             return [];
         }
 
-        const integrationInstance = integration.integrationInstances.find(
+        const currentInstance = integration.integrationInstances.find(
             (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
         );
 
-        if (!integrationInstance?.workflows) {
-            return [];
-        }
+        const workflows = currentInstance?.workflows || integration.workflows;
 
-        const mergedWorkflows: MergedWorkflowType[] = integration.workflows.map((integrationWorkflow) => {
-            const instanceWorkflow = integrationInstance.workflows.find(
-                (instance) => instance.workflowUuid === integrationWorkflow.workflowUuid
+        return workflows.map((workflow) => {
+            const instanceWorkflow = currentInstance?.workflows?.find(
+                (instanceWorkflow) => instanceWorkflow.workflowUuid === workflow.workflowUuid
             );
 
-            if (instanceWorkflow) {
-                return {
-                    ...integrationWorkflow,
-                    enabled: instanceWorkflow.enabled || false,
-                    inputs:
-                        integrationWorkflow.inputs?.map((inputDef) => ({
-                            ...inputDef,
-                            value: (instanceWorkflow.inputs as Record<string, string>)?.[inputDef.name] || '',
-                        })) || [],
-                };
-            }
+            const baseWorkflow = integration.workflows?.find(
+                (integrationWorkflow) => integrationWorkflow.workflowUuid === workflow.workflowUuid
+            );
+
+            const serverEnabled =
+                instanceWorkflow?.enabled ?? (baseWorkflow as IntegrationWorkflowType | undefined)?.enabled ?? false;
+
+            const effectiveEnabled = enabledOverrides[workflow.workflowUuid] ?? serverEnabled;
 
             return {
-                ...integrationWorkflow,
-                enabled: false,
-                inputs:
-                    integrationWorkflow.inputs?.map((inputDef) => ({
-                        ...inputDef,
-                        value: '',
-                    })) || [],
-            };
+                ...baseWorkflow,
+                label: baseWorkflow?.label,
+                workflowUuid: baseWorkflow?.workflowUuid ?? workflow.workflowUuid,
+                enabled: effectiveEnabled,
+                inputs: Array.isArray(baseWorkflow?.inputs)
+                    ? baseWorkflow!.inputs.map((input: WorkflowInputType) => ({
+                          ...input,
+                          value: (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ?? '',
+                      }))
+                    : [],
+            } as MergedWorkflowType;
         });
-
-        return mergedWorkflows;
-    }, [integration, currentIntegrationInstanceId]);
+    }, [integration, currentIntegrationInstanceId, enabledOverrides]);
 
     const registerFormSubmit = useCallback<RegisterFormSubmitFunction>((submitFn) => {
         formSubmitRef.current = submitFn;
@@ -177,42 +175,57 @@ export default function useConnectDialog({
 
     const saveOAuth2Connection = useCallback(
         async (payload: CodePayloadI | TokenPayloadI) => {
-            const newIntegrationInstanceId: number = await fetch(
-                `/api/embedded/v1/integrations/${integrationId}/instances`,
-                {
-                    method: 'POST',
-                    body: {
-                        connection: {
-                            parameters: payload,
+            try {
+                const newIntegrationInstanceId: number = await fetch(
+                    `/api/embedded/v1/integrations/${integrationId}/instances`,
+                    {
+                        method: 'POST',
+                        body: {
+                            connection: {
+                                parameters: payload,
+                            },
                         },
-                    },
+                    }
+                );
+
+                if (typeof newIntegrationInstanceId !== 'number' || isNaN(newIntegrationInstanceId)) {
+                    throw new Error('Invalid integration instance ID received from API');
                 }
-            );
 
-            setCurrentIntegrationInstanceId(newIntegrationInstanceId);
+                setCurrentIntegrationInstanceId(newIntegrationInstanceId);
 
-            setWorkflowsView(true);
+                setWorkflowsView(true);
+            } catch (error) {
+                console.error('Failed to save OAuth2 connection:', error);
+            }
         },
         [fetch, integrationId]
     );
 
     const saveNonOAuth2Connection = useCallback(
         async (formData: Record<string, string>) => {
-            const newIntegrationInstanceId: number = await fetch(
-                `/api/embedded/v1/integrations/${integrationId}/instances`,
-                {
-                    method: 'POST',
-                    body: {
-                        connection: {
-                            parameters: formData,
+            try {
+                const newIntegrationInstanceId: number = await fetch(
+                    `/api/embedded/v1/integrations/${integrationId}/instances`,
+                    {
+                        method: 'POST',
+                        body: {
+                            connection: {
+                                parameters: formData,
+                            },
                         },
-                    },
+                    }
+                );
+
+                if (typeof newIntegrationInstanceId !== 'number' || isNaN(newIntegrationInstanceId)) {
+                    throw new Error('Invalid integration instance ID received from API');
                 }
-            );
 
-            setCurrentIntegrationInstanceId(newIntegrationInstanceId);
-
-            setWorkflowsView(true);
+                setCurrentIntegrationInstanceId(newIntegrationInstanceId);
+                setWorkflowsView(true);
+            } catch (error) {
+                console.error('Failed to save non-OAuth2 connection:', error);
+            }
         },
         [fetch, integrationId]
     );
@@ -226,28 +239,30 @@ export default function useConnectDialog({
     }, [formValues, saveNonOAuth2Connection]);
 
     const handleWorkflowToggle = useCallback(
-        async (workflowId: string, isSelected: boolean) => {
+        async (workflowUuid: string, pressed: boolean) => {
+            if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+                console.error('Invalid integration instance ID');
+
+                return;
+            }
+
             try {
-                if (isSelected) {
-                    await fetch(
-                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowId}/enable`,
-                        {
-                            method: 'POST',
-                        }
-                    );
+                setEnabledOverrides((previous) => ({...previous, [workflowUuid]: pressed}));
 
-                    setSelectedWorkflows((selectedWorkflows) => [...selectedWorkflows, workflowId]);
-                } else {
-                    await fetch(
-                        `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowId}/enable`,
-                        {
-                            method: 'DELETE',
-                        }
-                    );
+                const method = pressed ? 'POST' : 'DELETE';
 
-                    setSelectedWorkflows((selectedWorkflows) => selectedWorkflows.filter((id) => id !== workflowId));
-                }
+                await fetch(
+                    `/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}/workflows/${workflowUuid}/enable`,
+                    {
+                        method,
+                    }
+                );
             } catch (error) {
+                setEnabledOverrides((previous) => ({
+                    ...previous,
+                    [workflowUuid]: !pressed,
+                }));
+
                 console.error('Failed to toggle workflow:', error);
             }
         },
@@ -400,13 +415,22 @@ export default function useConnectDialog({
     };
 
     const handleDisconnect = useCallback(async () => {
-        await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
-            method: 'DELETE',
-        });
+        if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+            console.error('Invalid integration instance ID');
 
-        setFormValues({});
+            return;
+        }
 
-        setWorkflowsView(false);
+        try {
+            await fetch(`/api/embedded/v1/integration-instances/${currentIntegrationInstanceId}`, {
+                method: 'DELETE',
+            });
+
+            setFormValues({});
+            setWorkflowsView(false);
+        } catch (error) {
+            console.error('Failed to disconnect:', error);
+        }
     }, [fetch, currentIntegrationInstanceId]);
 
     const handleClick = useCallback(
@@ -430,6 +454,12 @@ export default function useConnectDialog({
 
     const handleWorkflowInputChange = useCallback(
         (workflowUuid: string, inputName: string, value: string) => {
+            if (!currentIntegrationInstanceId || isNaN(currentIntegrationInstanceId)) {
+                console.error('Invalid integration instance ID');
+
+                return;
+            }
+
             const body = {
                 inputs: {
                     [inputName]: value,
@@ -508,7 +538,6 @@ export default function useConnectDialog({
                     isOpen={isOpen}
                     properties={integration?.connectionConfig?.inputs}
                     registerFormSubmit={registerFormSubmit}
-                    selectedWorkflows={selectedWorkflows}
                     workflowsView={workflowsView}
                     mergedWorkflows={mergedWorkflows}
                 />
@@ -523,7 +552,6 @@ export default function useConnectDialog({
         isOAuth2,
         registerFormSubmit,
         handleWorkflowToggle,
-        selectedWorkflows,
         handleWorkflowInputChange,
         integrationInstanceId,
         workflowsView,

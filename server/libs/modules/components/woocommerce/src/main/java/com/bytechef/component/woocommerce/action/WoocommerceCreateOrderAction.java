@@ -50,9 +50,9 @@ import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.STATE;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.STATUS;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.woocommerce.util.WoocommerceUtils;
 
@@ -67,7 +67,7 @@ public class WoocommerceCreateOrderAction {
             string(CUSTOMER_ID)
                 .label("Customer Id")
                 .description("User ID who owns the order. 0 for guests.")
-                .options((ActionOptionsFunction<String>) WoocommerceUtils::getCustomerIdOptions)
+                .options((OptionsFunction<String>) WoocommerceUtils::getCustomerIdOptions)
                 .required(true),
             array(LINE_ITEMS)
                 .label("Line Items")
@@ -79,7 +79,7 @@ public class WoocommerceCreateOrderAction {
                             string(PRODUCT_ID)
                                 .label("Product Id")
                                 .description("Product ID.")
-                                .options((ActionOptionsFunction<String>) WoocommerceUtils::getProductIdOptions),
+                                .options((OptionsFunction<String>) WoocommerceUtils::getProductIdOptions),
                             integer(QUANTITY)
                                 .label("Quantity")
                                 .description("Quantity ordered."))),
@@ -174,7 +174,7 @@ public class WoocommerceCreateOrderAction {
             string(PAYMENT_METHOD)
                 .label("Payment Method")
                 .description("Payment method ID.")
-                .options((ActionOptionsFunction<String>) WoocommerceUtils::getPaymentIdOptions)
+                .options((OptionsFunction<String>) WoocommerceUtils::getPaymentIdOptions)
                 .required(false),
             bool(SET_PAID)
                 .label("Set Paid")

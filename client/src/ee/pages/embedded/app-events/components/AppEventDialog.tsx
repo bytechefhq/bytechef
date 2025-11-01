@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -15,7 +15,7 @@ import {Input} from '@/components/ui/input';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
-import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, Suspense, lazy, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -158,12 +158,10 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>

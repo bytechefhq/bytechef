@@ -40,9 +40,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TH
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -100,7 +100,7 @@ public class GoogleMailSearchEmailAction {
                     "Only return messages with labels that match all of the specified label IDs. Messages in a " +
                         "thread might have labels that other messages in the same thread don't have.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
+                .options((OptionsFunction<String>) GoogleMailUtils::getLabelOptions)
                 .required(false),
             bool(INCLUDE_SPAM_TRASH)
                 .label("Include Spam Trash")

@@ -34,6 +34,7 @@ import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -62,19 +63,21 @@ class ContextImpl implements Context {
     private final Log log;
     private final MimeType mimeType;
     private final OutputSchema outputSchema;
+    private final boolean editorEnvironment;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, int componentVersion, String componentOperationName,
-        @Nullable ComponentConnection connection, HttpClientExecutor httpClientExecutor,
-        TempFileStorage tempFileStorage) {
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
 
         this.convert = new ConvertImpl();
+        this.editorEnvironment = editorEnvironment;
         this.encoder = new EncoderImpl();
         this.file = new FileImpl(tempFileStorage);
         this.http = new HttpImpl(
-            componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
+            componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.log = new LogImpl(componentName, componentOperationName);
         this.mimeType = new MimeTypeImpl();
@@ -116,6 +119,11 @@ class ContextImpl implements Context {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public boolean isEditorEnvironment() {
+        return editorEnvironment;
     }
 
     @Override
@@ -164,55 +172,55 @@ class ContextImpl implements Context {
     }
 
     private record HttpImpl(
-        String componentName, int componentVersion, String componentOperationName, ComponentConnection connection,
-        Context context, HttpClientExecutor httpClientExecutor)
+        String componentName, int componentVersion, String componentOperationName,
+        ComponentConnection componentConnection, Context context, HttpClientExecutor httpClientExecutor)
 
         implements Http {
 
         @Override
         public Executor delete(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.DELETE, componentName, componentVersion, componentOperationName, connection,
+                url, RequestMethod.DELETE, componentName, componentVersion, componentOperationName, componentConnection,
                 httpClientExecutor, context);
         }
 
         @Override
         public Executor exchange(String url, RequestMethod requestMethod) {
             return new ExecutorImpl(url, requestMethod, componentName, componentVersion, componentOperationName,
-                connection, httpClientExecutor, context);
+                componentConnection, httpClientExecutor, context);
         }
 
         @Override
         public Executor head(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.HEAD, componentName, componentVersion, componentOperationName, connection,
+                url, RequestMethod.HEAD, componentName, componentVersion, componentOperationName, componentConnection,
                 httpClientExecutor, context);
         }
 
         @Override
         public Executor get(String url) {
             return new ExecutorImpl(url, RequestMethod.GET, componentName, componentVersion, componentOperationName,
-                connection, httpClientExecutor, context);
+                componentConnection, httpClientExecutor, context);
         }
 
         @Override
         public Executor patch(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.PATCH, componentName, componentVersion, componentOperationName, connection,
+                url, RequestMethod.PATCH, componentName, componentVersion, componentOperationName, componentConnection,
                 httpClientExecutor, context);
         }
 
         @Override
         public Executor post(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.POST, componentName, componentVersion, componentOperationName, connection,
+                url, RequestMethod.POST, componentName, componentVersion, componentOperationName, componentConnection,
                 httpClientExecutor, context);
         }
 
         @Override
         public Executor put(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.PUT, componentName, componentVersion, componentOperationName, connection,
+                url, RequestMethod.PUT, componentName, componentVersion, componentOperationName, componentConnection,
                 httpClientExecutor, context);
         }
 
@@ -223,7 +231,7 @@ class ContextImpl implements Context {
             private final int componentVersion;
             private final String componentOperationName;
             private Configuration configuration = new Configuration();
-            private final ComponentConnection connection;
+            private final ComponentConnection componentConnection;
             private final Context context;
             private final HttpClientExecutor httpClientExecutor;
             private Map<String, List<String>> headers = new HashMap<>();
@@ -233,13 +241,13 @@ class ContextImpl implements Context {
 
             private ExecutorImpl(
                 String url, RequestMethod requestMethod, String componentName, int componentVersion,
-                String componentOperationName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
-                Context context) {
+                String componentOperationName, ComponentConnection componentConnection,
+                HttpClientExecutor httpClientExecutor, Context context) {
 
                 this.componentName = componentName;
                 this.componentVersion = componentVersion;
                 this.componentOperationName = componentOperationName;
-                this.connection = connection;
+                this.componentConnection = componentConnection;
                 this.context = context;
                 this.httpClientExecutor = httpClientExecutor;
                 this.url = url;
@@ -313,7 +321,7 @@ class ContextImpl implements Context {
                 try {
                     return httpClientExecutor.execute(
                         url, headers, queryParameters, body, configuration, requestMethod, componentName,
-                        componentVersion, componentOperationName, connection, context);
+                        componentVersion, componentOperationName, componentConnection, context);
                 } catch (Exception e) {
                     if (e instanceof ProviderException pe) {
                         throw pe;
@@ -364,13 +372,33 @@ class ContextImpl implements Context {
         public String base64EncodeToString(byte[] bytes) {
             return EncodingUtils.base64EncodeToString(bytes);
         }
+
+        @Override
+        public byte[] urlDecodeBase64FromString(String string) {
+            return EncodingUtils.urlDecodeBase64FromString(string);
+        }
+
+        @Override
+        public String urlEncode(String string) {
+            return EncodingUtils.urlEncode(string);
+        }
     }
 
     private record FileImpl(TempFileStorage tempFileStorage) implements File {
 
         @Override
-        public InputStream getStream(FileEntry fileEntry) {
-            return tempFileStorage.getFileStream(((FileEntryImpl) fileEntry).getFileEntry());
+        public long getContentLength(FileEntry fileEntry) {
+            return tempFileStorage.getContentLength(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public InputStream getInputStream(FileEntry fileEntry) {
+            return tempFileStorage.getInputStream(((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public OutputStream getOutputStream(FileEntry fileEntry) {
+            return tempFileStorage.getOutputStream(((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
@@ -398,7 +426,7 @@ class ContextImpl implements Context {
                 tempFilePath = Files.createTempFile("context_", fileEntry.getName());
 
                 Files.copy(
-                    tempFileStorage.getFileStream(toFileEntry(fileEntry)), tempFilePath,
+                    tempFileStorage.getInputStream(toFileEntry(fileEntry)), tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -409,7 +437,7 @@ class ContextImpl implements Context {
 
         @Override
         public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
-            InputStream inputStream = getStream(fileEntry);
+            InputStream inputStream = getInputStream(fileEntry);
 
             return inputStream.readAllBytes();
         }

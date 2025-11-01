@@ -28,10 +28,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.mautic.constant.MauticConstants.ID;
 import static com.bytechef.component.mautic.constant.MauticConstants.IS_PUBLISHED;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.mautic.util.MauticUtils;
@@ -49,7 +49,7 @@ public class MauticGetContactAction {
             string(ID)
                 .label("Contact ID")
                 .description("ID of the contact you want to retrieve.")
-                .options((ActionOptionsFunction<String>) MauticUtils::getContactOptions)
+                .options((OptionsFunction<String>) MauticUtils::getContactOptions)
                 .required(true))
         .output(
             outputSchema(

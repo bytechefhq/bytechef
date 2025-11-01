@@ -56,69 +56,72 @@ const Project = () => {
     const queryClient = useQueryClient();
 
     return (
-        <div className="flex w-full flex-col">
-            {projectId && (
-                <ProjectHeader
+        <div className="flex w-full">
+            {projectLeftSidebarOpen && projects && (
+                <ProjectsLeftSidebar
                     bottomResizablePanelRef={bottomResizablePanelRef}
-                    chatTrigger={
-                        workflow.triggers &&
-                        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                    }
+                    currentWorkflowId={workflow.id!}
+                    onProjectClick={handleProjectClick}
                     projectId={projectId}
-                    projectWorkflowId={projectWorkflowId}
-                    runDisabled={runDisabled}
-                    updateWorkflowMutation={updateWorkflowMutation}
                 />
             )}
 
-            <div className="flex flex-1">
-                <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
-                    <ResizablePanel className="relative flex" defaultSize={65}>
-                        {projectLeftSidebarOpen && projects && (
-                            <ProjectsLeftSidebar
-                                bottomResizablePanelRef={bottomResizablePanelRef}
-                                currentWorkflowId={workflow.id!}
-                                onProjectClick={handleProjectClick}
-                                projectId={projectId}
-                                updateWorkflowMutation={updateWorkflowMutation}
+            <div className="flex w-full flex-col">
+                {projectId && (
+                    <ProjectHeader
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        chatTrigger={
+                            workflow.triggers &&
+                            workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                        }
+                        projectId={projectId}
+                        projectWorkflowId={projectWorkflowId}
+                        runDisabled={runDisabled}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                    />
+                )}
+
+                <div className="flex flex-1">
+                    <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
+                        <ResizablePanel className="relative flex" defaultSize={65}>
+                            <WorkflowEditorProvider
+                                value={{
+                                    ConnectionKeys: ConnectionKeys,
+                                    deleteClusterElementParameterMutation,
+                                    deleteWorkflowNodeParameterMutation,
+                                    invalidateWorkflowQueries: () => {
+                                        queryClient.invalidateQueries({
+                                            queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
+                                        });
+                                        // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
+                                    },
+                                    updateClusterElementParameterMutation,
+                                    updateWorkflowMutation: updateWorkflowEditorMutation,
+                                    updateWorkflowNodeParameterMutation,
+                                    useCreateConnectionMutation: useCreateConnectionMutation,
+                                    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                                    useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                    useGetConnectionsQuery,
+                                    webhookTriggerTestApi: new WebhookTriggerTestApi(),
+                                }}
+                            >
+                                {projectId && (
+                                    <WorkflowEditorLayout runDisabled={runDisabled} showWorkflowInputs={true} />
+                                )}
+                            </WorkflowEditorProvider>
+                        </ResizablePanel>
+
+                        <ResizableHandle className="bg-muted" />
+
+                        <ResizablePanel className="bg-background" defaultSize={0} ref={bottomResizablePanelRef}>
+                            <WorkflowExecutionsTestOutput
+                                onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                workflowIsRunning={workflowIsRunning}
+                                workflowTestExecution={workflowTestExecution}
                             />
-                        )}
-
-                        <WorkflowEditorProvider
-                            value={{
-                                ConnectionKeys: ConnectionKeys,
-                                deleteClusterElementParameterMutation,
-                                deleteWorkflowNodeParameterMutation,
-                                invalidateWorkflowQueries: () => {
-                                    queryClient.invalidateQueries({
-                                        queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
-                                    });
-                                    // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
-                                },
-                                updateClusterElementParameterMutation,
-                                updateWorkflowMutation: updateWorkflowEditorMutation,
-                                updateWorkflowNodeParameterMutation,
-                                useCreateConnectionMutation: useCreateConnectionMutation,
-                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                useGetConnectionsQuery,
-                                webhookTriggerTestApi: new WebhookTriggerTestApi(),
-                            }}
-                        >
-                            {projectId && <WorkflowEditorLayout runDisabled={runDisabled} showWorkflowInputs={true} />}
-                        </WorkflowEditorProvider>
-                    </ResizablePanel>
-
-                    <ResizableHandle className="bg-muted" />
-
-                    <ResizablePanel className="bg-background" defaultSize={0} ref={bottomResizablePanelRef}>
-                        <WorkflowExecutionsTestOutput
-                            onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                            workflowIsRunning={workflowIsRunning}
-                            workflowTestExecution={workflowTestExecution}
-                        />
-                    </ResizablePanel>
-                </ResizablePanelGroup>
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon} from 'lucide-react';
@@ -25,7 +25,7 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const handleClick = () => {
-        setContext({parameters, source});
+        setContext({mode: MODE.CHAT, parameters, source});
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);

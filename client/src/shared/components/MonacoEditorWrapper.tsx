@@ -1,17 +1,16 @@
-import LoadingDots from '@/components/LoadingDots';
-import {editor} from 'monaco-editor';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {Suspense, lazy} from 'react';
 
-const Editor = lazy(() => import('@monaco-editor/react'));
+import type {EditorOptionsType, StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
-export type StandaloneCodeEditorType = editor.IStandaloneCodeEditor;
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 interface MonacoEditorProps {
     className?: string;
     defaultLanguage: string;
     onChange: (value: string | undefined) => void;
     onMount: (editor: StandaloneCodeEditorType) => void;
-    options?: Record<string, object>;
+    options?: EditorOptionsType;
     value?: string;
 }
 
@@ -19,12 +18,6 @@ const MonacoEditorWrapper = (props: MonacoEditorProps) => (
     <Suspense fallback={<MonacoEditorLoader />}>
         <Editor {...props} loading={<MonacoEditorLoader />} />
     </Suspense>
-);
-
-export const MonacoEditorLoader = () => (
-    <div className="flex size-full items-center justify-center p-4">
-        <LoadingDots />
-    </div>
 );
 
 export default MonacoEditorWrapper;

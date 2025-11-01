@@ -10,10 +10,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {MonacoEditorLoader, StandaloneCodeEditorType} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {Suspense, lazy, useState} from 'react';
+
+import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
@@ -119,7 +121,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
                         </Suspense>
 
                         <div
-                            className="absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
+                            className="pointer-events-none absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
                             id="monaco-placeholder"
                         >
                             {EDITOR_PLACEHOLDER}

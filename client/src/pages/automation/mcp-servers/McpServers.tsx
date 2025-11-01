@@ -2,11 +2,11 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ModeType, Tag, useMcpServerTagsQuery, useMcpServersByWorkspaceQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ServerIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 

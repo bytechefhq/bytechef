@@ -29,10 +29,10 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,7 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic;
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
+    private MockedStatic<GoogleUtils> googleUtilsMockedStatic;
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
@@ -65,6 +66,7 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     void beforeEach() {
         googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
         googleServicesMockedStatic = mockStatic(GoogleServices.class);
+        googleUtilsMockedStatic = mockStatic(GoogleUtils.class);
 
         googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
             .thenReturn(mockedCalendar);
@@ -72,8 +74,8 @@ class GoogleCalendarAddAttendeesToEventActionTest {
             .when(() -> GoogleCalendarUtils.updateEvent(
                 parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(), eventArgumentCaptor.capture()))
             .thenReturn(mockedEvent);
-        googleCalendarUtilsMockedStatic
-            .when(() -> GoogleCalendarUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+        googleUtilsMockedStatic
+            .when(() -> GoogleUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
             .thenReturn(CALENDAR_TIMEZONE);
         googleCalendarUtilsMockedStatic
             .when(() -> GoogleCalendarUtils.createCustomEvent(
@@ -85,10 +87,11 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     void afterEach() {
         googleCalendarUtilsMockedStatic.close();
         googleServicesMockedStatic.close();
+        googleUtilsMockedStatic.close();
     }
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() {
         EventAttendee oldAttendee = new EventAttendee().setEmail("oldAttendee");
         List<EventAttendee> objects = new ArrayList<>();
         objects.add(oldAttendee);
@@ -116,7 +119,7 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     }
 
     @Test
-    void testPerformForNoAttendees() throws IOException {
+    void testPerformForNoAttendees() {
         googleCalendarUtilsMockedStatic
             .when(() -> GoogleCalendarUtils.getEvent(
                 parametersArgumentCaptor.capture(), calendarArgumentCaptor.capture()))

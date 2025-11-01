@@ -1,7 +1,7 @@
+import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -19,7 +19,6 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -41,6 +40,7 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CircleQuestionMarkIcon, ClipboardIcon, RocketIcon} from 'lucide-react';
@@ -448,13 +448,17 @@ const ConnectionDialog = ({
 
                                             <Button
                                                 className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                                                icon={
+                                                    <ClipboardIcon
+                                                        aria-hidden="true"
+                                                        className="size-4 text-gray-400"
+                                                    />
+                                                }
                                                 onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
                                                 size="icon"
                                                 type="button"
                                                 variant="ghost"
-                                            >
-                                                <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
-                                            </Button>
+                                            />
                                         </div>
                                     </FormControl>
                                 )}
@@ -686,8 +690,13 @@ const ConnectionDialog = ({
                         <div className="px-6 pt-4">
                             <ConnectionParameters
                                 authorizationParameters={connection.authorizationParameters}
+                                authorizationType={connection.authorizationType}
+                                baseUri={connection.baseUri}
                                 connectionDefinition={connectionDefinition}
                                 connectionParameters={connection.connectionParameters}
+                                customAction={componentDefinition?.actions?.some(
+                                    (action) => action.name === 'customAction'
+                                )}
                             />
                         </div>
                     )}
@@ -695,6 +704,7 @@ const ConnectionDialog = ({
                     <DialogFooter className="px-6 pb-6 pt-4">
                         {wizardStep === 'oauth_step' && (
                             <Button
+                                label="Previous"
                                 onClick={() => {
                                     connectionMutation.reset();
 
@@ -704,28 +714,23 @@ const ConnectionDialog = ({
                                 }}
                                 type="button"
                                 variant="outline"
-                            >
-                                Previous
-                            </Button>
+                            />
                         )}
 
                         {wizardStep === 'configuration_step' && (
-                            <Button onClick={closeDialog} type="button" variant="outline">
-                                Cancel
-                            </Button>
+                            <Button label="Cancel" onClick={closeDialog} type="button" variant="outline" />
                         )}
 
                         {showOAuth2Step && (
                             <>
                                 {wizardStep === 'configuration_step' && (
                                     <Button
+                                        label="Next"
                                         onClick={handleSubmit(() => {
                                             setWizardStep('oauth_step');
                                         })}
                                         type="submit"
-                                    >
-                                        Next
-                                    </Button>
+                                    />
                                 )}
 
                                 {wizardStep === 'oauth_step' &&
@@ -750,9 +755,7 @@ const ConnectionDialog = ({
                         )}
 
                         {!showOAuth2Step && (
-                            <Button onClick={handleSubmit(() => saveConnection())} type="submit">
-                                Save
-                            </Button>
+                            <Button label="Save" onClick={handleSubmit(() => saveConnection())} type="submit" />
                         )}
                     </DialogFooter>
                 </Form>
@@ -783,12 +786,11 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
 
             <Button
                 className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                icon={<ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />}
                 onClick={() => copyToClipboard(redirectUri ?? '')}
                 size="icon"
                 variant="ghost"
-            >
-                <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
-            </Button>
+            />
         </div>
     );
 };

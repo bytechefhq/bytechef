@@ -21,7 +21,7 @@ package com.bytechef.component.datastream.constant;
  */
 public class DataStreamConstants {
 
-    public static final String CONNECTION_PARAMETERS = "connectionParameters";
+    public static final String COMPONENT_CONNECTION = "componentConnection";
     public static final String DATA_STREAM = "dataStream";
     public static final String INPUT_PARAMETERS = "inputParameters";
     public static final String JOB_ID = "jobId";

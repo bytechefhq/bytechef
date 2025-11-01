@@ -75,7 +75,9 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context) {
+    public Optional<String> executeBaseUri(
+        String componentName, ComponentConnection componentConnection, Context context) {
+
         throw new UnsupportedOperationException();
     }
 

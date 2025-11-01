@@ -1,52 +1,52 @@
 {
-  "label" : "workflow1",
-  "description" : "",
-  "inputs" : [ ],
-  "triggers" : [ {
-    "description" : "",
-    "label" : "Manual",
-    "name" : "trigger_1",
-    "type" : "manual/v1/manual"
+  "label": "workflow1",
+  "description": "",
+  "inputs": [ ],
+  "triggers": [ {
+    "description": "",
+    "label": "Manual",
+    "name": "trigger_1",
+    "type": "manual/v1/manual"
   } ],
-  "tasks" : [ {
-    "label" : "OpenAI",
-    "name" : "openAi_1",
-    "parameters" : {
-      "format" : "ADVANCED",
-      "response" : {
-        "responseFormat" : "TEXT"
+  "tasks": [ {
+    "label": "OpenAI",
+    "name": "openAi_1",
+    "parameters": {
+      "format": "ADVANCED",
+      "response": {
+        "responseFormat": "TEXT"
       },
-      "n" : 1,
-      "temperature" : 1,
-      "topP" : 1,
-      "frequencyPenalty" : 0,
-      "presencePenalty" : 0,
-      "messages" : [ {
-        "role" : "USER",
-        "content" : "sum 10 and 16"
+      "n": 1,
+      "temperature": 1,
+      "topP": 1,
+      "frequencyPenalty": 0,
+      "presencePenalty": 0,
+      "messages": [ {
+        "role": "USER",
+        "content": "sum 10 and 16"
       } ],
-      "model" : "gpt-4"
+      "model": "gpt-4"
     },
-    "type" : "openAi/v1/ask",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : {
-          "messages[0]" : "OBJECT",
-          "messages[0].content" : "STRING"
+    "type": "openAi/v1/ask",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": {
+          "messages[0]": "OBJECT",
+          "messages[0].content": "STRING"
         }
       }
     }
   }, {
-    "label" : "Logger",
-    "name" : "logger_1",
-    "parameters" : {
-      "text" : "The sum is ${openAi_1}"
+    "label": "Logger",
+    "name": "logger_1",
+    "parameters": {
+      "text": "The sum is ${openAi_1}"
     },
-    "type" : "logger/v1/info",
-    "metadata" : {
-      "ui" : {
-        "dynamicPropertyTypes" : {
-          "text" : "STRING"
+    "type": "logger/v1/info",
+    "metadata": {
+      "ui": {
+        "dynamicPropertyTypes": {
+          "text": "STRING"
         }
       }
     }

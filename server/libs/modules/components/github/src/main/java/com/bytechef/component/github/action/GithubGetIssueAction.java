@@ -24,11 +24,12 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
@@ -36,6 +37,7 @@ import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class GithubGetIssueAction {
 
@@ -43,15 +45,16 @@ public class GithubGetIssueAction {
         .title("Get Issue")
         .description("Get information from a specific issue")
         .properties(
+            OWNER_PROPERTY,
             string(REPOSITORY)
                 .label("Repository")
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .description("Repository where the issue is located.")
                 .required(true),
             string(ISSUE)
                 .label("Issue Number")
                 .description("The number of the issue you want to get details from.")
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-                .optionsLookupDependsOn(REPOSITORY)
+                .options((OptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY, OWNER)
                 .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubGetIssueAction::perform);
@@ -64,8 +67,9 @@ public class GithubGetIssueAction {
 
         return context
             .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues/"
-                    + inputParameters.getString(ISSUE)))
+                "/repos/" + inputParameters.getRequiredString(OWNER) + "/" +
+                    inputParameters.getRequiredString(REPOSITORY) + "/issues/" +
+                    inputParameters.getString(ISSUE)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

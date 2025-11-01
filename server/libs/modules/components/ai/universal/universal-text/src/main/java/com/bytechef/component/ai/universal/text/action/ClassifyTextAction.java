@@ -32,6 +32,8 @@ import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.universal.text.action.definition.AiTextActionDefinition;
@@ -84,7 +86,11 @@ public class ClassifyTextAction implements AiTextAction {
                         .additionalProperties(string()),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(),
+                .output(
+                    outputSchema(
+                        string()
+                            .description("The chosen category.")),
+                    sampleOutput("sample category")),
             provider, this, propertyService);
     }
 

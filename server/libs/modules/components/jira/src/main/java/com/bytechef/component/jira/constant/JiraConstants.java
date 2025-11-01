@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class JiraConstants {
 
     public static final String ASSIGNEE = "assignee";
+    public static final String ACCOUNT_ID = "accountId";
     public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
     public static final String DESCRIPTION = "description";

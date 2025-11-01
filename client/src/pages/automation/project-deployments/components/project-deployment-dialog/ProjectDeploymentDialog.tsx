@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -30,6 +29,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -322,11 +322,11 @@ const ProjectDeploymentDialog = ({
                         {activeStepIndex === 0 && (
                             <>
                                 <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
+                                    <Button label="Cancel" variant="outline" />
                                 </DialogClose>
 
                                 {(!projectDeployment?.id || updateProjectVersion) && (
-                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                    <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                 )}
                             </>
                         )}
@@ -334,9 +334,11 @@ const ProjectDeploymentDialog = ({
                         {(activeStepIndex === 1 || (projectDeployment?.id && !updateProjectVersion)) && (
                             <>
                                 {activeStepIndex === 1 && (
-                                    <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
-                                        Previous
-                                    </Button>
+                                    <Button
+                                        label="Previous"
+                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                        variant="outline"
+                                    />
                                 )}
 
                                 <Button
@@ -344,12 +346,15 @@ const ProjectDeploymentDialog = ({
                                         createProjectDeploymentMutation.isPending ||
                                         updateProjectDeploymentMutation.isPending
                                     }
+                                    icon={
+                                        createProjectDeploymentMutation.isPending ||
+                                        updateProjectDeploymentMutation.isPending ? (
+                                            <LoadingIcon />
+                                        ) : undefined
+                                    }
+                                    label="Save"
                                     onClick={handleSubmit(handleSaveClick)}
-                                >
-                                    {createProjectDeploymentMutation.isPending ||
-                                        (updateProjectDeploymentMutation.isPending && <LoadingIcon />)}
-                                    Save
-                                </Button>
+                                />
                             </>
                         )}
                     </DialogFooter>

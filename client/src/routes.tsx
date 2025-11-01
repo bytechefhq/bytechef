@@ -1,9 +1,16 @@
 import App from '@/App';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
+import Login from '@/pages/account/public/Login';
+import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
+import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
+import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
+import Register from '@/pages/account/public/Register';
+import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
+import VerifyEmail from '@/pages/account/public/VerifyEmail';
 import {Connections} from '@/pages/automation/connections/Connections';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
-import {environmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -17,11 +24,11 @@ import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient} from '@tanstack/react-query';
 import {lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
-const AccountErrorPage = lazy(() => import('@/pages/account/public/AccountErrorPage'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const ApiKeys = lazy(() => import('@/pages/settings/platform/api-keys/ApiKeys'));
@@ -31,20 +38,14 @@ const AutomationWorkflowExecutions = lazy(() =>
     }))
 );
 const Home = lazy(() => import('@/pages/home/Home'));
-const Login = lazy(() => import('@/pages/account/public/Login'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
-const PasswordResetEmailSent = lazy(() => import('@/pages/account/public/PasswordResetEmailSent'));
-const PasswordResetFinish = lazy(() => import('@/pages/account/public/PasswordResetFinish'));
-const PasswordResetInit = lazy(() => import('@/pages/account/public/PasswordResetInit'));
 const Project = lazy(() => import('@/pages/automation/project/Project'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
 const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project-templates/ProjectTemplates'));
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
-const Register = lazy(() => import('@/pages/account/public/Register'));
-const RegisterSuccess = lazy(() => import('@/pages/account/public/RegisterSuccess'));
+
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
-const VerifyEmail = lazy(() => import('@/pages/account/public/VerifyEmail'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
@@ -261,35 +262,21 @@ export const getRouter = (queryClient: QueryClient) =>
         //     path: '/oauth',
         // },
         {
-            element: (
-                <LazyLoadWrapper>
-                    <Login />
-                </LazyLoadWrapper>
-            ),
+            element: <Login />,
             path: '/login',
         },
         {
-            element: (
-                <LazyLoadWrapper>
-                    <Register />
-                </LazyLoadWrapper>
-            ),
+            element: <Register />,
             path: '/register',
         },
         {
-            element: (
-                <LazyLoadWrapper>
-                    <PasswordResetInit />
-                </LazyLoadWrapper>
-            ),
+            element: <PasswordResetInit />,
             path: '/password-reset/init',
         },
         {
             element: (
                 <AccessControl requiresFlow requiresKey>
-                    <LazyLoadWrapper>
-                        <RegisterSuccess />
-                    </LazyLoadWrapper>
+                    <RegisterSuccess />
                 </AccessControl>
             ),
             path: '/activate',
@@ -297,9 +284,7 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: (
                 <AccessControl requiresKey>
-                    <LazyLoadWrapper>
-                        <PasswordResetFinish />
-                    </LazyLoadWrapper>
+                    <PasswordResetFinish />
                 </AccessControl>
             ),
             path: '/password-reset/finish',
@@ -307,9 +292,7 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: (
                 <AccessControl requiresFlow>
-                    <LazyLoadWrapper>
-                        <PasswordResetEmailSent />
-                    </LazyLoadWrapper>
+                    <PasswordResetEmailSent />
                 </AccessControl>
             ),
             path: '/password-reset/email',
@@ -317,9 +300,7 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: (
                 <AccessControl requiresFlow>
-                    <LazyLoadWrapper>
-                        <VerifyEmail />
-                    </LazyLoadWrapper>
+                    <VerifyEmail />
                 </AccessControl>
             ),
             path: '/verify-email',
@@ -382,9 +363,7 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     element: (
                         <AccessControl requiresFlow>
-                            <LazyLoadWrapper>
-                                <AccountErrorPage />
-                            </LazyLoadWrapper>
+                            <AccountErrorPage />
                         </AccessControl>
                     ),
                     path: '/account-error',

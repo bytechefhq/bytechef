@@ -20,7 +20,7 @@ import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.automation.execution.facade.ToolFacade;
 import com.bytechef.platform.mcp.domain.McpTool;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.modelcontextprotocol.server.McpSyncServer;
+import io.modelcontextprotocol.server.McpAsyncServer;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.data.relational.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
@@ -33,30 +33,30 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class McpToolTransactionalEventListener {
 
-    private final McpSyncServer mcpSyncServer;
+    private final McpAsyncServer mcpAsyncServer;
     private final ToolFacade toolFacade;
 
     @SuppressFBWarnings("EI")
-    public McpToolTransactionalEventListener(McpSyncServer mcpSyncServer, ToolFacade toolFacade) {
-        this.mcpSyncServer = mcpSyncServer;
+    public McpToolTransactionalEventListener(McpAsyncServer mcpAsyncServer, ToolFacade toolFacade) {
+        this.mcpAsyncServer = mcpAsyncServer;
         this.toolFacade = toolFacade;
     }
 
     @TransactionalEventListener
     public void handleEvent(AfterSaveEvent<McpTool> mcpToolSaveEvent) {
-        mcpSyncServer.addTool(
-            McpToolUtils.toSyncToolSpecification(
+        mcpAsyncServer.addTool(
+            McpToolUtils.toAsyncToolSpecification(
                 toolFacade.getFunctionToolCallback(
                     toolFacade.toToolDTO(mcpToolSaveEvent.getEntity()))));
-        mcpSyncServer.notifyToolsListChanged();
+        mcpAsyncServer.notifyToolsListChanged();
     }
 
     @TransactionalEventListener
     public void handleEvent(AfterDeleteEvent<McpTool> mcpToolDeleteEvent) {
         ToolDTO toolDTO = toolFacade.toToolDTO(mcpToolDeleteEvent.getEntity());
 
-        mcpSyncServer.removeTool(toolDTO.name());
+        mcpAsyncServer.removeTool(toolDTO.name());
 
-        mcpSyncServer.notifyToolsListChanged();
+        mcpAsyncServer.notifyToolsListChanged();
     }
 }

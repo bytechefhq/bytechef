@@ -8,6 +8,15 @@ import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/u
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
+import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
+import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect';
+import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
+import PropertyTextArea from '@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea';
+import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditor';
+import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
+import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
+import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -27,7 +36,7 @@ import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -35,52 +44,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
-import {FieldsetSkeleton} from '../WorkflowEditorSkeletons';
-
-const PropertyComboBox = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox')
-);
-
-const PropertyDynamicProperties = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties')
-);
-
-const PropertySelect = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/PropertySelect')
-);
-
-const PropertyTextArea = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea')
-);
-
-const PropertyCodeEditor = lazy(
-    () =>
-        import(
-            '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditor'
-        )
-);
-
-const PropertyInput = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput')
-);
-
-const PropertyMentionsInput = lazy(
-    () =>
-        import(
-            '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput'
-        )
-);
-
-const PropertyMultiSelect = lazy(
-    () => import('@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect')
-);
-
-const PropertyJsonSchemaBuilder = lazy(
-    () =>
-        import(
-            '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder'
-        )
-);
 
 const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',
@@ -1039,26 +1002,24 @@ const Property = ({
             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
         >
             {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
-                <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                    <PropertyMentionsInput
-                        controlType={controlType || 'TEXT'}
-                        defaultValue={defaultValue}
-                        deletePropertyButton={deletePropertyButton}
-                        description={description}
-                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                        isFormulaMode={isFormulaMode}
-                        label={label || name}
-                        leadingIcon={typeIcon}
-                        path={path}
-                        placeholder={placeholder}
-                        ref={editorRef}
-                        required={required}
-                        setIsFormulaMode={setIsFormulaMode}
-                        showInputTypeSwitchButton={showInputTypeSwitchButton}
-                        type={type}
-                        value={mentionInputValue}
-                    />
-                </Suspense>
+                <PropertyMentionsInput
+                    controlType={controlType || 'TEXT'}
+                    defaultValue={defaultValue}
+                    deletePropertyButton={deletePropertyButton}
+                    description={description}
+                    handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                    isFormulaMode={isFormulaMode}
+                    label={label || name}
+                    leadingIcon={typeIcon}
+                    path={path}
+                    placeholder={placeholder}
+                    ref={editorRef}
+                    required={required}
+                    setIsFormulaMode={setIsFormulaMode}
+                    showInputTypeSwitchButton={showInputTypeSwitchButton}
+                    type={type}
+                    value={mentionInputValue}
+                />
             )}
 
             {!mentionInput && (
@@ -1230,119 +1191,108 @@ const Property = ({
                     )}
 
                     {!control && (isValidControlType || isNumericalInput) && path && (
-                        <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                            <PropertyInput
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                error={hasError}
-                                errorMessage={errorMessage}
-                                fieldsetClassName={objectName && arrayName && 'ml-2'}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                max={maxValue}
-                                maxLength={maxLength}
-                                min={minValue}
-                                minLength={minLength}
-                                name={path}
-                                onChange={handleInputChange}
-                                placeholder={
-                                    isNumericalInput && minValue && maxValue
-                                        ? `From ${minValue} to ${maxValue}`
-                                        : placeholder || `Type a ${isNumericalInput ? 'number' : 'something'} ...`
-                                }
-                                ref={inputRef}
-                                required={required}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                title={type}
-                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                value={inputValue}
-                            />
-                        </Suspense>
+                        <PropertyInput
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            error={hasError}
+                            errorMessage={errorMessage}
+                            fieldsetClassName={objectName && arrayName && 'ml-2'}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            max={maxValue}
+                            maxLength={maxLength}
+                            min={minValue}
+                            minLength={minLength}
+                            name={path}
+                            onChange={handleInputChange}
+                            placeholder={
+                                isNumericalInput && minValue && maxValue
+                                    ? `From ${minValue} to ${maxValue}`
+                                    : placeholder || `Type a ${isNumericalInput ? 'number' : 'something'} ...`
+                            }
+                            ref={inputRef}
+                            required={required}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            title={type}
+                            type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                            value={inputValue}
+                        />
                     )}
 
                     {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
-                        <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                            <PropertySelect
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                onValueChange={(value) => handleSelectChange(value, name!)}
-                                options={options as Array<SelectOptionType>}
-                                required={required}
-                                value={selectValue}
-                            />
-                        </Suspense>
+                        <PropertySelect
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name}
+                            onValueChange={(value) => handleSelectChange(value, name!)}
+                            options={options as Array<SelectOptionType>}
+                            required={required}
+                            value={selectValue}
+                        />
                     )}
 
                     {!control && controlType === 'JSON_SCHEMA_BUILDER' && (
-                        <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                            <PropertyJsonSchemaBuilder
-                                description={description}
-                                error={hasError}
-                                errorMessage={errorMessage}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name!}
-                                onChange={(value) => handleJsonSchemaBuilderChange(value)}
-                                schema={inputValue ? JSON.parse(inputValue) : undefined}
-                                title={`${label || name} Builder`}
-                            />
-                        </Suspense>
+                        <PropertyJsonSchemaBuilder
+                            description={description}
+                            error={hasError}
+                            errorMessage={errorMessage}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name!}
+                            onChange={(value) => handleJsonSchemaBuilderChange(value)}
+                            schema={inputValue ? JSON.parse(inputValue) : undefined}
+                            title={label || name}
+                        />
                     )}
 
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
-                        <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                            <PropertyComboBox
-                                arrayIndex={arrayIndex}
-                                defaultValue={defaultValue}
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
-                                    (optionLookupDependency) =>
-                                        optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                                )}
-                                lookupDependsOnValues={lookupDependsOnValues}
-                                name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name!)}
-                                options={(formattedOptions as Array<Option>) || undefined || []}
-                                optionsDataSource={optionsDataSource}
-                                path={path}
-                                required={required}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                value={selectValue}
-                                workflowId={workflow.id!}
-                                workflowNodeName={currentNode?.name ?? ''}
-                            />
-                        </Suspense>
+                        <PropertyComboBox
+                            arrayIndex={arrayIndex}
+                            defaultValue={defaultValue}
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                (optionLookupDependency) => optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                            )}
+                            lookupDependsOnValues={lookupDependsOnValues}
+                            name={name}
+                            onValueChange={(value: string) => handleSelectChange(value, name!)}
+                            options={(formattedOptions as Array<Option>) || undefined || []}
+                            optionsDataSource={optionsDataSource}
+                            path={path}
+                            required={required}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            value={selectValue}
+                            workflowId={workflow.id!}
+                            workflowNodeName={currentNode?.name ?? ''}
+                        />
                     )}
 
                     {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
-                        <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                            <PropertySelect
-                                defaultValue={defaultValue?.toString()}
-                                deletePropertyButton={deletePropertyButton}
-                                description={description}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                label={label || name}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name!)}
-                                options={[
-                                    {label: 'True', value: 'true'},
-                                    {label: 'False', value: 'false'},
-                                ]}
-                                required={required}
-                                showInputTypeSwitchButton={showInputTypeSwitchButton}
-                                value={selectValue}
-                            />
-                        </Suspense>
+                        <PropertySelect
+                            defaultValue={defaultValue?.toString()}
+                            deletePropertyButton={deletePropertyButton}
+                            description={description}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name}
+                            onValueChange={(value: string) => handleSelectChange(value, name!)}
+                            options={[
+                                {label: 'True', value: 'true'},
+                                {label: 'False', value: 'false'},
+                            ]}
+                            required={required}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            value={selectValue}
+                        />
                     )}
 
                     {!control && controlType === 'TEXT_AREA' && (
@@ -1385,40 +1335,36 @@ const Property = ({
             )}
 
             {type === 'DYNAMIC_PROPERTIES' && currentNode && (
-                <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                    <PropertyDynamicProperties
-                        currentOperationName={operationName}
-                        enabled={
-                            !!(currentNode?.connectionId && currentNode?.connections) ||
-                            currentNode?.connections?.length === 0
-                        }
-                        lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
-                        lookupDependsOnValues={lookupDependsOnValues}
-                        name={name}
-                        parameterValue={propertyParameterValue}
-                        path={path}
-                    />
-                </Suspense>
+                <PropertyDynamicProperties
+                    currentOperationName={operationName}
+                    enabled={
+                        !!(currentNode?.connectionId && currentNode?.connections) ||
+                        currentNode?.connections?.length === 0
+                    }
+                    lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
+                    lookupDependsOnValues={lookupDependsOnValues}
+                    name={name}
+                    parameterValue={propertyParameterValue}
+                    path={path}
+                />
             )}
 
             {controlType === 'CODE_EDITOR' && (
-                <Suspense fallback={<FieldsetSkeleton label="Loading Property..." />}>
-                    <PropertyCodeEditor
-                        defaultValue={defaultValue}
-                        description={description}
-                        error={hasError}
-                        errorMessage={errorMessage}
-                        label={label || name}
-                        language={languageId!}
-                        leadingIcon={typeIcon}
-                        name={name!}
-                        onChange={handleCodeEditorChange}
-                        required={required}
-                        value={propertyParameterValue}
-                        workflow={workflow}
-                        workflowNodeName={currentNode?.name ?? ''}
-                    />
-                </Suspense>
+                <PropertyCodeEditor
+                    defaultValue={defaultValue}
+                    description={description}
+                    error={hasError}
+                    errorMessage={errorMessage}
+                    label={label || name}
+                    language={languageId!}
+                    leadingIcon={typeIcon}
+                    name={name!}
+                    onChange={handleCodeEditorChange}
+                    required={required}
+                    value={propertyParameterValue}
+                    workflow={workflow}
+                    workflowNodeName={currentNode?.name ?? ''}
+                />
             )}
         </li>
     );

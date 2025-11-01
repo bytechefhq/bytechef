@@ -1,4 +1,15 @@
+import {getCookie} from '@/shared/util/cookie-utils';
 import {useCallback, useEffect, useState} from 'react';
+
+const fetchResendActivationEmail = async (email: string): Promise<Response> => {
+    return await fetch('/api/send-activation-email', {
+        body: email,
+        headers: {
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+        },
+        method: 'POST',
+    }).then((response) => response);
+};
 
 export function useResendEmail(storagePrefix: string, countdownSeconds: number = 60) {
     const [disabled, setDisabled] = useState(false);
@@ -53,6 +64,13 @@ export function useResendEmail(storagePrefix: string, countdownSeconds: number =
         return () => clearInterval(timer);
     }, [disabled, countdownSeconds, clearLocalStorage]);
 
+    const resendActivationEmail = async (email: string): Promise<void> => {
+        const response = await fetchResendActivationEmail(email);
+        if (response.status != 204) {
+            throw new Error('Failed to send activation email');
+        }
+    };
+
     const startCountdown = useCallback(() => {
         setDisabled(true);
 
@@ -63,6 +81,7 @@ export function useResendEmail(storagePrefix: string, countdownSeconds: number =
     return {
         countdown,
         disabled,
+        resendActivationEmail,
         startCountdown,
     };
 }

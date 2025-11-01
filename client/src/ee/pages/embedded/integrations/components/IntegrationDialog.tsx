@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -332,14 +332,10 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
+                            <Button label="Cancel" type="button" variant="outline" />
                         </DialogClose>
 
-                        <Button onClick={handleSubmit(saveIntegration)} type="submit">
-                            Save
-                        </Button>
+                        <Button label="Save" onClick={handleSubmit(saveIntegration)} type="submit" />
                     </DialogFooter>
                 </Form>
             </DialogContent>

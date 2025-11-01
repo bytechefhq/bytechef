@@ -16,8 +16,11 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -94,4 +97,30 @@ public interface TaskDispatcherDefinition {
      * @return
      */
     int getVersion();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface OutputFunction extends BaseOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @return
+         */
+        BaseOutputDefinition.OutputResponse apply(Map<String, ?> inputParameters) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface VariablePropertiesFunction {
+
+        /**
+         * @param inputParameters
+         * @return
+         */
+        BaseOutputDefinition.OutputResponse apply(Map<String, ?> inputParameters) throws Exception;
+    }
 }

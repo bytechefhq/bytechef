@@ -38,8 +38,8 @@ import static com.bytechef.component.zoho.commons.ZohoConstants.DATE;
 import static com.bytechef.component.zoho.commons.ZohoConstants.LINE_ITEMS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.PAYMENT_TERMS;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.commons.ZohoUtils;
 
@@ -57,7 +57,7 @@ public class ZohoBooksCreateSalesOrderAction {
                 .label("Customer ID")
                 .description("ID of the customer the invoice has to be created.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) ZohoUtils::getCustomersOptions),
+                .options((OptionsFunction<String>) ZohoUtils::getCustomersOptions),
             bool(USE_CUSTOM_SALES_ORDER_NUMBER)
                 .label("Use Custom Sales Order Number")
                 .description(
@@ -79,7 +79,7 @@ public class ZohoBooksCreateSalesOrderAction {
                             string("item_id")
                                 .label("Item ID")
                                 .description("ID of item.")
-                                .options((ActionOptionsFunction<String>) ZohoUtils::getItemsOptions)
+                                .options((OptionsFunction<String>) ZohoUtils::getItemsOptions)
                                 .required(true),
                             number("quantity")
                                 .label("Quantity")
@@ -88,7 +88,7 @@ public class ZohoBooksCreateSalesOrderAction {
             string(CURRENCY_ID)
                 .label("Currency ID")
                 .description("Currency ID of the customer's currency.")
-                .options((ActionOptionsFunction<String>) ZohoUtils::getCurrencyOptions)
+                .options((OptionsFunction<String>) ZohoUtils::getCurrencyOptions)
                 .required(false),
             date(DATE)
                 .label("Sales Order Date")

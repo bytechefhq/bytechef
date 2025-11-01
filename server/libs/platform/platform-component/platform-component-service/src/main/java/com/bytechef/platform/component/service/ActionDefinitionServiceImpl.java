@@ -19,18 +19,16 @@ package com.bytechef.platform.component.service;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
-import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
+import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
@@ -52,7 +50,6 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -73,12 +70,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection connection, ActionContext context) {
+        ComponentConnection componentConnection, ActionContext context) {
 
-        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, connection);
+        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
 
         try {
-            ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
+            PropertiesFunction propertiesFunction = getComponentPropertiesFunction(
                 componentName, componentVersion, actionName, propertyName, convertResult.inputParameters,
                 convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
 
@@ -150,12 +147,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection connection, ActionContext context) {
+        ComponentConnection componentConnection, ActionContext context) {
 
         try {
-            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, connection);
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
 
-            ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
                 componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
                 convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
 
@@ -178,20 +175,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        Context actionContext) {
+        ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         try {
-            Optional<ProcessErrorResponseFunction> processErrorResponse = actionDefinition.getProcessErrorResponse();
-
-            if (processErrorResponse.isPresent()) {
-                return processErrorResponse.get()
-                    .apply(statusCode, body, actionContext);
-            } else {
-                return ProviderException.getProviderException(statusCode, body);
-            }
+            return actionDefinition.getProcessErrorResponse()
+                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                    statusCode1, body1))
+                .apply(statusCode, body, context);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
@@ -200,7 +193,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public OutputResponse executeSingleConnectionOutput(
         String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection connection, ActionContext context) {
+        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -213,7 +206,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
                         ParametersFactory.createParameters(inputParameters),
                         ParametersFactory.createParameters(
-                            connection == null ? Map.of() : connection.getConnectionParameters()),
+                            componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
                         context);
 
                     return toOutputResponse(outputResponse);
@@ -231,7 +224,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executeSingleConnectionPerform(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection connection, ActionContext context) throws ExecutionException {
+        @Nullable ComponentConnection componentConnection, ActionContext context) throws ExecutionException {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -242,8 +235,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return singleConnectionPerformFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
-                connection == null
-                    ? null : ParametersFactory.createParameters(connection.getConnectionParameters()),
+                componentConnection == null
+                    ? null : ParametersFactory.createParameters(componentConnection.getConnectionParameters()),
                 context);
         } catch (Exception e) {
             if (e instanceof ProviderException) {
@@ -259,9 +252,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         ActionContext context) {
 
-        com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
-            getWorkflowNodeDescriptionFunction(
-                componentName, componentVersion, actionName);
+        com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
+            getWorkflowNodeDescriptionFunction(componentName, componentVersion, actionName);
 
         try {
             return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
@@ -308,7 +300,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return OptionalUtils.get(actionDefinition.getPerform()) instanceof SingleConnectionPerformFunction;
     }
 
-    private ActionOptionsFunction<?> getComponentOptionsFunction(
+    private static ConvertResult convert(
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+
+        return new ConvertResult(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(
+                componentConnection == null ? Map.of() : componentConnection.parameters()),
+            getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
+    private OptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String actionName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) throws Exception {
@@ -320,10 +322,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        return (ActionOptionsFunction<?>) optionsDataSource.getOptions();
+        return (OptionsFunction<?>) optionsDataSource.getOptions();
     }
 
-    private ActionPropertiesFunction getComponentPropertiesFunction(
+    private PropertiesFunction getComponentPropertiesFunction(
         String componentName, int componentVersion, String actionName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) throws Exception {
@@ -335,10 +337,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
-        return (ActionPropertiesFunction) propertiesDataSource.getProperties();
+        return (PropertiesFunction) propertiesDataSource.getProperties();
     }
 
-    private com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction
+    private com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction
         getWorkflowNodeDescriptionFunction(String componentName, int componentVersion, String actionName) {
 
         if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
@@ -370,15 +372,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         return SchemaUtils.toOutput(
             outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
-    }
-
-    private static ConvertResult convert(
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
-
-        return new ConvertResult(
-            ParametersFactory.createParameters(inputParameters),
-            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-            getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
     private record ConvertResult(

@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,10 +32,14 @@ import org.springframework.stereotype.Controller;
 public class ConnectedUserGraphQlController {
 
     private final ConnectedUserService connectedUserService;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserGraphQlController(ConnectedUserService connectedUserService) {
+    public ConnectedUserGraphQlController(
+        ConnectedUserService connectedUserService, EnvironmentService environmentService) {
+
         this.connectedUserService = connectedUserService;
+        this.environmentService = environmentService;
     }
 
     @QueryMapping
@@ -44,16 +49,16 @@ public class ConnectedUserGraphQlController {
 
     @QueryMapping
     public ConnectedUserPage connectedUsers(
-        @Argument Integer environment, @Argument String name, @Argument String createDateFrom,
+        @Argument Long environmentId, @Argument String name, @Argument String createDateFrom,
         @Argument String createDateTo, @Argument Long integrationId, @Argument Integer pageNumber) {
 
-        Environment env = environment != null ? Environment.values()[environment] : Environment.PRODUCTION;
+        Environment environment = environmentService.getEnvironment(environmentId);
         LocalDate dateFrom = createDateFrom != null ? LocalDate.parse(createDateFrom) : null;
         LocalDate dateTo = createDateTo != null ? LocalDate.parse(createDateTo) : null;
         int page = pageNumber != null ? pageNumber : 0;
 
         Page<ConnectedUser> connectedUsersPage = connectedUserService.getConnectedUsers(
-            env, name, dateFrom, dateTo, integrationId, page);
+            environment, name, dateFrom, dateTo, integrationId, page);
 
         return new ConnectedUserPage(
             connectedUsersPage.getContent(), connectedUsersPage.getTotalElements(), connectedUsersPage.getTotalPages(),

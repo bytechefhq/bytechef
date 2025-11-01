@@ -29,6 +29,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.Gmail.Users;
 import com.google.api.services.gmail.Gmail.Users.Messages;
@@ -49,7 +51,9 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailNewEmailPollingTriggerTest {
 
+    private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
     private final Gmail mockedGmail = mock(Gmail.class);
+    private final Calendar mockedCalendar = mock(Calendar.class);
     private final Users.Messages.List mockedList = mock(Users.Messages.List.class);
     private final Messages mockedMessages = mock(Messages.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
@@ -59,12 +63,20 @@ class GoogleMailNewEmailPollingTriggerTest {
 
     @Test
     void testPoll() throws IOException {
+        String timezone = "Europe/Zagreb";
         List<Message> messages = List.of(new Message().setId("abc"));
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
 
         Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedCalendar);
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+                .thenReturn(timezone);
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedGmail);
@@ -76,23 +88,23 @@ class GoogleMailNewEmailPollingTriggerTest {
                 .thenReturn(mockedList);
             when(mockedList.setQ(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
-
             when(mockedList.execute())
                 .thenReturn(new ListMessagesResponse().setMessages(messages));
 
-            PollOutput pollOutput =
-                GoogleMailNewEmailPollingTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
+            PollOutput pollOutput = GoogleMailNewEmailPollingTrigger.poll(
+                parameters, parameters, parameters, mockedTriggerContext);
 
             assertEquals(messages, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
-            ZoneId zoneId = ZoneId.systemDefault();
+            ZoneId zoneId = ZoneId.of(timezone);
 
             ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
 
             assertEquals(
                 List.of(ME, "is:unread after:" + zonedDateTime.toEpochSecond()), stringArgumentCaptor.getAllValues());
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(parameters, parameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
         }
     }
 }

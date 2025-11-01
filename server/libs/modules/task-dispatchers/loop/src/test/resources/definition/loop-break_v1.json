@@ -1,13 +1,13 @@
 {
-  "description" : "Breaks the loop execution.",
-  "help" : null,
-  "icon" : "path:assets/loop-break.svg",
-  "name" : "loopBreak",
-  "outputDefinition" : null,
-  "properties" : null,
-  "resources" : null,
-  "taskProperties" : null,
-  "title" : "Loop Break",
-  "variableProperties" : null,
-  "version" : 1
+  "description": "Breaks the loop execution.",
+  "help": null,
+  "icon": "path:assets/loop-break.svg",
+  "name": "loopBreak",
+  "outputDefinition": null,
+  "properties": null,
+  "resources": null,
+  "taskProperties": null,
+  "title": "Loop Break",
+  "variableProperties": null,
+  "version": 1
 }

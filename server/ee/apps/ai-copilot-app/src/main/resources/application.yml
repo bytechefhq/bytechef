@@ -3,21 +3,26 @@ server:
 
 spring:
   ai:
-    vectorstore:
-      pgvector:
-        dimensions: 1536
-        initialize-schema: true
+    model:
+      audio:
+        speech: none
+        transcription: none
+      chat: none
+      embedding: none
+      image: none
+      moderation: none
     openai:
       api-key: ${bytechef.ai.copilot.openai.api-key}
       chat:
         options:
           model: ${bytechef.ai.copilot.openai.chat.options.model}
           temperature: ${bytechef.ai.copilot.openai.chat.options.temperature}
+    vectorstore:
+      pgvector:
+        dimensions: 1536
+        initialize-schema: true
   application:
     name: ai-copilot
-  autoconfigure:
-    exclude:
-      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5433/bytechef_copilot
@@ -34,12 +39,25 @@ spring:
 bytechef:
   ai:
     copilot:
+      anthropic:
+        chat:
+          options:
+            model: claude-sonnet-4-5
+            temperature: 0.5
+      chat:
+        provider: openai
+      embedding:
+        provider: openai
       enabled: true
       openai:
-        api-key:
+
         chat:
           options:
             model: gpt-4.1
             temperature: 0.5
-      provider: openai
+      vectorstore:
+        pgvector:
+          url: jdbc:postgresql://localhost:5433/bytechef_copilot
+          username: postgres
+          password: postgres
   edition: EE

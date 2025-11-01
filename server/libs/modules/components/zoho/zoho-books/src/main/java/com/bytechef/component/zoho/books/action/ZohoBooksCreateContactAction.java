@@ -34,9 +34,9 @@ import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
 import static com.bytechef.component.zoho.commons.ZohoConstants.SHIPPING_ADDRESS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.WEBSITE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.commons.ZohoUtils;
 
@@ -78,7 +78,7 @@ public class ZohoBooksCreateContactAction {
             string(CURRENCY_ID)
                 .label("Currency ID")
                 .description("Currency ID of the customer's currency.")
-                .options((ActionOptionsFunction<String>) ZohoUtils::getCurrencyOptions)
+                .options((OptionsFunction<String>) ZohoUtils::getCurrencyOptions)
                 .required(false),
             object(BILLING_ADDRESS)
                 .label("Billing Address")

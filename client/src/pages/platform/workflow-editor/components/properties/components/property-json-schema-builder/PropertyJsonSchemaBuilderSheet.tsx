@@ -3,7 +3,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {MonacoEditorLoader} from '@/shared/components/MonacoEditorWrapper';
+import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
 import {Suspense, lazy} from 'react';
@@ -35,9 +35,9 @@ const PropertyJsonSchemaBuilderSheet = ({
                 <Tabs className="flex size-full flex-col" defaultValue="designer">
                     <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <div className="flex flex-col">
-                            <SheetTitle>{title || 'JSON Schema Builder'}</SheetTitle>
+                            <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
 
-                            <SheetDescription>Define desired response format for the output</SheetDescription>
+                            <SheetDescription>{`Define desired structure for the ${title}.`}</SheetDescription>
                         </div>
 
                         <div className="flex items-center gap-1">
@@ -56,10 +56,12 @@ const PropertyJsonSchemaBuilderSheet = ({
                     </SheetHeader>
 
                     <div className="flex-1 space-y-4 overflow-y-auto px-3">
-                        <Note
-                            content="Set up how you want OpenAI to format its replies — like a template for the response."
-                            icon={<MessageCircleQuestionIcon />}
-                        />
+                        {title === 'Response Schema' && (
+                            <Note
+                                content="Define how you’d like the LLM to structure its responses — essentially a template for its output."
+                                icon={<MessageCircleQuestionIcon />}
+                            />
+                        )}
 
                         <TabsContent value="designer">
                             <JsonSchemaBuilder locale={locale} onChange={onChange} schema={schema} />

@@ -18,8 +18,8 @@ package com.bytechef.component.nocodb.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.nocodb.util.NocoDbUtils;
 
 /**
@@ -40,21 +40,21 @@ public class NocoDbConstants {
     public static final ModifiableStringProperty BASE_ID_PROPERTY = string(BASE_ID)
         .label("Base ID")
         .description("ID of the base.")
-        .options((ActionOptionsFunction<String>) NocoDbUtils::getBaseIdOptions)
+        .options((OptionsFunction<String>) NocoDbUtils::getBaseIdOptions)
         .optionsLookupDependsOn(WORKSPACE_ID)
         .required(true);
 
     public static final ModifiableStringProperty TABLE_ID_PROPERTY = string(TABLE_ID)
         .label("Table ID")
         .description("ID of the table.")
-        .options((ActionOptionsFunction<String>) NocoDbUtils::getTableIdOptions)
+        .options((OptionsFunction<String>) NocoDbUtils::getTableIdOptions)
         .optionsLookupDependsOn(BASE_ID, WORKSPACE_ID)
         .required(true);
 
     public static final ModifiableStringProperty WORKSPACE_ID_PROPERTY = string(WORKSPACE_ID)
         .label("Workspace ID")
         .description("ID of the workspace.")
-        .options((ActionOptionsFunction<String>) NocoDbUtils::getWorkspaceIdOptions)
+        .options((OptionsFunction<String>) NocoDbUtils::getWorkspaceIdOptions)
         .required(true);
 
     private NocoDbConstants() {

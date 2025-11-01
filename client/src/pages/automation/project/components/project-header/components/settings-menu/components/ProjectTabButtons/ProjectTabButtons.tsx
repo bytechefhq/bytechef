@@ -64,7 +64,7 @@ const ProjectTabButtons = ({
 
             {ff_1042 && (
                 <Button className="dropdown-menu-item" onClick={onShareProject} variant="ghost">
-                    <Share2Icon /> Share Project
+                    <Share2Icon /> Share
                 </Button>
             )}
 
@@ -88,7 +88,7 @@ const ProjectTabButtons = ({
                     onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
                     variant="ghost"
                 >
-                    <DownloadIcon /> Export Project
+                    <DownloadIcon /> Export
                 </Button>
             )}
 

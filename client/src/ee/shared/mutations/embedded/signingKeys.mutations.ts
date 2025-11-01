@@ -1,5 +1,5 @@
 import {CreateSigningKey200Response, SigningKey, SigningKeyApi} from '@/ee/shared/middleware/embedded/security';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateSigningKeyMutationProps {

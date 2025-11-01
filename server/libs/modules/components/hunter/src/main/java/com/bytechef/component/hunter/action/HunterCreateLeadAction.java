@@ -25,8 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.hunter.util.HunterUtils;
 import java.util.Map;
 
@@ -88,7 +88,7 @@ public class HunterCreateLeadAction {
                 .description(
                     "The identifier of the list the lead belongs to. If it's not specified, the lead is saved in the last list created.")
                 .required(false)
-                .options((OptionsDataSource.ActionOptionsFunction<Long>) HunterUtils::getLeadListIdOptions))
+                .options((ActionDefinition.OptionsFunction<Long>) HunterUtils::getLeadListIdOptions))
         .output(outputSchema(object().properties(object("data").properties(string("id").description("ID of the lead.")
             .required(false),
             string("email").description("Email address of the lead.")

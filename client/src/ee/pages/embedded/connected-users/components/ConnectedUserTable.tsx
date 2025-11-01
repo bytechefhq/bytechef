@@ -14,7 +14,6 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -39,8 +38,6 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
             setConnectedUserSheetOpen: state.setConnectedUserSheetOpen,
         }))
     );
-
-    const {data: environmentsQuery} = useEnvironmentsQuery();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -112,11 +109,6 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 },
                 header: 'Integrations',
             }),
-            columnHelper.accessor('environmentId', {
-                cell: (info) =>
-                    environmentsQuery?.environments?.find((environment) => +environment!.id! === info.getValue())?.name,
-                header: 'Environment',
-            }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info?.getValue()?.toLocaleDateString()} ${info?.getValue()?.toLocaleTimeString()}`,
                 header: 'Created Date',
@@ -158,7 +150,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 id: 'actions',
             }),
         ],
-        [componentDefinitions, connectedUsers, environmentsQuery?.environments]
+        [componentDefinitions, connectedUsers]
     );
 
     const reactTable = useReactTable<ConnectedUser>({
@@ -189,7 +181,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     });
 
     return (
-        <div className="w-full px-4 2xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             <Table className="table-auto">
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (

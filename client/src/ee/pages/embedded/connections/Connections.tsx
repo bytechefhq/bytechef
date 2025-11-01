@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
@@ -10,11 +10,11 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -83,7 +83,7 @@ export const Connections = () => {
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
-                                triggerNode={<Button>New Connection</Button>}
+                                triggerNode={<Button label="New Connection" />}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
@@ -188,7 +188,7 @@ export const Connections = () => {
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                     connectionsQueryKey={ConnectionKeys.connections}
-                                    triggerNode={<Button>Create Connection</Button>}
+                                    triggerNode={<Button label="Create Connection" />}
                                     useCreateConnectionMutation={useCreateConnectionMutation}
                                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                                 />

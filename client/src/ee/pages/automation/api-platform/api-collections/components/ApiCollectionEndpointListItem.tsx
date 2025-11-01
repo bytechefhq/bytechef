@@ -1,6 +1,7 @@
+import '@/shared/styles/dropdownMenu.css';
+import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,7 +19,7 @@ import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/h
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -122,24 +123,31 @@ const ApiCollectionEndpointListItem = ({
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                        </Button>
+                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setShowEditApiCollectionEndpointDialog(true)}>
-                            Edit Endpoint
+                    <DropdownMenuContent align="end" className="p-0">
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            onClick={() => setShowEditApiCollectionEndpointDialog(true)}
+                        >
+                            <EditIcon /> Edit Endpoint
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={() => setShowEditWorkflowDialog(true)}>
-                            Edit Workflow
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            onClick={() => setShowEditWorkflowDialog(true)}
+                        >
+                            <EditIcon /> Edit Workflow
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="m-0" />
 
-                        <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                            Delete
+                        <DropdownMenuItem
+                            className="dropdown-menu-item-destructive"
+                            onClick={() => setShowDeleteDialog(true)}
+                        >
+                            <Trash2Icon /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

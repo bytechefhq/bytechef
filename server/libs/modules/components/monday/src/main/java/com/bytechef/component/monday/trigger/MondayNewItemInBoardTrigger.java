@@ -34,11 +34,11 @@ import static com.bytechef.component.monday.constant.MondayConstants.VALUE;
 import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -66,11 +66,11 @@ public class MondayNewItemInBoardTrigger {
         .properties(
             string(WORKSPACE_ID)
                 .label("Workspace ID")
-                .options((TriggerOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+                .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
                 .label("Board ID")
-                .options((TriggerOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+                .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true))
         .output()
@@ -162,7 +162,13 @@ public class MondayNewItemInBoardTrigger {
                             }
                             case COUNTRY, DROPDOWN, EMAIL, HOUR, LINK, LONG_TEXT, TEXT, STATUS, WORLD_CLOCK ->
                                 transformedValues.put(id, columnValueMap.get(TEXT));
-                            case DATE -> transformedValues.put(id, LocalDate.parse((String) columnValueMap.get(TEXT)));
+                            case DATE -> {
+                                String text = (String) columnValueMap.get(TEXT);
+
+                                if (text != null && !text.isEmpty()) {
+                                    transformedValues.put(id, LocalDate.parse(text));
+                                }
+                            }
                             case LOCATION -> {
                                 Map<String, ?> value1 =
                                     context.json(json -> json.readMap((String) columnValueMap.get(VALUE)));

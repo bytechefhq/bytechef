@@ -17,67 +17,60 @@
 package com.bytechef.component.github.trigger;
 
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.PULL_REQUESTS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.github.util.GithubUtils;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class GithubNewPullRequestTriggerTest extends AbstractGithubTriggerTest {
+class GithubNewPullRequestTriggerTest {
+
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testWebhookEnable() {
-        String webhookUrl = "testWebhookUrl";
+    void testPoll() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, List.of(1)));
 
-        mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, "repo"));
+        List<Map<String, ?>> responseList = List.of(Map.of(ID, 2));
 
-        githubUtilsMockedStatic.when(
-            () -> GithubUtils.subscribeWebhook(
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                triggerContextArgumentCaptor.capture()))
-            .thenReturn(123);
-        WebhookEnableOutput webhookEnableOutput = GithubNewPullRequestTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseList);
 
-        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
+        PollOutput pollOutput = GithubNewPullRequestTrigger.poll(
+            mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
-        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
-
-        assertEquals(List.of("repo", "pull_request", webhookUrl), stringArgumentCaptor.getAllValues());
-        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testWebhookDisable() {
-        mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, "repo", ID, 123));
-
-        GithubNewPullRequestTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
-
-        githubUtilsMockedStatic
-            .verify(() -> GithubUtils.unsubscribeWebhook("repo", 123, mockedTriggerContext));
-    }
-
-    @Test
-    void testWebhookRequest() {
-        Map<String, Object> content = Map.of("id", 123);
-
-        githubUtilsMockedStatic.when(
-            () -> GithubUtils.getContent(webhookBodyArgumentCaptor.capture()))
-            .thenReturn(content);
-
-        Map<String, Object> result = GithubNewIssueTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
-
-        assertEquals(content, result);
-        assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
+        assertEquals(List.of(Map.of(ID, 2)), pollOutput.records());
+        assertEquals(Map.of(PULL_REQUESTS, List.of(2)), pollOutput.closureParameters());
+        assertFalse(pollOutput.pollImmediately());
+        assertEquals(List.of("sort", "created", "direction", "desc"), stringArgumentCaptor.getAllValues());
     }
 }

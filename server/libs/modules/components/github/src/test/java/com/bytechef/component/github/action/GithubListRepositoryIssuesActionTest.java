@@ -17,29 +17,42 @@
 package com.bytechef.component.github.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
+ * @author Monika Kušter
  */
-class GithubListRepositoryIssuesActionTest extends AbstractGithubActionTest {
+class GithubListRepositoryIssuesActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
+    private final Context mockedContext = mock(Context.class);
 
     @Test
     void testPerform() {
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseList);
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic.when(() -> GithubUtils.getRepositoryIssues(
+                parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                .thenReturn(List.of());
 
-        Object result = GithubListRepositoryIssuesAction.perform(mockedParameters, mockedParameters, mockedContext);
+            List<Map<?, ?>> result = GithubListRepositoryIssuesAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responseList, result);
+            assertEquals(List.of(), result);
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        }
     }
 }

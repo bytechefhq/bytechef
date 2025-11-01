@@ -26,10 +26,10 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -44,12 +44,12 @@ public class BambooHrUpdateEmployeeFileAction {
             string(ID)
                 .label("Employee ID")
                 .description("The ID of the employee.")
-                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
                 .required(true),
             string(FILE_ID)
                 .label("File ID")
                 .description("The ID of the employee file being updated.")
-                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeFilesIdOptions)
+                .options((OptionsFunction<String>) BambooHrUtils::getEmployeeFilesIdOptions)
                 .optionsLookupDependsOn(ID)
                 .required(true),
             string(NAME)

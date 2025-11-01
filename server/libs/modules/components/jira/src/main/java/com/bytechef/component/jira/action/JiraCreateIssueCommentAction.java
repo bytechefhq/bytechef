@@ -28,9 +28,9 @@ import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
@@ -49,12 +49,12 @@ public class JiraCreateIssueCommentAction {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue where the comment will be added.")
-                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(COMMENT)

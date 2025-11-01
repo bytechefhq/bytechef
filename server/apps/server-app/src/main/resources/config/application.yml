@@ -103,14 +103,45 @@ openapi:
 
 spring:
   ai:
+    chat:
+      client:
+        enabled: ${bytechef.ai.copilot.enabled}
     mcp:
       server:
         name: bytechef-mcp-server
-        sse-endpoint: /api/sse
-        sse-message-endpoint: /api/v1/mcp/message
-        request-timeout: 300000
+        protocol: streamable
+        type: async
+        streamable-http:
+          mcp-endpoint: /api/mcp
+    model:
+      audio:
+        speech: none
+        transcription: none
+      chat: none
+      embedding: none
+      image: none
+      moderation: none
+    anthropic:
+      api-key: ${bytechef.ai.copilot.anthropic.api-key}
+      chat:
+        options:
+          model: ${bytechef.ai.copilot.anthropic.chat.options.model}
+          temperature: ${bytechef.ai.copilot.anthropic.chat.options.temperature}
+    openai:
+      api-key: ${bytechef.ai.copilot.openai.api-key}
+      chat:
+        options:
+          model: ${bytechef.ai.copilot.openai.chat.options.model}
+          temperature: ${bytechef.ai.copilot.openai.chat.options.temperature}
+    vectorstore:
+      type: none
+      pgvector:
+        dimensions: 1536
+        initialize-schema: true
   application:
     name: server-app
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:
@@ -215,7 +246,21 @@ templates:
 bytechef:
   ai:
     copilot:
+      anthropic:
+        chat:
+          options:
+            model: claude-sonnet-4-5
+            temperature: 0.5
+      chat:
+        provider: openai
+      embedding:
+        provider: openai
       enabled: false
+      openai:
+        chat:
+          options:
+            model: gpt-4.1
+            temperature: 0.5
   analytics:
     enabled: false
   cache:

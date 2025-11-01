@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
+import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
 import com.bytechef.component.definition.Parameters;
@@ -32,6 +33,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.google.commons.GoogleServices;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import java.io.IOException;
@@ -70,17 +72,21 @@ public class GoogleMailNewEmailPollingTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        ZoneId zoneId = ZoneId.systemDefault();
-
-        LocalDateTime now = LocalDateTime.now(zoneId);
-
-        LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
-
-        Gmail gmail = GoogleServices.getMail(connectionParameters);
-
         try {
-            ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
+            Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+            String timezone = getCalendarTimezone(calendar);
+
+            ZoneId zoneId = ZoneId.of(timezone);
+
+            LocalDateTime now = LocalDateTime.now(zoneId);
+
+            LocalDateTime startDate = closureParameters.getLocalDateTime(
+                LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+
+            Gmail gmail = GoogleServices.getMail(connectionParameters);
+
+            ZonedDateTime zonedDateTime = startDate.atZone(ZoneId.of(timezone));
 
             ListMessagesResponse listMessagesResponse = gmail.users()
                 .messages()
@@ -89,7 +95,6 @@ public class GoogleMailNewEmailPollingTrigger {
                 .execute();
 
             return new PollOutput(listMessagesResponse.getMessages(), Map.of(LAST_TIME_CHECKED, now), false);
-
         } catch (IOException e) {
             throw translateGoogleIOException(e);
         }

@@ -30,10 +30,10 @@ import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJ
 import static com.bytechef.component.salesforce.util.SalesforceUtils.combineFieldsAndCreateJsonFile;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.salesforce.util.SalesforceUtils;
 
@@ -48,12 +48,12 @@ public class SalesforceUpdateRecordAction {
         .properties(
             string(OBJECT)
                 .label("Salesforce Object")
-                .options((ActionOptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
+                .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true),
             string(ID)
                 .label("Record ID")
                 .description("ID of the record to update.")
-                .options((ActionOptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
+                .options((OptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
                 .optionsLookupDependsOn(OBJECT)
                 .required(true),
             dynamicProperties(FIELDS)

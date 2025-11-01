@@ -20,7 +20,6 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import Footer from '@/shared/layout/Footer';
@@ -31,6 +30,7 @@ import {
     WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -360,7 +360,7 @@ export const WorkflowExecutions = () => {
             footer={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <Footer position="main">
+                    <Footer centerTitle position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
@@ -375,6 +375,7 @@ export const WorkflowExecutions = () => {
                 workflowExecutions &&
                 workflowExecutions.length > 0 && (
                     <Header
+                        centerTitle
                         position="main"
                         title={
                             <WorkflowExecutionsFilterTitle

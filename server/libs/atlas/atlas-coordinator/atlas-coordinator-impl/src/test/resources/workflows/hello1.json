@@ -1,22 +1,22 @@
 {
-  "label" : "Hello Demo",
-  "inputs" : [ {
-    "name" : "yourName",
-    "label" : "Your Name",
-    "type" : "STRING",
-    "required" : true
+  "label": "Hello Demo",
+  "inputs": [ {
+    "name": "yourName",
+    "label": "Your Name",
+    "type": "STRING",
+    "required": true
   } ],
-  "outputs" : [ {
-    "name" : "myMagicNumber",
-    "value" : "${randomNumber}"
+  "outputs": [ {
+    "name": "myMagicNumber",
+    "value": "${randomNumber}"
   } ],
-  "tasks" : [ {
-    "name" : "randomNumber",
-    "label" : "Generate a random number",
-    "type" : "randomHelper/v1/randomInt",
-    "parameters" : {
-      "startInclusive" : 1000,
-      "endInclusive" : 5000
+  "tasks": [ {
+    "name": "randomNumber",
+    "label": "Generate a random number",
+    "type": "randomHelper/v1/randomInt",
+    "parameters": {
+      "startInclusive": 1000,
+      "endInclusive": 5000
     }
   } ]
 }

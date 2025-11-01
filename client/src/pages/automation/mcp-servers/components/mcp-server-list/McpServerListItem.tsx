@@ -7,7 +7,6 @@ import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServer
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemAlertDialog from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemAlertDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import TagList from '@/shared/components/TagList';
 import {
     McpProjectWorkflow,
@@ -152,16 +151,6 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex min-w-28 justify-end">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={+mcpServer.environmentId!} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-                        </div>
-
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <div className="flex items-center">
                                 {isEnablePending && <LoadingIcon />}

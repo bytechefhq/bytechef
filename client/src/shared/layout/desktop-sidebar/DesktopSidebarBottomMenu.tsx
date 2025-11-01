@@ -12,7 +12,6 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -21,6 +20,7 @@ import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -112,7 +112,9 @@ const DesktopSidebarBottomMenu = () => {
     const handleWorkspaceValueChange = (value: string) => {
         setCurrentWorkspaceId(+value);
 
-        navigate('/automation/projects');
+        if (currentType === ModeType.AUTOMATION) {
+            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+        }
     };
 
     useEffect(() => {

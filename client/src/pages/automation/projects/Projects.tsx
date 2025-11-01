@@ -1,8 +1,9 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
+import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -10,7 +11,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
-import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -68,39 +69,6 @@ const Projects = () => {
 
     const queryClient = useQueryClient();
 
-    const handleImportProject = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-
-        if (!file) {
-            return;
-        }
-
-        const formData = new FormData();
-
-        formData.append('file', file);
-
-        try {
-            const response = await fetch(`/api/automation/internal/workspaces/${currentWorkspaceId}/projects/import`, {
-                body: formData,
-                method: 'POST',
-            });
-
-            if (response.ok) {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectKeys.projects,
-                });
-            } else {
-                console.error('Failed to import project');
-            }
-        } catch (error) {
-            console.error('Error importing project:', error);
-        }
-
-        if (event.target) {
-            event.target.value = '';
-        }
-    };
-
     return (
         <LayoutContainer
             header={
@@ -113,7 +81,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>New Project</Button>
+                                        <Button label="New Project" />
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
@@ -141,7 +109,7 @@ const Projects = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <ProjectDialog project={undefined} triggerNode={<Button>New Project</Button>} />
+                                <ProjectDialog project={undefined} triggerNode={<Button label="New Project" />} />
                             )
                         }
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
@@ -168,7 +136,7 @@ const Projects = () => {
                             ff_2482 ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>Create Project</Button>
+                                        <Button label="Create Project" />
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
@@ -187,7 +155,7 @@ const Projects = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <ProjectDialog triggerNode={<Button>Create Project</Button>} />
+                                <ProjectDialog triggerNode={<Button label="Create Project" />} />
                             )
                         }
                         icon={<FolderIcon className="size-24 text-gray-300" />}
@@ -199,7 +167,7 @@ const Projects = () => {
 
             <input
                 accept=".zip"
-                onChange={handleImportProject}
+                onChange={(event) => handleImportProject(event, currentWorkspaceId, queryClient)}
                 ref={fileInputRef}
                 style={{display: 'none'}}
                 type="file"

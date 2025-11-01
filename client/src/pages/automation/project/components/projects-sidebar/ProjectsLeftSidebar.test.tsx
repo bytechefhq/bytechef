@@ -1,11 +1,25 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectsLeftSidebar from './ProjectsLeftSidebar';
 
 // Simple utility to flush promises
 const flushPromises = () => new Promise((r) => setTimeout(r, 0));
+
+// React Query test client setup
+const createTestQueryClient = () =>
+    new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false,
+            },
+        },
+    });
+
+let queryClient: QueryClient;
 
 // Mocks for UI components used inside dropdown/scroll
 vi.mock('@/components/ui/button', () => ({
@@ -124,9 +138,13 @@ vi.mock('@/hooks/use-toast', () => ({
     useToast: () => ({toast: vi.fn()}),
 }));
 
-vi.mock('@tanstack/react-query', async () => ({
-    useQueryClient: () => ({invalidateQueries: vi.fn()}),
-}));
+vi.mock('@tanstack/react-query', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
+    return {
+        ...actual,
+        useQueryClient: () => ({invalidateQueries: vi.fn()}),
+    };
+});
 
 vi.mock('react-router-dom', async () => ({
     useNavigate: () => vi.fn(),
@@ -166,15 +184,28 @@ const baseProps = {
     updateWorkflowMutation: {} as any,
 };
 
+// Helper render wrapper to provide required Providers (React Query + Tooltip)
+const renderWithProviders = (ui: React.ReactElement) =>
+    render(
+        <QueryClientProvider client={queryClient}>
+            <TooltipProvider>{ui}</TooltipProvider>
+        </QueryClientProvider>
+    );
+
 describe('ProjectsLeftSidebar', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        queryClient = createTestQueryClient();
+    });
+
+    afterEach(() => {
+        queryClient.clear();
     });
 
     it('shows loading skeleton when queries are loading', async () => {
         setupQueries({loading: true, selectedProjectId: 5});
 
-        render(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
 
         // isLoading becomes true after effect runs
         await waitFor(() => expect(screen.getByTestId('skeleton')).toBeInTheDocument());
@@ -184,7 +215,7 @@ describe('ProjectsLeftSidebar', () => {
         const projects = [{id: 11}, {id: 22}, {id: 33}];
         setupQueries({projects, selectedProjectId: 0, workflows: [{id: 'wa'}]});
 
-        render(<ProjectsLeftSidebar {...baseProps} projectId={0} />);
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={0} />);
 
         // Lists per project
         const items = await screen.findAllByTestId('project-workflows-list');
@@ -195,7 +226,7 @@ describe('ProjectsLeftSidebar', () => {
         const workflows = [{id: 'wa'}, {id: 'wb'}, {id: 'wc'}];
         setupQueries({selectedProjectId: 7, workflows});
 
-        render(<ProjectsLeftSidebar {...baseProps} projectId={7} />);
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={7} />);
 
         const items = await screen.findAllByTestId('workflow-item');
         expect(items).toHaveLength(workflows.length);
@@ -204,14 +235,15 @@ describe('ProjectsLeftSidebar', () => {
     it('shows New workflow button and opens WorkflowDialog on From Scratch click', async () => {
         setupQueries({selectedProjectId: 9});
 
-        render(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
 
         // Button visible
         expect(screen.getByText('New workflow')).toBeInTheDocument();
 
         // Open menu and click From Scratch
         fireEvent.click(screen.getByText('New workflow'));
-        fireEvent.click(screen.getByText(/From Scratch/i));
+        const fromScratchItems = screen.getAllByRole('menuitem', {name: /From Scratch/i});
+        fireEvent.click(fromScratchItems[0]);
 
         expect(await screen.findByRole('dialog')).toBeInTheDocument();
     });
@@ -219,7 +251,7 @@ describe('ProjectsLeftSidebar', () => {
     it('calls import workflow mutation when selecting a file', async () => {
         setupQueries({selectedProjectId: 3});
 
-        render(<ProjectsLeftSidebar {...baseProps} projectId={3} />);
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={3} />);
 
         // Click New workflow -> Import Workflow
         fireEvent.click(screen.getByText('New workflow'));

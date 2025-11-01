@@ -20,9 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 
 /**
  * @author Monika Domiter
@@ -45,7 +45,7 @@ public class AITableConstants {
         .label("Datasheet ID")
         .description("AITable Datasheet ID")
         .optionsLookupDependsOn(SPACE_ID)
-        .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetIdOptions)
+        .options((OptionsFunction<String>) AITableUtils::getDatasheetIdOptions)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
@@ -54,7 +54,7 @@ public class AITableConstants {
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
         .label("Space ID")
-        .options((ActionOptionsFunction<String>) AITableUtils::getSpaceIdOptions)
+        .options((OptionsFunction<String>) AITableUtils::getSpaceIdOptions)
         .required(true);
 
     private AITableConstants() {

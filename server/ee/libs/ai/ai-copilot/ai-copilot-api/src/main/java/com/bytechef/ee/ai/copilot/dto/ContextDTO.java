@@ -16,7 +16,11 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ContextDTO(Source source, Map<String, ?> parameters, String workflowId) {
+public record ContextDTO(Mode mode, Map<String, ?> parameters, Source source, String workflowId) {
+
+    public enum Mode {
+        CHAT, BUILD
+    }
 
     public enum Source {
         WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU, CODE_EDITOR

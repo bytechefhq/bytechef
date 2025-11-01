@@ -39,10 +39,10 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.capsule.crm.constant.ContactType;
 import com.bytechef.component.capsule.crm.util.CapsuleCRMUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -130,7 +130,7 @@ public class CapsuleCRMCreateContactAction {
                             string("country")
                                 .label("Country")
                                 .description("The country of the address.")
-                                .options((ActionOptionsFunction<String>) CapsuleCRMUtils::getCountryOptions)
+                                .options((OptionsFunction<String>) CapsuleCRMUtils::getCountryOptions)
                                 .required(false),
                             string("zip")
                                 .label("Zip")

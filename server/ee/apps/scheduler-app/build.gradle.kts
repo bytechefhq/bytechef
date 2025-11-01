@@ -30,8 +30,9 @@ dependencies {
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")

@@ -20,6 +20,8 @@ const WorkflowExecutionsFilterTitle = ({
                     </Badge>
                 </>
             )}
+
+            {!filterData.status && <span className="text-sm uppercase text-muted-foreground">none</span>}
         </div>
     );
 };

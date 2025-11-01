@@ -1,6 +1,6 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 
 export const useRun = () => {

@@ -35,11 +35,11 @@ import static com.bytechef.component.youtube.constant.YoutubeConstants.STATUS;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.TAGS;
 import static com.bytechef.component.youtube.constant.YoutubeConstants.TITLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.youtube.util.YoutubeUtils;
@@ -84,7 +84,7 @@ public class YoutubeUploadVideoAction {
                     option("Unlisted", "unlisted")),
             string(CATEGORY_ID)
                 .label("Video Category ID")
-                .options((ActionOptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
+                .options((OptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
                 .required(true))
         .output(
             outputSchema(

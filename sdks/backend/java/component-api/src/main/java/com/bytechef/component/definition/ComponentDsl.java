@@ -20,11 +20,10 @@ import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
-import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
+import com.bytechef.component.definition.OptionsDataSource.BaseOptionsFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -257,7 +257,8 @@ public final class ComponentDsl {
             .type(TOOLS)
             .properties(properties.orElse(List.of()))
             .output(outputDefinition.orElse(null))
-            .object(() -> perform::apply);
+            .object(() -> (inputParameters, connectionParameters, context) -> perform.apply(
+                inputParameters, connectionParameters, new ActionContextAdapater(context)));
     }
 
     public static ModifiableTriggerDefinition trigger(String name) {
@@ -281,7 +282,7 @@ public final class ComponentDsl {
         private OutputDefinition outputDefinition;
         private List<? extends Property> properties;
         private String title;
-        private ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
+        private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
         private ModifiableActionDefinition() {
         }
@@ -423,9 +424,9 @@ public final class ComponentDsl {
         }
 
         public ModifiableActionDefinition workflowNodeDescription(
-            ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction) {
+            WorkflowNodeDescriptionFunction workflowNodeDescription) {
 
-            this.workflowNodeDescriptionFunction = workflowNodeDescriptionFunction;
+            this.workflowNodeDescriptionFunction = workflowNodeDescription;
 
             return this;
         }
@@ -511,7 +512,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        public Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
             return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
@@ -546,7 +547,7 @@ public final class ComponentDsl {
         private Long minItems;
         private Boolean multipleValues;
         private List<? extends Option<Object>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableArrayProperty() {
             this(null);
@@ -697,7 +698,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableArrayProperty options(OptionsFunction optionsFunction) {
+        public ModifiableArrayProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -1192,12 +1193,12 @@ public final class ComponentDsl {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<? extends ActionDefinition> actions;
+        private List<ActionDefinition> actions;
         private List<ComponentCategory> componentCategories;
         private ConnectionDefinition connection;
         private Boolean customAction;
         private Help customActionHelp;
-        private List<? extends ClusterElementDefinition<?>> clusterElements;
+        private List<ClusterElementDefinition<?>> clusterElements;
         private String description;
         private String icon;
         private List<String> tags;
@@ -1206,7 +1207,7 @@ public final class ComponentDsl {
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<? extends TriggerDefinition> triggers;
+        private List<TriggerDefinition> triggers;
         private UnifiedApiDefinition unifiedApi;
 
         private ModifiableComponentDefinition() {
@@ -1348,7 +1349,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ActionDefinition>> getActions() {
+        public Optional<List<ActionDefinition>> getActions() {
             return Optional.ofNullable(actions == null ? null : actions);
         }
 
@@ -1373,7 +1374,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
             return Optional.ofNullable(clusterElements);
         }
 
@@ -1414,7 +1415,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends TriggerDefinition>> getTriggers() {
+        public Optional<List<TriggerDefinition>> getTriggers() {
             return Optional.ofNullable(triggers == null ? null : triggers);
         }
 
@@ -1616,11 +1617,19 @@ public final class ComponentDsl {
         private Help help;
         private final String name;
         private OutputDefinition outputDefinition;
+        private ProcessErrorResponseFunction processErrorResponseFunction;
         private List<? extends Property> properties;
         private String title;
+        private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
         public ModifiableClusterElementDefinition(String name) {
             this.name = name;
+        }
+
+        public ModifiableClusterElementDefinition<T> description(String description) {
+            this.description = description;
+
+            return this;
         }
 
         public ModifiableClusterElementDefinition<T> help(String body) {
@@ -1651,12 +1660,6 @@ public final class ComponentDsl {
                     throw new RuntimeException(e);
                 }
             };
-
-            return this;
-        }
-
-        public ModifiableClusterElementDefinition<T> description(String description) {
-            this.description = description;
 
             return this;
         }
@@ -1707,6 +1710,14 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableClusterElementDefinition<T> processErrorResponse(
+            ProcessErrorResponseFunction processErrorResponse) {
+
+            this.processErrorResponseFunction = processErrorResponse;
+
+            return this;
+        }
+
         @SafeVarargs
         public final <P extends Property> ModifiableClusterElementDefinition<T> properties(P... properties) {
             if (properties != null) {
@@ -1736,6 +1747,14 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableClusterElementDefinition<?> workflowNodeDescription(
+            WorkflowNodeDescriptionFunction workflowNodeDescription) {
+
+            this.workflowNodeDescriptionFunction = workflowNodeDescription;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (!(o instanceof ModifiableClusterElementDefinition<?> that)) {
@@ -1745,14 +1764,17 @@ public final class ComponentDsl {
             return Objects.equals(objectSupplier, that.objectSupplier) &&
                 Objects.equals(description, that.description) && Objects.equals(name, that.name) &&
                 Objects.equals(outputDefinition, that.outputDefinition) &&
+                Objects.equals(processErrorResponseFunction, that.processErrorResponseFunction) &&
                 Objects.equals(properties, that.properties) && Objects.equals(title, that.title) &&
-                Objects.equals(clusterElementType, that.clusterElementType);
+                Objects.equals(clusterElementType, that.clusterElementType) &&
+                Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(
-                objectSupplier, description, name, outputDefinition, properties, title, clusterElementType);
+                objectSupplier, description, name, outputDefinition, processErrorResponseFunction, properties, title,
+                clusterElementType, workflowNodeDescriptionFunction);
         }
 
         @Override
@@ -1781,6 +1803,11 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.ofNullable(processErrorResponseFunction);
+        }
+
+        @Override
         public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
         }
@@ -1793,6 +1820,11 @@ public final class ComponentDsl {
         @Override
         public ClusterElementType getType() {
             return clusterElementType;
+        }
+
+        @Override
+        public Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+            return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
         @Override
@@ -1823,7 +1855,7 @@ public final class ComponentDsl {
 
         private List<String> optionsLookupDependsOn;
         private List<? extends Option<LocalDate>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateProperty() {
             this(null);
@@ -1862,7 +1894,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableDateProperty options(OptionsFunction optionsFunction) {
+        public ModifiableDateProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -1933,7 +1965,7 @@ public final class ComponentDsl {
 
         private List<String> optionsLookupDependsOn;
         private List<? extends Option<LocalDateTime>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateTimeProperty() {
             this(null);
@@ -1972,7 +2004,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableDateTimeProperty options(OptionsFunction optionsFunction) {
+        public ModifiableDateTimeProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -2043,7 +2075,7 @@ public final class ComponentDsl {
 
         private String header;
         private List<String> propertiesLookupDependsOn;
-        private PropertiesDataSource.PropertiesFunction propertiesFunction;
+        private PropertiesDataSource.BasePropertiesFunction propertiesFunction;
 
         public ModifiableDynamicPropertiesProperty(String name) {
             super(name, Type.DYNAMIC_PROPERTIES);
@@ -2063,13 +2095,13 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty properties(ActionPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty properties(ActionDefinition.PropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty properties(TriggerPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty properties(PropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
@@ -2188,7 +2220,7 @@ public final class ComponentDsl {
         private Long maxValue;
         private Long minValue;
         private List<? extends Option<Long>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableIntegerProperty() {
             this(null);
@@ -2247,7 +2279,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableIntegerProperty options(OptionsFunction optionsFunction) {
+        public ModifiableIntegerProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -2359,7 +2391,7 @@ public final class ComponentDsl {
         private Double minValue;
         private Integer numberPrecision;
         private List<? extends Option<Double>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableNumberProperty() {
             this(null);
@@ -2464,7 +2496,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableNumberProperty options(OptionsFunction optionsFunction) {
+        public ModifiableNumberProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -2572,7 +2604,7 @@ public final class ComponentDsl {
         private List<String> optionsLookupDependsOn;
         private Boolean multipleValues;
         private List<? extends Option<Object>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
         private List<? extends ValueProperty<?>> properties;
 
         private ModifiableObjectProperty() {
@@ -2641,7 +2673,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableObjectProperty options(OptionsFunction optionsFunction) {
+        public ModifiableObjectProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -2986,7 +3018,7 @@ public final class ComponentDsl {
         private Integer minLength;
         private String regex;
         private List<? extends Option<String>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
         private Boolean optionsLoadedDynamically;
 
         private ModifiableStringProperty() {
@@ -3062,7 +3094,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableStringProperty options(OptionsFunction optionsFunction) {
+        public ModifiableStringProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -3180,7 +3212,7 @@ public final class ComponentDsl {
 
         private List<String> optionsLookupDependsOn;
         private List<? extends Option<LocalTime>> options;
-        private OptionsFunction optionsFunction;
+        private BaseOptionsFunction optionsFunction;
 
         private ModifiableTimeProperty() {
             this(null);
@@ -3219,7 +3251,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTimeProperty options(OptionsFunction optionsFunction) {
+        public ModifiableTimeProperty options(BaseOptionsFunction optionsFunction) {
             this.optionsFunction = optionsFunction;
 
             return this;
@@ -3303,7 +3335,7 @@ public final class ComponentDsl {
         private Boolean webhookRawBody;
         private WebhookValidateFunction webhookValidateFunction;
         private WebhookValidateOnEnableFunction webhookValidateOnEnableFunction;
-        private TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
+        private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
         private Boolean workflowSyncExecution;
 
         public ModifiableTriggerDefinition() {
@@ -3407,7 +3439,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition output(TriggerOutputFunction output) {
+        public ModifiableTriggerDefinition output(OutputFunction output) {
             this.outputDefinition = OutputDefinition.of(output);
 
             return this;
@@ -3485,7 +3517,7 @@ public final class ComponentDsl {
         }
 
         public ModifiableTriggerDefinition workflowNodeDescription(
-            TriggerWorkflowNodeDescriptionFunction workflowNodeDescription) {
+            WorkflowNodeDescriptionFunction workflowNodeDescription) {
 
             this.workflowNodeDescriptionFunction = workflowNodeDescription;
 
@@ -3643,7 +3675,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
+        public Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription() {
             return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
@@ -3763,12 +3795,12 @@ public final class ComponentDsl {
         }
     }
 
-    private static class OptionsDataSourceImpl implements OptionsDataSource {
+    private static class OptionsDataSourceImpl implements OptionsDataSource<BaseOptionsFunction> {
 
         private final List<String> optionsLookupDependsOn;
-        private final OptionsFunction options;
+        private final BaseOptionsFunction options;
 
-        private OptionsDataSourceImpl(List<String> loadOptionsDependOnPropertyNames, OptionsFunction options) {
+        private OptionsDataSourceImpl(List<String> loadOptionsDependOnPropertyNames, BaseOptionsFunction options) {
             this.optionsLookupDependsOn = loadOptionsDependOnPropertyNames;
             this.options = Objects.requireNonNull(options);
         }
@@ -3781,7 +3813,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public OptionsFunction getOptions() {
+        public BaseOptionsFunction getOptions() {
             return options;
         }
 
@@ -3821,13 +3853,14 @@ public final class ComponentDsl {
     }
 
     private static class PropertiesDataSourceImpl
-        implements PropertiesDataSource<PropertiesDataSource.PropertiesFunction> {
+        implements PropertiesDataSource<PropertiesDataSource.BasePropertiesFunction> {
 
         private final List<String> propertiesLookupDependsOn;
-        private final PropertiesFunction propertiesFunction;
+        private final BasePropertiesFunction propertiesFunction;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn, PropertiesFunction propertiesFunction) {
+        private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn,
+            BasePropertiesFunction propertiesFunction) {
             if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
                 throw new IllegalArgumentException("propertiesLookupDependsOn is not defined.");
             }
@@ -3846,7 +3879,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public PropertiesFunction getProperties() {
+        public BasePropertiesFunction getProperties() {
             return propertiesFunction;
         }
     }
@@ -3857,6 +3890,80 @@ public final class ComponentDsl {
         @Override
         public Optional<Map<String, String>> getAdditionalUrls() {
             return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
+        }
+    }
+
+    private static class ActionContextAdapater implements ActionContext {
+
+        private final ClusterElementContext context;
+
+        private ActionContextAdapater(ClusterElementContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public Approval.Links approval(ContextFunction<Approval, Approval.Links> approvalFunction) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <R> R data(ContextFunction<Data, R> dataFunction) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <R> R convert(ContextFunction<Convert, R> convertFunction) {
+            return context.convert(convertFunction);
+        }
+
+        @Override
+        public void event(Consumer<Event> eventConsumer) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
+            return context.encoder(encoderFunction);
+        }
+
+        @Override
+        public <R> R file(ContextFunction<File, R> fileFunction) {
+            return context.file(fileFunction);
+        }
+
+        @Override
+        public <R> R http(ContextFunction<Http, R> httpFunction) {
+            return context.http(httpFunction);
+        }
+
+        @Override
+        public boolean isEditorEnvironment() {
+            return context.isEditorEnvironment();
+        }
+
+        @Override
+        public <R> R json(ContextFunction<Json, R> jsonFunction) {
+            return context.json(jsonFunction);
+        }
+
+        @Override
+        public void log(ContextConsumer<Log> logConsumer) {
+            context.log(logConsumer);
+        }
+
+        @Override
+        public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction) {
+            return context.mimeType(mimeTypeContextFunction);
+        }
+
+        @Override
+        public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
+            return context.outputSchema(outputSchemaFunction);
+        }
+
+        @Override
+        public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
+            return context.xml(xmlFunction);
         }
     }
 }

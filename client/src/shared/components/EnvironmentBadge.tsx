@@ -1,5 +1,5 @@
 import {Badge} from '@/components/ui/badge';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
 const EnvironmentBadge = ({
     environmentId,

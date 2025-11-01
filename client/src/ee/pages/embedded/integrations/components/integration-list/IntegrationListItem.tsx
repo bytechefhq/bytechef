@@ -1,3 +1,5 @@
+import '@/shared/styles/dropdownMenu.css';
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,7 +11,6 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -36,7 +37,16 @@ import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
+import {
+    ChevronDownIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    PlusIcon,
+    SendIcon,
+    Trash2Icon,
+    UploadIcon,
+    WorkflowIcon,
+} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
@@ -176,7 +186,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                             : `${integration.integrationWorkflowIds?.length} workflows`}
                                     </div>
 
-                                    <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.preventDefault()}>
@@ -236,52 +246,63 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                                </Button>
+                                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                            <DropdownMenuContent align="end" className="p-0">
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowEditDialog(true)}
+                                >
+                                    <EditIcon /> Edit
+                                </DropdownMenuItem>
 
                                 {integration?.integrationWorkflowIds &&
                                     integration?.integrationWorkflowIds.length > 0 && (
                                         <DropdownMenuItem
+                                            className="dropdown-menu-item"
                                             onClick={() =>
                                                 navigate(
                                                     `/embedded/integrations/${integration?.id}/integration-workflows/${integration.integrationWorkflowIds![0]}`
                                                 )
                                             }
                                         >
-                                            View Workflows
+                                            <WorkflowIcon /> View Workflows
                                         </DropdownMenuItem>
                                     )}
 
-                                <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                    New Workflow
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem onClick={() => setShowPublishIntegrationDialog(true)}>
-                                    Publish
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowWorkflowDialog(true)}
+                                >
+                                    <PlusIcon /> New Workflow
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowPublishIntegrationDialog(true)}
+                                >
+                                    <SendIcon /> Publish
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
                                     onClick={() => {
                                         if (hiddenFileInputRef.current) {
                                             hiddenFileInputRef.current.click();
                                         }
                                     }}
                                 >
-                                    Import Workflow
+                                    <UploadIcon /> Import Workflow
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className="m-0" />
 
                                 <DropdownMenuItem
-                                    className="text-destructive"
+                                    className="dropdown-menu-item-destructive"
                                     onClick={() => setShowDeleteDialog(true)}
                                 >
-                                    Delete
+                                    <Trash2Icon /> Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -304,7 +325,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-destructive"
+                            className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                             onClick={() => {
                                 if (integration.id) {
                                     deleteIntegrationMutation.mutate(integration.id);
@@ -335,7 +356,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                 />
             )}
 
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleFileChange}
+                ref={hiddenFileInputRef}
+                type="file"
+            />
         </>
     );
 };

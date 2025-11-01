@@ -22,9 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJECT;
 import static com.bytechef.component.salesforce.util.SalesforceUtils.getPollOutput;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.salesforce.util.SalesforceUtils;
@@ -43,7 +43,7 @@ public class SalesforceUpdatedRecordTrigger {
         .properties(
             string(OBJECT)
                 .label("Salesforce Object")
-                .options((TriggerOptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
+                .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true))
         .output()
         .poll(SalesforceUpdatedRecordTrigger::poll);

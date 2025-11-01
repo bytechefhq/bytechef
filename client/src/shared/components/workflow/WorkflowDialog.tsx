@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {WORKFLOW_DEFINITION_SPACE} from '@/components/JsonSchemaBuilder/utils/constants';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -220,14 +220,10 @@ const WorkflowDialog = ({
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
+                            <Button label="Cancel" type="button" variant="outline" />
                         </DialogClose>
 
-                        <Button disabled={isPending} onClick={handleSubmit(saveWorkflow)} type="submit">
-                            Save
-                        </Button>
+                        <Button disabled={isPending} label="Save" onClick={handleSubmit(saveWorkflow)} type="submit" />
                     </DialogFooter>
                 </Form>
             </DialogContent>

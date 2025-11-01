@@ -24,8 +24,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.universal.image.util.AiImageUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.config.ApplicationProperties.Ai;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.function.BiFunction;
@@ -41,7 +41,7 @@ public class AiImageConstants {
         (aiProvider, propertyService) -> string(PROVIDER)
             .label("Provider")
             .options(
-                (OptionsDataSource.ActionOptionsFunction<String>) (
+                (ActionDefinition.OptionsFunction<String>) (
                     inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiImageUtils
                         .getProviderOptions(aiProvider, propertyService))
 
@@ -50,7 +50,7 @@ public class AiImageConstants {
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) AiImageUtils::getModelOptions)
+        .options((ActionDefinition.OptionsFunction<String>) AiImageUtils::getModelOptions)
         .optionsLookupDependsOn(PROVIDER)
         .displayCondition("contains({'%s','%s'}, provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
         .required(true);

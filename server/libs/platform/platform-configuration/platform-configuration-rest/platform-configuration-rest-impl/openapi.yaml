@@ -1010,8 +1010,12 @@ paths:
               required:
                 - "path"
               properties:
+                fromAiInMetadata:
+                  description: "If fromAi should be included in metadata."
+                  type: "boolean"
+                  default: false
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1090,8 +1094,12 @@ paths:
                 - "path"
                 - "type"
               properties:
+                fromAiInMetadata:
+                  description: "If fromAi should be included in metadata."
+                  type: "boolean"
+                  default: false
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1145,6 +1153,49 @@ paths:
             type: "string"
         - name: "workflowNodeName"
           description: "The name of an workflow's action task or trigger (E.g. mailchimp_1)"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The editor description."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  description:
+                    type: string
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-element-definition/{clusterElementName}/descriptions:
+    get:
+      description: "Get an action description shown in the editor."
+      summary: "Get an action description shown in the editor"
+      tags:
+        - "workflow-node-description"
+      operationId: "getClusterElementWorkflowNodeDescription"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of an workflow's action task or trigger (E.g. mailchimp_1)"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "clusterElementName"
+          description: "The name of a cluster element to get."
           required: true
           in: "path"
           schema:
@@ -1384,7 +1435,7 @@ paths:
                 - "path"
               properties:
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:
@@ -1452,7 +1503,7 @@ paths:
                 - "type"
               properties:
                 includeInMetadata:
-                  description: "If path and value type should be included in metadata "
+                  description: "If path and value type should be included in metadata."
                   type: "boolean"
                   default: false
                 path:

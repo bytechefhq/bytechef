@@ -1,0 +1,680 @@
+---
+title: "Google Maps"
+description: "Google Maps is a widely used mapping service by Google, offering free and feature-rich navigation, location discovery, and real-time traffic updates accessible through web browsers and mobile apps."
+---
+
+
+Categories: Helpers
+
+
+Type: googleMaps/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### api_key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_token | API Key | STRING | API key that can be found at Google Cloud Console. | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Address
+Name: getAddress
+
+`Get address from inputted geolocation.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| latitude | Latitude | NUMBER | Latitude of the geolocation. | true |
+| longitude | Longitude | NUMBER | Longitude of the geolocation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Address",
+  "name" : "getAddress",
+  "parameters" : {
+    "latitude" : 0.0,
+    "longitude" : 0.0
+  },
+  "type" : "googleMaps/v1/getAddress"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| results | ARRAY <details> <summary> Items </summary> [&#123;[&#123;STRING\(long_name), STRING\(short_name), [STRING]\(types)&#125;]\(address_components), STRING\(formatted_address), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(location), STRING\(location_type), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(northeast), &#123;NUMBER\(lat), NUMBER\(lng)&#125;\(southwest)&#125;\(viewport)&#125;\(geometry), [&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\($location)]\(navigation_points), STRING\(place_id), &#123;STRING\(compound_code), STRING\(global_code)&#125;\(plus_code), [STRING]\(types)&#125;] </details> | When the geocoder returns results, it places them within a (JSON) results array. |
+| status | STRING | Status of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "results" : [ {
+    "address_components" : [ {
+      "long_name" : "",
+      "short_name" : "",
+      "types" : [ "" ]
+    } ],
+    "formatted_address" : "",
+    "geometry" : {
+      "location" : {
+        "lat" : 0.0,
+        "lng" : 0.0
+      },
+      "location_type" : "",
+      "viewport" : {
+        "northeast" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        },
+        "southwest" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        }
+      }
+    },
+    "navigation_points" : [ {
+      "latitude" : 0.0,
+      "longitude" : 0.0
+    } ],
+    "place_id" : "",
+    "plus_code" : {
+      "compound_code" : "",
+      "global_code" : ""
+    },
+    "types" : [ "" ]
+  } ],
+  "status" : ""
+}
+```
+
+
+### Get Geolocation
+Name: getGeolocation
+
+`Get geolocation of address.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| address | Address | STRING | Specify address you want geolocation of. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Geolocation",
+  "name" : "getGeolocation",
+  "parameters" : {
+    "address" : ""
+  },
+  "type" : "googleMaps/v1/getGeolocation"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| results | ARRAY <details> <summary> Items </summary> [&#123;[&#123;STRING\(long_name), STRING\(short_name), [STRING]\(types)&#125;]\(address_components), STRING\(formatted_address), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(location), STRING\(location_type), &#123;&#123;NUMBER\(lat), NUMBER\(lng)&#125;\(northeast), &#123;NUMBER\(lat), NUMBER\(lng)&#125;\(southwest)&#125;\(viewport)&#125;\(geometry), [&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\($location)]\(navigation_points), STRING\(place_id), &#123;STRING\(compound_code), STRING\(global_code)&#125;\(plus_code), [STRING]\(types)&#125;] </details> | When the geocoder returns results, it places them within a (JSON) results array. |
+| status | STRING | Status of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "results" : [ {
+    "address_components" : [ {
+      "long_name" : "",
+      "short_name" : "",
+      "types" : [ "" ]
+    } ],
+    "formatted_address" : "",
+    "geometry" : {
+      "location" : {
+        "lat" : 0.0,
+        "lng" : 0.0
+      },
+      "location_type" : "",
+      "viewport" : {
+        "northeast" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        },
+        "southwest" : {
+          "lat" : 0.0,
+          "lng" : 0.0
+        }
+      }
+    },
+    "navigation_points" : [ {
+      "latitude" : 0.0,
+      "longitude" : 0.0
+    } ],
+    "place_id" : "",
+    "plus_code" : {
+      "compound_code" : "",
+      "global_code" : ""
+    },
+    "types" : [ "" ]
+  } ],
+  "status" : ""
+}
+```
+
+
+### Get Route
+Name: getRoute
+
+`Get route between inputted origin and destination.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| origin | Origin | STRING | Specify address of origin in accordance with the format used by the national postal service of the country concerned. Additional address elements such as business names and unit, suite or floor numbers should be avoided. Street address elements should be delimited by spaces. | true |
+| destination | Destination | STRING | Specify address of destination in accordance with the format used by the national postal service of the country concerned. Additional address elements such as business names and unit, suite or floor numbers should be avoided. Street address elements should be delimited by spaces. | true |
+| travelMode | Travel Mode | STRING <details> <summary> Options </summary> DRIVE, BICYCLE, WALK, TRANSIT </details> | Desired travel mode. | false |
+| routingPreference | Routing Preference | STRING <details> <summary> Options </summary> TRAFFIC_UNAWARE, TRAFFIC_AWARE, TRAFFIC_AWARE_OPTIMAL </details> | Routing preference of the route. | false |
+| computeAlternativeRoutes | Compute Alternative Routes | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether alternative routes should be computed. | false |
+| avoidTolls | Avoid Tolls | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to avoid tolls. | false |
+| avoidHighways | Avoid Highways | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to avoid highways. | false |
+| avoidFerries | Avoid Ferries | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to avoid ferries. | false |
+| units | Units | STRING <details> <summary> Options </summary> METRIC, IMPERIAL </details> | Metrics of the route | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Route",
+  "name" : "getRoute",
+  "parameters" : {
+    "origin" : "",
+    "destination" : "",
+    "travelMode" : "",
+    "routingPreference" : "",
+    "computeAlternativeRoutes" : false,
+    "avoidTolls" : false,
+    "avoidHighways" : false,
+    "avoidFerries" : false,
+    "units" : ""
+  },
+  "type" : "googleMaps/v1/getRoute"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| routes | ARRAY <details> <summary> Items </summary> [&#123;[STRING]\(routeLabels), [&#123;INTEGER\(distanceMeters), STRING\(duration), STRING\(staticDuration), &#123;STRING\(encodedPolyline), &#123;&#125;\(goeJsonLinestring)&#125;\(polyline), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(startLocation), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(endLocation)&#125;, [&#123;INTEGER\(distanceMeters), STRING\(staticDuration), &#123;STRING\(encodedPolyline), &#123;&#125;\(goeJsonLinestring)&#125;\(polyline), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(startLocation), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(endLocation), &#123;STRING\(maneuver), STRING\(instructions)&#125;\(navigationInstructions), &#123;[&#123;INTEGER\(startPolylinePointIndex), INTEGER\(endPolylinePointIndex), STRING\(speed)&#125;\($speedReadingInterval)]\(speedReadingInterval)&#125;\(travelAdvisory), &#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(distance), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(staticDuration)&#125;\(routeLegStepLocalizedValues), &#123;&#123;&#123;&#123;STRING\(name), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(location)&#125;\(transitStop)&#125;\(arrivalStop), STRING\(arrivalTime), &#123;&#123;STRING\(name), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng), INTEGER\(heading)&#125;\(location)&#125;\(location)&#125;\(transitStop)&#125;\(departureStop), STRING\(departureTime)&#125;\(stopDetails), &#123;&#123;&#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(time), STRING\(timeZone)&#125;\(localizedTime)&#125;\(arrivalTime), &#123;&#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(time), STRING\(timeZone)&#125;\(localizedTime)&#125;\(departureTime)&#125;\(localizedValues), STRING\(headsign), STRING\(headway), &#123;[&#123;STRING\(name), STRING\(phoneNumber), STRING\(uri)&#125;\($transitAgency)]\(agencies), STRING\(name), STRING\(uri), STRING\(color), STRING\(iconUri), STRING\(nameShort), STRING\(textColor), &#123;&#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(name), STRING\(type), STRING\(iconUri), STRING\(localIconUri)&#125;\(transitVehicle)&#125;\(vehicle)&#125;\(transitLine), INTEGER\(stopCount), STRING\(tripShortText)&#125;\(transitDetails), STRING\(travelMode)&#125;\($routeLegStep)]\($steps), &#123;&#123;&#123;[&#123;STRING\(currencyCode), STRING\(units), INTEGER\(nanos)&#125;\($money)]\(estimatedPrice)&#125;\(tollInfo), [&#123;INTEGER\(startPolylinePointIndex), INTEGER\(endPolylinePointIndex), STRING\(speed)&#125;\($speedReadingInterval)]\(speedReadingInterval)&#125;\(routeLegTravelAdvisory)&#125;\($travelAdvisory), &#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(distance), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(duration), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(staticDuration)&#125;\($localizedValuesRouteLeg), &#123;[&#123;&#123;STRING\(maneuver), STRING\(instructions)&#125;\(navigationInstructions), STRING\(travelMode), INTEGER\(stepStartIndex), INTEGER\(stepEndIndex)&#125;\($multiModalSegment)]\(multiModalSegments)&#125;\($stepsOverview)]\(legs), INTEGER\(distanceMeters), STRING\(duration), STRING\(staticDuration), &#123;STRING\(encodedPolyline), &#123;&#125;\(goeJsonLinestring)&#125;\(polyline), STRING\(description), [STRING]\(warnings), &#123;&#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng)&#125;\(low), &#123;&#123;NUMBER\(latitude), NUMBER\(longitude)&#125;\(latLng)&#125;\(high)&#125;\(viewport), &#123;&#123;&#123;[&#123;STRING\(currencyCode), STRING\(units), INTEGER\(nanos)&#125;\($money)]\(estimatedPrice)&#125;\(tollInfo), [&#123;INTEGER\(startPolylinePointIndex), INTEGER\(endPolylinePointIndex), STRING\(speed)&#125;\($speedReadingInterval)]\(speedReadingInterval), STRING\(fuelConsumptionMicroliters), BOOLEAN\(routeRestrictionsPartiallyIgnored), &#123;&#123;STRING\(currencyCode), STRING\(units), INTEGER\(nanos)&#125;\(money)&#125;\(transitFare)&#125;\(routeTravelAdvisory)&#125;\(travelAdvisory), [INTEGER]\(optimizedIntermediateWaypointIndex), &#123;&#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(distance), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(duration), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(staticDuration), &#123;&#123;STRING\(text), STRING\(languageCode)&#125;\(localizedText)&#125;\(transitFare)&#125;\(localizedValuesRoute), STRING\(routeToken), &#123;[&#123;STRING\(flyoverPresence), &#123;INTEGER\(startIndex), INTEGER\(endIndex)&#125;\(polylinePointIndex)&#125;\($flyoverInfo)]\(flyoverInfo), [&#123;STRING\(narrowRoadPresence), &#123;INTEGER\(startIndex), INTEGER\(endIndex)&#125;\(polylinePointIndex)&#125;\($narrowRoadInfo)]\(narrowRoadInfo)&#125;\(polylineDetails)&#125;\($route)] </details> | Routes from origin to destination. |
+| fallbackInfo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(routingMode), STRING\(reason)&#125; </details> | In some cases when the server is not able to compute the route results with all of the input preferences, it may fallback to using a different way of computation. |
+| geocodingResults | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#123;&#123;INTEGER\(code), STRING\(message), [&#123;&#125;]\(details)&#125;\(status), [STRING]\(type), BOOLEAN\(partialMatch), STRING\(placeId), INTEGER\(intermediateWaypointRequestIndex)&#125;\(geocodedWaypoint)&#125;\(origin), &#123;&#123;&#123;INTEGER\(code), STRING\(message), [&#123;&#125;]\(details)&#125;\(status), [STRING]\(type), BOOLEAN\(partialMatch), STRING\(placeId), INTEGER\(intermediateWaypointRequestIndex)&#125;\(geocodedWaypoint)&#125;\(destination), [&#123;&#123;INTEGER\(code), STRING\(message), [&#123;&#125;]\(details)&#125;\(status), [STRING]\(type), BOOLEAN\(partialMatch), STRING\(placeId), INTEGER\(intermediateWaypointRequestIndex)&#125;\($geocodedWaypoint)]\(intermediates)&#125; </details> | Contains geocoding response info for waypoints specified as addresses. |
+
+
+
+
+#### Output Example
+```json
+{
+  "routes" : [ {
+    "routeLabels" : [ "" ],
+    "legs" : [ {
+      "distanceMeters" : 1,
+      "duration" : "",
+      "staticDuration" : "",
+      "polyline" : {
+        "encodedPolyline" : "",
+        "goeJsonLinestring" : { }
+      },
+      "startLocation" : {
+        "location" : {
+          "latLng" : {
+            "latitude" : 0.0,
+            "longitude" : 0.0
+          },
+          "heading" : 1
+        }
+      },
+      "endLocation" : {
+        "location" : {
+          "latLng" : {
+            "latitude" : 0.0,
+            "longitude" : 0.0
+          },
+          "heading" : 1
+        }
+      }
+    }, [ {
+      "distanceMeters" : 1,
+      "staticDuration" : "",
+      "polyline" : {
+        "encodedPolyline" : "",
+        "goeJsonLinestring" : { }
+      },
+      "startLocation" : {
+        "location" : {
+          "latLng" : {
+            "latitude" : 0.0,
+            "longitude" : 0.0
+          },
+          "heading" : 1
+        }
+      },
+      "endLocation" : {
+        "location" : {
+          "latLng" : {
+            "latitude" : 0.0,
+            "longitude" : 0.0
+          },
+          "heading" : 1
+        }
+      },
+      "navigationInstructions" : {
+        "maneuver" : "",
+        "instructions" : ""
+      },
+      "travelAdvisory" : {
+        "speedReadingInterval" : [ {
+          "startPolylinePointIndex" : 1,
+          "endPolylinePointIndex" : 1,
+          "speed" : ""
+        } ]
+      },
+      "routeLegStepLocalizedValues" : {
+        "distance" : {
+          "localizedText" : {
+            "text" : "",
+            "languageCode" : ""
+          }
+        },
+        "staticDuration" : {
+          "localizedText" : {
+            "text" : "",
+            "languageCode" : ""
+          }
+        }
+      },
+      "transitDetails" : {
+        "stopDetails" : {
+          "arrivalStop" : {
+            "transitStop" : {
+              "name" : "",
+              "location" : {
+                "location" : {
+                  "latLng" : {
+                    "latitude" : 0.0,
+                    "longitude" : 0.0
+                  },
+                  "heading" : 1
+                }
+              }
+            }
+          },
+          "arrivalTime" : "",
+          "departureStop" : {
+            "transitStop" : {
+              "name" : "",
+              "location" : {
+                "location" : {
+                  "latLng" : {
+                    "latitude" : 0.0,
+                    "longitude" : 0.0
+                  },
+                  "heading" : 1
+                }
+              }
+            }
+          },
+          "departureTime" : ""
+        },
+        "localizedValues" : {
+          "arrivalTime" : {
+            "localizedTime" : {
+              "time" : {
+                "localizedText" : {
+                  "text" : "",
+                  "languageCode" : ""
+                }
+              },
+              "timeZone" : ""
+            }
+          },
+          "departureTime" : {
+            "localizedTime" : {
+              "time" : {
+                "localizedText" : {
+                  "text" : "",
+                  "languageCode" : ""
+                }
+              },
+              "timeZone" : ""
+            }
+          }
+        },
+        "headsign" : "",
+        "headway" : "",
+        "transitLine" : {
+          "agencies" : [ {
+            "name" : "",
+            "phoneNumber" : "",
+            "uri" : ""
+          } ],
+          "name" : "",
+          "uri" : "",
+          "color" : "",
+          "iconUri" : "",
+          "nameShort" : "",
+          "textColor" : "",
+          "vehicle" : {
+            "transitVehicle" : {
+              "name" : {
+                "localizedText" : {
+                  "text" : "",
+                  "languageCode" : ""
+                }
+              },
+              "type" : "",
+              "iconUri" : "",
+              "localIconUri" : ""
+            }
+          }
+        },
+        "stopCount" : 1,
+        "tripShortText" : ""
+      },
+      "travelMode" : ""
+    } ], {
+      "routeLegTravelAdvisory" : {
+        "tollInfo" : {
+          "estimatedPrice" : [ {
+            "currencyCode" : "",
+            "units" : "",
+            "nanos" : 1
+          } ]
+        },
+        "speedReadingInterval" : [ {
+          "startPolylinePointIndex" : 1,
+          "endPolylinePointIndex" : 1,
+          "speed" : ""
+        } ]
+      }
+    }, {
+      "distance" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      },
+      "duration" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      },
+      "staticDuration" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      }
+    }, {
+      "multiModalSegments" : [ {
+        "navigationInstructions" : {
+          "maneuver" : "",
+          "instructions" : ""
+        },
+        "travelMode" : "",
+        "stepStartIndex" : 1,
+        "stepEndIndex" : 1
+      } ]
+    } ],
+    "distanceMeters" : 1,
+    "duration" : "",
+    "staticDuration" : "",
+    "polyline" : {
+      "encodedPolyline" : "",
+      "goeJsonLinestring" : { }
+    },
+    "description" : "",
+    "warnings" : [ "" ],
+    "viewport" : {
+      "low" : {
+        "latLng" : {
+          "latitude" : 0.0,
+          "longitude" : 0.0
+        }
+      },
+      "high" : {
+        "latLng" : {
+          "latitude" : 0.0,
+          "longitude" : 0.0
+        }
+      }
+    },
+    "travelAdvisory" : {
+      "routeTravelAdvisory" : {
+        "tollInfo" : {
+          "estimatedPrice" : [ {
+            "currencyCode" : "",
+            "units" : "",
+            "nanos" : 1
+          } ]
+        },
+        "speedReadingInterval" : [ {
+          "startPolylinePointIndex" : 1,
+          "endPolylinePointIndex" : 1,
+          "speed" : ""
+        } ],
+        "fuelConsumptionMicroliters" : "",
+        "routeRestrictionsPartiallyIgnored" : false,
+        "transitFare" : {
+          "money" : {
+            "currencyCode" : "",
+            "units" : "",
+            "nanos" : 1
+          }
+        }
+      }
+    },
+    "optimizedIntermediateWaypointIndex" : [ 1 ],
+    "localizedValuesRoute" : {
+      "distance" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      },
+      "duration" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      },
+      "staticDuration" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      },
+      "transitFare" : {
+        "localizedText" : {
+          "text" : "",
+          "languageCode" : ""
+        }
+      }
+    },
+    "routeToken" : "",
+    "polylineDetails" : {
+      "flyoverInfo" : [ {
+        "flyoverPresence" : "",
+        "polylinePointIndex" : {
+          "startIndex" : 1,
+          "endIndex" : 1
+        }
+      } ],
+      "narrowRoadInfo" : [ {
+        "narrowRoadPresence" : "",
+        "polylinePointIndex" : {
+          "startIndex" : 1,
+          "endIndex" : 1
+        }
+      } ]
+    }
+  } ],
+  "fallbackInfo" : {
+    "routingMode" : "",
+    "reason" : ""
+  },
+  "geocodingResults" : {
+    "origin" : {
+      "geocodedWaypoint" : {
+        "status" : {
+          "code" : 1,
+          "message" : "",
+          "details" : [ { } ]
+        },
+        "type" : [ "" ],
+        "partialMatch" : false,
+        "placeId" : "",
+        "intermediateWaypointRequestIndex" : 1
+      }
+    },
+    "destination" : {
+      "geocodedWaypoint" : {
+        "status" : {
+          "code" : 1,
+          "message" : "",
+          "details" : [ { } ]
+        },
+        "type" : [ "" ],
+        "partialMatch" : false,
+        "placeId" : "",
+        "intermediateWaypointRequestIndex" : 1
+      }
+    },
+    "intermediates" : [ {
+      "status" : {
+        "code" : 1,
+        "message" : "",
+        "details" : [ { } ]
+      },
+      "type" : [ "" ],
+      "partialMatch" : false,
+      "placeId" : "",
+      "intermediateWaypointRequestIndex" : 1
+    } ]
+  }
+}
+```
+
+
+### Nearby Search
+Name: nearbySearch
+
+`Action takes one or more place types, and returns a list of matching places within the specified area.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| includedTypes | Included | ARRAY <details> <summary> Items </summary> [STRING\($keyword)] </details> | Keywords which will be used for filtering. | true |
+| address | Address | STRING | Center address of the nearby search. | true |
+| radius | Radius | NUMBER | Radius of circle area that will be searched. The radius must be between 0.0 meters and 50000.0 meters inclusive. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Nearby Search",
+  "name" : "nearbySearch",
+  "parameters" : {
+    "includedTypes" : [ "" ],
+    "address" : "",
+    "radius" : 0.0
+  },
+  "type" : "googleMaps/v1/nearbySearch"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Enable Geocoding API, Places API and Routes API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Click this icon.
+3. Click on **APIs & Services**.
+4. Enter **Geocoding API** in search bar.
+5. Click on **Geocoding API**.
+6. Click on **Enable**.
+7. Enter **Places API** in search bar.
+8. Click on **Places API**.
+9. Click on **Enable**.
+10. Enter **Routes API** in search bar.
+11. Click on **Routes API**.
+12. Click on **Enable**.
+
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/8f4f75b3-b4f9-43bd-a50e-6344dc2d298d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
+</div>

@@ -16,71 +16,43 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.List;
-import java.util.Map;
 
 /**
+ * The {@code PropertiesDataSource} interface defines a contract for providing a list of properties through a functional
+ * approach. This interface supports retrieving dependent properties that a given implementation may rely on.
+ *
+ * @param <F> A type that extends {@link PropertiesDataSource.BasePropertiesFunction} and serves as the functional
+ *            interface for defining how properties are retrieved.
+ *
  * @author Ivica Cardic
  */
-public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesFunction> {
+public interface PropertiesDataSource<F extends PropertiesDataSource.BasePropertiesFunction> {
 
     /**
-     * The function that returns a list of properties.
+     * Retrieves the functional interface implementation used for defining the retrieval of properties.
      *
-     * @return The function implementation
+     * @return an instance of the type {@code F}, which extends {@code PropertiesDataSource.BasePropertiesFunction},
+     *         representing the functional method for getting properties.
      */
     F getProperties();
 
     /**
+     * Retrieves a list of dependencies required for property lookup.
      *
-     * @return
+     * @return a list of strings representing the names of dependent properties necessary for performing property
+     *         lookup.
      */
     List<String> getPropertiesLookupDependsOn();
 
     /**
-     *
+     * Marker interface representing a base functional contract for retrieving property definitions or operations within
+     * the {@link PropertiesDataSource} context. This interface serves as a foundational functional abstraction,
+     * enabling different implementations to define custom logic for retrieving or processing property-related data.
+     * Specific functional interfaces that extend this base can define additional methods and semantics appropriate for
+     * their use cases. It is typically used as a type constraint for defining generic functional behavior in property
+     * data sources.
      */
-    interface PropertiesFunction {
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ActionPropertiesFunction extends PropertiesFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            ActionContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface TriggerPropertiesFunction extends PropertiesFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param context
-         * @return
-         * @throws Exception
-         */
-        List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            TriggerContext context) throws Exception;
+    interface BasePropertiesFunction {
     }
 }

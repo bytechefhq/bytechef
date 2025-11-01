@@ -9,11 +9,11 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import * as Portal from '@radix-ui/react-portal';
 import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';

@@ -27,9 +27,9 @@ import static com.bytechef.component.typeform.constant.TypeformConstants.TYPE;
 import static com.bytechef.component.typeform.constant.TypeformConstants.WORKSPACE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.typeform.util.TypeformUtils;
@@ -63,7 +63,7 @@ public class TypeformCreateFormAction {
             string(WORKSPACE)
                 .label("Workspace")
                 .description("Workspace where the form will be created.")
-                .options((ActionOptionsFunction<String>) TypeformUtils::getWorkspaceOptions)
+                .options((OptionsFunction<String>) TypeformUtils::getWorkspaceOptions)
                 .required(false))
         .output(
             outputSchema(

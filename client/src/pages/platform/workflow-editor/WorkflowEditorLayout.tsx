@@ -7,6 +7,7 @@ import './WorkflowEditorLayout.css';
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -22,7 +23,6 @@ import ClusterElementsWorkflowEditor from '../cluster-element-editor/components/
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
-    WorkflowNodeDetailsPanelSkeleton,
     WorkflowNodesSidebarSkeleton,
     WorkflowRightSidebarSkeleton,
 } from './components/WorkflowEditorSkeletons';
@@ -32,7 +32,6 @@ import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 
-const WorkflowNodeDetailsPanel = lazy(() => import('./components/WorkflowNodeDetailsPanel'));
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
@@ -149,14 +148,12 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
             </div>
 
             {currentComponent && !isMainRootClusterElement && (
-                <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
-                    <WorkflowNodeDetailsPanel
-                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                        previousComponentDefinitions={previousComponentDefinitions}
-                        updateWorkflowMutation={updateWorkflowMutation!}
-                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                    />
-                </Suspense>
+                <WorkflowNodeDetailsPanel
+                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                    previousComponentDefinitions={previousComponentDefinitions}
+                    updateWorkflowMutation={updateWorkflowMutation!}
+                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                />
             )}
 
             {clusterElementsCanvasOpen && (
@@ -182,15 +179,13 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
 
                         {currentComponent && (
                             <>
-                                <Suspense fallback={<WorkflowNodeDetailsPanelSkeleton />}>
-                                    <WorkflowNodeDetailsPanel
-                                        className="fixed inset-y-0 right-0 rounded-l-none border-none"
-                                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                                        previousComponentDefinitions={previousComponentDefinitions}
-                                        updateWorkflowMutation={updateWorkflowMutation!}
-                                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                                    />
-                                </Suspense>
+                                <WorkflowNodeDetailsPanel
+                                    className="fixed inset-y-0 right-0 rounded-l-none border-none"
+                                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                                    previousComponentDefinitions={previousComponentDefinitions}
+                                    updateWorkflowMutation={updateWorkflowMutation!}
+                                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                                />
 
                                 {dataPillPanelOpen && (
                                     <Suspense fallback={<DataPillPanelSkeleton />}>

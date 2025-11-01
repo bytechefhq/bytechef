@@ -10,7 +10,7 @@ interface EmptyListProps {
 }
 
 const EmptyList = ({button, className, icon, message, title}: EmptyListProps) => (
-    <div className={twMerge('w-full place-self-center px-2 2xl:mx-auto 2xl:w-4/5', className)}>
+    <div className={twMerge('w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5', className)}>
         <div className="text-center">
             <span className="mx-auto inline-block">{icon}</span>
 

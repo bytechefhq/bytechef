@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -72,12 +73,7 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
-        Path directoryPath = resolveDirectoryPath(directory);
-        String url = fileEntry.getUrl();
-
-        Path filePath = directoryPath.resolve(removeUrlPrefix(url, directory));
-
-        File file = filePath.toFile();
+        File file = getFile(directory, fileEntry);
 
         return file.exists();
     }
@@ -91,6 +87,13 @@ public class FilesystemFileStorageService implements FileStorageService {
         File file = filePath.toFile();
 
         return file.exists();
+    }
+
+    @Override
+    public long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException {
+        File file = getFile(directory, fileEntry);
+
+        return file.length();
     }
 
     @Override
@@ -120,7 +123,22 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directory, FileEntry fileEntry) {
+    public URL getFileEntryURL(String directory, FileEntry fileEntry) {
+        Path directoryPath = resolveDirectoryPath(directory);
+        String url = fileEntry.getUrl();
+
+        try {
+            URI uri = directoryPath.resolve(removeUrlPrefix(url, directory))
+                .toUri();
+
+            return uri.toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public InputStream getInputStream(String directory, FileEntry fileEntry) {
         Path directoryPath = resolveDirectoryPath(directory);
         String url = fileEntry.getUrl();
 
@@ -133,17 +151,16 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public URL getFileEntryURL(String directory, FileEntry fileEntry) {
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
         Path directoryPath = resolveDirectoryPath(directory);
         String url = fileEntry.getUrl();
 
         try {
-            URI uri = directoryPath.resolve(removeUrlPrefix(url, directory))
-                .toUri();
-
-            return uri.toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            return Files.newOutputStream(
+                directoryPath.resolve(removeUrlPrefix(url, directory)), StandardOpenOption.WRITE,
+                StandardOpenOption.APPEND);
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to open file " + url, ioe);
         }
     }
 
@@ -226,6 +243,15 @@ public class FilesystemFileStorageService implements FileStorageService {
         Assert.notNull(inputStream, "inputStream is required");
 
         return doStoreFileContent(directory, filename, inputStream, generateFilename);
+    }
+
+    private File getFile(String directory, FileEntry fileEntry) {
+        Path directoryPath = resolveDirectoryPath(directory);
+        String url = fileEntry.getUrl();
+
+        Path filePath = directoryPath.resolve(removeUrlPrefix(url, directory));
+
+        return filePath.toFile();
     }
 
     private FileEntry doStoreFileContent(

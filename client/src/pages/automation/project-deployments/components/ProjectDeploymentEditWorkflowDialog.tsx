@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -153,10 +153,10 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
                     <DialogFooter className="px-6 pb-6 pt-4">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button label="Cancel" variant="outline" />
                         </DialogClose>
 
-                        <Button onClick={handleSubmit(updateProjectDeploymentWorkflow)}>Save</Button>
+                        <Button label="Save" onClick={handleSubmit(updateProjectDeploymentWorkflow)} />
                     </DialogFooter>
                 </Form>
             </DialogContent>

@@ -241,7 +241,7 @@ describe('ConnectDialog', () => {
 
             fireEvent.click(toggleLabel as Element);
 
-            expect(toggleMock).toHaveBeenCalledWith('workflow-123', true);
+            expect(toggleMock).toHaveBeenCalledWith('workflow-123', false);
         });
 
         it('shows input fields when workflow is selected', () => {

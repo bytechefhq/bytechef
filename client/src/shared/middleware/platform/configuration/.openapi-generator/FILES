@@ -38,6 +38,7 @@ models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteClusterElementParameter200Response.ts
 models/DeleteClusterElementParameterRequest.ts
+models/DeleteWorkflowNodeParameterRequest.ts
 models/DynamicPropertiesProperty.ts
 models/Environment.ts
 models/ExecutionError.ts
@@ -74,6 +75,7 @@ models/TriggerDefinitionBasic.ts
 models/TriggerType.ts
 models/UnifiedApiCategory.ts
 models/UpdateClusterElementParameterRequest.ts
+models/UpdateWorkflowNodeParameterRequest.ts
 models/ValueProperty.ts
 models/Workflow.ts
 models/WorkflowBasic.ts

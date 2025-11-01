@@ -1,6 +1,5 @@
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {Type} from '@/pages/automation/projects/Projects';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -25,6 +24,7 @@ import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
@@ -32,8 +32,9 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useProject = () => {
-    const {setWorkflow, workflow} = useWorkflowDataStore(
+    const {setIsWorkflowLoaded, setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
+            setIsWorkflowLoaded: state.setIsWorkflowLoaded,
             setWorkflow: state.setWorkflow,
             workflow: state.workflow,
         }))
@@ -70,7 +71,7 @@ export const useProject = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
-    const {data: currentWorkflow} = useGetProjectWorkflowQuery(
+    const {data: currentWorkflow, isLoading: isWorkflowLoading} = useGetProjectWorkflowQuery(
         +projectId!,
         +projectWorkflowId!,
         !!projectId && !!projectWorkflowId
@@ -209,14 +210,6 @@ export const useProject = () => {
     }, [projectWorkflowId]);
 
     useEffect(() => {
-        if (currentWorkflow) {
-            setWorkflow({...currentWorkflow});
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWorkflow]);
-
-    useEffect(() => {
         return () => {
             setProjectLeftSidebarOpen(false);
 
@@ -224,6 +217,21 @@ export const useProject = () => {
         };
     }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
 
+    // Reset loading state when workflow ID changes
+    useEffect(() => {
+        setIsWorkflowLoaded(false);
+    }, [projectWorkflowId, setIsWorkflowLoaded]);
+
+    // Use useEffect to handle workflow updates with proper synchronization
+    useEffect(() => {
+        if (currentWorkflow && !isWorkflowLoading) {
+            const timeoutId = setTimeout(() => {
+                setWorkflow({...currentWorkflow});
+            }, 0);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [currentWorkflow, isWorkflowLoading, setWorkflow]);
     return {
         bottomResizablePanelRef,
         categories,

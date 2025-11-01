@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
@@ -140,64 +140,62 @@ const ProjectDeploymentWorkflowListItem = ({
                 <div className="flex items-center gap-x-6">
                     <div className="min-w-[36px]">
                         {(!workflow.triggers?.length || workflow.triggers?.[0]?.type.includes('manual')) && (
-                            <Button
-                                disabled={!projectDeploymentEnabled || !projectDeploymentWorkflow.enabled}
-                                onClick={handleRunWorkflowClick}
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <PlayIcon className="text-success" />
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={!projectDeploymentEnabled || !projectDeploymentWorkflow.enabled}
+                                        icon={<PlayIcon className="text-success" />}
+                                        onClick={handleRunWorkflowClick}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>Run workflow manually</TooltipContent>
-                                </Tooltip>
-                            </Button>
+                                <TooltipContent>Run workflow manually</TooltipContent>
+                            </Tooltip>
                         )}
 
                         {!hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
-                            <Button
-                                disabled={!projectDeploymentWorkflow.enabled}
-                                onClick={() => copyToClipboard(projectDeploymentWorkflow.staticWebhookUrl!)}
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <ClipboardIcon />
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        icon={<ClipboardIcon />}
+                                        onClick={() => copyToClipboard(projectDeploymentWorkflow.staticWebhookUrl!)}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                                </Tooltip>
-                            </Button>
+                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                            </Tooltip>
                         )}
 
                         {hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
-                            <Button
-                                disabled={!projectDeploymentWorkflow.enabled}
-                                onClick={() =>
-                                    window.open(
-                                        `/chat/${environmentId === 2 ? '' : environmentId === 1 ? 'staging/' : 'development/'}` +
-                                            projectDeploymentWorkflow.staticWebhookUrl?.substring(
-                                                projectDeploymentWorkflow.staticWebhookUrl?.lastIndexOf('/webhooks/') +
-                                                    10,
-                                                projectDeploymentWorkflow.staticWebhookUrl?.length
-                                            ),
-                                        '_blank'
-                                    )
-                                }
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        {hostedChatTrigger ? <MessageCircleMoreIcon /> : <ClipboardIcon />}
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        icon={hostedChatTrigger ? <MessageCircleMoreIcon /> : <ClipboardIcon />}
+                                        onClick={() =>
+                                            window.open(
+                                                `/chat/${environmentId === 2 ? '' : environmentId === 1 ? 'staging/' : 'development/'}` +
+                                                    projectDeploymentWorkflow.staticWebhookUrl?.substring(
+                                                        projectDeploymentWorkflow.staticWebhookUrl?.lastIndexOf(
+                                                            '/webhooks/'
+                                                        ) + 10,
+                                                        projectDeploymentWorkflow.staticWebhookUrl?.length
+                                                    ),
+                                                '_blank'
+                                            )
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                                </Tooltip>
-                            </Button>
+                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                            </Tooltip>
                         )}
                     </div>
 

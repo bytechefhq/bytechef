@@ -1,16 +1,17 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {DesktopSidebar} from '@/shared/layout/desktop-sidebar/DesktopSidebar';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -115,9 +116,10 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {ai} = useApplicationInfoStore(
+    const {ai, edition} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
+            edition: state.application?.edition,
         }))
     );
     const {
@@ -141,19 +143,22 @@ function App() {
     );
 
     const analytics = useAnalytics();
-
     const helpHub = useHelpHub();
-
     const location = useLocation();
-
     const queryClient = useQueryClient();
+
+    useFetchInterceptor();
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
-        if (currentEnvironmentId !== 0 && navItem.href === '/automation/projects') {
+        if (
+            currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
+            edition === EditionType.EE &&
+            navItem.href === '/automation/projects'
+        ) {
             return false;
         }
 
@@ -190,16 +195,6 @@ function App() {
     } else if (location.pathname.includes('/embedded/')) {
         navigation = filteredEmbeddedNavigation;
     }
-
-    useFetchInterceptor();
-
-    useEffect(() => {
-        analytics.init();
-    }, [analytics]);
-
-    useEffect(() => {
-        helpHub.init();
-    }, [helpHub]);
 
     useEffect(() => {
         if (account) {

@@ -23,6 +23,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -128,6 +129,10 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName(), environmentId)
             .orElse(null);
 
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(WORKFLOW_ENABLED_CACHE));
+
+        cache.put(workflowExecutionId.toString(), true);
+
         return triggerDefinitionFacade.executeWebhookValidateOnEnable(
             workflowNodeType.name(), workflowNodeType.version(),
             workflowNodeType.operation(), triggerParameters, webhookRequest, connectionId);
@@ -154,7 +159,12 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             executeTriggerEnable(
                 workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, environmentId);
 
-            cache.putIfAbsent(workflowExecutionId.toString(), true);
+            WebhookTriggerFlags webhookTriggerFlags = triggerDefinitionService.getWebhookTriggerFlags(
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(), triggerWorkflowNodeType.operation());
+
+            if (!webhookTriggerFlags.workflowSyncOnEnableValidation()) {
+                cache.put(workflowExecutionId.toString(), true);
+            }
         } else {
             try {
                 executeTriggerDisable(workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId);

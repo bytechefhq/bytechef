@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
@@ -9,7 +9,7 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {CheckIcon, DotIcon, Eye, EyeOff, XIcon} from 'lucide-react';
+import {CheckIcon, DotIcon, EyeIcon, EyeOffIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
@@ -103,8 +103,8 @@ const Register = () => {
     };
 
     const handleSubmit = useCallback(
-        ({email, password}: z.infer<typeof formSchema>) => {
-            register(email, password);
+        async ({email, password}: z.infer<typeof formSchema>) => {
+            await register(email, password);
 
             reset();
         },
@@ -152,21 +152,19 @@ const Register = () => {
                     {ff_1874 && (
                         <>
                             <div className="flex flex-col gap-4">
-                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
-                                    <img alt="Google logo" src={googleLogo} />
+                                <Button
+                                    icon={<img alt="Google logo" src={googleLogo} />}
+                                    label="Continue with Google"
+                                    size="lg"
+                                    variant="outline"
+                                />
 
-                                    <span className="text-sm font-medium text-content-neutral-primary">
-                                        Continue with Google
-                                    </span>
-                                </Button>
-
-                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
-                                    <img alt="Github logo" src={githubLogo} />
-
-                                    <span className="text-sm font-medium text-content-neutral-primary">
-                                        Continue with Github
-                                    </span>
-                                </Button>
+                                <Button
+                                    icon={<img alt="Github logo" src={githubLogo} />}
+                                    label="Continue with Github"
+                                    size="lg"
+                                    variant="outline"
+                                />
                             </div>
 
                             <div className="flex items-center">
@@ -220,20 +218,17 @@ const Register = () => {
                                                         />
 
                                                         {getValues('password') !== '' && (
-                                                            <button
+                                                            <Button
                                                                 aria-label={
                                                                     showPassword ? 'Hide Password' : 'Show Password'
                                                                 }
-                                                                className="absolute right-4 top-2 z-10"
+                                                                className="absolute right-2 top-1 z-10"
+                                                                icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
                                                                 onClick={() => setShowPassword((show) => !show)}
+                                                                size="iconSm"
                                                                 type="button"
-                                                            >
-                                                                {showPassword ? (
-                                                                    <EyeOff className="cursor-pointer text-content-neutral-primary" />
-                                                                ) : (
-                                                                    <Eye className="cursor-pointer text-content-neutral-primary" />
-                                                                )}
-                                                            </button>
+                                                                variant="ghost"
+                                                            />
                                                         )}
                                                     </div>
                                                 </FormControl>
@@ -317,34 +312,37 @@ const Register = () => {
                                     />
 
                                     <Button
-                                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                                        className="w-full"
                                         disabled={isSubmitting}
+                                        icon={
+                                            isSubmitting ? (
+                                                <div aria-label="loading icon">
+                                                    <LoadingIcon />
+                                                </div>
+                                            ) : undefined
+                                        }
+                                        label="Continue with password"
+                                        size="lg"
                                         type="submit"
-                                    >
-                                        {isSubmitting && <LoadingIcon />}
-                                        Continue with password
-                                    </Button>
+                                    />
                                 </>
                             )}
 
                             {!emailIsValid && (
                                 <Button
-                                    className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                                    className="w-full"
+                                    label="Continue"
                                     onClick={handleValidateEmailInput}
-                                >
-                                    Continue
-                                </Button>
+                                    size="lg"
+                                />
                             )}
                         </form>
 
-                        <div className="flex justify-center gap-1 text-sm">
+                        <div className="flex items-center justify-center gap-1 text-sm">
                             <span className="text-content-neutral-secondary">Already have an account?</span>
 
-                            <Link
-                                className="font-bold text-content-neutral-primary underline hover:text-content-neutral-secondary"
-                                to="/login"
-                            >
-                                Log in
+                            <Link to="/login">
+                                <Button className="px-1" label="Log in" variant="link" />
                             </Link>
                         </div>
                     </Form>

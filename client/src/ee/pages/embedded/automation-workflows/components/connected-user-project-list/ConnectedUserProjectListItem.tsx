@@ -1,6 +1,5 @@
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {ConnectedUserProject} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from 'lucide-react';
@@ -44,16 +43,6 @@ const ConnectedUserProjectListItem = ({connectedUserProject}: ConnectedUserProje
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex min-w-28 justify-end">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <EnvironmentBadge environmentId={+connectedUserProject.environmentId} />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The environment</TooltipContent>
-                            </Tooltip>
-                        </div>
-
                         <div className="flex min-w-52 flex-col items-end">
                             <div className="flex items-center"></div>
 

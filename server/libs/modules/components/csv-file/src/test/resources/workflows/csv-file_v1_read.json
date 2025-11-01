@@ -1,45 +1,45 @@
 {
-  "label" : "CSV File - READ operation",
-  "inputs" : [ {
-    "name" : "fileEntry",
-    "label" : "File property",
-    "type" : "FILE_ENTRY",
-    "required" : true
+  "label": "CSV File - READ operation",
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
   }, {
-    "name" : "includeEmptyCells",
-    "label" : "Include Empty Cells",
-    "type" : "boolean",
-    "required" : true
+    "name": "includeEmptyCells",
+    "label": "Include Empty Cells",
+    "type": "boolean",
+    "required": true
   }, {
-    "name" : "enclosingCharacter",
-    "label" : "Enclosing Character",
-    "type" : "string",
-    "required" : false
+    "name": "enclosingCharacter",
+    "label": "Enclosing Character",
+    "type": "string",
+    "required": false
   }, {
-    "name" : "delimiter",
-    "label" : "Delimiter Character",
-    "type" : "string",
-    "required" : false
+    "name": "delimiter",
+    "label": "Delimiter Character",
+    "type": "string",
+    "required": false
   }, {
-    "name" : "headerRow",
-    "label" : "First Row is Header",
-    "type" : "boolean",
-    "required" : false
+    "name": "headerRow",
+    "label": "First Row is Header",
+    "type": "boolean",
+    "required": false
   } ],
-  "outputs" : [ {
-    "name" : "readCsvFile",
-    "value" : "${readCsvFile}"
+  "outputs": [ {
+    "name": "readCsvFile",
+    "value": "${readCsvFile}"
   } ],
-  "tasks" : [ {
-    "name" : "readCsvFile",
-    "label" : "Read from the csv file",
-    "type" : "csvFile/v1/read",
-    "parameters" : {
-      "fileEntry" : "${fileEntry}",
-      "delimiter" : "${delimiter}",
-      "headerRow" : "${headerRow}",
-      "includeEmptyCells" : "${includeEmptyCells}",
-      "enclosingCharacter" : "${enclosingCharacter}"
+  "tasks": [ {
+    "name": "readCsvFile",
+    "label": "Read from the csv file",
+    "type": "csvFile/v1/read",
+    "parameters": {
+      "fileEntry": "${fileEntry}",
+      "delimiter": "${delimiter}",
+      "headerRow": "${headerRow}",
+      "includeEmptyCells": "${includeEmptyCells}",
+      "enclosingCharacter": "${enclosingCharacter}"
     }
   } ]
 }

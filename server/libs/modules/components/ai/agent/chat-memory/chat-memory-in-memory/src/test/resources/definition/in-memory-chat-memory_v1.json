@@ -1,36 +1,38 @@
 {
-  "actions" : null,
-  "clusterElements" : [ {
-    "description" : "Memory is retrieved added into the prompt's system text.",
-    "element" : { },
-    "help" : null,
-    "name" : "chatMemory",
-    "outputDefinition" : null,
-    "properties" : null,
-    "title" : "In Memory Chat Memory",
-    "type" : {
-      "key" : "chatMemory",
-      "label" : "Memory",
-      "multipleElements" : false,
-      "name" : "CHAT_MEMORY",
-      "required" : false
-    }
+  "actions": null,
+  "clusterElements": [ {
+    "description": "Memory is retrieved added into the prompt's system text.",
+    "element": { },
+    "help": null,
+    "name": "chatMemory",
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "In Memory Chat Memory",
+    "type": {
+      "key": "chatMemory",
+      "label": "Memory",
+      "multipleElements": false,
+      "name": "CHAT_MEMORY",
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
-  "componentCategories" : [ {
-    "label" : "Artificial Intelligence",
-    "name" : "artificial-intelligence"
+  "componentCategories": [ {
+    "label": "Artificial Intelligence",
+    "name": "artificial-intelligence"
   } ],
-  "connection" : null,
-  "customAction" : null,
-  "customActionHelp" : null,
-  "description" : "In Memory Chat Memory.",
-  "icon" : "path:assets/in-memory-chat-memory.svg",
-  "metadata" : null,
-  "name" : "inMemoryChatMemory",
-  "resources" : null,
-  "tags" : null,
-  "title" : "In Memory Chat Memory",
-  "triggers" : null,
-  "unifiedApi" : null,
-  "version" : 1
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "In Memory Chat Memory.",
+  "icon": "path:assets/in-memory-chat-memory.svg",
+  "metadata": null,
+  "name": "inMemoryChatMemory",
+  "resources": null,
+  "tags": null,
+  "title": "In Memory Chat Memory",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
 }

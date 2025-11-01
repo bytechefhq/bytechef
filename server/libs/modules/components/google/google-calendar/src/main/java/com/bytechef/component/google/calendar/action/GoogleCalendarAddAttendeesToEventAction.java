@@ -26,13 +26,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
-import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCalendarTimezone;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.updateEvent;
+import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
@@ -55,7 +55,7 @@ public class GoogleCalendarAddAttendeesToEventAction {
             string(EVENT_ID)
                 .label("Event ID")
                 .description("ID of the event to add attendees to.")
-                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+                .options((OptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true),
             array(ATTENDEES)

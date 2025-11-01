@@ -54,17 +54,23 @@ public interface ChatModel {
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired);
 
     @Nullable
+    default Object getResponse(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return getResponse(inputParameters, connectionParameters, context, true, true);
+    }
+
+    @Nullable
     default Object getResponse(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context,
+        boolean messageFormatRequired, boolean responseFormatRequired) {
 
         org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(
-            inputParameters, connectionParameters, true);
+            inputParameters, connectionParameters, responseFormatRequired);
 
         List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
-            inputParameters, actionContext);
+            inputParameters, context, messageFormatRequired);
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
-            inputParameters, actionContext, chatModel);
+            chatModel, inputParameters, responseFormatRequired, context);
 
         ChatClient.CallResponseSpec callResponseSpec = chatClientRequestSpec
             .messages(messages)
@@ -73,23 +79,26 @@ public interface ChatModel {
                     .build())
             .call();
 
-        return ModelUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);
+        return ModelUtils.getChatResponse(callResponseSpec, inputParameters, responseFormatRequired, context);
     }
 
     private ChatClient.ChatClientRequestSpec createPrompt(
-        Parameters inputParameters, ActionContext actionContext,
-        org.springframework.ai.chat.model.ChatModel chatModel) {
+        org.springframework.ai.chat.model.ChatModel chatModel, Parameters inputParameters,
+        boolean responseFormatRequired, ActionContext context) {
 
         ChatClient chatClient = ChatClient.create(chatModel);
+        ResponseFormat responseFormat = ResponseFormat.TEXT;
 
-        ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+        if (responseFormatRequired) {
+            responseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+        }
 
         if (responseFormat.equals(ResponseFormat.TEXT)) {
             return chatClient.prompt();
         } else {
             JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
-                inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), actionContext);
+                inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
 
             return chatClient.prompt(converter.getFormat());
         }

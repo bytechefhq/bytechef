@@ -1,7 +1,8 @@
 extend type Query {
     connectedUser(id: ID): ConnectedUser
     connectedUsers(
-        environment: Int,name: String,
+        environmentId: ID,
+        name: String,
         createDateFrom: String,
         createDateTo: String,
         integrationId: ID,

@@ -1,4 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -10,7 +11,6 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -80,12 +80,12 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
-    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
-
-    const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
+    const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
+
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const {toast} = useToast();
@@ -102,9 +102,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}?${searchParams}`);
-
-            setShowWorkflowDialog(false);
+            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}`);
         },
     });
 
@@ -130,9 +128,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         onSuccess: () => {
             captureProjectWorkflowImported();
 
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projects,
-            });
+            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             if (hiddenFileInputRef.current) {
                 hiddenFileInputRef.current.value = '';
@@ -169,14 +166,25 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         },
     });
 
+    const handleImportProjectWorkflowClick = (definition: string) => {
+        importProjectWorkflowMutation.mutate({
+            id: project.id!,
+            workflow: {
+                definition,
+            },
+        });
+    };
+
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            importProjectWorkflowMutation.mutate({
-                id: project.id!,
-                workflow: {
-                    definition: await event.target.files[0].text(),
-                },
-            });
+            const file = event.target.files[0];
+
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const definition = await (typeof (file as any).text === 'function'
+                ? (file as Blob).text()
+                : new Response(file).text());
+
+            handleImportProjectWorkflowClick(definition);
         }
     };
 
@@ -235,6 +243,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         <div className="flex items-center gap-2">
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
                                 <Link
+                                    onClick={(event) => event.stopPropagation()}
                                     to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
                                 >
                                     {project.description ? (
@@ -265,9 +274,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-2">
                                 <CollapsibleTrigger
-                                    className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground"
+                                    className="group flex items-center text-xs font-semibold text-muted-foreground"
                                     ref={workflowsCollapsibleTriggerRef}
                                 >
                                     <div className="mr-1">
@@ -276,8 +285,38 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             : `${project.projectWorkflowIds?.length} workflows`}
                                     </div>
 
-                                    <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button size="xs" variant="outline">
+                                            New workflow
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
+                                            <PlusIcon /> From Scratch
+                                        </DropdownMenuItem>
+
+                                        {ff_1041 && (
+                                            <DropdownMenuItem onClick={() => navigate(`./${project.id}/templates`)}>
+                                                <LayoutTemplateIcon /> From Template
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                if (hiddenFileInputRef.current) {
+                                                    hiddenFileInputRef.current.click();
+                                                }
+                                            }}
+                                        >
+                                            <UploadIcon /> Import Workflow
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (
@@ -354,9 +393,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <EllipsisVerticalIcon className="size-4 cursor-pointer" />
-                                </Button>
+                                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="p-0">
@@ -401,7 +438,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         className="dropdown-menu-item"
                                         onClick={() => setShowProjectShareDialog(true)}
                                     >
-                                        <Share2Icon /> Share Project
+                                        <Share2Icon /> Share
                                     </DropdownMenuItem>
                                 )}
 
@@ -425,38 +462,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
                                         }
                                     >
-                                        <DownloadIcon /> Export Project
+                                        <DownloadIcon /> Export
                                     </DropdownMenuItem>
                                 )}
-
-                                <DropdownMenuSeparator className="m-0" />
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() => setShowWorkflowDialog(true)}
-                                >
-                                    <PlusIcon /> New Empty Workflow
-                                </DropdownMenuItem>
-
-                                {ff_1041 && (
-                                    <DropdownMenuItem
-                                        className="dropdown-menu-item"
-                                        onClick={() => navigate(`${project.id}/templates`)}
-                                    >
-                                        <LayoutTemplateIcon /> Workflow from Template
-                                    </DropdownMenuItem>
-                                )}
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() => {
-                                        if (hiddenFileInputRef.current) {
-                                            hiddenFileInputRef.current.click();
-                                        }
-                                    }}
-                                >
-                                    <UploadIcon /> Import Workflow
-                                </DropdownMenuItem>
 
                                 <DropdownMenuSeparator className="m-0" />
 
@@ -548,7 +556,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 <ProjectPublishDialog onClose={() => setShowPublishProjectDialog(false)} project={project} />
             )}
 
-            {showWorkflowDialog && !!project.id && (
+            {showWorkflowDialog && (
                 <WorkflowDialog
                     createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
@@ -557,7 +565,14 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 />
             )}
 
-            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+            <input
+                accept=".json,.yaml,.yml"
+                alt="file"
+                className="hidden"
+                onChange={handleFileChange}
+                ref={hiddenFileInputRef}
+                type="file"
+            />
         </>
     );
 };

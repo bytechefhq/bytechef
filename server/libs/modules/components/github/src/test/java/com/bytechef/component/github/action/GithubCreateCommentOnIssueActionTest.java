@@ -17,11 +17,14 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -30,22 +33,26 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Luka Ljubic
+ * @author Monika Kušter
  */
 class GithubCreateCommentOnIssueActionTest extends AbstractGithubActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(BODY, "comment"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(OWNER, "testOwner", REPOSITORY, "testRepo", ISSUE, "testIssue", BODY, "comment"));
 
     @Test
-    void testPerform() {
+    void testPerform() throws Exception {
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of());
 
-        Map<String, Object> result =
-            GithubCreateCommentOnIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = executePerformFunction(GithubCreateCommentOnIssueAction.ACTION_DEFINITION, mockedParameters);
 
-        assertEquals(responseMap, result);
+        assertEquals(Map.of(), result);
+        assertEquals("/repos/testOwner/testRepo/issues/testIssue/comments", stringArgumentCaptor.getValue());
 
-        Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of(BODY, "comment"), body.getContent());
     }

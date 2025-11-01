@@ -1,5 +1,5 @@
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/platform/security';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiKeyMutationProps {

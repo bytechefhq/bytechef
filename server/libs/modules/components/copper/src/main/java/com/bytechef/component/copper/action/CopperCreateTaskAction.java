@@ -37,9 +37,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Date;
@@ -61,7 +61,7 @@ public class CopperCreateTaskAction {
             string(ASSIGNEE_ID)
                 .label("Assignee ID")
                 .description("ID of the user to assign the task to.")
-                .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
+                .options((OptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             date(DUE_DATE)
                 .label("Due Date")
@@ -89,7 +89,7 @@ public class CopperCreateTaskAction {
                 .label("Tags")
                 .items(
                     string()
-                        .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
+                        .options((OptionsFunction<String>) CopperOptionUtils::getTagsOptions))
                 .required(false),
             string(STATUS)
                 .label("Status")

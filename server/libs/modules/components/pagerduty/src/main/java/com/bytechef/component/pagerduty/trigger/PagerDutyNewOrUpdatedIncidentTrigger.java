@@ -26,11 +26,11 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.SERVI
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -53,7 +53,7 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
             string(SERVICE)
                 .label("Service")
                 .description("The service that will be watched for the trigger event.")
-                .options((TriggerOptionsFunction<String>) PagerDutyUtils::getServiceIdOptions)
+                .options((OptionsFunction<String>) PagerDutyUtils::getServiceIdOptions)
                 .required(true))
         .output(
             outputSchema(

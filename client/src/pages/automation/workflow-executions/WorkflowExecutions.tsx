@@ -4,7 +4,6 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import Footer from '@/shared/layout/Footer';
@@ -22,6 +21,7 @@ import {
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -283,7 +283,7 @@ export const WorkflowExecutions = () => {
             footer={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <Footer position="main">
+                    <Footer centerTitle position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
@@ -298,6 +298,7 @@ export const WorkflowExecutions = () => {
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
                     <Header
+                        centerTitle
                         position="main"
                         title={
                             <WorkflowExecutionsFilterTitle

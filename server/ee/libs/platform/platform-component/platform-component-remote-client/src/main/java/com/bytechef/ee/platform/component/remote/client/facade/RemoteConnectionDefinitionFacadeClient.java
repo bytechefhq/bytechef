@@ -51,7 +51,7 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection) {
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
         throw new UnsupportedOperationException();
     }
 

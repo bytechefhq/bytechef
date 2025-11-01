@@ -4,8 +4,7 @@ import {GetClusterElementParameterDisplayConditions200Response} from '@/shared/m
 import {PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {FieldValues} from 'react-hook-form/dist/types';
-import {Control, FormState} from 'react-hook-form/dist/types/form';
+import {Control, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';

@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
@@ -9,12 +9,12 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useEnvironmentStore} from '@/pages/automation/stores/useEnvironmentStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
@@ -114,7 +114,7 @@ const IntegrationInstanceConfigurations = () => {
                                             environmentId: currentEnvironmentId,
                                         } as IntegrationInstanceConfiguration
                                     }
-                                    triggerNode={<Button>New Instance Configuration</Button>}
+                                    triggerNode={<Button label="New Instance Configuration" />}
                                 />
                             )
                         }
@@ -247,7 +247,7 @@ const IntegrationInstanceConfigurations = () => {
                 {componentDefinitions &&
                 integrationInstanceConfigurations &&
                 integrationInstanceConfigurations?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
@@ -284,7 +284,7 @@ const IntegrationInstanceConfigurations = () => {
                                         environmentId: currentEnvironmentId,
                                     } as IntegrationInstanceConfiguration
                                 }
-                                triggerNode={<Button>Create Instance Configuration</Button>}
+                                triggerNode={<Button label="Create Instance Configuration" />}
                             />
                         }
                         icon={<Settings2Icon className="size-24 text-gray-300" />}

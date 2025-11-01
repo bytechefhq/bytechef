@@ -26,11 +26,11 @@ import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -53,7 +53,7 @@ public class NiftyNewTaskTrigger {
             string(APP_ID)
                 .label("Application")
                 .description("Application to be used for the trigger.")
-                .options((TriggerOptionsFunction<String>) NiftyUtils::getAppIdOptions)
+                .options((OptionsFunction<String>) NiftyUtils::getAppIdOptions)
                 .required(true))
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(

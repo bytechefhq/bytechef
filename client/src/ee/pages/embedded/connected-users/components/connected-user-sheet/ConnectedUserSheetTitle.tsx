@@ -11,7 +11,6 @@ import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/compo
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -36,8 +35,6 @@ const ConnectedUserSheetTitle = ({connectedUser}: {connectedUser: ConnectedUser}
                 <h3 className={twMerge('text-lg', !connectedUser.enabled && 'text-muted-foreground')}>
                     {connectedUser.name ?? connectedUser.externalId}
                 </h3>
-
-                <EnvironmentBadge environmentId={connectedUser.environmentId!} />
 
                 {!connectedUser.enabled && <Badge variant="destructive">Disabled</Badge>}
             </div>

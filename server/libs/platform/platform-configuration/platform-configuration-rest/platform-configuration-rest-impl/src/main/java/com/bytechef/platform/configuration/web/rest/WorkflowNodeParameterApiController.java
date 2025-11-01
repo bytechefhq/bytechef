@@ -22,8 +22,10 @@ import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameterRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetClusterElementParameterDisplayConditions200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateClusterElementParameterRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
         ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.deleteClusterElementParameter(
             id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
             deleteWorkflowNodeParameterRequestModel.getPath(),
+            deleteWorkflowNodeParameterRequestModel.getFromAiInMetadata(),
             deleteWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
 
         return ResponseEntity.ok(
@@ -67,7 +70,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     @Override
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> deleteWorkflowNodeParameter(
         String id, String workflowNodeName, Long environmentId,
-        DeleteClusterElementParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
+        DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
 
         ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
             id, workflowNodeName, deleteWorkflowNodeParameterRequestModel.getPath(),
@@ -115,6 +118,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
             id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
             updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
             updateWorkflowNodeParameterRequestModel.getType(),
+            updateWorkflowNodeParameterRequestModel.getFromAiInMetadata(),
             updateWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
 
         return ResponseEntity.ok(
@@ -124,7 +128,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     @Override
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, String workflowNodeName, Long environmentId,
-        UpdateClusterElementParameterRequestModel updateWorkflowNodeParameterRequestModel) {
+        UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
         ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.updateWorkflowNodeParameter(
             id, workflowNodeName,
