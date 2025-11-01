@@ -10,6 +10,7 @@ import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
+
 import {
     useDeleteProjectDeploymentMutation,
     useEnableProjectDeploymentMutation,
@@ -89,7 +90,10 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
             'svg',
         ].join(', ');
 
-        if (target.closest('[data-stop-propagation]')) {
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
             return;
         }
 
@@ -99,8 +103,8 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
-                onClick={handleCardClick}
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+                onClick={(event) => handleCardClick(event)}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">

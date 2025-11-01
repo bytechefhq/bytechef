@@ -22,19 +22,19 @@ const ProjectDeploymentListItemDropdownMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
+                <Button size="icon" variant="ghost" >
                     <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                 </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
+                <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>Edit</DropdownMenuItem>
 
-                <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
+                <DropdownMenuItem className="dropdown-menu-item" onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="text-destructive" onClick={onDeleteClick}>
+                <DropdownMenuItem className="text-destructive dropdown-menu-item" onClick={onDeleteClick}>
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
