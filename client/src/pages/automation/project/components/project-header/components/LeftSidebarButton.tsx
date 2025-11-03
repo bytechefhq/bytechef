@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PanelLeftIcon} from 'lucide-react';
 
@@ -6,14 +6,7 @@ const LeftSidebarButton = ({onLeftSidebarOpenClick}: {onLeftSidebarOpenClick: ()
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
-                    onClick={onLeftSidebarOpenClick}
-                    size="icon"
-                    variant="ghost"
-                >
-                    <PanelLeftIcon />
-                </Button>
+                <Button icon={<PanelLeftIcon />} onClick={onLeftSidebarOpenClick} size="icon" variant="ghost" />
             </TooltipTrigger>
 
             <TooltipContent>See projects</TooltipContent>

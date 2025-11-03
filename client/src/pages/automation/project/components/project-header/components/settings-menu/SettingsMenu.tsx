@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -64,14 +64,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                         className="cursor-pointer [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
                     >
                         <TooltipTrigger asChild>
-                            <Button
-                                aria-label="Settings"
-                                className="hover:bg-surface-neutral-primary-hover active:bg-surface-brand-secondary [&_svg]:size-5"
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <SettingsIcon />
-                            </Button>
+                            <Button aria-label="Settings" icon={<SettingsIcon />} size="icon" variant="ghost" />
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 

@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {MessageCircleMoreIcon, PlayIcon, SquareIcon} from 'lucide-react';
 
@@ -19,30 +19,23 @@ const WorkflowActionsButton = ({
 }: ProjectHeaderWorkflowActionsButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <div className="w-20">
+            <div className="mx-2 w-20">
                 {workflowIsRunning ? (
                     <Button
-                        className="w-full bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                        className="w-full"
+                        icon={<SquareIcon />}
+                        label="Stop"
                         onClick={onStopClick}
-                    >
-                        <SquareIcon /> Stop
-                    </Button>
+                        variant="destructive"
+                    />
                 ) : (
                     <Button
-                        className="w-full bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active disabled:pointer-events-auto"
+                        className="w-full"
                         disabled={runDisabled}
+                        icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
+                        label={chatTrigger ? 'Chat' : 'Test'}
                         onClick={() => onRunClick()}
-                    >
-                        {chatTrigger ? (
-                            <>
-                                <MessageCircleMoreIcon /> Chat
-                            </>
-                        ) : (
-                            <>
-                                <PlayIcon /> Test
-                            </>
-                        )}
-                    </Button>
+                    />
                 )}
             </div>
         </TooltipTrigger>

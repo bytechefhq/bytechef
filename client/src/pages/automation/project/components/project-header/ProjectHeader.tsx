@@ -97,7 +97,7 @@ const ProjectHeader = ({
                 )}
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
                 <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
 
                 <SettingsMenu project={project} updateWorkflowMutation={updateWorkflowMutation} workflow={workflow} />
