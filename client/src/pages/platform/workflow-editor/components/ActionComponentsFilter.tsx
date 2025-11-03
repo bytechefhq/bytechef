@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -54,12 +54,13 @@ const ActionComponentsFilter = ({
                 <Button
                     aria-label="All button"
                     className={twMerge(
-                        'border-none bg-transparent text-xs text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary',
+                        'text-xs text-content-neutral-secondary hover:bg-transparent hover:text-content-neutral-primary',
                         (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) &&
                             'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary hover:text-content-brand-primary disabled:opacity-100'
                     )}
                     disabled={filterState.activeView === 'all'}
                     onClick={() => setActiveView('all')}
+                    variant="ghost"
                 >
                     <span>All</span>
 
@@ -69,14 +70,14 @@ const ActionComponentsFilter = ({
                 <Button
                     aria-label="Filtered button"
                     className={twMerge(
-                        'border-none bg-transparent text-xs text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary',
+                        'text-xs text-content-neutral-secondary hover:bg-transparent hover:text-content-neutral-primary',
                         filterState.activeView === 'filtered' &&
                             'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary hover:text-content-brand-primary disabled:opacity-100',
                         filterState.selectedCategories.length > 0 ? 'visible' : 'invisible'
                     )}
                     disabled={filterState.activeView === 'filtered'}
                     onClick={() => setActiveView('filtered')}
-                    variant={filterState.activeView === 'filtered' ? 'default' : 'ghost'}
+                    variant="ghost"
                 >
                     <span>Filtered</span>
 
@@ -92,12 +93,11 @@ const ActionComponentsFilter = ({
                         <TooltipTrigger asChild>
                             <Button
                                 aria-label="Filter actions"
-                                className="border-none bg-transparent p-2 text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                size="icon"
-                                variant="outline"
-                            >
-                                <ListFilterIcon />
-                            </Button>
+                                className="data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                icon={<ListFilterIcon />}
+                                size="iconSm"
+                                variant="ghost"
+                            />
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
@@ -121,12 +121,11 @@ const ActionComponentsFilter = ({
                             {filterState.searchValue !== '' && (
                                 <Button
                                     aria-label="Clear search input"
-                                    className="absolute right-1 top-2.5 mx-1 h-auto p-0 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+                                    className="absolute right-1 top-2.5 mx-1 h-auto p-0 text-muted-foreground hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                    icon={<XIcon />}
                                     onClick={() => setSearchValue('')}
                                     variant="ghost"
-                                >
-                                    <XIcon className="size-4 text-muted-foreground" />
-                                </Button>
+                                />
                             )}
                         </div>
                     </div>
@@ -134,13 +133,14 @@ const ActionComponentsFilter = ({
                     <Button
                         aria-label="Deselect button"
                         className={twMerge(
-                            'flex h-auto w-full justify-start rounded-md bg-transparent px-3 py-1.5 font-normal text-content-destructive shadow-none hover:bg-surface-destructive-secondary hover:text-content-destructive',
+                            'h-auto w-full justify-start px-3 py-1.5 font-normal opacity-100',
                             filterState.selectedCategories.length > 0 ? 'inline-flex' : 'hidden'
                         )}
+                        icon={<CircleMinusIcon />}
+                        label="Clear all selected categories"
                         onClick={() => deselectAllCategories()}
-                    >
-                        <CircleMinusIcon /> Clear all selected categories
-                    </Button>
+                        variant="destructiveGhost"
+                    />
 
                     <ScrollArea className="h-48 overflow-y-auto pr-1">
                         {filteredCategories.length === 0 && (
