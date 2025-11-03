@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -103,14 +103,12 @@ const WorkflowCodeEditorSheetContent = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                className="[&_svg]:size-5"
                                 disabled={testConfigurationDisabled}
+                                icon={<Settings2Icon />}
                                 onClick={() => setShowWorkflowTestConfigurationDialog(true)}
                                 size="icon"
                                 variant="ghost"
-                            >
-                                <Settings2Icon />
-                            </Button>
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent>Set the workflow test configuration</TooltipContent>
@@ -119,15 +117,13 @@ const WorkflowCodeEditorSheetContent = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                className="[&_svg]:size-5"
                                 disabled={!dirty}
+                                icon={<SaveIcon />}
                                 onClick={() => handleWorkflowCodeEditorSheetSave(workflow, definition)}
                                 size="icon"
                                 type="submit"
                                 variant="ghost"
-                            >
-                                <SaveIcon />
-                            </Button>
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent>Save current workflow</TooltipContent>
@@ -138,14 +134,12 @@ const WorkflowCodeEditorSheetContent = ({
                             <TooltipTrigger asChild>
                                 <span tabIndex={0}>
                                     <Button
-                                        className="[&_svg]:size-5"
                                         disabled={runDisabled || dirty}
+                                        icon={<PlayIcon className="text-success" />}
                                         onClick={handleRunClick}
                                         size="icon"
                                         variant="ghost"
-                                    >
-                                        <PlayIcon className="text-success" />
-                                    </Button>
+                                    />
                                 </span>
                             </TooltipTrigger>
 
@@ -159,14 +153,13 @@ const WorkflowCodeEditorSheetContent = ({
 
                     {workflowIsRunning && (
                         <Button
+                            icon={<SquareIcon />}
                             onClick={() => {
                                 console.error('Implement cancel workflow execution');
                             }}
                             size="icon"
                             variant="destructive"
-                        >
-                            <SquareIcon className="h-5" />
-                        </Button>
+                        />
                     )}
 
                     <SheetCloseButton />

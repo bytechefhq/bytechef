@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -96,6 +96,7 @@ const WorkflowTestConfigurationFormField = ({
                                         {connectionDialogAllowed && (
                                             <Button
                                                 className="mt-auto p-2"
+                                                icon={<PlusIcon className="size-5" />}
                                                 onClick={() => {
                                                     setComponentConnection(componentConnection);
                                                     setShowNewConnectionDialog(true);
@@ -103,9 +104,7 @@ const WorkflowTestConfigurationFormField = ({
                                                 title="Create a new connection"
                                                 type="button"
                                                 variant="outline"
-                                            >
-                                                <PlusIcon className="size-5" />
-                                            </Button>
+                                            />
                                         )}
                                     </div>
                                 </FormControl>
@@ -314,12 +313,10 @@ const WorkflowTestConfigurationDialog = ({
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>
