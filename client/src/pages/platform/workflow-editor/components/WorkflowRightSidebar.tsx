@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {BlocksIcon, CableIcon, Code2Icon, SlidersIcon, SparklesIcon} from 'lucide-react';
@@ -32,7 +33,7 @@ const WorkflowRightSidebar = ({
             [
                 ...[
                     {
-                        icon: BlocksIcon,
+                        icon: <BlocksIcon />,
                         name: 'Components & Flow Controls',
                         onClick: onComponentsAndFlowControlsClick,
                     },
@@ -40,7 +41,7 @@ const WorkflowRightSidebar = ({
                 ...(showWorkflowInputs
                     ? [
                           {
-                              icon: SlidersIcon,
+                              icon: <SlidersIcon />,
                               name: 'Workflow Inputs',
                               onClick: onWorkflowInputsClick,
                           },
@@ -48,17 +49,17 @@ const WorkflowRightSidebar = ({
                     : []),
                 ...[
                     {
-                        icon: CableIcon,
+                        icon: <CableIcon />,
                         name: 'Workflow Outputs',
                         onClick: onWorkflowOutputsClick,
                     },
                     {
-                        icon: Code2Icon,
+                        icon: <Code2Icon />,
                         name: 'Workflow Code Editor',
                         onClick: onWorkflowCodeEditorClick,
                     },
                     {
-                        icon: SparklesIcon,
+                        icon: <SparklesIcon />,
                         name: 'Copilot',
                         onClick: onCopilotClick,
                     },
@@ -78,33 +79,34 @@ const WorkflowRightSidebar = ({
         [copilotPanelOpen, ff_1840, rightSidebarOpen]
     );
 
+    const activeItemStyling =
+        'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary-hover hover:text-content-brand-primary';
+
     return (
         <aside className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
-            {rightSidebarNavigation.map((item) => (
-                <button
-                    className={twMerge(
-                        'flex items-center rounded-md p-2 hover:bg-surface-neutral-primary-hover [&_svg]:size-4',
+            {rightSidebarNavigation.map((item) => {
+                const isActive =
+                    (item.name === 'Components & Flow Controls' && rightSidebarOpen) ||
+                    (item.name === 'Copilot' && copilotPanelOpen);
 
-                        item.name === 'Components & Flow Controls' &&
-                            rightSidebarOpen &&
-                            'bg-surface-brand-secondary text-content-brand-primary',
-
-                        item.name === 'Copilot' &&
-                            copilotPanelOpen &&
-                            'bg-surface-brand-secondary text-content-brand-primary'
-                    )}
-                    key={item.name}
-                    onClick={item.onClick}
-                >
-                    <Tooltip>
-                        <TooltipTrigger asChild>{item.icon && <item.icon aria-hidden="true" />}</TooltipTrigger>
+                return (
+                    <Tooltip key={item.name}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                aria-label={item.name}
+                                className={twMerge(isActive && activeItemStyling)}
+                                icon={item.icon}
+                                key={item.name}
+                                onClick={item.onClick}
+                                size="iconSm"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
 
                         <TooltipContent side="left">{item.name}</TooltipContent>
                     </Tooltip>
-
-                    <span className="sr-only">{item.name}</span>
-                </button>
-            ))}
+                );
+            })}
         </aside>
     );
 };
