@@ -1,5 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -34,51 +34,63 @@ const WorkflowTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button className="dropdown-menu-item" onClick={onShowEditWorkflowDialog} variant="ghost">
-                <EditIcon /> Edit
-            </Button>
+            <Button
+                className="dropdown-menu-item"
+                icon={<EditIcon />}
+                label="Edit"
+                onClick={onShowEditWorkflowDialog}
+                variant="ghost"
+            />
 
-            <Button className="dropdown-menu-item" onClick={onDuplicateWorkflow} variant="ghost">
-                <CopyIcon /> Duplicate
-            </Button>
+            <Button
+                className="dropdown-menu-item"
+                icon={<CopyIcon />}
+                label="Duplicate"
+                onClick={onDuplicateWorkflow}
+                variant="ghost"
+            />
 
             {ff_1042 && (
-                <Button className="dropdown-menu-item" onClick={onShareWorkflow} variant="ghost">
-                    <Share2Icon /> Share
-                </Button>
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share"
+                    onClick={onShareWorkflow}
+                    variant="ghost"
+                />
             )}
 
             {ff_2939 && (
                 <Button
                     className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share with Community"
                     onClick={() => {
                         if (templatesSubmissionForm) {
                             window.open(templatesSubmissionForm, '_blank');
                         }
                     }}
                     variant="ghost"
-                >
-                    <Share2Icon /> Share with Community
-                </Button>
+                />
             )}
 
             <Button
                 className="dropdown-menu-item"
+                icon={<DownloadIcon />}
+                label="Export"
                 onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
                 variant="ghost"
-            >
-                <DownloadIcon /> Export
-            </Button>
+            />
 
             <Separator />
 
             <Button
                 className="dropdown-menu-item-destructive"
+                icon={<Trash2Icon />}
+                label="Delete"
                 onClick={() => onShowDeleteWorkflowAlertDialog()}
                 variant="ghost"
-            >
-                <Trash2Icon /> Delete
-            </Button>
+            />
         </div>
     );
 };

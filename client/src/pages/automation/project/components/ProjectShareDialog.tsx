@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {Alert, AlertDescription} from '@/components/ui/alert';
-import {Button} from '@/components/ui/button';
 import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
@@ -145,9 +145,7 @@ export function ProjectShareDialog({
                                         time.
                                     </p>
 
-                                    <Button className="h-auto p-0 text-sm" variant="link">
-                                        Learn more
-                                    </Button>
+                                    <Button className="h-auto p-0" label="Learn more" variant="link" />
                                 </div>
                             )}
 
@@ -186,11 +184,13 @@ export function ProjectShareDialog({
                                                 <span>Copied</span>
                                             </div>
                                         ) : (
-                                            <Button onClick={handleCopyLinkClick} size="sm" variant="secondary">
-                                                <LinkIcon />
-
-                                                <span>Copy link</span>
-                                            </Button>
+                                            <Button
+                                                icon={<LinkIcon />}
+                                                label="Copy link"
+                                                onClick={handleCopyLinkClick}
+                                                size="sm"
+                                                variant="secondary"
+                                            />
                                         )}
                                     </div>
                                 </>
@@ -213,9 +213,7 @@ export function ProjectShareDialog({
                                             link.
                                         </p>
 
-                                        <Button className="h-auto p-0 text-sm" variant="link">
-                                            Learn more
-                                        </Button>
+                                        <Button className="h-auto p-0" label="Learn more" variant="link" />
                                     </div>
                                 </div>
                             )}
@@ -239,15 +237,21 @@ export function ProjectShareDialog({
                     </div>
 
                     {shareState === 'not-shared' && (
-                        <Button className="w-full bg-primary" disabled={!description} onClick={handleExport}>
-                            Export and generate template link
-                        </Button>
+                        <Button
+                            className="w-full"
+                            disabled={!description}
+                            label="Export and generate template link"
+                            onClick={handleExport}
+                        />
                     )}
 
                     {shareState === 'exported' && sharedProject?.projectVersion !== projectVersion && (
-                        <Button className="w-full bg-primary" disabled={!description} onClick={handleExport}>
-                            Update template based on the current version
-                        </Button>
+                        <Button
+                            className="w-full"
+                            disabled={!description}
+                            label="Update template based on the current version"
+                            onClick={handleExport}
+                        />
                     )}
 
                     <p className="space-x-1 text-xs leading-relaxed text-muted-foreground">
@@ -256,9 +260,7 @@ export function ProjectShareDialog({
                             share, and you may disable and re-enable them at any time.
                         </span>
 
-                        <Button className="h-auto p-0 text-xs" variant="link">
-                            Learn more
-                        </Button>
+                        <Button className="h-auto p-0" label="Learn more" size="sm" variant="link" />
                     </p>
                 </div>
             </DialogContent>

@@ -1,5 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -54,42 +54,54 @@ const ProjectTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button className="dropdown-menu-item" onClick={() => onShowEditProjectDialogClick()} variant="ghost">
-                <EditIcon /> Edit
-            </Button>
+            <Button
+                className="dropdown-menu-item"
+                icon={<EditIcon />}
+                label="Edit"
+                onClick={() => onShowEditProjectDialogClick()}
+                variant="ghost"
+            />
 
-            <Button className="dropdown-menu-item" onClick={onDuplicateProjectClick} variant="ghost">
-                <CopyIcon /> Duplicate
-            </Button>
+            <Button
+                className="dropdown-menu-item"
+                icon={<CopyIcon />}
+                label="Duplicate"
+                onClick={onDuplicateProjectClick}
+                variant="ghost"
+            />
 
             {ff_1042 && (
-                <Button className="dropdown-menu-item" onClick={onShareProject} variant="ghost">
-                    <Share2Icon /> Share
-                </Button>
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share"
+                    onClick={onShareProject}
+                    variant="ghost"
+                />
             )}
 
             {ff_2939 && (
                 <Button
                     className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share with Community"
                     onClick={() => {
                         if (templatesSubmissionForm) {
                             window.open(templatesSubmissionForm, '_blank');
                         }
                     }}
                     variant="ghost"
-                >
-                    <Share2Icon /> Share with Community
-                </Button>
+                />
             )}
 
             {ff_2482 && (
                 <Button
                     className="dropdown-menu-item"
+                    icon={<DownloadIcon />}
+                    label="Export"
                     onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
                     variant="ghost"
-                >
-                    <DownloadIcon /> Export
-                </Button>
+                />
             )}
 
             <Separator />
@@ -99,33 +111,41 @@ const ProjectTabButtons = ({
                     <Button
                         className="dropdown-menu-item"
                         disabled={!projectGitConfigurationEnabled}
+                        icon={<GitPullRequestArrowIcon />}
+                        label="Pull Project from Git"
                         onClick={onPullProjectFromGitClick}
                         variant="ghost"
-                    >
-                        <GitPullRequestArrowIcon /> Pull Project from Git
-                    </Button>
+                    />
 
                     <Button
                         className="dropdown-menu-item"
+                        icon={<GitBranchIcon />}
+                        label="Git Configuration"
                         onClick={onShowProjectGitConfigurationDialog}
                         variant="ghost"
-                    >
-                        <GitBranchIcon /> Git Configuration
-                    </Button>
+                    />
 
                     <Separator />
                 </EEVersion>
             )}
 
-            <Button className="dropdown-menu-item" onClick={onShowProjectVersionHistorySheet} variant="ghost">
-                <HistoryIcon /> Project History
-            </Button>
+            <Button
+                className="dropdown-menu-item"
+                icon={<HistoryIcon />}
+                label="Project History"
+                onClick={onShowProjectVersionHistorySheet}
+                variant="ghost"
+            />
 
             <Separator />
 
-            <Button className="dropdown-menu-item-destructive" onClick={onDeleteProjectClick} variant="ghost">
-                <Trash2Icon /> Delete
-            </Button>
+            <Button
+                className="dropdown-menu-item-destructive"
+                icon={<Trash2Icon />}
+                label="Delete"
+                onClick={onDeleteProjectClick}
+                variant="ghost"
+            />
         </div>
     );
 };
