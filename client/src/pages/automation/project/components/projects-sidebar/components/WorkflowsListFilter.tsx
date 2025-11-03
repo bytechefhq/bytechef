@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -21,7 +21,7 @@ const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProp
                     <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
 
                     <Input
-                        className="h-auto border-stroke-neutral-secondary py-1.5 pl-8 shadow-none"
+                        className="border-stroke-neutral-secondary py-1.5 pl-8 shadow-none"
                         onChange={(event) => setSearchValue(event.target.value)}
                         placeholder="Search workflows"
                         ref={ref}
@@ -35,11 +35,11 @@ const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProp
                             <TooltipTrigger asChild>
                                 <Button
                                     aria-label="Sort by"
-                                    className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                    icon={<ListFilterIcon />}
+                                    size="icon"
                                     variant="outline"
-                                >
-                                    <ListFilterIcon />
-                                </Button>
+                                />
                             </TooltipTrigger>
                         </DropdownMenuTrigger>
 
