@@ -223,6 +223,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:supabase"))
     implementation(project(":server:libs:modules:components:tavily"))
     implementation(project(":server:libs:modules:components:teamwork"))
+    implementation(project(":server:libs:modules:components:telegram"))
     implementation(project(":server:libs:modules:components:text-helper"))
     implementation(project(":server:libs:modules:components:todoist"))
     implementation(project(":server:libs:modules:components:trello"))
