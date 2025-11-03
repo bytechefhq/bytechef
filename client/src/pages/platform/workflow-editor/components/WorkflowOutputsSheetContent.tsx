@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetTable';
@@ -16,7 +16,7 @@ const WorkflowOutputsSheetContent = ({workflow}: WorkflowOutputsSheetContentProp
             <div className="flex items-center space-x-2">
                 {!!workflow.outputs?.length && (
                     <WorkflowOutputsSheetDialog
-                        triggerNode={<Button size="sm">New Output</Button>}
+                        triggerNode={<Button label="New Output" size="sm" />}
                         workflow={workflow}
                     />
                 )}

@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -8,7 +9,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -89,26 +89,24 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
 
                                     <TableCell className="flex justify-end">
                                         <Button
+                                            icon={<EditIcon />}
                                             onClick={() => {
                                                 setCurrentInputIndex(index);
                                                 setShowEditDialog(true);
                                             }}
                                             size="icon"
                                             variant="ghost"
-                                        >
-                                            <EditIcon className="size-4" />
-                                        </Button>
+                                        />
 
                                         <Button
+                                            icon={<Trash2Icon className="text-destructive" />}
                                             onClick={() => {
                                                 setCurrentInputIndex(index);
                                                 setShowDeleteDialog(true);
                                             }}
                                             size="icon"
                                             variant="ghost"
-                                        >
-                                            <Trash2Icon className="h-4 text-destructive" />
-                                        </Button>
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -125,7 +123,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
 
                         <div className="mt-6">
                             <WorkflowOutputsSheetDialog
-                                triggerNode={<Button size="sm">New Output</Button>}
+                                triggerNode={<Button label="New Output" size="sm" />}
                                 workflow={workflow}
                             />
                         </div>
