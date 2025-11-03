@@ -40,7 +40,7 @@ const WorkflowInputsDeleteDialog = ({
 
                 {workflowInputs?.[currentInputIndex] && (
                     <AlertDialogAction
-                        className="bg-surface-destructive-primary"
+                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                         onClick={() => deleteWorkflowInput(workflowInputs![currentInputIndex])}
                     >
                         Delete

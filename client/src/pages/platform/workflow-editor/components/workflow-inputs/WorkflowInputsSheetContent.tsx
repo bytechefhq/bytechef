@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
@@ -39,9 +39,7 @@ const WorkflowInputsSheetContent = ({
 
                 <div className="flex items-center space-x-2">
                     {!!workflow.inputs?.length && (
-                        <Button className="bg-content-brand-primary" onClick={() => openEditDialog()} size="sm">
-                            <PlusIcon /> New Input
-                        </Button>
+                        <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} size="sm" />
                     )}
 
                     <SheetCloseButton />
@@ -69,10 +67,7 @@ const WorkflowInputsSheetContent = ({
 
                         <p className="text-sm text-gray-500">Get started by creating a new input.</p>
 
-                        <Button className="bg-content-brand-primary" onClick={() => openEditDialog()}>
-                            <PlusIcon className="-ml-0.5 mr-1.5 size-5" />
-                            New Input
-                        </Button>
+                        <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} />
                     </div>
                 </div>
             )}

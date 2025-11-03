@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {EditIcon, Trash2Icon} from 'lucide-react';
@@ -51,13 +51,14 @@ const WorkflowInputsTable = ({
                     </TableCell>
 
                     <TableCell className="flex justify-end">
-                        <Button onClick={() => openEditDialog(index)} size="icon" variant="ghost">
-                            <EditIcon className="size-4" />
-                        </Button>
+                        <Button icon={<EditIcon />} onClick={() => openEditDialog(index)} size="icon" variant="ghost" />
 
-                        <Button onClick={() => openDeleteDialog(index)} size="icon" variant="ghost">
-                            <Trash2Icon className="h-4 text-destructive" />
-                        </Button>
+                        <Button
+                            icon={<Trash2Icon className="text-destructive" />}
+                            onClick={() => openDeleteDialog(index)}
+                            size="icon"
+                            variant="ghost"
+                        />
                     </TableCell>
                 </TableRow>
             ))}
