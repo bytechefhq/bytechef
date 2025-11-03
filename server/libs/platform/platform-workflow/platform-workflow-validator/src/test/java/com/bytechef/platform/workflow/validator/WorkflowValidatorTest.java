@@ -222,7 +222,6 @@ class WorkflowValidatorTest {
 
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, errors, warnings);
 
-            // this is an exception, every value can be converted to string
             assertEquals("", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -1729,7 +1728,6 @@ class WorkflowValidatorTest {
 
     @Test
     void validateTaskParametersStringValueConditionWorksCorrectly() {
-        // here
         String taskParameters = """
             {
                 "format": "json",
@@ -3776,7 +3774,6 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        // Mock task definition and output providers
         WorkflowValidator.TaskDefinitionProvider taskDefProvider = (taskType, kind) -> List.of(
             new PropertyInfo("name", "STRING", null, false, true, null, null));
 

@@ -46,7 +46,6 @@ class WorkflowUtils {
 
     private static boolean evaluateCondition(String condition, JsonNode actualParameters) {
         Map<String, String> map = new HashMap<>();
-        // convert condition to SpEL condition
         map.put("convertedExpression", "=" + condition);
 
         Map<String, Object> actualParametersMap =

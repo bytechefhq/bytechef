@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ class DisplayConditionEvaluator {
      * Evaluates a display condition and returns the result along with any validation messages.
      */
     static DisplayConditionResult evaluate(
-        @Nullable String displayCondition, JsonNode parametersJsonNode, StringBuilder warnings) {
+        @Nullable String displayCondition, JsonNode parametersJsonNode) {
 
         if (displayCondition == null || displayCondition.isEmpty()) {
             return DisplayConditionResult.visible();
@@ -47,7 +48,7 @@ class DisplayConditionEvaluator {
             boolean shouldShow = WorkflowUtils.extractAndEvaluateCondition(displayCondition, parametersJsonNode);
             return DisplayConditionResult.of(shouldShow, false, null);
         } catch (Exception e) {
-            return handleEvaluationException(e, displayCondition, warnings);
+            return handleEvaluationException(e);
         }
     }
 
@@ -55,7 +56,7 @@ class DisplayConditionEvaluator {
      * Evaluates display condition for array elements with index placeholder replacement.
      */
     static DisplayConditionResult evaluateForArrayElement(
-        @Nullable String displayCondition, int index, JsonNode rootParametersJsonNode, StringBuilder warnings) {
+        @Nullable String displayCondition, int index, JsonNode rootParametersJsonNode) {
 
         if (displayCondition == null || displayCondition.isEmpty()) {
             return DisplayConditionResult.visible();
@@ -74,8 +75,7 @@ class DisplayConditionEvaluator {
         }
     }
 
-    private static DisplayConditionResult handleEvaluationException(
-        Exception e, String displayCondition, StringBuilder warnings) {
+    private static DisplayConditionResult handleEvaluationException(Exception e) {
 
         String message = e.getMessage();
         if (message != null && message.startsWith("Invalid logic for display condition:")) {
@@ -101,7 +101,8 @@ class DisplayConditionEvaluator {
         private final boolean isMalformed;
         private final String malformedMessage;
 
-        private DisplayConditionResult(boolean shouldShow, boolean isMalformed, String malformedMessage) {
+        @SuppressFBWarnings("NP")
+        private DisplayConditionResult(boolean shouldShow, boolean isMalformed, @Nullable String malformedMessage) {
             this.shouldShow = shouldShow;
             this.isMalformed = isMalformed;
             this.malformedMessage = malformedMessage;
@@ -119,7 +120,7 @@ class DisplayConditionEvaluator {
             return new DisplayConditionResult(false, true, message);
         }
 
-        static DisplayConditionResult of(boolean shouldShow, boolean isMalformed, String malformedMessage) {
+        static DisplayConditionResult of(boolean shouldShow, boolean isMalformed, @Nullable String malformedMessage) {
             return new DisplayConditionResult(shouldShow, isMalformed, malformedMessage);
         }
 

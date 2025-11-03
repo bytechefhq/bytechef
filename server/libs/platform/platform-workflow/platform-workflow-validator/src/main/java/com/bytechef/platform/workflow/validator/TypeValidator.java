@@ -36,12 +36,10 @@ class TypeValidator {
     static void validateType(
         JsonNode valueJsonNode, String expectedType, String propertyPath, StringBuilder errors) {
 
-        // Skip validation for data pill expressions
         if (valueJsonNode.isTextual() && isDataPillExpression(valueJsonNode.asText())) {
             return;
         }
 
-        // Handle date/time types with format validation
         if (valueJsonNode.isTextual() && isDateTimeType(expectedType)) {
             validateDateTimeType(valueJsonNode.asText(), expectedType, propertyPath, errors);
         } else if (!isTypeValid(valueJsonNode, expectedType)) {
@@ -56,7 +54,6 @@ class TypeValidator {
      * Checks if a JsonNode matches the expected type.
      */
     static boolean isTypeValid(JsonNode jsonNode, String expectedType) {
-        // Null values are allowed for all types except when explicitly expecting the null type
         if (jsonNode.isNull() && !"null".equalsIgnoreCase(expectedType)) {
             return true;
         }
@@ -89,7 +86,7 @@ class TypeValidator {
     private static void validateDateTimeType(
         String value, String expectedType, String propertyPath, StringBuilder errors) {
 
-        String formatError = DateTimeValidator.validateWithError(value, expectedType, propertyPath);
+        String formatError = DateTimeValidator.validateError(value, expectedType, propertyPath);
         if (formatError != null) {
             StringUtils.appendWithNewline(formatError, errors);
         }
@@ -142,7 +139,7 @@ class TypeValidator {
         }
 
         @Nullable
-        static String validateWithError(String value, String expectedType, String propertyPath) {
+        static String validateError(String value, String expectedType, String propertyPath) {
             String lowerType = expectedType.toLowerCase();
 
             switch (lowerType) {
