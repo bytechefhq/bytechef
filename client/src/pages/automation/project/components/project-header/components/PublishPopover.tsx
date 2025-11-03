@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
@@ -45,11 +45,11 @@ const PublishPopover = ({
                 <PopoverTrigger asChild>
                     <TooltipTrigger asChild>
                         <Button
-                            className="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover [&[data-state=open]]:border-stroke-brand-secondary [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
+                            className="[&[data-state=open]]:border-stroke-brand-secondary [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
+                            icon={<SendIcon />}
+                            label="Publish"
                             variant="outline"
-                        >
-                            <SendIcon /> Publish
-                        </Button>
+                        />
                     </TooltipTrigger>
                 </PopoverTrigger>
 
@@ -82,14 +82,12 @@ const PublishPopover = ({
                         <div className="flex justify-end">
                             <Button
                                 aria-label="Publish button"
-                                className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
                                 disabled={isPending}
+                                icon={isPending ? <LoadingIcon /> : undefined}
+                                label="Publish"
                                 size="sm"
                                 type="submit"
-                            >
-                                {isPending && <LoadingIcon />}
-                                Publish
-                            </Button>
+                            />
                         </div>
                     </form>
                 </Form>
