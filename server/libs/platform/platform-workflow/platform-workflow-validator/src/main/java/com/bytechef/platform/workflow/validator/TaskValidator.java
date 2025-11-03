@@ -70,7 +70,6 @@ class TaskValidator {
             return;
         }
 
-        // Validate required task fields
         FieldValidator.appendErrorRequiredStringField(taskJsonNode, "label", errors);
         FieldValidator.appendErrorRequiredStringField(taskJsonNode, "name", errors);
         appendErrorTaskTypeField(taskJsonNode, errors);
@@ -92,11 +91,9 @@ class TaskValidator {
             } else {
                 validateTaskStructure(taskJsonNode.toString(), errors);
 
-                // If task has parameters, validate them recursively if we have the task type
                 if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
                     JsonNode parametersJsonNode = taskJsonNode.get("parameters");
 
-                    // Basic parameter structure validation
                     if (!parametersJsonNode.isObject()) {
                         String actualType = JsonUtils.getJsonNodeType(parametersJsonNode);
 

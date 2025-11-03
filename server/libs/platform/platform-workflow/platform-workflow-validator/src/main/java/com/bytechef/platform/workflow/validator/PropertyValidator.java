@@ -50,7 +50,6 @@ class PropertyValidator {
 
         Set<String> validatedProperties = new HashSet<>();
 
-        // Validate properties whose display conditions are true
         for (PropertyInfo propertyInfo : propertyInfos) {
             ValidationResult result = validatePropertyWithDisplayCondition(
                 taskParametersJsonNode, propertyInfo, path, originalCurrentParameters, errors, warnings);
@@ -60,7 +59,6 @@ class PropertyValidator {
             }
         }
 
-        // Check for properties in parameters that weren't validated by any definition
         checkForUndefinedProperties(taskParametersJsonNode, validatedProperties, path, warnings);
     }
 
@@ -84,14 +82,12 @@ class PropertyValidator {
         @Nullable String originalTaskDefinitionForArrays, String originalCurrentParameters, StringBuilder errors,
         StringBuilder warnings) {
 
-        // Check for extra properties
         if (isEmptyContainer(definitionJsonNode)) {
             generateWarningsForAllProperties(taskParametersJsonNode, path, warnings);
         } else {
             checkExtraProperties(taskParametersJsonNode, definitionJsonNode, path, warnings);
         }
 
-        // Validate defined properties
         validateDefinedProperties(
             taskParametersJsonNode, definitionJsonNode, path, originalTaskDefinition,
             originalTaskDefinitionForArrays, originalCurrentParameters, errors, warnings);
@@ -107,8 +103,7 @@ class PropertyValidator {
         DisplayConditionEvaluator.DisplayConditionResult conditionResult =
             DisplayConditionEvaluator.evaluate(
                 propertyInfo.displayCondition(),
-                com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters),
-                warnings);
+                com.bytechef.commons.util.JsonUtils.readTree(originalCurrentParameters));
 
         if (conditionResult.isMalformed()) {
             handleMalformedDisplayCondition(
@@ -200,7 +195,7 @@ class PropertyValidator {
             } else if (curDefinitionJsonNode.isArray() && !curDefinitionJsonNode.isEmpty()) {
                 validateArrayProperty(
                     taskParametersJsonNode, fieldName, curDefinitionJsonNode, propertyPath,
-                    originalTaskDefinitionForArrays, errors, warnings);
+                    originalTaskDefinitionForArrays, errors);
             }
         });
     }
@@ -297,7 +292,7 @@ class PropertyValidator {
 
     private static void validateArrayProperty(
         JsonNode taskParametersJsonNode, String fieldName, JsonNode definitionJsonNode, String propertyPath,
-        @Nullable String originalTaskDefinitionForArrays, StringBuilder errors, StringBuilder warnings) {
+        @Nullable String originalTaskDefinitionForArrays, StringBuilder errors) {
 
         if (!taskParametersJsonNode.has(fieldName)) {
             return;
@@ -311,40 +306,16 @@ class PropertyValidator {
             return;
         }
 
-        if (originalTaskDefinitionForArrays == null) {
-            validateArrayWithoutArraySupport(valueJsonNode, definitionJsonNode, propertyPath, errors);
-        } else {
-            validateArrayWithArraySupport(valueJsonNode, definitionJsonNode, propertyPath, errors);
-        }
-    }
-
-    private static void validateArrayWithoutArraySupport(
-        JsonNode valueJsonNode, JsonNode definitionJsonNode, String propertyPath, StringBuilder errors) {
-
         JsonNode firstElementJsonNode = definitionJsonNode.get(0);
 
         if (isUnionType(definitionJsonNode, firstElementJsonNode)) {
             validateUnionArrayElements(valueJsonNode, definitionJsonNode, propertyPath, errors);
-        } else {
+        } else if (originalTaskDefinitionForArrays == null) {
             validateObjectArrayElements(valueJsonNode, firstElementJsonNode, propertyPath, errors);
-        }
-    }
-
-    private static void validateArrayWithArraySupport(
-        JsonNode valueJsonNode, JsonNode definitionJsonNode, String propertyPath, StringBuilder errors) {
-
-        if (isUnionType(definitionJsonNode, definitionJsonNode.get(0))) {
-            if (isTaskTypeDefinition(definitionJsonNode)) {
+        } else {
+            if (firstElementJsonNode.isTextual() && "task".equalsIgnoreCase(firstElementJsonNode.asText())) {
                 TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
-            } else {
-                validateUnionArrayElements(valueJsonNode, definitionJsonNode, propertyPath, errors);
-            }
-        } else if (!definitionJsonNode.isEmpty()) {
-            JsonNode arrayElementJsonNode = definitionJsonNode.get(0);
-
-            if (arrayElementJsonNode.isTextual() && "task".equalsIgnoreCase(arrayElementJsonNode.asText())) {
-                TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
-            } else if (arrayElementJsonNode.isArray()) {
+            } else if (firstElementJsonNode.isArray()) {
                 validateArrayOfArrays(valueJsonNode, propertyPath, errors);
             }
         }
@@ -363,15 +334,6 @@ class PropertyValidator {
         }
 
         return true;
-    }
-
-    private static boolean isTaskTypeDefinition(JsonNode definitionJsonNode) {
-        return definitionJsonNode.size() == 1 &&
-            definitionJsonNode.get(0)
-                .isTextual()
-            &&
-            "task".equalsIgnoreCase(definitionJsonNode.get(0)
-                .asText());
     }
 
     private static void validateUnionArrayElements(

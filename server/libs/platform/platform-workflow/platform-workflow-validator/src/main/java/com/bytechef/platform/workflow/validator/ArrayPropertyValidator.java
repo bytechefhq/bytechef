@@ -58,19 +58,16 @@ class ArrayPropertyValidator {
             return;
         }
 
-        // Check for TASK type array
         if (isTaskTypeArray(nestedProperties)) {
             TaskValidator.validateTaskArray(valueJsonNode, propertyPath, errors);
             return;
         }
 
-        // Check for wrapped definition (array of arrays or array of objects)
         if (isWrappedDefinition(nestedProperties)) {
             validateWrappedArray(valueJsonNode, nestedProperties, propertyPath, errors, warnings);
             return;
         }
 
-        // Determine validation type based on actual content
         if (!valueJsonNode.isEmpty()) {
             JsonNode firstElement = valueJsonNode.get(0);
             if (firstElement.isObject()) {
@@ -105,13 +102,11 @@ class ArrayPropertyValidator {
         JsonNode arrayJsonNode, List<PropertyInfo> elementProperties,
         String propertyPath, StringBuilder errors, StringBuilder warnings) {
 
-        // Check if this is a union type object array
         if (isUnionTypeObjectArray(elementProperties)) {
             validateUnionTypeObjectArray(arrayJsonNode, elementProperties, propertyPath, errors, warnings);
             return;
         }
 
-        // Standard object array validation
         JsonNode rootParametersJsonNode = createRootParametersJsonNode(arrayJsonNode, propertyPath);
 
         for (int i = 0; i < arrayJsonNode.size(); i++) {
@@ -159,11 +154,9 @@ class ArrayPropertyValidator {
             return;
         }
 
-        // Check for extra properties
         validateExtraPropertiesInArrayElement(
             elementJsonNode, elementProperties, propertyPath, index, rootParametersJsonNode, warnings);
 
-        // Validate each defined property
         for (PropertyInfo propertyInfo : elementProperties) {
             validatePropertyInArrayElement(
                 elementJsonNode, propertyInfo, elementPath, index, rootParametersJsonNode, errors);
@@ -200,7 +193,7 @@ class ArrayPropertyValidator {
 
         DisplayConditionEvaluator.DisplayConditionResult result =
             DisplayConditionEvaluator.evaluateForArrayElement(
-                propertyInfo.displayCondition(), index, rootParametersJsonNode, warnings);
+                propertyInfo.displayCondition(), index, rootParametersJsonNode);
 
         if (!result.shouldShow()) {
             StringUtils.appendWithNewline(
@@ -218,10 +211,9 @@ class ArrayPropertyValidator {
         String fieldPath = elementPath + "." + fieldName;
         boolean isRequired = propertyInfo.required();
 
-        // Check display condition
         DisplayConditionEvaluator.DisplayConditionResult result =
             DisplayConditionEvaluator.evaluateForArrayElement(
-                propertyInfo.displayCondition(), index, rootParametersJsonNode, new StringBuilder());
+                propertyInfo.displayCondition(), index, rootParametersJsonNode);
 
         if (result.shouldShow()) {
             if (isRequired && !elementJsonNode.has(fieldName)) {
@@ -350,10 +342,8 @@ class ArrayPropertyValidator {
         String escapedArrayName = baseArrayName.replaceAll("\\[", "\\\\[")
             .replaceAll("]", "\\\\]");
 
-        // Replace patterns like "baseArrayName[index][index]." with ""
         String simplified = condition.replaceAll(escapedArrayName + "\\[index]\\[index]\\.", "");
 
-        // Also handle single [index]
         simplified = simplified.replaceAll(escapedArrayName + "\\[index]\\.", "");
 
         return simplified;

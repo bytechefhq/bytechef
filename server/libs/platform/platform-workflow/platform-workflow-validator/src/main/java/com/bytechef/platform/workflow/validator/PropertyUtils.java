@@ -64,12 +64,10 @@ class PropertyUtils {
             return null;
         }
 
-        // Check if the parent property itself matches the name
         if (targetName.equals(parentProperty.name())) {
             return parentProperty;
         }
 
-        // Search in nested properties
         for (PropertyInfo nested : parentProperty.nestedProperties()) {
             if (targetName.equals(nested.name())) {
                 return nested;
@@ -101,17 +99,14 @@ class PropertyUtils {
 
         String currentProperty = propertyPath[0];
 
-        // Handle array access like "items[0]"
         if (currentProperty.contains("[") && currentProperty.endsWith("]")) {
             return checkArrayPropertyExists(outputInfo, currentProperty, propertyPath);
         }
 
-        // Check if the current property matches the main property
         if (currentProperty.equals(outputInfo.name())) {
             return checkCurrentPropertyExists(outputInfo, propertyPath);
         }
 
-        // Check nested properties if they exist
         return checkNestedPropertyExists(outputInfo, currentProperty, propertyPath);
     }
 
@@ -120,7 +115,6 @@ class PropertyUtils {
 
         String arrayName = currentProperty.substring(0, currentProperty.indexOf('['));
 
-        // Check if the array property exists
         List<PropertyInfo> propertyInfos = outputInfo.nestedProperties();
 
         boolean anyMatch = propertyInfos != null &&
@@ -129,7 +123,6 @@ class PropertyUtils {
                 .anyMatch(prop -> arrayName.equals(prop.name()));
 
         if (arrayName.equals(outputInfo.name()) || anyMatch) {
-            // Find the array property
             PropertyInfo arrayPropertyInfo = findArrayProperty(outputInfo, arrayName);
 
             if (arrayPropertyInfo != null && "ARRAY".equals(arrayPropertyInfo.type())) {
@@ -221,17 +214,14 @@ class PropertyUtils {
 
         String currentProperty = propertyPath[0];
 
-        // Handle array access like "items[0]"
         if (currentProperty.contains("[") && currentProperty.endsWith("]")) {
             return getArrayPropertyType(outputInfo, currentProperty, propertyPath);
         }
 
-        // Check if the current property matches the main property
         if (currentProperty.equals(outputInfo.name())) {
             return getCurrentPropertyType(outputInfo, propertyPath);
         }
 
-        // Check nested properties if they exist
         return getNestedPropertyType(outputInfo, currentProperty, propertyPath);
     }
 
