@@ -26,16 +26,20 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZ
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.csv.file.action.CsvFileAppendAction;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.DuplicateHeaderMode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.csv.CSVParser;
 
 /**
  * @author Ivica Cardic
@@ -44,16 +48,16 @@ import org.apache.commons.lang3.StringUtils;
 public class CsvFileReadUtils {
 
     public static Map<String, Object> getColumnRow(
-        ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
+            ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
         for (int i = 0; i < row.size(); i++) {
             map.put(
-                "column_" + (i + 1),
-                processValue(
-                    (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString()));
+                    "column_" + (i + 1),
+                    processValue(
+                            (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
+                            configuration.readAsString()));
         }
 
         return map;
@@ -72,7 +76,7 @@ public class CsvFileReadUtils {
     }
 
     public static Map<String, Object> getHeaderRow(
-        ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
+            ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -86,10 +90,10 @@ public class CsvFileReadUtils {
             }
 
             map.put(
-                strippedString,
-                processValue(
-                    (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString()));
+                    strippedString,
+                    processValue(
+                            (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
+                            configuration.readAsString()));
 
             currColumn++;
         }
@@ -97,28 +101,46 @@ public class CsvFileReadUtils {
         return map;
     }
 
-    public static MappingIterator<Object> getIterator(
-        BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
+    public static Iterator<CSVRecord> getIterator(
+            BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
-        MappingIterator<Object> iterator;
+        Iterator<CSVRecord> iterator;
 
         if (configuration.headerRow()) {
             String delimiter = configuration.delimiter();
 
-            CsvSchema headerSchema = CsvSchema
-                .emptySchema()
-                .withHeader()
-                .withColumnSeparator(delimiter.charAt(0));
+            String[] originalHeaderRow = bufferedReader.readLine().split(delimiter, -1);
+            Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
+            String[] usableHeaderRow = new String[originalHeaderRow.length];
 
-            iterator = CSV_MAPPER
-                .readerForMapOf(String.class)
-                .with(headerSchema)
-                .readValues(bufferedReader);
+            for (int i = 0; i < originalHeaderRow.length; i++) {
+                String header = originalHeaderRow[i];
+                if ("".equals(header)) {
+                    header = "NULL";
+                }
+
+                if (repetitiveHeaderCounter.containsKey(header)) {
+                    repetitiveHeaderCounter.put(header, repetitiveHeaderCounter.get(header) + 1);
+
+                    usableHeaderRow[i] = String.format("%s{%d}", header, repetitiveHeaderCounter.get(header));
+                } else {
+                    repetitiveHeaderCounter.put(header, 1);
+                    usableHeaderRow[i] = header;
+                }
+            }
+
+            CSVFormat csvFormat = CSVFormat.Builder.create()
+                    .setIgnoreEmptyLines(false)
+                    .setDelimiter(delimiter)
+                    .setHeader(usableHeaderRow)
+                    .get();
+
+            CSVParser csvParser = csvFormat.parse(bufferedReader);
+            iterator = csvParser.iterator();
         } else {
-            iterator = CSV_MAPPER
-                .readerForListOf(String.class)
-                .with(CsvParser.Feature.WRAP_AS_ARRAY)
-                .readValues(bufferedReader);
+            CSVFormat csvFormat = CSVFormat.DEFAULT;
+
+            iterator = csvFormat.parse(bufferedReader).iterator();
         }
 
         return iterator;
@@ -143,13 +165,13 @@ public class CsvFileReadUtils {
         }
 
         return new ReadConfiguration(
-            delimiter, enclosingCharacter, headerRow, includeEmptyCells,
-            rangeStartRow == null ? 0 : rangeStartRow,
-            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString);
+                delimiter, enclosingCharacter, headerRow, includeEmptyCells,
+                rangeStartRow == null ? 0 : rangeStartRow,
+                rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString);
     }
 
     public static Object processValue(
-        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
+            String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
 
         Object value = null;
 
