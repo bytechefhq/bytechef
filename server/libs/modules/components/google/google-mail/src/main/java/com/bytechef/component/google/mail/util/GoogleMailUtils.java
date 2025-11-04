@@ -468,7 +468,7 @@ public class GoogleMailUtils {
 
         return new SimpleMessage(
             message.getId(), message.getThreadId(), message.getHistoryId(), subject, from, to, cc, bcc, bodyPlain,
-            bodyHtml, fileEntries);
+            bodyHtml, fileEntries, "https://mail.google.com/mail/u/0/#all/" + message.getId());
     }
 
     private static List<FileEntry> getFileEntries(Message message, Context context, Gmail service) {
@@ -570,6 +570,6 @@ public class GoogleMailUtils {
     public record SimpleMessage(
         String id, String threadId, BigInteger historyId, String subject, String from, List<String> to,
         List<String> cc, List<String> bcc, String bodyPlain, String bodyHtml,
-        List<FileEntry> attachments) {
+        List<FileEntry> attachments, String webLink) {
     }
 }
