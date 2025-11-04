@@ -16,7 +16,6 @@
 
 package com.bytechef.component.csv.file.util;
 
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPPER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.DELIMITER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.ENCLOSING_CHARACTER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.HEADER_ROW;
@@ -25,21 +24,24 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.component.csv.file.action.CsvFileAppendAction;
-import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.dataformat.csv.CsvParser;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.csv.DuplicateHeaderMode;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
+
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -105,11 +107,17 @@ public class CsvFileReadUtils {
             BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
         Iterator<CSVRecord> iterator;
+        List<String> regexSpecials = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|",
+                "\\");
 
         if (configuration.headerRow()) {
             String delimiter = configuration.delimiter();
+            String regexPrefix = "";
+            if (regexSpecials.contains(delimiter)) {
+                regexPrefix = "\\";
+            }
 
-            String[] originalHeaderRow = bufferedReader.readLine().split(delimiter, -1);
+            String[] originalHeaderRow = bufferedReader.readLine().split(regexPrefix + delimiter, -1);
             Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
             String[] usableHeaderRow = new String[originalHeaderRow.length];
 
