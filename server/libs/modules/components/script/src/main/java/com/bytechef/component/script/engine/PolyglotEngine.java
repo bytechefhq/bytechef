@@ -23,6 +23,8 @@ import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -339,7 +341,7 @@ public class PolyglotEngine {
 
     private static class ComponentProxyObject implements ProxyObject {
 
-        private final ActionContext actionContext;
+        private ActionContext actionContext;
         private final ApplicationContext applicationContext;
         private final Map<String, ComponentDefinition> componentDefinitionMap = new ConcurrentHashMap<>();
         private final String languageId;
@@ -357,6 +359,24 @@ public class PolyglotEngine {
 
         @Override
         public Object getMember(String componentName) {
+            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
+
+            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+            ComponentDefinition componentDefinition = componentDefinitionMap.get(componentName);
+
+            actionContext = contextFactory.createActionContext(
+                componentName,
+                componentDefinition.getVersion(),
+                "",
+                actionContextAware.getJobPrincipalId(),
+                actionContextAware.getJobPrincipalWorkflowId(),
+                actionContextAware.getJobId(),
+                actionContextAware.getWorkflowId(),
+                componentConnections.get(componentName),
+                actionContextAware.getModeType(),
+                true);
+
             return new ActionProxyObject(
                 actionContext, applicationContext, componentDefinitionMap.get(componentName), languageId,
                 componentConnections);
