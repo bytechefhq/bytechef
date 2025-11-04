@@ -126,12 +126,12 @@ const PropertyMultiSelect = ({
         [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues, optionsDataSource]
     );
 
-    const {data: optionsData, isPending: isOptionsDataPending} = useGetWorkflowNodeOptionsQuery(
+    const {data: optionsData, isLoading: isOptionsDataLoading} = useGetWorkflowNodeOptionsQuery(
         queryOptions,
         Boolean(queryEnabled && !currentNode?.clusterElementType)
     );
 
-    const {data: clusterElementOptionsData, isPending: isClusterElementOptionsDataPending} =
+    const {data: clusterElementOptionsData, isLoading: isClusterElementOptionsDataLoading} =
         useGetClusterElementNodeOptionsQuery(
             clusterElementQueryOptions,
             Boolean(queryEnabled && currentNode?.clusterElementType)
@@ -276,7 +276,7 @@ const PropertyMultiSelect = ({
                     }
                 }}
                 options={mappedOptionsData ?? options ?? []}
-                optionsLoading={(isOptionsDataPending || isClusterElementOptionsDataPending) && !!queryEnabled}
+                optionsLoading={(isOptionsDataLoading || isClusterElementOptionsDataLoading) && !!queryEnabled}
                 placeholder={memoizedPlaceholder}
                 placeholderClassName={placeholderClassName}
                 value={value}
