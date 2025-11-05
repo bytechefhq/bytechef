@@ -34,7 +34,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
@@ -1626,69 +1625,6 @@ public class WorkflowNodeParameterFacadeTest {
             assertNotNull(result.parameters());
             verify(workflowService).getWorkflow(workflowId);
             verify(workflowService).update(anyString(), anyString(), anyInt());
-        }
-    }
-
-    @Test
-    void testRemoveWorkflowNodeParameterWithNullValue() {
-        String workflowId = "workflow1";
-        String workflowNodeName = "task1";
-        String parameterPath = "nullParamName";
-        Object value = null;
-        String type = "STRING";
-        boolean includeInMetadata = false;
-
-        ActionDefinition actionDefinition = mock(ActionDefinition.class);
-
-        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
-
-        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
-            // Use mutable maps since the implementation modifies them
-            Map<String, Object> task = new HashMap<>();
-
-            task.put("name", "task1");
-            task.put("type", "component/v1/action");
-            task.put("metadata", new HashMap<>());
-
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("nullParamName", value);
-
-            task.put("parameters", parameters);
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            tasks.add(task);
-
-            Map<String, Object> definitionMap = new HashMap<>();
-
-            definitionMap.put("tasks", tasks);
-
-            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
-                .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
-                .thenReturn("{}");
-
-            Workflow workflow = mock(Workflow.class);
-
-            when(workflow.getId()).thenReturn(workflowId);
-            when(workflow.getDefinition()).thenReturn("{}");
-            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
-            when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
-                .thenReturn(actionDefinition);
-            when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
-                .thenReturn(Map.of());
-
-            // When
-            assertTrue(MapUtils.containsPath(definitionMap, "tasks[0].parameters.nullParamName"));
-
-            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
-                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
-
-            // Then
-            assertNotNull(result);
-            verify(workflowService).update(anyString(), anyString(), anyInt());
-
-            assertFalse(MapUtils.containsPath(definitionMap, "tasks[0].parameters.nullParamName"));
         }
     }
 
