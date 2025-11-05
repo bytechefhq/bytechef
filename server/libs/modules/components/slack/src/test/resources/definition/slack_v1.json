@@ -1435,7 +1435,7 @@
       "required": true,
       "type": "STRING"
     } ],
-    "title": "Send message",
+    "title": "Send Message",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -3594,7 +3594,7 @@
       "required": true,
       "type": "STRING"
     } ],
-    "title": "Send message",
+    "title": "Send Message",
     "type": {
       "key": "tools",
       "label": "Tools",
