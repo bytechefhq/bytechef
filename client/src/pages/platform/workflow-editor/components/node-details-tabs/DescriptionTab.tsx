@@ -109,7 +109,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             },
             updateWorkflowMutation,
         });
-    }, 300);
+    }, 600);
 
     const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
         if (!currentNode) {
@@ -177,7 +177,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
             },
             updateWorkflowMutation,
         });
-    }, 300);
+    }, 600);
 
     let workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
         (task) => task.name === currentNode?.workflowNodeName
