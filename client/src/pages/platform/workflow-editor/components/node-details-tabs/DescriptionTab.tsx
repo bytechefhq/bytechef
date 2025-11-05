@@ -194,6 +194,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                 <Label>Title</Label>
 
                 <Input
+                    className="bg-white"
                     defaultValue={workflowTaskOrTrigger?.label}
                     key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}_nodeTitle`}
                     name="nodeTitle"
@@ -205,6 +206,7 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
                 <Label>Notes</Label>
 
                 <Textarea
+                    className="bg-white"
                     defaultValue={workflowTaskOrTrigger?.description}
                     key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}_nodeNotes`}
                     name="nodeNotes"

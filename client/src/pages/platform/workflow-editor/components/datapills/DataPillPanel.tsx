@@ -107,7 +107,7 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
                     </button>
                 </header>
 
-                <main className="flex w-full grow flex-col overflow-hidden">
+                <main className="flex size-full grow flex-col">
                     <div className="mb-0 border-b border-b-border/50 p-4">
                         <Input
                             name="dataPillFilter"
@@ -117,11 +117,13 @@ const DataPillPanel = ({className, previousComponentDefinitions, workflowNodeOut
                         />
                     </div>
 
-                    <DataPillPanelBody
-                        dataPillFilterQuery={dataPillFilterQuery}
-                        operations={operations}
-                        workflowInputs={workflow.inputs}
-                    />
+                    <div className="flex size-full overflow-hidden bg-surface-main">
+                        <DataPillPanelBody
+                            dataPillFilterQuery={dataPillFilterQuery}
+                            operations={operations}
+                            workflowInputs={workflow.inputs}
+                        />
+                    </div>
                 </main>
             </div>
         </div>
