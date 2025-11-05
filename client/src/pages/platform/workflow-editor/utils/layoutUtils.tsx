@@ -359,6 +359,9 @@ export const getLayoutedElements = async ({
                 condition: sourceNode.type === 'taskDispatcherTopGhostNode',
             },
             {
+                condition: sourceNode.type === 'taskDispatcherBottomGhostNode',
+            },
+            {
                 condition: sourceNode.data.clusterRoot,
             },
             {
@@ -434,36 +437,60 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
         componentName = parentTaskDispatcher.type.split('/')[0];
 
-        if (componentName === 'parallel') {
-            return null;
-        }
-
         let parentSubtasks: WorkflowTask[] = [];
 
-        if (componentName === 'condition') {
-            parentSubtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
-                context: {
-                    conditionCase:
-                        ((taskDispatcherNode?.data as NodeDataType).conditionData?.conditionCase as
-                            | 'caseTrue'
-                            | 'caseFalse') || CONDITION_CASE_TRUE,
-                    taskDispatcherId: parentTaskDispatcher.name,
-                },
-                task: parentTaskDispatcher,
-            });
-        } else if (componentName === 'fork-join') {
-            const branches = parentTaskDispatcher.parameters?.branches || [];
+        switch (componentName) {
+            case 'branch': {
+                parentSubtasks = TASK_DISPATCHER_CONFIG[
+                    componentName as keyof typeof TASK_DISPATCHER_CONFIG
+                ].getSubtasks({
+                    context: {
+                        caseKey: (taskDispatcherNode?.data as NodeDataType)?.branchData?.caseKey,
+                        taskDispatcherId: parentTaskDispatcher.name,
+                    },
+                    task: parentTaskDispatcher,
+                });
 
-            const branchIndex = branches.findIndex(
-                (branch: WorkflowTask[]) =>
-                    Array.isArray(branch) && branch.some((subtask) => subtask.name === taskDispatcherId)
-            );
+                break;
+            }
+            case 'parallel':
+                return null;
+            case 'condition':
+                parentSubtasks = TASK_DISPATCHER_CONFIG[
+                    componentName as keyof typeof TASK_DISPATCHER_CONFIG
+                ].getSubtasks({
+                    context: {
+                        conditionCase:
+                            ((taskDispatcherNode?.data as NodeDataType).conditionData?.conditionCase as
+                                | 'caseTrue'
+                                | 'caseFalse') || CONDITION_CASE_TRUE,
+                        taskDispatcherId: parentTaskDispatcher.name,
+                    },
+                    task: parentTaskDispatcher,
+                });
 
-            parentSubtasks = branchIndex !== -1 ? branches[branchIndex] || [] : [];
-        } else {
-            parentSubtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
-                task: parentTaskDispatcher,
-            });
+                break;
+            case 'fork-join': {
+                const branches = parentTaskDispatcher.parameters?.branches || [];
+
+                const branchIndex = branches.findIndex(
+                    (branch: WorkflowTask[]) =>
+                        Array.isArray(branch) && branch.some((subtask) => subtask.name === taskDispatcherId)
+                );
+
+                parentSubtasks = branchIndex !== -1 ? branches[branchIndex] || [] : [];
+
+                break;
+            }
+            default: {
+                parentSubtasks = TASK_DISPATCHER_CONFIG[
+                    componentName as keyof typeof TASK_DISPATCHER_CONFIG
+                ].getSubtasks({
+                    task: parentTaskDispatcher,
+                });
+
+                break;
+            }
         }
 
         const currentSubtaskIndex = parentSubtasks.findIndex((subtask) => subtask.name === taskDispatcherId);
@@ -499,6 +526,12 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             const branchSide = getForkJoinBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
+        } else if (componentName === 'branch') {
+            const branchSide = getBranchCaseSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
+
+            const handlePosition = branchSide === 'middle' ? 'top' : branchSide;
+
+            targetHandle = `${parentTaskDispatcherBottomGhostId}-${handlePosition}`;
         }
 
         return {
@@ -572,6 +605,63 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
         type: 'placeholder',
     };
 };
+
+/**
+ * Determines the target handle side for a branch case based on case position
+ */
+export function getBranchCaseSide(
+    taskDispatcherId: string,
+    tasks: WorkflowTask[],
+    parentBranchId: string
+): 'left' | 'middle' | 'right' {
+    const parentBranchTask = tasks?.find((task) => task.name === parentBranchId);
+
+    if (!parentBranchTask) {
+        return 'right';
+    }
+
+    const defaultCase = {
+        key: 'default',
+        tasks: parentBranchTask.parameters?.default || [],
+    };
+
+    const customCases = (parentBranchTask.parameters?.cases || []).map((caseItem: BranchCaseType) => ({
+        key: caseItem.key,
+        tasks: caseItem.tasks || [],
+    }));
+
+    const allCases = [defaultCase, ...customCases];
+
+    const caseIndex = allCases.findIndex((caseItem) =>
+        caseItem.tasks.some((task: WorkflowTask) => task.name === taskDispatcherId)
+    );
+
+    if (caseIndex === -1) {
+        return 'right';
+    }
+
+    const isEvenCount = allCases.length % 2 === 0;
+
+    if (isEvenCount) {
+        const halfPoint = allCases.length / 2;
+
+        if (caseIndex < halfPoint) {
+            return 'left';
+        } else {
+            return 'right';
+        }
+    } else {
+        const middleIndex = Math.floor(allCases.length / 2);
+
+        if (caseIndex < middleIndex) {
+            return 'left';
+        } else if (caseIndex === middleIndex) {
+            return 'middle';
+        } else {
+            return 'right';
+        }
+    }
+}
 
 /**
  * Collects nested tasks for all task dispatchers in the workflow
