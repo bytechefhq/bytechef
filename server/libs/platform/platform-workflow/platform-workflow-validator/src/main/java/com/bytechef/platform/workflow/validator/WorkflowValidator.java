@@ -233,8 +233,7 @@ public class WorkflowValidator {
                 String type = typeJsonNode.asText();
 
                 taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, ""));
-                taskOutputMap.putIfAbsent(
-                    type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
+                taskOutputMap.putIfAbsent(type, taskOutputProvider.getTaskOutputProperty(type, "", warnings));
 
                 processNestedTasks(
                     taskJsonNode, taskDefinitionMap, taskDefinitionMap, taskOutputMap, taskJsonNodes,
@@ -248,6 +247,7 @@ public class WorkflowValidator {
         Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
         StringBuilder errors, StringBuilder warnings, JsonNode workflowNode, List<JsonNode> taskJsonNodes) {
         JsonNode triggersJsonNode = workflowNode.get("triggers");
+
         if (triggersJsonNode != null && triggersJsonNode.isArray()) {
             Iterator<JsonNode> triggersJsonNodeIterator = triggersJsonNode.elements();
 

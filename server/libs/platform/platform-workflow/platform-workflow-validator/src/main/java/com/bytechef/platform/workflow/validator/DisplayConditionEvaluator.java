@@ -66,24 +66,26 @@ class DisplayConditionEvaluator {
 
         try {
             boolean shouldShow = WorkflowUtils.extractAndEvaluateCondition(resolvedCondition, rootParametersJsonNode);
+
             return DisplayConditionResult.of(shouldShow, false, null);
         } catch (Exception e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage());
             }
+
             return DisplayConditionResult.hidden();
         }
     }
 
-    private static DisplayConditionResult handleEvaluationException(Exception e) {
+    private static DisplayConditionResult handleEvaluationException(Exception exception) {
+        String message = exception.getMessage();
 
-        String message = e.getMessage();
         if (message != null && message.startsWith("Invalid logic for display condition:")) {
             return DisplayConditionResult.malformed(message);
         }
 
         if (logger.isTraceEnabled()) {
-            logger.trace(e.getMessage());
+            logger.trace(exception.getMessage());
         }
 
         return DisplayConditionResult.hidden();
@@ -97,8 +99,10 @@ class DisplayConditionEvaluator {
      * Result of display condition evaluation.
      */
     static class DisplayConditionResult {
+
         private final boolean shouldShow;
         private final boolean isMalformed;
+        @Nullable
         private final String malformedMessage;
 
         @SuppressFBWarnings("NP")
@@ -132,6 +136,7 @@ class DisplayConditionEvaluator {
             return isMalformed;
         }
 
+        @Nullable
         String getMalformedMessage() {
             return malformedMessage;
         }

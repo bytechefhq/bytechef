@@ -16,10 +16,10 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -65,11 +65,13 @@ class ArrayPropertyValidator {
 
         if (isWrappedDefinition(nestedProperties)) {
             validateWrappedArray(valueJsonNode, nestedProperties, propertyPath, errors, warnings);
+
             return;
         }
 
         if (!valueJsonNode.isEmpty()) {
             JsonNode firstElement = valueJsonNode.get(0);
+
             if (firstElement.isObject()) {
                 validateObjectArray(valueJsonNode, nestedProperties, propertyPath, errors, warnings);
             } else {
@@ -86,6 +88,7 @@ class ArrayPropertyValidator {
 
         for (int i = 0; i < arrayJsonNode.size(); i++) {
             JsonNode valueJsonNode = arrayJsonNode.get(i);
+
             boolean matchesAnyType = allowedTypes.stream()
                 .anyMatch(typeInfo -> TypeValidator.isTypeValid(valueJsonNode, typeInfo.type()));
 
@@ -104,6 +107,7 @@ class ArrayPropertyValidator {
 
         if (isUnionTypeObjectArray(elementProperties)) {
             validateUnionTypeObjectArray(arrayJsonNode, elementProperties, propertyPath, errors, warnings);
+
             return;
         }
 
@@ -111,8 +115,7 @@ class ArrayPropertyValidator {
 
         for (int i = 0; i < arrayJsonNode.size(); i++) {
             validateObjectArrayElement(
-                arrayJsonNode.get(i), elementProperties, propertyPath, i,
-                rootParametersJsonNode, errors, warnings);
+                arrayJsonNode.get(i), elementProperties, propertyPath, i, rootParametersJsonNode, errors, warnings);
         }
     }
 
@@ -129,8 +132,10 @@ class ArrayPropertyValidator {
 
             if (!elementJsonNode.isObject()) {
                 String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
+
                 StringUtils.appendWithNewline(
                     ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+
                 continue;
             }
 
@@ -141,16 +146,16 @@ class ArrayPropertyValidator {
     }
 
     private static void validateObjectArrayElement(
-        JsonNode elementJsonNode, List<PropertyInfo> elementProperties,
-        String propertyPath, int index, JsonNode rootParametersJsonNode,
-        StringBuilder errors, StringBuilder warnings) {
+        JsonNode elementJsonNode, List<PropertyInfo> elementProperties, String propertyPath, int index,
+        JsonNode rootParametersJsonNode, StringBuilder errors, StringBuilder warnings) {
 
         String elementPath = propertyPath + "[" + index + "]";
 
         if (!elementJsonNode.isObject()) {
             String actualType = JsonUtils.getJsonNodeType(elementJsonNode);
-            StringUtils.appendWithNewline(
-                ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+
+            StringUtils.appendWithNewline(ValidationErrorUtils.typeError(elementPath, "object", actualType), errors);
+
             return;
         }
 
@@ -179,8 +184,9 @@ class ArrayPropertyValidator {
                 StringUtils.appendWithNewline(
                     "Property '" + propertyPath + "[index]." + fieldName + "' is not defined in task definition",
                     warnings);
-            } else if (matchingProperty.displayCondition() != null && !matchingProperty.displayCondition()
-                .isEmpty()) {
+            } else if (matchingProperty.displayCondition() != null &&
+                !org.apache.commons.lang3.StringUtils.isEmpty(matchingProperty.displayCondition())) {
+
                 checkDisplayConditionForExtraProperty(
                     matchingProperty, index, propertyPath, fieldName, rootParametersJsonNode, warnings);
             }
@@ -197,8 +203,7 @@ class ArrayPropertyValidator {
 
         if (!result.shouldShow()) {
             StringUtils.appendWithNewline(
-                "Property '" + propertyPath + "[" + index + "]." + fieldName +
-                    "' is not defined in task definition",
+                "Property '" + propertyPath + "[" + index + "]." + fieldName + "' is not defined in task definition",
                 warnings);
         }
     }
@@ -220,6 +225,7 @@ class ArrayPropertyValidator {
                 StringUtils.appendWithNewline("Missing required property: " + fieldPath, errors);
             } else if (elementJsonNode.has(fieldName)) {
                 JsonNode valueJsonNode = elementJsonNode.get(fieldName);
+
                 if (!valueJsonNode.isTextual() || !TypeValidator.isDataPillExpression(valueJsonNode.asText())) {
                     TypeValidator.validateType(valueJsonNode, propertyInfo.type(), fieldPath, errors);
                 }
@@ -232,6 +238,7 @@ class ArrayPropertyValidator {
 
         for (PropertyInfo unionType : unionTypes) {
             List<PropertyInfo> schemaProperties = unionType.nestedProperties();
+
             if (schemaProperties == null || schemaProperties.isEmpty()) {
                 continue;
             }
@@ -250,6 +257,7 @@ class ArrayPropertyValidator {
                 if (!currentWarnings.isEmpty()) {
                     warnings.append(currentWarnings);
                 }
+
                 return true;
             }
         }
@@ -303,16 +311,15 @@ class ArrayPropertyValidator {
 
     private static boolean isUnionTypeObjectArray(List<PropertyInfo> elementProperties) {
         return elementProperties.stream()
-            .allMatch(prop -> "OBJECT".equalsIgnoreCase(prop.type()) &&
-                prop.nestedProperties() != null &&
-                !prop.nestedProperties()
-                    .isEmpty());
+            .allMatch(prop -> "OBJECT".equalsIgnoreCase(prop.type()) && prop.nestedProperties() != null &&
+                !CollectionUtils.isEmpty(prop.nestedProperties()));
     }
 
     private static JsonNode createRootParametersJsonNode(JsonNode arrayValue, String propertyPath) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode rootNode = mapper.createObjectNode();
+        ObjectNode rootNode = com.bytechef.commons.util.JsonUtils.createObjectNode();
+
         rootNode.set(propertyPath, arrayValue);
+
         return rootNode;
     }
 
@@ -327,6 +334,7 @@ class ArrayPropertyValidator {
 
             if (displayCondition != null && !displayCondition.isEmpty()) {
                 String simplifiedCondition = simplifyConditionForUnionType(displayCondition, baseArrayName);
+
                 simplified.add(new PropertyInfo(
                     prop.name(), prop.type(), prop.description(), prop.required(),
                     prop.expressionEnabled(), simplifiedCondition, prop.nestedProperties()));
@@ -357,13 +365,15 @@ class ArrayPropertyValidator {
         String actualType = JsonUtils.getJsonNodeType(valueJsonNode);
 
         StringBuilder expectedTypes = new StringBuilder();
+
         for (int j = 0; j < allowedTypes.size(); j++) {
             if (j > 0) {
                 expectedTypes.append(" or ");
             }
-            expectedTypes.append(allowedTypes.get(j)
-                .type()
-                .toLowerCase());
+
+            PropertyInfo propertyInfo = allowedTypes.get(j);
+
+            expectedTypes.append(org.apache.commons.lang3.StringUtils.lowerCase(propertyInfo.type()));
         }
 
         StringUtils.appendWithNewline(
@@ -371,15 +381,19 @@ class ArrayPropertyValidator {
             errors);
     }
 
-    private static void
-        addUnionTypeObjectError(String elementPath, List<PropertyInfo> unionTypes, StringBuilder errors) {
+    private static void addUnionTypeObjectError(
+        String elementPath, List<PropertyInfo> unionTypes, StringBuilder errors) {
+
         StringBuilder typeNames = new StringBuilder();
+
         for (int j = 0; j < unionTypes.size(); j++) {
             if (j > 0) {
                 typeNames.append(", ");
             }
-            typeNames.append(unionTypes.get(j)
-                .name());
+
+            PropertyInfo propertyInfo = unionTypes.get(j);
+
+            typeNames.append(propertyInfo.name());
         }
 
         StringUtils.appendWithNewline(
