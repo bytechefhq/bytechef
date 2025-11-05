@@ -60,26 +60,6 @@ export const PropertiesTabSkeleton = () => (
     </div>
 );
 
-export const WorkflowCodeEditorSheetSkeleton = () => (
-    <div className="flex size-full flex-col">
-        <header className="flex w-full items-center justify-between border-b border-b-border/50 p-3">
-            <h2 className="text-lg font-semibold text-foreground">Edit Workflow</h2>
-
-            <div className="flex items-center gap-1">
-                {Array.from({length: 4}).map((_, index) => (
-                    <Skeleton className="size-9" key={index} />
-                ))}
-            </div>
-        </header>
-
-        <div className="flex size-full flex-col items-center justify-center p-4">
-            <LoadingDots />
-        </div>
-
-        <div className="h-2/5 w-full" />
-    </div>
-);
-
 export const WorkflowSheetSkeleton = ({title}: {title: string}) => (
     <div className="flex size-full flex-col">
         <header className="flex w-full items-center justify-between">
