@@ -1212,7 +1212,7 @@ const Property = ({
                             maxLength={maxLength}
                             min={minValue}
                             minLength={minLength}
-                            name={memoizedPath!}
+                            name={memoizedPath}
                             onChange={handleInputChange}
                             placeholder={
                                 isNumericalInput && minValue && maxValue
