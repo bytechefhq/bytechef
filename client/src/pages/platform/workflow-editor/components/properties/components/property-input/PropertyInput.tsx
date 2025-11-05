@@ -129,7 +129,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
 
                         <Input
                             className={twMerge(
-                                'outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+                                'bg-background outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
                                 error &&
                                     'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                                 disabled && 'bg-gray-100 text-gray-500',
