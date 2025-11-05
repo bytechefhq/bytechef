@@ -87,6 +87,7 @@ class TypeValidator {
         String value, String expectedType, String propertyPath, StringBuilder errors) {
 
         String formatError = DateTimeValidator.validateError(value, expectedType, propertyPath);
+
         if (formatError != null) {
             StringUtils.appendWithNewline(formatError, errors);
         }
@@ -131,6 +132,7 @@ class TypeValidator {
             }
 
             String[] parts = dateTimeValue.split("T");
+
             if (parts.length != 2) {
                 return false;
             }
@@ -148,30 +150,34 @@ class TypeValidator {
                         return "Property '" + propertyPath +
                             "' is in incorrect date format. Format should be in: 'yyyy-MM-dd'";
                     }
+
                     if (!isValidDate(value)) {
                         return "Property '" + propertyPath + "' is in incorrect date format. Impossible date: " + value;
                     }
-                    break;
 
+                    break;
                 case "time":
                     if (!value.matches("\\d{2}:\\d{2}:\\d{2}")) {
                         return "Property '" + propertyPath +
                             "' is in incorrect time format. Format should be in: 'hh:mm:ss'";
                     }
+
                     if (!isValidTime(value)) {
                         return "Property '" + propertyPath + "' is in incorrect time format. Impossible time: " + value;
                     }
-                    break;
 
+                    break;
                 case "date_time":
                     if (!value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}")) {
                         return "Property '" + propertyPath +
                             "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
                     }
+
                     if (!isValidDateTime(value)) {
                         return "Property '" + propertyPath +
                             "' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'";
                     }
+
                     break;
                 default:
             }
