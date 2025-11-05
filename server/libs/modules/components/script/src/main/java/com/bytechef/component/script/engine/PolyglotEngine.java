@@ -285,7 +285,8 @@ public class PolyglotEngine {
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     (Map) copyFromPolyglotContext(inputParameters), componentConnection,
                     createActionContext(
-                        componentDefinition.getName(), componentDefinition.getVersion(), actionName, actionContext));
+                        componentDefinition.getName(), componentDefinition.getVersion(),
+                        actionName, actionContext, componentConnection));
 
                 if (result == null) {
                     return null;
@@ -296,7 +297,8 @@ public class PolyglotEngine {
         }
 
         private ActionContext createActionContext(
-            String componentName, int componentVersion, String actionName, ActionContext actionContext) {
+            String componentName, int componentVersion, String actionName, ActionContext actionContext,
+            ComponentConnection componentConnection) {
 
             ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
 
@@ -305,7 +307,7 @@ public class PolyglotEngine {
             return contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(), componentConnections.get(componentName),
+                actionContextAware.getWorkflowId(), componentConnection,
                 actionContextAware.getModeType(), true);
         }
 
