@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
@@ -35,6 +36,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.discord.action.DiscordSendDirectMessageAction;
 import com.google.auto.service.AutoService;
@@ -114,6 +116,9 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
                     option("GUILD_TEXT", 0, "a text channel within a server"),
                     option("GUILD_VOICE", 2, "a voice channel within a server"),
                     option("GUILD_CATEGORY", 4, "an organizational category that contains up to 50 channels"));
+        } else if (Objects.equals(modifiableProperty.getName(), CONTENT)) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .controlType(Property.ControlType.TEXT_AREA);
         }
 
         return modifiableProperty;
