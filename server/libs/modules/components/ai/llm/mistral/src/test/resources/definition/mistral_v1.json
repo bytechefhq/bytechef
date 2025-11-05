@@ -2360,6 +2360,10 @@
       "name": "model",
       "options": [ {
         "description": null,
+        "label": "codestral-embed",
+        "value": "codestral-embed"
+      }, {
+        "description": null,
         "label": "mistral-embed",
         "value": "mistral-embed"
       } ],
