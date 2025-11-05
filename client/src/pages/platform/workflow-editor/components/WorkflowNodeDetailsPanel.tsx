@@ -396,15 +396,30 @@ const WorkflowNodeDetailsPanel = ({
         [currentNode, nodes]
     );
 
-    const hasOutputData = useMemo(() => {
+    const outputDefined =
+        currentActionDefinition?.outputDefined ||
+        currentTriggerDefinition?.outputDefined ||
+        currentClusterElementDefinition?.outputDefined ||
+        (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined;
+    const outputFunctionDefined =
+        currentActionDefinition?.outputFunctionDefined ||
+        currentTriggerDefinition?.outputFunctionDefined ||
+        currentClusterElementDefinition?.outputSchemaDefined;
+
+    const showOutputTab = useMemo(() => {
         if (currentNode?.clusterElementType) {
             return false;
         }
 
-        return (
-            currentOperationDefinition?.outputDefined ||
-            (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined
-        );
+        if (currentOperationDefinition && 'variablePropertiesDefined' in currentOperationDefinition) {
+            const taskDispatcher = currentOperationDefinition as TaskDispatcherDefinition;
+
+            if (!taskDispatcher.variablePropertiesDefined) {
+                return false;
+            }
+        }
+
+        return true;
     }, [currentNode?.clusterElementType, currentOperationDefinition]);
 
     const currentWorkflowTrigger = useMemo(
@@ -451,7 +466,7 @@ const WorkflowNodeDetailsPanel = ({
                 }
 
                 if (name === 'output') {
-                    return hasOutputData;
+                    return showOutputTab;
                 }
 
                 if (name === 'properties') {
@@ -464,7 +479,7 @@ const WorkflowNodeDetailsPanel = ({
             }),
         [
             currentWorkflowNodeConnections,
-            hasOutputData,
+            showOutputTab,
             currentNode,
             currentTaskDispatcherDefinition,
             currentOperationProperties,
@@ -865,7 +880,7 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        if (activeTab === 'output' && !hasOutputData) {
+        if (activeTab === 'output' && !showOutputTab) {
             setActiveTab('description');
 
             return;
@@ -1260,6 +1275,8 @@ const WorkflowNodeDetailsPanel = ({
                                         }
                                         currentNode={currentNode}
                                         key={`${currentNode?.componentName}-${currentNode?.type}_output`}
+                                        outputDefined={outputDefined}
+                                        outputFunctionDefined={outputFunctionDefined}
                                         variablePropertiesDefined={
                                             currentTaskDispatcherDefinition?.variablePropertiesDefined
                                         }

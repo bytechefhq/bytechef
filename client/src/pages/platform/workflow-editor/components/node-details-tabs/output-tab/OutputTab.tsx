@@ -31,15 +31,24 @@ import {twMerge} from 'tailwind-merge';
 interface OutputTabProps {
     connectionMissing: boolean;
     currentNode: NodeDataType;
+    outputDefined?: boolean;
+    outputFunctionDefined?: boolean;
     variablePropertiesDefined?: boolean;
     workflowId: string;
 }
 
-const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = false, workflowId}: OutputTabProps) => {
-    const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
+const OutputTab = ({
+    connectionMissing,
+    currentNode,
+    outputDefined,
+    outputFunctionDefined,
+    variablePropertiesDefined = false,
+    workflowId,
+}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
+    const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -213,6 +222,12 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
         return <></>;
     }
 
+    if (!testing && outputFunctionDefined && !outputSchema) {
+        return <div className="p-4 text-sm text-muted-foreground">No output schema to show.</div>;
+    }
+
+    console.log(outputFunctionDefined);
+
     return (
         <div className="h-full p-4">
             {!testing && (
@@ -236,8 +251,10 @@ const OutputTab = ({connectionMissing, currentNode, variablePropertiesDefined = 
                     {!outputSchema && (
                         <OutputSchemaCreationControls
                             handleTestOperationClick={handleTestOperationClick}
+                            outputDefined={outputDefined}
                             saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutation.isPending}
                             setShowUploadDialog={setShowUploadDialog}
+                            showUploadSampleOutputButton={outputDefined}
                             trigger={currentNode.trigger}
                             uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutation.isPending}
                             variablePropertiesDefined={variablePropertiesDefined}
