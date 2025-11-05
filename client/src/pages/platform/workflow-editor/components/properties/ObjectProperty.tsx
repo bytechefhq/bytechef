@@ -263,7 +263,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 value: defaultValueObject,
                 workflowId: workflow.id!,
             });
-        }, 300);
+        }, 600);
 
         return () => clearTimeout(timeoutId);
         // eslint-disable-next-line react-hooks/exhaustive-deps

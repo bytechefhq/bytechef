@@ -9,7 +9,7 @@ export function TemplatesLayoutContainerSearchBar({placeholder}: {placeholder: s
 
     const handleInputChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         setQuery(event.target.value);
-    }, 300);
+    }, 600);
 
     return (
         <div className="relative mx-auto max-w-2xl">

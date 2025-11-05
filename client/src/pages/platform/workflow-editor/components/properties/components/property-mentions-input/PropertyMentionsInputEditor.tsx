@@ -275,7 +275,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 value: value || null,
                 workflowId: workflow.id,
             });
-        }, 300);
+        }, 600);
 
         const onUpdate = useCallback(
             ({editor}: {editor: Editor}) => {
