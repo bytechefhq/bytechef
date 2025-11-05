@@ -14,7 +14,7 @@ const DataPillPanelBodyInputsItem = () => {
 
     return (
         <>
-            <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-background p-4 group-data-[state=closed]:border-b">
+            <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b">
                 <div className="flex items-center space-x-4">
                     <FormInputIcon className="size-5" />
 

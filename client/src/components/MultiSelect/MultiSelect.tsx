@@ -201,7 +201,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         ref={ref}
                         {...props}
                         className={twMerge(
-                            'flex h-auto w-full items-center justify-between rounded-md border border-input bg-inherit px-4 py-2 text-sm font-normal text-primary shadow-sm hover:bg-inherit [&_svg]:pointer-events-auto',
+                            'flex h-auto w-full items-center justify-between rounded-md border border-input bg-background px-4 py-2 text-sm font-normal text-primary shadow-sm hover:bg-inherit [&_svg]:pointer-events-auto',
                             leadingIcon && 'relative',
                             optionsLoading && 'min-h-10 cursor-not-allowed',
                             className
