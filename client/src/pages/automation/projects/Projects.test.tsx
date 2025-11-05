@@ -19,7 +19,7 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482',
+    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482' || flag === 'ff-1041',
 }));
 
 // Mock the API queries
@@ -100,14 +100,16 @@ describe('Projects Import Functionality', () => {
     it('should show import dropdown menu items', async () => {
         renderProjects();
 
-        // Find and click the "Create Project" button
+        // Find the dropdown trigger (chevron) button and click it to open the menu
         const createButton = screen.getByRole('button', {name: /create project/i});
         expect(createButton).toBeInTheDocument();
 
-        await userEvent.click(createButton);
+        const buttons = screen.getAllByRole('button');
+        const chevronButton = buttons.find((b) => !/create project/i.test(b.textContent || ''))!;
+        await userEvent.click(chevronButton);
 
         await waitFor(() => {
-            expect(screen.getByText('From Scratch')).toBeInTheDocument();
+            expect(screen.getByText('From Template')).toBeInTheDocument();
             expect(screen.getByText('Import Project')).toBeInTheDocument();
         });
     });
@@ -115,8 +117,10 @@ describe('Projects Import Functionality', () => {
     it('should trigger file input when import project is clicked', async () => {
         renderProjects();
 
-        const createButton = screen.getByRole('button', {name: /create project/i});
-        await userEvent.click(createButton);
+        // Open the dropdown using the chevron button
+        const buttons = screen.getAllByRole('button');
+        const chevronButton = buttons.find((b) => /chevron-down/i.test(b.innerHTML) || b.querySelector('svg'))!;
+        await userEvent.click(chevronButton);
 
         await waitFor(() => {
             const importButton = screen.getByText('Import Project');

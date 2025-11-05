@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {useToast} from '@/hooks/use-toast';
@@ -17,7 +18,7 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {LayoutTemplateIcon, PlusIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon, LayoutTemplateIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
@@ -156,33 +157,51 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
                                 createWorkflowMutation={createProjectWorkflowMutation}
                                 projectId={project.id}
                                 triggerNode={
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button>Create Workflow</Button>
-                                        </DropdownMenuTrigger>
+                                    <ButtonGroup className="mx-auto">
+                                        <Button
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                                <PlusIcon /> From Scratch
-                                            </DropdownMenuItem>
+                                                setShowWorkflowDialog(true);
+                                            }}
+                                        >
+                                            Create Workflow
+                                        </Button>
 
-                                            {ff_1041 && (
-                                                <DropdownMenuItem onClick={() => navigate(`./${project.id}/templates`)}>
-                                                    <LayoutTemplateIcon /> From Template
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button>
+                                                    <ChevronDownIcon />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent align="end">
+                                                {ff_1041 && (
+                                                    <DropdownMenuItem
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+
+                                                            navigate(`./${project.id}/templates`);
+                                                        }}
+                                                    >
+                                                        <LayoutTemplateIcon /> From Template
+                                                    </DropdownMenuItem>
+                                                )}
+
+                                                <DropdownMenuItem
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        if (hiddenFileInputRef.current) {
+                                                            hiddenFileInputRef.current.click();
+                                                        }
+                                                    }}
+                                                >
+                                                    <UploadIcon /> Import Workflow
                                                 </DropdownMenuItem>
-                                            )}
-
-                                            <DropdownMenuItem
-                                                onClick={() => {
-                                                    if (hiddenFileInputRef.current) {
-                                                        hiddenFileInputRef.current.click();
-                                                    }
-                                                }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
                                 }
                                 useGetWorkflowQuery={useGetWorkflowQuery}
                             />
