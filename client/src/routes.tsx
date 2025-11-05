@@ -539,7 +539,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                                     <EEVersion>
-                                                        <LazyLoadWrapper hasLeftSidebar>
+                                                        <LazyLoadWrapper>
                                                             <Workspaces />
                                                         </LazyLoadWrapper>
                                                     </EEVersion>
