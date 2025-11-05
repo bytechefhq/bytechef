@@ -97,10 +97,13 @@ public class PolyglotEngine {
     }
 
     /**
-     * Copy from PolyglotMap to Map and PolyglotList to List
+     * Recursively converts data structures originating from a polyglot context into Java-native objects. Handles
+     * conversions for common data structures such as maps and lists, while leaving other object types unmodified.
      *
-     * @param object
-     * @return
+     * @param object the object to be copied and converted from the polyglot context. This may be a map, list, or any
+     *               other data type.
+     * @return a Java-native representation of the input object. If the input is a map or list, it is recursively copied
+     *         and converted. Other objects are returned as is.
      */
     private static Object copyFromPolyglotContext(Object object) {
         switch (object) {
