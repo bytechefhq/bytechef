@@ -1,4 +1,14 @@
 import LoadingDots from '@/components/LoadingDots';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
@@ -9,7 +19,7 @@ import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, RefreshCwIcon, SaveIcon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -39,6 +49,7 @@ const PropertyCodeEditorSheet = ({
     const [newValue, setNewValue] = useState<string | undefined>(value);
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
+    const [showCloseAlertDialog, setShowCloseAlertDialog] = useState(false);
 
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -63,6 +74,16 @@ const PropertyCodeEditorSheet = ({
             });
     };
 
+    const handleOpenOnChange = (open: boolean) => {
+        if (!open && dirty) {
+            setShowCloseAlertDialog(true);
+        } else {
+            if (onClose) {
+                onClose();
+            }
+        }
+    };
+
     useEffect(() => {
         if (value === newValue) {
             setDirty(false);
@@ -73,7 +94,7 @@ const PropertyCodeEditorSheet = ({
 
     return (
         <>
-            <Sheet modal={!copilotPanelOpen} onOpenChange={onClose} open={true}>
+            <Sheet modal={!copilotPanelOpen} onOpenChange={handleOpenOnChange} open={true}>
                 <SheetContent
                     className={twMerge('flex flex-col gap-0 p-0 sm:max-w-[1200px]', copilotPanelOpen && 'mr-[460px]')}
                     onFocusOutside={(event) => event.preventDefault()}
@@ -83,6 +104,23 @@ const PropertyCodeEditorSheet = ({
                         <SheetTitle>Edit Script</SheetTitle>
 
                         <div className="flex items-center gap-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="[&_svg]:size-5"
+                                        disabled={!dirty}
+                                        onClick={() => onChange(newValue)}
+                                        size="icon"
+                                        type="submit"
+                                        variant="ghost"
+                                    >
+                                        <SaveIcon />
+                                    </Button>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Save current workflow</TooltipContent>
+                            </Tooltip>
+
                             {!scriptIsRunning && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -131,7 +169,6 @@ const PropertyCodeEditorSheet = ({
                                         defaultLanguage={language}
                                         onChange={(value) => {
                                             setNewValue(value);
-                                            onChange(value);
                                         }}
                                         onMount={(editor) => {
                                             editor.focus();
@@ -198,6 +235,41 @@ const PropertyCodeEditorSheet = ({
                     </div>
                 </SheetContent>
             </Sheet>
+
+            <AlertDialog open={showCloseAlertDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            There are unsaved changes. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            className="shadow-none"
+                            onClick={() => {
+                                setShowCloseAlertDialog(false);
+                            }}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            onClick={() => {
+                                setShowCloseAlertDialog(false);
+
+                                if (onClose) {
+                                    onClose();
+                                }
+                            }}
+                        >
+                            Close
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 };
