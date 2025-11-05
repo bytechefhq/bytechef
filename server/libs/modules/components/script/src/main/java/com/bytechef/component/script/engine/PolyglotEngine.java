@@ -280,7 +280,9 @@ public class PolyglotEngine {
 
                 Object result = actionDefinitionFacade.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
-                    (Map) copyFromPolyglotContext(inputParameters), componentConnection, actionContext);
+                    (Map) copyFromPolyglotContext(inputParameters), componentConnection,
+                    createActionContext(
+                        componentDefinition.getName(), componentDefinition.getVersion(), actionName, actionContext));
 
                 if (result == null) {
                     return null;
@@ -288,6 +290,20 @@ public class PolyglotEngine {
 
                 return copyToGuestValue(result, languageId);
             };
+        }
+
+        private ActionContext createActionContext(
+            String componentName, int componentVersion, String actionName, ActionContext actionContext) {
+
+            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
+
+            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+            return contextFactory.createActionContext(
+                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
+                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
+                actionContextAware.getWorkflowId(), componentConnections.get(componentName),
+                actionContextAware.getModeType(), true);
         }
 
         @Override
@@ -341,7 +357,7 @@ public class PolyglotEngine {
 
     private static class ComponentProxyObject implements ProxyObject {
 
-        private ActionContext actionContext;
+        private final ActionContext actionContext;
         private final ApplicationContext applicationContext;
         private final Map<String, ComponentDefinition> componentDefinitionMap = new ConcurrentHashMap<>();
         private final String languageId;
@@ -359,24 +375,6 @@ public class PolyglotEngine {
 
         @Override
         public Object getMember(String componentName) {
-            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
-
-            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
-
-            ComponentDefinition componentDefinition = componentDefinitionMap.get(componentName);
-
-            actionContext = contextFactory.createActionContext(
-                componentName,
-                componentDefinition.getVersion(),
-                "",
-                actionContextAware.getJobPrincipalId(),
-                actionContextAware.getJobPrincipalWorkflowId(),
-                actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(),
-                componentConnections.get(componentName),
-                actionContextAware.getModeType(),
-                true);
-
             return new ActionProxyObject(
                 actionContext, applicationContext, componentDefinitionMap.get(componentName), languageId,
                 componentConnections);
