@@ -120,6 +120,11 @@ public class DataStorageSetValueAction {
                 .description("The value to set under the specified key.")
                 .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
+        .output((inputParameters, connectionParameters, context) -> {
+            perform(inputParameters, connectionParameters, context);
+
+            return null;
+        })
         .perform(DataStorageSetValueAction::perform);
 
     protected static Object perform(
