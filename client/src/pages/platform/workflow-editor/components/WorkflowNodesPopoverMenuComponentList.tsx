@@ -65,6 +65,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
 
         const ff_797 = useFeatureFlagsStore()('ff-797');
+        const ff_1652 = useFeatureFlagsStore()('ff-1652');
 
         useEffect(
             () =>
@@ -84,7 +85,11 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                                 (name?.toLowerCase().includes(filter.toLowerCase()) ||
                                     title?.toLowerCase().includes(filter.toLowerCase()))
                         )
-                        .filter(({name}) => (!ff_797 && name !== 'dataStream') || ff_797)
+                        .filter(
+                            ({name}) =>
+                                ((!ff_797 && name !== 'dataStream') || ff_797) &&
+                                ((!ff_1652 && name !== 'aiAgent') || ff_1652)
+                        )
                 );
 
                 setFilteredTriggerComponentDefinitions(
@@ -107,7 +112,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     );
                 }
             }
-        }, [componentDefinitions, filter, ff_797, clusterElementType]);
+        }, [componentDefinitions, filter, ff_797, ff_1652, clusterElementType]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
