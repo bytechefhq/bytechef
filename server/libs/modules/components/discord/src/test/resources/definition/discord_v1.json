@@ -1501,7 +1501,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Message contents (up to 2000 characters)",
       "displayCondition": null,
@@ -3914,7 +3914,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Message contents (up to 2000 characters)",
       "displayCondition": null,
@@ -5456,7 +5456,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Message contents (up to 2000 characters)",
       "displayCondition": null,
@@ -7872,7 +7872,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "Message contents (up to 2000 characters)",
       "displayCondition": null,
