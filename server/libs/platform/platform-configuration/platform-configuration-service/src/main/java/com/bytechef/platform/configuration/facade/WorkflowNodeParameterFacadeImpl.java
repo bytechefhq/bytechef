@@ -123,7 +123,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] parameterPathParts = parameterPath.split("\\.");
 
-        setParameter(parameterPathParts, null, workflowNodeStructure.parameterMap);
+        setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
@@ -175,7 +175,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] parameterPathParts = parameterPath.split("\\.");
 
-        setParameter(parameterPathParts, null, workflowNodeStructure.parameterMap);
+        setParameter(parameterPathParts, null, true, workflowNodeStructure.parameterMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
@@ -283,7 +283,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] parameterPathParts = parameterPath.split("\\.");
 
-        setParameter(parameterPathParts, value, workflowNodeStructure.parameterMap);
+        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
@@ -335,7 +335,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] parameterPathParts = parameterPath.split("\\.");
 
-        setParameter(parameterPathParts, value, workflowNodeStructure.parameterMap);
+        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
@@ -1219,9 +1219,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private void setParameter(
-        String[] parameterPathParts, Object value, Map<String, ?> parameterMap) {
-
-        boolean removeValue = value == null;
+        String[] parameterPathParts, Object value, boolean removeValue, Map<String, ?> parameterMap) {
 
         Map<String, Object> map = (Map<String, Object>) parameterMap;
 
