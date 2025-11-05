@@ -1,4 +1,14 @@
 import Button from '@/components/Button/Button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -39,6 +49,7 @@ const WorkflowCodeEditorSheet = ({
     const [definition, setDefinition] = useState<string>(workflow.definition!);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
+    const [showCloseAlertDialog, setShowCloseAlertDialog] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -94,8 +105,18 @@ const WorkflowCodeEditorSheet = ({
         }
     };
 
+    const handleOpenOnChange = (open: boolean) => {
+        if (!open && dirty) {
+            setShowCloseAlertDialog(true);
+        } else {
+            if (onSheetOpenClose) {
+                onSheetOpenClose(open);
+            }
+        }
+    };
+
     return (
-        <Sheet onOpenChange={onSheetOpenClose} open={sheetOpen}>
+        <Sheet onOpenChange={handleOpenOnChange} open={sheetOpen}>
             <SheetContent
                 className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
                 onFocusOutside={(event) => event.preventDefault()}
@@ -226,6 +247,40 @@ const WorkflowCodeEditorSheet = ({
                 )}
             </SheetContent>
 
+            <AlertDialog open={showCloseAlertDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            There are unsaved changes. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            className="shadow-none"
+                            onClick={() => {
+                                setShowCloseAlertDialog(false);
+                            }}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            onClick={() => {
+                                setShowCloseAlertDialog(false);
+
+                                if (onSheetOpenClose) {
+                                    onSheetOpenClose(true);
+                                }
+                            }}
+                        >
+                            Close
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Sheet>
     );
 };
