@@ -53,7 +53,7 @@ const ComboBox: FC<ComboBoxProps> = ({disabled, emptyMessage, items, name, onBlu
     const item = items.find((item) => item.value === value);
 
     return (
-        <Popover onOpenChange={setOpen} open={open}>
+        <Popover modal onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild onBlur={onBlur}>
                 <Button
                     aria-expanded={open}
