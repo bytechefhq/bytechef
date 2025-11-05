@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
@@ -15,7 +16,7 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {FolderIcon, LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
+import {ChevronDownIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
 import {useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -79,35 +80,36 @@ const Projects = () => {
                         position="main"
                         right={
                             ff_2482 ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button label="New Project" />
-                                    </DropdownMenuTrigger>
+                                <ButtonGroup>
+                                    <ProjectDialog
+                                        project={undefined}
+                                        triggerNode={
+                                            <Button onSelect={(event) => event.preventDefault()}>New Project</Button>
+                                        }
+                                    />
 
-                                    <DropdownMenuContent align="end">
-                                        <ProjectDialog
-                                            project={undefined}
-                                            triggerNode={
-                                                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                                                    <PlusIcon className="mr-2 size-4" />
-                                                    From Scratch
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button>
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end">
+                                            {ff_1041 && (
+                                                <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                                    <LayoutTemplateIcon className="mr-2 size-4" />
+                                                    From Template
                                                 </DropdownMenuItem>
-                                            }
-                                        />
+                                            )}
 
-                                        {ff_1041 && (
-                                            <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                                <LayoutTemplateIcon className="mr-2 size-4" />
-                                                From Template
+                                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                                <UploadIcon className="mr-2 size-4" />
+                                                Import Project
                                             </DropdownMenuItem>
-                                        )}
-
-                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <UploadIcon className="mr-2 size-4" />
-                                            Import Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
                             ) : (
                                 <ProjectDialog project={undefined} triggerNode={<Button label="New Project" />} />
                             )
@@ -134,33 +136,33 @@ const Projects = () => {
                     <EmptyList
                         button={
                             ff_2482 ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button label="Create Project" />
-                                    </DropdownMenuTrigger>
+                                <ButtonGroup className="mx-auto">
+                                    <ProjectDialog
+                                        project={undefined}
+                                        triggerNode={<Button label="Create Project" />}
+                                    />
 
-                                    <DropdownMenuContent align="end">
-                                        <ProjectDialog
-                                            project={undefined}
-                                            triggerNode={
-                                                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                                                    <PlusIcon className="mr-2 size-4" /> From Scratch
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button>
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end">
+                                            {ff_1041 && (
+                                                <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                                    <LayoutTemplateIcon className="mr-2 size-4" />
+                                                    From Template
                                                 </DropdownMenuItem>
-                                            }
-                                        />
+                                            )}
 
-                                        {ff_1041 && (
-                                            <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                                <LayoutTemplateIcon className="mr-2 size-4" />
-                                                From Template
+                                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                                <UploadIcon className="mr-2 size-4" /> Import Project
                                             </DropdownMenuItem>
-                                        )}
-
-                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                            <UploadIcon className="mr-2 size-4" /> Import Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
                             ) : (
                                 <ProjectDialog triggerNode={<Button label="Create Project" />} />
                             )

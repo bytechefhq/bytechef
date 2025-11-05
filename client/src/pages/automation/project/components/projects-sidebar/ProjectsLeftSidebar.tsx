@@ -1,4 +1,5 @@
 import {Button} from '@/components/ui/button';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -21,7 +22,7 @@ import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automa
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
+import {ChevronDownIcon, LayoutTemplateIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
@@ -203,43 +204,50 @@ const ProjectsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            className="w-full bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"
-                            size="icon"
-                            variant="ghost"
-                        >
-                            <div className="flex items-center justify-center gap-2">
-                                <PlusIcon />
+                <ButtonGroup className="w-full">
+                    <Button
+                        className="w-full bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"
+                        onClick={() => setShowWorkflowDialog(true)}
+                        size="icon"
+                        variant="ghost"
+                    >
+                        <div className="flex items-center justify-center gap-2">
+                            <PlusIcon />
 
-                                <span>New workflow</span>
-                            </div>
-                        </Button>
-                    </DropdownMenuTrigger>
+                            <span>Workflow</span>
+                        </div>
+                    </Button>
 
-                    <DropdownMenuContent align="center" className="w-80">
-                        <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                            <PlusIcon /> From Scratch
-                        </DropdownMenuItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                className="bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <ChevronDownIcon />
+                            </Button>
+                        </DropdownMenuTrigger>
 
-                        {ff_1041 && (
-                            <DropdownMenuItem onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}>
-                                <LayoutTemplateIcon /> From Template
+                        <DropdownMenuContent align="end">
+                            {ff_1041 && (
+                                <DropdownMenuItem onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}>
+                                    <LayoutTemplateIcon /> From Template
+                                </DropdownMenuItem>
+                            )}
+
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    if (workflowHiddenFileInputRef.current) {
+                                        workflowHiddenFileInputRef.current.click();
+                                    }
+                                }}
+                            >
+                                <UploadIcon /> Import Workflow
                             </DropdownMenuItem>
-                        )}
-
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (workflowHiddenFileInputRef.current) {
-                                    workflowHiddenFileInputRef.current.click();
-                                }
-                            }}
-                        >
-                            <UploadIcon /> Import Workflow
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </ButtonGroup>
             </div>
 
             <ScrollArea className="mb-3 h-screen w-full overflow-y-auto px-4">

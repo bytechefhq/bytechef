@@ -11,6 +11,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -267,27 +268,44 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                {project.projectWorkflowIds?.length && (
+                                <ButtonGroup>
+                                    <Button
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+
+                                            setShowWorkflowDialog(true);
+                                        }}
+                                        size="xs"
+                                        variant="outline"
+                                    >
+                                        <PlusIcon />
+                                        Workflow
+                                    </Button>
+
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button size="xs" variant="outline">
-                                                New workflow
+                                                <ChevronDownIcon />
                                             </Button>
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                                <PlusIcon /> From Scratch
-                                            </DropdownMenuItem>
-
                                             {ff_1041 && (
-                                                <DropdownMenuItem onClick={() => navigate(`./${project.id}/templates`)}>
+                                                <DropdownMenuItem
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        navigate(`./${project.id}/templates`);
+                                                    }}
+                                                >
                                                     <LayoutTemplateIcon /> From Template
                                                 </DropdownMenuItem>
                                             )}
 
                                             <DropdownMenuItem
-                                                onClick={() => {
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+
                                                     if (hiddenFileInputRef.current) {
                                                         hiddenFileInputRef.current.click();
                                                     }
@@ -297,7 +315,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                )}
+                                </ButtonGroup>
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (
