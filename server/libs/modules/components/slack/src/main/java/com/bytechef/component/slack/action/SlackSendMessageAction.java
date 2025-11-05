@@ -38,7 +38,7 @@ import com.bytechef.component.slack.util.SlackUtils;
 public class SlackSendMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
-        .title("Send message")
+        .title("Send Message")
         .description("Sends a message to a public channel, private channel, or existing direct message conversation.")
         .properties(
             string(CHANNEL)
