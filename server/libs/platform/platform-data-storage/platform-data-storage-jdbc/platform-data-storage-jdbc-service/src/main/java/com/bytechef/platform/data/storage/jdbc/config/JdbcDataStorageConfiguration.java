@@ -23,6 +23,9 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +38,8 @@ import org.springframework.lang.NonNull;
 @Configuration
 @ConditionalOnDataStorageProviderJdbc
 public class JdbcDataStorageConfiguration {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Bean
     JdbcDataStorageService jdbcDataStorageService(DataStorageRepository dataStorageRepository) {
@@ -80,6 +85,13 @@ public class JdbcDataStorageConfiguration {
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
             @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
+            int size = getSizeInBytes(value);
+
+            if (size > 409600) {
+                throw new IllegalArgumentException(
+                    "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
+            }
+
             jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
@@ -89,6 +101,20 @@ public class JdbcDataStorageConfiguration {
             @NonNull String key, @NonNull ModeType type) {
 
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
+        }
+
+        private int getSizeInBytes(Object value) {
+            if (value instanceof byte[] bytes) {
+                return bytes.length;
+            }
+            if (value instanceof String string) {
+                return string.getBytes(StandardCharsets.UTF_8).length;
+            }
+            try {
+                return OBJECT_MAPPER.writeValueAsBytes(value).length;
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Failed to serialize value for size check.", e);
+            }
         }
     }
 }
