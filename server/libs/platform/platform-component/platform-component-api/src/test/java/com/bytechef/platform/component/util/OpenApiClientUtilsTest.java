@@ -53,7 +53,7 @@ class OpenApiClientUtilsTest {
 
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> contextFunctionArgumentCaptor =
-        ArgumentCaptor.forClass(ContextFunction.class);
+        forClass(ContextFunction.class);
     private final ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
         forClass(Http.Configuration.ConfigurationBuilder.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
@@ -61,10 +61,10 @@ class OpenApiClientUtilsTest {
     private final Http mockedHttp = mock(Http.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<Http.RequestMethod> requestMethodArgumentCaptor = forClass(Http.RequestMethod.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<Map> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Map> mapArgumentCaptor = forClass(Map.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
 
     ModifiableStringProperty idProperty = string("id")
         .metadata(Map.of("type", PropertyType.PATH));
@@ -78,8 +78,11 @@ class OpenApiClientUtilsTest {
     @BeforeEach
     void beforeEach() {
         when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
-                .apply(mockedHttp));
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = contextFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
         when(mockedHttp.exchange(stringArgumentCaptor.capture(), requestMethodArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
