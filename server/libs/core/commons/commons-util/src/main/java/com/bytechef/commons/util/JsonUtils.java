@@ -385,6 +385,14 @@ public class JsonUtils {
         }
     }
 
+    public static byte[] writeValueAsBytes(Object value) {
+        try {
+            return objectMapper.writeValueAsBytes(value);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Failed to serialize value for size check.", e);
+        }
+    }
+
     private static class TypeTypeRef<L> extends TypeRef<L> {
 
         private final Type type;
