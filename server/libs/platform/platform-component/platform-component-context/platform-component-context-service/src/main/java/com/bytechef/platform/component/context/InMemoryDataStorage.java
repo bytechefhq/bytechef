@@ -16,12 +16,11 @@
 
 package com.bytechef.platform.component.context;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,6 @@ import org.springframework.lang.NonNull;
 class InMemoryDataStorage implements DataStorage {
 
     private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final CacheManager cacheManager;
     private final String workflowUuid;
@@ -111,14 +109,12 @@ class InMemoryDataStorage implements DataStorage {
         if (value instanceof byte[] bytes) {
             return bytes.length;
         }
+
         if (value instanceof String string) {
             return string.getBytes(StandardCharsets.UTF_8).length;
         }
-        try {
-            return OBJECT_MAPPER.writeValueAsBytes(value).length;
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Failed to serialize value for size check.", e);
-        }
+
+        return JsonUtils.writeValueAsBytes(value).length;
     }
 
     private Map<String, Object> getValueMap(

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.data.storage.jdbc.config;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
@@ -23,8 +24,6 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
@@ -38,8 +37,6 @@ import org.springframework.lang.NonNull;
 @Configuration
 @ConditionalOnDataStorageProviderJdbc
 public class JdbcDataStorageConfiguration {
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Bean
     JdbcDataStorageService jdbcDataStorageService(DataStorageRepository dataStorageRepository) {
@@ -107,14 +104,12 @@ public class JdbcDataStorageConfiguration {
             if (value instanceof byte[] bytes) {
                 return bytes.length;
             }
+
             if (value instanceof String string) {
                 return string.getBytes(StandardCharsets.UTF_8).length;
             }
-            try {
-                return OBJECT_MAPPER.writeValueAsBytes(value).length;
-            } catch (JsonProcessingException e) {
-                throw new IllegalArgumentException("Failed to serialize value for size check.", e);
-            }
+
+            return JsonUtils.writeValueAsBytes(value).length;
         }
     }
 }
