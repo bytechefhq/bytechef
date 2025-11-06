@@ -1,4 +1,4 @@
-# Calling a component inside a script
+### Calling a Component Inside a Script
 
 To call a component inside a script, you need to use the `context.component` object which gives you references to components and their actions.
 
@@ -12,14 +12,56 @@ function perform(input, context) {
 }
 ```
 
+### Adding Component Connection
+
 If you want to call an action of a component which requires a connection you can define its connection inside the Script editor:
 
+1. Click on **+** button.
+2. Click on add **Script** component to the workflow.
+3. Choose **Python** action.
+4. Click on **Properties** tab.
+5. Click on **Open Code Editor**.
+6. Click on **Add Component**.
+7. Enter name of your connection.
+8. Click on **Select...** and choose your component connection.
+9. Click on **Add**.
+10. Select connection you want to use in the Script for that component.
+
+Example of usage:
+
+```javascript
+function perform(input, context) {
+    context.component.googleMaps.getAddress({'latitude': 12.5, 'longitude': 45.8});
+
+	return null;
+}
+```
+
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-<iframe src="https://www.guidejar.com/embed/8d622f3f-252c-4869-9f01-108111778c71?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
-</iframe></div>
+    <iframe src="https://www.guidejar.com/embed/a905b8d2-66d0-4d0d-82fb-46c11117c688?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
+    </iframe></div>
+
+
+### Defining Multiple Connections
 
 You can also define multiple connections of the same component and then reference a particular connection when calling the action:
 
+1. Click on **Add Component**.
+2. Add another **Google Maps** connection with different name.
+3. To define which connection will be used for what action call, add connection name as the parameter of the action.
+4. In this case it looks like this: `context.component.googleMaps.getAddress({'latitude': 12.5, 'longitude': 45.8}, 'googleMaps2');`.
+
+Example of usage:
+
+```javascript
+function perform(input, context) {
+    context.component.googleMaps.getAddress({'latitude': 12.5, 'longitude': 45.8}, 'googleMaps2');
+    context.component.googleMaps.getAddress({'latitude': 12.5, 'longitude': 45.8}, 'googleMaps');
+
+    return null;
+}
+```
+
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-<iframe src="https://www.guidejar.com/embed/81148ac3-e742-43a9-a852-eb1f0ab593d5?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
+<iframe src="https://www.guidejar.com/embed/6ec7275a-fbd9-4bd9-b97b-1c1a460acd9a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
 </iframe></div>
