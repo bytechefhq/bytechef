@@ -1,0 +1,356 @@
+---
+title: "X"
+description: "X (formerly known as Twitter) is a social media platform that enables users to share short messages, known as posts or tweets, and interact with others in real time."
+---
+
+
+Categories: Social Media
+
+
+Type: x/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Post
+Name: createPost
+
+`Creates a new post for the authenticated user,`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text of the post to create. | false |
+| media | Images | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | The images to attach to the post. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "text" : "",
+    "media" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "x/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(edit_history_tweet_ids), STRING\(id), STRING\(text)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "edit_history_tweet_ids" : [ "" ],
+    "id" : "",
+    "text" : ""
+  }
+}
+```
+
+
+### Delete Post
+Name: deletePost
+
+`Deletes a specific post.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Post ID | STRING | The ID of the post to be deleted. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Post",
+  "name" : "deletePost",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "x/v1/deletePost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(deleted)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "deleted" : false
+  }
+}
+```
+
+
+### Like Post
+Name: likePost
+
+`Like a specific post by its ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tweet_id | Tweet ID | STRING | The ID of the post to be liked. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Like Post",
+  "name" : "likePost",
+  "parameters" : {
+    "tweet_id" : ""
+  },
+  "type" : "x/v1/likePost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;BOOLEAN\(liked)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "liked" : false
+  }
+}
+```
+
+
+### Repost Post
+Name: repostPost
+
+`Reposts a specific post by its ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tweet_id | Tweet ID | STRING | The ID of the post to be reposted. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Repost Post",
+  "name" : "repostPost",
+  "parameters" : {
+    "tweet_id" : ""
+  },
+  "type" : "x/v1/repostPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), BOOLEAN\(retweeted)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "retweeted" : false
+  }
+}
+```
+
+
+### Send Direct Message
+Name: sendDirectMessage
+
+`Sends a direct message to a specified user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The username of the user to send a direct message to. | true |
+| text | Text | STRING | The text of the message. | true |
+| media | Images | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | The images to attach to the direct message. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
+  "parameters" : {
+    "username" : "",
+    "text" : "",
+    "media" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "x/v1/sendDirectMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(dm_conversation_id), STRING\(dm_event_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "dm_conversation_id" : "",
+    "dm_event_id" : ""
+  }
+}
+```
+
+
+
+## Triggers
+
+
+### New Post
+Name: newPost
+
+`Triggers when a new post is created by a specific user.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | The username of the user to monitor for new posts. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the Tweet. |
+| text | STRING | The content of the Tweet. |
+| edit_history_tweet_ids | ARRAY <details> <summary> Items </summary> [STRING] </details> | A list of Tweet Ids in this Tweet chain. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Post",
+  "name" : "newPost",
+  "parameters" : {
+    "username" : ""
+  },
+  "type" : "x/v1/newPost"
+}
+```
+
+
+
+

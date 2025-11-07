@@ -316,6 +316,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:woocommerce"))
     implementation(project(":server:libs:modules:components:wordpress"))
     implementation(project(":server:libs:modules:components:wrike"))
+    implementation(project(":server:libs:modules:components:x"))
     implementation(project(":server:libs:modules:components:xero"))
     implementation(project(":server:libs:modules:components:xlsx-file"))
     implementation(project(":server:libs:modules:components:xml-file"))

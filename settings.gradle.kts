@@ -386,6 +386,7 @@ include("server:libs:modules:components:wolfram-alpha:wolfram-alpha-shortanswers
 include("server:libs:modules:components:woocommerce")
 include("server:libs:modules:components:wordpress")
 include("server:libs:modules:components:wrike")
+include("server:libs:modules:components:x")
 include("server:libs:modules:components:xero")
 include("server:libs:modules:components:xlsx-file")
 include("server:libs:modules:components:xml-file")
