@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from '@storybook/react';
+import {Decorator, Meta, StoryObj} from '@storybook/react-vite';
 import {CheckIcon, CircleIcon, TriangleAlert, XIcon} from 'lucide-react';
 
 import Badge from './Badge';
@@ -75,8 +75,8 @@ const meta = {
         },
     },
     decorators: [
-        (Story, context) => {
-            const {styleType} = context.args;
+        ((Story, context) => {
+            const {styleType} = (context.args ?? {}) as {styleType?: string};
 
             const isDestructiveVariant = styleType === 'destructive-outline' || styleType === 'warning-outline';
 
@@ -87,7 +87,7 @@ const meta = {
             ) : (
                 <Story />
             );
-        },
+        }) as Decorator,
     ],
     tags: ['autodocs'],
 } satisfies Meta<typeof Badge>;
@@ -98,7 +98,7 @@ type Story = StoryObj<typeof Badge>;
 
 export const DefaultBadge: Story = {
     args: {
-        children: 'Label 1',
+        children: 'Badge',
         icon: undefined,
         styleType: 'primary-filled',
         weight: 'regular',
@@ -110,7 +110,7 @@ export const DefaultBadge: Story = {
             },
         },
     },
-    render: (args) => <Badge {...args} />,
+    render: (args: React.ComponentProps<typeof Badge>) => <Badge {...args} />,
 };
 
 export const BadgeStyleVariants: Story = {
