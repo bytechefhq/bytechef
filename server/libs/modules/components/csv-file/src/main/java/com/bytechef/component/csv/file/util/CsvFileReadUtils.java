@@ -26,17 +26,14 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
@@ -106,52 +103,56 @@ public class CsvFileReadUtils {
     public static Iterator<CSVRecord> getIterator(
             BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
-        Iterator<CSVRecord> iterator;
-        List<String> regexSpecials = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|",
-                "\\");
+        class CSVHeaderBuilder {
+            static String[] asArray(String headerRow, String delimiter) {
+                List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
+                        "{", "}", "|",
+                        "\\");
 
-        if (configuration.headerRow()) {
-            String delimiter = configuration.delimiter();
-            String regexPrefix = "";
-            if (regexSpecials.contains(delimiter)) {
-                regexPrefix = "\\";
-            }
-
-            String[] originalHeaderRow = bufferedReader.readLine().split(regexPrefix + delimiter, -1);
-            Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
-            String[] usableHeaderRow = new String[originalHeaderRow.length];
-
-            for (int i = 0; i < originalHeaderRow.length; i++) {
-                String header = originalHeaderRow[i];
-                if ("".equals(header)) {
-                    header = "NULL";
+                String regexPrefix = "";
+                if (regexReservedCharacters.contains(delimiter)) {
+                    regexPrefix = "\\";
                 }
 
-                if (repetitiveHeaderCounter.containsKey(header)) {
-                    repetitiveHeaderCounter.put(header, repetitiveHeaderCounter.get(header) + 1);
+                String[] originalHeaderRow = headerRow.split(regexPrefix + delimiter, -1);
+                Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
+                String[] usableHeaderRow = new String[originalHeaderRow.length];
 
-                    usableHeaderRow[i] = String.format("%s{%d}", header, repetitiveHeaderCounter.get(header));
-                } else {
-                    repetitiveHeaderCounter.put(header, 1);
-                    usableHeaderRow[i] = header;
+                for (int i = 0; i < originalHeaderRow.length; i++) {
+                    String header = originalHeaderRow[i];
+                    if ("".equals(header)) {
+                        header = "NULL";
+                    }
+
+                    if (repetitiveHeaderCounter.containsKey(header)) {
+                        repetitiveHeaderCounter.put(header, repetitiveHeaderCounter.get(header) + 1);
+
+                        usableHeaderRow[i] = String.format("%s{%d}", header, repetitiveHeaderCounter.get(header));
+                    } else {
+                        repetitiveHeaderCounter.put(header, 1);
+                        usableHeaderRow[i] = header;
+                    }
+
                 }
+
+                return usableHeaderRow;
             }
-
-            CSVFormat csvFormat = CSVFormat.Builder.create()
-                    .setIgnoreEmptyLines(false)
-                    .setDelimiter(delimiter)
-                    .setHeader(usableHeaderRow)
-                    .get();
-
-            CSVParser csvParser = csvFormat.parse(bufferedReader);
-            iterator = csvParser.iterator();
-        } else {
-            CSVFormat csvFormat = CSVFormat.DEFAULT;
-
-            iterator = csvFormat.parse(bufferedReader).iterator();
         }
 
-        return iterator;
+        String delimiter = configuration.delimiter();
+        String[] headerRow = null;
+
+        if (configuration.headerRow()) {
+            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter);
+        }
+
+        CSVFormat csvFormat = CSVFormat.Builder.create()
+                .setIgnoreEmptyLines(false)
+                .setDelimiter(delimiter)
+                .setHeader(headerRow)
+                .get();
+
+        return csvFormat.parse(bufferedReader).iterator();
     }
 
     public static ReadConfiguration getReadConfiguration(Parameters inputParameters) {
