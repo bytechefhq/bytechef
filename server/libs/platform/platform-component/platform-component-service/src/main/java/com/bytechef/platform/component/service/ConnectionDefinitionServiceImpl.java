@@ -469,7 +469,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ConfigurationException(
-                        "Invalid claim", ConnectionDefinitionErrorType.INVALID_CLAIM);
+                        httpResponse.body(), ConnectionDefinitionErrorType.INVALID_CLAIM);
                 }
 
                 if (httpResponse.body() == null) {
