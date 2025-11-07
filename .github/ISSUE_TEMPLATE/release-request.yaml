@@ -1,0 +1,33 @@
+name: Release request
+description: Initiate official public release of current ongoing release.
+title: "[release]: "
+labels: [release]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Release new version of ByteChef.
+  - type: input
+    id: ongoingRelease
+    attributes:
+      label: Release Version
+      description: Software SNAPSHOT version that would be published. Example v1.0.2
+      placeholder: "1.10.1"
+    validations:
+      required: true
+  - type: input
+    id: nextRelease
+    attributes:
+      label: Next Release Version
+      description: Next software SNAPSHOT version that would be active until release. Example v1.0.2-SNAPSHOT
+      placeholder: "1.10.2"
+    validations:
+      required: false
+  - type: input
+    id: cloud
+    attributes:
+      label: Cloud
+      description: "Is cloud deployment required (yes/no)"
+      placeholder: "yes"
+    validations:
+      required: true
