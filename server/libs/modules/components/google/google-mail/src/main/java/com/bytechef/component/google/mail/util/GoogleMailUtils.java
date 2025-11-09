@@ -208,7 +208,7 @@ public class GoogleMailUtils {
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
-        mimeBodyPart.setContent(inputParameters.getRequiredString(BODY), "text/plain");
+        mimeBodyPart.setText(inputParameters.getRequiredString(BODY), StandardCharsets.UTF_8.name());
 
         Multipart multipart = new MimeMultipart();
 
@@ -250,7 +250,7 @@ public class GoogleMailUtils {
             jakarta.mail.Message.RecipientType.TO,
             InternetAddress.parse(String.join(",", inputParameters.getRequiredList(TO, String.class))));
 
-        mimeMessage.setText(inputParameters.getRequiredString(BODY));
+        mimeMessage.setText(inputParameters.getRequiredString(BODY), StandardCharsets.UTF_8.name());
         mimeMessage.setRecipients(
             jakarta.mail.Message.RecipientType.CC,
             InternetAddress.parse(String.join(",", inputParameters.getList(CC, String.class, List.of()))));
@@ -262,7 +262,7 @@ public class GoogleMailUtils {
             InternetAddress.parse(String.join(",", inputParameters.getList(REPLY_TO, String.class, List.of()))));
 
         if (messageToReply == null) {
-            mimeMessage.setSubject(inputParameters.getRequiredString(SUBJECT));
+            mimeMessage.setSubject(inputParameters.getRequiredString(SUBJECT), StandardCharsets.UTF_8.name());
         } else {
             MessagePart payload = messageToReply.getPayload();
 
@@ -280,10 +280,9 @@ public class GoogleMailUtils {
                 }
             }
 
-            mimeMessage.setSubject(subject);
+            mimeMessage.setSubject(subject, StandardCharsets.UTF_8.name());
             mimeMessage.setHeader("In-Reply-To", messageID);
             mimeMessage.setHeader("References", messageID);
-            mimeMessage.setHeader("Subject", subject);
         }
 
         return mimeMessage;
