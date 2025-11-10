@@ -409,6 +409,7 @@ include("server:libs:modules:task-dispatchers:each")
 include("server:libs:modules:task-dispatchers:fork-join")
 include("server:libs:modules:task-dispatchers:loop")
 include("server:libs:modules:task-dispatchers:map")
+include("server:libs:modules:task-dispatchers:on-error")
 include("server:libs:modules:task-dispatchers:parallel")
 include("server:libs:modules:task-dispatchers:subflow")
 
