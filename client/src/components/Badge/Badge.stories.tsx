@@ -1,4 +1,4 @@
-import {Decorator, Meta, StoryObj} from '@storybook/react-vite';
+import {Meta, StoryObj} from '@storybook/react-vite';
 import {CheckIcon, CircleIcon, TriangleAlert, XIcon} from 'lucide-react';
 
 import Badge from './Badge';
@@ -119,11 +119,6 @@ const meta = {
             },
         },
     },
-    decorators: [
-        ((Story) => {
-            return <Story />;
-        }) as Decorator,
-    ],
     tags: ['autodocs'],
 } satisfies Meta<typeof Badge>;
 
