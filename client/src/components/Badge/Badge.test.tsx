@@ -5,7 +5,7 @@ import {describe, expect, it} from 'vitest';
 import Badge from './Badge';
 
 it('should render a default badge with text if no styling props are set', () => {
-    render(<Badge>Badge</Badge>);
+    render(<Badge label="Badge" />);
 
     expect(screen.getByText('Badge')).toHaveTextContent('Badge');
     expect(screen.getByText('Badge')).toHaveClass('px-2 py-0.5');
@@ -14,7 +14,7 @@ it('should render a default badge with text if no styling props are set', () => 
 });
 
 it('should render a badge with text and icon', () => {
-    const {container} = render(<Badge icon={<CheckIcon />}>Badge</Badge>);
+    const {container} = render(<Badge icon={<CheckIcon />} label="Badge" />);
 
     expect(screen.getByText('Badge')).toHaveTextContent('Badge');
     expect(container.querySelector('svg')).toBeInTheDocument();
@@ -23,72 +23,72 @@ it('should render a badge with text and icon', () => {
 
 describe('Badge variants', () => {
     it('should render a primary filled badge if styleType is set to primary-filled', () => {
-        render(<Badge styleType="primary-filled">Badge</Badge>);
+        render(<Badge label="Badge" styleType="primary-filled" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-brand-primary text-content-onsurface-primary');
     });
 
     it('should render a primary outline badge if styleType is set to primary-outline', () => {
-        render(<Badge styleType="primary-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="primary-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-brand-secondary text-content-brand-primary');
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-brand-primary');
     });
 
     it('should render a secondary filled badge if styleType is set to secondary-filled', () => {
-        render(<Badge styleType="secondary-filled">Badge</Badge>);
+        render(<Badge label="Badge" styleType="secondary-filled" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-neutral-secondary text-content-neutral-primary');
     });
 
     it('should render a secondary outline badge if styleType is set to secondary-outline', () => {
-        render(<Badge styleType="secondary-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="secondary-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-neutral-secondary text-content-neutral-primary');
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-neutral-secondary');
     });
 
     it('should render an outline badge if styleType is set to outline-outline', () => {
-        render(<Badge styleType="outline-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="outline-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-neutral-primary text-content-neutral-primary');
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-neutral-secondary');
     });
 
     it('should render a success filled badge if styleType is set to success-filled', () => {
-        render(<Badge styleType="success-filled">Badge</Badge>);
+        render(<Badge label="Badge" styleType="success-filled" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-success-primary text-content-onsurface-primary');
     });
 
     it('should render a success outline badge if styleType is set to success-outline', () => {
-        render(<Badge styleType="success-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="success-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-success-secondary text-content-success-primary');
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-success-primary');
     });
 
     it('should render a warning filled badge if styleType is set to warning-filled', () => {
-        render(<Badge styleType="warning-filled">Badge</Badge>);
+        render(<Badge label="Badge" styleType="warning-filled" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-warning-secondary text-content-warning-primary');
     });
 
     it('should render a warning outline badge if styleType is set to warning-outline', () => {
-        render(<Badge styleType="warning-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="warning-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-warning-secondary text-content-warning-primary');
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-warning-primary');
     });
 
     it('should render a destructive filled badge if styleType is set to destructive-filled', () => {
-        render(<Badge styleType="destructive-filled">Badge</Badge>);
+        render(<Badge label="Badge" styleType="destructive-filled" />);
 
         expect(screen.getByText('Badge')).toHaveClass('bg-surface-destructive-primary text-content-onsurface-primary');
     });
 
     it('should render a destructive outline badge if styleType is set to destructive-outline', () => {
-        render(<Badge styleType="destructive-outline">Badge</Badge>);
+        render(<Badge label="Badge" styleType="destructive-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass(
             'bg-surface-destructive-secondary text-content-destructive-primary'
@@ -99,13 +99,13 @@ describe('Badge variants', () => {
 
 describe('Badge weights', () => {
     it('should render a regular weight badge if weight is set to regular', () => {
-        render(<Badge weight="regular">Badge</Badge>);
+        render(<Badge label="Badge" weight="regular" />);
 
         expect(screen.getByText('Badge')).toHaveClass('font-normal');
     });
 
     it('should render a semibold weight badge if weight is set to semibold', () => {
-        render(<Badge weight="semibold">Badge</Badge>);
+        render(<Badge label="Badge" weight="semibold" />);
 
         expect(screen.getByText('Badge')).toHaveClass('font-semibold');
     });
@@ -128,28 +128,26 @@ describe('TypeScript tests', () => {
 
         it('should not allow aria-label for text-only badges', () => {
             // @ts-expect-error - aria-label is not allowed for text-only badges
-            render(<Badge aria-label="Some label">Badge</Badge>);
+            render(<Badge aria-label="Some label" label="Badge" />);
         });
 
         it('should not allow aria-label for icon+text badges', () => {
             render(
                 // @ts-expect-error - aria-label is not allowed for icon+text badges (text serves as accessible name)
-                <Badge aria-label="Some label" icon={<CheckIcon />}>
-                    Badge
-                </Badge>
+                <Badge aria-label="Some label" icon={<CheckIcon />} label="Badge" />
             );
         });
     });
 
     describe('className prop', () => {
         it('should allow className prop to be set', () => {
-            render(<Badge className="ring-1">Badge</Badge>);
+            render(<Badge className="ring-1" label="Badge" />);
 
             expect(screen.getByText('Badge')).toHaveClass('ring-1');
         });
 
         it('should merge className with default styles using twMerge', () => {
-            render(<Badge className="my-2 rounded-full">Badge</Badge>);
+            render(<Badge className="my-2 rounded-full" label="Badge" />);
 
             const badge = screen.getByText('Badge');
             expect(badge).toHaveClass('rounded-full');
@@ -159,8 +157,8 @@ describe('TypeScript tests', () => {
     });
 
     describe('prop type safety', () => {
-        it('should require children for text-only badges', () => {
-            // @ts-expect-error - children is required for text-only badges
+        it('should require label or children for badges', () => {
+            // @ts-expect-error - label or children is required for badges
             render(<Badge />);
         });
 
@@ -180,23 +178,23 @@ describe('TypeScript tests', () => {
             ] as const;
 
             validStyleTypes.forEach((styleType) => {
-                render(<Badge styleType={styleType}>Badge</Badge>);
+                render(<Badge label="Badge" styleType={styleType} />);
             });
         });
 
         it('should not allow invalid styleType values', () => {
             // @ts-expect-error - invalid styleType value
-            render(<Badge styleType="invalid-style">Badge</Badge>);
+            render(<Badge label="Badge" styleType="invalid-style" />);
         });
 
         it('should allow valid weight values', () => {
-            render(<Badge weight="regular">Badge</Badge>);
-            render(<Badge weight="semibold">Badge</Badge>);
+            render(<Badge label="Badge" weight="regular" />);
+            render(<Badge label="Badge" weight="semibold" />);
         });
 
         it('should not allow invalid weight values', () => {
             // @ts-expect-error - invalid weight value
-            render(<Badge weight="bold">Badge</Badge>);
+            render(<Badge label="Badge" weight="bold" />);
         });
     });
 });
@@ -204,9 +202,13 @@ describe('TypeScript tests', () => {
 describe('Badge with all props combined', () => {
     it('should render a badge with all props combined', () => {
         const {container} = render(
-            <Badge className="ring-1" icon={<CheckIcon />} styleType="success-outline" weight="semibold">
-                Badge
-            </Badge>
+            <Badge
+                className="ring-1"
+                icon={<CheckIcon />}
+                label="Badge"
+                styleType="success-outline"
+                weight="semibold"
+            />
         );
 
         expect(screen.getByText('Badge')).toBeInTheDocument();
@@ -237,5 +239,40 @@ describe('Badge with all props combined', () => {
         expect(badgeDiv).toHaveClass('bg-surface-warning-secondary');
         expect(badgeDiv).toHaveClass('text-content-warning-primary');
         expect(badgeDiv).toHaveClass('ring-1');
+    });
+});
+
+describe('Badge with custom children', () => {
+    it('should render a badge with custom children', () => {
+        render(
+            <Badge styleType="primary-filled">
+                <span className="font-semibold">Custom</span>
+
+                <span>Content</span>
+            </Badge>
+        );
+
+        expect(screen.getByText('Custom')).toBeInTheDocument();
+        expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    it('should render a badge with custom children and icon', () => {
+        const {container} = render(
+            <Badge icon={<CheckIcon />} styleType="success-filled">
+                <span>Active</span>
+            </Badge>
+        );
+
+        expect(screen.getByText('Active')).toBeInTheDocument();
+        expect(container.querySelector('svg')).toBeInTheDocument();
+    });
+
+    it('should not allow label and children together', () => {
+        render(
+            // @ts-expect-error - label and children cannot be used together
+            <Badge label="Badge">
+                <span>Custom</span>
+            </Badge>
+        );
     });
 });
