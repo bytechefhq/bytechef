@@ -33,13 +33,23 @@ class Contains implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        List<?> l1 = (List<?>) arguments[0];
-        Object value = arguments[1];
+        Object firstArgument = arguments[0];
 
-        if (l1 == null) {
+        if (firstArgument == null) {
             return new TypedValue(false);
-        }
+        } else {
+            if (firstArgument instanceof List<?> list) {
+                Object value = arguments[1];
 
-        return new TypedValue(l1.contains(value));
+                return new TypedValue(list.contains(value));
+            } else if (firstArgument instanceof String string) {
+                String substring = (String) arguments[1];
+
+                return new TypedValue(string.contains(substring));
+            } else {
+                throw new IllegalArgumentException(
+                    "Invalid arguments for contains. Expected 2 string or list and element.");
+            }
+        }
     }
 }
