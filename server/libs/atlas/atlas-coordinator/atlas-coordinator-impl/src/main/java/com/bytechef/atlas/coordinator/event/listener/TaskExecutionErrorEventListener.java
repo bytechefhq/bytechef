@@ -96,6 +96,20 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                 while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                     taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
+                    // if it's an on-error dispatcher and its error is not set, navigate back to the on-error
+                    // dispatcher to start executing the error branch
+                    if (taskExecution.getType()
+                        .startsWith("on-error/") && taskExecution.getError() == null) {
+                        taskExecution.setError(error);
+                        taskExecution.setStatus(TaskExecution.Status.CREATED);
+
+                        taskExecution = taskExecutionService.update(taskExecution);
+
+                        taskDispatcher.dispatch(taskExecution);
+
+                        return;
+                    }
+
                     taskExecution.setEndDate(Instant.now());
                     taskExecution.setStatus(TaskExecution.Status.FAILED);
 
