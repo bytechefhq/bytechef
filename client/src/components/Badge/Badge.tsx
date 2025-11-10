@@ -9,24 +9,34 @@ interface BaseBadgeProps extends Omit<ShadcnBadgeProps, 'variant'> {
 }
 
 interface TextBadgeProps extends BaseBadgeProps {
-    children: string;
+    label: string;
+    children?: never;
     icon?: never;
     'aria-label'?: never;
 }
 
 interface IconBadgeProps extends BaseBadgeProps {
     children?: never;
+    label?: never;
     icon: React.ReactElement;
     'aria-label': string;
 }
 
 interface IconTextBadgeProps extends BaseBadgeProps {
-    children: string;
+    label: string;
+    children?: never;
     icon: React.ReactElement;
     'aria-label'?: never;
 }
 
-type BadgePropsType = TextBadgeProps | IconBadgeProps | IconTextBadgeProps;
+interface CustomBadgeProps extends BaseBadgeProps {
+    children: React.ReactNode;
+    label?: never;
+    icon?: React.ReactElement;
+    'aria-label'?: string;
+}
+
+type BadgePropsType = TextBadgeProps | IconBadgeProps | IconTextBadgeProps | CustomBadgeProps;
 
 type StyleType =
     | 'primary-filled'
@@ -40,18 +50,15 @@ type StyleType =
     | 'warning-outline'
     | 'destructive-filled'
     | 'destructive-outline';
+
 type WeightType = 'regular' | 'semibold';
 
-const basicStyles = `
-  justify-center gap-1 shadow-none transition-none hover:bg-opacity-0
-  [&_svg]:size-3
-`;
-// Using `hover:bg-opacity-0` (or any other opacity) disables hover color change without altering the badge's default color.
-// Our badge background uses CSS variables while Tailwind's opacity utilities only affect colors defined as rgb()/hsl() with `var(--tw-bg-opacity)`
+const basicStyles = 'justify-center gap-1 shadow-none transition-none hover:bg-opacity-0 [&_svg]:size-3';
 
-const size = (hasTextContent: boolean) => (hasTextContent ? 'px-2 py-0.5' : 'size-5 p-0.5');
-
-const weightClass = (weight: WeightType) => (weight === 'semibold' ? 'font-semibold' : 'font-normal');
+const weightClass: Record<WeightType, string> = {
+    regular: 'font-normal',
+    semibold: 'font-semibold',
+};
 
 const variants: Record<StyleType, string> = {
     'primary-filled': `
@@ -112,29 +119,20 @@ const Badge = ({
     children,
     className,
     icon,
+    label,
     styleType = 'primary-filled',
     weight = 'regular',
     ...props
 }: BadgePropsType) => {
-    const hasTextContent = typeof children !== 'undefined' && children !== null;
-    const spacingClass = size(hasTextContent);
-    const weightClassValue = weightClass(weight);
-    const variantClass = variants[styleType];
+    const size = (label ?? children) !== undefined ? 'px-2 py-0.5' : 'size-5 p-0.5';
 
-    const badgeClasses = twMerge(basicStyles, spacingClass, weightClassValue, variantClass, className);
-
-    const safeProps = {...(props as Record<string, unknown>)} as ShadcnBadgeProps & {
-        contentType?: unknown;
-    };
-    if ('contentType' in safeProps) {
-        delete (safeProps as unknown as {contentType?: unknown}).contentType;
-    }
+    const badgeClasses = twMerge(basicStyles, size, weightClass[weight], variants[styleType], className);
 
     return (
-        <ShadcnBadge className={badgeClasses} {...(safeProps as ShadcnBadgeProps)}>
+        <ShadcnBadge className={badgeClasses} {...props}>
             {icon}
 
-            {children}
+            {label ?? children}
         </ShadcnBadge>
     );
 };
