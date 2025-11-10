@@ -45,16 +45,16 @@ import org.apache.commons.lang3.StringUtils;
 public class CsvFileReadUtils {
 
     public static Map<String, Object> getColumnRow(
-            ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
+        ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
         for (int i = 0; i < row.size(); i++) {
             map.put(
-                    "column_" + (i + 1),
-                    processValue(
-                            (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
-                            configuration.readAsString()));
+                "column_" + (i + 1),
+                processValue(
+                    (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
+                    configuration.readAsString()));
         }
 
         return map;
@@ -73,7 +73,7 @@ public class CsvFileReadUtils {
     }
 
     public static Map<String, Object> getHeaderRow(
-            ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
+        ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -87,10 +87,10 @@ public class CsvFileReadUtils {
             }
 
             map.put(
-                    strippedString,
-                    processValue(
-                            (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
-                            configuration.readAsString()));
+                strippedString,
+                processValue(
+                    (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
+                    configuration.readAsString()));
 
             currColumn++;
         }
@@ -99,13 +99,13 @@ public class CsvFileReadUtils {
     }
 
     public static Iterator<CSVRecord> getIterator(
-            BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
+        BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
         class CSVHeaderBuilder {
             static String[] asArray(String headerRow, String delimiter) {
                 List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
-                        "{", "}", "|",
-                        "\\");
+                    "{", "}", "|",
+                    "\\");
 
                 String regexPrefix = "";
                 if (regexReservedCharacters.contains(delimiter)) {
@@ -151,13 +151,13 @@ public class CsvFileReadUtils {
         }
 
         CSVFormat csvFormat = CSVFormat.Builder.create()
-                .setIgnoreEmptyLines(false)
-                .setDelimiter(delimiter)
-                .setHeader(headerRow)
-                .get();
+            .setIgnoreEmptyLines(false)
+            .setDelimiter(delimiter)
+            .setHeader(headerRow)
+            .get();
 
         return csvFormat.parse(bufferedReader)
-                .iterator();
+            .iterator();
     }
 
     public static ReadConfiguration getReadConfiguration(Parameters inputParameters) {
@@ -179,13 +179,13 @@ public class CsvFileReadUtils {
         }
 
         return new ReadConfiguration(
-                delimiter, enclosingCharacter, headerRow, includeEmptyCells,
-                rangeStartRow == null ? 0 : rangeStartRow,
-                rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString);
+            delimiter, enclosingCharacter, headerRow, includeEmptyCells,
+            rangeStartRow == null ? 0 : rangeStartRow,
+            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString);
     }
 
     public static Object processValue(
-            String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
+        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
 
         Object value = null;
 
