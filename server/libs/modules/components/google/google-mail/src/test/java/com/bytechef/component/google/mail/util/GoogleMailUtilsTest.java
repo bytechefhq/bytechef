@@ -18,16 +18,22 @@ package com.bytechef.component.google.mail.util;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.METADATA_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.MINIMAL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.RAW_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.SIMPLE_MESSAGE_OUTPUT_PROPERTY;
+import static java.util.Base64.getUrlDecoder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -50,11 +56,17 @@ import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.Thread;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -299,5 +311,76 @@ class GoogleMailUtilsTest {
 
         assertEquals(mockedMessage, result);
         assertEquals(ME, stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetEncodedEmailWithoutReplyAndAttachments() throws Exception {
+        String croatianText = "Pozdrav - šđ!";
+        String body = "Mail s hrvatskim slovima: š, č, ć, đ, Ž.";
+
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TO, List.of("to@example.com"), SUBJECT, croatianText, BODY, body));
+
+        String encodedEmail = GoogleMailUtils.getEncodedEmail(mockedParameters, mockedActionContext, null);
+
+        byte[] raw = getUrlDecoder().decode(encodedEmail);
+
+        MimeMessage mimeMessage = new MimeMessage(
+            Session.getDefaultInstance(new Properties()), new ByteArrayInputStream(raw));
+
+        assertEquals(croatianText, mimeMessage.getSubject());
+
+        Object content = mimeMessage.getContent();
+
+        if (!(content instanceof MimeMultipart mimeMultipart)) {
+            throw new AssertionError("Expected MimeMultipart content but was: " + content);
+        }
+
+        BodyPart bodyPart = mimeMultipart.getBodyPart(0);
+
+        String partContentType = bodyPart.getContentType();
+
+        assertNotNull(partContentType);
+
+        String upperCT = partContentType.toUpperCase();
+
+        assertTrue(upperCT.contains("UTF-8"), "Content-Type should include UTF-8 but was: " + partContentType);
+        assertEquals(body, bodyPart.getContent());
+    }
+
+    @Test
+    void testGetEncodedEmailWithReplyMessageNoAttachments() throws Exception {
+        String replyMessageId = "<message-id-123@example.com>";
+        String originalSubject = "Re: Tema s đ i ž";
+        String newBody = "Odgovor s dijakritičkim znakovima: čćžšđ.";
+
+        MessagePartHeader messagePartHeader = new MessagePartHeader()
+            .setName("Message-ID")
+            .setValue(replyMessageId);
+
+        MessagePartHeader messagePartHeader1 = new MessagePartHeader()
+            .setName("Subject")
+            .setValue(originalSubject);
+        MessagePart messagePart = new MessagePart()
+            .setHeaders(List.of(messagePartHeader, messagePartHeader1));
+        Message toReply = new Message().setPayload(messagePart);
+
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TO, List.of("to@example.com"), SUBJECT, "ignored subject when replying", BODY, newBody));
+
+        String encodedEmail = GoogleMailUtils.getEncodedEmail(mockedParameters, mockedActionContext, toReply);
+
+        byte[] raw = getUrlDecoder().decode(encodedEmail);
+        MimeMessage parsed = new MimeMessage(
+            Session.getDefaultInstance(new Properties()), new ByteArrayInputStream(raw));
+
+        assertEquals(originalSubject, parsed.getSubject());
+        assertEquals(replyMessageId, parsed.getHeader("In-Reply-To", null));
+        assertEquals(replyMessageId, parsed.getHeader("References", null));
+
+        MimeMultipart mimeMultipart = (MimeMultipart) parsed.getContent();
+        BodyPart bodyPart = mimeMultipart.getBodyPart(0);
+
+        assertEquals(newBody, bodyPart.getContent());
     }
 }
