@@ -10,29 +10,65 @@ const icons = {
     XIcon: <XIcon />,
 } as const;
 
+const labels = {
+    'Label 1': 'Badge',
+    'Label 2': 'Online',
+    'Label 3': 'Published',
+    'Label 4': 'Draft',
+} as const;
+
+const customContent = {
+    'Example 1': (
+        <>
+            <span className="font-semibold">Custom</span>
+
+            <span>Content</span>
+        </>
+    ),
+    'Example 2': <span>Active</span>,
+    'Example 3': (
+        <>
+            <span>State: </span>
+
+            <span className="font-semibold">deployed</span>
+        </>
+    ),
+} as const;
+
 const meta = {
     title: 'Components/Badge',
     // eslint-disable-next-line sort-keys
     component: Badge,
     parameters: {
         controls: {
-            include: ['styleType', 'weight', 'icon', 'children'],
+            include: ['styleType', 'weight', 'icon', 'label', 'children', 'aria-label'],
         },
         docs: {
             description: {
                 component:
-                    'A customizable badge component with various style types and content options. This component supports text, icons, and custom content. Default badge is visual component and does not have hover or active states. For hover or active states, use the className prop to add custom styles.',
+                    'A customizable badge component with various style types (colors/categories) and font weight options. This component supports text labels, icons, and custom content. Badge has two weight options: regular and semibold. Style types define the color categories (primary, secondary, success, warning, destructive, etc.) with filled and outline variants. Default badge is a visual component and does not have hover or active states. For hover or active states, use the className prop to add custom styles.',
             },
         },
         layout: 'centered',
     },
     // eslint-disable-next-line sort-keys
     argTypes: {
-        children: {
+        'aria-label': {
             control: {type: 'text'},
-            description: 'Badge text content',
+            description:
+                'Accessible label for the badge. **Required** when using icon-only badges (when `icon` is provided without `label` or `children`). This ensures screen readers can properly identify the badge content. Not allowed for text-only or icon+text badges as the text content serves as the accessible name.',
             table: {
                 type: {summary: 'string'},
+            },
+        },
+        children: {
+            control: {type: 'select'},
+            defaultValue: 'no-content',
+            description: 'Custom content displayed inside the badge - **only** applied when no label is provided.',
+            mapping: {'no-content': undefined, ...customContent},
+            options: ['no-content', ...Object.keys(customContent)],
+            table: {
+                type: {summary: 'ReactNode'},
             },
         },
         icon: {
@@ -45,9 +81,18 @@ const meta = {
                 type: {summary: 'ReactElement'},
             },
         },
+        label: {
+            control: {type: 'select'},
+            description: 'Badge text content - **always** takes precedence over custom content.',
+            mapping: {'no-label': undefined, ...labels},
+            options: ['no-label', ...Object.keys(labels)],
+            table: {
+                type: {summary: 'string'},
+            },
+        },
         styleType: {
             control: {type: 'select'},
-            description: 'Visual style type of the badge that determines colors and appearance',
+            description: 'Color category/style type of the badge that determines colors and appearance',
             options: [
                 'primary-filled',
                 'primary-outline',
@@ -67,7 +112,7 @@ const meta = {
         },
         weight: {
             control: {type: 'select'},
-            description: 'Font weight of the badge text',
+            description: 'Font weight of the badge text - regular or semibold',
             options: ['regular', 'semibold'],
             table: {
                 type: {summary: 'string'},
@@ -75,18 +120,8 @@ const meta = {
         },
     },
     decorators: [
-        ((Story, context) => {
-            const {styleType} = (context.args ?? {}) as {styleType?: string};
-
-            const isDestructiveVariant = styleType === 'destructive-outline' || styleType === 'warning-outline';
-
-            return isDestructiveVariant ? (
-                <div className={'rounded-md bg-surface-destructive-primary p-1.5'}>
-                    <Story />
-                </div>
-            ) : (
-                <Story />
-            );
+        ((Story) => {
+            return <Story />;
         }) as Decorator,
     ],
     tags: ['autodocs'],
@@ -98,8 +133,9 @@ type Story = StoryObj<typeof Badge>;
 
 export const DefaultBadge: Story = {
     args: {
-        children: 'Badge',
+        children: undefined,
         icon: undefined,
+        label: 'Label 1',
         styleType: 'primary-filled',
         weight: 'regular',
     },
@@ -123,27 +159,27 @@ export const BadgeStyleVariants: Story = {
     },
     render: () => (
         <div className="grid grid-cols-6 items-center gap-4">
-            <Badge styleType="primary-filled">Primary Filled</Badge>
+            <Badge label="Primary Filled" styleType="primary-filled" />
 
-            <Badge styleType="primary-outline">Primary Outline</Badge>
+            <Badge label="Primary Outline" styleType="primary-outline" />
 
-            <Badge styleType="secondary-filled">Secondary Filled</Badge>
+            <Badge label="Secondary Filled" styleType="secondary-filled" />
 
-            <Badge styleType="secondary-outline">Secondary Outline</Badge>
+            <Badge label="Secondary Outline" styleType="secondary-outline" />
 
-            <Badge styleType="outline-outline">Outline</Badge>
+            <Badge label="Outline" styleType="outline-outline" />
 
-            <Badge styleType="success-filled">Success Filled</Badge>
+            <Badge label="Success Filled" styleType="success-filled" />
 
-            <Badge styleType="success-outline">Success Outline</Badge>
+            <Badge label="Success Outline" styleType="success-outline" />
 
-            <Badge styleType="warning-filled">Warning Filled</Badge>
+            <Badge label="Warning Filled" styleType="warning-filled" />
 
-            <Badge styleType="warning-outline">Warning Outline</Badge>
+            <Badge label="Warning Outline" styleType="warning-outline" />
 
-            <Badge styleType="destructive-filled">Destructive Filled</Badge>
+            <Badge label="Destructive Filled" styleType="destructive-filled" />
 
-            <Badge styleType="destructive-outline">Destructive Outline</Badge>
+            <Badge label="Destructive Outline" styleType="destructive-outline" />
         </div>
     ),
 };
@@ -158,9 +194,9 @@ export const BadgeWeightVariants: Story = {
     },
     render: () => (
         <div className="flex items-center gap-4">
-            <Badge weight="regular">Regular Weight</Badge>
+            <Badge label="Regular Weight" weight="regular" />
 
-            <Badge weight="semibold">Semibold Weight</Badge>
+            <Badge label="Semibold Weight" weight="semibold" />
         </div>
     ),
 };
@@ -175,21 +211,13 @@ export const BadgesWithIcons: Story = {
     },
     render: () => (
         <div className="flex flex-wrap items-center gap-4">
-            <Badge icon={<CheckIcon />} styleType="success-filled">
-                Success
-            </Badge>
+            <Badge icon={<CheckIcon />} label="Success" styleType="success-filled" />
 
-            <Badge icon={<CircleIcon />} styleType="primary-outline">
-                Info
-            </Badge>
+            <Badge icon={<CircleIcon />} label="Info" styleType="primary-outline" />
 
-            <Badge icon={<TriangleAlert />} styleType="warning-filled">
-                Warning
-            </Badge>
+            <Badge icon={<TriangleAlert />} label="Warning" styleType="warning-filled" />
 
-            <Badge icon={<XIcon />} styleType="destructive-filled">
-                Error
-            </Badge>
+            <Badge icon={<XIcon />} label="Error" styleType="destructive-filled" />
         </div>
     ),
 };
@@ -229,13 +257,13 @@ export const BadgeUseCases: Story = {
                 <h3 className="text-sm font-semibold">Status Indicators</h3>
 
                 <div className="flex items-center gap-2">
-                    <Badge styleType="success-filled">Online</Badge>
+                    <Badge label="Online" styleType="success-filled" />
 
-                    <Badge styleType="secondary-filled">Offline</Badge>
+                    <Badge label="Offline" styleType="secondary-filled" />
 
-                    <Badge styleType="destructive-filled">Error</Badge>
+                    <Badge label="Error" styleType="destructive-filled" />
 
-                    <Badge styleType="warning-filled">Warning</Badge>
+                    <Badge label="Warning" styleType="warning-filled" />
                 </div>
             </div>
 
@@ -243,11 +271,11 @@ export const BadgeUseCases: Story = {
                 <h3 className="text-sm font-semibold">Categories</h3>
 
                 <div className="flex items-center gap-2">
-                    <Badge styleType="primary-outline">Frontend</Badge>
+                    <Badge label="Frontend" styleType="primary-outline" />
 
-                    <Badge styleType="secondary-outline">Backend</Badge>
+                    <Badge label="Backend" styleType="secondary-outline" />
 
-                    <Badge styleType="outline-outline">DevOps</Badge>
+                    <Badge label="DevOps" styleType="outline-outline" />
                 </div>
             </div>
 
@@ -255,17 +283,11 @@ export const BadgeUseCases: Story = {
                 <h3 className="text-sm font-semibold">Notifications</h3>
 
                 <div className="flex items-center gap-2">
-                    <Badge icon={<CheckIcon />} styleType="success-filled">
-                        Completed
-                    </Badge>
+                    <Badge icon={<CheckIcon />} label="Completed" styleType="success-filled" />
 
-                    <Badge icon={<TriangleAlert />} styleType="warning-filled">
-                        Pending
-                    </Badge>
+                    <Badge icon={<TriangleAlert />} label="Pending" styleType="warning-filled" />
 
-                    <Badge icon={<XIcon />} styleType="destructive-filled">
-                        Failed
-                    </Badge>
+                    <Badge icon={<XIcon />} label="Failed" styleType="destructive-filled" />
                 </div>
             </div>
 
@@ -273,19 +295,44 @@ export const BadgeUseCases: Story = {
                 <h3 className="text-sm font-semibold">Version & Publication Status</h3>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Badge styleType="secondary-outline" weight="semibold">
-                        V1 DRAFT
-                    </Badge>
+                    <Badge label="V1 DRAFT" styleType="secondary-outline" weight="semibold" />
 
-                    <Badge styleType="success-outline" weight="semibold">
-                        V2 PUBLISHED
-                    </Badge>
+                    <Badge label="V2 PUBLISHED" styleType="success-outline" weight="semibold" />
 
-                    <Badge styleType="primary-outline" weight="semibold">
-                        V2 DEPLOYED
-                    </Badge>
+                    <Badge label="V2 DEPLOYED" styleType="primary-outline" weight="semibold" />
+
+                    <Badge label="V3 FAILED" styleType="destructive-outline" weight="semibold" />
                 </div>
             </div>
+        </div>
+    ),
+};
+
+export const BadgesWithCustomChildren: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Badges with custom children (divs, spans, etc.) instead of simple text labels.',
+            },
+        },
+    },
+    render: () => (
+        <div className="flex flex-wrap items-center gap-4">
+            <Badge styleType="primary-filled">
+                <span className="font-semibold">Custom</span>
+
+                <span>Content</span>
+            </Badge>
+
+            <Badge icon={<CheckIcon />} styleType="success-filled">
+                <span>Active</span>
+            </Badge>
+
+            <Badge styleType="secondary-outline">
+                <span>State: </span>
+
+                <span className="font-semibold">deployed</span>
+            </Badge>
         </div>
     ),
 };
