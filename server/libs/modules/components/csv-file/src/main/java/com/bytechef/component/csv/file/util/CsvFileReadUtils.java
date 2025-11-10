@@ -24,6 +24,8 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.definition.Parameters;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,13 +34,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
-
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -143,7 +141,13 @@ public class CsvFileReadUtils {
         String[] headerRow = null;
 
         if (configuration.headerRow()) {
-            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter);
+            String headerString = bufferedReader.readLine();
+            if (headerString != null) {
+                headerRow = CSVHeaderBuilder.asArray(headerString, delimiter);
+            } else {
+                throw new NullPointerException();
+            }
+
         }
 
         CSVFormat csvFormat = CSVFormat.Builder.create()
@@ -152,7 +156,8 @@ public class CsvFileReadUtils {
                 .setHeader(headerRow)
                 .get();
 
-        return csvFormat.parse(bufferedReader).iterator();
+        return csvFormat.parse(bufferedReader)
+                .iterator();
     }
 
     public static ReadConfiguration getReadConfiguration(Parameters inputParameters) {

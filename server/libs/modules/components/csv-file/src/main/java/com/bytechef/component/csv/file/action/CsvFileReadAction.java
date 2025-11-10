@@ -26,9 +26,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.MappingIterator;
-import org.apache.commons.csv.CSVRecord;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * @author Ivica Cardic
@@ -80,7 +78,8 @@ public class CsvFileReadAction {
 
             if (configuration.headerRow()) {
                 while (iterator.hasNext()) {
-                    Map<?, ?> row = (Map<?, ?>) iterator.next().toMap();
+                    Map<?, ?> row = (Map<?, ?>) iterator.next()
+                        .toMap();
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = CsvFileReadUtils.getHeaderRow(
@@ -97,7 +96,8 @@ public class CsvFileReadAction {
                 }
             } else {
                 while (iterator.hasNext()) {
-                    List<?> row = (List<?>) iterator.next().toList();
+                    List<?> row = (List<?>) iterator.next()
+                        .toList();
 
                     context.log(log -> log.trace("row: {}", row));
 

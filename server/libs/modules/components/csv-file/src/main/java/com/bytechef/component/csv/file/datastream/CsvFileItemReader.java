@@ -19,14 +19,6 @@ package com.bytechef.component.csv.file.datastream;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_PROPERTIES;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
 import com.bytechef.component.definition.ComponentDsl;
@@ -35,6 +27,13 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.csv.CSVRecord;
 
 /**
@@ -43,12 +42,12 @@ import org.apache.commons.csv.CSVRecord;
 public class CsvFileItemReader implements ItemReader {
 
     public static final ModifiableClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION = ComponentDsl
-            .<CsvFileItemReader>clusterElement("reader")
-            .title("Read CSV file row")
-            .description("Reads a single row from a CSV file.")
-            .type(SOURCE)
-            .object(CsvFileItemReader.class)
-            .properties(READ_PROPERTIES);
+        .<CsvFileItemReader>clusterElement("reader")
+        .title("Read CSV file row")
+        .description("Reads a single row from a CSV file.")
+        .type(SOURCE)
+        .object(CsvFileItemReader.class)
+        .properties(READ_PROPERTIES);
 
     private BufferedReader bufferedReader;
     private ReadConfiguration configuration;
@@ -68,17 +67,17 @@ public class CsvFileItemReader implements ItemReader {
 
     @Override
     public void open(
-            Parameters inputParameters, Parameters connectionParameters, Context context,
-            ExecutionContext executionContext) {
+        Parameters inputParameters, Parameters connectionParameters, Context context,
+        ExecutionContext executionContext) {
 
         configuration = CsvFileReadUtils.getReadConfiguration(inputParameters);
 
         enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
 
         bufferedReader = new BufferedReader(
-                new InputStreamReader(
-                        context.file(file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
-                        StandardCharsets.UTF_8));
+            new InputStreamReader(
+                context.file(file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
+                StandardCharsets.UTF_8));
 
         try {
             iterator = CsvFileReadUtils.getIterator(bufferedReader, configuration);
@@ -91,13 +90,15 @@ public class CsvFileItemReader implements ItemReader {
     public Map<String, Object> read() throws Exception {
         if (configuration.headerRow()) {
             if (iterator.hasNext()) {
-                Map<?, ?> row = (Map<?, ?>) iterator.next().toMap();
+                Map<?, ?> row = (Map<?, ?>) iterator.next()
+                    .toMap();
 
                 return CsvFileReadUtils.getHeaderRow(configuration, row, enclosingCharacter);
             }
         } else {
             if (iterator.hasNext()) {
-                List<?> row = (List<?>) iterator.next().toList();
+                List<?> row = (List<?>) iterator.next()
+                    .toList();
 
                 return CsvFileReadUtils.getColumnRow(configuration, row, enclosingCharacter);
             }
