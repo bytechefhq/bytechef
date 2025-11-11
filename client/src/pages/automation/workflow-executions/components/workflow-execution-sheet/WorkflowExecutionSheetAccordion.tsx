@@ -10,7 +10,7 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
-    const taskExecutionsCompleted = job?.taskExecutions?.every((taskExecution) => taskExecution.status === 'COMPLETED');
+    const taskExecutionsCompleted = job?.status === 'COMPLETED';
     const triggerExecutionCompleted = !triggerExecution || triggerExecution?.status === 'COMPLETED';
 
     let duration;
