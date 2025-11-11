@@ -64,7 +64,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -106,6 +106,7 @@ const TABS: Array<{label: string; name: TabNameType}> = [
 
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
+    closeButton?: ReactNode;
     invalidateWorkflowQueries: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -114,6 +115,7 @@ interface WorkflowNodeDetailsPanelProps {
 
 const WorkflowNodeDetailsPanel = ({
     className,
+    closeButton,
     invalidateWorkflowQueries,
     previousComponentDefinitions,
     updateWorkflowMutation,
@@ -1155,13 +1157,17 @@ const WorkflowNodeDetailsPanel = ({
                             </Tooltip>
                         )}
 
-                        <button
-                            aria-label="Close the node details dialog"
-                            className="ml-auto pr-0"
-                            onClick={handlePanelClose}
-                        >
-                            <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
-                        </button>
+                        {closeButton ? (
+                            closeButton
+                        ) : (
+                            <button
+                                aria-label="Close the node details dialog"
+                                className="ml-auto pr-0"
+                                onClick={handlePanelClose}
+                            >
+                                <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
+                            </button>
+                        )}
                     </header>
 
                     <main className="flex h-full flex-col overflow-hidden">
