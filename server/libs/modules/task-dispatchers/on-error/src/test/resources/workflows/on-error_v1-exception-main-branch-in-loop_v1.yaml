@@ -1,0 +1,44 @@
+---
+label: "On Error Task Dispatcher"
+tasks:
+- name: "loop_1"
+  type: "loop/v1"
+  parameters:
+    loopForever: false
+    items:
+    - 1
+    - 2
+    iteratee:
+    - name: "on_error_1"
+      type: "on-error/v1"
+      parameters:
+        main-branch:
+        - name: "beforeExceptionMainBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "main branch before exception, iteration number ${loop_1.item}"
+        - name: "httpClient_error"
+          type: "httpClient/v1/get"
+          parameters:
+            allowUnauthorizedCerts: false
+            responseType: "JSON"
+            responseContentType: "application/octet-stream"
+            fullResponse: false
+            followAllRedirects: false
+            followRedirect: false
+            ignoreResponseCode: false
+            timeout: 1000
+            uri: "https://localhost:8080"
+        - name: "afterExceptionMainBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "main branch after exception, iteration number ${loop_1.item}"
+        on-error-branch:
+        - name: "errorBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "error branch iteration number ${loop_1.item}"
+- name: "endVar"
+  type: "var/v1/set"
+  parameters:
+    value: "end"
