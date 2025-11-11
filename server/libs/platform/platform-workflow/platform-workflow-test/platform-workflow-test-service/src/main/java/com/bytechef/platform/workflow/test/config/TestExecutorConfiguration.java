@@ -65,6 +65,8 @@ import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
+import com.bytechef.task.dispatcher.on.error.OnErrorTaskDispatcher;
+import com.bytechef.task.dispatcher.on.error.completition.OnErrorTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
@@ -148,6 +150,9 @@ public class TestExecutorConfiguration {
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
                 contextService, counterService, evaluator, taskDispatcher, taskCompletionHandler, taskExecutionService,
                 taskFileStorage),
+            (taskCompletionHandler, taskDispatcher) -> new OnErrorTaskCompletionHandler(
+                contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
                 counterService, taskCompletionHandler, taskExecutionService));
     }
@@ -195,6 +200,8 @@ public class TestExecutorConfiguration {
             (taskDispatcher) -> new MapTaskDispatcher(
                 contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
+            (taskDispatcher) -> new OnErrorTaskDispatcher(
+                contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
