@@ -1,3 +1,4 @@
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -13,6 +14,8 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+    const currentType = useModeTypeStore((state) => state.currentType);
+
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const location = useLocation();
@@ -32,16 +35,22 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'api-keys') {
             return (
-                isFeatureFlagEnabled('ff-1023') || isFeatureFlagEnabled('ff-1024') || isFeatureFlagEnabled('ff-1025')
+                (currentType === ModeType.AUTOMATION &&
+                    (isFeatureFlagEnabled('ff-1025') || isFeatureFlagEnabled('ff-1039'))) ||
+                (currentType === ModeType.EMBEDDED && isFeatureFlagEnabled('ff-520'))
             );
+        }
+
+        if (navItem.href === 'admin-api-keys') {
+            return isFeatureFlagEnabled('ff-1024');
+        }
+
+        if (navItem.href === 'mcp-server') {
+            return isFeatureFlagEnabled('ff-2197');
         }
 
         return true;
     });
-
-    // useEffect(() => {
-    //     getApplicationInfo();
-    // }, [getApplicationInfo]);
 
     return (
         <LayoutContainer

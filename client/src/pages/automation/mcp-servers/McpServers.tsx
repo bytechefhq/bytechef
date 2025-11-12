@@ -5,7 +5,13 @@ import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {ModeType, Tag, useMcpServerTagsQuery, useMcpServersByWorkspaceQuery} from '@/shared/middleware/graphql';
+import {
+    McpServer,
+    ModeType,
+    Tag,
+    useMcpServerTagsQuery,
+    useWorkspaceMcpServersQuery,
+} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ServerIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
@@ -32,7 +38,7 @@ const McpServers = () => {
         data,
         error: mcpServersError,
         isLoading: mcpServersIsLoading,
-    } = useMcpServersByWorkspaceQuery({workspaceId: currentWorkspaceId + ''});
+    } = useWorkspaceMcpServersQuery({workspaceId: currentWorkspaceId + ''});
 
     const {
         data: tagsData,
@@ -40,11 +46,11 @@ const McpServers = () => {
         isLoading: tagsIsLoading,
     } = useMcpServerTagsQuery({type: ModeType.Automation});
 
-    if (!data || !data.mcpServersByWorkspace) {
+    if (!data || !data.workspaceMcpServers) {
         return <></>;
     }
 
-    const validMcpServers = data.mcpServersByWorkspace.filter((server) => server !== null);
+    const validMcpServers = data.workspaceMcpServers.filter((server) => server !== null);
     const tags = tagsData?.mcpServerTags as Tag[] | undefined;
 
     // Filter servers based on environment and/or tagId
@@ -83,7 +89,7 @@ const McpServers = () => {
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
                 {filteredMcpServers.length > 0 ? (
-                    <McpServerList mcpServers={filteredMcpServers} tags={tags} />
+                    <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
                 ) : (
                     <EmptyList
                         button={

@@ -11,17 +11,16 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
+import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {useToast} from '@/hooks/use-toast';
-import {ApiKey} from '@/shared/middleware/platform/security';
-import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
-import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
+import {useShallow} from 'zustand/react/shallow';
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -30,14 +29,23 @@ const formSchema = z.object({
 });
 
 interface ApiKeyDialogProps {
-    apiKey?: ApiKey;
-    onClose?: () => void;
     triggerNode?: ReactNode;
 }
 
-const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
+const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
-    const [secretKey, setSecretKey] = useState<string | undefined>();
+
+    const {currentApiKey, secretKey, setCurrentApiKey, setSecretKey, setShowEditDialog} = useApiKeysStore(
+        useShallow((state) => ({
+            currentApiKey: state.currentApiKey,
+            secretKey: state.secretKey,
+            setCurrentApiKey: state.setCurrentApiKey,
+            setSecretKey: state.setSecretKey,
+            setShowEditDialog: state.setShowEditDialog,
+        }))
+    );
+
+    const {handleSave} = useApiKeys();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -45,59 +53,26 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            name: apiKey?.name || '',
+            name: currentApiKey?.name || '',
         },
         resolver: zodResolver(formSchema),
     });
 
     const {control, getValues, handleSubmit, reset} = form;
 
-    const queryClient = useQueryClient();
-
-    const createApiKeyMutation = useCreateApiKeyMutation({
-        onSuccess: (result: {secretKey?: string}) => {
-            queryClient.invalidateQueries({
-                queryKey: ApiKeyKeys.apiKeys,
-            });
-
-            setSecretKey(result.secretKey);
-
-            reset();
-        },
-    });
-    const updateApiKeyMutation = useUpdateApiKeyMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ApiKeyKeys.apiKeys,
-            });
-
-            closeDialog();
-        },
-    });
-
     function closeDialog() {
-        setIsOpen(false);
-
-        if (onClose) {
-            onClose();
-        }
-
         reset();
+        setCurrentApiKey(undefined);
+        setShowEditDialog(false);
         setSecretKey(undefined);
+        setIsOpen(false);
     }
 
     function saveApiKey() {
-        if (apiKey?.id) {
-            updateApiKeyMutation.mutate({
-                ...apiKey,
-                ...getValues(),
-            } as ApiKey);
-        } else {
-            createApiKeyMutation.mutate({
-                ...apiKey,
-                ...getValues(),
-            } as ApiKey);
-        }
+        handleSave({
+            ...currentApiKey,
+            ...getValues(),
+        });
     }
 
     return (
@@ -118,7 +93,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiKey)}>
                         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                             <DialogTitle>
-                                {secretKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} API Key
+                                {secretKey ? 'Save your' : `${currentApiKey?.id ? 'Edit' : 'Create'}`} API Key
                             </DialogTitle>
 
                             <DialogCloseButton />
@@ -127,16 +102,18 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                         {secretKey ? (
                             <div className="space-y-4">
                                 <p className="text-sm">
-                                    Please save this secret API key somewhere safe and accessible. For security reasons,
-                                    you won&apos;t be able to view it again through your ByteChef account. If you lose
-                                    this secret API key, you&apos;ll need to generate a new one.
+                                    Please save this secret key somewhere safe and accessible. For security reasons, you
+                                    won&apos;t be able to view it again through your ByteChef account. If you lose this
+                                    secret key, you&apos;ll need to generate a new one.
                                 </p>
 
                                 <div className="flex space-x-1">
                                     <Input readOnly={true} value={secretKey} />
 
                                     <Button
-                                        onClick={() => {
+                                        onClick={(event) => {
+                                            event.preventDefault();
+
                                             copyToClipboard(secretKey);
 
                                             toast({description: 'The secret API key is copied.'});
@@ -173,7 +150,9 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                                 </Button>
                             </DialogClose>
 
-                            {!secretKey && <Button type="submit">{apiKey?.id ? 'Save' : 'Create API Key'}</Button>}
+                            {!secretKey && (
+                                <Button type="submit">{currentApiKey?.id ? 'Save' : 'Create API Key'}</Button>
+                            )}
                         </DialogFooter>
                     </form>
                 </Form>

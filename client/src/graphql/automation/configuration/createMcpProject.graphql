@@ -1,0 +1,8 @@
+mutation createMcpProject($input: CreateMcpProjectInput!) {
+    createMcpProject(input: $input) {
+        id
+        mcpServerId
+        projectDeploymentId
+        projectVersion
+    }
+}

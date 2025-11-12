@@ -129,9 +129,9 @@ const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps
                         {secretApiKey ? (
                             <div className="space-y-4">
                                 <p className="text-sm">
-                                    Please save this secret API key somewhere safe and accessible. For security reasons,
-                                    you won&apos;t be able to view it again through your ByteChef account. If you lose
-                                    this secret API key, you&apos;ll need to generate a new one.
+                                    Please save this secret key somewhere safe and accessible. For security reasons, you
+                                    won&apos;t be able to view it again through your ByteChef account. If you lose this
+                                    secret key, you&apos;ll need to generate a new one.
                                 </p>
 
                                 <div className="flex space-x-1">
