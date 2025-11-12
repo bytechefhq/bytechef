@@ -37,16 +37,16 @@ import com.bytechef.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.springframework.ai.audio.tts.Speech;
+import org.springframework.ai.audio.tts.TextToSpeechModel;
+import org.springframework.ai.audio.tts.TextToSpeechPrompt;
+import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest;
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioResponseFormat;
 import org.springframework.ai.openai.api.OpenAiAudioApi.TtsModel;
-import org.springframework.ai.openai.audio.speech.Speech;
-import org.springframework.ai.openai.audio.speech.SpeechModel;
-import org.springframework.ai.openai.audio.speech.SpeechPrompt;
-import org.springframework.ai.openai.audio.speech.SpeechResponse;
 
 /**
  * @author Monika Domiter
@@ -114,16 +114,16 @@ public class OpenAiCreateSpeechAction {
             .input(input)
             .voice(SpeechRequest.Voice.valueOf(inputParameters.getString(VOICE)))
             .responseFormat(audioResponseFormat)
-            .speed(inputParameters.getFloat(SPEED))
+            .speed(inputParameters.getDouble(SPEED))
             .build();
 
-        SpeechModel speechModel = new OpenAiAudioSpeechModel(
+        TextToSpeechModel speechModel = new OpenAiAudioSpeechModel(
             OpenAiAudioApi.builder()
                 .apiKey(connectionParameters.getRequiredString(TOKEN))
                 .build(),
             speechOptions);
 
-        SpeechResponse response = speechModel.call(new SpeechPrompt(input));
+        TextToSpeechResponse response = speechModel.call(new TextToSpeechPrompt(input));
 
         Speech result = response.getResult();
 

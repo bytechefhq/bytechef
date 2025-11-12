@@ -50,11 +50,15 @@ public class MistralAiEmbedding {
                     .options(EMBEDDING_MODELS));
 
     protected static EmbeddingModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return new MistralAiEmbeddingModel(
-            new MistralAiApi(
-                connectionParameters.getRequiredString(TOKEN)),
-            MistralAiEmbeddingOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .build());
+        return MistralAiEmbeddingModel.builder()
+            .mistralAiApi(
+                MistralAiApi.builder()
+                    .apiKey(connectionParameters.getRequiredString(TOKEN))
+                    .build())
+            .options(
+                MistralAiEmbeddingOptions.builder()
+                    .withModel(inputParameters.getRequiredString(MODEL))
+                    .build())
+            .build();
     }
 }
