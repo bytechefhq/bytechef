@@ -1,24 +1,12 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import ApiKeyDialog from '@/pages/settings/platform/api-keys/components/ApiKeyDialog';
-import {ApiKey} from '@/shared/middleware/platform/security';
-import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
-import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
-import {useQueryClient} from '@tanstack/react-query';
+import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import {ApiKey} from '@/shared/middleware/graphql';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {EditIcon, Trash2Icon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 const columnHelper = createColumnHelper<ApiKey>();
 
@@ -26,50 +14,14 @@ interface ApiKeyTableProps {
     apiKeys: ApiKey[];
 }
 
-const ApiKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () => void}) => {
-    const queryClient = useQueryClient();
-
-    const deleteApiKeyMutation = useDeleteApiKeyMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ApiKeyKeys.apiKeys,
-            });
-
-            onClose();
-        },
-    });
-
-    const handleClick = () => {
-        deleteApiKeyMutation.mutate(apiKeyId);
-    };
-
-    return (
-        <AlertDialog onOpenChange={onClose} open={true}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the API key.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <AlertDialogAction className="bg-destructive" onClick={handleClick}>
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
-
 const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
-    const [currentApiKey, setCurrentApiKey] = useState<ApiKey>();
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showEditDialog, setShowEditDialog] = useState(false);
+    const {setCurrentApiKey, setShowDeleteDialog, setShowEditDialog} = useApiKeysStore(
+        useShallow((state) => ({
+            setCurrentApiKey: state.setCurrentApiKey,
+            setShowDeleteDialog: state.setShowDeleteDialog,
+            setShowEditDialog: state.setShowEditDialog,
+        }))
+    );
 
     const columns = useMemo(
         () => [
@@ -82,13 +34,18 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                 header: 'Secret Key',
             }),
             columnHelper.accessor('createdDate', {
-                cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
+                cell: (info) =>
+                    `${new Date(info.getValue()).toLocaleDateString()} ${new Date(info.getValue()).toLocaleTimeString()}`,
                 header: 'Created Date',
             }),
             columnHelper.accessor('lastUsedDate', {
                 cell: (info) =>
-                    `${info.getValue()?.toLocaleDateString() ?? ''} ${info.getValue()?.toLocaleTimeString() ?? ''}`,
+                    `${new Date(info.getValue()).toLocaleDateString() ?? ''} ${new Date(info.getValue()).toLocaleTimeString() ?? ''}`,
                 header: 'Last Used Date',
+            }),
+            columnHelper.accessor('createdBy', {
+                cell: (info) => `${info.getValue()}`,
+                header: 'Created By',
             }),
             columnHelper.display({
                 cell: (info) => (
@@ -120,7 +77,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                 id: 'actions',
             }),
         ],
-        []
+        [setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
     );
 
     const reactTable = useReactTable<ApiKey>({
@@ -134,17 +91,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
 
     return (
         <div className="w-full space-y-4 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
-            <p>
-                Your secret API keys are listed below. Please note that we do not display your secret API keys again
-                after you generate them.
-            </p>
-
-            <p>
-                Do not share your API key with others or expose it in the browser or other client-side code. To protect
-                your account&#39;s security, ByteChef may automatically disable any API key that has leaked publicly.
-            </p>
-
-            <Table className="table-auto">
+            <Table>
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
@@ -197,12 +144,6 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                     ))}
                 </TableBody>
             </Table>
-
-            {showDeleteDialog && currentApiKey && (
-                <ApiKeyDeleteDialog apiKeyId={currentApiKey.id!} onClose={() => setShowDeleteDialog(false)} />
-            )}
-
-            {showEditDialog && <ApiKeyDialog apiKey={currentApiKey} onClose={() => setShowEditDialog(false)} />}
         </div>
     );
 };

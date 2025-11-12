@@ -1,0 +1,3 @@
+mutation updateWorkspaceApiKey($apiKeyId: ID!, $name: String!) {
+    updateWorkspaceApiKey(apiKeyId: $apiKeyId, name: $name)
+}

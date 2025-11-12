@@ -1,0 +1,3 @@
+mutation createWorkspaceApiKey($workspaceId: ID!, $name: String!, $environmentId: ID!) {
+    createWorkspaceApiKey(workspaceId: $workspaceId,name: $name, environmentId: $environmentId)
+}

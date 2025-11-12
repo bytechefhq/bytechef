@@ -44,10 +44,8 @@ const McpServerDialog = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    // Use external state if provided, otherwise use internal state
     const open = externalOpen !== undefined ? externalOpen : internalOpen;
     const setOpen = externalOnOpenChange || setInternalOpen;
-    const queryClient = useQueryClient();
 
     const form = useForm<FormValuesType>({
         defaultValues: {
@@ -56,6 +54,8 @@ const McpServerDialog = ({
         },
         resolver: zodResolver(formSchema),
     });
+
+    const queryClient = useQueryClient();
 
     const createMcpServerMutation = useCreateMcpServerMutation();
     const updateMcpServerMutation = useUpdateMcpServerMutation();
@@ -72,7 +72,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                         setOpen(false);
                     },
                 }
@@ -90,7 +90,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['mcpServersByWorkspace']});
+                        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                         setOpen(false);
                     },
                 }

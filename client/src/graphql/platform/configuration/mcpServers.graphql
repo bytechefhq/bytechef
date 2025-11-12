@@ -5,6 +5,7 @@ query mcpServers($type: ModeType!) {
         type
         environmentId
         enabled
+        secretKey
         mcpComponents {
             id
             mcpServerId

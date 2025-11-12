@@ -49,9 +49,15 @@ const RegisterSuccess = () => {
                     </CardDescription>
                 </CardHeader>
 
-                <Link to="/login">
-                    <Button disabled={loading} icon={loading ? <LoadingIcon /> : undefined} label="Start" size="lg" />
-                </Link>
+                {loading ? (
+                    <div>
+                        <Button disabled icon={<LoadingIcon />} label="Start" size="lg" />
+                    </div>
+                ) : (
+                    <Link to="/login">
+                        <Button label="Start" size="lg" />
+                    </Link>
+                )}
             </Card>
         </PublicLayoutContainer>
     );

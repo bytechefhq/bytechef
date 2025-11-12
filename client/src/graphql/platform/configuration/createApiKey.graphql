@@ -1,0 +1,3 @@
+mutation createApiKey($name: String!, $environmentId: ID!, $type: ModeType) {
+    createApiKey(name: $name, environmentId: $environmentId, type: $type)
+}

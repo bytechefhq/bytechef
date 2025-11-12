@@ -12,7 +12,7 @@ import {
     McpProjectWorkflow,
     McpServer,
     Tag,
-    useDeleteMcpServerMutation,
+    useDeleteWorkspaceMcpServerMutation,
     useUpdateMcpServerMutation,
     useUpdateMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
@@ -39,7 +39,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
     const queryClient = useQueryClient();
 
     const updateMcpServerMutation = useUpdateMcpServerMutation();
-    const deleteMcpServerMutation = useDeleteMcpServerMutation();
+    const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
     const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['mcpServers']});
@@ -58,7 +58,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['mcpServers']});
+                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                     setIsEnablePending(false);
                 },
             }
@@ -68,13 +68,13 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
     const handleDeleteClick = async () => {
         setIsPending(true);
 
-        deleteMcpServerMutation.mutate(
+        deleteWorkspaceMcpServerMutation.mutate(
             {
                 id: mcpServer.id,
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['mcpServersByWorkspace']});
+                    queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                     setShowDeleteDialog(false);
                 },
             }
