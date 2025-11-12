@@ -99,7 +99,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 
 /**
  * @author Marko Kriskovic
@@ -163,7 +163,7 @@ public class OllamaChatAction {
         return OllamaChatModel.builder()
             .ollamaApi(ollamaApi)
             .defaultOptions(
-                OllamaOptions.builder()
+                OllamaChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
