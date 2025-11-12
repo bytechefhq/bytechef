@@ -40,7 +40,12 @@ export type Scalars = {
 
 export type ApiKey = {
   __typename?: 'ApiKey';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  lastUsedDate?: Maybe<Scalars['Long']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   secretKey?: Maybe<Scalars['String']['output']>;
 };
@@ -128,14 +133,14 @@ export type ConnectionDefinition = {
   version: Scalars['Int']['output'];
 };
 
-export type CreateMcpProjectWithWorkflowsInput = {
+export type CreateMcpProjectInput = {
   mcpServerId: Scalars['ID']['input'];
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
 };
 
-export type CreateMcpServerForWorkspaceInput = {
+export type CreateWorkspaceMcpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -245,6 +250,7 @@ export type McpServer = {
   secretKey: Scalars['String']['output'];
   tags?: Maybe<Array<Maybe<Tag>>>;
   type: ModeType;
+  url: Scalars['String']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -304,38 +310,40 @@ export type Mutation = {
   createApiKey: Scalars['String']['output'];
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
-  createMcpProjectWithWorkflows?: Maybe<McpProject>;
+  createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpServer?: Maybe<McpServer>;
-  createMcpServerForWorkspace?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
+  createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteApiKey: Scalars['Boolean']['output'];
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpServerFromWorkspace?: Maybe<Scalars['Boolean']['output']>;
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
+  deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
   updateApiKey: Scalars['Boolean']['output'];
+  updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   updateMcpServer?: Maybe<McpServer>;
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
+  updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
 
 
 export type MutationCreateApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: ModeType;
+  type?: InputMaybe<ModeType>;
 };
 
 
@@ -349,8 +357,8 @@ export type MutationCreateMcpComponentWithToolsArgs = {
 };
 
 
-export type MutationCreateMcpProjectWithWorkflowsArgs = {
-  input: CreateMcpProjectWithWorkflowsInput;
+export type MutationCreateMcpProjectArgs = {
+  input: CreateMcpProjectInput;
 };
 
 
@@ -364,11 +372,6 @@ export type MutationCreateMcpServerArgs = {
 };
 
 
-export type MutationCreateMcpServerForWorkspaceArgs = {
-  input: CreateMcpServerForWorkspaceInput;
-};
-
-
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
 };
@@ -378,6 +381,11 @@ export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateWorkspaceMcpServerArgs = {
+  input: CreateWorkspaceMcpServerInput;
 };
 
 
@@ -406,11 +414,6 @@ export type MutationDeleteMcpServerArgs = {
 };
 
 
-export type MutationDeleteMcpServerFromWorkspaceArgs = {
-  mcpServerId: Scalars['ID']['input'];
-};
-
-
 export type MutationDeleteSharedProjectArgs = {
   id: Scalars['ID']['input'];
 };
@@ -423,6 +426,11 @@ export type MutationDeleteSharedWorkflowArgs = {
 
 export type MutationDeleteWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWorkspaceMcpServerArgs = {
+  mcpServerId: Scalars['ID']['input'];
 };
 
 
@@ -481,6 +489,17 @@ export type MutationUpdateMcpServerTagsArgs = {
   tags: Array<TagInput>;
 };
 
+
+export type MutationUpdateMcpServerUrlArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWorkspaceApiKeyArgs = {
+  apiKeyId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
 export type Project = {
   __typename?: 'Project';
   category?: Maybe<Category>;
@@ -529,6 +548,7 @@ export type ProjectTemplate = {
 export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   connectedUser?: Maybe<ConnectedUser>;
@@ -536,6 +556,7 @@ export type Query = {
   connectedUsers?: Maybe<ConnectedUserPage>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   integration?: Maybe<Integration>;
+  managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
   mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
@@ -548,9 +569,7 @@ export type Query = {
   mcpProjectsByServerId?: Maybe<Array<Maybe<McpProject>>>;
   mcpServer?: Maybe<McpServer>;
   mcpServerTags?: Maybe<Array<Maybe<Tag>>>;
-  mcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpServers?: Maybe<Array<Maybe<McpServer>>>;
-  mcpServersByWorkspace?: Maybe<Array<Maybe<McpServer>>>;
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
@@ -563,6 +582,12 @@ export type Query = {
   sharedWorkflow?: Maybe<SharedWorkflow>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
+  workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
+};
+
+
+export type QueryAdminApiKeysArgs = {
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -573,6 +598,7 @@ export type QueryApiKeyArgs = {
 
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
+  type: ModeType;
 };
 
 
@@ -653,11 +679,6 @@ export type QueryMcpServersArgs = {
 };
 
 
-export type QueryMcpServersByWorkspaceArgs = {
-  workspaceId: Scalars['ID']['input'];
-};
-
-
 export type QueryMcpToolArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -708,6 +729,12 @@ export type QueryWorkflowTemplateArgs = {
 
 
 export type QueryWorkspaceApiKeysArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceMcpServersArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -779,19 +806,28 @@ export type WorkflowTemplate = {
   workflow: SharedWorkflowInfo;
 };
 
-export type CreateMcpProjectWithWorkflowsMutationVariables = Exact<{
-  input: CreateMcpProjectWithWorkflowsInput;
+export type CreateMcpProjectMutationVariables = Exact<{
+  input: CreateMcpProjectInput;
 }>;
 
 
-export type CreateMcpProjectWithWorkflowsMutation = { __typename?: 'Mutation', createMcpProjectWithWorkflows?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
+export type CreateMcpProjectMutation = { __typename?: 'Mutation', createMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
+
+export type CreateWorkspaceApiKeyMutationVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  environmentId: Scalars['ID']['input'];
+}>;
+
+
+export type CreateWorkspaceApiKeyMutation = { __typename?: 'Mutation', createWorkspaceApiKey: string };
 
 export type CreateMcpServerMutationVariables = Exact<{
-  input: CreateMcpServerForWorkspaceInput;
+  input: CreateWorkspaceMcpServerInput;
 }>;
 
 
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createMcpServerForWorkspace?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -799,13 +835,6 @@ export type DeleteMcpProjectMutationVariables = Exact<{
 
 
 export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
-
-export type DeleteMcpServerMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteMcpServerMutation = { __typename?: 'Mutation', deleteMcpServerFromWorkspace?: boolean | null };
 
 export type DeleteSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -820,6 +849,20 @@ export type DeleteSharedWorkflowMutationVariables = Exact<{
 
 
 export type DeleteSharedWorkflowMutation = { __typename?: 'Mutation', deleteSharedWorkflow: boolean };
+
+export type DeleteWorkspaceApiKeyMutationVariables = Exact<{
+  apiKeyId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorkspaceApiKeyMutation = { __typename?: 'Mutation', deleteWorkspaceApiKey: boolean };
+
+export type DeleteWorkspaceMcpServerMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorkspaceMcpServerMutation = { __typename?: 'Mutation', deleteWorkspaceMcpServer?: boolean | null };
 
 export type ExportSharedProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -861,13 +904,6 @@ export type McpProjectsByServerIdQueryVariables = Exact<{
 
 
 export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, projectDeploymentId: any, inputs?: any | null, workflowId: string } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
-
-export type McpServersByWorkspaceQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-}>;
-
-
-export type McpServersByWorkspaceQuery = { __typename?: 'Query', mcpServersByWorkspace?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -930,6 +966,14 @@ export type UpdateMcpServerTagsMutationVariables = Exact<{
 
 export type UpdateMcpServerTagsMutation = { __typename?: 'Mutation', updateMcpServerTags?: Array<{ __typename?: 'Tag', id: string } | null> | null };
 
+export type UpdateWorkspaceApiKeyMutationVariables = Exact<{
+  apiKeyId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+}>;
+
+
+export type UpdateWorkspaceApiKeyMutation = { __typename?: 'Mutation', updateWorkspaceApiKey: boolean };
+
 export type WorkflowTemplateQueryVariables = Exact<{
   id: Scalars['String']['input'];
   sharedWorkflow: Scalars['Boolean']['input'];
@@ -937,6 +981,21 @@ export type WorkflowTemplateQueryVariables = Exact<{
 
 
 export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow: { __typename?: 'SharedWorkflowInfo', label: string }, components: Array<{ __typename?: 'ComponentDefinition', icon: string, name: string, title: string, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }> } | null };
+
+export type WorkspaceApiKeysQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+}>;
+
+
+export type WorkspaceApiKeysQuery = { __typename?: 'Query', workspaceApiKeys: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null }> };
+
+export type WorkspaceMcpServersQueryVariables = Exact<{
+  workspaceId: Scalars['ID']['input'];
+}>;
+
+
+export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -952,6 +1011,30 @@ export type IntegrationByIdQueryVariables = Exact<{
 
 
 export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
+
+export type AdminApiKeysQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+}>;
+
+
+export type AdminApiKeysQuery = { __typename?: 'Query', adminApiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
+
+export type ApiKeysQueryVariables = Exact<{
+  environmentId: Scalars['ID']['input'];
+  type: ModeType;
+}>;
+
+
+export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
+
+export type CreateApiKeyMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  environmentId: Scalars['ID']['input'];
+  type?: InputMaybe<ModeType>;
+}>;
+
+
+export type CreateApiKeyMutation = { __typename?: 'Mutation', createApiKey: string };
 
 export type CreateMcpComponentMutationVariables = Exact<{
   input: McpComponentInput;
@@ -974,6 +1057,13 @@ export type CreateMcpToolMutationVariables = Exact<{
 
 export type CreateMcpToolMutation = { __typename?: 'Mutation', createMcpTool?: { __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null };
 
+export type DeleteApiKeyMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteApiKeyMutation = { __typename?: 'Mutation', deleteApiKey: boolean };
+
 export type DeleteMcpComponentMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -986,17 +1076,17 @@ export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type EnvironmentsQuery = { __typename?: 'Query', environments?: Array<{ __typename?: 'Environment', id?: string | null, name?: string | null } | null> | null };
 
+export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ManagementMcpServerUrlQuery = { __typename?: 'Query', managementMcpServerUrl?: string | null };
+
 export type McpComponentsByServerIdQueryVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
 }>;
 
 
 export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, connectionId?: string | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string } | null> | null } | null> | null };
-
-export type McpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type McpServerUrlQuery = { __typename?: 'Query', mcpServerUrl?: string | null };
 
 export type McpServerTagsQueryVariables = Exact<{
   type: ModeType;
@@ -1019,6 +1109,19 @@ export type McpToolsByComponentIdQueryVariables = Exact<{
 
 export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null> | null };
 
+export type UpdateApiKeyMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+}>;
+
+
+export type UpdateApiKeyMutation = { __typename?: 'Mutation', updateApiKey: boolean };
+
+export type UpdateManagementMcpServerUrlMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UpdateManagementMcpServerUrlMutation = { __typename?: 'Mutation', updateManagementMcpServerUrl: string };
+
 export type UpdateMcpComponentWithToolsMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
@@ -1027,16 +1130,18 @@ export type UpdateMcpComponentWithToolsMutationVariables = Exact<{
 
 export type UpdateMcpComponentWithToolsMutation = { __typename?: 'Mutation', updateMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
 
-export type UpdateMcpServerUrlMutationVariables = Exact<{ [key: string]: never; }>;
+export type UpdateMcpServerUrlMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
 
 
 
-export const CreateMcpProjectWithWorkflowsDocument = `
-    mutation createMcpProjectWithWorkflows($input: CreateMcpProjectWithWorkflowsInput!) {
-  createMcpProjectWithWorkflows(input: $input) {
+export const CreateMcpProjectDocument = `
+    mutation createMcpProject($input: CreateMcpProjectInput!) {
+  createMcpProject(input: $input) {
     id
     mcpServerId
     projectDeploymentId
@@ -1045,22 +1150,45 @@ export const CreateMcpProjectWithWorkflowsDocument = `
 }
     `;
 
-export const useCreateMcpProjectWithWorkflowsMutation = <
+export const useCreateMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<CreateMcpProjectWithWorkflowsMutation, TError, CreateMcpProjectWithWorkflowsMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>) => {
     
-    return useMutation<CreateMcpProjectWithWorkflowsMutation, TError, CreateMcpProjectWithWorkflowsMutationVariables, TContext>(
+    return useMutation<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>(
       {
-    mutationKey: ['createMcpProjectWithWorkflows'],
-    mutationFn: (variables?: CreateMcpProjectWithWorkflowsMutationVariables) => fetcher<CreateMcpProjectWithWorkflowsMutation, CreateMcpProjectWithWorkflowsMutationVariables>(CreateMcpProjectWithWorkflowsDocument, variables)(),
+    mutationKey: ['createMcpProject'],
+    mutationFn: (variables?: CreateMcpProjectMutationVariables) => fetcher<CreateMcpProjectMutation, CreateMcpProjectMutationVariables>(CreateMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateWorkspaceApiKeyDocument = `
+    mutation createWorkspaceApiKey($workspaceId: ID!, $name: String!, $environmentId: ID!) {
+  createWorkspaceApiKey(
+    workspaceId: $workspaceId
+    name: $name
+    environmentId: $environmentId
+  )
+}
+    `;
+
+export const useCreateWorkspaceApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkspaceApiKey'],
+    mutationFn: (variables?: CreateWorkspaceApiKeyMutationVariables) => fetcher<CreateWorkspaceApiKeyMutation, CreateWorkspaceApiKeyMutationVariables>(CreateWorkspaceApiKeyDocument, variables)(),
     ...options
   }
     )};
 
 export const CreateMcpServerDocument = `
-    mutation createMcpServer($input: CreateMcpServerForWorkspaceInput!) {
-  createMcpServerForWorkspace(input: $input) {
+    mutation createMcpServer($input: CreateWorkspaceMcpServerInput!) {
+  createWorkspaceMcpServer(input: $input) {
     id
     name
     type
@@ -1102,25 +1230,6 @@ export const useDeleteMcpProjectMutation = <
   }
     )};
 
-export const DeleteMcpServerDocument = `
-    mutation deleteMcpServer($id: ID!) {
-  deleteMcpServerFromWorkspace(mcpServerId: $id)
-}
-    `;
-
-export const useDeleteMcpServerMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>) => {
-    
-    return useMutation<DeleteMcpServerMutation, TError, DeleteMcpServerMutationVariables, TContext>(
-      {
-    mutationKey: ['deleteMcpServer'],
-    mutationFn: (variables?: DeleteMcpServerMutationVariables) => fetcher<DeleteMcpServerMutation, DeleteMcpServerMutationVariables>(DeleteMcpServerDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const DeleteSharedProjectDocument = `
     mutation deleteSharedProject($id: ID!) {
   deleteSharedProject(id: $id)
@@ -1155,6 +1264,44 @@ export const useDeleteSharedWorkflowMutation = <
       {
     mutationKey: ['deleteSharedWorkflow'],
     mutationFn: (variables?: DeleteSharedWorkflowMutationVariables) => fetcher<DeleteSharedWorkflowMutation, DeleteSharedWorkflowMutationVariables>(DeleteSharedWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceApiKeyDocument = `
+    mutation deleteWorkspaceApiKey($apiKeyId: ID!) {
+  deleteWorkspaceApiKey(apiKeyId: $apiKeyId)
+}
+    `;
+
+export const useDeleteWorkspaceApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceApiKey'],
+    mutationFn: (variables?: DeleteWorkspaceApiKeyMutationVariables) => fetcher<DeleteWorkspaceApiKeyMutation, DeleteWorkspaceApiKeyMutationVariables>(DeleteWorkspaceApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceMcpServerDocument = `
+    mutation deleteWorkspaceMcpServer($id: ID!) {
+  deleteWorkspaceMcpServer(mcpServerId: $id)
+}
+    `;
+
+export const useDeleteWorkspaceMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceMcpServer'],
+    mutationFn: (variables?: DeleteWorkspaceMcpServerMutationVariables) => fetcher<DeleteWorkspaceMcpServerMutation, DeleteWorkspaceMcpServerMutationVariables>(DeleteWorkspaceMcpServerDocument, variables)(),
     ...options
   }
     )};
@@ -1303,45 +1450,6 @@ export const useMcpProjectsByServerIdQuery = <
       {
     queryKey: ['mcpProjectsByServerId', variables],
     queryFn: fetcher<McpProjectsByServerIdQuery, McpProjectsByServerIdQueryVariables>(McpProjectsByServerIdDocument, variables),
-    ...options
-  }
-    )};
-
-export const McpServersByWorkspaceDocument = `
-    query mcpServersByWorkspace($workspaceId: ID!) {
-  mcpServersByWorkspace(workspaceId: $workspaceId) {
-    id
-    name
-    type
-    environmentId
-    enabled
-    mcpComponents {
-      id
-      mcpServerId
-      componentName
-      componentVersion
-    }
-    tags {
-      id
-      name
-    }
-    lastModifiedDate
-  }
-}
-    `;
-
-export const useMcpServersByWorkspaceQuery = <
-      TData = McpServersByWorkspaceQuery,
-      TError = unknown
-    >(
-      variables: McpServersByWorkspaceQueryVariables,
-      options?: Omit<UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersByWorkspaceQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<McpServersByWorkspaceQuery, TError, TData>(
-      {
-    queryKey: ['mcpServersByWorkspace', variables],
-    queryFn: fetcher<McpServersByWorkspaceQuery, McpServersByWorkspaceQueryVariables>(McpServersByWorkspaceDocument, variables),
     ...options
   }
     )};
@@ -1605,6 +1713,25 @@ export const useUpdateMcpServerTagsMutation = <
   }
     )};
 
+export const UpdateWorkspaceApiKeyDocument = `
+    mutation updateWorkspaceApiKey($apiKeyId: ID!, $name: String!) {
+  updateWorkspaceApiKey(apiKeyId: $apiKeyId, name: $name)
+}
+    `;
+
+export const useUpdateWorkspaceApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceApiKey'],
+    mutationFn: (variables?: UpdateWorkspaceApiKeyMutationVariables) => fetcher<UpdateWorkspaceApiKeyMutation, UpdateWorkspaceApiKeyMutationVariables>(UpdateWorkspaceApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const WorkflowTemplateDocument = `
     query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
   workflowTemplate(id: $id, sharedWorkflow: $sharedWorkflow) {
@@ -1639,6 +1766,77 @@ export const useWorkflowTemplateQuery = <
       {
     queryKey: ['workflowTemplate', variables],
     queryFn: fetcher<WorkflowTemplateQuery, WorkflowTemplateQueryVariables>(WorkflowTemplateDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceApiKeysDocument = `
+    query workspaceApiKeys($workspaceId: ID!, $environmentId: ID!) {
+  workspaceApiKeys(workspaceId: $workspaceId, environmentId: $environmentId) {
+    id
+    name
+    secretKey
+    lastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useWorkspaceApiKeysQuery = <
+      TData = WorkspaceApiKeysQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceApiKeysQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceApiKeysQuery, TError, TData>(
+      {
+    queryKey: ['workspaceApiKeys', variables],
+    queryFn: fetcher<WorkspaceApiKeysQuery, WorkspaceApiKeysQueryVariables>(WorkspaceApiKeysDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceMcpServersDocument = `
+    query workspaceMcpServers($workspaceId: ID!) {
+  workspaceMcpServers(workspaceId: $workspaceId) {
+    id
+    name
+    type
+    environmentId
+    enabled
+    url
+    mcpComponents {
+      id
+      mcpServerId
+      componentName
+      componentVersion
+    }
+    tags {
+      id
+      name
+    }
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useWorkspaceMcpServersQuery = <
+      TData = WorkspaceMcpServersQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceMcpServersQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceMcpServersQuery, TError, TData>(
+      {
+    queryKey: ['workspaceMcpServers', variables],
+    queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
     ...options
   }
     )};
@@ -1713,6 +1911,87 @@ export const useIntegrationByIdQuery = <
       {
     queryKey: ['integrationById', variables],
     queryFn: fetcher<IntegrationByIdQuery, IntegrationByIdQueryVariables>(IntegrationByIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const AdminApiKeysDocument = `
+    query adminApiKeys($environmentId: ID!) {
+  adminApiKeys(environmentId: $environmentId) {
+    id
+    name
+    secretKey
+    lastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useAdminApiKeysQuery = <
+      TData = AdminApiKeysQuery,
+      TError = unknown
+    >(
+      variables: AdminApiKeysQueryVariables,
+      options?: Omit<UseQueryOptions<AdminApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AdminApiKeysQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AdminApiKeysQuery, TError, TData>(
+      {
+    queryKey: ['adminApiKeys', variables],
+    queryFn: fetcher<AdminApiKeysQuery, AdminApiKeysQueryVariables>(AdminApiKeysDocument, variables),
+    ...options
+  }
+    )};
+
+export const ApiKeysDocument = `
+    query apiKeys($environmentId: ID!, $type: ModeType!) {
+  apiKeys(environmentId: $environmentId, type: $type) {
+    id
+    name
+    secretKey
+    lastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `;
+
+export const useApiKeysQuery = <
+      TData = ApiKeysQuery,
+      TError = unknown
+    >(
+      variables: ApiKeysQueryVariables,
+      options?: Omit<UseQueryOptions<ApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiKeysQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ApiKeysQuery, TError, TData>(
+      {
+    queryKey: ['apiKeys', variables],
+    queryFn: fetcher<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateApiKeyDocument = `
+    mutation createApiKey($name: String!, $environmentId: ID!, $type: ModeType) {
+  createApiKey(name: $name, environmentId: $environmentId, type: $type)
+}
+    `;
+
+export const useCreateApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['createApiKey'],
+    mutationFn: (variables?: CreateApiKeyMutationVariables) => fetcher<CreateApiKeyMutation, CreateApiKeyMutationVariables>(CreateApiKeyDocument, variables)(),
     ...options
   }
     )};
@@ -1796,6 +2075,25 @@ export const useCreateMcpToolMutation = <
   }
     )};
 
+export const DeleteApiKeyDocument = `
+    mutation deleteApiKey($id: ID!) {
+  deleteApiKey(id: $id)
+}
+    `;
+
+export const useDeleteApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteApiKey'],
+    mutationFn: (variables?: DeleteApiKeyMutationVariables) => fetcher<DeleteApiKeyMutation, DeleteApiKeyMutationVariables>(DeleteApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteMcpComponentDocument = `
     mutation deleteMcpComponent($id: ID!) {
   deleteMcpComponent(id: $id)
@@ -1840,6 +2138,28 @@ export const useEnvironmentsQuery = <
   }
     )};
 
+export const ManagementMcpServerUrlDocument = `
+    query managementMcpServerUrl {
+  managementMcpServerUrl
+}
+    `;
+
+export const useManagementMcpServerUrlQuery = <
+      TData = ManagementMcpServerUrlQuery,
+      TError = unknown
+    >(
+      variables?: ManagementMcpServerUrlQueryVariables,
+      options?: Omit<UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ManagementMcpServerUrlQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['managementMcpServerUrl'] : ['managementMcpServerUrl', variables],
+    queryFn: fetcher<ManagementMcpServerUrlQuery, ManagementMcpServerUrlQueryVariables>(ManagementMcpServerUrlDocument, variables),
+    ...options
+  }
+    )};
+
 export const McpComponentsByServerIdDocument = `
     query mcpComponentsByServerId($mcpServerId: ID!) {
   mcpComponentsByServerId(mcpServerId: $mcpServerId) {
@@ -1870,28 +2190,6 @@ export const useMcpComponentsByServerIdQuery = <
       {
     queryKey: ['mcpComponentsByServerId', variables],
     queryFn: fetcher<McpComponentsByServerIdQuery, McpComponentsByServerIdQueryVariables>(McpComponentsByServerIdDocument, variables),
-    ...options
-  }
-    )};
-
-export const McpServerUrlDocument = `
-    query mcpServerUrl {
-  mcpServerUrl
-}
-    `;
-
-export const useMcpServerUrlQuery = <
-      TData = McpServerUrlQuery,
-      TError = unknown
-    >(
-      variables?: McpServerUrlQueryVariables,
-      options?: Omit<UseQueryOptions<McpServerUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerUrlQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<McpServerUrlQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['mcpServerUrl'] : ['mcpServerUrl', variables],
-    queryFn: fetcher<McpServerUrlQuery, McpServerUrlQueryVariables>(McpServerUrlDocument, variables),
     ...options
   }
     )};
@@ -1988,6 +2286,44 @@ export const useMcpToolsByComponentIdQuery = <
   }
     )};
 
+export const UpdateApiKeyDocument = `
+    mutation updateApiKey($id: ID!, $name: String!) {
+  updateApiKey(id: $id, name: $name)
+}
+    `;
+
+export const useUpdateApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['updateApiKey'],
+    mutationFn: (variables?: UpdateApiKeyMutationVariables) => fetcher<UpdateApiKeyMutation, UpdateApiKeyMutationVariables>(UpdateApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateManagementMcpServerUrlDocument = `
+    mutation updateManagementMcpServerUrl {
+  updateManagementMcpServerUrl
+}
+    `;
+
+export const useUpdateManagementMcpServerUrlMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>(
+      {
+    mutationKey: ['updateManagementMcpServerUrl'],
+    mutationFn: (variables?: UpdateManagementMcpServerUrlMutationVariables) => fetcher<UpdateManagementMcpServerUrlMutation, UpdateManagementMcpServerUrlMutationVariables>(UpdateManagementMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateMcpComponentWithToolsDocument = `
     mutation updateMcpComponentWithTools($id: ID!, $input: McpComponentWithToolsInput!) {
   updateMcpComponentWithTools(id: $id, input: $input) {
@@ -2019,8 +2355,8 @@ export const useUpdateMcpComponentWithToolsMutation = <
     )};
 
 export const UpdateMcpServerUrlDocument = `
-    mutation updateMcpServerUrl {
-  updateMcpServerUrl
+    mutation updateMcpServerUrl($id: ID!) {
+  updateMcpServerUrl(id: $id)
 }
     `;
 
