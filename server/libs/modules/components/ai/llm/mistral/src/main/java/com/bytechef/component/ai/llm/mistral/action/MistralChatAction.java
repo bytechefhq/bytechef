@@ -94,11 +94,12 @@ public class MistralChatAction {
 
         return MistralAiChatModel.builder()
             .mistralAiApi(
-                new MistralAiApi(
-                    "https://api.mistral.ai",
-                    connectionParameters.getString(TOKEN),
-                    ModelUtils.getRestClientBuilder(),
-                    RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER))
+                MistralAiApi.builder()
+                    .baseUrl("https://api.mistral.ai")
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .restClientBuilder(ModelUtils.getRestClientBuilder())
+                    .responseErrorHandler(RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER)
+                    .build())
             .defaultOptions(
                 MistralAiChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))

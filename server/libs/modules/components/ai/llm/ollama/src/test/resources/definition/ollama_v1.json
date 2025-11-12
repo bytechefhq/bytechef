@@ -135,8 +135,20 @@
         "value": "qwen2.5vl"
       }, {
         "description": null,
+        "label": "qwen3:0.6b",
+        "value": "qwen3:0.6b"
+      }, {
+        "description": null,
+        "label": "qwen3:1.7b",
+        "value": "qwen3:1.7b"
+      }, {
+        "description": null,
         "label": "qwen3:4b",
         "value": "qwen3:4b"
+      }, {
+        "description": null,
+        "label": "qwen3:4b-thinking",
+        "value": "qwen3:4b-thinking"
       }, {
         "description": null,
         "label": "qwen3:7b",
@@ -1469,8 +1481,20 @@
         "value": "qwen2.5vl"
       }, {
         "description": null,
+        "label": "qwen3:0.6b",
+        "value": "qwen3:0.6b"
+      }, {
+        "description": null,
+        "label": "qwen3:1.7b",
+        "value": "qwen3:1.7b"
+      }, {
+        "description": null,
         "label": "qwen3:4b",
         "value": "qwen3:4b"
+      }, {
+        "description": null,
+        "label": "qwen3:4b-thinking",
+        "value": "qwen3:4b-thinking"
       }, {
         "description": null,
         "label": "qwen3:7b",
