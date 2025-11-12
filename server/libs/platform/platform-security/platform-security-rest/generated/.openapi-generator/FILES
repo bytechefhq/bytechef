@@ -1,6 +1,0 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/platform/security/web/rest/ApiKeyApi.java
-src/main/java/com/bytechef/platform/security/web/rest/ApiUtil.java
-src/main/java/com/bytechef/platform/security/web/rest/model/ApiKeyModel.java
-src/main/java/com/bytechef/platform/security/web/rest/model/CreateApiKey200ResponseModel.java
