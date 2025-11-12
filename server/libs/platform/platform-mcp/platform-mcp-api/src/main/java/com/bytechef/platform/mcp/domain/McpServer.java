@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.tenant.domain.TenantKey;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +59,9 @@ public final class McpServer {
     @Column
     private boolean enabled;
 
+    @Column("secret_key")
+    private String secretKey;
+
     @MappedCollection(idColumn = "mcp_server_id")
     private Set<McpServerTag> mcpServerTags = new HashSet<>();
 
@@ -84,17 +88,39 @@ public final class McpServer {
     }
 
     public McpServer(String name, ModeType type, Environment environment) {
-        this.name = name;
-        this.type = type.ordinal();
-        this.environment = environment.ordinal();
         this.enabled = true;
+        this.environment = environment.ordinal();
+        this.name = name;
+        this.secretKey = String.valueOf(TenantKey.of());
+        this.type = type.ordinal();
     }
 
     public McpServer(String name, ModeType type, Environment environment, boolean enabled) {
-        this.name = name;
-        this.type = type.ordinal();
-        this.environment = environment.ordinal();
         this.enabled = enabled;
+        this.environment = environment.ordinal();
+        this.name = name;
+        this.secretKey = String.valueOf(TenantKey.of());
+        this.type = type.ordinal();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        McpServer mcpServer = (McpServer) o;
+
+        return Objects.equals(id, mcpServer.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public String getCreatedBy() {
@@ -137,6 +163,10 @@ public final class McpServer {
         return enabled;
     }
 
+    public String getSecretKey() {
+        return secretKey;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -148,24 +178,8 @@ public final class McpServer {
             .toList();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        McpServer mcpServer = (McpServer) o;
-
-        return Objects.equals(id, mcpServer.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -186,8 +200,8 @@ public final class McpServer {
         this.enabled = enabled;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 
     public void setVersion(int version) {
@@ -218,6 +232,7 @@ public final class McpServer {
             ", type='" + type + '\'' +
             ", environment='" + environment + '\'' +
             ", enabled=" + enabled +
+            ", secretKey=" + secretKey +
             ", mcpServerTags=" + mcpServerTags +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +

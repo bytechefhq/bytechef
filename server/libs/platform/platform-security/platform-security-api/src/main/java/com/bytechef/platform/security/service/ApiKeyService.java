@@ -16,23 +16,27 @@
 
 package com.bytechef.platform.security.service;
 
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiKeyService {
 
-    String create(ApiKey apiKey);
+    ApiKey create(ApiKey apiKey);
 
     void delete(long id);
+
+    ApiKey getApiKey(String secretKey);
 
     ApiKey getApiKey(String secretKey, long environmentId);
 
     ApiKey getApiKey(long id);
 
-    List<ApiKey> getApiKeys(long environmentId);
+    List<ApiKey> getApiKeys(long environmentId, @Nullable ModeType type);
 
     ApiKey update(ApiKey apiKey);
 }

@@ -61,6 +61,12 @@ public class McpProjectGraphQlController {
         this.projectService = projectService;
     }
 
+    @MutationMapping
+    public McpProject createMcpProject(@Argument CreateMcpProjectInput input) {
+        return mcpProjectFacade.createMcpProject(
+            input.mcpServerId(), input.projectId(), input.projectVersion(), input.selectedWorkflowIds());
+    }
+
     @QueryMapping
     public McpProject mcpProject(@Argument long id) {
         return mcpProjectService.fetchMcpProject(id)
@@ -94,12 +100,6 @@ public class McpProjectGraphQlController {
     }
 
     @MutationMapping
-    public McpProject createMcpProjectWithWorkflows(@Argument CreateMcpProjectWithWorkflowsInput input) {
-        return mcpProjectFacade.createMcpProject(
-            input.mcpServerId(), input.projectId(), input.projectVersion(), input.selectedWorkflowIds());
-    }
-
-    @MutationMapping
     public boolean deleteMcpProject(@Argument long id) {
         mcpProjectFacade.deleteMcpProject(id);
 
@@ -107,7 +107,7 @@ public class McpProjectGraphQlController {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateMcpProjectWithWorkflowsInput(
+    public record CreateMcpProjectInput(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
     }
 }

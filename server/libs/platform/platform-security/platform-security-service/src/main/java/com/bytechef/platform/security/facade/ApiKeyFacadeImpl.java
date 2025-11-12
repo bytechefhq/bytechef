@@ -42,12 +42,37 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    public String create(ApiKey apiKey, ModeType type) {
+    public ApiKey create(ApiKey apiKey, ModeType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);
         apiKey.setUserId(user.getId());
 
         return apiKeyService.create(apiKey);
+    }
+
+    @Override
+    public void delete(long id) {
+        apiKeyService.delete(id);
+    }
+
+    @Override
+    public java.util.List<ApiKey> getAdminApiKeys(long environmentId) {
+        return apiKeyService.getApiKeys(environmentId, null);
+    }
+
+    @Override
+    public ApiKey getApiKey(long id) {
+        return apiKeyService.getApiKey(id);
+    }
+
+    @Override
+    public java.util.List<ApiKey> getApiKeys(long environmentId, ModeType type) {
+        return apiKeyService.getApiKeys(environmentId, type);
+    }
+
+    @Override
+    public ApiKey update(ApiKey apiKey) {
+        return apiKeyService.update(apiKey);
     }
 }

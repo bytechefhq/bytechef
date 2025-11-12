@@ -17,6 +17,7 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -24,9 +25,11 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -44,11 +47,16 @@ public class McpServerGraphQlController {
 
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
+    private final String publicUrl;
 
     @SuppressFBWarnings("EI")
-    public McpServerGraphQlController(McpServerFacade mcpServerFacade, McpServerService mcpServerService) {
+    public McpServerGraphQlController(
+        ApplicationProperties applicationProperties, McpServerFacade mcpServerFacade,
+        McpServerService mcpServerService) {
+
         this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
+        this.publicUrl = applicationProperties.getPublicUrl();
     }
 
     @QueryMapping
@@ -101,8 +109,29 @@ public class McpServerGraphQlController {
     }
 
     @BatchMapping
+    public Map<McpServer, String> url(List<McpServer> mcpServers) {
+        return mcpServers.stream()
+            .collect(Collectors.toMap(mcpServer -> mcpServer, this::getMcpServerUrl));
+    }
+
+    @BatchMapping
     public Map<McpServer, List<Tag>> tags(List<McpServer> mcpServers) {
         return mcpServerFacade.getMcpServerTags(mcpServers);
+    }
+
+    @MutationMapping
+    public String updateMcpServerUrl(@Argument long id) {
+        McpServer mcpServer = mcpServerService.getMcpServer(id);
+
+        mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
+
+        mcpServer = mcpServerService.update(mcpServer);
+
+        return getMcpServerUrl(mcpServer);
+    }
+
+    private String getMcpServerUrl(McpServer mcpServer) {
+        return publicUrl + "/api/automation/" + mcpServer.getSecretKey() + "/mcp";
     }
 
     public record TagInput(Long id, String name) {

@@ -88,6 +88,7 @@ import org.springframework.lang.Nullable;
 @Import({
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
+@SuppressFBWarnings("NP")
 public class TaskCoordinatorIntTest {
 
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());

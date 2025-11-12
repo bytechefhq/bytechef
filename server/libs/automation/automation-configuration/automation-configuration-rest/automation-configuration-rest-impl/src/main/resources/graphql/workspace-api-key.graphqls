@@ -1,0 +1,9 @@
+extend type Query {
+    workspaceApiKeys(workspaceId: ID!, environmentId: ID!): [ApiKey!]!
+}
+
+extend type Mutation {
+    createWorkspaceApiKey(workspaceId: ID!, name: String!, environmentId: ID!): String!
+    deleteWorkspaceApiKey(apiKeyId: ID!): Boolean!
+    updateWorkspaceApiKey(apiKeyId: ID!, name: String!): Boolean!
+}

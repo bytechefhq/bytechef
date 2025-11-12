@@ -40,10 +40,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Integration test for {@link McpProjectGraphQlController}. This test focuses on testing the GraphQL layer with mocked
- * service dependencies.
+ * Unit est for {@link McpProjectGraphQlController}. This test focuses on testing the GraphQL layer with mocked service
+ * dependencies.
  *
- * @author ByteChef
+ * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
 public class McpProjectGraphQlControllerTest {
@@ -130,15 +130,15 @@ public class McpProjectGraphQlControllerTest {
     @Test
     void testCreateMcpProjectWithWorkflows() {
         // Given
-        McpProjectGraphQlController.CreateMcpProjectWithWorkflowsInput input =
-            new McpProjectGraphQlController.CreateMcpProjectWithWorkflowsInput(
+        McpProjectGraphQlController.CreateMcpProjectInput input =
+            new McpProjectGraphQlController.CreateMcpProjectInput(
                 1L, 123L, 1, List.of("workflow1", "workflow2"));
         McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
         when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), any(Integer.class), any()))
             .thenReturn(mockProject);
 
         // When
-        McpProject result = mcpProjectGraphQlController.createMcpProjectWithWorkflows(input);
+        McpProject result = mcpProjectGraphQlController.createMcpProject(input);
 
         // Then
         assertNotNull(result);
