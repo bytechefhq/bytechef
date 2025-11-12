@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -54,9 +55,9 @@ public class ApiKeyApiController implements ApiKeyApi {
 
     @Override
     public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel apiKeyModel) {
-        return ResponseEntity.ok(
-            new CreateApiKey200ResponseModel().secretKey(
-                apiKeyFacade.create(conversionService.convert(apiKeyModel, ApiKey.class), null)));
+        ApiKey apiKey = apiKeyFacade.create(conversionService.convert(apiKeyModel, ApiKey.class), null);
+
+        return ResponseEntity.ok(new CreateApiKey200ResponseModel().secretKey(apiKey.getSecretKey()));
     }
 
     @Override
@@ -80,7 +81,7 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<List<ApiKeyModel>> getApiKeys(Long environmentId) {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiKeyService.getApiKeys(environmentId),
+                apiKeyService.getApiKeys(environmentId, ModeType.AUTOMATION),
                 apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)
                     .secretKey(obfuscate(apiKey.getSecretKey()))));
     }

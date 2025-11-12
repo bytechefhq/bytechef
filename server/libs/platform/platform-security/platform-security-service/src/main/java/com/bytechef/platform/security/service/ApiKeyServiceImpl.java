@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.service;
 
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
@@ -39,21 +40,26 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public String create(ApiKey apiKey) {
+    public ApiKey create(ApiKey apiKey) {
         Assert.notNull(apiKey, "'apiKey' must not be null");
         Assert.isTrue(apiKey.getId() == null, "'id' must be null");
         Assert.notNull(apiKey.getName(), "'name' must not be null");
 
         apiKey.setSecretKey(String.valueOf(TenantKey.of()));
 
-        apiKey = apiKeyRepository.save(apiKey);
-
-        return apiKey.getSecretKey();
+        return apiKeyRepository.save(apiKey);
     }
 
     @Override
     public void delete(long id) {
         apiKeyRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ApiKey getApiKey(String secretKey) {
+        return apiKeyRepository.findBySecretKey(secretKey)
+            .orElseThrow(() -> new IllegalArgumentException("Api key not found."));
     }
 
     @Override
@@ -72,8 +78,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ApiKey> getApiKeys(long environmentId) {
-        return apiKeyRepository.findAllByEnvironment((int) environmentId);
+    public List<ApiKey> getApiKeys(long environmentId, ModeType type) {
+        if (type == null) {
+            return apiKeyRepository.findAllByEnvironmentAndTypeIsNull((int) environmentId);
+        } else {
+            return apiKeyRepository.findAllByEnvironmentAndType((int) environmentId, type.ordinal());
+        }
     }
 
     @Override

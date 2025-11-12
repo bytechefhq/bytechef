@@ -48,7 +48,7 @@ public interface WorkspaceMcpServerFacade {
      * @param workspaceId the workspace ID to assign the server to
      * @return the created MCP server
      */
-    McpServer createMcpServerForWorkspace(
+    McpServer createWorkspaceMcpServer(
         String name, ModeType type, Environment environment, Boolean enabled, Long workspaceId);
 
     /**
@@ -56,5 +56,5 @@ public interface WorkspaceMcpServerFacade {
      *
      * @param mcpServerId the ID of the MCP server to delete
      */
-    void deleteMcpServerFromWorkspace(Long mcpServerId);
+    void deleteWorkspaceMcpServer(Long mcpServerId);
 }

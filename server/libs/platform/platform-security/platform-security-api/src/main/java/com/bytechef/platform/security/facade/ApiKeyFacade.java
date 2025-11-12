@@ -18,11 +18,23 @@ package com.bytechef.platform.security.facade;
 
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.domain.ApiKey;
+import java.util.List;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiKeyFacade {
 
-    String create(ApiKey apiKey, ModeType type);
+    ApiKey create(ApiKey apiKey, @Nullable ModeType type);
+
+    void delete(long id);
+
+    List<ApiKey> getAdminApiKeys(long environmentId);
+
+    ApiKey getApiKey(long id);
+
+    List<ApiKey> getApiKeys(long environmentId, ModeType type);
+
+    ApiKey update(ApiKey apiKey);
 }

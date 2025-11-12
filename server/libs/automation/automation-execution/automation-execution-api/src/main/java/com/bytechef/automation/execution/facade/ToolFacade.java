@@ -20,6 +20,7 @@ import com.bytechef.automation.execution.dto.ToolDTO;
 import com.bytechef.platform.mcp.domain.McpTool;
 import java.util.List;
 import java.util.Map;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
@@ -29,8 +30,9 @@ public interface ToolFacade {
 
     FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(ToolDTO toolDTO);
 
-    ToolDTO toToolDTO(McpTool mcpTool);
+    List<ToolCallback> getToolCallbacks();
 
     List<ToolDTO> getTools();
 
+    ToolDTO toTool(McpTool mcpTool);
 }

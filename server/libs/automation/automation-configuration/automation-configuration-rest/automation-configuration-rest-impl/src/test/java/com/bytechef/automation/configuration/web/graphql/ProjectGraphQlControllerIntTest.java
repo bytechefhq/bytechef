@@ -28,7 +28,7 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.web.graphql.config.ProjectConfigurationGraphQlTestConfiguration;
+import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -45,7 +45,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    ProjectConfigurationGraphQlTestConfiguration.class,
+    AutomationConfigurationGraphQlTestConfiguration.class,
     ProjectGraphQlController.class
 })
 @GraphQlTest(

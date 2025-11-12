@@ -93,9 +93,9 @@ public class WorkspaceMcpServerFacadeIntTest {
     @Test
     void testGetWorkspaceMcpServers() {
         // Given - Create and assign servers to workspace
-        McpServer createdServer1 = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer createdServer1 = workspaceMcpServerFacade.createWorkspaceMcpServer(
             "Test Server 1", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
-        McpServer createdServer2 = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer createdServer2 = workspaceMcpServerFacade.createWorkspaceMcpServer(
             "Test Server 2", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         // When
@@ -113,7 +113,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     }
 
     @Test
-    void testCreateMcpServerForWorkspace() {
+    void testCreateWorkspaceMcpServer() {
         // Given
         String name = "Test Server";
         ModeType type = ModeType.AUTOMATION;
@@ -121,7 +121,7 @@ public class WorkspaceMcpServerFacadeIntTest {
         Boolean enabled = true;
 
         // When
-        McpServer result = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
             name, type, environment, enabled, testWorkspaceId);
 
         // Then
@@ -141,7 +141,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     }
 
     @Test
-    void testCreateMcpServerForWorkspaceWithNullEnabled() {
+    void testCreateWorkspaceMcpServerWithNullEnabled() {
         // Given
         String name = "Test Server";
         ModeType type = ModeType.AUTOMATION;
@@ -149,7 +149,7 @@ public class WorkspaceMcpServerFacadeIntTest {
         Boolean enabled = null; // Should default to enabled
 
         // When
-        McpServer result = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer result = workspaceMcpServerFacade.createWorkspaceMcpServer(
             name, type, environment, enabled, testWorkspaceId);
 
         // Then
@@ -167,9 +167,9 @@ public class WorkspaceMcpServerFacadeIntTest {
     }
 
     @Test
-    void testDeleteMcpServerFromWorkspace() {
+    void testDeleteWorkspaceMcpServer() {
         // Given - Create server and assign to workspace
-        McpServer createdServer = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
             "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         // Verify server exists
@@ -178,7 +178,7 @@ public class WorkspaceMcpServerFacadeIntTest {
         assertEquals(1, mcpServerRepository.count());
 
         // When
-        workspaceMcpServerFacade.deleteMcpServerFromWorkspace(createdServer.getId());
+        workspaceMcpServerFacade.deleteWorkspaceMcpServer(createdServer.getId());
 
         // Then - Server should be removed from workspace and deleted from system
         List<WorkspaceMcpServer> assignments = workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId);
@@ -187,13 +187,13 @@ public class WorkspaceMcpServerFacadeIntTest {
     }
 
     @Test
-    void testDeleteMcpServerFromWorkspaceButKeepIfUsedByOtherWorkspaces() {
+    void testDeleteWorkspaceMcpServerButKeepIfUsedByOtherWorkspaces() {
         // Given - Create server and assign to two workspaces
-        McpServer createdServer = workspaceMcpServerFacade.createMcpServerForWorkspace(
+        McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
             "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         Long otherWorkspaceId = 1050L;
-        workspaceMcpServerFacade.createMcpServerForWorkspace(
+        workspaceMcpServerFacade.createWorkspaceMcpServer(
             "Test Server 2", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, otherWorkspaceId);
 
         // Manually assign the first server to the second workspace to simulate shared usage
@@ -206,7 +206,7 @@ public class WorkspaceMcpServerFacadeIntTest {
         assertEquals(2, mcpServerRepository.count()); // Two servers total
 
         // When - Delete from one workspace
-        workspaceMcpServerFacade.deleteMcpServerFromWorkspace(createdServer.getId());
+        workspaceMcpServerFacade.deleteWorkspaceMcpServer(createdServer.getId());
 
         // Then - Server should be completely deleted from all workspaces (current implementation behavior)
         List<WorkspaceMcpServer> assignments1 = workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId);

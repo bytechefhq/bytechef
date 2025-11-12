@@ -26,6 +26,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

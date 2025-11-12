@@ -41,6 +41,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.platform.security.facade.ApiKeyFacade;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -57,14 +59,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ComponentDefinitionService.class, ConnectionDefinitionService.class, ConnectionFacade.class,
-    ConnectionService.class, ConnectedUserService.class, EnvironmentService.class, PrincipalJobFacade.class,
-    PrincipalJobService.class, JobFacade.class, JobService.class, OAuth2Service.class, TriggerDefinitionService.class,
-    TriggerExecutionService.class, TriggerLifecycleFacade.class, ComponentConnectionFacade.class, WorkflowFacade.class,
-    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class,
-    OAuth2ParametersFacade.class, ProjectDeploymentFacade.class, ProjectDeploymentService.class,
-    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class,
-    ProjectWorkflowService.class, WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
+    ApiKeyFacade.class, ApiKeyService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
+    ConnectionFacade.class, ConnectionService.class, ConnectedUserService.class, EnvironmentService.class,
+    PrincipalJobFacade.class, PrincipalJobService.class, JobFacade.class, JobService.class, OAuth2Service.class,
+    TriggerDefinitionService.class, TriggerExecutionService.class, TriggerLifecycleFacade.class,
+    ComponentConnectionFacade.class, WorkflowFacade.class, WorkflowNodeParameterFacade.class,
+    WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class, OAuth2ParametersFacade.class,
+    ProjectDeploymentFacade.class, ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class,
+    ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
+    WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }

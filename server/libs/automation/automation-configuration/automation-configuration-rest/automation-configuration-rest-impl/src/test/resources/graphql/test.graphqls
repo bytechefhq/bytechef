@@ -1,8 +1,6 @@
-# Base types and shared definitions for GraphQL schema within this module
+# Test-only GraphQL base operations and minimal type stubs for GraphQL slice tests in this module.
 
-# Provide base Query/Mutation so that extensions in other files can merge correctly
-# Include a harmless placeholder field to satisfy SDL validators
-
+# Base operation types so that 'extend type Query/Mutation' from main resources can merge.
 type Query {
     _placeholder: Boolean
 }
@@ -11,16 +9,10 @@ type Mutation {
     _placeholder: Boolean
 }
 
-# Minimal definitions for types referenced by this module's schemas but defined in other modules
-# We only define essential fields needed by tests. Add more fields later if needed.
+# Minimal type stubs referenced by this module's SDL
 
-
-type Category {
+type ApiKey {
     id: ID
-    name: String
-}
-
-type ComponentDefinition {
     name: String
 }
 
@@ -29,8 +21,17 @@ type Environment {
     name: String
 }
 
+type Category {
+    id: ID
+    name: String
+}
+
 type Tag {
     id: ID
     name: String
     color: String
+}
+
+type ComponentDefinition {
+    name: String
 }

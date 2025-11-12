@@ -16,56 +16,64 @@
 
 package com.bytechef.automation.ai.mcp.server.config;
 
+import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
+import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import io.modelcontextprotocol.server.McpAsyncServer;
+import io.modelcontextprotocol.server.McpServer;
+import io.modelcontextprotocol.server.transport.WebMvcStreamableServerTransportProvider;
+import io.modelcontextprotocol.spec.McpSchema;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerResponse;
+
 /**
  * @author Ivica Cardic
  */
-// @Configuration TODO remove comment once Spring supports multiple MCP servers
+@Configuration
 public class AutomationMcpServerConfiguration {
-//
-//    private final ToolFacade toolFacade;
-//
-//    public AutomationMcpServerConfiguration(ToolFacade toolFacade) {
-//        this.toolFacade = toolFacade;
-//    }
-//
-//    @Bean
-//    WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
-//        return new WebMvcSseServerTransportProvider(
-//            objectMapper, "/api/automation/v1/mcp/message", "/api/automation/sse");
-//    }
-//
-//    @Bean
-//    RouterFunction<ServerResponse> routerFunction(WebMvcSseServerTransportProvider transportProvider) {
-//        return transportProvider.getRouterFunction();
-//    }
-//
-//    @Bean
-//    McpSyncServer mcpServer(McpServerTransportProvider transportProvider) {
-//        var capabilities = McpSchema.ServerCapabilities.builder()
-//            .resources(false, true)
-//            .tools(true)
-//            .prompts(true)
-//            .logging()
-//            .build();
-//
-//        return McpServer.sync(transportProvider)
-//            .serverInfo("bytechef-automation-mcp-server", "1.0.0")
-//            .capabilities(capabilities)
-//            .tools(McpToolUtils.toSyncToolSpecification(getToolCallbacks()))
-//            .build();
-//    }
-//
-//    public List<ToolCallback> getToolCallbacks() {
-//        List<ToolCallback> toolCallbacks = new ArrayList<>();
-//
-//        List<ToolDTO> toolDTOs = toolFacade.getTools();
-//
-//        for (ToolDTO toolDTO : toolDTOs) {
-//
-//            toolCallbacks.add(toolFacade.getFunctionToolCallback(toolDTO));
-//        }
-//
-//        return toolCallbacks;
-//    }
-//
+
+    @Bean
+    WebMvcStreamableServerTransportProvider automationWebMvcStreamableHttpServerTransportProvider() {
+        return WebMvcStreamableServerTransportProvider.builder()
+            .mcpEndpoint("/api/automation/{tenantKey}/mcp")
+            .build();
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> automationMcpRouterFunction() {
+        return automationWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    McpAsyncServer automationMcpAsyncServer() {
+        return McpServer.async(automationWebMvcStreamableHttpServerTransportProvider())
+            .serverInfo("automation-mcp-server", "1.0.0")
+            .capabilities(
+                McpSchema.ServerCapabilities.builder()
+                    .resources(false, true)
+                    .tools(true)
+                    .prompts(true)
+                    .logging()
+                    .build())
+//            .tools(McpToolUtils.toAsyncToolSpecifications(toolFacade.getToolCallbacks()))
+            .build();
+    }
+
+    @Bean
+    SecurityConfigurerContributor automationMcpServerSecurityConfigurerContributor(McpServerService mcpServerService) {
+        return new SecurityConfigurerContributor() {
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
+                getSecurityConfigurerAdapter() {
+
+                return (T) new AutomationMcpServerSecurityConfigurer(mcpServerService);
+            }
+        };
+    }
 }
