@@ -1,0 +1,16 @@
+extend type Query {
+    workspaceMcpServers(workspaceId: ID!): [McpServer]
+}
+
+extend type Mutation {
+    createWorkspaceMcpServer(input: CreateWorkspaceMcpServerInput!): McpServer
+    deleteWorkspaceMcpServer(mcpServerId: ID!): Boolean
+}
+
+input CreateWorkspaceMcpServerInput {
+    name: String!
+    type: ModeType!
+    environmentId: ID!
+    enabled: Boolean
+    workspaceId: ID!
+}

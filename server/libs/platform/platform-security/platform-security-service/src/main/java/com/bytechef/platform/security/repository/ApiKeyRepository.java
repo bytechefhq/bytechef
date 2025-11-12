@@ -28,7 +28,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
+    Optional<ApiKey> findBySecretKey(String secretKey);
+
     Optional<ApiKey> findBySecretKeyAndEnvironment(String secretKey, int environment);
 
-    List<ApiKey> findAllByEnvironment(int environmentId);
+    List<ApiKey> findAllByEnvironmentAndTypeIsNull(int environmentId);
+
+    List<ApiKey> findAllByEnvironmentAndType(int environmentId, int type);
 }

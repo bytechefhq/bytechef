@@ -17,6 +17,7 @@
 package com.bytechef.platform.mcp.repository;
 
 import com.bytechef.platform.mcp.domain.McpServer;
+import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface McpServerRepository extends ListCrudRepository<McpServer, Long> {
+
+    Optional<McpServer> findBySecretKey(String secretKey);
 }

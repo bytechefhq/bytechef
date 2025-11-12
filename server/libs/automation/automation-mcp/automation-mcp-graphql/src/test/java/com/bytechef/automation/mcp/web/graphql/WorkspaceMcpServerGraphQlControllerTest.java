@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.mcp.web.graphql.WorkspaceMcpServerGraphQlController.CreateMcpServerForWorkspaceInput;
+import com.bytechef.automation.mcp.web.graphql.WorkspaceMcpServerGraphQlController.CreateWorkspaceMcpServerInput;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -61,7 +61,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
             .thenReturn(expectedServers);
 
         // When
-        List<McpServer> result = workspaceMcpServerGraphQlController.mcpServersByWorkspace(workspaceId);
+        List<McpServer> result = workspaceMcpServerGraphQlController.workspaceMcpServers(workspaceId);
 
         // Then
         assertNotNull(result);
@@ -84,17 +84,17 @@ class WorkspaceMcpServerGraphQlControllerTest {
         Boolean enabled = true;
         Long workspaceId = 1L;
 
-        CreateMcpServerForWorkspaceInput input = new CreateMcpServerForWorkspaceInput(
+        CreateWorkspaceMcpServerInput input = new CreateWorkspaceMcpServerInput(
             name, type, environmentId, enabled, workspaceId);
 
         McpServer createdServer = createMockMcpServer(100L, name);
 
         when(workspaceMcpServerFacade
-            .createMcpServerForWorkspace(name, type, Environment.DEVELOPMENT, enabled, workspaceId))
+            .createWorkspaceMcpServer(name, type, Environment.DEVELOPMENT, enabled, workspaceId))
                 .thenReturn(createdServer);
 
         // When
-        McpServer result = workspaceMcpServerGraphQlController.createMcpServerForWorkspace(input);
+        McpServer result = workspaceMcpServerGraphQlController.createWorkspaceMcpServer(input);
 
         // Then
         assertNotNull(result);
@@ -102,7 +102,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
         assertEquals(name, result.getName());
         assertEquals(100L, result.getId());
 
-        verify(workspaceMcpServerFacade).createMcpServerForWorkspace(
+        verify(workspaceMcpServerFacade).createWorkspaceMcpServer(
             name, type, Environment.DEVELOPMENT, enabled, workspaceId);
     }
 
@@ -115,17 +115,17 @@ class WorkspaceMcpServerGraphQlControllerTest {
         Boolean enabled = null;
         Long workspaceId = 2L;
 
-        CreateMcpServerForWorkspaceInput input = new CreateMcpServerForWorkspaceInput(
+        CreateWorkspaceMcpServerInput input = new CreateWorkspaceMcpServerInput(
             name, type, environmentId, enabled, workspaceId);
 
         McpServer createdServer = createMockMcpServer(200L, name);
 
         when(workspaceMcpServerFacade
-            .createMcpServerForWorkspace(name, type, Environment.PRODUCTION, enabled, workspaceId))
+            .createWorkspaceMcpServer(name, type, Environment.PRODUCTION, enabled, workspaceId))
                 .thenReturn(createdServer);
 
         // When
-        McpServer result = workspaceMcpServerGraphQlController.createMcpServerForWorkspace(input);
+        McpServer result = workspaceMcpServerGraphQlController.createWorkspaceMcpServer(input);
 
         // Then
         assertNotNull(result);
@@ -133,7 +133,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
         assertEquals(name, result.getName());
         assertEquals(200L, result.getId());
 
-        verify(workspaceMcpServerFacade).createMcpServerForWorkspace(
+        verify(workspaceMcpServerFacade).createWorkspaceMcpServer(
             name, type, Environment.PRODUCTION, enabled, workspaceId);
     }
 
@@ -146,38 +146,38 @@ class WorkspaceMcpServerGraphQlControllerTest {
         Boolean enabled = false;
         Long workspaceId = 3L;
 
-        CreateMcpServerForWorkspaceInput input = new CreateMcpServerForWorkspaceInput(
+        CreateWorkspaceMcpServerInput input = new CreateWorkspaceMcpServerInput(
             name, type, environmentId, enabled, workspaceId);
 
         McpServer createdServer = createMockMcpServer(300L, name);
 
-        when(workspaceMcpServerFacade.createMcpServerForWorkspace(
+        when(workspaceMcpServerFacade.createWorkspaceMcpServer(
             name, type, Environment.DEVELOPMENT, enabled, workspaceId))
                 .thenReturn(createdServer);
 
         // When
-        McpServer result = workspaceMcpServerGraphQlController.createMcpServerForWorkspace(input);
+        McpServer result = workspaceMcpServerGraphQlController.createWorkspaceMcpServer(input);
 
         // Then
         assertNotNull(result);
         assertEquals(createdServer, result);
         assertEquals(name, result.getName());
 
-        verify(workspaceMcpServerFacade).createMcpServerForWorkspace(
+        verify(workspaceMcpServerFacade).createWorkspaceMcpServer(
             name, type, Environment.DEVELOPMENT, enabled, workspaceId);
     }
 
     @Test
-    void testDeleteMcpServerFromWorkspace() {
+    void testDeleteWorkspaceMcpServer() {
         // Given
         Long mcpServerId = 100L;
 
         // When
-        boolean result = workspaceMcpServerGraphQlController.deleteMcpServerFromWorkspace(mcpServerId);
+        boolean result = workspaceMcpServerGraphQlController.deleteWorkspaceMcpServer(mcpServerId);
 
         // Then
         assertTrue(result);
-        verify(workspaceMcpServerFacade).deleteMcpServerFromWorkspace(mcpServerId);
+        verify(workspaceMcpServerFacade).deleteWorkspaceMcpServer(mcpServerId);
     }
 
     @Test
@@ -190,7 +190,7 @@ class WorkspaceMcpServerGraphQlControllerTest {
         Long workspaceId = 1L;
 
         // When
-        CreateMcpServerForWorkspaceInput input = new CreateMcpServerForWorkspaceInput(
+        CreateWorkspaceMcpServerInput input = new CreateWorkspaceMcpServerInput(
             name, type, environmentId, enabled, workspaceId);
 
         // Then

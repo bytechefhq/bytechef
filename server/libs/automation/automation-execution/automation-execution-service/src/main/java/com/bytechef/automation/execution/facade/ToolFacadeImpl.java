@@ -26,9 +26,12 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.stereotype.Service;
 
@@ -58,8 +61,8 @@ public class ToolFacadeImpl implements ToolFacade {
     @Override
     public FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(ToolDTO toolDTO) {
         FunctionToolCallback.Builder<Map<String, Object>, Object> functionToolCallbackBuilder =
-            FunctionToolCallback.builder(
-                toolDTO.name(), getToolCallbackFunction(toolDTO.name(), toolDTO.connectionId()))
+            FunctionToolCallback
+                .builder(toolDTO.name(), getToolCallbackFunction(toolDTO.name(), toolDTO.connectionId()))
                 .inputType(Map.class)
                 .inputSchema(toolDTO.parameters())
                 .description(toolDTO.description());
@@ -68,15 +71,28 @@ public class ToolFacadeImpl implements ToolFacade {
     }
 
     @Override
+    public List<ToolCallback> getToolCallbacks() {
+        Map<String, ToolCallback> toolCallbackMap = new HashMap<>();
+
+        List<ToolDTO> toolDTOs = getTools();
+
+        for (ToolDTO toolDTO : toolDTOs) {
+            toolCallbackMap.put(toolDTO.name(), getFunctionToolCallback(toolDTO));
+        }
+
+        return new ArrayList<>(toolCallbackMap.values());
+    }
+
+    @Override
     public List<ToolDTO> getTools() {
         return mcpToolService.getMcpTools()
             .stream()
-            .map(this::toToolDTO)
+            .map(this::toTool)
             .toList();
     }
 
     @Override
-    public ToolDTO toToolDTO(McpTool mcpTool) {
+    public ToolDTO toTool(McpTool mcpTool) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
         ClusterElementDefinition clusterElementDefinition =

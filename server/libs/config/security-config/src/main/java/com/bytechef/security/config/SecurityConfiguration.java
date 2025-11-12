@@ -22,11 +22,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.web.config.AuthenticationProviderContributor;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
-import com.bytechef.platform.security.web.config.CsrfContributor;
-import com.bytechef.platform.security.web.config.FilterAfterContributor;
-import com.bytechef.platform.security.web.config.FilterBeforeContributor;
+import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
@@ -43,11 +40,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -73,7 +68,6 @@ import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -147,25 +141,16 @@ public class SecurityConfiguration {
      * Configures the security filter chain for API endpoints and GraphQL requests, defining authorization,
      * authentication, CSRF settings, and headers for securing requests.
      *
-     * @param http                               the {@link HttpSecurity} object used to customize the security settings
-     *                                           for the application.
-     * @param mvc                                a {@link PathPatternRequestMatcher.Builder} used to build request
-     *                                           matchers.
-     * @param authenticationProviderContributors a list of {@link AuthenticationProviderContributor} instances
-     *                                           contributing custom {@link AuthenticationProvider}s to handle
-     *                                           authentication.
-     * @param authorizeHttpRequestContributors   a list of {@link AuthorizeHttpRequestContributor} instances providing
-     *                                           paths to be configured as permit-all in the API security configuration.
-     * @param csrfContributors                   a list of {@link CsrfContributor} instances contributing request
-     *                                           matchers to be ignored for CSRF protection.
-     * @param environment                        the {@link Environment} object used to retrieve profiles and
-     *                                           environment properties.
-     * @param filterAfterContributors            a list of {@link FilterAfterContributor} instances allowing additional
-     *                                           filters to be added after default filters in the chain.
-     * @param filterBeforeContributors           a list of {@link FilterBeforeContributor} instances allowing additional
-     *                                           filters to be added before default filters in the chain.
-     * @param spaWebFilterContributors           a list of {@link SpaWebFilterContributor} instances contributing to the
-     *                                           customization of SPA-specific filters.
+     * @param http                             the {@link HttpSecurity} object used to customize the security settings
+     *                                         for the application.
+     * @param mvc                              a {@link PathPatternRequestMatcher.Builder} used to build request
+     *                                         matchers.
+     * @param authorizeHttpRequestContributors a list of {@link AuthorizeHttpRequestContributor} instances providing
+     *                                         paths to be configured as permit-all in the API security configuration.
+     * @param environment                      the {@link Environment} object used to retrieve profiles and environment
+     *                                         properties.
+     * @param spaWebFilterContributors         a list of {@link SpaWebFilterContributor} instances contributing to the
+     *                                         customization of SPA-specific filters.
      * @return a configured {@link SecurityFilterChain} for securing API and GraphQL endpoints.
      * @throws Exception if an error occurs while configuring the security filter chain.
      */
@@ -173,10 +158,9 @@ public class SecurityConfiguration {
     @Order(3)
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
-        List<AuthenticationProviderContributor> authenticationProviderContributors,
-        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors, List<CsrfContributor> csrfContributors,
-        Environment environment, List<FilterAfterContributor> filterAfterContributors,
-        List<FilterBeforeContributor> filterBeforeContributors, List<SpaWebFilterContributor> spaWebFilterContributors)
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors, Environment environment,
+        List<SecurityConfigurerContributor> securityConfigurerContributors,
+        List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
 
         http
@@ -186,25 +170,13 @@ public class SecurityConfiguration {
                 csrf
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     // See https://stackoverflow.com/q/74447118/65681
-                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler());
-
-                for (CsrfContributor csrfContributor : csrfContributors) {
-                    for (RequestMatcher requestMatcher : csrfContributor.getIgnoringRequestMatchers()) {
-                        csrf.ignoringRequestMatchers(requestMatcher);
-                    }
-                }
-
-                csrf
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                     // For CORS requests
                     .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
                     // For internal calls from the swagger UI in the dev profile
                     .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
                         StringUtils.contains(request.getHeader("Referer"), "/swagger-ui/"));
             });
-
-        for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
-            http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
-        }
 
         http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
@@ -252,8 +224,10 @@ public class SecurityConfiguration {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .permitAll());
 
-        http.with(new FilterAfterContributorConfigurer<>(filterAfterContributors), withDefaults());
-        http.with(new FilterBeforeContributorConfigurer<>(filterBeforeContributors), withDefaults());
+        for (SecurityConfigurerContributor securityConfigurerContributor : securityConfigurerContributors) {
+
+            http.with(securityConfigurerContributor.getSecurityConfigurerAdapter(), withDefaults());
+        }
 
         return http.build();
     }
@@ -388,59 +362,6 @@ public class SecurityConfiguration {
     }
 
     /**
-     * A configuration class for adding custom filters to the security filter chain after specified filters. This class
-     * allows customization of the filter chain by applying a list of {@link FilterAfterContributor} instances.
-     *
-     * @param <H> the type of {@link HttpSecurityBuilder} used for configuring the security filter chain
-     */
-    private static class FilterAfterContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
-        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
-
-        private final List<FilterAfterContributor> filterAfterContributors;
-
-        FilterAfterContributorConfigurer(List<FilterAfterContributor> filterAfterContributors) {
-            this.filterAfterContributors = filterAfterContributors;
-        }
-
-        @Override
-        public void configure(HttpSecurity http) {
-            for (FilterAfterContributor filterAfterContributor : filterAfterContributors) {
-                http.addFilterAfter(
-                    filterAfterContributor.getFilter(),
-                    filterAfterContributor.getAfterFilter());
-            }
-        }
-    }
-
-    /**
-     * A private configuration class for adding and positioning filters in the web security filter chain before a
-     * specific set of filters. This configurer uses a list of {@link FilterBeforeContributor} instances to determine
-     * which filters should be introduced into the chain and their corresponding positions.
-     *
-     * @param <H> the type of {@link HttpSecurityBuilder} used to configure the web security filter chain.
-     */
-    private static class FilterBeforeContributorConfigurer<H extends HttpSecurityBuilder<HttpSecurity>>
-        extends AbstractHttpConfigurer<FilterBeforeContributorConfigurer<H>, HttpSecurity> {
-
-        private final List<FilterBeforeContributor> filterBeforeContributors;
-
-        FilterBeforeContributorConfigurer(List<FilterBeforeContributor> filterBeforeContributors) {
-            this.filterBeforeContributors = filterBeforeContributors;
-        }
-
-        @Override
-        public void configure(HttpSecurity http) {
-            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-
-            for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
-                http.addFilterBefore(
-                    filterBeforeContributor.getFilter(authenticationManager),
-                    filterBeforeContributor.getBeforeFilter());
-            }
-        }
-    }
-
-    /**
      * Custom CSRF handler to provide BREACH protection.
      *
      * @see <a href=
@@ -484,18 +405,13 @@ public class SecurityConfiguration {
 
     /**
      * A custom implementation of {@link BasicAuthenticationEntryPoint} used to handle unauthorized access attempts when
-     * basic authentication is required.
-     *
-     * This class extends the default functionality of {@link BasicAuthenticationEntryPoint} to customize the behavior
-     * for responding to unauthorized requests. It specifically defines the response headers and status code returned to
-     * the client upon an authentication failure.
-     *
+     * basic authentication is required. This class extends the default functionality of
+     * {@link BasicAuthenticationEntryPoint} to customize the behavior for responding to unauthorized requests. It
+     * specifically defines the response headers and status code returned to the client upon an authentication failure.
      * Key functionality: - Sets the "WWW-Authenticate" response header to indicate the required basic authentication
      * with a realm. - Responds with the HTTP 401 (Unauthorized) status code to indicate that the request requires
-     * authentication.
-     *
-     * Method: {@link #commence(HttpServletRequest, HttpServletResponse, AuthenticationException)}: - Handles the
-     * response when an {@link AuthenticationException} occurs, customizing the headers and status code.
+     * authentication. Method: {@link #commence(HttpServletRequest, HttpServletResponse, AuthenticationException)}: -
+     * Handles the response when an {@link AuthenticationException} occurs, customizing the headers and status code.
      */
     private static class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 

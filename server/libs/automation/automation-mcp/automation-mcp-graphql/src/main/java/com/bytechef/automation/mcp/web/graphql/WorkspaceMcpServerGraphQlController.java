@@ -45,13 +45,13 @@ public class WorkspaceMcpServerGraphQlController {
     }
 
     @QueryMapping
-    public List<McpServer> mcpServersByWorkspace(@Argument Long workspaceId) {
+    public List<McpServer> workspaceMcpServers(@Argument Long workspaceId) {
         return workspaceMcpServerFacade.getWorkspaceMcpServers(workspaceId);
     }
 
     @MutationMapping
-    public McpServer createMcpServerForWorkspace(@Argument CreateMcpServerForWorkspaceInput input) {
-        return workspaceMcpServerFacade.createMcpServerForWorkspace(
+    public McpServer createWorkspaceMcpServer(@Argument CreateWorkspaceMcpServerInput input) {
+        return workspaceMcpServerFacade.createWorkspaceMcpServer(
             input.name(),
             input.type(),
             Environment.values()[(int) input.environmentId()],
@@ -60,12 +60,13 @@ public class WorkspaceMcpServerGraphQlController {
     }
 
     @MutationMapping
-    public boolean deleteMcpServerFromWorkspace(@Argument Long mcpServerId) {
-        workspaceMcpServerFacade.deleteMcpServerFromWorkspace(mcpServerId);
+    public boolean deleteWorkspaceMcpServer(@Argument Long mcpServerId) {
+        workspaceMcpServerFacade.deleteWorkspaceMcpServer(mcpServerId);
+
         return true;
     }
 
-    public record CreateMcpServerForWorkspaceInput(
+    public record CreateWorkspaceMcpServerInput(
         String name, ModeType type, long environmentId, Boolean enabled, Long workspaceId) {
     }
 }
