@@ -98,7 +98,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-rest"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-graphql"))
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
