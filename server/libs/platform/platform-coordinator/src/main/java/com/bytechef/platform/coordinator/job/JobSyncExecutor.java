@@ -129,6 +129,9 @@ public class JobSyncExecutor {
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS, event -> {
                 TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) event).getTaskExecution();
+                if (erroredTaskExecution.getError() != null) {
+                    erroredTaskExecution.setStatus(TaskExecution.Status.FAILED);
+                }
 
                 taskExecutionService.update(erroredTaskExecution);
 
