@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chatmemory.inmemory;
+package com.bytechef.component.ai.agent.chat.memory.memory;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;

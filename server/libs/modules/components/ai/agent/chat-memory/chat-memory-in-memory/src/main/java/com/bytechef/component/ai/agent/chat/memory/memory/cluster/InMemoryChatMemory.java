@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chatmemory.inmemory.cluster;
+package com.bytechef.component.ai.agent.chat.memory.memory.cluster;
 
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
