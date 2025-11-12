@@ -1,0 +1,12 @@
+query workspaceApiKeys($workspaceId: ID!, $environmentId: ID!) {
+    workspaceApiKeys(workspaceId: $workspaceId, environmentId: $environmentId) {
+        id,
+        name,
+        secretKey,
+        lastUsedDate,
+        createdBy,
+        createdDate,
+        lastModifiedBy,
+        lastModifiedDate
+    }
+}

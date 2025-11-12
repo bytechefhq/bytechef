@@ -1,0 +1,3 @@
+mutation deleteWorkspaceApiKey($apiKeyId: ID!) {
+    deleteWorkspaceApiKey(apiKeyId: $apiKeyId)
+}

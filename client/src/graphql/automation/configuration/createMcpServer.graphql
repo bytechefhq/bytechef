@@ -1,9 +1,0 @@
-mutation createMcpServer($input: CreateMcpServerForWorkspaceInput!) {
-    createMcpServerForWorkspace(input: $input) {
-        id
-        name
-        type
-        environmentId
-        enabled
-    }
-}

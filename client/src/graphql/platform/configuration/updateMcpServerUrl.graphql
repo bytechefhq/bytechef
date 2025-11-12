@@ -1,0 +1,3 @@
+mutation updateMcpServerUrl($id: ID!) {
+    updateMcpServerUrl(id: $id)
+}

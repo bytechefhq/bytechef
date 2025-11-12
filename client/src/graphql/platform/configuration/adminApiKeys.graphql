@@ -1,0 +1,12 @@
+query adminApiKeys($environmentId: ID!) {
+    adminApiKeys(environmentId: $environmentId) {
+        id,
+        name,
+        secretKey,
+        lastUsedDate,
+        createdBy,
+        createdDate,
+        lastModifiedBy,
+        lastModifiedDate
+    }
+}

@@ -1,0 +1,12 @@
+query apiKeys($environmentId: ID!, $type:ModeType!) {
+    apiKeys(environmentId: $environmentId, type: $type) {
+        id,
+        name,
+        secretKey,
+        lastUsedDate,
+        createdBy,
+        createdDate,
+        lastModifiedBy,
+        lastModifiedDate
+    }
+}

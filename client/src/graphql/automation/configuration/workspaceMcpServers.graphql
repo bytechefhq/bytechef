@@ -1,10 +1,11 @@
-query mcpServersByWorkspace($workspaceId: ID!) {
-    mcpServersByWorkspace(workspaceId: $workspaceId) {
+query workspaceMcpServers($workspaceId: ID!) {
+    workspaceMcpServers(workspaceId: $workspaceId) {
         id
         name
         type
         environmentId
         enabled
+        url
         mcpComponents {
             id
             mcpServerId
