@@ -1,7 +1,0 @@
-apis/ApiKeyApi.ts
-apis/index.ts
-index.ts
-models/ApiKey.ts
-models/CreateApiKey200Response.ts
-models/index.ts
-runtime.ts
