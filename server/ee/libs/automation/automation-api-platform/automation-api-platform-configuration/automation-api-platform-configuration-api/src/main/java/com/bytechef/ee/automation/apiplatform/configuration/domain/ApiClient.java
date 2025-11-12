@@ -41,6 +41,9 @@ public class ApiClient {
     @Column("secret_key")
     private String secretKey;
 
+    @Column
+    private int environment;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -93,6 +96,10 @@ public class ApiClient {
         return secretKey;
     }
 
+    public int getEnvironment() {
+        return environment;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -125,12 +132,17 @@ public class ApiClient {
         this.secretKey = secretKey;
     }
 
+    public void setEnvironment(int environment) {
+        this.environment = environment;
+    }
+
     @Override
     public String toString() {
         return "ApiKey{" +
             "id=" + id +
             ", name='" + name + '\'' +
             ", secretKey='" + secretKey + '\'' +
+            ", environment=" + environment +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

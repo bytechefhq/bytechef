@@ -51,8 +51,8 @@ public class ApiClientServiceImpl implements ApiClientService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ApiClient> fetchApiClient(String secretKey) {
-        return apiClientRepository.findBySecretKey(secretKey);
+    public Optional<ApiClient> fetchApiClient(String secretKey, long environmentId) {
+        return apiClientRepository.findBySecretKeyAndEnvironment(secretKey, (int) environmentId);
     }
 
     @Override
