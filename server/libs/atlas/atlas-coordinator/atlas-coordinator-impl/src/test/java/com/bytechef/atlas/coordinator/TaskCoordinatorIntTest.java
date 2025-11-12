@@ -52,6 +52,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -62,7 +63,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Arik Cohen
@@ -96,23 +95,18 @@ public class TaskCoordinatorIntTest {
     private final Evaluator evaluator = SpelEvaluator.create();
 
     @Autowired
-    @Nullable
     private Environment environment;
 
     @Autowired
-    @Nullable
     private ContextService contextService;
 
     @Autowired
-    @Nullable
     private JobService jobService;
 
     @Autowired
-    @Nullable
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    @Nullable
     private WorkflowService workflowService;
 
     @Test
@@ -135,9 +129,8 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            Objects.requireNonNull(contextService), environment, evaluator, Objects.requireNonNull(jobService),
-            List.of(), Objects.requireNonNull(taskExecutionService), taskHandlerMap::get, TASK_FILE_STORAGE,
-            Objects.requireNonNull(workflowService));
+            contextService, environment, evaluator, jobService, -1, SyncMessageBroker::new, List.of(),
+            taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE, -1, workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")));
     }

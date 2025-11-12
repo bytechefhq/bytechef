@@ -30,7 +30,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.SpelEvaluator;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -84,13 +84,13 @@ public class TaskDispatcherJobTestExecutor {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, environment, SpelEvaluator.create(), jobService, syncMessageBroker,
-            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService),
-            List.of(), List.of(),
+            contextService, environment, SpelEvaluator.create(), jobService, -1, () -> syncMessageBroker,
+            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 contextService, counterService, taskExecutionService),
-            taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorage, workflowService);
+            taskExecutionService,
+            taskHandlerMapSupplier.get()::get, taskFileStorage, -1, workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
     }

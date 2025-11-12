@@ -16,28 +16,23 @@
  * Modifications copyright (C) 2025 ByteChef
  */
 
-package com.bytechef.message.broker.sync;
+package com.bytechef.message.broker.memory;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.util.Assert;
 
 /**
- * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.
+ * Simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.
  *
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Jul 10, 2016
  */
-public class SyncMessageBroker implements MessageBroker {
-
-    private final Map<MessageRoute, List<Receiver>> receiverMap = new HashMap<>();
+public class SyncMessageBroker extends AbstractMessageBroker {
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
@@ -51,15 +46,5 @@ public class SyncMessageBroker implements MessageBroker {
             receiver.receive(
                 ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
         }
-    }
-
-    public void receive(MessageRoute messageRoute, Receiver receiver) {
-        List<Receiver> receivers = receiverMap.computeIfAbsent(messageRoute, k -> new ArrayList<>());
-
-        receivers.add(receiver);
-    }
-
-    public interface Receiver {
-        void receive(Object message);
     }
 }

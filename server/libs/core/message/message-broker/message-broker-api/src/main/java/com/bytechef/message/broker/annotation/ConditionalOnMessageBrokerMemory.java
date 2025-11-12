@@ -34,6 +34,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @Target({
     ElementType.TYPE, ElementType.METHOD
 })
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "local")
-public @interface ConditionalOnMessageBrokerLocal {
+@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "memory")
+public @interface ConditionalOnMessageBrokerMemory {
 }

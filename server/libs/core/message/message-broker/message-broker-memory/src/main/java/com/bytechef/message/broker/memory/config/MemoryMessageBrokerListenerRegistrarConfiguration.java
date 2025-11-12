@@ -16,13 +16,13 @@
  * Modifications copyright (C) 2025 ByteChef
  */
 
-package com.bytechef.message.broker.sync.config;
+package com.bytechef.message.broker.memory.config;
 
-import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerLocal;
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerMemory;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
-import com.bytechef.message.broker.sync.listener.LocalListenerEndpointRegistrar;
+import com.bytechef.message.broker.memory.MemoryMessageBroker;
+import com.bytechef.message.broker.memory.listener.MemoryListenerEndpointRegistrar;
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -37,34 +37,34 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnMessageBrokerLocal
-public class LocalMessageBrokerListenerRegistrarConfiguration
+@ConditionalOnMessageBrokerMemory
+public class MemoryMessageBrokerListenerRegistrarConfiguration
     implements
-    MessageBrokerListenerRegistrar<LocalListenerEndpointRegistrar>,
+    MessageBrokerListenerRegistrar<MemoryListenerEndpointRegistrar>,
     SmartInitializingSingleton {
 
     private static final Logger logger = LoggerFactory.getLogger(
-        LocalMessageBrokerListenerRegistrarConfiguration.class);
+        MemoryMessageBrokerListenerRegistrarConfiguration.class);
 
-    private final List<MessageBrokerConfigurer<LocalListenerEndpointRegistrar>> messageBrokerConfigurers;
-    private final SyncMessageBroker syncMessageBroker;
+    private final List<MessageBrokerConfigurer<MemoryListenerEndpointRegistrar>> messageBrokerConfigurers;
+    private final MemoryMessageBroker memoryMessageBroker;
 
     @SuppressFBWarnings("EI")
-    public LocalMessageBrokerListenerRegistrarConfiguration(
+    public MemoryMessageBrokerListenerRegistrarConfiguration(
         @Autowired(
-            required = false) List<MessageBrokerConfigurer<LocalListenerEndpointRegistrar>> messageBrokerConfigurers,
-        SyncMessageBroker syncMessageBroker) {
+            required = false) List<MessageBrokerConfigurer<MemoryListenerEndpointRegistrar>> messageBrokerConfigurers,
+        MemoryMessageBroker memoryMessageBroker) {
 
-        this.syncMessageBroker = syncMessageBroker;
+        this.memoryMessageBroker = memoryMessageBroker;
         this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
     }
 
     @Override
     public void afterSingletonsInstantiated() {
-        LocalListenerEndpointRegistrar listenerEndpointRegistrar = new LocalListenerEndpointRegistrar(
-            syncMessageBroker);
+        MemoryListenerEndpointRegistrar listenerEndpointRegistrar = new MemoryListenerEndpointRegistrar(
+            memoryMessageBroker);
 
-        for (MessageBrokerConfigurer<LocalListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<MemoryListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
 
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
@@ -72,7 +72,7 @@ public class LocalMessageBrokerListenerRegistrarConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        LocalListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
+        MemoryListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
         Object delegate, String methodName) {
 
         Class<?> delegateClass = delegate.getClass();

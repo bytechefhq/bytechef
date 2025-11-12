@@ -214,7 +214,8 @@ public final class CollectionUtils {
         Validate.notNull(list, "'list' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
-        return list.stream()
+        return new ArrayList<>(list)
+            .stream()
             .map(mapper)
             .toList();
     }
@@ -223,7 +224,8 @@ public final class CollectionUtils {
         Validate.notNull(set, "'set' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
-        return set.stream()
+        return new ArrayList<>(set)
+            .stream()
             .map(mapper)
             .toList();
     }

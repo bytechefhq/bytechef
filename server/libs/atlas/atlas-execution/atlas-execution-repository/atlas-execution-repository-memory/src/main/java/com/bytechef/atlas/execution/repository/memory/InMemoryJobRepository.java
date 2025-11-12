@@ -71,7 +71,9 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public void deleteById(Long id) {
-        throw new UnsupportedOperationException();
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        cache.evict(TenantCacheKeyUtils.getKey(id));
     }
 
     @Override

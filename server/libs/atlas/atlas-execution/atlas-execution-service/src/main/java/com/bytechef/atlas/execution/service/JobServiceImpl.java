@@ -69,6 +69,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Optional<Job> fetchJob(Long id) {
+        return jobRepository.findById(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Job> fetchLastJob() {
         return jobRepository.findLastJob();
