@@ -22,7 +22,7 @@ public interface ApiClientService {
 
     void delete(long id);
 
-    Optional<ApiClient> fetchApiClient(String secretKey);
+    Optional<ApiClient> fetchApiClient(String secretKey, long environmentId);
 
     ApiClient getApiClient(long id);
 
