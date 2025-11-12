@@ -120,7 +120,7 @@ include("server:libs:core:tenant:tenant-single-service")
 
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-security:platform-security-api")
-include("server:libs:platform:platform-security:platform-security-rest")
+include("server:libs:platform:platform-security:platform-security-graphql")
 include("server:libs:platform:platform-security:platform-security-service")
 include("server:libs:platform:platform-category:platform-category-api")
 include("server:libs:platform:platform-category:platform-category-service")
