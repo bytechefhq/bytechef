@@ -41,7 +41,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
@@ -86,7 +86,7 @@ public class TestExecutorConfiguration {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
 
@@ -97,22 +97,23 @@ public class TestExecutorConfiguration {
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
         return new JobTestExecutor(
-            componentDefinitionService, contextService, evaluator,
+            componentDefinitionService, contextService, evaluator, jobService,
             new JobSyncExecutor(
-                contextService, environment, evaluator, jobService, syncMessageBroker,
+                contextService, environment, evaluator, jobService, 1000, () -> asyncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(cacheManager, evaluator),
+                getTaskDispatcherAdapterFactories(
+                    cacheManager, evaluator),
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, evaluator, jobService, syncMessageBroker,
-                    taskExecutionService, taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
+                    contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
+                    taskFileStorage),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
     }
 
-    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
-        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
+    private static ApplicationEventPublisher getEventPublisher(AsyncMessageBroker asyncMessageBroker) {
+        return event -> asyncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
@@ -161,10 +162,10 @@ public class TestExecutorConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
-        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
+        AsyncMessageBroker asyncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
-        ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
+        ApplicationEventPublisher eventPublisher = getEventPublisher(asyncMessageBroker);
 
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),

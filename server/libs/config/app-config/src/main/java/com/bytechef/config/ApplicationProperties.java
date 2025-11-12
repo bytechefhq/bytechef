@@ -1756,7 +1756,7 @@ public class ApplicationProperties {
     public static class MessageBroker {
 
         public enum Provider {
-            AMQP, AWS, JMS, KAFKA, LOCAL, REDIS
+            AMQP, AWS, JMS, KAFKA, MEMORY, REDIS
         }
 
         private Provider provider = Provider.JMS;

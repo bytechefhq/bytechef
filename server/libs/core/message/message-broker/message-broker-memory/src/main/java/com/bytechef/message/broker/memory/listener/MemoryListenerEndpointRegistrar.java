@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.sync.listener;
+package com.bytechef.message.broker.memory.listener;
 
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.route.MessageRoute;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,16 +30,16 @@ import org.springframework.util.ReflectionUtils;
 /**
  * @author Ivica Cardic
  */
-public class LocalListenerEndpointRegistrar {
+public class MemoryListenerEndpointRegistrar {
 
-    private final SyncMessageBroker syncMessageBroker;
+    private final MemoryMessageBroker memoryMessageBroker;
 
-    public LocalListenerEndpointRegistrar(SyncMessageBroker syncMessageBroker) {
-        this.syncMessageBroker = syncMessageBroker;
+    public MemoryListenerEndpointRegistrar(MemoryMessageBroker memoryMessageBroker) {
+        this.memoryMessageBroker = memoryMessageBroker;
     }
 
     public void registerListenerEndpoint(MessageRoute messageRoute, Object delegate, String methodName) {
-        syncMessageBroker.receive(
+        memoryMessageBroker.receive(
             messageRoute,
             message -> {
                 try {
