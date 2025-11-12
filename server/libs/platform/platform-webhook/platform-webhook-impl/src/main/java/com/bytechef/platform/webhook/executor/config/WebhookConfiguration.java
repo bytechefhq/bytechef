@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.webhook.executor.config;
 
+import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
@@ -32,7 +34,8 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
@@ -56,6 +59,7 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
@@ -79,25 +83,31 @@ public class WebhookConfiguration {
         WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, environment, evaluator, jobService, syncMessageBroker,
+                contextService, environment, evaluator, jobService, -1, () -> asyncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, evaluator, jobService, syncMessageBroker, taskExecutionService,
+                    contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 
-    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
-        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
+    private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
+        return event -> {
+            MessageEvent<?> messageEvent = (MessageEvent<?>) event;
+
+            messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+
+            messageBroker.send(((MessageEvent<?>) event).getRoute(), event);
+        };
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
@@ -146,10 +156,10 @@ public class WebhookConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
-        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
+        AsyncMessageBroker asyncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
-        ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
+        ApplicationEventPublisher eventPublisher = createEventPublisher(asyncMessageBroker);
 
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),

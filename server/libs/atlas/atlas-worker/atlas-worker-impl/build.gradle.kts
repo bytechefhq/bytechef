@@ -17,6 +17,6 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    testImplementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
+    testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-support"))
 }

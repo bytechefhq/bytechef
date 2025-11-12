@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.sync.config;
+package com.bytechef.message.broker.memory.config;
 
-import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerLocal;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerMemory;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnMessageBrokerLocal
-public class LocalMessageBrokerConfiguration {
+@ConditionalOnMessageBrokerMemory
+public class MemoryMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalMessageBrokerConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(MemoryMessageBrokerConfiguration.class);
 
-    public LocalMessageBrokerConfiguration() {
+    public MemoryMessageBrokerConfiguration() {
         if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: local");
+            logger.info("Message broker provider type enabled: memory");
         }
     }
 
     @Bean
-    SyncMessageBroker syncMessageBroker() {
-        return new SyncMessageBroker();
+    AsyncMessageBroker asyncMessageBroker(Environment environment) {
+        return new AsyncMessageBroker(environment);
     }
 }

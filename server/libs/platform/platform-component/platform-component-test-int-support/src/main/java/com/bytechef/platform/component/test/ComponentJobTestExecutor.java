@@ -29,6 +29,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
@@ -73,9 +74,9 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, environment, evaluator, jobService, getTaskDispatcherPreSendProcessors(),
-            taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage,
-            workflowService);
+            contextService, environment, evaluator, jobService, -1, SyncMessageBroker::new,
+            getTaskDispatcherPreSendProcessors(), taskExecutionService,
+            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage, -1, workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
     }

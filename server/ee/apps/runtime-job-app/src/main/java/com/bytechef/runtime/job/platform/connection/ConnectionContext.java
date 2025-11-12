@@ -7,8 +7,8 @@
 
 package com.bytechef.runtime.job.platform.connection;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -19,22 +19,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ConnectionContext {
 
     private static final AtomicLong ATOMIC_CONNECTION_ID = new AtomicLong(1);
-
-    private static final ThreadLocal<Map<Long, Connection>> CURRENT_CONNECTION_MAP = ThreadLocal.withInitial(
-        HashMap::new);
+    private static final Map<Long, Connection> CONNECTION_MAP = new ConcurrentHashMap<>();
 
     public static Map<String, ?> getConnectionParameters(long id) {
-        Map<Long, Connection> parameterMap = CURRENT_CONNECTION_MAP.get();
-
-        return parameterMap.get(id).parameters;
+        return CONNECTION_MAP.get(id).parameters;
     }
 
     public static long putConnectionParameters(String name, Map<String, ?> parameters) {
-        Map<Long, Connection> parameterMap = CURRENT_CONNECTION_MAP.get();
-
         long connectionId = -1;
 
-        for (Map.Entry<Long, Connection> entry : parameterMap.entrySet()) {
+        for (Map.Entry<Long, Connection> entry : CONNECTION_MAP.entrySet()) {
             Connection connection = entry.getValue();
 
             if (connection.name.equals(name)) {
@@ -47,9 +41,7 @@ public class ConnectionContext {
         if (connectionId == -1) {
             connectionId = ATOMIC_CONNECTION_ID.getAndIncrement();
 
-            parameterMap.putIfAbsent(connectionId, new Connection(name, parameters));
-
-            CURRENT_CONNECTION_MAP.set(parameterMap);
+            CONNECTION_MAP.putIfAbsent(connectionId, new Connection(name, parameters));
         }
 
         return connectionId;
