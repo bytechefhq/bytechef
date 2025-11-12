@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.chatmemory.inmemory;
+package com.bytechef.component.ai.agent.chat.memory.memory;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.ai.agent.chatmemory.inmemory.cluster.InMemoryChatMemory;
+import com.bytechef.component.ai.agent.chat.memory.memory.cluster.InMemoryChatMemory;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
