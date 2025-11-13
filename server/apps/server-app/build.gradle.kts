@@ -206,6 +206,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:freshsales"))
     implementation(project(":server:libs:modules:components:github"))
     implementation(project(":server:libs:modules:components:gitlab"))
+    implementation(project(":server:libs:modules:components:google:google-bigquery"))
     implementation(project(":server:libs:modules:components:google:google-calendar"))
     implementation(project(":server:libs:modules:components:google:google-chat"))
     implementation(project(":server:libs:modules:components:google:google-contacts"))
