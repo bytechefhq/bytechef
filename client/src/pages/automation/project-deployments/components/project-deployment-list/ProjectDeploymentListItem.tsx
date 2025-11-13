@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -143,7 +143,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     <div className="flex items-center justify-end gap-x-6">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge variant="secondary">V{projectDeployment.projectVersion}</Badge>
+                                <Badge label={`V${projectDeployment.projectVersion}`} styleType="secondary-filled" weight="semibold" />
                             </TooltipTrigger>
 
                             <TooltipContent>The project version</TooltipContent>
