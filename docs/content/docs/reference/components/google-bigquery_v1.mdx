@@ -1,0 +1,184 @@
+---
+title: "BigQuery"
+description: "BigQuery is the autonomous data to AI platform, automating the entire data life cycle, from ingestion to AI-driven insights, so you can go from data to AI to action faster."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: bigQuery/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Query
+Name: query
+
+`Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| projectId | Project ID | STRING | Project ID of the query request. | true |
+| query | Query | STRING | Required. A query string to execute, using Google Standard SQL or legacy SQL syntax. Example: "SELECT COUNT(f1) FROM myProjectId.myDatasetId.myTableId". | true |
+| maxResults | Max Results | INTEGER | The maximum number of rows of data to return per page of results. | false |
+| timeoutMs | Timeout | INTEGER | Specifies the maximum amount of time, in milliseconds, that the client is willing to wait for the query to complete. By default, this limit is 10 seconds (10,000 milliseconds). | false |
+| dryRun | Dry Run | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. | false |
+| createSession | Create Session | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, creates a new session using a randomly generated sessionId. If false, runs query with an existing sessionId passed in ConnectionProperty. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Query",
+  "name" : "query",
+  "parameters" : {
+    "projectId" : "",
+    "query" : "",
+    "maxResults" : 1,
+    "timeoutMs" : 1,
+    "dryRun" : false,
+    "createSession" : false
+  },
+  "type" : "bigQuery/v1/query"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| kind | STRING | The resource type. |
+| schema | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(name), STRING\(type), STRING\(mode), []\(fields), STRING\(description), &#123;[STRING]\(names)&#125;\(policyTags), &#123;STRING\(name)&#125;\(dataPolicies), STRING\(maxLength), STRING\(precision), STRING\(scale), STRING\(roundingMode), STRING\(collation), STRING\(defaultValueExpression), &#123;STRING\(type)&#125;\(rangeElementType)&#125;]\(fields)&#125; </details> | The schema of the results. Present only when the query completes successfully. |
+| objectReference | OBJECT <details> <summary> Properties </summary> &#123;STRING\(projectId), STRING\(jobId), STRING\(location)&#125; </details> | Reference to the Job that was created to run the query. |
+| jobCreationReason | OBJECT <details> <summary> Properties </summary> &#123;STRING\(code)&#125; </details> | The reason why a Job was created. |
+| queryId | STRING | Auto-generated ID for the query. |
+| location | STRING | The geographic location of the query. |
+| totalRows | STRING | The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. |
+| pageToken | STRING | A token used for paging results. |
+| rows | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | An object with as many results as can be contained within the maximum permitted reply size.  |
+| totalBytesProcessed | STRING | The total number of bytes processed for this query. |
+| jobComplete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the query has completed or not. |
+| errors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(reason), STRING\(location), STRING\(debugInfo), STRING\(message)&#125;, BOOLEAN\($cacheHit), STRING\($numDmlAffectedRows), &#123;STRING\(sessionId)&#125;\($sessionInfo), &#123;STRING\(insertedRowCount), STRING\(deletedRowCount), STRING\(updatedRowCount)&#125;\($dmlStats), STRING\($totalBytesBilled), STRING\($totalSlotMs), STRING\($creationTime), STRING\($startTime), STRING\($endTime)] </details> | The first errors or warnings encountered during the running of the job. |
+
+
+
+
+#### Output Example
+```json
+{
+  "kind" : "",
+  "schema" : {
+    "fields" : [ {
+      "name" : "",
+      "type" : "",
+      "mode" : "",
+      "fields" : [ ],
+      "description" : "",
+      "policyTags" : {
+        "names" : [ "" ]
+      },
+      "dataPolicies" : {
+        "name" : ""
+      },
+      "maxLength" : "",
+      "precision" : "",
+      "scale" : "",
+      "roundingMode" : "",
+      "collation" : "",
+      "defaultValueExpression" : "",
+      "rangeElementType" : {
+        "type" : ""
+      }
+    } ]
+  },
+  "objectReference" : {
+    "projectId" : "",
+    "jobId" : "",
+    "location" : ""
+  },
+  "jobCreationReason" : {
+    "code" : ""
+  },
+  "queryId" : "",
+  "location" : "",
+  "totalRows" : "",
+  "pageToken" : "",
+  "rows" : [ { } ],
+  "totalBytesProcessed" : "",
+  "jobComplete" : false,
+  "errors" : [ {
+    "reason" : "",
+    "location" : "",
+    "debugInfo" : "",
+    "message" : ""
+  }, false, "", {
+    "sessionId" : ""
+  }, {
+    "insertedRowCount" : "",
+    "deletedRowCount" : "",
+    "updatedRowCount" : ""
+  }, "", "", "", "", "" ]
+}
+```
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create OAuth 2.0 Application
+
+Creation of OAuth 2.0 application is documented [here](https://docs.bytechef.io/reference/components/google-calendar#create-oauth-20-application).
+
+### Enable BigQuery API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Click on **APIs & Services**.
+3. Enter **bigquery** into search bar and press enter.
+4. Click on **BigQuery API**.
+5. Click on **Enable**.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/1a93fe01-973c-4185-97c1-073b2cb03d1c?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+![anl-c-google-calendar-md](https://static.scarf.sh/a.png?x-pxid=88f94c85-204a-4086-bfae-12024a15535d)
