@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Separator} from '@/components/ui/separator';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
@@ -53,7 +53,7 @@ const ProjectWorkflowsList = ({
                     </Tooltip>
 
                     {project.lastPublishedDate && project.lastProjectVersion ? (
-                        <Badge className="flex space-x-1" variant="success">
+                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
                             <span>V{project.lastProjectVersion - 1}</span>
 
                             <span>PUBLISHED</span>
@@ -61,7 +61,8 @@ const ProjectWorkflowsList = ({
                     ) : (
                         <Badge
                             className="flex space-x-1 bg-surface-neutral-secondary text-content-neutral-primary"
-                            variant="secondary"
+                            styleType="secondary-filled"
+                            weight="semibold"
                         >
                             <span>V{project.lastProjectVersion}</span>
 
