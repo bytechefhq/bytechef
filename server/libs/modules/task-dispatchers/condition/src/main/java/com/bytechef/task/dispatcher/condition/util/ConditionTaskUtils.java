@@ -126,6 +126,9 @@ public class ConditionTaskUtils {
             Map.ofEntries(
                 Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "'${value1}'.equals('${value2}')"),
                 Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.EQUALS_IGNORE_CASE.name(),
+                    "'${value1}'.equalsIgnoreCase('${value2}')"),
+                Map.entry(
                     ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(),
                     "!'${value1}'.equals('${value2}')"),
                 Map.entry(

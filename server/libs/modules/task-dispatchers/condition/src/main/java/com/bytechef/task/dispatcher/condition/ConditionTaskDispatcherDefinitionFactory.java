@@ -173,6 +173,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .description("Compare operation to decide where to map data.")
                                         .options(
                                             option("Equals", Operation.EQUALS.name()),
+                                            option("Equals Ignore Case", Operation.EQUALS_IGNORE_CASE.name()),
                                             option("Not Equals", Operation.NOT_EQUALS.name()),
                                             option("Contains", Operation.CONTAINS.name()),
                                             option("Not Contains", Operation.NOT_CONTAINS.name()),
