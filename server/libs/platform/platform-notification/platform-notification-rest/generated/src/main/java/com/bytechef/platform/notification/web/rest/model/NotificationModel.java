@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-07T14:49:42.849969+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-13T11:43:16.460432936+01:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
 public class NotificationModel {
 
   private @Nullable Long id;
