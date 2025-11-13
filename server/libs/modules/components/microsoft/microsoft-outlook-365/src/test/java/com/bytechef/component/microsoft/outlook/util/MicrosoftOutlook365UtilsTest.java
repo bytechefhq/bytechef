@@ -83,8 +83,9 @@ class MicrosoftOutlook365UtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(VALUE, List.of(Map.of(
-                CONTENT_BYTES, "encode"))));
+            .thenReturn(Map.of(VALUE, List.of(
+                Map.of(CONTENT_BYTES, "encode", "isInline", false),
+                Map.of(CONTENT_BYTES, "encode", "isInline", true))));
 
         Map<String, Object> messageBody = new HashMap<>(
             Map.of(
@@ -115,6 +116,7 @@ class MicrosoftOutlook365UtilsTest {
                 List.of("address3"),
                 "Hello World!",
                 "Hello World!",
+                List.of(mockedFileEntry),
                 List.of(mockedFileEntry),
                 "https://example.com"),
             result);
