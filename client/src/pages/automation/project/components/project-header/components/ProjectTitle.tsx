@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 
@@ -13,8 +13,11 @@ const ProjectTitle = ({project}: {project: Project}) => {
 
                     {project && (
                         <Badge
-                            className="flex space-x-1 bg-white"
-                            variant={project.lastStatus === ProjectStatus.Published ? 'success' : 'outline'}
+                            className="bg-surface-neutral-primary flex space-x-1"
+                            styleType={
+                                project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'outline-outline'
+                            }
+                            weight="semibold"
                         >
                             <span>V{project.lastProjectVersion}</span>
 
