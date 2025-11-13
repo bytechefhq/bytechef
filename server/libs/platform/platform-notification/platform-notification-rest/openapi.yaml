@@ -189,3 +189,4 @@ components:
             - "JOB_COMPLETED"
             - "JOB_FAILED"
             - "JOB_STARTED"
+            - "JOB_STOPPED"
