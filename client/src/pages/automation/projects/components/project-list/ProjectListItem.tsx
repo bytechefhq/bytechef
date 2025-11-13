@@ -1,4 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     AlertDialog,
@@ -10,7 +11,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Badge} from '@/components/ui/badge';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -342,7 +342,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             <div className="flex items-center space-x-2">
                                 {project.lastPublishedDate && project.lastProjectVersion ? (
                                     <>
-                                        <Badge className="flex space-x-1" variant="success">
+                                        <Badge className="flex space-x-1" styleType="success-outline">
                                             <span>V{project.lastProjectVersion - 1}</span>
 
                                             <span>PUBLISHED</span>
@@ -365,7 +365,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         {/*/>*/}
                                     </>
                                 ) : (
-                                    <Badge className="flex space-x-1" variant="secondary">
+                                    <Badge className="flex space-x-1" styleType="secondary-filled">
                                         <span>V{project.lastProjectVersion}</span>
 
                                         <span>{project.lastStatus}</span>
