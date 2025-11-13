@@ -89,7 +89,7 @@ class MicrosoftOutlook365GetMailActionTest {
 
             MicrosoftOutlook365Utils.SimpleMessage simpleMessage = new MicrosoftOutlook365Utils.SimpleMessage(
                 "id", "conversationId", "subject", "from", List.of("toRecipient"), List.of("ccRecipient"),
-                List.of("bccRecipient"), "bodyPreview", "bodyHtml", List.of(), "https://example.com");
+                List.of("bccRecipient"), "bodyPreview", "bodyHtml", List.of(), List.of(), "https://example.com");
 
             microsoftOutlook365UtilsMockedStatic
                 .when(() -> MicrosoftOutlook365Utils.createSimpleMessage(
