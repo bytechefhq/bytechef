@@ -30,8 +30,8 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.var.constant.VarConstants.TYPE;
 import static com.bytechef.component.var.constant.VarConstants.VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 
@@ -118,7 +118,7 @@ public class VarSetAction {
         .perform(VarSetAction::perform);
 
     protected static OutputResponse output(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         if (!inputParameters.containsKey(VALUE)) {
             return null;
@@ -128,7 +128,7 @@ public class VarSetAction {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return inputParameters.getRequired(VALUE);
     }

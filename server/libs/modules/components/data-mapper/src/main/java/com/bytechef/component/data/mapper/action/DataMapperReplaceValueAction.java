@@ -50,8 +50,8 @@ import com.bytechef.component.data.mapper.constant.ValueType;
 import com.bytechef.component.data.mapper.model.Mapping;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.data.mapper.util.DataMapperUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -321,7 +321,7 @@ public class DataMapperReplaceValueAction {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Class<?> type = DataMapperUtils.getType(inputParameters);
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());

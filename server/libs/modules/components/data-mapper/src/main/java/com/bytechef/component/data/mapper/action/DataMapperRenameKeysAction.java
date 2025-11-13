@@ -27,8 +27,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.data.mapper.model.Mapping;
 import com.bytechef.component.data.mapper.model.StringMapping;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -74,7 +74,7 @@ public class DataMapperRenameKeysAction {
     }
 
     protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<StringMapping> mappings = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());
 

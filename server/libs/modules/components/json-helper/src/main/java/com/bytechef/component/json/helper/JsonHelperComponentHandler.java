@@ -17,6 +17,7 @@
 package com.bytechef.component.json.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +39,10 @@ public class JsonHelperComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             JsonHelperParseAction.ACTION_DEFINITION,
-            JsonHelperStringifyAction.ACTION_DEFINITION);
+            JsonHelperStringifyAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(JsonHelperParseAction.ACTION_DEFINITION),
+            tool(JsonHelperStringifyAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

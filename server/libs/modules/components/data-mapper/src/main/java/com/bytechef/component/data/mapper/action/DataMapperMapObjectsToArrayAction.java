@@ -29,8 +29,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.data.mapper.constant.InputType;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +83,7 @@ public class DataMapperMapObjectsToArrayAction {
 
     @SuppressWarnings("unchecked")
     protected static List<Map<String, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<Map<String, Object>> output = new ArrayList<>();
         InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
