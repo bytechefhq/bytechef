@@ -25,9 +25,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.date.helper.util.DateHelperUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -56,7 +56,7 @@ public class DateHelperGetCurrentDateAction {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         String dateFormat = inputParameters.getRequiredString(DATE_FORMAT);
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);

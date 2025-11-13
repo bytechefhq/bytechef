@@ -33,8 +33,8 @@ import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -79,7 +79,7 @@ public class DateHelperExtractDateUnitsAction {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         LocalDateTime inputDate = inputParameters.getRequiredLocalDateTime(INPUT_DATE);
 

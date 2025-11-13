@@ -39,6 +39,7 @@ import com.bytechef.component.data.mapper.model.Pair;
 import com.bytechef.component.data.mapper.model.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -156,7 +157,7 @@ public class DataMapperMapObjectsToObjectAction {
 
     private static Map<String, Object> fillOutput(
         Parameters inputParameters, DocumentContext input, Map<String, Pair<String, Boolean>> mappingMap,
-        ActionContext context) {
+        Context context) {
         Map<String, Object> output = new LinkedHashMap<>();
 
         if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null && inputParameters.getBoolean(INCLUDE_UNMAPPED)) {

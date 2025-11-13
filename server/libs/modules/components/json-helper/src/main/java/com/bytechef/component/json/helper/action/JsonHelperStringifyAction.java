@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.json.helper.constant.JsonHelperConstants.SOURCE;
 import static com.bytechef.component.json.helper.constant.JsonHelperConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -65,7 +65,7 @@ public class JsonHelperStringifyAction {
     }
 
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Object input = inputParameters.getRequired(SOURCE);
 
