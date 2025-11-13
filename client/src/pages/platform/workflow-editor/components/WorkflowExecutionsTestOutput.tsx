@@ -1,12 +1,15 @@
+import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import {ScrollArea} from '@/components/ui/scroll-area';
+import WorkflowExecutionSheetAccordionItem from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetAccordionItem';
+import WorkflowExecutionSheetAccordionTrigger from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetAccordionTrigger';
+import WorkflowExecutionTabsContent from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionTabsContent';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
-import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
-import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
-import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {getTasksTree, handleTaskClick} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionsTestOutputHeader = ({
@@ -72,7 +75,9 @@ const WorkflowExecutionsTestOutput = ({
     workflowTestExecution?: WorkflowTestExecution;
     onCloseClick?: () => void;
 }) => {
-    const [content, setContent] = useState<TaskExecution | TriggerExecution | undefined>(
+    const [activeTab, setActiveTab] = useState<'input' | 'output' | 'error'>('input');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
         workflowTestExecution?.triggerExecution
             ? (workflowTestExecution.triggerExecution as TriggerExecution)
             : workflowTestExecution?.job?.taskExecutions
@@ -84,14 +89,27 @@ const WorkflowExecutionsTestOutput = ({
     const triggerExecution = workflowTestExecution?.triggerExecution as TriggerExecution;
 
     useEffect(() => {
-        setContent(
+        setSelectedItem(
             workflowTestExecution?.triggerExecution
                 ? (workflowTestExecution.triggerExecution as TriggerExecution)
                 : workflowTestExecution?.job?.taskExecutions
                   ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecution)
                   : undefined
         );
+
+        setActiveTab('input');
     }, [workflowTestExecution]);
+
+    const tasksTree = useMemo(() => getTasksTree(job), [job]);
+
+    const onTaskClick = useCallback(
+        (taskExecution: TaskExecution | TriggerExecution) => {
+            handleTaskClick({setActiveTab, setSelectedItem, taskExecution});
+        },
+        [setActiveTab, setSelectedItem]
+    );
+
+    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
 
     return (
         <div className="flex size-full flex-col">
@@ -126,32 +144,49 @@ const WorkflowExecutionsTestOutput = ({
                             {workflowTestExecution?.job && (
                                 <ResizablePanelGroup direction="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
-                                        <ul className="mx-2 space-y-0.5">
-                                            {triggerExecution && (
-                                                <WorkflowTriggerExecutionItem
-                                                    key={triggerExecution.id}
-                                                    onClick={() => setContent(triggerExecution)}
-                                                    selected={content?.id === triggerExecution.id}
-                                                    triggerExecution={triggerExecution}
-                                                />
-                                            )}
+                                        <ScrollArea className="h-full pr-4">
+                                            <Accordion
+                                                className="space-y-2 [transform:translateZ(0)]"
+                                                collapsible
+                                                defaultValue={
+                                                    isTriggerExecution
+                                                        ? triggerExecution?.id || ''
+                                                        : selectedItem?.id || ''
+                                                }
+                                                type="single"
+                                            >
+                                                {triggerExecution && (
+                                                    <WorkflowExecutionSheetAccordionTrigger
+                                                        onTaskClick={onTaskClick}
+                                                        selectedItem={selectedItem}
+                                                        triggerExecution={triggerExecution}
+                                                    />
+                                                )}
 
-                                            {job?.taskExecutions &&
-                                                job?.taskExecutions.map((taskExecution) => (
-                                                    <WorkflowTaskExecutionItem
-                                                        key={taskExecution.id}
-                                                        onClick={() => setContent(taskExecution)}
-                                                        selected={content?.id === taskExecution.id}
-                                                        taskExecution={taskExecution}
+                                                {tasksTree.map((node) => (
+                                                    <WorkflowExecutionSheetAccordionItem
+                                                        key={node.task.id}
+                                                        node={node}
+                                                        onTaskClick={onTaskClick}
+                                                        selectedTaskExecutionId={selectedItem?.id || ''}
                                                     />
                                                 ))}
-                                        </ul>
+                                            </Accordion>
+                                        </ScrollArea>
                                     </ResizablePanel>
 
                                     <ResizableHandle className="bg-muted" />
 
-                                    <ResizablePanel className="space-y-4 overflow-y-auto p-4">
-                                        <WorkflowExecutionContent {...content} />
+                                    <ResizablePanel className="flex min-h-0 flex-col space-y-4 overflow-hidden p-4">
+                                        <WorkflowExecutionTabsContent
+                                            activeTab={activeTab}
+                                            dialogOpen={dialogOpen}
+                                            job={job}
+                                            selectedItem={selectedItem}
+                                            setActiveTab={setActiveTab}
+                                            setDialogOpen={setDialogOpen}
+                                            triggerExecution={triggerExecution}
+                                        />
                                     </ResizablePanel>
                                 </ResizablePanelGroup>
                             )}
