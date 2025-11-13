@@ -13,7 +13,7 @@ const ProjectTitle = ({project}: {project: Project}) => {
 
                     {project && (
                         <Badge
-                            className="bg-surface-neutral-primary flex space-x-1"
+                            className="flex space-x-1 bg-surface-neutral-primary"
                             styleType={
                                 project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'outline-outline'
                             }

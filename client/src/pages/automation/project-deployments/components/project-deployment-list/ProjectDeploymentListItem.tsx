@@ -143,7 +143,11 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     <div className="flex items-center justify-end gap-x-6">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge label={`V${projectDeployment.projectVersion}`} styleType="secondary-filled" weight="semibold" />
+                                <Badge
+                                    label={`V${projectDeployment.projectVersion}`}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
                             </TooltipTrigger>
 
                             <TooltipContent>The project version</TooltipContent>
