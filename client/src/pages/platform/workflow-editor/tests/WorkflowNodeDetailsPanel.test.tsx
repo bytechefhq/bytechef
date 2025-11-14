@@ -1,9 +1,9 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 describe('WorkflowNodeDetailsPanel', () => {
-    let mockSetCurrentOperationProperties: ReturnType<typeof vi.fn>;
-    let mockSetCurrentActionDefinition: ReturnType<typeof vi.fn>;
-    let mockSetCurrentActionFetched: ReturnType<typeof vi.fn>;
+    let mockSetCurrentOperationProperties = vi.fn();
+    let mockSetCurrentActionDefinition = vi.fn();
+    let mockSetCurrentActionFetched = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
