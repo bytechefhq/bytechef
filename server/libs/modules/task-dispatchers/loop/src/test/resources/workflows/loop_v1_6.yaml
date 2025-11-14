@@ -20,7 +20,7 @@ tasks:
             value2: 5
         combineOperation: "ANY"
         caseTrue:
-        - name: "loopBreak"
+        - name: "loopBreak_1"
           type: "loopBreak/v1"
         caseFalse:
         - name: "sumVar2"
