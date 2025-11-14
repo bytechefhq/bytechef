@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +40,6 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType.Type;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import java.util.Optional;
@@ -92,24 +90,17 @@ class GoogleBigQueryQueryActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = singleConnectionPerformFunction.apply(
-            mockedParameters, null, mockedActionContext);
+        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertEquals(mockedObject, result);
 
-        Body body = bodyArgumentCaptor.getValue();
-
         Map<String, Object> expectedBodyContent = Map.of(
-            QUERY, "query",
-            MAX_RESULT, 10,
-            TIMEOUT_MS, 10,
-            DRY_RUN, true,
-            CREATION_SESSION, true);
+            QUERY, "query", MAX_RESULT, 10, TIMEOUT_MS, 10, DRY_RUN, true, CREATION_SESSION, true);
 
-        assertEquals(expectedBodyContent, body.getContent());
+        assertEquals(Http.Body.of(expectedBodyContent, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
