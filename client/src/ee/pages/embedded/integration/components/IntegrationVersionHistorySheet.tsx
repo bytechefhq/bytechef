@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
@@ -51,14 +51,14 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                                 )}
 
                                                 <Badge
-                                                    variant={
+                                                    label={integrationVersion.status ?? ''}
+                                                    styleType={
                                                         integrationVersion.status === IntegrationStatus.Published
-                                                            ? 'success'
-                                                            : 'secondary'
+                                                            ? 'success-outline'
+                                                            : 'secondary-filled'
                                                     }
-                                                >
-                                                    {integrationVersion.status}
-                                                </Badge>
+                                                    weight="semibold"
+                                                />
                                             </div>
                                         </div>
                                     </AccordionTrigger>
