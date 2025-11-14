@@ -32,11 +32,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GoogleBigQueryComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("bigQuery")
-        .title("BigQuery")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleBigQuery")
+        .title("Google BigQuery")
         .description(
-            "BigQuery is the autonomous data to AI platform, automating the entire data life cycle, from ingestion " +
-                "to AI-driven insights, so you can go from data to AI to action faster.")
+            "Google BigQuery is the autonomous data to AI platform, automating the entire data life cycle, from " +
+                "ingestion to AI-driven insights, so you can go from data to AI to action faster.")
         .icon("path:assets/google-bigquery.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(GoogleBigQueryConnection.CONNECTION_DEFINITION)
