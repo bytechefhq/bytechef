@@ -274,7 +274,6 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         if (properties?.length) {
             setSubProperties(properties as Array<PropertyAllType>);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [properties]);
 
     // update parameterObject when workflowDefinition changes

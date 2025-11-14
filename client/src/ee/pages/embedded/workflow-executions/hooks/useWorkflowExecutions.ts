@@ -30,7 +30,6 @@ export const useWorkflowExecutions = (
     const [workflowExecutionsIsLoading, setWorkflowExecutionsIsLoading] = useState(true);
 
     const {data: connectedUserProjectsQuery} = useConnectedUserProjectsQuery({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         environmentId: request.environmentId?.toString(),
     });
 
