@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
 import {Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {ReactNode} from 'react';
@@ -31,7 +31,7 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
                 {searchParams.get('tagId') ? 'tag' : 'integration'}:
             </span>
 
-            <Badge variant="secondary">
+            <Badge styleType="secondary-filled" weight="semibold">
                 <span className="text-sm">{pageTitle ?? 'All Integrations'}</span>
             </Badge>
         </div>
