@@ -91,7 +91,7 @@ class SlackUtilsTest {
     }
 
     @Test
-    void testGetChannelOptions() {
+    void testGetChannelIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("channels", List.of(Map.of(NAME, "abc", ID, "123"))));
 
@@ -101,11 +101,11 @@ class SlackUtilsTest {
 
         assertEquals(
             expectedOptions,
-            SlackUtils.getChannelOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            SlackUtils.getChannelIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
-    void testGetUserOptions() {
+    void testGetUserIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("members", List.of(Map.of(NAME, "abc", ID, "123"))));
 
@@ -115,6 +115,6 @@ class SlackUtilsTest {
 
         assertEquals(
             expectedOptions,
-            SlackUtils.getUserOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            SlackUtils.getUserIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 }

@@ -44,6 +44,26 @@ public class SlackUtils {
     private SlackUtils() {
     }
 
+    public static List<Option<String>> getChannelIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
+
+        List<Object> channels = fetchAll(
+            context, "/conversations.list", "channels",
+            "types", "public_channel,private_channel", "exclude_archived", true, "limit", 1000);
+
+        return getOptions(channels);
+    }
+
+    public static List<Option<String>> getUserIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
+
+        List<Object> users = fetchAll(context, "/users.list", "members", "limit", 1000);
+
+        return getOptions(users);
+    }
+
     public static Object sendMessage(
         String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
 
@@ -63,26 +83,6 @@ public class SlackUtils {
         } else {
             throw new ProviderException((String) body.get(ERROR));
         }
-    }
-
-    public static List<Option<String>> getChannelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
-
-        List<Object> channels = fetchAll(
-            context, "/conversations.list", "channels",
-            "types", "public_channel,private_channel", "exclude_archived", true, "limit", 1000);
-
-        return getOptions(channels);
-    }
-
-    public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
-
-        List<Object> users = fetchAll(context, "/users.list", "members", "limit", 1000);
-
-        return getOptions(users);
     }
 
     private static List<Object> fetchAll(
@@ -105,9 +105,8 @@ public class SlackUtils {
                 .getBody(new TypeReference<>() {});
 
             if ((boolean) body.get(OK)) {
-                Object list = body.get(listKey);
-                if (list instanceof List<?> l) {
-                    items.addAll(l);
+                if (body.get(listKey) instanceof List<?> list) {
+                    items.addAll(list);
                 }
 
                 if (body.get("response_metadata") instanceof Map<?, ?> map) {

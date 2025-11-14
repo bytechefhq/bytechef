@@ -44,7 +44,7 @@ public class SlackSendMessageAction {
             string(CHANNEL)
                 .label("Channel ID")
                 .description("ID of the channel, private group, or IM channel to send message to.")
-                .options((OptionsFunction<String>) SlackUtils::getChannelOptions)
+                .options((OptionsFunction<String>) SlackUtils::getChannelIdOptions)
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
@@ -59,5 +59,4 @@ public class SlackSendMessageAction {
         return sendMessage(
             inputParameters.getRequiredString(CHANNEL), inputParameters.getRequiredString(TEXT), null, actionContext);
     }
-
 }
