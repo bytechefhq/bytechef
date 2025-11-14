@@ -81,6 +81,7 @@ public class SpelEvaluator implements Evaluator {
         map.put("config", new Config(builder.environment));
         map.put("concat", new Concat());
         map.put("contains", new Contains());
+        map.put("equalsIgnoreCase", new EqualsIgnoreCase());
         map.put("format", new Format());
         map.put("flatten", new Flatten());
         map.put("float", new Cast<>(Float.class));
