@@ -18,6 +18,8 @@
 
 package com.bytechef.error;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
  * An interface which marks an object as being able to provide {@link ExecutionError} status about itself.
  *
@@ -27,5 +29,6 @@ package com.bytechef.error;
 public interface Errorable {
 
     /** Returns the error associated with the object. */
+    @Nullable
     ExecutionError getError();
 }
