@@ -46,7 +46,7 @@ public class SlackSendDirectMessageAction {
             string(CHANNEL)
                 .label("User ID")
                 .description("ID of the user to send the direct message to.")
-                .options((OptionsFunction<String>) SlackUtils::getUserOptions)
+                .options((OptionsFunction<String>) SlackUtils::getUserIdOptions)
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))

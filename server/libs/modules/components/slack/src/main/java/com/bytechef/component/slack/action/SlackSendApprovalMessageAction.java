@@ -24,6 +24,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
+import static com.bytechef.component.slack.constant.SlackConstants.TYPE;
 import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
@@ -46,7 +47,7 @@ public class SlackSendApprovalMessageAction {
             string(CHANNEL)
                 .label("Channel")
                 .description("Channel, private group, or IM channel to send message to.")
-                .options((OptionsFunction<String>) SlackUtils::getChannelOptions)
+                .options((OptionsFunction<String>) SlackUtils::getChannelIdOptions)
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
@@ -63,16 +64,16 @@ public class SlackSendApprovalMessageAction {
             .formatted(inputParameters.getRequiredString(TEXT));
         List<Map<String, Object>> blocks = List.of(
             Map.of(
-                "type", "section", TEXT,
-                Map.of("type", "mrkdwn", TEXT, inputParameters.getRequiredString(TEXT))),
+                TYPE, "section", TEXT,
+                Map.of(TYPE, "mrkdwn", TEXT, inputParameters.getRequiredString(TEXT))),
             Map.of(
-                "type", "actions", "block_id", "actions", "elements",
+                TYPE, "actions", "block_id", "actions", "elements",
                 List.of(
                     Map.of(
-                        "type", "button", "text", Map.of("type", "plain_text", "text", "Approve"),
+                        TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Approve"),
                         "style", "primary", "url", links.approvalLink()),
                     Map.of(
-                        "type", "button", "text", Map.of("type", "plain_text", "text", "Disapprove"),
+                        TYPE, "button", TEXT, Map.of(TYPE, "plain_text", TEXT, "Disapprove"),
                         "style", "danger", "url", links.disapprovalLink()))));
 
         return sendMessage(inputParameters.getRequiredString(CHANNEL), text, blocks, actionContext);
