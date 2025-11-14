@@ -16,9 +16,9 @@
 
 package com.bytechef.ee.tenant.repository;
 
+import com.bytechef.ee.tenant.util.TenantUtils;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.domain.Tenant;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -79,7 +79,7 @@ public class TenantRepository {
                     continue;
                 }
 
-                tenants.add(TenantUtils.getTenantId(schemaName));
+                tenants.add(getTenantId(schemaName));
             }
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle.getMessage(), sqle);
@@ -148,7 +148,7 @@ public class TenantRepository {
             if (resultSet.next()) {
                 String schemaName = resultSet.getString(1);
 
-                return TenantUtils.getTenantId(schemaName);
+                return getTenantId(schemaName);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -241,5 +241,13 @@ public class TenantRepository {
         }
 
         return rows;
+    }
+
+    private static String getTenantId(String schemaName) {
+        if (schemaName == null) {
+            return "000000";
+        } else {
+            return schemaName.replace(TenantConstants.TENANT_PREFIX + "_", "");
+        }
     }
 }

@@ -40,7 +40,6 @@ import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.platform.user.web.rest.webhook.SignUpWebhook;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -177,7 +176,7 @@ public class AccountController {
 
             user.setId(null);
 
-            TenantUtils.runWithTenantId(tenantId, () -> userService.save(user));
+            TenantContext.runWithTenantId(tenantId, () -> userService.save(user));
         }
     }
 
@@ -327,7 +326,7 @@ public class AccountController {
             user = tenantService.getTenantIdsByUserEmail(email)
                 .stream()
                 .findFirst()
-                .flatMap(tenantId -> TenantUtils.callWithTenantId(
+                .flatMap(tenantId -> TenantContext.callWithTenantId(
                     tenantId, () -> userService.requestPasswordReset(email)));
         } else {
             user = userService.requestPasswordReset(email);
@@ -365,7 +364,7 @@ public class AccountController {
                     "No user was found for this reset key", AccountErrorType.USER_NOT_FOUND);
             }
 
-            user = TenantUtils.callWithTenantId(
+            user = TenantContext.callWithTenantId(
                 tenantId,
                 () -> userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey()));
         } else {

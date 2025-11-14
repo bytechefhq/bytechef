@@ -21,8 +21,8 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +71,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
                 throw new UsernameNotFoundException("User with email " + login + " was not found in the database");
             }
 
-            return TenantUtils.callWithTenantId(
+            return TenantContext.callWithTenantId(
                 tenantIds.getFirst(),
                 () -> getUserService().fetchUserByEmail(login)
                     .map(user -> createSpringSecurityUser(login, user))
@@ -87,7 +87,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
             throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
         }
 
-        return TenantUtils.callWithTenantId(
+        return TenantContext.callWithTenantId(
             tenantIds.getFirst(),
             () -> getUserService().fetchUserByLogin(lowercaseLogin)
                 .map(user -> createSpringSecurityUser(lowercaseLogin, user))

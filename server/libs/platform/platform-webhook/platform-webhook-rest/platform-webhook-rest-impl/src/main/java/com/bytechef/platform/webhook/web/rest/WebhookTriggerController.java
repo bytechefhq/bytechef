@@ -28,7 +28,7 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,7 +75,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return TenantUtils.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
 
             if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||

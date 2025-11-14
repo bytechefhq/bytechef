@@ -18,7 +18,6 @@ package com.bytechef.ee.tenant.multi.security.web.filter;
 
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
-import com.bytechef.tenant.util.TenantUtils;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -65,7 +64,7 @@ public class MultiTenantInternalFilter implements Filter {
                 }
             }
 
-            TenantUtils.runWithTenantId(
+            TenantContext.runWithTenantId(
                 sessionCurrentTenantId, () -> filterChain.doFilter(servletRequest, servletResponse));
         } else {
             filterChain.doFilter(servletRequest, servletResponse);

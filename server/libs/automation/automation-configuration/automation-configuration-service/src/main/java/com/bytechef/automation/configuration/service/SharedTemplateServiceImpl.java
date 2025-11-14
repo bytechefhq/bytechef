@@ -20,7 +20,6 @@ import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.repository.SharedTemplateRepository;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.util.TenantUtils;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -43,14 +42,14 @@ public class SharedTemplateServiceImpl implements SharedTemplateService {
     @Override
     @Transactional(readOnly = true)
     public Optional<SharedTemplate> fetchSharedTemplate(UUID uuid) {
-        return TenantUtils.callWithTenantId(
+        return TenantContext.callWithTenantId(
             TenantContext.DEFAULT_TENANT_ID, () -> sharedTemplateRepository.findByUuid(uuid));
     }
 
     @Override
     @Transactional(readOnly = true)
     public SharedTemplate getSharedTemplate(UUID uuid) {
-        return TenantUtils.callWithTenantId(
+        return TenantContext.callWithTenantId(
             TenantContext.DEFAULT_TENANT_ID,
             () -> sharedTemplateRepository.findByUuid(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Shared template not found for uuid: " + uuid)));
@@ -61,7 +60,7 @@ public class SharedTemplateServiceImpl implements SharedTemplateService {
         Assert.notNull(uuid, "'uuid' must not be null");
         Assert.notNull(template, "'template' must not be null");
 
-        return TenantUtils.callWithTenantId(TenantContext.DEFAULT_TENANT_ID, () -> fetchSharedTemplate(uuid)
+        return TenantContext.callWithTenantId(TenantContext.DEFAULT_TENANT_ID, () -> fetchSharedTemplate(uuid)
             .map(sharedTemplate -> {
                 sharedTemplate.setTemplate(template);
 
@@ -82,7 +81,7 @@ public class SharedTemplateServiceImpl implements SharedTemplateService {
         Assert.notNull(sharedTemplate.getId(), "'id' must not be null");
         Assert.notNull(sharedTemplate.getUuid(), "'uuid' must not be null");
 
-        return TenantUtils.callWithTenantId(TenantContext.DEFAULT_TENANT_ID, () -> {
+        return TenantContext.callWithTenantId(TenantContext.DEFAULT_TENANT_ID, () -> {
             SharedTemplate existingTemplate = sharedTemplateRepository.findById(sharedTemplate.getId())
                 .orElseThrow(
                     () -> new IllegalArgumentException("Shared template not found for id: " + sharedTemplate.getId()));

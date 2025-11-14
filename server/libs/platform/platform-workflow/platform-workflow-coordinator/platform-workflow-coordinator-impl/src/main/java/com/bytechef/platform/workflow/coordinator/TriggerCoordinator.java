@@ -41,7 +41,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -143,7 +143,7 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerListenerEvent.getWorkflowExecutionId();
 
-        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             TriggerExecution triggerExecution = TriggerExecution.builder()
                 .startDate(triggerListenerEvent.getExecutionDate())
                 .endDate(triggerListenerEvent.getExecutionDate())
@@ -175,7 +175,7 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
 
-        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             TriggerExecution triggerExecution = TriggerExecution.builder()
                 .workflowExecutionId(workflowExecutionId)
                 .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
@@ -204,7 +204,7 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
 
-        TenantUtils.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             TriggerExecution triggerExecution = TriggerExecution.builder()
                 .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
                 .workflowExecutionId(workflowExecutionId)

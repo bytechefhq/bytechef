@@ -32,7 +32,6 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -132,7 +131,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private ResponseEntity<Object> doHandle(
         HttpMethod httpMethod, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
-        return TenantUtils.callWithTenantId(TenantContext.getCurrentTenantId(), () -> {
+        return TenantContext.callWithTenantId(TenantContext.getCurrentTenantId(), () -> {
             Map<String, List<String>> variables;
 
             String requestURI = httpServletRequest.getRequestURI();

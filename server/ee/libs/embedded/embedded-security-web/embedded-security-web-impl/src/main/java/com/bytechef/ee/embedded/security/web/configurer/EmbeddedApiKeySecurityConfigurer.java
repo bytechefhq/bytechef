@@ -16,8 +16,8 @@ import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthen
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
-import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.Claims;
@@ -126,7 +126,7 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
 
             TenantKey tenantKey = TenantKey.parse(keyId);
 
-            return TenantUtils.callWithTenantId(
+            return TenantContext.callWithTenantId(
                 tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId, environmentId));
         }
     }

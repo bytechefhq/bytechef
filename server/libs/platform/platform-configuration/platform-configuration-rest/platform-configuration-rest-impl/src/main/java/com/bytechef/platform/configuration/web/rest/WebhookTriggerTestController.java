@@ -28,7 +28,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -74,7 +74,7 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return TenantUtils.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
             WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
