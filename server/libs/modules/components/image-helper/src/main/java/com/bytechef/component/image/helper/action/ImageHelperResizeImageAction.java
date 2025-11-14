@@ -28,8 +28,8 @@ import static com.bytechef.component.image.helper.constant.ImageHelperConstants.
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.WIDTH;
 import static com.bytechef.component.image.helper.util.ImageHelperUtils.storeBufferedImage;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.awt.Graphics2D;
@@ -64,7 +64,7 @@ public class ImageHelperResizeImageAction {
     }
 
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
         FileEntry image = inputParameters.getRequiredFileEntry(IMAGE);
 
         BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(image)));
