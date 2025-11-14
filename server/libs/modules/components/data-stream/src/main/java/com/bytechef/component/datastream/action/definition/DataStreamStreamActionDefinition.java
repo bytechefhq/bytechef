@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.bytechef.tenant.util.TenantUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -143,7 +145,8 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                 }
             });
 
-        JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+        JobExecution jobExecution =  TenantUtils.callWithTenantId(
+            TenantContext.DEFAULT_TENANT_ID, () ->  jobLauncher.run(job, jobParameters));
 
         List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();
 
