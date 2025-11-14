@@ -17,6 +17,7 @@
 package com.bytechef.component.json.file;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +39,10 @@ public class JsonFileComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             JsonFileReadAction.ACTION_DEFINITION,
-            JsonFileWriteAction.ACTION_DEFINITION);
+            JsonFileWriteAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(JsonFileReadAction.ACTION_DEFINITION),
+            tool(JsonFileWriteAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
