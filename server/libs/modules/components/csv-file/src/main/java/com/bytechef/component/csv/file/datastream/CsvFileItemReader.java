@@ -90,8 +90,7 @@ public class CsvFileItemReader implements ItemReader {
     public Map<String, Object> read() throws Exception {
         if (configuration.headerRow()) {
             if (iterator.hasNext()) {
-                Map<?, ?> row = (Map<?, ?>) iterator.next()
-                    .toMap();
+                Map<String, String> row = iterator.next().toMap();
 
                 return CsvFileReadUtils.getHeaderRow(configuration, row, enclosingCharacter);
             }
