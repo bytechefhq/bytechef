@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -162,11 +162,11 @@ const IntegrationInstanceConfigurationListItem = ({
                     <div className="flex items-center justify-end gap-x-6">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge variant="secondary">
-                                    <Badge variant="secondary">
-                                        V{integrationInstanceConfiguration.integrationVersion}
-                                    </Badge>
-                                </Badge>
+                                <Badge
+                                    label={`V${integrationInstanceConfiguration.integrationVersion}`}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
                             </TooltipTrigger>
 
                             <TooltipContent>The integration version</TooltipContent>
