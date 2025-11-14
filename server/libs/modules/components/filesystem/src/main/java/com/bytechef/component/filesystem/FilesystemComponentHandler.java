@@ -17,6 +17,7 @@
 package com.bytechef.component.filesystem;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -48,7 +49,15 @@ public class FilesystemComponentHandler implements ComponentHandler {
             FilesystemLsAction.ACTION_DEFINITION,
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemRmAction.ACTION_DEFINITION,
-            FilesystemWriteFileAction.ACTION_DEFINITION);
+            FilesystemWriteFileAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(FilesystemCreateTempDirAction.ACTION_DEFINITION),
+            tool(FilesystemMkdirAction.ACTION_DEFINITION),
+            tool(FilesystemGetParentFolderAction.ACTION_DEFINITION),
+            tool(FilesystemLsAction.ACTION_DEFINITION),
+            tool(FilesystemReadFileAction.ACTION_DEFINITION),
+            tool(FilesystemRmAction.ACTION_DEFINITION),
+            tool(FilesystemWriteFileAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

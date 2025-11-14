@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RECURSIVE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class FilesystemLsAction {
     }
 
     protected static List<FileInfo> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         Path root = Paths.get(inputParameters.getRequiredString(PATH));
         boolean recursive = inputParameters.getBoolean(RECURSIVE, false);

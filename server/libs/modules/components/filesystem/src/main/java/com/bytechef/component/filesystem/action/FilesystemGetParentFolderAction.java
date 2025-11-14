@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
@@ -59,7 +59,7 @@ public class FilesystemGetParentFolderAction {
      * the text before the last forward or backslash.
      */
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws NoSuchFileException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws NoSuchFileException {
         String filename = inputParameters.getRequiredString(FILENAME);
         File file = new File(filename);
 
