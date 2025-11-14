@@ -20,10 +20,11 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
+import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskExecutionErrorEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
@@ -70,8 +71,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
@@ -82,8 +81,6 @@ import org.springframework.data.domain.Page;
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
 
@@ -126,20 +123,6 @@ public class JobSyncExecutor {
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
 
-        syncMessageBroker.receive(
-            TaskCoordinatorMessageRoute.ERROR_EVENTS, event -> {
-                TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) event).getTaskExecution();
-                if (erroredTaskExecution.getError() != null) {
-                    erroredTaskExecution.setStatus(TaskExecution.Status.FAILED);
-                }
-
-                taskExecutionService.update(erroredTaskExecution);
-
-                ExecutionError error = erroredTaskExecution.getError();
-
-                logger.error(error.getMessage());
-            });
-
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, event -> {});
 
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
@@ -161,7 +144,14 @@ public class JobSyncExecutor {
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
-                Stream.of(new DefaultTaskDispatcher(eventPublisher, taskDispatcherPreSendProcessors))));
+                Stream.of(new DefaultTaskDispatcher(
+                    eventPublisher, taskDispatcherPreSendProcessors))));
+
+        TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
+            eventPublisher, jobService, taskDispatcherChain, taskExecutionService);
+
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.ERROR_EVENTS,
+            event -> taskExecutionErrorEventListener.onErrorEvent((ErrorEvent) event));
 
         JobExecutor jobExecutor = new JobExecutor(
             contextService, evaluator, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);

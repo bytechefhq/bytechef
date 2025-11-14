@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,23 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2025 ByteChef
  */
 
-package com.bytechef.error;
+package com.bytechef.task.dispatcher.on.error;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * An interface which marks an object as being able to provide {@link ExecutionError} status about itself.
- *
- * @author Arik Cohen
- * @since Apr 10, 2017
+ * @author Matija Petanjek
  */
-public interface Errorable {
+public class OnErrorTaskDispatcherDefinitionFactoryTest {
 
-    /** Returns the error associated with the object. */
-    @Nullable
-    ExecutionError getError();
+    @Test
+    public void testGetTaskDispatcherDefinition() {
+        JsonFileAssert.assertEquals("definition/on-error_v1.json",
+            new OnErrorTaskDispatcherDefinitionFactory().getDefinition());
+    }
 }

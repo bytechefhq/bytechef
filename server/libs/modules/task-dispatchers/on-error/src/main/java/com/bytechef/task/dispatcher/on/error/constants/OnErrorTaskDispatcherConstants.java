@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,23 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2025 ByteChef
  */
 
-package com.bytechef.error;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
+package com.bytechef.task.dispatcher.on.error.constants;
 
 /**
- * An interface which marks an object as being able to provide {@link ExecutionError} status about itself.
- *
- * @author Arik Cohen
- * @since Apr 10, 2017
+ * @author Matija Petanjek
  */
-public interface Errorable {
+public class OnErrorTaskDispatcherConstants {
 
-    /** Returns the error associated with the object. */
-    @Nullable
-    ExecutionError getError();
+    public static final String MAIN_BRANCH = "main-branch";
+    public static final String ON_ERROR = "on-error";
+    public static final String ON_ERROR_BRANCH = "on-error-branch";
 }
