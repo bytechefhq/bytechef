@@ -28,8 +28,8 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_T
 import static com.bytechef.component.json.file.constant.JsonFileConstants.SOURCE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.constant.FileType;
@@ -98,7 +98,7 @@ public class JsonFileWriteAction {
 
     @SuppressWarnings("unchecked")
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         FileType fileType = JsonFileReadAction.getFileType(inputParameters);
         Object source = inputParameters.getRequired(SOURCE);
