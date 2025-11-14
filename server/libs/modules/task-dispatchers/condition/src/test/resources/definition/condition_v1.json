@@ -465,6 +465,10 @@
             "value": "EQUALS"
           }, {
             "description": null,
+            "label": "Equals Ignore Case",
+            "value": "EQUALS_IGNORE_CASE"
+          }, {
+            "description": null,
             "label": "Not Equals",
             "value": "NOT_EQUALS"
           }, {

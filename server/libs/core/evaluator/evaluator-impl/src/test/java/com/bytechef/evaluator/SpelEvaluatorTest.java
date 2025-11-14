@@ -18,6 +18,12 @@
 
 package com.bytechef.evaluator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.text.SimpleDateFormat;
@@ -28,7 +34,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -44,14 +49,14 @@ public class SpelEvaluatorTest {
     public void test1() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "hello"), Collections.emptyMap());
 
-        Assertions.assertEquals(map, Map.of("type", "hello"));
+        assertEquals(map, Map.of("type", "hello"));
     }
 
     @Test
     public void test2() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "hello", "world"), Collections.emptyMap());
 
-        Assertions.assertEquals(map, Map.of("type", "type", "hello", "world"));
+        assertEquals(map, Map.of("type", "type", "hello", "world"));
     }
 
     @Test
@@ -59,7 +64,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "hello", "${name}"), Collections.singletonMap("name", "arik"));
 
-        Assertions.assertEquals("arik", MapUtils.getString(map, "hello"));
+        assertEquals("arik", MapUtils.getString(map, "hello"));
     }
 
     @Test
@@ -72,12 +77,12 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "hello", "${firstName} ${lastName}"), context);
 
-        Assertions.assertEquals("Arik Cohen", MapUtils.getString(map, "hello"));
+        assertEquals("Arik Cohen", MapUtils.getString(map, "hello"));
     }
 
     @Test
     public void test5() {
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
             Map<String, Object> context = new HashMap<>();
 
             context.put("number", "5");
@@ -98,7 +103,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "list", Arrays.asList("${firstName}", "${lastName}")), context);
 
-        Assertions.assertEquals(Arrays.asList("Arik", "Cohen"), MapUtils.getList(map, "list", String.class));
+        assertEquals(Arrays.asList("Arik", "Cohen"), MapUtils.getList(map, "list", String.class));
     }
 
     @Test
@@ -109,7 +114,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "map", Collections.singletonMap("hello", "${firstName}")), context);
 
-        Assertions.assertEquals(Collections.singletonMap("hello", "Arik"), MapUtils.getMap(map, "map"));
+        assertEquals(Collections.singletonMap("hello", "Arik"), MapUtils.getMap(map, "map"));
     }
 
     @Test
@@ -121,7 +126,7 @@ public class SpelEvaluatorTest {
 
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "mult", "=n1*n2"), context);
 
-        Assertions.assertEquals(Integer.valueOf(15), MapUtils.getInteger(map, "mult"));
+        assertEquals(Integer.valueOf(15), MapUtils.getInteger(map, "mult"));
     }
 
     @Test
@@ -129,7 +134,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "${name}"), Collections.emptyMap());
 
-        Assertions.assertEquals("${name}", MapUtils.getString(map, "message"));
+        assertEquals("${name}", MapUtils.getString(map, "message"));
     }
 
     @Test
@@ -137,7 +142,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "yo ${name}"), Collections.emptyMap());
 
-        Assertions.assertEquals("yo ${name}", MapUtils.getString(map, "message"));
+        assertEquals("yo ${name}", MapUtils.getString(map, "message"));
     }
 
     @Test
@@ -145,7 +150,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "${number}"), Collections.singletonMap("number", 1));
 
-        Assertions.assertEquals(1, MapUtils.get(map, "thing"));
+        assertEquals(1, MapUtils.get(map, "thing"));
     }
 
     @Test
@@ -153,7 +158,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "=number*3"), Collections.singletonMap("number", 1));
 
-        Assertions.assertEquals(3, MapUtils.get(map, "thing"));
+        assertEquals(3, MapUtils.get(map, "thing"));
     }
 
     @Test
@@ -161,7 +166,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "=number*3"), Collections.emptyMap());
 
-        Assertions.assertEquals("=number*3", MapUtils.get(map, "thing"));
+        assertEquals("=number*3", MapUtils.get(map, "thing"));
     }
 
     @Test
@@ -169,7 +174,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "list", "=range(1,3)"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapUtils.get(map, "list"));
+        assertEquals(Arrays.asList(1, 2, 3), MapUtils.get(map, "list"));
     }
 
     @Test
@@ -179,7 +184,7 @@ public class SpelEvaluatorTest {
 
         Map<String, ?> sub = MapUtils.getRequiredMap(map, "sub");
 
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), sub.get("list"));
+        assertEquals(Arrays.asList(1, 2, 3), sub.get("list"));
     }
 
     @Test
@@ -187,7 +192,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "${item1}-${item2}"), Map.of("item1", "hello", "item2", "world"));
 
-        Assertions.assertEquals("hello-world", MapUtils.get(map, "message"));
+        assertEquals("hello-world", MapUtils.get(map, "message"));
     }
 
     @Test
@@ -195,7 +200,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someBoolean", "=boolean('1')"), Collections.emptyMap());
 
-        Assertions.assertEquals(Boolean.TRUE, MapUtils.get(map, "someBoolean"));
+        assertEquals(Boolean.TRUE, MapUtils.get(map, "someBoolean"));
     }
 
     @Test
@@ -203,7 +208,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someByte", "=byte('127')"), Collections.emptyMap());
 
-        Assertions.assertEquals(Byte.MAX_VALUE, MapUtils.get(map, "someByte"));
+        assertEquals(Byte.MAX_VALUE, MapUtils.get(map, "someByte"));
     }
 
     @Test
@@ -211,7 +216,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someChar", "=char('c')"), Collections.emptyMap());
 
-        Assertions.assertEquals('c', MapUtils.get(map, "someChar"));
+        assertEquals('c', MapUtils.get(map, "someChar"));
     }
 
     @Test
@@ -219,7 +224,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someShort", "=short('32767')"), Collections.emptyMap());
 
-        Assertions.assertEquals(Short.MAX_VALUE, MapUtils.get(map, "someShort"));
+        assertEquals(Short.MAX_VALUE, MapUtils.get(map, "someShort"));
     }
 
     @Test
@@ -227,7 +232,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someInt", "=int('1')"), Collections.emptyMap());
 
-        Assertions.assertEquals(1, MapUtils.get(map, "someInt"));
+        assertEquals(1, MapUtils.get(map, "someInt"));
     }
 
     @Test
@@ -235,7 +240,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someLong", "=long('1')"), Collections.emptyMap());
 
-        Assertions.assertEquals(1L, MapUtils.get(map, "someLong"));
+        assertEquals(1L, MapUtils.get(map, "someLong"));
     }
 
     @Test
@@ -243,7 +248,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someFloat", "=float('1.337')"), Collections.emptyMap());
 
-        Assertions.assertEquals(1.337f, MapUtils.get(map, "someFloat"));
+        assertEquals(1.337f, MapUtils.get(map, "someFloat"));
     }
 
     @Test
@@ -251,7 +256,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someDouble", "=double('1.337')"), Collections.emptyMap());
 
-        Assertions.assertEquals(1.337d, MapUtils.get(map, "someDouble"));
+        assertEquals(1.337d, MapUtils.get(map, "someDouble"));
     }
 
     @Test
@@ -259,7 +264,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(',',range(1,3))"), Collections.emptyMap());
 
-        Assertions.assertEquals("1,2,3", MapUtils.get(map, "joined"));
+        assertEquals("1,2,3", MapUtils.get(map, "joined"));
     }
 
     @Test
@@ -267,7 +272,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(',',range(1,1))"), Collections.emptyMap());
 
-        Assertions.assertEquals("1", MapUtils.get(map, "joined"));
+        assertEquals("1", MapUtils.get(map, "joined"));
     }
 
     @Test
@@ -275,7 +280,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(' and ',{'a','b','c'})"), Collections.emptyMap());
 
-        Assertions.assertEquals("a and b and c", MapUtils.get(map, "joined"));
+        assertEquals("a and b and c", MapUtils.get(map, "joined"));
     }
 
     @Test
@@ -283,7 +288,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "concatenated", "=concat({'a','b','c'}, {'d','e','f'})"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), MapUtils.get(map, "concatenated"));
+        assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), MapUtils.get(map, "concatenated"));
     }
 
     @Test
@@ -291,7 +296,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "concatenated", "=concat({'a','b','c'}, range(1,3))"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "concatenated"));
+        assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "concatenated"));
     }
 
     @Test
@@ -299,7 +304,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "flattened", "=flatten({{'a','b','c'},{'d','e','f'}})"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), MapUtils.get(map, "flattened"));
+        assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), MapUtils.get(map, "flattened"));
     }
 
     @Test
@@ -307,7 +312,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "flattened", "=flatten({{'a','b','c'},range(1,3)})"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "flattened"));
+        assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "flattened"));
     }
 
 //    @Test
@@ -321,7 +326,7 @@ public class SpelEvaluatorTest {
 //            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
 //        }
 //
-//        Assertions.assertEquals(tmpDir, MapUtils.get(map, "tempDir"));
+//        assertEquals(tmpDir, MapUtils.get(map, "tempDir"));
 //    }
 
     @Test
@@ -329,7 +334,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "uuid", "=uuid()"), Collections.emptyMap());
 
-        Assertions.assertNotNull(MapUtils.get(map, "uuid"));
+        assertNotNull(MapUtils.get(map, "uuid"));
     }
 
     @Test
@@ -341,7 +346,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "fullName", "${firstName} ${lastName}"), context);
 
-        Assertions.assertEquals("Arik ${lastName}", MapUtils.getString(map, "fullName"));
+        assertEquals("Arik ${lastName}", MapUtils.getString(map, "fullName"));
     }
 
     @Test
@@ -353,7 +358,7 @@ public class SpelEvaluatorTest {
 
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "result", "=num/den"), context);
 
-        Assertions.assertEquals(0.5d, MapUtils.getDouble(map, "result"));
+        assertEquals(0.5d, MapUtils.getDouble(map, "result"));
     }
 
     @Test
@@ -361,7 +366,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sorted", "=sort({3,1,2})"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapUtils.getList(map, "sorted", Integer.class));
+        assertEquals(Arrays.asList(1, 2, 3), MapUtils.getList(map, "sorted", Integer.class));
     }
 
     @Test
@@ -369,7 +374,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sorted", "=sort({'C','A','B'})"), Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList("A", "B", "C"), MapUtils.getList(map, "sorted", String.class));
+        assertEquals(Arrays.asList("A", "B", "C"), MapUtils.getList(map, "sorted", String.class));
     }
 
     @Test
@@ -379,7 +384,7 @@ public class SpelEvaluatorTest {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
-        Assertions.assertEquals(sdf.format(new Date()), MapUtils.getString(map, "date"));
+        assertEquals(sdf.format(new Date()), MapUtils.getString(map, "date"));
     }
 
     @Test
@@ -389,40 +394,40 @@ public class SpelEvaluatorTest {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("date", "${localDateTime}"), Map.of("localDateTime", localDateTime));
 
-        Assertions.assertEquals(localDateTime, MapUtils.getLocalDateTime(map, "date"));
+        assertEquals(localDateTime, MapUtils.getLocalDateTime(map, "date"));
 
         map = EVALUATOR.evaluate(
             Map.of("date", "=minusDays(localDateTime, 1)"), Map.of("localDateTime", localDateTime));
 
-        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+        assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
 
         map = EVALUATOR.evaluate(
             Map.of("date", "=minusDays(${localDateTime}, 1)"), Map.of("localDateTime", localDateTime));
 
-        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+        assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
 
         map = EVALUATOR.evaluate(Map.of("hour", "=${localDateTime}.hour"), Map.of("localDateTime", localDateTime));
 
-        Assertions.assertEquals(localDateTime.getHour(), MapUtils.getInteger(map, "hour"));
+        assertEquals(localDateTime.getHour(), MapUtils.getInteger(map, "hour"));
     }
 
     @Test
     public void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
             EVALUATOR.evaluate(Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime));
         });
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
             EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
         });
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
             EVALUATOR.evaluate(Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
         });
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        assertThrowsExactly(IllegalArgumentException.class, () -> {
             EVALUATOR.evaluate(Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime));
         });
     }
@@ -431,7 +436,7 @@ public class SpelEvaluatorTest {
     public void test43() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("size", "=size(${list})"), Map.of("list", List.of(1, 2)));
 
-        Assertions.assertEquals(2, MapUtils.getInteger(map, "size"));
+        assertEquals(2, MapUtils.getInteger(map, "size"));
     }
 
     @Test
@@ -442,6 +447,48 @@ public class SpelEvaluatorTest {
 
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("size", "=size(${list})"), testMap);
 
-        Assertions.assertEquals(-1, MapUtils.getInteger(map, "size"));
+        assertEquals(-1, MapUtils.getInteger(map, "size"));
+    }
+
+    @Test
+    public void test45() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
+            Map.of("str1", "test", "str2", "Test"));
+
+        assertTrue(MapUtils.getBoolean(map, "equalsIgnoreCase"));
+    }
+
+    @Test
+    public void test46() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
+            Map.of("str1", "test", "str2", "abc"));
+
+        assertFalse(MapUtils.getBoolean(map, "equalsIgnoreCase"));
+    }
+
+    @Test
+    public void test47() {
+        Map<String, Object> testMap = new HashMap<>();
+
+        testMap.put("str1", null);
+        testMap.put("str2", "abc");
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"), testMap);
+
+        assertFalse(MapUtils.getBoolean(map, "equalsIgnoreCase"));
+    }
+
+    @Test
+    public void test48() {
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
+                Map.of("str1", 6, "str2", "abc")));
+
+        assertEquals("Invalid arguments for equalsIgnoreCase.", illegalArgumentException.getMessage());
     }
 }
