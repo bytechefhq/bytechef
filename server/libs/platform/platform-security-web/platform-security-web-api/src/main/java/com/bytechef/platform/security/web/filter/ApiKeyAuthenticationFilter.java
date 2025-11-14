@@ -17,7 +17,7 @@
 package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,7 +92,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                     httpServletRequest.changeSessionId();
                 }
 
-                TenantUtils.runWithTenantId(
+                TenantContext.runWithTenantId(
                     authentication.getTenantId(),
                     () -> {
                         Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);

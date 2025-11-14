@@ -41,7 +41,6 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.util.TenantUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,7 +143,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                 }
             });
 
-        JobExecution jobExecution = TenantUtils.callWithTenantId(
+        JobExecution jobExecution = TenantContext.callWithTenantId(
             TenantContext.DEFAULT_TENANT_ID, () -> jobLauncher.run(job, jobParameters));
 
         List<Throwable> failureExceptions = jobExecution.getAllFailureExceptions();

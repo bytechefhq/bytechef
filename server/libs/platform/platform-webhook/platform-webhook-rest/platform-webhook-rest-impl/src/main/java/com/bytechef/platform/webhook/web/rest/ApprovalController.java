@@ -19,7 +19,7 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.ApprovalId;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -49,7 +49,7 @@ public class ApprovalController {
     public ResponseEntity<Void> approve(@PathVariable String id) {
         ApprovalId approvalId = ApprovalId.parse(id);
 
-        return TenantUtils.callWithTenantId(approvalId.getTenantId(), () -> {
+        return TenantContext.callWithTenantId(approvalId.getTenantId(), () -> {
             jobFacade.resumeApproval(approvalId.getJobId(), approvalId.getUuidAsString(), approvalId.isApproved());
 
             return ResponseEntity.noContent()

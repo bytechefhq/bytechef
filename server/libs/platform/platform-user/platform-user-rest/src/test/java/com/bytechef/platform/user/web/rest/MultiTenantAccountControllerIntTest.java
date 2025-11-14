@@ -38,7 +38,6 @@ import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
-import com.bytechef.tenant.util.TenantUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import java.time.Instant;
@@ -261,7 +260,7 @@ class MultiTenantAccountControllerIntTest {
         restAccountMockMvc.perform(get("/api/activate?key={activationKey}", testUser.getActivationKey()))
             .andExpect(status().isOk());
 
-        String resetKey = TenantUtils.callWithTenantId("000001", () -> {
+        String resetKey = TenantContext.callWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElseThrow();
 
@@ -288,7 +287,7 @@ class MultiTenantAccountControllerIntTest {
                     .with(csrf()))
             .andExpect(status().isOk());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElse(null);
 
@@ -329,7 +328,7 @@ class MultiTenantAccountControllerIntTest {
         restAccountMockMvc.perform(get("/api/activate?key={activationKey}", activationKey))
             .andExpect(status().isOk());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElse(null);
 
@@ -369,7 +368,7 @@ class MultiTenantAccountControllerIntTest {
         restAccountMockMvc.perform(get("/api/activate?key={activationKey}", testUser.getActivationKey()))
             .andExpect(status().isOk());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElse(null);
 
@@ -382,7 +381,7 @@ class MultiTenantAccountControllerIntTest {
                     .with(csrf()))
             .andExpect(status().isOk());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElse(null);
 
@@ -435,7 +434,7 @@ class MultiTenantAccountControllerIntTest {
                     .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000001"))
             .andExpect(status().isOk());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin(user.getLogin())
                 .orElse(null);
 
@@ -518,7 +517,7 @@ class MultiTenantAccountControllerIntTest {
                     .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000001"))
             .andExpect(status().isBadRequest());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin("save-existing-email")
                 .orElse(null);
 
@@ -645,7 +644,7 @@ class MultiTenantAccountControllerIntTest {
                     .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000002"))
             .andExpect(status().isBadRequest());
 
-        TenantUtils.runWithTenantId("000001", () -> {
+        TenantContext.runWithTenantId("000001", () -> {
             User updatedUser = userRepository.findByLogin("save-existing-email-1")
                 .orElse(null);
 

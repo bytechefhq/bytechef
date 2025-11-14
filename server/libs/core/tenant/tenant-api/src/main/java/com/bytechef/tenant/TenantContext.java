@@ -18,6 +18,7 @@ package com.bytechef.tenant;
 
 import com.bytechef.tenant.constant.TenantConstants;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import org.springframework.util.Assert;
 
 /**
@@ -28,6 +29,20 @@ public class TenantContext {
     public static final String DEFAULT_TENANT_ID = "public";
 
     private static final ThreadLocal<String> currentTenant = ThreadLocal.withInitial(() -> DEFAULT_TENANT_ID);
+
+    public static <V> V callWithTenantId(String tenantId, Callable<V> callable) {
+        String curTenantId = getCurrentTenantId();
+
+        try {
+            setCurrentTenantId(tenantId);
+
+            return callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            setCurrentTenantId(curTenantId);
+        }
+    }
 
     public static String getCurrentDatabaseSchema() {
         return Objects.equals(getCurrentTenantId(), DEFAULT_TENANT_ID)
@@ -43,9 +58,31 @@ public class TenantContext {
         setCurrentTenantId(DEFAULT_TENANT_ID);
     }
 
+    public static void runWithTenantId(String tenantId, Runnable runnable) {
+        String curTenantId = getCurrentTenantId();
+
+        try {
+            setCurrentTenantId(tenantId);
+
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            setCurrentTenantId(curTenantId);
+        }
+    }
+
     public static void setCurrentTenantId(String tenantId) {
         Assert.notNull(tenantId, "tenantId must not be null");
 
         currentTenant.set(tenantId);
+    }
+
+    @FunctionalInterface
+    public interface Runnable {
+
+        void run() throws Exception;
     }
 }

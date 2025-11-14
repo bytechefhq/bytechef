@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATIO
 import com.bytechef.component.definition.datastream.ItemWriter;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
@@ -57,7 +57,7 @@ public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
-        TenantUtils.runWithTenantId(
+        TenantContext.runWithTenantId(
             tenantId, () -> itemWriter.open(
                 inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
@@ -66,13 +66,13 @@ public class ItemStreamWriterDelegate extends AbstractItemStreamDelegate
     public void update(ExecutionContext executionContext) throws ItemStreamException {
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
-        TenantUtils.runWithTenantId(tenantId, () -> itemWriter.update(
+        TenantContext.runWithTenantId(tenantId, () -> itemWriter.update(
             inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     @Override
     public void write(Chunk<? extends Map<String, Object>> chunk) {
-        TenantUtils.runWithTenantId(tenantId, () -> itemWriter.write(chunk.getItems()));
+        TenantContext.runWithTenantId(tenantId, () -> itemWriter.write(chunk.getItems()));
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {

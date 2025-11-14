@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
@@ -56,21 +56,21 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
-        TenantUtils.runWithTenantId(
+        TenantContext.runWithTenantId(
             tenantId, () -> itemReader.open(
                 inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
 
     @Override
     public Map<String, Object> read() {
-        return TenantUtils.callWithTenantId(tenantId, () -> itemReader.read());
+        return TenantContext.callWithTenantId(tenantId, () -> itemReader.read());
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
-        TenantUtils.runWithTenantId(
+        TenantContext.runWithTenantId(
             tenantId, () -> itemReader.update(
                 inputParameters, connectionParameters, clusterElementContext, itemStreamExecutionContext));
     }
