@@ -105,15 +105,14 @@ public class CsvFileReadUtils {
         String delimiter = configuration.delimiter();
         String[] headerRow = null;
 
-        char quoteCharacter = 0;
-
-        if (Objects.nonNull(configuration.enclosingCharacter())) {
-            quoteCharacter = configuration.enclosingCharacter()
-                .charAt(0);
-        }
+        char quoteCharacter = getEnclosingCharacter(configuration);
 
         if (configuration.headerRow()) {
-            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter, quoteCharacter);
+            String headerLine = bufferedReader.readLine();
+
+            Objects.requireNonNull(headerLine, "Invalid file content. Text is expected in the first line.");
+
+            headerRow = CSVHeaderBuilder.asArray(headerLine, delimiter, quoteCharacter);
         }
 
         CSVFormat csvFormat = CSVFormat.Builder.create()
