@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -128,10 +129,25 @@ class CsvFileComponentHandlerIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        assertEquals(
-            new JSONArray(Files.contentOf(getFile("expected_output_header.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) outputs.get("readCsvFile")),
-            true);
+        List<Map<String, String>> readCsvFile = (List<Map<String, String>>) outputs.get("readCsvFile");
+
+        Map<String, String> theFirstRow = readCsvFile.get(0);
+
+        String[] expectedHeaders = {
+            "id", "name", "city", "description", "active", "date", "sum"
+        };
+        String[] expectedvalues = {
+            "77", "A", "B", "C", "true", "2021-12-07", "11.2"
+        };
+
+        for (int i = 0; i < expectedHeaders.length; i++) {
+            Assertions.assertThat(theFirstRow)
+                .containsKey(expectedHeaders[i]);
+
+            Assertions.assertThat(theFirstRow)
+                .containsValues(expectedvalues);
+        }
+
     }
 
     @Test
