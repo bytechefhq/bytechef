@@ -17,6 +17,7 @@
 package com.bytechef.component.file.storage;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -40,7 +41,10 @@ public class FileStorageComponentHandler implements ComponentHandler {
         .actions(
             FileStorageReadAction.ACTION_DEFINITION,
             FileStorageWriteAction.ACTION_DEFINITION,
-            FileStorageDownloadAction.ACTION_DEFINITION);
+            FileStorageDownloadAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(FileStorageReadAction.ACTION_DEFINITION),
+            tool(FileStorageWriteAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
