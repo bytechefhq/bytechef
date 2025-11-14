@@ -13,9 +13,9 @@ module.exports = {
                 }
 
                 if (rightSideLength || leftSideLength) {
-                    const jsxExpressionScope = context
-                        .getAncestors()
-                        .find((node) => node.type === 'JSXExpressionContainer');
+                    const sourceCode = context.getSourceCode();
+                    const ancestors = sourceCode.getAncestors(node) || [];
+                    const jsxExpressionScope = ancestors.find((ancestor) => ancestor.type === 'JSXExpressionContainer');
 
                     if (jsxExpressionScope) {
                         context.report({
