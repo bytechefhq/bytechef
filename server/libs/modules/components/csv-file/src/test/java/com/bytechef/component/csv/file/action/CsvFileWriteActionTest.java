@@ -90,7 +90,7 @@ class CsvFileWriteActionTest {
         return parameters;
     }
 
-    private List<Map<String, Object>> read(InputStream inputStream, Context context) throws IOException {
+    private List<Map<String, String>> read(InputStream inputStream, Context context) throws IOException {
         return CsvFileReadAction.read(
             inputStream, new ReadConfiguration(",", null, true, true, 0, Integer.MAX_VALUE, false), context);
     }
