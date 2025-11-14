@@ -2,6 +2,7 @@ import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automati
 
 export interface TaskTreeNodeI {
     children: TaskTreeNodeI[];
+    iterations?: TaskTreeNodeI[][];
     task: TaskExecution;
 }
 
@@ -25,6 +26,31 @@ export const getTasksTree = (job: Job): TaskTreeNodeI[] => {
 
     const buildTasksTree = (task: TaskExecution): TaskTreeNodeI => {
         const matchingChildrenFromTasksMap = tasksMap.get(task.id || '') || [];
+
+        const isLoop = typeof task.type === 'string' && task.type.toLowerCase().includes('loop');
+
+        if (isLoop) {
+            const iterations: TaskTreeNodeI[][] = [];
+            let currentIteration: TaskTreeNodeI[] = [];
+            let started = false;
+
+            for (const child of matchingChildrenFromTasksMap) {
+                if (started && child.taskNumber === 0) {
+                    if (currentIteration.length) {
+                        iterations.push(currentIteration);
+                    }
+                    currentIteration = [];
+                }
+                currentIteration.push(buildTasksTree(child));
+                started = true;
+            }
+
+            if (currentIteration.length) {
+                iterations.push(currentIteration);
+            }
+
+            return {children: [], iterations, task};
+        }
 
         const children = matchingChildrenFromTasksMap.map((child) => buildTasksTree(child));
 
