@@ -43,14 +43,15 @@ public class SharedTemplateServiceImpl implements SharedTemplateService {
     @Override
     @Transactional(readOnly = true)
     public Optional<SharedTemplate> fetchSharedTemplate(UUID uuid) {
-        return TenantUtils.callWithTenantId(TenantContext.DEFAULT_TENANT_ID,
-            () -> sharedTemplateRepository.findByUuid(uuid));
+        return TenantUtils.callWithTenantId(
+            TenantContext.DEFAULT_TENANT_ID, () -> sharedTemplateRepository.findByUuid(uuid));
     }
 
     @Override
     @Transactional(readOnly = true)
     public SharedTemplate getSharedTemplate(UUID uuid) {
-        return TenantUtils.callWithTenantId(TenantContext.DEFAULT_TENANT_ID,
+        return TenantUtils.callWithTenantId(
+            TenantContext.DEFAULT_TENANT_ID,
             () -> sharedTemplateRepository.findByUuid(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Shared template not found for uuid: " + uuid)));
     }

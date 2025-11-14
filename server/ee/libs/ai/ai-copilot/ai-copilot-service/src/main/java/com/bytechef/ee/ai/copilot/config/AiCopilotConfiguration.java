@@ -56,8 +56,10 @@ public class AiCopilotConfiguration {
 
         this.model = options.getModel();
         this.openAiApiKey = openAi.getApiKey();
-        this.pgVector = copilot.getVectorstore()
-            .getPgVector();
+
+        ApplicationProperties.Ai.Copilot.Vectorstore vectorstore = copilot.getVectorstore();
+
+        this.pgVector = vectorstore.getPgVector();
         this.temperature = options.getTemperature();
     }
 
