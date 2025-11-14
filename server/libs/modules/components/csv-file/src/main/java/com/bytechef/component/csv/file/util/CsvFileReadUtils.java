@@ -35,7 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -106,14 +105,15 @@ public class CsvFileReadUtils {
         String delimiter = configuration.delimiter();
         String[] headerRow = null;
 
-        if (configuration.headerRow()) {
-            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter);
-        }
-
         char quoteCharacter = 0;
 
         if (Objects.nonNull(configuration.enclosingCharacter())) {
-            quoteCharacter = configuration.enclosingCharacter().charAt(0);
+            quoteCharacter = configuration.enclosingCharacter()
+                .charAt(0);
+        }
+
+        if (configuration.headerRow()) {
+            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter, quoteCharacter);
         }
 
         CSVFormat csvFormat = CSVFormat.Builder.create()
@@ -184,7 +184,7 @@ public class CsvFileReadUtils {
     }
 
     class CSVHeaderBuilder {
-        static String[] asArray(String headerRow, String delimiter) {
+        static String[] asArray(String headerRow, String delimiter, char enclosingCharacter) {
             List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
                 "{", "}", "|",
                 "\\");
@@ -199,7 +199,8 @@ public class CsvFileReadUtils {
             String[] usableHeaderRow = new String[originalHeaderRow.length];
 
             for (int i = 0; i < originalHeaderRow.length; i++) {
-                String header = originalHeaderRow[i];
+                String header = strip(originalHeaderRow[i], enclosingCharacter);
+
                 if ("".equals(header)) {
                     header = "NULL";
                 }
