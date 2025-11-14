@@ -288,6 +288,7 @@ Usage example:
 |----------|-------------|
 | `concat(str1, str2)` | Concatenates two strings or two lists. |
 | `contains(str, substr)` | Checks if a string contains a substring. |
+| `equalsIgnoreCase(str1, str2)` | Checks if two strings are equal ignoring case differences. |
 | `format(formatStr, args...)` | Formats a string using a format string and arguments (similar to String.format). |
 | `indexOf(str, substr)` | Returns the index of the first occurrence of a substring in a string. |
 | `join(list, delimiter)` | Joins a list of strings with a delimiter. |
