@@ -31,7 +31,6 @@ public class GoogleBigQueryConstants {
     public static final String DRY_RUN = "dryRun";
     public static final String ID = "id";
     public static final String MAX_RESULT = "maxResults";
-    public static final String NAME = "name";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PROJECT_ID = "projectId";
     public static final String TIMEOUT_MS = "timeoutMs";

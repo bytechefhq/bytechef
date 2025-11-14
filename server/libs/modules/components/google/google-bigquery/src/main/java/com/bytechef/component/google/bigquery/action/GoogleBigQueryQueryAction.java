@@ -39,7 +39,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.bigquery.util.GoogleBigQueryUtils;
 
 /**
@@ -202,6 +201,6 @@ public class GoogleBigQueryQueryAction {
                     DRY_RUN, inputParameters.getBoolean(DRY_RUN),
                     CREATION_SESSION, inputParameters.getBoolean(CREATION_SESSION)))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

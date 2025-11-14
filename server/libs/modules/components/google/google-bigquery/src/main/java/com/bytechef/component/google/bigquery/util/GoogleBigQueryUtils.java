@@ -39,14 +39,13 @@ public class GoogleBigQueryUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        List<Option<String>> projectIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Object> response;
         String nextPageToken = "";
 
         do {
-            response = context.http(
-                http -> http.get("https://bigquery.googleapis.com/bigquery/v2/projects"))
+            Map<String, Object> response = context
+                .http(http -> http.get("https://bigquery.googleapis.com/bigquery/v2/projects"))
                 .configuration(responseType(Http.ResponseType.JSON))
                 .queryParameter(NEXT_PAGE_TOKEN, nextPageToken)
                 .execute()
@@ -55,8 +54,7 @@ public class GoogleBigQueryUtils {
             if (response.get("projects") instanceof List<?> projects) {
                 for (Object project : projects) {
                     if (project instanceof Map<?, ?> projectMap) {
-                        projectIdOptions.add(
-                            option((String) projectMap.get("friendlyName"), (String) projectMap.get(ID)));
+                        options.add(option((String) projectMap.get("friendlyName"), (String) projectMap.get(ID)));
                     }
                 }
             }
@@ -65,7 +63,6 @@ public class GoogleBigQueryUtils {
 
         } while (nextPageToken != null);
 
-        return projectIdOptions;
-
+        return options;
     }
 }
