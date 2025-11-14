@@ -50,7 +50,7 @@ public class CsvFileReadAction {
         .output()
         .perform(CsvFileReadAction::perform);
 
-    protected static List<Map<String, Object>> perform(
+    protected static List<Map<String, String>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         ReadConfiguration readConfiguration = CsvFileReadUtils.getReadConfiguration(inputParameters);
@@ -63,57 +63,21 @@ public class CsvFileReadAction {
         }
     }
 
-    protected static List<Map<String, Object>> read(
+    protected static List<Map<String, String>> read(
         InputStream inputStream, ReadConfiguration configuration, Context context) throws IOException {
 
-        List<Map<String, Object>> rows = new ArrayList<>();
+        List<Map<String, String>> rows = new ArrayList<>();
         int count = 0;
 
         try (BufferedReader bufferedReader = new BufferedReader(
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-            char enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
-
             Iterator<CSVRecord> iterator = CsvFileReadUtils.getIterator(bufferedReader, configuration);
 
-            if (configuration.headerRow()) {
-                while (iterator.hasNext()) {
-                    Map<?, ?> row = (Map<?, ?>) iterator.next()
-                        .toMap();
+            while (iterator.hasNext()) {
+                CSVRecord csvRecord = iterator.next();
 
-                    if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                        Map<String, Object> map = CsvFileReadUtils.getHeaderRow(
-                            configuration, row, enclosingCharacter);
-
-                        rows.add(map);
-                    } else {
-                        if (count >= configuration.rangeEndRow()) {
-                            break;
-                        }
-                    }
-
-                    count++;
-                }
-            } else {
-                while (iterator.hasNext()) {
-                    List<?> row = (List<?>) iterator.next()
-                        .toList();
-
-                    context.log(log -> log.trace("row: {}", row));
-
-                    if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                        Map<String, Object> map = CsvFileReadUtils.getColumnRow(
-                            configuration, row, enclosingCharacter);
-
-                        rows.add(map);
-                    } else {
-                        if (count >= configuration.rangeEndRow()) {
-                            break;
-                        }
-                    }
-
-                    count++;
-                }
+                rows.add(csvRecord.toMap());
             }
         }
 
