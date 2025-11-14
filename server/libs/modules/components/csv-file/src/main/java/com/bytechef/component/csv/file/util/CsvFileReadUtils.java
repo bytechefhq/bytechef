@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +75,7 @@ public class CsvFileReadUtils {
     }
 
     public static Map<String, Object> getHeaderRow(
-        ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
+        ReadConfiguration configuration, Map<String, String> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -101,42 +103,6 @@ public class CsvFileReadUtils {
     public static Iterator<CSVRecord> getIterator(
         BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
-        class CSVHeaderBuilder {
-            static String[] asArray(String headerRow, String delimiter) {
-                List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
-                    "{", "}", "|",
-                    "\\");
-
-                String regexPrefix = "";
-                if (regexReservedCharacters.contains(delimiter)) {
-                    regexPrefix = "\\";
-                }
-
-                String[] originalHeaderRow = headerRow.split(regexPrefix + delimiter, -1);
-                Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
-                String[] usableHeaderRow = new String[originalHeaderRow.length];
-
-                for (int i = 0; i < originalHeaderRow.length; i++) {
-                    String header = originalHeaderRow[i];
-                    if ("".equals(header)) {
-                        header = "NULL";
-                    }
-
-                    if (repetitiveHeaderCounter.containsKey(header)) {
-                        repetitiveHeaderCounter.put(header, repetitiveHeaderCounter.get(header) + 1);
-
-                        usableHeaderRow[i] = String.format("%s{%d}", header, repetitiveHeaderCounter.get(header));
-                    } else {
-                        repetitiveHeaderCounter.put(header, 1);
-                        usableHeaderRow[i] = header;
-                    }
-
-                }
-
-                return usableHeaderRow;
-            }
-        }
-
         String delimiter = configuration.delimiter();
         String[] headerRow = null;
 
@@ -150,9 +116,16 @@ public class CsvFileReadUtils {
 
         }
 
+        char quoteCharacter = 0;
+
+        if (Objects.nonNull(configuration.enclosingCharacter())) {
+            quoteCharacter = configuration.enclosingCharacter().charAt(0);
+        }
+
         CSVFormat csvFormat = CSVFormat.Builder.create()
             .setIgnoreEmptyLines(false)
             .setDelimiter(delimiter)
+            .setQuote(quoteCharacter)
             .setHeader(headerRow)
             .get();
 
@@ -214,6 +187,42 @@ public class CsvFileReadUtils {
         valueString = StringUtils.removeStart(valueString, enclosingCharacter);
 
         return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
+    }
+
+    class CSVHeaderBuilder {
+        static String[] asArray(String headerRow, String delimiter) {
+            List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
+                "{", "}", "|",
+                "\\");
+
+            String regexPrefix = "";
+            if (regexReservedCharacters.contains(delimiter)) {
+                regexPrefix = "\\";
+            }
+
+            String[] originalHeaderRow = headerRow.split(regexPrefix + delimiter, -1);
+            Map<String, Integer> repetitiveHeaderCounter = new HashMap<>();
+            String[] usableHeaderRow = new String[originalHeaderRow.length];
+
+            for (int i = 0; i < originalHeaderRow.length; i++) {
+                String header = originalHeaderRow[i];
+                if ("".equals(header)) {
+                    header = "NULL";
+                }
+
+                if (repetitiveHeaderCounter.containsKey(header)) {
+                    repetitiveHeaderCounter.put(header, repetitiveHeaderCounter.get(header) + 1);
+
+                    usableHeaderRow[i] = String.format("%s{%d}", header, repetitiveHeaderCounter.get(header));
+                } else {
+                    repetitiveHeaderCounter.put(header, 1);
+                    usableHeaderRow[i] = header;
+                }
+
+            }
+
+            return usableHeaderRow;
+        }
     }
 
 }
