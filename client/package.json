@@ -111,6 +111,8 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.2",
     "@dagrejs/dagre": "^1.1.8",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "9.39.1",
     "@graphql-codegen/cli": "^6.0.2",
     "@graphql-codegen/typescript-react-query": "^6.1.1",
     "@storybook/addon-docs": "^10.0.7",
@@ -133,15 +135,16 @@
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.8",
     "autoprefixer": "^10.4.22",
-    "eslint": "8.57.0",
+    "eslint": "9.39.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-bytechef": "1.0.0",
+    "eslint-plugin-bytechef": "file:eslint",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "eslint-plugin-storybook": "^10.0.7",
     "eslint-plugin-tailwindcss": "^3.18.2",
+    "globals": "^15.13.0",
     "identity-obj-proxy": "^3.0.0",
     "isobject": "^4.0.0",
     "jsdom": "^27.2.0",
@@ -155,6 +158,7 @@
     "storybook": "^10.0.7",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
     "vite": "^7.2.2",
     "vite-bundle-analyzer": "^1.2.3",
     "vite-tsconfig-paths": "^5.1.4",
@@ -162,10 +166,5 @@
   },
   "msw": {
     "workerDirectory": "public"
-  },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
   }
 }
