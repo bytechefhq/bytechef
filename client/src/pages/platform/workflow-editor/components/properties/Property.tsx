@@ -913,7 +913,6 @@ const Property = ({
                 setMultiSelectValue(parameterDefaultValue);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
 
     // handle NULL type property saving
