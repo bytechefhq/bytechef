@@ -32,9 +32,10 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.util.json.JsonParser;
 
@@ -70,7 +71,7 @@ public class JsonSchemaGeneratorUtils {
         schemaObjectNode.put("type", "object");
 
         ObjectNode propertiesObjectNode = schemaObjectNode.putObject("properties");
-        List<String> required = new ArrayList<>();
+        Set<String> required = new HashSet<>();
 
         for (Property property : properties) {
             String parameterName = property.getName();
