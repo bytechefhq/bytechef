@@ -8,7 +8,6 @@ import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const projectDeploymentWorkflow = undefined;
