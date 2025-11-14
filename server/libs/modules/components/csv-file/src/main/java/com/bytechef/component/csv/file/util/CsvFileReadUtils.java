@@ -107,13 +107,7 @@ public class CsvFileReadUtils {
         String[] headerRow = null;
 
         if (configuration.headerRow()) {
-            String headerString = bufferedReader.readLine();
-            if (headerString != null) {
-                headerRow = CSVHeaderBuilder.asArray(headerString, delimiter);
-            } else {
-                throw new NullPointerException();
-            }
-
+            headerRow = CSVHeaderBuilder.asArray(bufferedReader.readLine(), delimiter);
         }
 
         char quoteCharacter = 0;
