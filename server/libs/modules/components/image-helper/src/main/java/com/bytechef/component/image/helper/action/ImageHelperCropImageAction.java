@@ -30,8 +30,8 @@ import static com.bytechef.component.image.helper.constant.ImageHelperConstants.
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.Y_COORDINATE;
 import static com.bytechef.component.image.helper.util.ImageHelperUtils.storeBufferedImage;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.awt.image.BufferedImage;
@@ -75,11 +75,11 @@ public class ImageHelperCropImageAction {
     }
 
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
-        BufferedImage bufferedImage = ImageIO.read((File) actionContext.file(file -> file.toTempFile(imageFileEntry)));
+        BufferedImage bufferedImage = ImageIO.read((File) context.file(file -> file.toTempFile(imageFileEntry)));
 
         int x = inputParameters.getRequiredInteger(X_COORDINATE);
         int y = inputParameters.getRequiredInteger(Y_COORDINATE);
@@ -91,7 +91,7 @@ public class ImageHelperCropImageAction {
         BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
 
         return storeBufferedImage(
-            actionContext, croppedImage, imageFileEntry.getExtension(),
+            context, croppedImage, imageFileEntry.getExtension(),
             inputParameters.getRequiredString(RESULT_FILE_NAME));
     }
 

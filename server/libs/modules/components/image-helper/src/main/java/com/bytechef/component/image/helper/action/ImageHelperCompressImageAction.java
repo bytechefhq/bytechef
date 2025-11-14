@@ -26,8 +26,8 @@ import static com.bytechef.component.image.helper.constant.ImageHelperConstants.
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME;
 import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME_PROPERTY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.awt.image.BufferedImage;
@@ -67,7 +67,7 @@ public class ImageHelperCompressImageAction {
     }
 
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context actionContext) throws IOException {
 
         FileEntry imageFileEntry = inputParameters.getRequiredFileEntry(IMAGE);
 
