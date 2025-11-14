@@ -27,31 +27,32 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.ItemReader;
-import com.fasterxml.jackson.databind.MappingIterator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * @author Ivica Cardic
  */
 public class CsvFileItemReader implements ItemReader {
 
-    public static final ModifiableClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<CsvFileItemReader>clusterElement("reader")
-            .title("Read CSV file row")
-            .description("Reads a single row from a CSV file.")
-            .type(SOURCE)
-            .object(CsvFileItemReader.class)
-            .properties(READ_PROPERTIES);
+    public static final ModifiableClusterElementDefinition<CsvFileItemReader> CLUSTER_ELEMENT_DEFINITION = ComponentDsl
+        .<CsvFileItemReader>clusterElement("reader")
+        .title("Read CSV file row")
+        .description("Reads a single row from a CSV file.")
+        .type(SOURCE)
+        .object(CsvFileItemReader.class)
+        .properties(READ_PROPERTIES);
 
     private BufferedReader bufferedReader;
     private ReadConfiguration configuration;
     private char enclosingCharacter;
-    private MappingIterator<Object> iterator;
+    private Iterator<CSVRecord> iterator;
 
     @Override
     public void close() {
@@ -89,13 +90,15 @@ public class CsvFileItemReader implements ItemReader {
     public Map<String, Object> read() throws Exception {
         if (configuration.headerRow()) {
             if (iterator.hasNext()) {
-                Map<?, ?> row = (Map<?, ?>) iterator.nextValue();
+                Map<?, ?> row = (Map<?, ?>) iterator.next()
+                    .toMap();
 
                 return CsvFileReadUtils.getHeaderRow(configuration, row, enclosingCharacter);
             }
         } else {
             if (iterator.hasNext()) {
-                List<?> row = (List<?>) iterator.nextValue();
+                List<?> row = (List<?>) iterator.next()
+                    .toList();
 
                 return CsvFileReadUtils.getColumnRow(configuration, row, enclosingCharacter);
             }
