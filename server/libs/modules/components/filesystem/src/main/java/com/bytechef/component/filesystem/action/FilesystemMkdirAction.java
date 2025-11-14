@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,7 +57,7 @@ public class FilesystemMkdirAction {
      * An exception is not thrown if the directory could not be created because it already exists.
      */
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         return String.valueOf(Files.createDirectories(Paths.get(inputParameters.getRequiredString(PATH))));
     }

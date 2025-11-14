@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class FilesystemRmAction {
      * </p>
      */
     protected static Boolean perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         File file = new File(inputParameters.getRequiredString(PATH));
 
