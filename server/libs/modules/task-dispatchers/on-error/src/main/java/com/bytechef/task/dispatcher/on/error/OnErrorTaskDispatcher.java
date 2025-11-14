@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +53,7 @@ public class OnErrorTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
 
+    @SuppressFBWarnings("EI")
     public OnErrorTaskDispatcher(
         ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         TaskDispatcher taskDispatcher, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
