@@ -1,4 +1,4 @@
-import {Accordion, AccordionContent, AccordionItem} from '@/components/ui/accordion';
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import AiProviderForm from '@/ee/pages/settings/platform/ai-providers/components/AiProviderForm';
@@ -6,10 +6,11 @@ import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {useEnableAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/shared/queries/platform/aiProviders.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
+
+import './AiProviderList.css';
 
 const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
     const [enabledItems, setEnabledItems] = useState<{[key: number]: boolean}>({});
@@ -73,27 +74,25 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
         >
             {aiProviders &&
                 aiProviders.map((aiProvider) => (
-                    <AccordionItem key={aiProvider.id} value={`item-${aiProvider.id}`}>
+                    <AccordionItem className="ai-provider w-full" key={aiProvider.id} value={`item-${aiProvider.id}`}>
                         <div className="flex w-full items-center justify-between">
-                            <AccordionPrimitive.Header>
-                                <AccordionPrimitive.Trigger className="flex flex-1 cursor-pointer items-center justify-between py-4 text-left transition-all">
-                                    <div className="flex items-center gap-3">
-                                        <InlineSVG
-                                            className="size-9 flex-none"
-                                            key={aiProvider.name!}
-                                            src={aiProvider.icon!}
-                                        />
+                            <AccordionTrigger className="flex w-full flex-1 cursor-pointer items-center justify-between py-4 text-left transition-all">
+                                <div className="flex w-full items-center gap-3">
+                                    <InlineSVG
+                                        className="size-9 flex-none"
+                                        key={aiProvider.name!}
+                                        src={aiProvider.icon!}
+                                    />
 
-                                        <div className="mr-1 flex flex-col">
-                                            <div className="text-lg">{aiProvider.name}</div>
+                                    <div className="mr-1 flex flex-col">
+                                        <div className="text-lg">{aiProvider.name}</div>
 
-                                            <div className="text-sm text-muted-foreground">
-                                                Configure credentials {aiProvider.name} for AI provider
-                                            </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            Configure credentials {aiProvider.name} for AI provider
                                         </div>
                                     </div>
-                                </AccordionPrimitive.Trigger>
-                            </AccordionPrimitive.Header>
+                                </div>
+                            </AccordionTrigger>
 
                             <div>
                                 <Switch

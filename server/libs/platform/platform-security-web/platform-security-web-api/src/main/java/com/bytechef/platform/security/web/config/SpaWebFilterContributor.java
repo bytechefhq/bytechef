@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
+@FunctionalInterface
 public interface SpaWebFilterContributor {
 
     /**

@@ -20,5 +20,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApiClientRepository extends ListCrudRepository<ApiClient, Long> {
 
-    Optional<ApiClient> findBySecretKey(String secretKey);
+    Optional<ApiClient> findBySecretKeyAndEnvironment(String secretKey, int environment);
 }

@@ -30,6 +30,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.security.facade.ApiKeyFacade;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -48,11 +50,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AuthorityService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class, ConnectionFacade.class,
-    EnvironmentService.class, GitHubProxyClient.class, JobFacade.class, JobService.class, ConnectionService.class,
-    PrincipalJobFacade.class, PrincipalJobService.class, TaskExecutionService.class, TriggerDefinitionService.class,
-    TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class,
-    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
+    ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
+    ComponentDefinitionService.class, ConnectionFacade.class, EnvironmentService.class, GitHubProxyClient.class,
+    JobFacade.class, JobService.class, ConnectionService.class, PrincipalJobFacade.class, PrincipalJobService.class,
+    TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
+    TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
+    WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
 })
 public @interface ProjectIntTestConfigurationSharedMocks {
 }

@@ -1,0 +1,3 @@
+mutation deleteWorkspaceMcpServer($id: ID!) {
+    deleteWorkspaceMcpServer(mcpServerId: $id)
+}

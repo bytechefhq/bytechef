@@ -31,6 +31,8 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.security.facade.ApiKeyFacade;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -49,7 +51,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AuthorityService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class, ConnectionFacade.class,
+    ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
+    ComponentDefinitionService.class, ConnectionFacade.class,
     ConnectionService.class, EnvironmentService.class, GitHubProxyClient.class, JobFacade.class, JobService.class,
     PrincipalJobFacade.class, PrincipalJobService.class, SharedTemplateFileStorage.class, TaskExecutionService.class,
     TriggerDefinitionService.class, TriggerExecutionService.class, TriggerLifecycleFacade.class, UserService.class,

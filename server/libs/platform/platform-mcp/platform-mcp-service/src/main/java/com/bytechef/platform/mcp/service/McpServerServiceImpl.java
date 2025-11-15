@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.mcp.service;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -53,7 +52,14 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     public McpServer getMcpServer(long mcpServerId) {
-        return OptionalUtils.get(mcpServerRepository.findById(mcpServerId));
+        return mcpServerRepository.findById(mcpServerId)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+    }
+
+    @Override
+    public McpServer getMcpServer(String secretKey) {
+        return mcpServerRepository.findBySecretKey(secretKey)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with secret key " + secretKey + " not found"));
     }
 
     @Override
@@ -110,12 +116,11 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     public McpServer update(McpServer mcpServer) {
-        McpServer currentMcpServer = OptionalUtils.get(mcpServerRepository.findById(mcpServer.getId()));
+        McpServer currentMcpServer = getMcpServer(mcpServer.getId());
 
         currentMcpServer.setName(mcpServer.getName());
-        currentMcpServer.setType(mcpServer.getType());
-        currentMcpServer.setEnvironment(mcpServer.getEnvironment());
         currentMcpServer.setEnabled(mcpServer.isEnabled());
+        currentMcpServer.setSecretKey(mcpServer.getSecretKey());
         currentMcpServer.setTagIds(mcpServer.getTagIds());
         currentMcpServer.setVersion(mcpServer.getVersion());
 

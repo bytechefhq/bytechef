@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.web.graphql.config.ProjectConfigurationGraphQlTestConfiguration;
+import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    ProjectConfigurationGraphQlTestConfiguration.class,
+    AutomationConfigurationGraphQlTestConfiguration.class,
     ProjectWorkflowGraphQlController.class,
 })
 @GraphQlTest(

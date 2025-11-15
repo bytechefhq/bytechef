@@ -106,13 +106,6 @@ spring:
     chat:
       client:
         enabled: ${bytechef.ai.copilot.enabled}
-    mcp:
-      server:
-        name: bytechef-mcp-server
-        protocol: streamable
-        type: async
-        streamable-http:
-          mcp-endpoint: /api/mcp
     model:
       audio:
         speech: none

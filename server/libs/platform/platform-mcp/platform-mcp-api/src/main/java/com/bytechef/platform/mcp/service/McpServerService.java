@@ -75,6 +75,14 @@ public interface McpServerService {
     McpServer getMcpServer(long mcpServerId);
 
     /**
+     * Retrieves an MCP server by its secret key.
+     *
+     * @param secretKey the secret key used to identify the MCP server
+     * @return the MCP server associated with the specified secret key
+     */
+    McpServer getMcpServer(String secretKey);
+
+    /**
      * Gets MCP servers filtered by type.
      *
      * @param type the type to filter by

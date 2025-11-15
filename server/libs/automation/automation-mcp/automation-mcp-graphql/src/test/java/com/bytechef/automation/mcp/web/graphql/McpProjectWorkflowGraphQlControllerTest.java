@@ -37,8 +37,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Integration test for {@link McpProjectWorkflowGraphQlController}. This test focuses on testing the GraphQL layer with
- * mocked service dependencies.
+ * Unit test for {@link McpProjectWorkflowGraphQlController}. This test focuses on testing the GraphQL layer with mocked
+ * service dependencies.
  *
  * @author ByteChef
  */

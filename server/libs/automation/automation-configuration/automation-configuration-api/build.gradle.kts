@@ -3,6 +3,7 @@ dependencies {
     api(project(":server:libs:platform:platform-category:platform-category-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    api(project(":server:libs:platform:platform-security:platform-security-api"))
     api(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
     implementation("org.apache.commons:commons-lang3")

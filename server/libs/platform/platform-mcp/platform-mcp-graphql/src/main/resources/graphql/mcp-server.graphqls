@@ -1,0 +1,55 @@
+extend type Query {
+    mcpServer(id: ID): McpServer
+    mcpServers(type: ModeType!, orderBy: McpServerOrderBy): [McpServer]
+}
+
+extend type Mutation {
+    createMcpServer(input: McpServerInput!): McpServer
+    updateMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
+    updateMcpServerUrl(id: ID!): String!
+    updateMcpServerTags(id: ID!, tags: [TagInput!]!): [Tag]
+    deleteMcpServer(id: ID!): Boolean
+}
+
+type McpServer {
+    id: ID!
+    name: String!
+    type: ModeType!
+    environmentId: ID!
+    enabled: Boolean!
+    mcpComponents: [McpComponent]
+    url: String!
+    secretKey: String!
+    tags: [Tag]
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    version: Int
+}
+
+enum McpServerOrderBy {
+    NAME_ASC
+    NAME_DESC
+    CREATED_DATE_ASC
+    CREATED_DATE_DESC
+    LAST_MODIFIED_DATE_ASC
+    LAST_MODIFIED_DATE_DESC
+}
+
+input McpServerInput {
+    name: String!
+    type: ModeType!
+    environmentId: ID!
+    enabled: Boolean
+}
+
+input McpServerUpdateInput {
+    name: String
+    enabled: Boolean
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}

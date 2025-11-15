@@ -22,32 +22,33 @@ import com.bytechef.tenant.TenantContext;
 
 public class TenantKey {
 
-    private final String secretKey;
+    private final String key;
     private final String tenantId;
 
-    private TenantKey(String secretKey, String tenantId) {
-        this.secretKey = secretKey;
+    private TenantKey(String key, String tenantId) {
+        this.key = key;
         this.tenantId = tenantId;
     }
 
     public static TenantKey of() {
         String tenantId = TenantContext.getCurrentTenantId();
+
         return new TenantKey(
             EncodingUtils.base64EncodeToString(
                 tenantId + ":" + EncodingUtils.base64EncodeToString(RandomUtils.nextBytes(24))),
             tenantId);
     }
 
-    public static TenantKey parse(String secretKey) {
-        secretKey = EncodingUtils.base64DecodeToString(secretKey);
+    public static TenantKey parse(String tenantKeyString) {
+        tenantKeyString = EncodingUtils.base64DecodeToString(tenantKeyString);
 
-        String[] items = secretKey.split(":");
+        String[] items = tenantKeyString.split(":");
 
-        return new TenantKey(secretKey, items[0]);
+        return new TenantKey(tenantKeyString, items[0]);
     }
 
-    public String getSecretKey() {
-        return secretKey;
+    public String getKey() {
+        return key;
     }
 
     public String getTenantId() {
@@ -56,6 +57,6 @@ public class TenantKey {
 
     @Override
     public String toString() {
-        return secretKey;
+        return key;
     }
 }

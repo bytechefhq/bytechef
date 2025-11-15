@@ -1,0 +1,9 @@
+mutation createMcpServer($input: CreateWorkspaceMcpServerInput!) {
+    createWorkspaceMcpServer(input: $input) {
+        id
+        name
+        type
+        environmentId
+        enabled
+    }
+}

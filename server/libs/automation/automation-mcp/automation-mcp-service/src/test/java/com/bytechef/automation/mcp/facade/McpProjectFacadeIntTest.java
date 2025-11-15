@@ -131,10 +131,7 @@ public class McpProjectFacadeIntTest {
         List<String> selectedWorkflowIds = List.of("workflow1", "workflow2");
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(),
-            project.getId(),
-            1,
-            selectedWorkflowIds);
+            mcpServer.getId(), project.getId(), 1, selectedWorkflowIds);
 
         assertThat(mcpProject).isNotNull();
         assertThat(mcpProject.getId()).isNotNull();
@@ -148,10 +145,7 @@ public class McpProjectFacadeIntTest {
         List<String> selectedWorkflowIds = List.of();
 
         McpProject mcpProject = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(),
-            project.getId(),
-            1,
-            selectedWorkflowIds);
+            mcpServer.getId(), project.getId(), 1, selectedWorkflowIds);
 
         assertThat(mcpProject).isNotNull();
         assertThat(mcpProject.getId()).isNotNull();
@@ -162,16 +156,10 @@ public class McpProjectFacadeIntTest {
     @Test
     public void testCreateMcpProjectMultipleVersions() {
         McpProject mcpProject1 = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(),
-            project.getId(),
-            1,
-            List.of("workflow1"));
+            mcpServer.getId(), project.getId(), 1, List.of("workflow1"));
 
         McpProject mcpProject2 = mcpProjectFacade.createMcpProject(
-            mcpServer.getId(),
-            project.getId(),
-            2,
-            List.of("workflow2"));
+            mcpServer.getId(), project.getId(), 2, List.of("workflow2"));
 
         assertThat(mcpProject1).isNotNull();
         assertThat(mcpProject2).isNotNull();

@@ -58,19 +58,18 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
-    public McpServer createMcpServerForWorkspace(
+    public McpServer createWorkspaceMcpServer(
         String name, ModeType type, Environment environment, Boolean enabled, Long workspaceId) {
-        // Create the MCP server first
+
         McpServer mcpServer = mcpServerService.create(name, type, environment, enabled);
 
-        // Assign it to the workspace
         workspaceMcpServerService.assignMcpServerToWorkspace(mcpServer.getId(), workspaceId);
 
         return mcpServer;
     }
 
     @Override
-    public void deleteMcpServerFromWorkspace(Long mcpServerId) {
+    public void deleteWorkspaceMcpServer(Long mcpServerId) {
         workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
 
         mcpServerService.delete(mcpServerId);

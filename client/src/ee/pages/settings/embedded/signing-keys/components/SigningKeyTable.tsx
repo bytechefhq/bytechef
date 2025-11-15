@@ -1,20 +1,8 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import SigningKeyDeleteDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDeleteDialog';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import {SigningKey} from '@/ee/shared/middleware/embedded/security';
-import {useDeleteSigningKeyMutation} from '@/ee/shared/mutations/embedded/signingKeys.mutations';
-import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
-import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, EditIcon, Trash2Icon} from 'lucide-react';
@@ -26,46 +14,6 @@ const columnHelper = createColumnHelper<SigningKey>();
 interface SigningKeyTableProps {
     signingKeys: SigningKey[];
 }
-
-const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose: () => void}) => {
-    const queryClient = useQueryClient();
-
-    const deleteSigningKeyMutation = useDeleteSigningKeyMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: SigningKeyKeys.signingKeys,
-            });
-
-            onClose();
-        },
-    });
-
-    const handleClick = () => {
-        deleteSigningKeyMutation.mutate(apiKeyId);
-    };
-
-    return (
-        <AlertDialog onOpenChange={onClose} open={true}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the signing key.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <AlertDialogAction className="bg-destructive" onClick={handleClick}>
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
 
 const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const [currentSigningKey, setCurrentSigningKey] = useState<SigningKey>();

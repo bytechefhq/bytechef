@@ -1,0 +1,22 @@
+extend type Query {
+    apiKeys(environmentId: ID!, type: ModeType!): [ApiKey]
+    adminApiKeys(environmentId: ID!): [ApiKey]
+    apiKey(id: ID!): ApiKey
+}
+
+extend type Mutation {
+    createApiKey(name: String!, environmentId: ID!, type: ModeType): String!
+    deleteApiKey(id: ID!): Boolean!
+    updateApiKey(id: ID!, name: String!): Boolean!
+}
+
+type ApiKey {
+    id: ID
+    name: String
+    secretKey: String
+    lastUsedDate: Long
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+}

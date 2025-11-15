@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -35,9 +36,9 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -53,8 +54,20 @@ public class McpServerGraphQlControllerTest {
     @Mock
     private McpServerService mcpServerService;
 
-    @InjectMocks
+    @Mock
+    private ApplicationProperties applicationProperties;
+
     private McpServerGraphQlController mcpServerGraphQlController;
+
+    @BeforeEach
+    void setUp() {
+        // McpServerGraphQlController constructor reads publicUrl from ApplicationProperties
+        when(applicationProperties.getPublicUrl()).thenReturn("http://localhost:8080");
+
+        // Manually construct controller after stubbing so the stub is used during construction
+        mcpServerGraphQlController = new McpServerGraphQlController(
+            applicationProperties, mcpServerFacade, mcpServerService);
+    }
 
     @Test
     void testGetMcpServerById() {

@@ -16,7 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
-import {McpProject, McpServer, useCreateMcpProjectWithWorkflowsMutation} from '@/shared/middleware/graphql';
+import {McpProject, McpServer, useCreateMcpProjectMutation} from '@/shared/middleware/graphql';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -76,7 +76,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         closeDialog();
     };
 
-    const createMcpProjectWithWorkflowsMutation = useCreateMcpProjectWithWorkflowsMutation({onSuccess});
+    const createMcpProjectMutation = useCreateMcpProjectMutation({onSuccess});
 
     const closeDialog = () => {
         setIsOpen(false);
@@ -92,7 +92,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         const formValues = getValues();
 
         if (!mcpProject?.id) {
-            createMcpProjectWithWorkflowsMutation.mutate({
+            createMcpProjectMutation.mutate({
                 input: {
                     mcpServerId: formValues.mcpServerId,
                     projectId: formValues.projectId.toString(),
