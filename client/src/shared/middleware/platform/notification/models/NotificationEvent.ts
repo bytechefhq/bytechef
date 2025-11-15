@@ -42,7 +42,8 @@ export const NotificationEventTypeEnum = {
     JobCreated: 'JOB_CREATED',
     JobCompleted: 'JOB_COMPLETED',
     JobFailed: 'JOB_FAILED',
-    JobStarted: 'JOB_STARTED'
+    JobStarted: 'JOB_STARTED',
+    JobStopped: 'JOB_STOPPED'
 } as const;
 export type NotificationEventTypeEnum = typeof NotificationEventTypeEnum[keyof typeof NotificationEventTypeEnum];
 
