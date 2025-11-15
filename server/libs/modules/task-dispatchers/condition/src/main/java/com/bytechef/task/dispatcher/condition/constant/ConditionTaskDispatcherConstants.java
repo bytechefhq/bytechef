@@ -38,6 +38,7 @@ public class ConditionTaskDispatcherConstants {
 
     public enum Operation {
         EQUALS,
+        EQUALS_IGNORE_CASE,
         NOT_EQUALS,
         AFTER,
         BEFORE,
