@@ -24,6 +24,7 @@ import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispat
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context;
@@ -33,13 +34,16 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -86,28 +90,35 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
+            try {
+                counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
 
-            for (WorkflowTask workflowTask : workflowTasks) {
-                TaskExecution parallelTaskExecution = TaskExecution.builder()
-                    .jobId(taskExecution.getJobId())
-                    .parentId(taskExecution.getId())
-                    .priority(taskExecution.getPriority())
-                    .workflowTask(workflowTask)
-                    .build();
+                for (WorkflowTask workflowTask : workflowTasks) {
+                    TaskExecution parallelTaskExecution = TaskExecution.builder()
+                        .jobId(taskExecution.getJobId())
+                        .parentId(taskExecution.getId())
+                        .priority(taskExecution.getPriority())
+                        .workflowTask(workflowTask)
+                        .build();
 
-                parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
+                    parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
-                Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                    Map<String, ?> context = taskFileStorage.readContextValue(
+                        contextService.peek(
+                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
-                contextService.push(
-                    Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    taskFileStorage.storeContextValue(
+                    contextService.push(
                         Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                        context));
-                taskDispatcher.dispatch(parallelTaskExecution);
+                        taskFileStorage.storeContextValue(
+                            Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                            context));
+                    taskDispatcher.dispatch(parallelTaskExecution);
+                }
+            } catch (Exception e) {
+                taskExecution
+                    .setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
+                eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
             }
         }
     }
