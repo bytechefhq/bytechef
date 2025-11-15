@@ -1,4 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     AlertDialog,
@@ -10,7 +11,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -213,13 +213,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                         {integration.lastIntegrationVersion && (
                             <div className="flex flex-col items-end gap-y-4">
                                 {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
-                                    <Badge className="flex space-x-1" variant="success">
+                                    <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
                                         <span>V{integration.lastIntegrationVersion - 1}</span>
 
                                         <span>PUBLISHED</span>
                                     </Badge>
                                 ) : (
-                                    <Badge className="flex space-x-1" variant="secondary">
+                                    <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
                                         <span>V{integration.lastIntegrationVersion}</span>
 
                                         <span>{integration.lastStatus}</span>
