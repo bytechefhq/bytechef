@@ -48,6 +48,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * @author Monika Kušter
@@ -82,11 +83,13 @@ public class MicrosoftOutlook365Utils {
             bodyHtml = (String) map.get(CONTENT);
         }
 
+        Pair<List<FileEntry>, List<FileEntry>> attachments = getFileEntries(id, context);
+
         return new SimpleMessage(
             (String) messageBody.get(ID), (String) messageBody.get("conversationId"), (String) messageBody.get(SUBJECT),
             from, getRecipients(messageBody, TO_RECIPIENTS), getRecipients(messageBody, CC_RECIPIENTS),
             getRecipients(messageBody, BCC_RECIPIENTS), (String) messageBody.get("bodyPreview"), bodyHtml,
-            getFileEntries(id, context), (String) messageBody.get("webLink"));
+            attachments.getLeft(), attachments.getRight(), (String) messageBody.get("webLink"));
     }
 
     public static List<Map<String, Object>> getAttachments(Context context, List<FileEntry> attachments) {
@@ -119,8 +122,9 @@ public class MicrosoftOutlook365Utils {
         return body.get(VALUE);
     }
 
-    private static List<FileEntry> getFileEntries(String id, Context context) {
+    private static Pair<List<FileEntry>, List<FileEntry>> getFileEntries(String id, Context context) {
         List<FileEntry> fileEntries = new ArrayList<>();
+        List<FileEntry> inlineFileEntries = new ArrayList<>();
 
         Map<String, Object> attachmentsBody = context
             .http(http -> http.get("/me/messages/%s/attachments".formatted(id)))
@@ -137,12 +141,16 @@ public class MicrosoftOutlook365Utils {
                     FileEntry fileEntry = context.file(
                         file -> file.storeContent((String) map.get(NAME), new ByteArrayInputStream(decodedBytes)));
 
-                    fileEntries.add(fileEntry);
+                    if ((Boolean) map.get("isInline")) {
+                        inlineFileEntries.add(fileEntry);
+                    } else {
+                        fileEntries.add(fileEntry);
+                    }
                 }
             }
         }
 
-        return fileEntries;
+        return Pair.of(fileEntries, inlineFileEntries);
     }
 
     private static List<String> getRecipients(Map<?, ?> body, String recipientType) {
@@ -174,6 +182,7 @@ public class MicrosoftOutlook365Utils {
     @SuppressFBWarnings("EI")
     public record SimpleMessage(
         String id, String conversationId, String subject, String from, List<String> to, List<String> cc,
-        List<String> bcc, String bodyPlain, String bodyHtml, List<FileEntry> attachments, String webLink) {
+        List<String> bcc, String bodyPlain, String bodyHtml, List<FileEntry> attachments,
+        List<FileEntry> inlineAttachments, String webLink) {
     }
 }
