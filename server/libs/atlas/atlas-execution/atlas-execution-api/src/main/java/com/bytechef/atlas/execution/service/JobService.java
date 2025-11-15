@@ -32,6 +32,8 @@ public interface JobService {
 
     void deleteJob(long id);
 
+    Optional<Job> fetchJob(Long id);
+
     Optional<Job> fetchLastJob();
 
     Optional<Job> fetchLastWorkflowJob(String workflowId);

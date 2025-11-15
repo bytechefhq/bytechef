@@ -32,7 +32,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
@@ -79,24 +79,24 @@ public class WebhookConfiguration {
         WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, environment, evaluator, jobService, syncMessageBroker,
+                contextService, environment, evaluator, jobService, -1, () -> asyncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, evaluator, jobService, syncMessageBroker, taskExecutionService,
+                    contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 
-    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
+    private static ApplicationEventPublisher getEventPublisher(AsyncMessageBroker syncMessageBroker) {
         return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 
@@ -146,10 +146,10 @@ public class WebhookConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, Evaluator evaluator, JobService jobService,
-        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
+        AsyncMessageBroker asyncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
-        ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
+        ApplicationEventPublisher eventPublisher = getEventPublisher(asyncMessageBroker);
 
         return List.of(
             (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
