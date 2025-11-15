@@ -51,6 +51,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@SuppressFBWarnings("PREDICTABLE_RANDOM")
 public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
     private static final Random RANDOM = new Random();

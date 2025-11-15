@@ -16,6 +16,7 @@
 
 package com.bytechef.component.claude.code.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,7 +33,9 @@ import org.zeroturnaround.exec.ProcessExecutor;
 /**
  * @author Marko Kriskovic
  */
+@SuppressFBWarnings("COMMAND_INJECTION")
 public class ClaudeCodeUtil {
+
     private ClaudeCodeUtil() {
     }
 

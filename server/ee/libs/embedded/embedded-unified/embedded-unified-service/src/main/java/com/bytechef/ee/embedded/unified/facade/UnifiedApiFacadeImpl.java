@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
  */
 @Service
 @ConditionalOnEEVersion
+@SuppressFBWarnings("UNSAFE_HASH_EQUALS")
 public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     private static final Logger log = LoggerFactory.getLogger(UnifiedApiFacadeImpl.class);

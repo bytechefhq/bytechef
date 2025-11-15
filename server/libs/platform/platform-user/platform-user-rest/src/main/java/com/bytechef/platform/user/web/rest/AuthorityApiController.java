@@ -51,6 +51,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
+@SuppressFBWarnings("CRLF_INJECTION_LOGS")
 public class AuthorityApiController implements AuthorityApi {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorityApiController.class);

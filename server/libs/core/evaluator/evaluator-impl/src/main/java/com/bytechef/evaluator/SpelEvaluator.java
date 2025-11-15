@@ -18,6 +18,7 @@
 
 package com.bytechef.evaluator;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +53,9 @@ import org.springframework.lang.Nullable;
  * @author Ivica Cardic
  * @since Mar 31, 2017
  */
+@SuppressFBWarnings({
+    "SPEL_INJECTION", "REDOS"
+})
 public class SpelEvaluator implements Evaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(SpelEvaluator.class);

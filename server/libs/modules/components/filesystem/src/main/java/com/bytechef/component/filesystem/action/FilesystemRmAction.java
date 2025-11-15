@@ -26,6 +26,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.PAT
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -37,6 +38,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemRmAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("rm")

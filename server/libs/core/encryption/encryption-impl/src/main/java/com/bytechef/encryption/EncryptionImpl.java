@@ -18,6 +18,7 @@ package com.bytechef.encryption;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.encryption.exception.InvalidEncryptionKeyException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
@@ -62,6 +63,9 @@ public class EncryptionImpl implements Encryption {
         }
     }
 
+    @SuppressFBWarnings({
+        "CIPHER_INTEGRITY", "ECB_MODE"
+    })
     private Cipher getCipher(int encryptMode) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
