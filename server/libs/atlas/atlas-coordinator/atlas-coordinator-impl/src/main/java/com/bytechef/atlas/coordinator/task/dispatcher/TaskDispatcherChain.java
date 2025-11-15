@@ -39,6 +39,7 @@ public class TaskDispatcherChain implements TaskDispatcher<Task> {
             TaskDispatcher<Task> taskDispatcher = (TaskDispatcher<Task>) taskDispatcherResolver.resolve(task);
 
             if (taskDispatcher != null) {
+                // we can add try catch here instead, but I'm afraid of regression
                 taskDispatcher.dispatch(task);
 
                 return;
