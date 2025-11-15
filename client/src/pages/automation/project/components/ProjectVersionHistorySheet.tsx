@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
 
@@ -51,16 +51,18 @@ const ProjectVersionHistorySheet = ({
                                                     )}
 
                                                     <Badge
-                                                        variant={
+                                                        label={
                                                             projectVersion.status === ProjectStatus.Published
-                                                                ? 'success'
-                                                                : 'secondary'
+                                                                ? 'Published'
+                                                                : 'Draft'
                                                         }
-                                                    >
-                                                        {projectVersion.status === ProjectStatus.Published
-                                                            ? `Published`
-                                                            : 'Draft'}
-                                                    </Badge>
+                                                        styleType={
+                                                            projectVersion.status === ProjectStatus.Published
+                                                                ? 'success-outline'
+                                                                : 'secondary-filled'
+                                                        }
+                                                        weight="semibold"
+                                                    />
                                                 </div>
                                             </div>
                                         </AccordionTrigger>

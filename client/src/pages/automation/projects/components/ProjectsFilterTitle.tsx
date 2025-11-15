@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/pages/automation/projects/Projects';
 import {Category, Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
@@ -27,7 +27,7 @@ const ProjectsFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
 
-            <Badge variant="secondary">
+            <Badge styleType="secondary-filled" weight="semibold">
                 <span className="text-sm">{pageTitle ?? 'All Categories'}</span>
             </Badge>
         </div>
