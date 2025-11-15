@@ -17,6 +17,7 @@
 package com.bytechef.component.date.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.date.helper.action.DateHelperAddTimeAction;
@@ -51,7 +52,16 @@ public class DateHelperComponentHandler implements ComponentHandler {
             DateHelperGetCurrentDateAction.ACTION_DEFINITION,
             DateHelperIsBusinessHoursAction.ACTION_DEFINITION,
             DateHelperIsWeekendAction.ACTION_DEFINITION,
-            DateHelperSubtractTimeAction.ACTION_DEFINITION);
+            DateHelperSubtractTimeAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(DateHelperAddTimeAction.ACTION_DEFINITION),
+            tool(DateHelperConvertAction.ACTION_DEFINITION),
+            tool(DateHelperDateDifferenceAction.ACTION_DEFINITION),
+            tool(DateHelperExtractDateUnitsAction.ACTION_DEFINITION),
+            tool(DateHelperGetCurrentDateAction.ACTION_DEFINITION),
+            tool(DateHelperIsBusinessHoursAction.ACTION_DEFINITION),
+            tool(DateHelperIsWeekendAction.ACTION_DEFINITION),
+            tool(DateHelperSubtractTimeAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

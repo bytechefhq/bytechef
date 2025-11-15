@@ -17,6 +17,7 @@
 package com.bytechef.component.data.mapper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToArrayAction;
@@ -48,7 +49,15 @@ public class DataMapperComponentHandler implements ComponentHandler {
             DataMapperRenameKeysAction.ACTION_DEFINITION,
             DataMapperReplaceAllSpecifiedValuesAction.ACTION_DEFINITION,
             DataMapperReplaceMultipleValuesByKeyAction.ACTION_DEFINITION,
-            DataMapperReplaceValueAction.ACTION_DEFINITION);
+            DataMapperReplaceValueAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(DataMapperMapObjectsToArrayAction.ACTION_DEFINITION),
+            tool(DataMapperMapObjectsToObjectAction.ACTION_DEFINITION),
+            tool(DataMapperMergeAndPivotByKeyAction.ACTION_DEFINITION),
+            tool(DataMapperRenameKeysAction.ACTION_DEFINITION),
+            tool(DataMapperReplaceAllSpecifiedValuesAction.ACTION_DEFINITION),
+            tool(DataMapperReplaceMultipleValuesByKeyAction.ACTION_DEFINITION),
+            tool(DataMapperReplaceValueAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

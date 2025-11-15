@@ -29,8 +29,8 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_N
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_SIZE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PATH;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.constant.FileType;
@@ -97,7 +97,7 @@ public class JsonFileReadAction {
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         FileType fileType = getFileType(inputParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);

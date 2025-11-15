@@ -17,6 +17,7 @@
 package com.bytechef.component.random.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -44,7 +45,13 @@ public class RandomHelperComponentHandler implements ComponentHandler {
             RandomHelperRandomHexAction.ACTION_DEFINITION,
             RandomHelperRandomIntAction.ACTION_DEFINITION,
             RandomHelperRandomStringAction.ACTION_DEFINITION,
-            RandomHelperRandomUuidAction.ACTION_DEFINITION);
+            RandomHelperRandomUuidAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(RandomHelperRandomFloatAction.ACTION_DEFINITION),
+            tool(RandomHelperRandomHexAction.ACTION_DEFINITION),
+            tool(RandomHelperRandomIntAction.ACTION_DEFINITION),
+            tool(RandomHelperRandomStringAction.ACTION_DEFINITION),
+            tool(RandomHelperRandomUuidAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

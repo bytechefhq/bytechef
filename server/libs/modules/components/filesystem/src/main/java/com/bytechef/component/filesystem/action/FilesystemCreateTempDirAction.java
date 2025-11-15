@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class FilesystemCreateTempDirAction {
     }
 
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         Path path = Files.createTempDirectory("createTempDir_");
 

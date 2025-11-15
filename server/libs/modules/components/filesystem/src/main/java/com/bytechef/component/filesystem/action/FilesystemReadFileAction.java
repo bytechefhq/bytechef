@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.io.FileInputStream;
@@ -51,7 +51,7 @@ public class FilesystemReadFileAction {
     }
 
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Context context)
         throws IOException {
 
         String filename = inputParameters.getRequiredString(FILENAME);

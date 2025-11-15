@@ -17,6 +17,7 @@
 package com.bytechef.component.image.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -46,7 +47,14 @@ public class ImageHelperComponentHandler implements ComponentHandler {
             ImageHelperGetImageMetadataAction.ACTION_DEFINITION,
             ImageHelperImageToBase64Action.ACTION_DEFINITION,
             ImageHelperResizeImageAction.ACTION_DEFINITION,
-            ImageHelperRotateImageAction.ACTION_DEFINITION);
+            ImageHelperRotateImageAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(ImageHelperCompressImageAction.ACTION_DEFINITION),
+            tool(ImageHelperCropImageAction.ACTION_DEFINITION),
+            tool(ImageHelperGetImageMetadataAction.ACTION_DEFINITION),
+            tool(ImageHelperImageToBase64Action.ACTION_DEFINITION),
+            tool(ImageHelperResizeImageAction.ACTION_DEFINITION),
+            tool(ImageHelperRotateImageAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

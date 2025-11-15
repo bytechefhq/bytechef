@@ -19,7 +19,7 @@ package com.bytechef.component.data.mapper.util;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
 
 import com.bytechef.component.data.mapper.constant.ValueType;
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,15 +60,15 @@ public class DataMapperUtils {
         };
     }
 
-    public static boolean canConvert(ActionContext context, Object mappingFrom, Class<?> type) {
+    public static boolean canConvert(Context context, Object mappingFrom, Class<?> type) {
         return context.convert(convert -> convert.canConvert(mappingFrom, type));
     }
 
-    public static Object convertTo(ActionContext context, Object mappingTo, Class<?> type) {
+    public static Object convertTo(Context context, Object mappingTo, Class<?> type) {
         return context.convert(convert -> convert.value(mappingTo, type));
     }
 
-    public static Object convertFrom(ActionContext context, Object mappingFrom, Class<?> type) {
+    public static Object convertFrom(Context context, Object mappingFrom, Class<?> type) {
         return context.convert(convert -> convert.value(mappingFrom, type));
     }
 

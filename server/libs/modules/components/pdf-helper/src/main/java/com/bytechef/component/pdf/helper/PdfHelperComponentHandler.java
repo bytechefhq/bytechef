@@ -43,7 +43,11 @@ public class PdfHelperComponentHandler implements ComponentHandler {
             PdfHelperExtractTextAction.ACTION_DEFINITION,
             PdfHelperImageToPdfAction.ACTION_DEFINITION,
             PdfHelperTextToPdfAction.ACTION_DEFINITION)
-        .clusterElements(tool(PdfHelperTextToPdfAction.ACTION_DEFINITION));
+        .clusterElements(
+            tool(PdfHelperConvertToImageAction.ACTION_DEFINITION),
+            tool(PdfHelperExtractTextAction.ACTION_DEFINITION),
+            tool(PdfHelperImageToPdfAction.ACTION_DEFINITION),
+            tool(PdfHelperTextToPdfAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

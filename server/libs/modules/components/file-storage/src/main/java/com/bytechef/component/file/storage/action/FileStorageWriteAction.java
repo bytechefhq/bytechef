@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.CONTENT;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -51,7 +51,7 @@ public class FileStorageWriteAction {
         .perform(FileStorageWriteAction::perform);
 
     protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Object content = inputParameters.getRequired(CONTENT);
         String fileName = inputParameters.getString(FILENAME, "file.txt");

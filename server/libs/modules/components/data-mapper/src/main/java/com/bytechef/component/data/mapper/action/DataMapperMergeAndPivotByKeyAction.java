@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class DataMapperMergeAndPivotByKeyAction {
 
     @SuppressWarnings("unchecked")
     protected static Map<String, Map<Object, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
         String fieldKey = inputParameters.getRequiredString(FIELD_KEY);

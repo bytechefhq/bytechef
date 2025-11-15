@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILE_ENTRY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -44,7 +44,7 @@ public class FileStorageReadAction {
         .perform(FileStorageReadAction::perform);
 
     protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context.file(file -> file.readToString(inputParameters.getRequiredFileEntry(FILE_ENTRY)));
     }

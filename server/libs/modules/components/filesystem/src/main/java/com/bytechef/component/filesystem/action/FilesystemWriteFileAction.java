@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,7 +62,7 @@ public class FilesystemWriteFileAction {
     }
 
     protected static Map<String, ?> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
 
         String fileName = inputParameters.getRequiredString(FILENAME);
 

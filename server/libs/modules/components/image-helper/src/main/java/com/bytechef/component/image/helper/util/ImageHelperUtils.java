@@ -16,7 +16,7 @@
 
 package com.bytechef.component.image.helper.util;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -34,7 +34,7 @@ public class ImageHelperUtils {
     }
 
     public static FileEntry storeBufferedImage(
-        ActionContext actionContext, BufferedImage image, String extension, String resultFileName) throws IOException {
+        Context context, BufferedImage image, String extension, String resultFileName) throws IOException {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -42,6 +42,6 @@ public class ImageHelperUtils {
 
         InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-        return actionContext.file(file -> file.storeContent(resultFileName + "." + extension, inputStream));
+        return context.file(file -> file.storeContent(resultFileName + "." + extension, inputStream));
     }
 }

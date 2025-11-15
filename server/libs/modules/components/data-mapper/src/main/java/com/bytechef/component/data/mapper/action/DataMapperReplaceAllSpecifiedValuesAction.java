@@ -46,8 +46,8 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import com.bytechef.component.data.mapper.constant.InputType;
 import com.bytechef.component.data.mapper.constant.ValueType;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -241,7 +241,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
