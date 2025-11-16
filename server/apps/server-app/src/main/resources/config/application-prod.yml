@@ -21,8 +21,6 @@ spring:
   devtools:
     restart:
       enabled: false
-    livereload:
-      enabled: false
   thymeleaf:
     cache: true
 

@@ -9,6 +9,8 @@ server:
 
 spring:
   devtools:
+    livereload:
+      enabled: false
     restart:
       enabled: true
   graphql:
