@@ -193,6 +193,10 @@ spring:
       direct:
         prefetch: 1
   shell:
+    interactive:
+      enabled: false
+    history:
+      enabled: false
     noninteractive:
       enabled: false
   quartz:
