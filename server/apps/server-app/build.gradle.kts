@@ -7,6 +7,7 @@ springBoot {
 }
 
 dependencies {
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
 //    implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
@@ -23,7 +24,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
