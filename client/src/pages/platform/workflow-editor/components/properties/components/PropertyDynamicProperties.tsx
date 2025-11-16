@@ -115,6 +115,15 @@ const PropertyDynamicProperties = ({
 
     const isPending = lookupDependsOnValuesKey !== lastProcessedKey;
 
+    // Guard against primitive parameterValue (e.g., string) so bracket access doesn't hit prototype methods
+    const paramValueObject = useMemo(
+        () =>
+            parameterValue && typeof parameterValue === 'object' && !Array.isArray(parameterValue)
+                ? parameterValue
+                : undefined,
+        [parameterValue]
+    );
+
     if ((isLoading || isClusterElementPropertiesLoading || isPending) && queryEnabled) {
         return (
             <ul className="flex flex-col gap-4">
@@ -140,11 +149,11 @@ const PropertyDynamicProperties = ({
                     key={`${property.name}_${index}_${lastProcessedKey}_property`}
                     objectName={name}
                     operationName={currentOperationName}
-                    parameterValue={property.name ? parameterValue?.[property.name] : ''}
+                    parameterValue={property.name ? (paramValueObject?.[property.name] ?? '') : ''}
                     path={path}
                     property={{
                         ...property,
-                        defaultValue: property.name ? parameterValue?.[property.name] : '',
+                        defaultValue: property.name ? (paramValueObject?.[property.name] ?? '') : '',
                     }}
                 />
             ))}
