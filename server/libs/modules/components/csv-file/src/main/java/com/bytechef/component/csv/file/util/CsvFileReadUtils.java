@@ -26,6 +26,7 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,8 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
