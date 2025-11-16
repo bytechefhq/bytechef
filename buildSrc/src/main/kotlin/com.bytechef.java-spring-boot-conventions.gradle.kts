@@ -56,6 +56,10 @@ if (project.hasProperty("prod")) {
 
 tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
     args = listOf("--spring.profiles.active=$profiles")
+    jvmArgs(
+        "--enable-native-access=ALL-UNNAMED",
+        "--sun-misc-unsafe-memory-access=allow"
+    )
 }
 
 tasks.withType(org.springframework.boot.gradle.tasks.bundling.BootJar::class) {
