@@ -24,7 +24,7 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
@@ -47,7 +47,7 @@ import org.apache.commons.lang3.StringUtils;
 public class CsvFileReadUtils {
 
     public static Map<String, Object> getColumnRow(
-        ReadConfiguration configuration, List<?> row, char enclosingCharacter, Context context) {
+        ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -56,7 +56,7 @@ public class CsvFileReadUtils {
                 "column_" + (i + 1),
                 processValue(
                     (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString(), context));
+                    configuration.readAsString()));
         }
 
         return map;
@@ -75,7 +75,7 @@ public class CsvFileReadUtils {
     }
 
     public static Map<String, Object> getHeaderRow(
-        ReadConfiguration configuration, Map<String, String> row, char enclosingCharacter, Context context) {
+        ReadConfiguration configuration, Map<String, String> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -92,7 +92,7 @@ public class CsvFileReadUtils {
                 strippedString,
                 processValue(
                     (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString(), context));
+                    configuration.readAsString()));
 
             currColumn++;
         }
@@ -153,8 +153,7 @@ public class CsvFileReadUtils {
     }
 
     public static Object processValue(
-        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString,
-        Context context) {
+        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
 
         Object value = null;
 
@@ -170,9 +169,7 @@ public class CsvFileReadUtils {
             if (readAsString) {
                 value = valueString;
             } else {
-                String finalValueString = valueString;
-
-                value = context.convert(convert -> convert.string(finalValueString));
+                value = ConvertUtils.convertString(valueString);
             }
         }
 

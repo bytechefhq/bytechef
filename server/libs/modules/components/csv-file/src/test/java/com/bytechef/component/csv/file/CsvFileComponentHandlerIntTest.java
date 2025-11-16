@@ -38,7 +38,6 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Ivica Cardic
  * @author Igor Beslic
  */
-@Disabled
 @ComponentIntTest
 class CsvFileComponentHandlerIntTest {
 
