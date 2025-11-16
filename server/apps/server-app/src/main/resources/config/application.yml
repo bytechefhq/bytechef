@@ -31,6 +31,13 @@ info:
     activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
 
+logging:
+  level:
+    ROOT: INFO
+    org.quartz: WARN
+    org.jline: ERROR
+    com.bytechef.ee.platform.scheduler.tenant: ERROR
+
 management:
   endpoints:
     web:
