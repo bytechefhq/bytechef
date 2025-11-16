@@ -46,6 +46,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      - JAVA_TOOL_OPTIONS=--enable-native-access=ALL-UNNAMED
 #      - SPRING_RABBITMQ_HOST=rabbitmq
 #      - SPRING_RABBITMQ_PORT=5672
       - SPRING_DATA_REDIS_HOST=redis

@@ -20,6 +20,8 @@ FROM ghcr.io/graalvm/graalvm-community:25.0.0
 
 WORKDIR /opt
 
+ENV JAVA_TOOL_OPTIONS="--enable-native-access=ALL-UNNAMED"
+
 COPY --from=build /build/server/apps/server-app/build/libs/server-app*.jar server-app.jar
 
 EXPOSE 9555
