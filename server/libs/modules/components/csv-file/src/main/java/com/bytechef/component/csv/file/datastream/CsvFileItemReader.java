@@ -51,6 +51,7 @@ public class CsvFileItemReader implements ItemReader {
 
     private BufferedReader bufferedReader;
     private ReadConfiguration configuration;
+    private Context context;
     private char enclosingCharacter;
     private Iterator<CSVRecord> iterator;
 
@@ -70,11 +71,12 @@ public class CsvFileItemReader implements ItemReader {
         Parameters inputParameters, Parameters connectionParameters, Context context,
         ExecutionContext executionContext) {
 
-        configuration = CsvFileReadUtils.getReadConfiguration(inputParameters);
+        this.configuration = CsvFileReadUtils.getReadConfiguration(inputParameters);
+        this.context = context;
 
-        enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
+        this.enclosingCharacter = CsvFileReadUtils.getEnclosingCharacter(configuration);
 
-        bufferedReader = new BufferedReader(
+        this.bufferedReader = new BufferedReader(
             new InputStreamReader(
                 context.file(file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY))),
                 StandardCharsets.UTF_8));
@@ -88,19 +90,19 @@ public class CsvFileItemReader implements ItemReader {
 
     @Override
     public Map<String, Object> read() throws Exception {
+        CSVRecord record = iterator.next();
+
         if (configuration.headerRow()) {
             if (iterator.hasNext()) {
-                Map<String, String> row = iterator.next()
-                    .toMap();
+                Map<String, String> row = record.toMap();
 
-                return CsvFileReadUtils.getHeaderRow(configuration, row, enclosingCharacter);
+                return CsvFileReadUtils.getHeaderRow(configuration, row, enclosingCharacter, context);
             }
         } else {
             if (iterator.hasNext()) {
-                List<?> row = (List<?>) iterator.next()
-                    .toList();
+                List<?> row = record.toList();
 
-                return CsvFileReadUtils.getColumnRow(configuration, row, enclosingCharacter);
+                return CsvFileReadUtils.getColumnRow(configuration, row, enclosingCharacter, context);
             }
         }
 
