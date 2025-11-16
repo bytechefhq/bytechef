@@ -67,7 +67,6 @@ public class CsvFileReadAction {
         InputStream inputStream, ReadConfiguration configuration, Context context) throws IOException {
 
         List<Map<String, String>> rows = new ArrayList<>();
-        int count = 0;
 
         try (BufferedReader bufferedReader = new BufferedReader(
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {

@@ -35,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -141,10 +140,10 @@ class CsvFileComponentHandlerIntTest {
         };
 
         for (int i = 0; i < expectedHeaders.length; i++) {
-            Assertions.assertThat(theFirstRow)
+            assertThat(theFirstRow)
                 .containsKey(expectedHeaders[i]);
 
-            Assertions.assertThat(theFirstRow)
+            assertThat(theFirstRow)
                 .containsValues(expectedvalues);
         }
 

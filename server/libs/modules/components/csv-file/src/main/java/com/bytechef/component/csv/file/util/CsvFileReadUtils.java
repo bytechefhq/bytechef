@@ -35,6 +35,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +101,7 @@ public class CsvFileReadUtils {
         return map;
     }
 
+    @SuppressFBWarnings("NP")
     public static Iterator<CSVRecord> getIterator(
         BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
 
@@ -182,13 +185,13 @@ public class CsvFileReadUtils {
         return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 
-    class CSVHeaderBuilder {
+    private static class CSVHeaderBuilder {
         static String[] asArray(String headerRow, String delimiter, char enclosingCharacter) {
-            List<String> regexReservedCharacters = Arrays.asList(".", "+", "*", "?", "^", "$", "(", ")", "[", "]",
-                "{", "}", "|",
-                "\\");
+            List<String> regexReservedCharacters = Arrays.asList(
+                ".", "+", "*", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|", "\\");
 
             String regexPrefix = "";
+
             if (regexReservedCharacters.contains(delimiter)) {
                 regexPrefix = "\\";
             }
@@ -218,5 +221,4 @@ public class CsvFileReadUtils {
             return usableHeaderRow;
         }
     }
-
 }
