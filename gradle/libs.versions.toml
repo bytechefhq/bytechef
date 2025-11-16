@@ -1,16 +1,16 @@
 [versions]
 checkstyle = "11.1.0"
 com-google-auto-service = "1.1.1"
-graalvm = "25.0.0"
+graalvm = "25.0.1"
 jackson = "2.19.2"
 jacoco = "0.8.13"
 java = "25"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "1.1.3"
-org-springdoc = "2.8.13"
+org-springdoc = "2.8.14"
 pmd = "7.17.0"
-spotbugs = "4.9.7"
-spring-ai = "1.1.0-RC1"
+spotbugs = "4.9.8"
+spring-ai = "1.1.0"
 spring-boot = "3.5.7"
 spring-cloud-aws = "3.4.0"
 spring-cloud-dependencies = "2025.0.0"
@@ -18,29 +18,29 @@ spring-shell = "3.4.1"
 
 [libraries]
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.7.0"
-com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.8.3"
+com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.8.4"
 com-github-spotbugs-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 commons-validator = "commons-validator:commons-validator:1.10.0"
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.38"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.34"
-loki-logback-appender = "com.github.loki4j:loki-logback-appender:2.0.0"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.42.0"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.40"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.35"
+loki-logback-appender = "com.github.loki4j:loki-logback-appender:1.6.0"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.44.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.4.1"
-org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r"
+org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.4.0.202509020913-r"
 org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
 org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
 org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
 org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
-org-graalvm-polyglot-ruby = { module = "org.graalvm.polyglot:ruby", version.ref = "graalvm" }
+org-graalvm-polyglot-ruby = "org.graalvm.polyglot:ruby:25.0.0"
 org-json = "org.json:json:20250517"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
-org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.7"
+org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.8"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.1"
@@ -51,8 +51,8 @@ com-github-ben-manes-versions = "com.github.ben-manes.versions:0.53.0"
 gradle-git-properties = "com.gorylenko.gradle-git-properties:2.5.2"
 jib = "com.google.cloud.tools.jib:3.4.5"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.1"
-org-graalvm-buildtools-native = "org.graalvm.buildtools.native:0.11.1"
-org-openapi-generator = "org.openapi.generator:7.16.0"
-org-sonarqube = "org.sonarqube:7.0.0.6105"
-spotbugs = "com.github.spotbugs:6.4.3"
+org-graalvm-buildtools-native = "org.graalvm.buildtools.native:0.11.3"
+org-openapi-generator = "org.openapi.generator:7.17.0"
+org-sonarqube = "org.sonarqube:7.0.1.6134"
+spotbugs = "com.github.spotbugs:6.4.5"
 spotless = "com.diffplug.gradle.spotless:8.0.0"
