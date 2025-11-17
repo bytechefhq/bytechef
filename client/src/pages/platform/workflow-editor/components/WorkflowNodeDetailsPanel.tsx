@@ -83,6 +83,7 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import {getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
@@ -985,9 +986,12 @@ const WorkflowNodeDetailsPanel = ({
 
         const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-        const mainClusterRootTask = workflowDefinitionTasks?.find(
-            (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
+        const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+            ? getTaskDispatcherTask({
+                  taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+                  tasks: workflowDefinitionTasks,
+              })
+            : undefined;
 
         if (!mainClusterRootTask) {
             return;
