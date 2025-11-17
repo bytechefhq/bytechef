@@ -24,7 +24,7 @@ import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispat
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context;
@@ -34,16 +34,13 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -54,7 +51,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Arik Cohen
  * @since May 12, 2017
  */
-public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class ParallelTaskDispatcher extends ErrorHandlingTaskDispatcher implements TaskDispatcherResolver {
 
     private final ContextService contextService;
     private final CounterService counterService;
@@ -69,6 +66,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
+        super(eventPublisher);
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.eventPublisher = eventPublisher;
@@ -78,7 +77,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    public void dispatch(TaskExecution taskExecution) {
+    public void doDispatch(TaskExecution taskExecution) {
         List<WorkflowTask> workflowTasks = Validate.notNull(
             MapUtils.getList(taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList()),
             "'workflowTasks' property must not be null");
@@ -90,35 +89,28 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
-            try {
-                counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
 
-                for (WorkflowTask workflowTask : workflowTasks) {
-                    TaskExecution parallelTaskExecution = TaskExecution.builder()
-                        .jobId(taskExecution.getJobId())
-                        .parentId(taskExecution.getId())
-                        .priority(taskExecution.getPriority())
-                        .workflowTask(workflowTask)
-                        .build();
+            for (WorkflowTask workflowTask : workflowTasks) {
+                TaskExecution parallelTaskExecution = TaskExecution.builder()
+                    .jobId(taskExecution.getJobId())
+                    .parentId(taskExecution.getId())
+                    .priority(taskExecution.getPriority())
+                    .workflowTask(workflowTask)
+                    .build();
 
-                    parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
+                parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
-                    Map<String, ?> context = taskFileStorage.readContextValue(
-                        contextService.peek(
-                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                Map<String, ?> context = taskFileStorage.readContextValue(
+                    contextService.peek(
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
-                    contextService.push(
+                contextService.push(
+                    Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(
                         Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                        taskFileStorage.storeContextValue(
-                            Validate.notNull(parallelTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                            context));
-                    taskDispatcher.dispatch(parallelTaskExecution);
-                }
-            } catch (Exception e) {
-                taskExecution
-                    .setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-                eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+                        context));
+                taskDispatcher.dispatch(parallelTaskExecution);
             }
         }
     }

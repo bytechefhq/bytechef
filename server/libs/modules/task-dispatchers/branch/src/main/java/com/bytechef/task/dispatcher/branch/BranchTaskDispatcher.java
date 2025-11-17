@@ -28,7 +28,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context.Classname;
@@ -37,18 +37,15 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -57,7 +54,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * @since Jun 3, 2017
  * @see BranchTaskCompletionHandler
  */
-public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements TaskDispatcherResolver {
 
     private final ContextService contextService;
     private final Evaluator evaluator;
@@ -72,6 +69,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
+        super(eventPublisher);
+
         this.evaluator = evaluator;
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
@@ -81,7 +80,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     @Override
-    public void dispatch(TaskExecution taskExecution) {
+    public void doDispatch(TaskExecution taskExecution) {
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
@@ -89,61 +88,56 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
         Map<String, ?> selectedCase = resolveCase(taskExecution);
 
-        try {
-            if (selectedCase.containsKey(TASKS)) {
-                List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                    selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
+        if (selectedCase.containsKey(TASKS)) {
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
+                selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
 
-                if (subWorkflowTasks.isEmpty()) {
-                    taskExecution.setStartDate(Instant.now());
-                    taskExecution.setEndDate(Instant.now());
-                    taskExecution.setExecutionTime(0);
-
-                    eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
-                } else {
-                    WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
-
-                    TaskExecution subTaskExecution = TaskExecution.builder()
-                        .jobId(taskExecution.getJobId())
-                        .parentId(taskExecution.getId())
-                        .priority(taskExecution.getPriority())
-                        .taskNumber(1)
-                        .workflowTask(subWorkflowTask)
-                        .build();
-
-                    Map<String, ?> context = taskFileStorage.readContextValue(
-                        contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
-
-                    subTaskExecution.evaluate(context, evaluator);
-
-                    subTaskExecution = taskExecutionService.create(subTaskExecution);
-
-                    contextService.push(
-                        Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                        taskFileStorage.storeContextValue(
-                            Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
-
-                    taskDispatcher.dispatch(subTaskExecution);
-                }
-            } else {
+            if (subWorkflowTasks.isEmpty()) {
                 taskExecution.setStartDate(Instant.now());
                 taskExecution.setEndDate(Instant.now());
                 taskExecution.setExecutionTime(0);
-                // TODO check, it seems wrong
-
-                if (selectedCase.get("value") != null) {
-                    taskExecution.setOutput(
-                        taskFileStorage.storeTaskExecutionOutput(
-                            Validate.notNull(taskExecution.getId(), "id"), selectedCase.get("value")));
-                }
 
                 eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
-            }
-        } catch (Exception e) {
-            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+            } else {
+                WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+                TaskExecution subTaskExecution = TaskExecution.builder()
+                    .jobId(taskExecution.getJobId())
+                    .parentId(taskExecution.getId())
+                    .priority(taskExecution.getPriority())
+                    .taskNumber(1)
+                    .workflowTask(subWorkflowTask)
+                    .build();
+
+                Map<String, ?> context = taskFileStorage.readContextValue(
+                    contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
+
+                subTaskExecution.evaluate(context, evaluator);
+
+                subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+                contextService.push(
+                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(
+                        Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
+
+                taskDispatcher.dispatch(subTaskExecution);
+            }
+        } else {
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setExecutionTime(0);
+            // TODO check, it seems wrong
+
+            if (selectedCase.get("value") != null) {
+                taskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        Validate.notNull(taskExecution.getId(), "id"), selectedCase.get("value")));
+            }
+
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
+
     }
 
     @Override

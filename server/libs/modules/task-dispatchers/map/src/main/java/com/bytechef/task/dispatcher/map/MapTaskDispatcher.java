@@ -28,7 +28,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context.Classname;
@@ -38,25 +38,22 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Arik Cohen
  * @since Jun 4, 2017
  */
-public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements TaskDispatcherResolver {
 
     private final ContextService contextService;
     private final CounterService counterService;
@@ -72,6 +69,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
         ApplicationEventPublisher eventPublisher, TaskDispatcher<? super TaskExecution> taskDispatcher,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
+        super(eventPublisher);
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.evaluator = evaluator;
@@ -82,7 +81,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     }
 
     @Override
-    public void dispatch(TaskExecution taskExecution) {
+    public void doDispatch(TaskExecution taskExecution) {
         List<?> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
         List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
             taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
@@ -91,68 +90,63 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        try {
-            if (items.isEmpty()) {
-                taskExecution.setStartDate(Instant.now());
-                taskExecution.setEndDate(Instant.now());
-                taskExecution.setExecutionTime(0);
+        if (items.isEmpty()) {
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setExecutionTime(0);
 
-                eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
-            } else {
-                long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
+        } else {
+            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
 
-                counterService.set(taskExecutionId, items.size());
+            counterService.set(taskExecutionId, items.size());
 
-                long taskExecutionJobId = Validate.notNull(
-                    taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+            long taskExecutionJobId = Validate.notNull(
+                taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
-                for (int i = 0; i < items.size(); i++) {
-                    Object item = items.get(i);
-                    WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
+            for (int i = 0; i < items.size(); i++) {
+                Object item = items.get(i);
+                WorkflowTask iterateeWorkflowTask = iterateeWorkflowTasks.getFirst();
 
-                    TaskExecution iterateeTaskExecution = TaskExecution.builder()
-                        .jobId(taskExecutionJobId)
-                        .parentId(taskExecution.getId())
-                        .priority(taskExecution.getPriority())
-                        .taskNumber(1)
-                        .workflowTask(
-                            new WorkflowTask(
-                                MapUtils.append(
-                                    iterateeWorkflowTask.toMap(), WorkflowConstants.PARAMETERS,
-                                    Map.of(MapTaskDispatcherConstants.ITERATION, i))))
-                        .build();
+                TaskExecution iterateeTaskExecution = TaskExecution.builder()
+                    .jobId(taskExecutionJobId)
+                    .parentId(taskExecution.getId())
+                    .priority(taskExecution.getPriority())
+                    .taskNumber(1)
+                    .workflowTask(
+                        new WorkflowTask(
+                            MapUtils.append(
+                                iterateeWorkflowTask.toMap(), WorkflowConstants.PARAMETERS,
+                                Map.of(MapTaskDispatcherConstants.ITERATION, i))))
+                    .build();
 
-                    Map<String, Object> context = new HashMap<>(
-                        taskFileStorage
-                            .readContextValue(contextService.peek(taskExecutionId, Classname.TASK_EXECUTION)));
+                Map<String, Object> context = new HashMap<>(
+                    taskFileStorage
+                        .readContextValue(contextService.peek(taskExecutionId, Classname.TASK_EXECUTION)));
 
-                    WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-                    context.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
+                context.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
 
-                    iterateeTaskExecution.evaluate(context, evaluator);
+                iterateeTaskExecution.evaluate(context, evaluator);
 
-                    iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
+                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                    long iterateeTaskExecutionId = Validate.notNull(iterateeTaskExecution.getId(), "id");
+                long iterateeTaskExecutionId = Validate.notNull(iterateeTaskExecution.getId(), "id");
 
-                    contextService.push(
-                        iterateeTaskExecutionId, Classname.TASK_EXECUTION,
-                        taskFileStorage.storeContextValue(iterateeTaskExecutionId, Classname.TASK_EXECUTION, context));
+                contextService.push(
+                    iterateeTaskExecutionId, Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(iterateeTaskExecutionId, Classname.TASK_EXECUTION, context));
 
-                    contextService.push(
-                        taskExecutionId, i, Classname.TASK_EXECUTION,
-                        taskFileStorage.storeContextValue(taskExecutionId, i, Classname.TASK_EXECUTION, context));
-                    taskDispatcher.dispatch(iterateeTaskExecution);
-                }
-
-                counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
+                contextService.push(
+                    taskExecutionId, i, Classname.TASK_EXECUTION,
+                    taskFileStorage.storeContextValue(taskExecutionId, i, Classname.TASK_EXECUTION, context));
+                taskDispatcher.dispatch(iterateeTaskExecution);
             }
-        } catch (Exception e) {
-            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+            counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
         }
+
     }
 
     @Override
