@@ -23,7 +23,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context;
@@ -32,15 +32,18 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -82,11 +85,9 @@ public class ConditionTaskDispatcher extends ErrorHandlingTaskDispatcher impleme
         List<WorkflowTask> subWorkflowTasks;
 
         if (ConditionTaskUtils.resolveCase(taskExecution)) {
-            subWorkflowTasks = MapUtils.getList(
-                taskExecution.getParameters(), CASE_TRUE, WorkflowTask.class, Collections.emptyList());
+            subWorkflowTasks = getSubWorkflowTasks(taskExecution, CASE_TRUE);
         } else {
-            subWorkflowTasks = MapUtils.getList(
-                taskExecution.getParameters(), CASE_FALSE, WorkflowTask.class, Collections.emptyList());
+            subWorkflowTasks = getSubWorkflowTasks(taskExecution, CASE_FALSE);
         }
 
         if (!subWorkflowTasks.isEmpty()) {
@@ -122,6 +123,14 @@ public class ConditionTaskDispatcher extends ErrorHandlingTaskDispatcher impleme
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
 
+    }
+
+    private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution conditionTaskExecution, String caseTrue) {
+        return ((List<Map<String, ?>>) conditionTaskExecution.getParameters()
+            .get(caseTrue))
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
     }
 
     @Override

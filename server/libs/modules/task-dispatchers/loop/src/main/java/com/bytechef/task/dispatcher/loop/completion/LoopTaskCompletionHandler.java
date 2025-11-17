@@ -95,8 +95,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
-            loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) loopTaskExecution.getParameters()
+            .get(ITERATEE))
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
 
         Map<String, Object> parentContextValue = updateParentContextValue(taskExecution, loopTaskExecution);
 

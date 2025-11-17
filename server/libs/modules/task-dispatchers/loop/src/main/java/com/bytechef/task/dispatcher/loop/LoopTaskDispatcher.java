@@ -81,8 +81,11 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
     @Override
     public void doDispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
-            taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) taskExecution.getParameters()
+            .get(ITERATEE))
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         List<?> items = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
         taskExecution.setStartDate(Instant.now());

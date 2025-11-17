@@ -117,8 +117,11 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecutionParentId);
 
-        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
-            mapTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) mapTaskExecution.getParameters()
+            .get(ITERATEE))
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
 
         if (taskExecution.getTaskNumber() < iterateeWorkflowTasks.size()) {
             WorkflowTask iterationWorkflowTask = iterateeWorkflowTasks.get(taskExecution.getTaskNumber());
