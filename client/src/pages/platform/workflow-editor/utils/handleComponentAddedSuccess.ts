@@ -2,11 +2,14 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {NodeDataType} from '@/shared/types';
+import {ComponentType, NodeDataType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
 interface HandleComponentAddedSuccessProps {
-    nodeData: NodeDataType;
+    nodeData: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+        componentName?: string;
+        workflowNodeName?: string;
+    };
     queryClient: QueryClient;
     workflow: Workflow;
 }
@@ -33,12 +36,12 @@ export default function handleComponentAddedSuccess({
 
     if (useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
         if (currentNode?.trigger && nodeData.trigger) {
-            setCurrentNode({...currentNode, ...nodeData});
-            setCurrentComponent({...currentComponent, ...nodeData});
+            setCurrentNode({...currentNode, ...nodeData} as NodeDataType);
+            setCurrentComponent({...currentComponent, ...nodeData} as ComponentType);
         }
     } else if (!nodeData.clusterElements) {
-        setCurrentNode({...nodeData, description: ''});
-        setCurrentComponent({...nodeData, description: ''});
+        setCurrentNode({...nodeData, description: ''} as NodeDataType);
+        setCurrentComponent({...nodeData, description: ''} as ComponentType);
         setWorkflowNodeDetailsPanelOpen(true);
     }
 }
