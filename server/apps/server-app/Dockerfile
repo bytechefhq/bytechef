@@ -7,6 +7,7 @@ RUN mkdir ${ARG_APPLICATION_HOME}
 RUN mkdir ${ARG_APPLICATION_HOME}/server
 RUN mkdir ${ARG_APPLICATION_HOME}/server/tmp
 RUN mkdir ${ARG_APPLICATION_HOME}/server/logs
+RUN mkdir ${ARG_APPLICATION_HOME}/external_jars
 
 WORKDIR /opt/bytechef
 
@@ -18,6 +19,7 @@ ENTRYPOINT exec \
      -Djava.io.tmpdir=/opt/bytechef/server/tmp \
      -Dserver.tomcat.basedir=/opt/bytechef/server \
      -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs \
+     -Dloader.path=/opt/bytechef/external_jars \
      -jar server/server-app.jar
 
 FROM bytechef-server-base AS bytechef-server
