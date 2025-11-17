@@ -24,9 +24,9 @@ import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskExecutionErrorEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
@@ -84,6 +84,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
@@ -94,6 +96,8 @@ import org.springframework.data.domain.Page;
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
     private static final int NO_TIMEOUT = -1;
@@ -148,7 +152,7 @@ public class JobSyncExecutor {
         this.timeout = timeout;
         this.workflowService = workflowService;
 
-        syncMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, event -> {});
+        receive(memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, event -> {});
 
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
@@ -202,7 +206,7 @@ public class JobSyncExecutor {
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
             eventPublisher, jobService, taskDispatcherChain, taskExecutionService);
 
-        syncMessageBroker.receive(TaskCoordinatorMessageRoute.ERROR_EVENTS,
+        receive(memoryMessageBroker, TaskCoordinatorMessageRoute.ERROR_EVENTS,
             event -> taskExecutionErrorEventListener.onErrorEvent((ErrorEvent) event));
 
         JobExecutor jobExecutor = new JobExecutor(
