@@ -9,7 +9,8 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
-import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
+import {TASK_DISPATCHER_CONFIG, getTaskDispatcherTask} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
     rootClusterElementNodeData?: NodeDataType;
@@ -193,7 +194,10 @@ export default function handleDeleteTask({
             return parentForkJoinTask;
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
-        const mainRootClusterElementTask = workflowTasks.find((task) => task.name === rootClusterElementNodeData?.name);
+        const mainRootClusterElementTask = getTaskDispatcherTask({
+            taskDispatcherId: rootClusterElementNodeData.name,
+            tasks: workflowTasks,
+        });
 
         if (!mainRootClusterElementTask || !mainRootClusterElementTask.clusterElements) {
             return;
@@ -237,13 +241,23 @@ export default function handleDeleteTask({
             }
         }
 
-        updatedTasks = workflowTasks.map((task) => {
-            if (task.name !== mainRootClusterElementTask?.name) {
-                return task;
-            }
+        // Check if the task is at top level
+        const topLevelTaskIndex = workflowTasks.findIndex((task) => task.name === mainRootClusterElementTask.name);
 
-            return updatedRootClusterElementTask;
-        }) as Array<WorkflowTaskType>;
+        if (topLevelTaskIndex !== -1) {
+            updatedTasks = workflowTasks.map((task) => {
+                if (task.name !== mainRootClusterElementTask?.name) {
+                    return task;
+                }
+
+                return updatedRootClusterElementTask;
+            }) as Array<WorkflowTaskType>;
+        } else {
+            updatedTasks = getRecursivelyUpdatedTasks(
+                workflowTasks as Array<WorkflowTask>,
+                updatedRootClusterElementTask
+            ) as Array<WorkflowTaskType>;
+        }
     } else {
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }
