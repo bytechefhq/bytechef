@@ -26,7 +26,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Context;
@@ -35,18 +35,15 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -56,7 +53,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  * @author Igor Beslic
  */
-public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements TaskDispatcherResolver {
 
     private final ContextService contextService;
     private final Evaluator evaluator;
@@ -71,6 +68,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
+        super(eventPublisher);
+
         this.contextService = contextService;
         this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
@@ -80,7 +79,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    public void dispatch(TaskExecution taskExecution) {
+    public void doDispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
         List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
             taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
@@ -91,54 +90,49 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        try {
-            if (loopForever || !items.isEmpty()) {
-                TaskExecution subTaskExecution = TaskExecution.builder()
-                    .jobId(taskExecution.getJobId())
-                    .parentId(taskExecution.getId())
-                    .priority(taskExecution.getPriority())
-                    .taskNumber(0)
-                    .workflowTask(iterateeWorkflowTasks.getFirst())
-                    .build();
+        if (loopForever || !items.isEmpty()) {
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(taskExecution.getJobId())
+                .parentId(taskExecution.getId())
+                .priority(taskExecution.getPriority())
+                .taskNumber(0)
+                .workflowTask(iterateeWorkflowTasks.getFirst())
+                .build();
 
-                Map<String, Object> newContext = new HashMap<>(
-                    taskFileStorage.readContextValue(
-                        contextService.peek(
-                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
+            Map<String, Object> newContext = new HashMap<>(
+                taskFileStorage.readContextValue(
+                    contextService.peek(
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
-                Map<String, Object> workflowTaskNameMap = new HashMap<>();
+            Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
-                if (!items.isEmpty()) {
-                    workflowTaskNameMap.put(ITEM, items.getFirst());
-                }
-
-                workflowTaskNameMap.put(INDEX, 0);
-
-                WorkflowTask loopWorkflowTask = taskExecution.getWorkflowTask();
-
-                newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
-
-                subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext, evaluator));
-
-                contextService.push(
-                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    taskFileStorage.storeContextValue(
-                        Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                        newContext));
-
-                taskDispatcher.dispatch(subTaskExecution);
-            } else {
-                taskExecution.setStartDate(Instant.now());
-                taskExecution.setEndDate(Instant.now());
-                taskExecution.setExecutionTime(0);
-
-                eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
+            if (!items.isEmpty()) {
+                workflowTaskNameMap.put(ITEM, items.getFirst());
             }
-        } catch (Exception e) {
-            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+            workflowTaskNameMap.put(INDEX, 0);
+
+            WorkflowTask loopWorkflowTask = taskExecution.getWorkflowTask();
+
+            newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
+
+            subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext, evaluator));
+
+            contextService.push(
+                Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(
+                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    newContext));
+
+            taskDispatcher.dispatch(subTaskExecution);
+        } else {
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setExecutionTime(0);
+
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
+
     }
 
     @Override
