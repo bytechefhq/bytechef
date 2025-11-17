@@ -83,8 +83,11 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
     @Override
     public void doDispatch(TaskExecution taskExecution) {
         List<?> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
-        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
-            taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) taskExecution.getParameters()
+            .get(ITERATEE))
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
