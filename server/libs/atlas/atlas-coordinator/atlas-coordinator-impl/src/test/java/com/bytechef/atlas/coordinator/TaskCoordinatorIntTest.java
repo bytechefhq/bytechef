@@ -132,7 +132,8 @@ public class TaskCoordinatorIntTest {
             contextService, environment, evaluator, jobService, -1, SyncMessageBroker::new, List.of(),
             taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE, -1, workflowService);
 
-        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")));
+        return jobSyncExecutor.execute(
+            new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")), true);
     }
 
     @EnableAutoConfiguration

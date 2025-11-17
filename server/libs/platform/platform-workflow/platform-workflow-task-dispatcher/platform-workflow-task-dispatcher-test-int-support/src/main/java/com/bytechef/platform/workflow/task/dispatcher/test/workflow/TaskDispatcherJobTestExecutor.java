@@ -92,7 +92,7 @@ public class TaskDispatcherJobTestExecutor {
             taskExecutionService,
             taskHandlerMapSupplier.get()::get, taskFileStorage, -1, workflowService);
 
-        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
+        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
     }
 
     @FunctionalInterface

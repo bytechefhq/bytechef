@@ -75,7 +75,7 @@ public class JobTestExecutor {
     }
 
     public JobDTO execute(JobParametersDTO jobParametersDTO) {
-        Job job = jobSyncExecutor.execute(jobParametersDTO);
+        Job job = jobSyncExecutor.execute(jobParametersDTO, false);
 
         try {
             return new JobDTO(

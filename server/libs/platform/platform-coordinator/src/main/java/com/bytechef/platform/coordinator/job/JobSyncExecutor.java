@@ -274,16 +274,18 @@ public class JobSyncExecutor {
             event -> taskCoordinator.onStartJobEvent((StartJobEvent) event));
     }
 
-    public Job execute(JobParametersDTO jobParametersDTO) {
-        return execute(jobParametersDTO, jobFacade);
+    public Job execute(JobParametersDTO jobParametersDTO, boolean checkForError) {
+        return execute(jobParametersDTO, jobFacade, checkForError);
     }
 
-    public Job execute(JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction) {
+    public Job execute(
+        JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction, boolean checkForError) {
+
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
             taskFileStorage, workflowService);
 
-        return execute(jobParametersDTO, jobFacade);
+        return execute(jobParametersDTO, jobFacade, checkForError);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
@@ -296,7 +298,7 @@ public class JobSyncExecutor {
         };
     }
 
-    private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade) {
+    private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError) {
         Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
 
         long jobId = Validate.notNull(job.getId(), "id");
@@ -305,7 +307,9 @@ public class JobSyncExecutor {
 
         job = jobService.getJob(jobId);
 
-        checkForError(job);
+        if (checkForError) {
+            checkForError(job);
+        }
 
         return checkForWebhookResponse(job);
     }
