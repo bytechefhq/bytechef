@@ -78,7 +78,7 @@ public class ComponentJobTestExecutor {
             getTaskDispatcherPreSendProcessors(), taskExecutionService,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage, -1, workflowService);
 
-        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
+        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
     }
 
     private static List<TaskDispatcherPreSendProcessor> getTaskDispatcherPreSendProcessors() {

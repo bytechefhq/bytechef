@@ -86,7 +86,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
                     jobParameters -> principalJobFacade.createSyncJob(
-                        jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+                        jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
+                    true);
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
@@ -96,7 +97,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutput.value()),
                 jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
+                true);
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
