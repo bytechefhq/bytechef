@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.api.CloneCommand;
@@ -65,7 +67,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private static final Logger log = LoggerFactory.getLogger(JGitWorkflowOperations.class);
 
     private static final String LATEST = "latest";
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final ConcurrentHashMap<String, ReentrantLock> TENANT_LOCKS = new ConcurrentHashMap<>();
 
     private final String branch;
     private final List<String> extensions;
@@ -155,8 +157,9 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     @Override
     @SuppressFBWarnings("REC_CATCH_EXCEPTION")
     public String write(List<WorkflowResource> workflowResources, String commitMessage) {
+        ReentrantLock lock = getTenantLock();
         try {
-            LOCK.lock();
+            lock.lock();
 
             Repository repository = getRepository();
 
@@ -215,7 +218,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 throw new RuntimeException(e);
             }
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -271,8 +274,9 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     }
 
     private Repository getRepository() {
+        ReentrantLock lock = getTenantLock();
         try {
-            LOCK.lock();
+            lock.lock();
 
             clear();
 
@@ -295,7 +299,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 throw new RuntimeException(e);
             }
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -350,11 +354,17 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         Path path;
 
         try {
-            path = Files.createTempDirectory("jgit_");
+            String tenantKey = TenantCacheKeyUtils.getKey("git");
+            path = Files.createTempDirectory("jgit_" + tenantKey + "_");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         repositoryDir = path.toFile();
+    }
+
+    private ReentrantLock getTenantLock() {
+        String tenantKey = TenantCacheKeyUtils.getKey("git");
+        return TENANT_LOCKS.computeIfAbsent(tenantKey, k -> new ReentrantLock());
     }
 }
