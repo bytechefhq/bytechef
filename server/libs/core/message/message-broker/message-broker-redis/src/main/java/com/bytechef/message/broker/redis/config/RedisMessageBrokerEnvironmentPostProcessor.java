@@ -28,7 +28,7 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class RedisEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class RedisMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -38,6 +38,11 @@ public class RedisEnvironmentPostProcessor implements EnvironmentPostProcessor {
             source.put("management.health.redis.enabled", true);
         } else {
             source.put("management.health.redis.enabled", false);
+
+            source.put(
+                "spring.autoconfigure.exclude",
+                environment.getProperty("spring.autoconfigure.exclude") +
+                    ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Redis Config", source);
