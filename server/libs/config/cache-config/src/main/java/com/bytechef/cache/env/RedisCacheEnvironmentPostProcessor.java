@@ -34,7 +34,7 @@ public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProces
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
+        if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
             source.put("management.health.redis.enabled", true);
 
             source.computeIfPresent(

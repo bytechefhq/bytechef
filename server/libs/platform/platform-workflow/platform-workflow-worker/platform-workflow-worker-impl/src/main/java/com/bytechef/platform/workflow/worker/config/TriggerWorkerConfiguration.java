@@ -28,6 +28,7 @@ import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerProvi
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -45,13 +46,14 @@ public class TriggerWorkerConfiguration {
         Map<String, TriggerHandler> triggerHandlerMap,
         @Autowired(required = false) TriggerHandlerProvider triggerHandlerProvider) {
 
-        return type -> memoize(
+        Supplier<Map<String, TriggerHandler>> memoize = memoize(
             () -> MapUtils.concat(
                 triggerHandlerMap,
                 triggerHandlerProvider.getTriggerHandlerMap() == null
-                    ? Map.of() : triggerHandlerProvider.getTriggerHandlerMap()))
-                        .get()
-                        .get(type);
+                    ? Map.of() : triggerHandlerProvider.getTriggerHandlerMap()));
+
+        return type -> memoize.get()
+            .get(type);
     }
 
     @Bean
