@@ -19,6 +19,7 @@ package com.bytechef.task.dispatcher.loop;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -33,14 +34,17 @@ import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatch
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
+import com.bytechef.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -68,17 +72,22 @@ public class LoopTaskDispatcherIntTest {
     private TaskFileStorage taskFileStorage;
 
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
         testVarTaskHandler = new TestVarTaskHandler<>(
-            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
-                .add(value));
+            (valueMap, name, value) -> {
+                List<Object> list = valueMap.computeIfAbsent(name, k -> new ArrayList<>());
+
+                list.add(value);
+            });
+
+        TenantContext.setCurrentTenantId("test");
     }
 
     @Test
     public void testDispatch1() {
         assertNoTaskErrors(taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("loop_v1_1"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
+            EncodingUtils.base64EncodeToString("loop_v1_1"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
 
         Assertions.assertEquals(
             IntStream.rangeClosed(2, 11)
@@ -90,8 +99,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch2() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("loop_v1_2"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+            EncodingUtils.base64EncodeToString("loop_v1_2"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(1, 10)
@@ -106,9 +115,8 @@ public class LoopTaskDispatcherIntTest {
     public void testDispatch3() {
         assertNoTaskErrors(
             taskDispatcherJobTestExecutor.execute(
-                EncodingUtils.base64EncodeToString("loop_v1_3"),
-                this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
-                getTaskHandlerMap()));
+                EncodingUtils.base64EncodeToString("loop_v1_3"), this::getTaskCompletionHandlerFactories,
+                this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 13)
@@ -120,8 +128,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch4() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("loop_v1_4"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+            EncodingUtils.base64EncodeToString("loop_v1_4"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -133,8 +141,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch5() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("loop_v1_5"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+            EncodingUtils.base64EncodeToString("loop_v1_5"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -146,14 +154,64 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch6() {
         taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("loop_v1_6"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+            EncodingUtils.base64EncodeToString("loop_v1_6"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 8)
                 .boxed()
                 .collect(Collectors.toList()),
             testVarTaskHandler.get("sumVar2"));
+    }
+
+    @RepeatedTest(10)
+    void testLoopForeverCappedNoResidualStarted() {
+        // Use an existing workflow with loopForever=true and a condition that triggers loopBreak after index > 5
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_6"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertAllTasksTerminated(job);
+
+        TaskExecution parentTaskExecution = findParentLoopTask(Objects.requireNonNull(job.getId()));
+
+        Assertions.assertNotNull(parentTaskExecution.getEndDate(), "Loop parent must have endDate");
+
+        TaskExecution.Status status = parentTaskExecution.getStatus();
+
+        Assertions.assertTrue(status.isTerminated(), "Loop parent must be in a terminated state");
+    }
+
+    @RepeatedTest(10)
+    void testLoopEmptyItemsParentCompletesImmediately() {
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_empty"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertAllTasksTerminated(job);
+
+        TaskExecution parentTaskExecution = findParentLoopTask(Objects.requireNonNull(job.getId()));
+
+        Assertions.assertNotNull(parentTaskExecution.getEndDate(), "Loop parent must have endDate");
+
+        TaskExecution.Status status = parentTaskExecution.getStatus();
+
+        Assertions.assertTrue(status.isTerminated());
+    }
+
+    @RepeatedTest(10)
+    void testLoopOverSmallItemsNoResidualStarted() {
+        Job job = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("loop_v1_1"), this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+
+        assertAllTasksTerminated(job);
+
+        // Parent loop should be COMPLETED with endDate
+        TaskExecution parent = findParentLoopTask(Objects.requireNonNull(job.getId()));
+
+        Assertions.assertNotNull(parent.getEndDate(), "Loop parent must have endDate");
+        Assertions.assertEquals(TaskExecution.Status.COMPLETED, parent.getStatus());
     }
 
     private void assertNoTaskErrors(Job job) {
@@ -169,20 +227,40 @@ public class LoopTaskDispatcherIntTest {
         if (!executionErrors.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
 
-            executionErrors
-                .forEach(executionError -> {
-                    stringBuilder.append(executionError.getMessage());
-                    stringBuilder.append(System.lineSeparator());
+            executionErrors.forEach(executionError -> {
+                stringBuilder.append(executionError.getMessage());
+                stringBuilder.append(System.lineSeparator());
 
-                    executionError.getStackTrace()
-                        .forEach(s -> {
-                            stringBuilder.append(s);
-                            stringBuilder.append(System.lineSeparator());
-                        });
-                });
+                executionError.getStackTrace()
+                    .forEach(s -> {
+                        stringBuilder.append(s);
+                        stringBuilder.append(System.lineSeparator());
+                    });
+            });
 
             Assertions.fail(stringBuilder.toString());
         }
+    }
+
+    private void assertAllTasksTerminated(Job job) {
+        Long jobId = Objects.requireNonNull(job.getId(), "job id");
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+        for (TaskExecution taskExecution : taskExecutions) {
+            TaskExecution.Status status = taskExecution.getStatus();
+
+            Assertions.assertTrue(status == null || status.isTerminated(),
+                () -> "TaskExecution " + taskExecution.getId() + " not terminated: " + status);
+        }
+    }
+
+    private TaskExecution findParentLoopTask(long jobId) {
+        return taskExecutionService.getJobTaskExecutions(jobId)
+            .stream()
+            .filter(te -> te.getParentId() == null)
+            .filter(te -> "loop/v1".equals(te.getType()))
+            .findFirst()
+            .orElseThrow();
     }
 
     @SuppressWarnings("PMD")

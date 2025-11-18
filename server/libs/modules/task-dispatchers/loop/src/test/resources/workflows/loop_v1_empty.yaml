@@ -1,0 +1,12 @@
+---
+label: "Loop Empty"
+tasks:
+- name: "loop_empty"
+  type: "loop/v1"
+  parameters:
+    items: []
+    iteratee:
+    - name: "noop"
+      type: "var/v1/set"
+      parameters:
+        value: "=null"

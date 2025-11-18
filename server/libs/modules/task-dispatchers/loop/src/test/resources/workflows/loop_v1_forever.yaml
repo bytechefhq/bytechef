@@ -1,0 +1,12 @@
+---
+label: "Loop Forever (capped in tests)"
+tasks:
+- name: "loop_forever"
+  type: "loop/v1"
+  parameters:
+    loopForever: true
+    iteratee:
+    - name: "noop"
+      type: "var/v1/set"
+      parameters:
+        value: "=loop_forever.index"
