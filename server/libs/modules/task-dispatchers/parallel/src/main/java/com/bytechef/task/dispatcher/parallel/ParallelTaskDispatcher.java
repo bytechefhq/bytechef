@@ -89,6 +89,11 @@ public class ParallelTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         } else {
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setStatus(TaskExecution.Status.STARTED);
+
+            taskExecution = taskExecutionService.update(taskExecution);
+
             counterService.set(Validate.notNull(taskExecution.getId(), "id"), workflowTasks.size());
 
             for (WorkflowTask workflowTask : workflowTasks) {

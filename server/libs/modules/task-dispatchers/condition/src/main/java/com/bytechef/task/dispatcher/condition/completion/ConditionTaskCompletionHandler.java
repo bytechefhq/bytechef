@@ -146,6 +146,8 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
         else {
             conditionTaskExecution.setEndDate(Instant.now());
 
+            conditionTaskExecution = taskExecutionService.update(conditionTaskExecution);
+
             taskCompletionHandler.handle(conditionTaskExecution);
         }
     }

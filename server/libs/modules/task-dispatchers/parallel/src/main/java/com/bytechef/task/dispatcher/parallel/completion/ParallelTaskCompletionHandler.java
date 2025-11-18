@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -78,7 +79,13 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
         long tasksLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (tasksLeft == 0) {
-            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            TaskExecution parallelTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+
+            parallelTaskExecution.setEndDate(Instant.now());
+
+            parallelTaskExecution = taskExecutionService.update(parallelTaskExecution);
+
+            taskCompletionHandler.handle(parallelTaskExecution);
             counterService.delete(taskExecution.getParentId());
         }
     }
