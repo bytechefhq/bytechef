@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.platform.mail.config.MailEnvironmentPostProcessor
+com.bytechef.platform.mail.env.MailEnvironmentPostProcessor

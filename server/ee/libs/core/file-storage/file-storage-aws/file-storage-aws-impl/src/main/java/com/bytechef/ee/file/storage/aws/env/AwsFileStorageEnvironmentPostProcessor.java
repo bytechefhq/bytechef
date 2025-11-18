@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.cache.config;
+package com.bytechef.ee.file.storage.aws.env;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,26 +28,18 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
-            source.put("management.health.redis.enabled", true);
-        } else {
-            source.put("management.health.redis.enabled", false);
-
-            if (!source.containsValue("org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration")) {
-                source.put(
-                    "spring.autoconfigure.exclude",
-                    environment.getProperty("spring.autoconfigure.exclude") +
-                        ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
-            }
+        if (Objects.equals(environment.getProperty("bytechef.file.storage.provider", String.class), "aws")) {
+            source.put("spring.cloud.aws.s3.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Redis Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource(
+            "Custom Spring Cloud AWS S3 File Storage Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

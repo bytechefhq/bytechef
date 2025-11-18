@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.ee.message.broker.aws.config.AwsMessageBrokerEnvironmentPostProcessor
+com.bytechef.ee.message.broker.aws.env.AwsMessageBrokerEnvironmentPostProcessor

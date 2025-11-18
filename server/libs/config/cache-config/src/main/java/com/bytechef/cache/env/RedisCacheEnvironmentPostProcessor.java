@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.message.broker.aws.config;
+package com.bytechef.cache.env;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,17 +28,26 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "aws")) {
-            source.put("spring.cloud.aws.sqs.enabled", true);
+        if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
+            source.put("management.health.redis.enabled", true);
+        } else {
+            source.put("management.health.redis.enabled", false);
+
+            if (!source.containsValue("org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration")) {
+                source.put(
+                    "spring.autoconfigure.exclude",
+                    environment.getProperty("spring.autoconfigure.exclude") +
+                        ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
+            }
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management AWS SQS Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Cache Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

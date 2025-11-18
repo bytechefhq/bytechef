@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.redis.config;
+package com.bytechef.message.broker.redis.env;
 
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerRedis;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;

@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.ee.file.storage.aws.config.AwsFileStorageEnvironmentPostProcessor
+com.bytechef.ee.file.storage.aws.env.AwsFileStorageEnvironmentPostProcessor

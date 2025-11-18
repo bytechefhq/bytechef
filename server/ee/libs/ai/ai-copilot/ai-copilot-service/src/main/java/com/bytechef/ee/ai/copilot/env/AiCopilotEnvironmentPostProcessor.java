@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.copilot.config;
+package com.bytechef.ee.ai.copilot.env;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class AiCopilotEnvironmentPostProcessor implements EnvironmentPostProcess
             source.put("spring.ai.vectorstore.type", "pgvector");
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom AI Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom AI Copilot Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
