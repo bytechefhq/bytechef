@@ -16,14 +16,60 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import org.junit.jupiter.api.Disabled;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * @author Ivica Cardic
+ */
+@TaskDispatcherIntTest
 public class ParallelTaskDispatcherIntTest {
 
-    @Disabled
+    private TestVarTaskHandler<Object, Object> testVarTaskHandler;
+
+    @Autowired
+    protected ContextService contextService;
+
+    @Autowired
+    protected TaskExecutionService taskExecutionService;
+
+    @Autowired
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
+
+    @Autowired
+    private TaskFileStorage taskFileStorage;
+
+    @BeforeEach
+    void beforeEach() {
+        testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
+    }
+
     @Test
     public void testDispatch() {
-        // TODO
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("parallel_v1_1"),
+            (counterService, taskExecutionService) -> List.of(
+                (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(
+                    counterService, taskCompletionHandler, taskExecutionService)),
+            (eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                (taskDispatcher) -> new ParallelTaskDispatcher(
+                    contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
+                    taskFileStorage)),
+            () -> Map.of("var/v1/set", testVarTaskHandler));
+
+        Assertions.assertEquals(42, testVarTaskHandler.get("sumVar1"));
+        Assertions.assertEquals(73, testVarTaskHandler.get("sumVar2"));
     }
 }
