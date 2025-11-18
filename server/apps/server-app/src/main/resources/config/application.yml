@@ -94,9 +94,10 @@ management:
   prometheus:
     metrics:
       export:
-        enabled: true
+        enabled: ${bytechef.observability.enabled}
         step: 60
   tracing:
+    enabled: ${bytechef.observability.enabled}
     sampling:
       probability: 1.0
   otlp:
