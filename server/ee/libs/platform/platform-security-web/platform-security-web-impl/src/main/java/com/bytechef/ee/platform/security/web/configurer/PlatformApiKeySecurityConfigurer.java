@@ -48,7 +48,7 @@ public class PlatformApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
 
         @Override
         protected Authentication doConvert(int environment, String authToken, String tenantId) {
-            return new PlatformApiKeyAuthenticationToken(authToken, tenantId);
+            return new PlatformApiKeyAuthenticationToken(environment, authToken, tenantId);
         }
     }
 }
