@@ -29,6 +29,7 @@ import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -51,7 +53,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepository.class);
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final ConcurrentHashMap<String, ReentrantLock> TENANT_LOCKS = new ConcurrentHashMap<>();
 
     private final GitWorkflowOperations gitWorkflowOperations;
 
@@ -78,8 +80,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     @Override
     public List<Workflow> findAll() {
+        ReentrantLock lock = getTenantLock();
         try {
-            LOCK.lock();
+            lock.lock();
 
             HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
 
@@ -89,13 +92,14 @@ public class GitWorkflowRepository implements WorkflowRepository {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
     public GitWorkflows findAllWithGitInfo() {
+        ReentrantLock lock = getTenantLock();
         try {
-            LOCK.lock();
+            lock.lock();
 
             HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
 
@@ -107,14 +111,15 @@ public class GitWorkflowRepository implements WorkflowRepository {
                     .collect(Collectors.toList()),
                 headFiles.gitInfo());
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public Optional<Workflow> findById(String id) {
+        ReentrantLock lock = getTenantLock();
         try {
-            LOCK.lock();
+            lock.lock();
 
             Workflow workflow = null;
 
@@ -130,7 +135,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
             return Optional.ofNullable(workflow);
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -198,6 +203,11 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private static String encode(String id) {
         return EncodingUtils.base64EncodeToString(id);
+    }
+
+    private ReentrantLock getTenantLock() {
+        String tenantKey = TenantCacheKeyUtils.getKey("git-workflow");
+        return TENANT_LOCKS.computeIfAbsent(tenantKey, k -> new ReentrantLock());
     }
 
     @SuppressFBWarnings("EI")
