@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Value;
@@ -58,11 +59,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
-    private final ApplicationContext applicationContext;
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
-    private static final Engine engine = Engine
-        .newBuilder()
-        .build();
+    private static Engine engine;
+
+    private final ApplicationContext applicationContext;
 
     public PolyglotEngine(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -223,8 +224,25 @@ public class PolyglotEngine {
 
     private static Context getContext() {
         return Context.newBuilder()
-            .engine(engine)
+            .engine(getEngine())
             .build();
+    }
+
+    private static Engine getEngine() {
+        if (engine == null) {
+            LOCK.lock();
+
+            try {
+                if (engine == null) {
+                    engine = Engine.newBuilder()
+                        .build();
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+
+        return engine;
     }
 
     @SuppressWarnings("unchecked")
