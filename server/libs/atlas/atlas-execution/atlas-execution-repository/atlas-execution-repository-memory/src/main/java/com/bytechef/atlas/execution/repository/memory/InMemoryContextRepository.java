@@ -27,6 +27,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -37,8 +38,8 @@ import org.springframework.cache.CacheManager;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
     private static final String CACHE = InMemoryContextRepository.class.getName() + ".context";
+    private static final ConcurrentHashMap<String, ReentrantLock> LOCKS = new ConcurrentHashMap<>();
 
     private final CacheManager cacheManager;
 
@@ -66,8 +67,10 @@ public class InMemoryContextRepository implements ContextRepository {
     public Context save(Context context) {
         String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
 
+        ReentrantLock lock = LOCKS.computeIfAbsent(key, k -> new ReentrantLock());
+
         try {
-            LOCK.lock();
+            lock.lock();
 
             Deque<FileEntry> stack = getStack(key);
 
@@ -81,7 +84,11 @@ public class InMemoryContextRepository implements ContextRepository {
 
             cache.put(key, stack);
         } finally {
-            LOCK.unlock();
+            lock.unlock();
+
+            if (!lock.isLocked() && !lock.hasQueuedThreads()) {
+                LOCKS.remove(key, lock);
+            }
         }
 
         return context;
