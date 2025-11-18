@@ -12,7 +12,7 @@ pmd = "7.17.0"
 spotbugs = "4.9.8"
 spring-ai = "1.1.0"
 spring-boot = "3.5.7"
-spring-cloud-aws = "3.4.0"
+spring-cloud-aws = "3.4.1"
 spring-cloud-dependencies = "2025.0.0"
 spring-shell = "3.4.1"
 
