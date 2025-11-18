@@ -30,8 +30,13 @@
             <message>
                 <pattern>${FILE_LOG_PATTERN}</pattern>
             </message>
-            <sortByTime>true</sortByTime>
         </format>
+    </appender>
+
+    <appender name="ASYNC-LOKI" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>1024</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="LOKI"/>
     </appender>
 
     <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
@@ -84,7 +89,7 @@
 
     <root level="${log.level}">
         <appender-ref ref="CONSOLE" />
-        <appender-ref ref="LOKI" />
+        <appender-ref ref="ASYNC-LOKI" />
     </root>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
