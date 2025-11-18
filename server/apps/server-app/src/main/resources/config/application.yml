@@ -153,6 +153,8 @@ spring:
         enabled: false
       secretsmanager:
         enabled: false
+      sqs:
+        enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}
