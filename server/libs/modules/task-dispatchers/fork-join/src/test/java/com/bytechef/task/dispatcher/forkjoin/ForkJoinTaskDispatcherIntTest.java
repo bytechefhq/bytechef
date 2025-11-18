@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -38,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @TaskDispatcherIntTest
 public class ForkJoinTaskDispatcherIntTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
@@ -65,12 +68,12 @@ public class ForkJoinTaskDispatcherIntTest {
             (
                 counterService, taskExecutionService) -> List.of(
                     (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-                        contextService, counterService, SpelEvaluator.create(), taskExecutionService,
+                        contextService, counterService, EVALUATOR, taskExecutionService,
                         taskCompletionHandler, taskDispatcher, taskFileStorage)),
             (
                 eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                        contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                         taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
 

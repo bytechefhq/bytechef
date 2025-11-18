@@ -18,6 +18,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -40,6 +41,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -55,6 +57,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Arik Cohen
  */
 public class EachTaskDispatcherTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final ContextService contextService = mock(ContextService.class);
@@ -73,15 +77,16 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testEachTaskDispatcherWhenMissingRequiredParameter() {
+        assertThrows(NullPointerException.class, () -> {
+            EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                taskExecutionService, taskFileStorage);
 
-        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
-            taskExecutionService, taskFileStorage);
-
-        dispatcher.dispatch(TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
-            .build());
-        verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionErrorEvent.class));
+            dispatcher.dispatch(TaskExecution.builder()
+                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+                .build());
+            verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionErrorEvent.class));
+        });
     }
 
     @Test
@@ -94,7 +99,7 @@ public class EachTaskDispatcherTest {
                 .build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+            contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
             taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -123,7 +128,7 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+            contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
             taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(
