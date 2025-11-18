@@ -55,19 +55,6 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     }
 
     @Override
-    @CrossOrigin
-    public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
-            externalUserId, id, workflowUuid);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
     public ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid) {
 
@@ -78,9 +65,17 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
             .build();
     }
 
-    @InitBinder
-    public void initBinder(WebDataBinder dataBinder) {
-        dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    @Override
+    @CrossOrigin
+    public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+        connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            externalUserId, id, workflowUuid);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
@@ -122,5 +117,10 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder dataBinder) {
+        dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 }
