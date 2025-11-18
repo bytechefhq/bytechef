@@ -149,6 +149,8 @@ spring:
     type: ${bytechef.cache.provider}
   cloud:
     aws:
+      s3:
+        enabled: false
       secretsmanager:
         enabled: false
   datasource:
