@@ -719,20 +719,8 @@ export const getRouter = (queryClient: QueryClient) =>
                                         {
                                             index: true,
                                             loader: async () => {
-                                                return redirect('api-keys');
+                                                return redirect('signing-keys');
                                             },
-                                        },
-                                        {
-                                            element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                                                    <EEVersion>
-                                                        <LazyLoadWrapper>
-                                                            <EmbeddedApiKeys />
-                                                        </LazyLoadWrapper>
-                                                    </EEVersion>
-                                                </PrivateRoute>
-                                            ),
-                                            path: 'api-keys',
                                         },
                                         {
                                             element: (
@@ -746,18 +734,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'signing-keys',
                                         },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedApiKeys />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-keys',
+                                        },
                                         ...platformSettingsRoutes.children,
                                     ],
                                     element: (
                                         <Settings
                                             sidebarNavItems={[
                                                 {
-                                                    href: '/embedded/settings/api-keys',
-                                                    title: 'API Keys',
-                                                },
-                                                {
                                                     href: '/embedded/settings/signing-keys',
                                                     title: 'Signing Keys',
+                                                },
+                                                {
+                                                    href: '/embedded/settings/api-keys',
+                                                    title: 'API Keys',
                                                 },
                                                 ...platformSettingsRoutes.navItems,
                                             ]}
