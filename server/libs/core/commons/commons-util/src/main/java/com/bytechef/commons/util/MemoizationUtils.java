@@ -27,7 +27,7 @@ public class MemoizationUtils {
 
     public static <T> Supplier<T> memoize(Supplier<T> supplier) {
         return new Supplier<>() {
-            private static final Lock LOCK = new ReentrantLock();
+            private final Lock lock = new ReentrantLock();
 
             private volatile T value;
 
@@ -36,7 +36,7 @@ public class MemoizationUtils {
                 T result = value;
 
                 if (result == null) {
-                    LOCK.lock();
+                    lock.lock();
 
                     try {
                         if (value == null) {
@@ -45,7 +45,7 @@ public class MemoizationUtils {
 
                         result = value;
                     } finally {
-                        LOCK.unlock();
+                        lock.unlock();
                     }
                 }
 

@@ -40,10 +40,9 @@ public class JmsMessageBrokerEnvironmentPostProcessor implements EnvironmentPost
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
                     environment.getProperty("spring.autoconfigure.exclude"),
-                    """
-                        ,org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
-                        ,org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration
-                        """));
+                    StringUtils.join(
+                        ",org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration",
+                        ",org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration")));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom JMS Message Broker Config", source);
