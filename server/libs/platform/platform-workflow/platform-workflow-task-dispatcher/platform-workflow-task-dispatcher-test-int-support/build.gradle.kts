@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-coordinator"))
     implementation(project(":server:libs:test:test-int-support"))
