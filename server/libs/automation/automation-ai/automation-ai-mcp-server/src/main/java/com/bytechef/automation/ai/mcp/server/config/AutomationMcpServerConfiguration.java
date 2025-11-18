@@ -39,7 +39,7 @@ public class AutomationMcpServerConfiguration {
     @Bean
     WebMvcStreamableServerTransportProvider automationWebMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
-            .mcpEndpoint("/api/automation/{tenantKey}/mcp")
+            .mcpEndpoint("/api/automation/{secretKey}/mcp")
             .build();
     }
 

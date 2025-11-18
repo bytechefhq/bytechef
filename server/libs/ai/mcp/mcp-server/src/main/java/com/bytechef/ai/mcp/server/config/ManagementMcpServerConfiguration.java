@@ -70,7 +70,7 @@ public class ManagementMcpServerConfiguration {
     @Bean
     WebMvcStreamableServerTransportProvider webMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
-            .mcpEndpoint("/api/management/{tenantKey}/mcp")
+            .mcpEndpoint("/api/management/{secretKey}/mcp")
             .build();
     }
 
