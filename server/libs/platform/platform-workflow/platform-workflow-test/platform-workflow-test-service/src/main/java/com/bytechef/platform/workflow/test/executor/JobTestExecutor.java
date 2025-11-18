@@ -99,6 +99,8 @@ public class JobTestExecutor {
                             workflowTask.evaluateParameters(context, evaluator), output);
                     }));
         } finally {
+            taskExecutionService.deleteJobTaskExecutions(Validate.notNull(job.getId(), "id"));
+
             jobService.deleteJob(Validate.notNull(job.getId(), "id"));
         }
     }
