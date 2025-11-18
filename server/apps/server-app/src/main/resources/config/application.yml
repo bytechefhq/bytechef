@@ -207,6 +207,7 @@ spring:
     noninteractive:
       enabled: false
   quartz:
+    auto-startup: false
     job-store-type: jdbc
     jdbc:
       initialize-schema: never

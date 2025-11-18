@@ -20,21 +20,28 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
+@EnableConfigurationProperties(QuartzProperties.class)
 @ConditionalOnProperty(
     prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
 public class QuartzTriggerSchedulerConfiguration {
@@ -45,13 +52,17 @@ public class QuartzTriggerSchedulerConfiguration {
     }
 
     @Bean
-    TriggerScheduler quartzTriggerScheduler(ApplicationProperties applicationProperties, Scheduler scheduler) {
-        return new QuartzTriggerScheduler(
-            applicationProperties
-                .getCoordinator()
-                .getTrigger()
-                .getPolling(),
-            scheduler);
+    TriggerScheduler quartzTriggerScheduler(ApplicationProperties applicationProperties, @Lazy Scheduler scheduler) {
+        ApplicationProperties.Coordinator.Trigger.Polling polling = applicationProperties.getCoordinator()
+            .getTrigger()
+            .getPolling();
+
+        return new QuartzTriggerScheduler(polling, scheduler);
+    }
+
+    @Bean
+    QuartzDelayer quartzDelayer(@Lazy Scheduler scheduler) {
+        return new QuartzDelayer(scheduler);
     }
 
     private static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
@@ -71,6 +82,14 @@ public class QuartzTriggerSchedulerConfiguration {
             beanFactory.autowireBean(job);
 
             return job;
+        }
+    }
+
+    private record QuartzDelayer(Scheduler scheduler) {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void startLater() throws SchedulerException {
+            scheduler.start();
         }
     }
 }
