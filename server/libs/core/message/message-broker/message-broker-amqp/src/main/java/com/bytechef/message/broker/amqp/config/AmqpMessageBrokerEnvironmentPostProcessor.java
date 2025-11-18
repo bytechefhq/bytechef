@@ -28,7 +28,7 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AmqpEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class AmqpMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -38,9 +38,14 @@ public class AmqpEnvironmentPostProcessor implements EnvironmentPostProcessor {
             source.put("management.health.rabbit.enabled", true);
         } else {
             source.put("management.health.rabbit.enabled", false);
+
+            source.put(
+                "spring.autoconfigure.exclude",
+                environment.getProperty("spring.autoconfigure.exclude") +
+                    ",org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration");
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Rabbit Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Rabbit Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
