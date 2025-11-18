@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -38,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @TaskDispatcherIntTest
 public class EachTaskDispatcherIntTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private TestVarTaskHandler<List<String>, String> testVarTaskHandler;
 
@@ -64,7 +67,7 @@ public class EachTaskDispatcherIntTest {
             (
                 eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
-                        contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                        contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                         taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
 

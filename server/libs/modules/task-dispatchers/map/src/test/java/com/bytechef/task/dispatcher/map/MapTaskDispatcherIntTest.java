@@ -24,6 +24,7 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -47,6 +48,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 @TaskDispatcherIntTest
 public class MapTaskDispatcherIntTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
 
@@ -119,10 +122,10 @@ public class MapTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(
-                contextService, counterService, SpelEvaluator.create(), taskDispatcher, taskCompletionHandler,
+                contextService, counterService, EVALUATOR, taskDispatcher, taskCompletionHandler,
                 taskExecutionService, taskFileStorage));
     }
 
@@ -133,10 +136,10 @@ public class MapTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new MapTaskDispatcher(
-                contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
                 taskExecutionService, taskFileStorage));
     }
 

@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -49,6 +50,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 @TaskDispatcherIntTest
 public class LoopTaskDispatcherIntTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
 
@@ -188,10 +191,10 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 
@@ -202,11 +205,11 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 

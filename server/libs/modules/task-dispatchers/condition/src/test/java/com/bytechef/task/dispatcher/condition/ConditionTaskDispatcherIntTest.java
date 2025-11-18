@@ -24,6 +24,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -44,6 +45,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 @TaskDispatcherIntTest
 public class ConditionTaskDispatcherIntTest {
+
+    private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
@@ -166,7 +169,7 @@ public class ConditionTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, SpelEvaluator.create(), taskCompletionHandler, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 
@@ -177,7 +180,7 @@ public class ConditionTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, SpelEvaluator.create(), eventPublisher, taskDispatcher, taskExecutionService,
+                contextService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 
