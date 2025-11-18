@@ -7,4 +7,9 @@ dependencies {
     implementation("org.springframework:spring-core")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    // Tests
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.springframework:spring-test")
 }
