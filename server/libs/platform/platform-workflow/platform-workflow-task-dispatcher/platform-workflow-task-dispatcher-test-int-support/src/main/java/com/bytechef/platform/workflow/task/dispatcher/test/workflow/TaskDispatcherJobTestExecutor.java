@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.test.workflow;
 
+import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -87,12 +89,23 @@ public class TaskDispatcherJobTestExecutor {
             contextService, environment, SpelEvaluator.create(), jobService, -1, () -> syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
-                event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-                contextService, counterService, taskExecutionService),
+                createEventPublisher(syncMessageBroker), contextService, counterService, taskExecutionService),
             taskExecutionService,
             taskHandlerMapSupplier.get()::get, taskFileStorage, -1, workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
+    }
+
+    private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker messageBroker) {
+        return event -> {
+            MessageEvent<?> messageEvent = (MessageEvent<?>) event;
+
+            if (messageEvent.getMetadata(CURRENT_TENANT_ID) == null) {
+                messageEvent.putMetadata(CURRENT_TENANT_ID, "test");
+            }
+
+            messageBroker.send(messageEvent.getRoute(), messageEvent);
+        };
     }
 
     @FunctionalInterface
