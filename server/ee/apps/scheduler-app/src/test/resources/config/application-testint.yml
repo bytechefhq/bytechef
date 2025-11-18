@@ -4,4 +4,4 @@ server:
 bytechef:
   edition: EE
   message-broker:
-    provider: jms
+    provider: memory

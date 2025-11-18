@@ -4,7 +4,7 @@ server:
 bytechef:
   edition: EE
   message-broker:
-    provider: jms
+    provider: memory
   file-storage:
     provider: jdbc
   oauth2:
