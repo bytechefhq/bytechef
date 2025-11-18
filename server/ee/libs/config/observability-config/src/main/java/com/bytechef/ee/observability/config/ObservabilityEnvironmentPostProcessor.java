@@ -36,10 +36,14 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
         if (!environment.getProperty("bytechef.observability.enabled", Boolean.class, false)) {
             source.put(
                 "spring.autoconfigure.exclude",
-                environment.getProperty("spring.autoconfigure.exclude") +
-                    ",org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus." +
-                    "PrometheusMetricsExportAutoConfiguration" +
-                    ",org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration");
+                environment.getProperty("spring.autoconfigure.exclude")
+                    + """
+                        ,org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
+                        ,org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
+                        """);
 
             source.put("bytechef.observability.loki.appender.level", "OFF");
         }
