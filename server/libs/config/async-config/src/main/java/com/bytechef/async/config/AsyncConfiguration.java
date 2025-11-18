@@ -19,8 +19,6 @@ package com.bytechef.async.config;
 import com.bytechef.tenant.concurrent.TenantThreadPoolTaskExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.Executor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -44,8 +43,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableScheduling
 public class AsyncConfiguration implements AsyncConfigurer {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
-
     private final Environment environment;
     private final TaskExecutionProperties taskExecutionProperties;
 
@@ -58,8 +55,6 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Override
     @Bean(name = "taskExecutor")
     public Executor getAsyncExecutor() {
-        log.debug("Creating Async Task Executor");
-
         TenantThreadPoolTaskExecutor executor = new TenantThreadPoolTaskExecutor();
 
         TaskExecutionProperties.Pool pool = taskExecutionProperties.getPool();
@@ -83,7 +78,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         return new WebMvcConfigurer() {
 
             @Override
-            public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+            public void configureAsyncSupport(@NonNull AsyncSupportConfigurer configurer) {
                 configurer.setTaskExecutor((AsyncTaskExecutor) executor);
             }
         };
