@@ -70,18 +70,6 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
-    @CrossOrigin
-    public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
     public ResponseEntity<Long> createIntegrationInstance(
         String externalUserId, Long id,
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
@@ -96,6 +84,18 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
             externalUserId, id, parameters, getEnvironment(xEnvironment));
 
         return ResponseEntity.ok(integrationInstance.getId());
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

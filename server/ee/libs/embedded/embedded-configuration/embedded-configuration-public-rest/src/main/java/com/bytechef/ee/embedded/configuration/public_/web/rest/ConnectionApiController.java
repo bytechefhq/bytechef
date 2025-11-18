@@ -55,11 +55,8 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<List<ConnectionModel>> getFrontendConnections(
-        String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
-
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+    public ResponseEntity<List<ConnectionModel>> getConnections(
+        String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
 
         Environment environment = getEnvironment(xEnvironment);
 
@@ -76,8 +73,11 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<List<ConnectionModel>> getConnections(
-        String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
+    public ResponseEntity<List<ConnectionModel>> getFrontendConnections(
+        String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
+
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         Environment environment = getEnvironment(xEnvironment);
 

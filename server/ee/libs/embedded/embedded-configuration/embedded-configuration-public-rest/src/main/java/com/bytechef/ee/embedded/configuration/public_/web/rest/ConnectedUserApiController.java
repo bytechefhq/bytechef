@@ -42,16 +42,6 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateConnectedUser(
-        String externalUserId, EnvironmentModel xEnvironment, Map<String, Object> requestBody) {
-
-        connectedUserService.updateConnectedUser(externalUserId, getEnvironment(xEnvironment), requestBody);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
     public ResponseEntity<Void> updateFrontendConnectedUser(
         EnvironmentModel xEnvironment, Map<String, Object> requestBody) {
 
@@ -60,6 +50,16 @@ public class ConnectedUserApiController implements ConnectedUserApi {
 
         connectedUserService.updateConnectedUser(
             externalUserId, getEnvironment(xEnvironment), requestBody);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateConnectedUser(
+        String externalUserId, EnvironmentModel xEnvironment, Map<String, Object> requestBody) {
+
+        connectedUserService.updateConnectedUser(externalUserId, getEnvironment(xEnvironment), requestBody);
 
         return ResponseEntity.noContent()
             .build();

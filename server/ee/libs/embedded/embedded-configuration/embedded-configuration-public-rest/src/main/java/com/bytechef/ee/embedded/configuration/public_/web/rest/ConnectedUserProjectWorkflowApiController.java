@@ -72,6 +72,17 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
+    public ResponseEntity<String> createProjectWorkflow(
+        String externalUserId, CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.createProjectWorkflow(
+                externalUserId,
+                createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment)));
+    }
+
+    @Override
     @CrossOrigin
     public ResponseEntity<Void> deleteFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
@@ -79,6 +90,17 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         connectedUserProjectFacade.deleteProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
             getEnvironment(xEnvironment));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.deleteProjectWorkflow(
+            externalUserId, workflowUuid, getEnvironment(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -97,9 +119,33 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
+    public ResponseEntity<Void> disableProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.enableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
+            (long) getEnvironment(xEnvironment).ordinal());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     @CrossOrigin
     public ResponseEntity<Void> enableFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.enableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
+            (long) getEnvironment(xEnvironment).ordinal());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> enableProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
         connectedUserProjectFacade.enableProjectWorkflow(
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
@@ -138,6 +184,57 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     }
 
     @Override
+    public ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflow(
+                    externalUserId, workflowUuid, (long) getEnvironment(xEnvironment).ordinal()),
+                ConnectedUserProjectWorkflowModel.class));
+    }
+
+    @Override
+    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getProjectWorkflows(
+        String externalUserId, EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
+                .toList());
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<Void> publishFrontendProjectWorkflow(
+        String workflowUuid,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.publishProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
+            publishFrontendProjectWorkflowRequestModel.getDescription(), (long) getEnvironment(xEnvironment).ordinal());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> publishProjectWorkflow(
+        String externalUserId, String workflowUuid,
+        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
+        EnvironmentModel xEnvironment) {
+
+        connectedUserProjectFacade.publishProjectWorkflow(
+            externalUserId, workflowUuid,
+            publishFrontendProjectWorkflowRequestModel.getDescription(), (long) getEnvironment(xEnvironment).ordinal());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     @CrossOrigin
     public ResponseEntity<Void> updateFrontendProjectWorkflow(
         String workflowUuid,
@@ -167,103 +264,6 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
             externalUserId, workflowUuid, workflowNodeName, componentName,
             Objects.requireNonNull(updateFrontendWorkflowConfigurationConnectionRequestModel.getConnectionId()),
             environment);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    @CrossOrigin
-    public ResponseEntity<Void> publishFrontendProjectWorkflow(
-        String workflowUuid,
-        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
-        EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.publishProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
-            publishFrontendProjectWorkflowRequestModel.getDescription(), (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    public ResponseEntity<String> createProjectWorkflow(
-        String externalUserId, CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
-        EnvironmentModel xEnvironment) {
-
-        return ResponseEntity.ok(
-            connectedUserProjectFacade.createProjectWorkflow(
-                externalUserId,
-                createFrontendProjectWorkflowRequestModel.getDefinition(), getEnvironment(xEnvironment)));
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteProjectWorkflow(
-        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.deleteProjectWorkflow(
-            externalUserId, workflowUuid, getEnvironment(xEnvironment));
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    public ResponseEntity<Void> disableProjectWorkflow(
-        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.enableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
-            (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    public ResponseEntity<Void> enableProjectWorkflow(
-        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.enableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
-            (long) getEnvironment(xEnvironment).ordinal());
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
-    @Override
-    public ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
-        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                connectedUserProjectFacade.getConnectedUserProjectWorkflow(
-                    externalUserId, workflowUuid, (long) getEnvironment(xEnvironment).ordinal()),
-                ConnectedUserProjectWorkflowModel.class));
-    }
-
-    @Override
-    public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getProjectWorkflows(
-        String externalUserId, EnvironmentModel xEnvironment) {
-
-        return ResponseEntity.ok(
-            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<Void> publishProjectWorkflow(
-        String externalUserId, String workflowUuid,
-        PublishFrontendProjectWorkflowRequestModel publishFrontendProjectWorkflowRequestModel,
-        EnvironmentModel xEnvironment) {
-
-        connectedUserProjectFacade.publishProjectWorkflow(
-            externalUserId, workflowUuid,
-            publishFrontendProjectWorkflowRequestModel.getDescription(), (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
             .build();
