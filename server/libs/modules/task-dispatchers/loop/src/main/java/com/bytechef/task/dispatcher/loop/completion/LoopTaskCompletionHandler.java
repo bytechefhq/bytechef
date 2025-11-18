@@ -131,6 +131,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         } else {
             loopTaskExecution.setEndDate(Instant.now());
 
+            loopTaskExecution = taskExecutionService.update(loopTaskExecution);
+
             taskCompletionHandler.handle(loopTaskExecution);
         }
     }

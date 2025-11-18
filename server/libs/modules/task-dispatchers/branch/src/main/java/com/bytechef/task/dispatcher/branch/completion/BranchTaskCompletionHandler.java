@@ -149,6 +149,8 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         else {
             branchTaskExecution.setEndDate(Instant.now());
 
+            branchTaskExecution = taskExecutionService.update(branchTaskExecution);
+
             taskCompletionHandler.handle(branchTaskExecution);
         }
     }

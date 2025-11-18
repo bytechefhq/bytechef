@@ -171,6 +171,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             if (iterationsLeft == 0) {
                 mapTaskExecution.setEndDate(Instant.now());
 
+                mapTaskExecution = taskExecutionService.update(mapTaskExecution);
+
                 taskCompletionHandler.handle(mapTaskExecution);
             }
         }

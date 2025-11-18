@@ -168,6 +168,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             if (branchesLeft == 0) {
                 forkJoinTaskExecution.setEndDate(Instant.now());
 
+                forkJoinTaskExecution = taskExecutionService.update(forkJoinTaskExecution);
+
                 taskCompletionHandler.handle(forkJoinTaskExecution);
             }
         }
