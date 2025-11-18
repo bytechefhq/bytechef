@@ -1,0 +1,15 @@
+---
+label: "Parallel 1"
+tasks:
+- name: "parallel_1"
+  type: "parallel/v1"
+  parameters:
+    tasks:
+    - name: "sumVar1"
+      type: "var/v1/set"
+      parameters:
+        value: 42
+    - name: "sumVar2"
+      type: "var/v1/set"
+      parameters:
+        value: 73
