@@ -29,6 +29,7 @@ import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerProvi
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -37,22 +38,25 @@ import java.util.stream.Collectors;
 @SuppressFBWarnings("EI")
 public final class ComponentTriggerHandlerProvider implements TriggerHandlerProvider {
 
-    private final Map<String, TriggerHandler> triggerHandlerMap;
+    private final Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
 
     public ComponentTriggerHandlerProvider(
-        List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
+        Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier,
         TriggerDefinitionFacade triggerDefinitionFacade) {
 
-        this.triggerHandlerMap = componentHandlerEntries.stream()
-            .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
-            .map(ComponentHandler::getDefinition)
-            .map(componentDefinition -> collect(componentDefinition, triggerDefinitionFacade))
-            .reduce(Map.of(), MapUtils::concat);
+        this.componentHandlerEntriesSupplier = componentHandlerEntriesSupplier;
+        this.triggerDefinitionFacade = triggerDefinitionFacade;
     }
 
     @Override
     public Map<String, TriggerHandler> getTriggerHandlerMap() {
-        return triggerHandlerMap;
+        return componentHandlerEntriesSupplier.get()
+            .stream()
+            .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
+            .map(ComponentHandler::getDefinition)
+            .map(componentDefinition -> collect(componentDefinition, triggerDefinitionFacade))
+            .reduce(Map.of(), MapUtils::concat);
     }
 
     private Map<String, TriggerHandler> collect(

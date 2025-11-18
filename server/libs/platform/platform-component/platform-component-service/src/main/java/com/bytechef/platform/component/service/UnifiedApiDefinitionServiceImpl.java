@@ -29,6 +29,7 @@ import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,7 +40,7 @@ public class UnifiedApiDefinitionServiceImpl implements UnifiedApiDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    public UnifiedApiDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public UnifiedApiDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 

@@ -46,6 +46,7 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,7 +57,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    public ClusterElementDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public ClusterElementDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 

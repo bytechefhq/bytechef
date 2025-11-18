@@ -70,6 +70,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -83,7 +84,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
-    public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public ConnectionDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 

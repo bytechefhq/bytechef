@@ -16,22 +16,37 @@
 
 package com.bytechef.platform.component.handler.factory;
 
+import static com.bytechef.commons.util.MemoizationUtils.memoize;
+
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.handler.ComponentHandlerRegistry;
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
 import com.bytechef.platform.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandlerProvider;
 import com.bytechef.platform.component.trigger.handler.ComponentTriggerHandlerProvider;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,36 +54,72 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public class ComponentHandlerBeanFactoryPostProcessor
+    implements BeanFactoryPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
     private static final List<ComponentHandlerLoader> COMPONENT_HANDLER_LOADERS =
         List.of(
             new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenApiComponentHandlerLoader());
 
+    private static final Supplier<List<ComponentHandlerEntry>> COMPONENT_HANDLER_ENTRIES_SUPPLIER = memoize(
+        () -> CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers));
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        List<? extends ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries =
-            CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers);
-
-        beanFactory.registerSingleton(
-            "componentHandlerRegistry", new ComponentHandlerRegistry(
-                CollectionUtils.map(
-                    componentHandlerEntries, ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)));
-
         BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
 
         beanDefinitionRegistry.registerBeanDefinition(
-            "componentTaskHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerProvider.class)
-                .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("actionDefinitionFacade")
+            "componentDefinitionRegistry",
+            BeanDefinitionBuilder.genericBeanDefinition(
+                ComponentDefinitionRegistry.class,
+                () -> new ComponentDefinitionRegistry(
+                    beanFactory.getBean(ApplicationProperties.class), List.copyOf(getComponentHandler(beanFactory)),
+                    COMPONENT_HANDLER_ENTRIES_SUPPLIER, List.copyOf(getDynamicComponentHandlerRegistry(beanFactory))))
+                .setLazyInit(true)
                 .getBeanDefinition());
 
         beanDefinitionRegistry.registerBeanDefinition(
-            "componentTriggerHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerProvider.class)
-                .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("triggerDefinitionFacade")
+            "componentTaskHandlerProvider",
+            BeanDefinitionBuilder.genericBeanDefinition(
+                ComponentTaskHandlerProvider.class,
+                () -> new ComponentTaskHandlerProvider(
+                    COMPONENT_HANDLER_ENTRIES_SUPPLIER,
+                    beanFactory.getBean("actionDefinitionFacade", ActionDefinitionFacade.class)))
+                .setLazyInit(true)
                 .getBeanDefinition());
+
+        beanDefinitionRegistry.registerBeanDefinition(
+            "componentTriggerHandlerProvider",
+            BeanDefinitionBuilder.genericBeanDefinition(
+                ComponentTriggerHandlerProvider.class,
+                () -> new ComponentTriggerHandlerProvider(
+                    COMPONENT_HANDLER_ENTRIES_SUPPLIER,
+                    beanFactory.getBean("triggerDefinitionFacade", TriggerDefinitionFacade.class)))
+                .setLazyInit(true)
+                .getBeanDefinition());
+    }
+
+    @Override
+    @Async
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        // Trigger async load of component handlers on application startup
+        COMPONENT_HANDLER_ENTRIES_SUPPLIER.get();
+    }
+
+    @NonNull
+    private static Collection<ComponentHandler> getComponentHandler(ConfigurableListableBeanFactory beanFactory) {
+        Map<String, ComponentHandler> beansOfType = beanFactory.getBeansOfType(ComponentHandler.class);
+
+        return beansOfType.values();
+    }
+
+    @NonNull
+    private static Collection<DynamicComponentHandlerRegistry> getDynamicComponentHandlerRegistry(
+        ConfigurableListableBeanFactory beanFactory) {
+
+        Map<String, DynamicComponentHandlerRegistry> beansOfType = beanFactory.getBeansOfType(
+            DynamicComponentHandlerRegistry.class);
+
+        return beansOfType.values();
     }
 }

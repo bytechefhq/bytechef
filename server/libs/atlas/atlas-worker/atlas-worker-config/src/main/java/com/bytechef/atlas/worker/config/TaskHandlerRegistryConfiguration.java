@@ -16,6 +16,8 @@
 
 package com.bytechef.atlas.worker.config;
 
+import static com.bytechef.commons.util.MemoizationUtils.memoize;
+
 import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerProvider;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerProvider;
@@ -24,6 +26,7 @@ import com.bytechef.commons.util.MapUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,21 +40,23 @@ public class TaskHandlerRegistryConfiguration {
         @Autowired(required = false) TaskHandlerProvider taskHandlerProvider,
         @Autowired(required = false) List<DynamicTaskHandlerProvider> dynamicTaskHandlerFactories) {
 
-        Map<String, TaskHandler<?>> mergedTaskHandlerMap = MapUtils.concat(
-            taskHandlerMap,
-            taskHandlerProvider == null ? Map.of() : taskHandlerProvider.getTaskHandlerMap());
-
         return new TaskHandlerRegistryImpl(
-            mergedTaskHandlerMap, dynamicTaskHandlerFactories == null ? List.of() : dynamicTaskHandlerFactories);
+            memoize(
+                () -> MapUtils.concat(
+                    taskHandlerMap,
+                    taskHandlerProvider == null ? Map.of() : taskHandlerProvider.getTaskHandlerMap())),
+            dynamicTaskHandlerFactories == null ? List.of() : dynamicTaskHandlerFactories);
     }
 
     private record TaskHandlerRegistryImpl(
-        Map<String, TaskHandler<?>> taskHandlerMap,
+        Supplier<Map<String, TaskHandler<?>>> taskHandlerMapSupplier,
         List<DynamicTaskHandlerProvider> dynamicTaskHandlerFactories) implements TaskHandlerRegistry {
 
         @Override
         public TaskHandler<?> getTaskHandler(String type) {
             TaskHandler<?> taskHandler;
+
+            Map<String, TaskHandler<?>> taskHandlerMap = taskHandlerMapSupplier.get();
 
             if (taskHandlerMap.containsKey(type)) {
                 taskHandler = taskHandlerMap.get(type);

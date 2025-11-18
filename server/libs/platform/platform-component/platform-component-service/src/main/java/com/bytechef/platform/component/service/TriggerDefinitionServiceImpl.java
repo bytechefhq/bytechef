@@ -70,6 +70,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -83,7 +84,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
     public TriggerDefinitionServiceImpl(
-        ApplicationEventPublisher eventPublisher, ComponentDefinitionRegistry componentDefinitionRegistry) {
+        ApplicationEventPublisher eventPublisher, @Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
 
         this.eventPublisher = eventPublisher;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
