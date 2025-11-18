@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.file.storage.aws.config;
+package com.bytechef.message.broker.jms.env;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,17 +29,24 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class JmsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.file.storage.provider", String.class), "aws")) {
-            source.put("spring.cloud.aws.s3.enabled", true);
+        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "jms")) {
+            source.put(
+                "spring.autoconfigure.exclude",
+                StringUtils.join(
+                    environment.getProperty("spring.autoconfigure.exclude"),
+                    """
+                        ,org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration
+                        ,org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration
+                        """));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management AWS S3 Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom JMS Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

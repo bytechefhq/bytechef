@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.mail.config;
+package com.bytechef.message.broker.kafka.env;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
@@ -28,19 +29,21 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class MailEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (StringUtils.isBlank(environment.getProperty("bytechef.mail.host", String.class))) {
-            source.put("management.health.mail.enabled", false);
-        } else {
-            source.put("management.health.mail.enabled", true);
+        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "kafka")) {
+            source.put(
+                "spring.autoconfigure.exclude",
+                StringUtils.join(
+                    environment.getProperty("spring.autoconfigure.exclude"),
+                    ",org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"));
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Mail Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Kafka Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

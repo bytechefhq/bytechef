@@ -33,7 +33,8 @@ public class RedisDiscoveryServiceProviderEnvironmentPostProcessor implements En
             source.put("spring.cloud.redis.enabled", false);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource(
+            "Custom Spring Cloud Redis Discovery Service Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

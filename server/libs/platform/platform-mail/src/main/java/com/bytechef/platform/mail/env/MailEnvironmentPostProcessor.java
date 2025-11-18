@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.observability.config;
+package com.bytechef.platform.mail.env;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -25,34 +26,24 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class MailEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!environment.getProperty("bytechef.observability.enabled", Boolean.class, false)) {
-            source.put(
-                "spring.autoconfigure.exclude",
-                environment.getProperty("spring.autoconfigure.exclude")
-                    + """
-                        ,org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
-                        ,org.springframework.boot.actuate.autoconfigure.logging.OpenTelemetryLoggingAutoConfiguration
-                        """);
-
-            source.put("bytechef.observability.loki.appender.level", "OFF");
+        if (StringUtils.isBlank(environment.getProperty("bytechef.mail.host", String.class))) {
+            source.put("management.health.mail.enabled", false);
+        } else {
+            source.put("management.health.mail.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Observability Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Mail Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
         mutablePropertySources.addFirst(mapPropertySource);
     }
-
 }

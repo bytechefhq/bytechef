@@ -45,7 +45,7 @@ public class RedisMessageBrokerEnvironmentPostProcessor implements EnvironmentPo
                     ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Health Redis Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

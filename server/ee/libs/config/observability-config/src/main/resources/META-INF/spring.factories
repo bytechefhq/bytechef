@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.ee.observability.config.ObservabilityEnvironmentPostProcessor
+com.bytechef.ee.observability.env.ObservabilityEnvironmentPostProcessor

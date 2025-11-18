@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.message.broker.kafka.config;
+package com.bytechef.ee.message.broker.aws.env;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,20 +28,18 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "kafka")) {
-            source.put(
-                "spring.autoconfigure.exclude",
-                environment.getProperty("spring.autoconfigure.exclude") +
-                    ",org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration");
+        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "aws")) {
+            source.put("spring.cloud.aws.sqs.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Management Kafka Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource(
+            "Custom Spring Cloud AWS SQS Message Broker Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 

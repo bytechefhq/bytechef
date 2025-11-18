@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.cache.config.RedisCacheEnvironmentPostProcessor
+com.bytechef.cache.env.RedisCacheEnvironmentPostProcessor

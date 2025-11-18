@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.message.broker.jms.config.JmsMessageBrokerEnvironmentPostProcessor
+com.bytechef.message.broker.jms.env.JmsMessageBrokerEnvironmentPostProcessor

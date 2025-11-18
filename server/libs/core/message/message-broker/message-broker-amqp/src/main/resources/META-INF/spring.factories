@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.message.broker.amqp.config.AmqpMessageBrokerEnvironmentPostProcessor
+com.bytechef.message.broker.amqp.env.AmqpMessageBrokerEnvironmentPostProcessor
