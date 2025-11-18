@@ -34,8 +34,8 @@ public class MemoryMessageBrokerConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(MemoryMessageBrokerConfiguration.class);
 
     public MemoryMessageBrokerConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: memory");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message broker provider type enabled: memory");
         }
     }
 

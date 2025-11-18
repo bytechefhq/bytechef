@@ -39,8 +39,8 @@ public class AwsMessageBrokerConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(AwsMessageBrokerConfiguration.class);
 
     public AwsMessageBrokerConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: aws");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message broker provider type enabled: aws");
         }
     }
 

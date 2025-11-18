@@ -39,8 +39,8 @@ public class RedisMessageBrokerConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(RedisMessageBrokerConfiguration.class);
 
     public RedisMessageBrokerConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: redis");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message broker provider type enabled: redis");
         }
     }
 

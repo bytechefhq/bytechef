@@ -41,8 +41,8 @@ public class AmqpMessageBrokerConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
 
     public AmqpMessageBrokerConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: amqp");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message broker provider type enabled: amqp");
         }
     }
 

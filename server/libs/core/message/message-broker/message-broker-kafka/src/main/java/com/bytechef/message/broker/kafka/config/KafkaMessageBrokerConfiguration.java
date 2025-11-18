@@ -54,8 +54,8 @@ public class KafkaMessageBrokerConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
 
     public KafkaMessageBrokerConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Message broker provider type enabled: kafka");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message broker provider type enabled: kafka");
         }
     }
 
