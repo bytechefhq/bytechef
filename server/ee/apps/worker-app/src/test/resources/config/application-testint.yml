@@ -10,7 +10,7 @@ bytechef:
   file-storage:
     provider: jdbc
   message-broker:
-    provider: jms
+    provider: memory
   workflow:
     output-storage:
       provider: jdbc

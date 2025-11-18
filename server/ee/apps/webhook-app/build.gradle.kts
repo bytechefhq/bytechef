@@ -52,6 +52,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client"))
 
-
+    testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
