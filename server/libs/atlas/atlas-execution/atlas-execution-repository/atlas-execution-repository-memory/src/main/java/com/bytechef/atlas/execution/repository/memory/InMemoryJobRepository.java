@@ -19,7 +19,6 @@ package com.bytechef.atlas.execution.repository.memory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -115,7 +114,8 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
-        TaskExecution taskExecution = OptionalUtils.get(inMemoryTaskExecutionRepository.findById(taskExecutionId));
+        TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow(() -> new IllegalArgumentException("TaskExecution not found: " + taskExecutionId));
 
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
