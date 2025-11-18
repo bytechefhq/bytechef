@@ -28,6 +28,7 @@ import com.bytechef.platform.component.util.BeanUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -36,20 +37,23 @@ import java.util.stream.Collectors;
 @SuppressFBWarnings("EI")
 public final class ComponentTaskHandlerProvider implements TaskHandlerProvider {
 
-    private final Map<String, TaskHandler<?>> taskHandlerMap;
+    private final ActionDefinitionFacade actionDefinitionFacade;
+    private final Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier;
 
     public ComponentTaskHandlerProvider(
-        List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
+        Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier,
         ActionDefinitionFacade actionDefinitionFacade) {
 
-        this.taskHandlerMap = componentHandlerEntries.stream()
-            .map(componentHandlerEntry -> collect(componentHandlerEntry, actionDefinitionFacade))
-            .reduce(Map.of(), MapUtils::concat);
+        this.componentHandlerEntriesSupplier = componentHandlerEntriesSupplier;
+        this.actionDefinitionFacade = actionDefinitionFacade;
     }
 
     @Override
     public Map<String, TaskHandler<?>> getTaskHandlerMap() {
-        return taskHandlerMap;
+        return componentHandlerEntriesSupplier.get()
+            .stream()
+            .map(componentHandlerEntry -> collect(componentHandlerEntry, actionDefinitionFacade))
+            .reduce(Map.of(), MapUtils::concat);
     }
 
     private Map<String, TaskHandler<?>> collect(

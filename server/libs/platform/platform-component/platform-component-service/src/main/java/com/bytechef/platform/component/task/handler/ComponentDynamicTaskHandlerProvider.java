@@ -34,7 +34,6 @@ public class ComponentDynamicTaskHandlerProvider implements DynamicTaskHandlerPr
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         return new ComponentTaskHandler(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), actionDefinitionFacade);
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), actionDefinitionFacade);
     }
 }

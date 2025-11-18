@@ -44,8 +44,8 @@ import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
-import com.bytechef.platform.component.handler.ComponentHandlerRegistry;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.platform.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -56,17 +56,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  * @author Igor Beslic
  */
-@Component
 @SuppressFBWarnings({
     "CT", "EI"
 })
@@ -87,15 +85,16 @@ public class ComponentDefinitionRegistry {
             .title("Missing Action"));
 
     private final Map<String, Map<Integer, ComponentDefinition>> componentDefinitionsMap = new HashMap<>();
-    private final List<DynamicComponentHandlerRegistry> dynamicComponentHandlerListFactories;
+    private final List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries;
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
-        ComponentHandlerRegistry componentHandlerRegistry,
-        @Autowired List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries) {
+        Supplier<List<ComponentHandlerEntry>> componentHandlerEntriesSupplier,
+        List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries) {
 
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
-            componentHandlers, componentHandlerRegistry.componentHandlers());
+            componentHandlers,
+            CollectionUtils.map(componentHandlerEntriesSupplier.get(), ComponentHandlerEntry::componentHandler));
 
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
@@ -123,7 +122,7 @@ public class ComponentDefinitionRegistry {
                 .put(componentDefinition.getVersion(), componentDefinition);
         }
 
-        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerRegistries;
+        this.dynamicComponentHandlerRegistries = dynamicComponentHandlerRegistries;
     }
 
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
@@ -144,7 +143,7 @@ public class ComponentDefinitionRegistry {
             }
 
             if (componentDefinition == null) {
-                componentDefinition = dynamicComponentHandlerListFactories.stream()
+                componentDefinition = dynamicComponentHandlerRegistries.stream()
                     .map(dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
                         name, version))
                     .filter(Optional::isPresent)
@@ -165,7 +164,7 @@ public class ComponentDefinitionRegistry {
                     .stream()
                     .flatMap(map -> CollectionUtils.stream(map.values()))
                     .toList(),
-                dynamicComponentHandlerListFactories.stream()
+                dynamicComponentHandlerRegistries.stream()
                     .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
                         dynamicComponentHandlerRegistry.getComponentHandlers()))
                     .map(ComponentHandler::getDefinition)
@@ -272,7 +271,7 @@ public class ComponentDefinitionRegistry {
         }
 
         if (filteredComponentDefinitions.isEmpty()) {
-            filteredComponentDefinitions = dynamicComponentHandlerListFactories.stream()
+            filteredComponentDefinitions = dynamicComponentHandlerRegistries.stream()
                 .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
                     dynamicComponentHandlerRegistry.getComponentHandlers()))
                 .map(ComponentHandler::getDefinition)

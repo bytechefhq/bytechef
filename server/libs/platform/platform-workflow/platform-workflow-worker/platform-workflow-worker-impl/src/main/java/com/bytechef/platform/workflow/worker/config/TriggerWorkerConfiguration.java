@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.worker.config;
 
+import static com.bytechef.commons.util.MemoizationUtils.memoize;
+
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -43,10 +45,13 @@ public class TriggerWorkerConfiguration {
         Map<String, TriggerHandler> triggerHandlerMap,
         @Autowired(required = false) TriggerHandlerProvider triggerHandlerProvider) {
 
-        return MapUtils.concat(
-            triggerHandlerMap,
-            triggerHandlerProvider.getTriggerHandlerMap() == null
-                ? Map.of() : triggerHandlerProvider.getTriggerHandlerMap())::get;
+        return type -> memoize(
+            () -> MapUtils.concat(
+                triggerHandlerMap,
+                triggerHandlerProvider.getTriggerHandlerMap() == null
+                    ? Map.of() : triggerHandlerProvider.getTriggerHandlerMap()))
+                        .get()
+                        .get(type);
     }
 
     @Bean
