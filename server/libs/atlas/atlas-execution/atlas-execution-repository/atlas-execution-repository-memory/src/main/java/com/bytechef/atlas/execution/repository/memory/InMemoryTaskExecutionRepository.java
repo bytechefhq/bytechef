@@ -27,8 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import org.apache.commons.lang3.Validate;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.util.comparator.Comparators;
@@ -40,13 +40,9 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
-    private static final String JOB_TASK_EXECUTIONS_CACHE =
-        InMemoryTaskExecutionRepository.class.getName() + ".jobTaskExecutions";
-    private static final String TASK_EXECUTION_CACHE =
-        InMemoryTaskExecutionRepository.class.getName() + ".taskExecution";
-    private static final String PARENT_TASK_EXECUTIONS_CACHE =
-        InMemoryTaskExecutionRepository.class.getName() + ".parentTaskExecutions";
+    private static final ConcurrentHashMap<String, ReentrantLock> LOCKS = new ConcurrentHashMap<>();
+    private static final String TASK_EXECUTION_CACHE = InMemoryTaskExecutionRepository.class.getName() +
+        ".taskExecution";
 
     private final CacheManager cacheManager;
 
@@ -56,64 +52,171 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public void deleteById(long id) {
-        throw new UnsupportedOperationException();
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+
+        TaskExecution existingTaskExecution = store.byId.get(id);
+
+        if (existingTaskExecution == null) {
+            return;
+        }
+
+        String jobKey = getJobLockKey(Objects.requireNonNull(existingTaskExecution.getJobId()));
+        String parentKey = getParentLockKey(existingTaskExecution.getParentId());
+
+        // Acquire locks in deterministic order to avoid deadlocks
+        String firstKey = jobKey;
+        String secondKey = parentKey;
+
+        if (secondKey != null && firstKey.compareTo(secondKey) > 0) {
+            firstKey = parentKey;
+            secondKey = jobKey;
+        }
+
+        ReentrantLock firstLock = obtainLock(firstKey);
+        ReentrantLock secondLock = secondKey != null ? obtainLock(secondKey) : null;
+
+        try {
+            firstLock.lock();
+
+            if (secondLock != null) {
+                secondLock.lock();
+            }
+
+            // Work with the latest store instance under locks
+            Store lockedStore = cache.get(getStoreKey(), Store::new);
+
+            TaskExecution removedTaskExecution = Objects.requireNonNull(lockedStore).byId.remove(id);
+
+            if (removedTaskExecution != null) {
+                // Remove from the job list
+                List<TaskExecution> jobLTaskExecution = lockedStore.getJobTaskExecutions(
+                    existingTaskExecution.getJobId());
+
+                jobLTaskExecution.removeIf(taskExecution -> Objects.equals(taskExecution.getId(), id));
+
+                // Remove from the parent list if applicable
+                if (existingTaskExecution.getParentId() != null) {
+                    List<TaskExecution> parentTaskExecutions = lockedStore.getParentTaskExecutions(
+                        existingTaskExecution.getParentId());
+
+                    parentTaskExecutions.removeIf(te -> Objects.equals(te.getId(), id));
+                }
+
+                // Persist back to cache for explicitness
+                cache.put(getStoreKey(), lockedStore);
+            }
+        } finally {
+            if (secondLock != null) {
+                releaseLock(secondKey, secondLock);
+            }
+
+            releaseLock(firstKey, firstLock);
+        }
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId) {
-        Comparator<Object> comparable = Comparators.comparable();
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
 
-        return Objects
-            .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(jobId), () -> new ArrayList<TaskExecution>()))
-            .stream()
-            .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
-            .toList();
+        String key = getJobLockKey(jobId);
+
+        ReentrantLock lock = obtainLock(key);
+
+        try {
+            lock.lock();
+
+            Comparator<Object> comparable = Comparators.comparable();
+
+            return new ArrayList<>(store.getJobTaskExecutions(jobId))
+                .stream()
+                .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
+                .toList();
+        } finally {
+            releaseLock(key, lock);
+        }
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        return cache.get(TenantCacheKeyUtils.getKey(jobId), ArrayList::new);
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+
+        String key = getJobLockKey(jobId);
+
+        ReentrantLock lock = obtainLock(key);
+
+        try {
+            lock.lock();
+
+            // Return in insertion order (created date order), same semantics as before
+            return new ArrayList<>(store.getJobTaskExecutions(jobId));
+        } finally {
+            releaseLock(key, lock);
+        }
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        return Objects
-            .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(jobId), () -> new ArrayList<TaskExecution>()))
-            .stream()
-            .sorted((taskExecution1, taskExecution2) -> {
-                long diff =
-                    Objects.requireNonNull(taskExecution1.getId()) - Objects.requireNonNull(taskExecution2.getId());
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
 
-                return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-            })
-            .toList();
+        String key = getJobLockKey(jobId);
+
+        ReentrantLock lock = obtainLock(key);
+
+        try {
+            lock.lock();
+
+            return new ArrayList<>(store.getJobTaskExecutions(jobId))
+                .stream()
+                .sorted((t1, t2) -> {
+                    Long id1 = Objects.requireNonNull(t1.getId());
+                    Long id2 = Objects.requireNonNull(t2.getId());
+
+                    return Long.compare(id2, id1);
+                })
+                .toList();
+        } finally {
+            releaseLock(key, lock);
+        }
     }
 
     @Override
     public List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(PARENT_TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        return Objects
-            .requireNonNull(cache.get(TenantCacheKeyUtils.getKey(parentId), () -> new ArrayList<TaskExecution>()))
-            .stream()
-            .sorted((o1, o2) -> Comparators.comparable()
-                .compare(o1.getTaskNumber(), o2.getTaskNumber()))
-            .toList();
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+
+        String key = getParentLockKey(parentId);
+
+        ReentrantLock lock = obtainLock(key);
+
+        try {
+            lock.lock();
+
+            Comparator<Object> comparable = Comparators.comparable();
+
+            return new ArrayList<>(store.getParentTaskExecutions(parentId))
+                .stream()
+                .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
+                .toList();
+        } finally {
+            releaseLock(key, lock);
+        }
     }
 
     @Override
     public Optional<TaskExecution> findById(long id) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+        Store store = cache.get(getStoreKey(), Store::new);
 
-        TaskExecution taskExecution = cache.get(TenantCacheKeyUtils.getKey(id), TaskExecution.class);
-
-        return Optional.ofNullable(taskExecution);
+        return Optional.ofNullable(Objects.requireNonNull(store).byId.get(id));
     }
 
     @Override
@@ -123,15 +226,26 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public Optional<TaskExecution> findLastByJobId(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        List<TaskExecution> taskExecutions = Validate.notNull(
-            cache.get(TenantCacheKeyUtils.getKey(jobId), ArrayList::new), "taskExecutions");
+        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
 
-        if (taskExecutions.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(taskExecutions.getLast());
+        String key = getJobLockKey(jobId);
+
+        ReentrantLock lock = obtainLock(key);
+
+        try {
+            lock.lock();
+
+            List<TaskExecution> taskExecutions = new ArrayList<>(store.getJobTaskExecutions(jobId));
+
+            if (taskExecutions.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(taskExecutions.getLast());
+            }
+        } finally {
+            releaseLock(key, lock);
         }
     }
 
@@ -146,49 +260,132 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-            cache.put(TenantCacheKeyUtils.getKey(taskExecution.getId()), clonedTaskExecution);
+            Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+
+            String jobKey = getJobLockKey(Objects.requireNonNull(taskExecution.getJobId()));
+            String parentKey = getParentLockKey(taskExecution.getParentId());
+
+            // Acquire locks in a deterministic order to avoid deadlocks
+            String firstKey = jobKey;
+            String secondKey = parentKey;
+
+            if (secondKey != null && firstKey.compareTo(secondKey) > 0) {
+                firstKey = parentKey;
+                secondKey = jobKey;
+            }
+
+            ReentrantLock firstLock = obtainLock(firstKey);
+            ReentrantLock secondLock = secondKey != null ? obtainLock(secondKey) : null;
 
             try {
-                LOCK.lock();
+                firstLock.lock();
 
-                cache = Objects.requireNonNull(cacheManager.getCache(JOB_TASK_EXECUTIONS_CACHE));
-                String key = TenantCacheKeyUtils.getKey(taskExecution.getJobId());
-
-                List<TaskExecution> taskExecutions = Objects.requireNonNull(cache.get(key, ArrayList::new));
-
-                int index = taskExecutions.indexOf(clonedTaskExecution);
-
-                if (index == -1) {
-                    taskExecutions.add(clonedTaskExecution);
-                } else {
-                    taskExecutions.set(index, clonedTaskExecution);
+                if (secondLock != null) {
+                    secondLock.lock();
                 }
 
-                cache.put(key, taskExecutions);
+                // by id
+                store.byId.put(Objects.requireNonNull(clonedTaskExecution.getId()), clonedTaskExecution);
 
+                // by job id (preserve insertion order for newly created entries; replace on update by id)
+                List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(taskExecution.getJobId());
+
+                int index = -1;
+
+                for (int i = 0; i < jobTaskExecutions.size(); i++) {
+                    TaskExecution existingTaskExecution = jobTaskExecutions.get(i);
+
+                    if (Objects.equals(existingTaskExecution.getId(), clonedTaskExecution.getId())) {
+                        index = i;
+
+                        break;
+                    }
+                }
+                if (index >= 0) {
+                    jobTaskExecutions.set(index, clonedTaskExecution);
+                } else {
+                    jobTaskExecutions.add(clonedTaskExecution);
+                }
+
+                // by parent id (same semantics)
                 if (taskExecution.getParentId() != null) {
-                    cache = Objects.requireNonNull(cacheManager.getCache(PARENT_TASK_EXECUTIONS_CACHE));
-                    key = TenantCacheKeyUtils.getKey(taskExecution.getParentId());
+                    List<TaskExecution> parentTaskExecutions = store.getParentTaskExecutions(
+                        taskExecution.getParentId());
 
-                    taskExecutions = Objects.requireNonNull(cache.get(key, ArrayList::new));
+                    int pIndex = -1;
 
-                    index = taskExecutions.indexOf(clonedTaskExecution);
+                    for (int i = 0; i < parentTaskExecutions.size(); i++) {
+                        TaskExecution existingTaskExecution = parentTaskExecutions.get(i);
 
-                    if (index == -1) {
-                        taskExecutions.add(clonedTaskExecution);
-                    } else {
-                        taskExecutions.set(index, clonedTaskExecution);
+                        if (Objects.equals(existingTaskExecution.getId(), clonedTaskExecution.getId())) {
+                            pIndex = i;
+
+                            break;
+                        }
                     }
 
-                    cache.put(key, taskExecutions);
+                    if (pIndex >= 0) {
+                        parentTaskExecutions.set(pIndex, clonedTaskExecution);
+                    } else {
+                        parentTaskExecutions.add(clonedTaskExecution);
+                    }
                 }
+
+                // persist the updated store back into cache (not strictly necessary, but keeps semantics explicit)
+                cache.put(getStoreKey(), store);
             } finally {
-                LOCK.unlock();
+                if (secondLock != null) {
+                    releaseLock(secondKey, secondLock);
+                }
+
+                releaseLock(firstKey, firstLock);
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
 
         return taskExecution;
+    }
+
+    private static String getJobLockKey(long jobId) {
+        return getStoreKey() + ":job:" + jobId;
+    }
+
+    private static String getStoreKey() {
+        return TenantCacheKeyUtils.getKey("store");
+    }
+
+    private static String getParentLockKey(Long parentId) {
+        return parentId == null ? null : getStoreKey() + ":parent:" + parentId;
+    }
+
+    private static ReentrantLock obtainLock(String key) {
+        return LOCKS.computeIfAbsent(key, k -> new ReentrantLock());
+    }
+
+    private static void releaseLock(String key, ReentrantLock lock) {
+        lock.unlock();
+
+        if (!lock.isLocked() && !lock.hasQueuedThreads()) {
+            LOCKS.remove(key, lock);
+        }
+    }
+
+    private static final class Store {
+
+        // by id
+        private final ConcurrentHashMap<Long, TaskExecution> byId = new ConcurrentHashMap<>();
+        // by job id, maintains insertion order (created date order)
+        private final ConcurrentHashMap<Long, List<TaskExecution>> byJobId = new ConcurrentHashMap<>();
+        // by parent id, maintains insertion order (created date order)
+        private final ConcurrentHashMap<Long, List<TaskExecution>> byParentId = new ConcurrentHashMap<>();
+
+        List<TaskExecution> getJobTaskExecutions(long jobId) {
+            return byJobId.computeIfAbsent(jobId, k -> new ArrayList<>());
+        }
+
+        List<TaskExecution> getParentTaskExecutions(long parentId) {
+            return byParentId.computeIfAbsent(parentId, k -> new ArrayList<>());
+        }
     }
 }
