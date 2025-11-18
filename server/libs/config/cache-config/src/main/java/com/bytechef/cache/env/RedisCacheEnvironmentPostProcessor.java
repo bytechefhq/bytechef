@@ -34,17 +34,13 @@ public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProces
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
+        if (!Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
             source.put("management.health.redis.enabled", true);
-        } else {
-            source.put("management.health.redis.enabled", false);
 
-            if (!source.containsValue("org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration")) {
-                source.put(
-                    "spring.autoconfigure.exclude",
-                    environment.getProperty("spring.autoconfigure.exclude") +
-                        ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
-            }
+            source.computeIfPresent(
+                "spring.autoconfigure.exclude",
+                (k, v) -> ((String) v).replace(
+                    ", org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration", ""));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Cache Config", source);

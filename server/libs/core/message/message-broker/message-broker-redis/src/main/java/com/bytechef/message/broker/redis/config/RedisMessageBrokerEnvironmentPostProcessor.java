@@ -34,15 +34,13 @@ public class RedisMessageBrokerEnvironmentPostProcessor implements EnvironmentPo
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "redis")) {
+        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "redis")) {
             source.put("management.health.redis.enabled", true);
-        } else {
-            source.put("management.health.redis.enabled", false);
 
-            source.put(
+            source.computeIfPresent(
                 "spring.autoconfigure.exclude",
-                environment.getProperty("spring.autoconfigure.exclude") +
-                    ",org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration");
+                (k, v) -> ((String) v).replace(
+                    ", org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration", ""));
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Message Broker Config", source);

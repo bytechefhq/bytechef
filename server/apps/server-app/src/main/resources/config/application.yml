@@ -68,6 +68,8 @@ management:
   health:
     neo4j:
       enabled: false
+    redis:
+      enabled: false
   info:
     git:
       mode: full
@@ -144,7 +146,9 @@ spring:
   application:
     name: server-app
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
+    exclude:
+      org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,
+      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:
