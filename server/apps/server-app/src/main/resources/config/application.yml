@@ -310,8 +310,8 @@ bytechef:
       enable: false
       required: false
   message-broker:
-    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
-    provider: jms
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | memory | redis) default: memory
+    provider: memory
   oauth2:
 #    predefinedApps:
 #      mailchimp:
