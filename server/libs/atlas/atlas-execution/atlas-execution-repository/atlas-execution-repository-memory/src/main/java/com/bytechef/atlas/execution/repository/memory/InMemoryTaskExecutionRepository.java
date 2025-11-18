@@ -54,7 +54,9 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     public void deleteById(long id) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+        String storeKey = getStoreKey();
+
+        Store store = Objects.requireNonNull(cache.get(storeKey, Store::new));
 
         TaskExecution existingTaskExecution = store.byId.get(id);
 
@@ -85,7 +87,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             }
 
             // Work with the latest store instance under locks
-            Store lockedStore = cache.get(getStoreKey(), Store::new);
+            Store lockedStore = cache.get(storeKey, Store::new);
 
             TaskExecution removedTaskExecution = Objects.requireNonNull(lockedStore).byId.remove(id);
 
@@ -104,8 +106,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                     parentTaskExecutions.removeIf(te -> Objects.equals(te.getId(), id));
                 }
 
-                // Persist back to cache for explicitness
-                cache.put(getStoreKey(), lockedStore);
+                cache.put(storeKey, lockedStore);
             }
         } finally {
             if (secondLock != null) {
@@ -214,6 +215,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     @Override
     public Optional<TaskExecution> findById(long id) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+
         Store store = cache.get(getStoreKey(), Store::new);
 
         return Optional.ofNullable(Objects.requireNonNull(store).byId.get(id));
@@ -260,7 +262,9 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
 
-            Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+            String storeKey = getStoreKey();
+
+            Store store = Objects.requireNonNull(cache.get(storeKey, Store::new));
 
             String jobKey = getJobLockKey(Objects.requireNonNull(taskExecution.getJobId()));
             String parentKey = getParentLockKey(taskExecution.getParentId());
@@ -331,8 +335,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                     }
                 }
 
-                // persist the updated store back into cache (not strictly necessary, but keeps semantics explicit)
-                cache.put(getStoreKey(), store);
+                cache.put(storeKey, store);
             } finally {
                 if (secondLock != null) {
                     releaseLock(secondKey, secondLock);

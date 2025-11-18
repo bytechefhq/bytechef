@@ -45,6 +45,8 @@ import org.springframework.core.env.Environment;
 
 public class TaskDispatcherJobTestExecutor {
 
+    private static final String TEST_TENANT_ID = "test";
+
     private final ContextService contextService;
     private final CounterService counterService;
     private final Environment environment;
@@ -101,7 +103,7 @@ public class TaskDispatcherJobTestExecutor {
             MessageEvent<?> messageEvent = (MessageEvent<?>) event;
 
             if (messageEvent.getMetadata(CURRENT_TENANT_ID) == null) {
-                messageEvent.putMetadata(CURRENT_TENANT_ID, "test");
+                messageEvent.putMetadata(CURRENT_TENANT_ID, TEST_TENANT_ID);
             }
 
             messageBroker.send(messageEvent.getRoute(), messageEvent);
