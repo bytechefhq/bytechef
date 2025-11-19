@@ -7,23 +7,32 @@
 
 package com.bytechef.ee.ai.copilot.facade;
 
+import com.bytechef.ai.mcp.tool.automation.ProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
-import com.bytechef.ee.ai.copilot.workflow.OrchestratorWorkersWorkflow;
 import com.bytechef.ee.ai.copilot.workflow.RoutingWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
+
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.execution.ToolExecutionException;
+import org.springframework.ai.tool.execution.ToolExecutionExceptionProcessor;
+import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,62 +56,102 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         "The user wants something else.");
     private static final String WORKFLOW_EDITOR_SYSTEM_PROMPT =
         """
-            Return your response in a JSON format in a similar structure to the Workflows in the context.
+            You are an expert in Bytechef automation software using tools. Your role is to design, build, and validate Bytechef workflows with maximum accuracy and efficiency.
 
-            Workflow Building Rules:
-            - Use the structure inside "structure" to build the workflow according to the Workflow Prompt
-            - Use the attributes inside "output" to understand available variables from previous components
-            - Put tasks where "parentTaskName" is not null into a component with "task_type"=flow, according to their "parentTaskName" and according to the given Workflow Prompt
-            - Do not put "parentTaskName" or "task_type" as attributes into the workflow
+            ## Core Workflow Building Process
 
-            Using Flow Task Type Components:
-            - If task involves conditional logic, use condition/v1 flow
-            - If task involves iteration/looping, use loop/v1 flow
-            - If a flow task type component already exists in components that matches this task's requirements, do NOT create a new one
+            1. **Discovery Phase** - Find the right tasks:
+               - Think deeply about user request and the logic you are going to build to fulfill it. Ask follow-up questions to clarify the user's intent, if something is unclear. Then, proceed with the rest of your instructions.
+               - `searchTask(query, type)` - Search triggers, actions or task dispatchers by keywords
+               - `listTasks(type, limit)` - list all tasks of certain type: action, trigger or taskDispatcher
 
-            Using References:
-            - When referencing previous component outputs in parameters, use the format: $\\{componentName.outputProperty\\}
-            - For array access, use: $\\{componentName.outputProperty[index]\\}
-            - For nested objects, use: $\\{componentName.outputProperty.nestedProperty\\}
+            2. **Configuration Phase** - Get task details efficiently:
+               - `getTaskDefinition(type, name, componentName, version)` - Structure of the task
+               - `getTaskProperties(type, name, componentName, version)` - Optional. Get a more detailed descriptions of its properties
+               - `getTaskOutputProperty(type, name, componentName, version)` - Output properties of the task.
+            - If you get an error on getTaskOutputProperty() that says that the user needs to make a connection, warn the user that the final workflow might not complete if he doesn't have a connection. Repeat getTaskOutputProperty() if he makes a connection
 
-            Handling Missing Components:
-            - If component.type is "trigger" and component.structure.type is "missing/v1/missing", don't put any trigger
-            - If component.type is "action" and component.structure.type is "missing/v1/missing", pass the missing Component
+            3. **Pre-Validation Phase** - Validate BEFORE building:
+               - `validateTask(task, type,  name, conponentName, version)` - Task related validation
+               - Fix any errors before proceeding. Repeat task validation until all errors are gone
+               - It is good common practice to show a visual representation of the workflow architecture to the user and asking for opinion, before moving forward.
 
-            Return your response in this JSON format:
-            \\{
-              "label": "Workflow label",
-              "description": "Workflow description",
-              "inputs": [],
-              "triggers": [],
-              "tasks": []
-            \\}
+            4. **Building Phase** - Create the workflow:
+               - `buildingInstructions()` - Start here!
+               - `getTaskDispatcherInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
+               - Use validated configurations from step 3
+               - Connect nodes with proper structure
+               - Build the workflow in an artifact for easy editing downstream (unless the user asked to create in Bytechef instance)
+
+            5. **Workflow Validation Phase** - Validate complete workflow:
+               - `validateWorkflow(workflow)` - Complete validation
+               - Fix any errors found. Repeat workflow validation until all errors are gone
+
+            6. **Deployment** - Deploy it on ByteChef:
+            - `searchWorkflows(query)` - search for a specific workflow
+            - `updateWorkflow(workflowId, workflow)` -
+            - `searchProjects(query)` - search for a specific project if asked to create a new one
+            - `createProject(name)` - create a new project if asked to create a new one
+            - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
+
+            ## Key Insights
+
+            - **VALIDATE EARLY AND OFTEN** - Catch errors before they reach deployment
+            - **Pre-validate configurations** - Use validateTask before building
+            - **Post-validate workflows** - Always validate complete workflows before deployment
+
+            ## Validation Strategy
+
+            ### Before Building:
+            1. validateTask() - Full configuration validation
+            2. If there are errors, fix them and validateTask() again before proceeding
+
+            ### After Building:
+            1. validateWorkflow() - Complete workflow validation
+            2. If there are errors, fix them and validateWorkflow() again before proceeding
+
+            ## Example Workflow
+
+            ### 1. Discovery & Configuration
+            searchTask('slack', 'action')
+            // Ask questions if something is unclear
+
+            ### 2. Configuration Phase
+            getTaskDefinition('action', 'slackActionName', 'slack', 1)
+            getTaskOutputProperty('action', 'slackActionName', 'slack', 1)
+            // If getTaskOutputProperty() throws an error, remind them to make a connection before you proceed
+            // Ask questions if something is unclear
+
+            ### 3. Pre-Validation
+            validateTask()
+
+            ### 4. Build Workflow
+            buildingInstructions()
+            // Create workflow JSON with validated configs
+
+            ### 5. Workflow Validation
+            validateWorkflow()
+
+            ### 5. Deploy Workflow
+            // Ask the user what project and workflow you should deploy it to
+            // If provided:
+            searchWorkflows()
+            updateWorkflow()
+            // If asked to create a new one:
+            createProject()
+            createProjectWorkflow()
+
+            ## Important Rules
+
+            - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
+            - Display condition is located in metadata if the property is an object or in between @@ if it's not. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
+            - Every task must have a unique name in format: componentName_{number}
+            - Required fields must be filled, the other fields are optional
+            - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
+            - ALWAYS validate before building
+            - ALWAYS validate after building
+            - FIX all errors before proceeding
             """;
-    private static final String WORKFLOW_EDITOR_USER_PROMPT =
-        """
-            components:
-            {task_list}
-
-            Workflow Prompt:
-            {task_analysis}
-
-            Build a workflow using component.structure using the instructions from the Workflow Prompt and component.parentTaskName.
-            Provide it in a JSON format similar structure to the Workflows in the context.
-            Only use components that are provided in this prompt.
-            """;
-    private static final String WORKFLOW_CHECKER_USER_PROMPT = """
-            Workflow:
-            {workflow}
-            Prompt:
-            {message}
-
-            Check the provided workflow and correct any mistakes:
-            1. Check if the Workflow displays what the prompt describes
-            2. Check if the Workflow has the correct structure (similar to the one in the context)
-
-            If the Workflow correctly follows these guidelines, return it unmodified. If it doesn't, modify it.
-            Return only the JSON.
-        """;
 
     private static final String WORKFLOW_ROUTE = "workflow";
     private static final String USER_PROMPT = """
@@ -120,39 +169,28 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
     private final RoutingWorkflow routingWorkflow;
-    private final OrchestratorWorkersWorkflow orchestratorWorkersWorkflow;
+    private final ProjectWorkflowTools projectWorkflowTools;
+    private final ProjectTools projectTools;
+    private final TaskTools taskTools;
 
     @SuppressFBWarnings("EI")
     public AiCopilotFacadeImpl(
         ChatClient.Builder chatClientBuilder, VectorStore vectorStore,
         // TODO Remove dependency on WorkflowService, send the workflow definition and return the updated workflow in
         // the response
-        @Autowired(required = false) WorkflowService workflowService) {
+        @Autowired(required = false) WorkflowService workflowService,
+        ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools) {
 
         this.workflowService = workflowService;
+        this.projectTools = projectTools;
+        this.projectWorkflowTools = projectWorkflowTools;
+        this.taskTools = taskTools;
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor
             .builder(
                 MessageWindowChatMemory.builder()
                     .chatMemoryRepository(new InMemoryChatMemoryRepository())
                     .maxMessages(50)
-                    .build())
-            .build();
-
-        QuestionAnswerAdvisor questionAnswerAdvisorComponents = QuestionAnswerAdvisor.builder(vectorStore)
-            .searchRequest(
-                SearchRequest.builder()
-                    .filterExpression("category == 'components' or category == 'flows'")
-                    .topK(15)
-                    .similarityThreshold(0.7)
-                    .build())
-            .build();
-
-        QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = QuestionAnswerAdvisor.builder(vectorStore)
-            .searchRequest(
-                SearchRequest.builder()
-                    .filterExpression("category == 'workflows'")
-                    .topK(6)
                     .build())
             .build();
 
@@ -166,13 +204,31 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             1 // Log level
         );
 
+//        ToolCallAdvisor toolCallAdvisor = ToolCallAdvisor.builder()
+//            .toolCallingManager(ToolCallingManager.builder()
+//                .toolCallbackResolver(new ToolCallbackResolver() {
+//                    @Override
+//                    public ToolCallback resolve(String toolName) {
+//                        return null;
+//                    }
+//                })
+//                .observationRegistry(ObservationRegistry.NOOP)
+//                .toolExecutionExceptionProcessor(new ToolExecutionExceptionProcessor() {
+//                    @Override
+//                    public String process(ToolExecutionException exception) {
+//                        return "";
+//                    }
+//                })
+//                .build())
+//            .advisorOrder(BaseAdvisor.HIGHEST_PRECEDENCE)
+//            .build();
+
         // TODO add multiuser, multitenant history
         // messageChatMemoryAdvisor,
         ChatClient chatClientComponent = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
 //                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents,
                 qaRetrievedDocuments)
             .build();
 
@@ -180,7 +236,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
-                questionAnswerAdvisorWorkflow,
                 qaRetrievedDocuments
 //                , questionAnswerAdvisorComponents
             )
@@ -189,14 +244,12 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         this.chatClientScript = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
-                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents
+                messageChatMemoryAdvisor
             // add script advisor
             )
             .build();
 
         this.routingWorkflow = new RoutingWorkflow(this.chatClientWorkflow);
-        this.orchestratorWorkersWorkflow = new OrchestratorWorkersWorkflow(chatClientComponent);
     }
 
     @Override
@@ -218,19 +271,15 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         return switch (route) {
             case WORKFLOW_ROUTE -> switch (context.source()) {
                 case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                    OrchestratorWorkersWorkflow.WorkerResponse process =
-                        orchestratorWorkersWorkflow.process(message, currentWorkflow);
-
                     String definition = chatClientWorkflow.prompt()
                         .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
                         .user(user -> user
-                            .text(WORKFLOW_EDITOR_USER_PROMPT)
-                            .param("task_analysis", process.analysis())
-                            .param("task_list", process.workerResponses()))
+                            .text(message))
                         .advisors(advisor -> advisor.param(
                             ChatMemory.CONVERSATION_ID,
                             Objects.requireNonNull(Objects.requireNonNull(workflow)
                                 .getId()))) // conversationId
+                        .tools(taskTools, projectWorkflowTools, projectTools)
                         .call()
                         .content();
 
@@ -244,17 +293,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         definition = definition
                             .replace("```json", "")
                             .replace("```", "");
-
-                        String finalDefinition = definition;
-
-                        definition = chatClientWorkflow.prompt()
-                            .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
-                            .user(user -> user
-                                .text(WORKFLOW_CHECKER_USER_PROMPT)
-                                .param("message", process.analysis())
-                                .param("workflow", finalDefinition))
-                            .call()
-                            .content();
 
                         Objects.requireNonNull(workflowService)
                             .update(
@@ -310,6 +348,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                     .system(MESSAGE_SYSTEM_PROMPT)
                     .user(user -> user.text(message))
                     .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                    .tools(projectTools, projectWorkflowTools)
                     .stream()
                     .content()
                     .map(content -> Map.of("text", content));
