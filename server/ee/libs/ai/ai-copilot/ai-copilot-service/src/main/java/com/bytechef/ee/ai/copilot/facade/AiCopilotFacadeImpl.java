@@ -18,21 +18,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
 
-import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
-import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.execution.ToolExecutionException;
-import org.springframework.ai.tool.execution.ToolExecutionExceptionProcessor;
-import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,7 +40,8 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
-    private static final String MESSAGE_ROUTE = "other";
+    private static final String MESSAGE_ROUTE = "message";
+    private static final String OTHER_ROUTE = "other";
     private static final Map<String, String> ROUTES = Map.of(
         "workflow",
         "The prompt contains some kind of workflow or the user asks you to create, add or modify something.",
@@ -190,7 +183,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .builder(
                 MessageWindowChatMemory.builder()
                     .chatMemoryRepository(new InMemoryChatMemoryRepository())
-                    .maxMessages(50)
+                    .maxMessages(500)
                     .build())
             .build();
 
@@ -203,34 +196,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             response -> "Response: " + ModelOptionsUtils.toJsonStringPrettyPrinter(response),
             1 // Log level
         );
-
-//        ToolCallAdvisor toolCallAdvisor = ToolCallAdvisor.builder()
-//            .toolCallingManager(ToolCallingManager.builder()
-//                .toolCallbackResolver(new ToolCallbackResolver() {
-//                    @Override
-//                    public ToolCallback resolve(String toolName) {
-//                        return null;
-//                    }
-//                })
-//                .observationRegistry(ObservationRegistry.NOOP)
-//                .toolExecutionExceptionProcessor(new ToolExecutionExceptionProcessor() {
-//                    @Override
-//                    public String process(ToolExecutionException exception) {
-//                        return "";
-//                    }
-//                })
-//                .build())
-//            .advisorOrder(BaseAdvisor.HIGHEST_PRECEDENCE)
-//            .build();
-
-        // TODO add multiuser, multitenant history
-        // messageChatMemoryAdvisor,
-        ChatClient chatClientComponent = chatClientBuilder.clone()
-            // TODO add multiuser, multitenant history
-            .defaultAdvisors(
-//                messageChatMemoryAdvisor,
-                qaRetrievedDocuments)
-            .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
@@ -270,43 +235,21 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         return switch (route) {
             case WORKFLOW_ROUTE -> switch (context.source()) {
-                case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
-                    String definition = chatClientWorkflow.prompt()
+                case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
+                    chatClientWorkflow.prompt()
                         .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
-                        .user(user -> user
-                            .text(message))
+                        .user(user -> user.text(USER_PROMPT)
+                            .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
+                            .param(MESSAGE_ROUTE, message))
                         .advisors(advisor -> advisor.param(
                             ChatMemory.CONVERSATION_ID,
                             Objects.requireNonNull(Objects.requireNonNull(workflow)
                                 .getId()))) // conversationId
                         .tools(taskTools, projectWorkflowTools, projectTools)
-                        .call()
-                        .content();
-
-                    Map<String, ?> result;
-
-                    if (definition == null) {
-                        result = Map.of(
-                            "workflowUpdated", false,
-                            "text", "Unable to generate workflow, please try again");
-                    } else {
-                        definition = definition
-                            .replace("```json", "")
-                            .replace("```", "");
-
-                        Objects.requireNonNull(workflowService)
-                            .update(
-                                Objects.requireNonNull(workflow)
-                                    .getId(),
-                                definition, workflow.getVersion());
-
-                        result = Map.of(
-                            "workflowUpdated", true,
-                            "text", "Workflow has been updated");
-                    }
-
-                    yield Flux.just(result);
-                }
+                        .stream()
+                        .content()
+                        .map(content -> Map.of(
+                            "text", content));
                 case CODE_EDITOR -> {
                     Map<String, ?> parameters = context.parameters();
 
@@ -343,7 +286,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                     };
                 }
             };
-            case MESSAGE_ROUTE ->
+            case OTHER_ROUTE ->
                 chatClientWorkflow.prompt()
                     .system(MESSAGE_SYSTEM_PROMPT)
                     .user(user -> user.text(message))
