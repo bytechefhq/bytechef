@@ -82,7 +82,11 @@ export default function saveClusterElementNodesPosition({
         // Save updated data but reset the position saving flag even when there are errors
         saveWorkflowDefinition({
             invalidateWorkflowQueries,
-            nodeData: updatedNodeData,
+            nodeData: {
+                ...updatedNodeData,
+                componentName: rootClusterElementNodeData.componentName,
+                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+            },
             updateWorkflowMutation,
         })
             .catch((error) => {
@@ -109,7 +113,11 @@ export default function saveClusterElementNodesPosition({
 
         saveWorkflowDefinition({
             invalidateWorkflowQueries,
-            nodeData: updatedNodeData,
+            nodeData: {
+                ...updatedNodeData,
+                componentName: rootClusterElementNodeData.componentName,
+                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+            },
             updateWorkflowMutation,
         });
     }
