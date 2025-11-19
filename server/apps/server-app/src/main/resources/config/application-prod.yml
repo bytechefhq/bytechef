@@ -26,6 +26,12 @@ spring:
   thymeleaf:
     cache: true
 
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 #####
 
 command-bar:
