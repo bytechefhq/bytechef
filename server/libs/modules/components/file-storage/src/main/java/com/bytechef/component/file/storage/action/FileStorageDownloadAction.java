@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,6 +46,9 @@ import java.util.function.Consumer;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings({
+    "SSRF", "URLCONNECTION_SSRF_FD"
+})
 public class FileStorageDownloadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("download")

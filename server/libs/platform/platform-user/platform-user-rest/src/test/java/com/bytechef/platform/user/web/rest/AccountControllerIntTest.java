@@ -44,6 +44,7 @@ import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationShared
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -74,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
 @UserIntTestConfigurationSharedMocks
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class AccountControllerIntTest {
 
     static final String TEST_USER_LOGIN = "test";
