@@ -226,8 +226,6 @@ const OutputTab = ({
         return <div className="p-4 text-sm text-muted-foreground">No output schema to show.</div>;
     }
 
-    console.log(outputFunctionDefined);
-
     return (
         <div className="h-full p-4">
             {!testing && (
