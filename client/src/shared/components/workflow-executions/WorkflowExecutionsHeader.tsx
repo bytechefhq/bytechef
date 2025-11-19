@@ -5,7 +5,7 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
-    const taskExecutionsCompleted = job?.taskExecutions?.every((taskExecution) => taskExecution.status === 'COMPLETED');
+    const taskExecutionsCompleted = job?.status === 'COMPLETED';
     const triggerExecutionCompleted = !triggerExecution || triggerExecution?.status === 'COMPLETED';
 
     let duration = 0;
