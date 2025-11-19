@@ -1,45 +1,36 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {twMerge} from 'tailwind-merge';
+import {AlertTriangleIcon, CheckIcon} from 'lucide-react';
 
-const WorkflowTriggerExecutionItem = ({
-    onClick,
-    selected,
-    triggerExecution,
-}: {
-    selected?: boolean;
-    triggerExecution: TriggerExecution;
-    onClick?: () => void;
-}) => {
+const WorkflowTriggerExecutionItem = ({triggerExecution}: {triggerExecution: TriggerExecution}) => {
     const {endDate, icon, startDate, title, workflowTrigger} = triggerExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
 
     return (
-        <li
-            className={twMerge(
-                'flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-4 hover:bg-muted',
-                selected && 'bg-muted/50 font-semibold'
-            )}
-            onClick={() => onClick && onClick()}
-        >
-            <div className="flex items-center space-x-2 text-sm">
-                <WorkflowExecutionBadge status={triggerExecution.status} />
+        <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
+            <div className="flex items-center gap-x-2 text-sm">
+                {triggerExecution.status === 'COMPLETED' ? (
+                    <CheckIcon className="size-4 text-success" />
+                ) : (
+                    <AlertTriangleIcon className="size-4 text-destructive" />
+                )}
 
                 <div className="flex items-center gap-x-1">
-                    {icon && <LazyLoadSVG className="size-4" src={icon} />}
+                    {icon && <LazyLoadSVG className="size-5" src={icon} />}
 
-                    <span>{title}</span>
+                    <div className="flex flex-col items-start">
+                        <span>{workflowTrigger?.label || title}</span>
 
-                    <span className="text-xs text-muted-foreground">
-                        ({workflowTrigger?.name || workflowTrigger?.type})
-                    </span>
+                        <span className="text-xs text-muted-foreground">
+                            ({workflowTrigger?.name || workflowTrigger?.type})
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <div className="flex items-center">
-                <span className="ml-auto mr-2 text-xs">{duration ?? 0}ms</span>
+                <span className="p-1 text-xs">{duration ?? 0}ms</span>
             </div>
         </li>
     );
