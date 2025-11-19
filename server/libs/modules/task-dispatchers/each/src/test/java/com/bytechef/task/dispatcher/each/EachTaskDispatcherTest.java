@@ -29,6 +29,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -46,7 +47,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationEventPublisher;
@@ -72,16 +72,16 @@ public class EachTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatch1() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
-                taskExecutionService, taskFileStorage);
+    public void testEachTaskDispatcherWhenMissingRequiredParameter() {
 
-            dispatcher.dispatch(TaskExecution.builder()
-                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
-                .build());
-        });
+        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+            contextService, counterService, SpelEvaluator.create(), eventPublisher, taskDispatcher,
+            taskExecutionService, taskFileStorage);
+
+        dispatcher.dispatch(TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+            .build());
+        verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionErrorEvent.class));
     }
 
     @Test
