@@ -44,6 +44,7 @@ const ProjectsLeftSidebar = ({
     const [sortBy, setSortBy] = useState('last-edited');
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const projectHiddenFileInputRef = useRef<HTMLInputElement>(null);
@@ -156,15 +157,10 @@ const ProjectsLeftSidebar = ({
                                 </Tooltip>
 
                                 <DropdownMenuContent align="end">
-                                    <ProjectDialog
-                                        project={undefined}
-                                        triggerNode={
-                                            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                                                <PlusIcon className="mr-2 size-4" />
-                                                From Scratch
-                                            </DropdownMenuItem>
-                                        }
-                                    />
+                                    <DropdownMenuItem onClick={() => setShowProjectDialog(true)}>
+                                        <PlusIcon className="mr-2 size-4" />
+                                        From Scratch
+                                    </DropdownMenuItem>
 
                                     {ff_1041 && (
                                         <DropdownMenuItem onClick={() => navigate(`templates`)}>
@@ -291,6 +287,8 @@ const ProjectsLeftSidebar = ({
                     </ul>
                 )}
             </ScrollArea>
+
+            {showProjectDialog && <ProjectDialog onClose={() => setShowProjectDialog(false)} project={undefined} />}
 
             {showWorkflowDialog && (
                 <WorkflowDialog
