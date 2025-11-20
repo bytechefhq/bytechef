@@ -54,11 +54,12 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
 
-//    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
-//    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
-    implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
