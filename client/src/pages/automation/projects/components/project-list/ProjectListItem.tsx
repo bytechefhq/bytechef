@@ -342,7 +342,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             <div className="flex items-center space-x-2">
                                 {project.lastPublishedDate && project.lastProjectVersion ? (
                                     <>
-                                        <Badge className="flex space-x-1" styleType="success-outline">
+                                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
                                             <span>V{project.lastProjectVersion - 1}</span>
 
                                             <span>PUBLISHED</span>
@@ -365,7 +365,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         {/*/>*/}
                                     </>
                                 ) : (
-                                    <Badge className="flex space-x-1" styleType="secondary-filled">
+                                    <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
                                         <span>V{project.lastProjectVersion}</span>
 
                                         <span>{project.lastStatus}</span>
