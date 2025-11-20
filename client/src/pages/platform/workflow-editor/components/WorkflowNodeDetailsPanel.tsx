@@ -429,14 +429,23 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const currentWorkflowTask = useMemo(
-        () => workflow.tasks?.find((task) => task.name === currentNode?.workflowNodeName),
+        () =>
+            currentNode?.workflowNodeName
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.workflowNodeName,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined,
         [workflow.tasks, currentNode]
     );
 
     const currentClusterElementsConnections = useMemo(() => {
-        const mainClusterRootTask = workflow.tasks?.find(
-            (task) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
+        const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+            ? getTaskDispatcherTask({
+                  taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+                  tasks: workflow.tasks || [],
+              })
+            : undefined;
 
         if (mainClusterRootTask?.connections && currentNode?.clusterElementType) {
             return mainClusterRootTask.connections.filter(
@@ -561,9 +570,12 @@ const WorkflowNodeDetailsPanel = ({
         let filteredNodeNames = workflowNodeOutputs?.map((output) => output.workflowNodeName) || [];
 
         if (currentNode?.conditionData) {
-            const parentConditionTask = workflow.tasks?.find(
-                (task) => task.name === currentNode.conditionData?.conditionId
-            );
+            const parentConditionTask = currentNode.conditionData.conditionId
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.conditionData.conditionId,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined;
 
             if (!parentConditionTask) {
                 return [];
@@ -582,7 +594,12 @@ const WorkflowNodeDetailsPanel = ({
                 (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
             );
         } else if (currentNode?.branchData) {
-            const parentBranchTask = workflow.tasks?.find((task) => task.name === currentNode.branchData?.branchId);
+            const parentBranchTask = currentNode.branchData.branchId
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.branchData.branchId,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined;
 
             if (!parentBranchTask || !parentBranchTask.parameters) {
                 return [];
