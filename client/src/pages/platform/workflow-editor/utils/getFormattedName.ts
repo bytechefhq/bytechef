@@ -3,6 +3,7 @@ import {ClusterElementsType, NodeDataType} from '@/shared/types';
 
 import {isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import getAllTasksRecursively from './getAllTasksRecursively';
 
 export default function getFormattedName(itemName: string): string {
     const {nodes, workflow} = useWorkflowDataStore.getState();
@@ -13,7 +14,9 @@ export default function getFormattedName(itemName: string): string {
 
     const workflowDefinition = JSON.parse(workflow.definition!);
 
-    const clusterElementNames = workflowDefinition.tasks.map((task: WorkflowTask) => {
+    const allTasks = getAllTasksRecursively(workflowDefinition.tasks);
+
+    const clusterElementNames = allTasks.map((task: WorkflowTask) => {
         const elementNames: string[] = [];
 
         const {clusterElements} = task;
