@@ -18,7 +18,6 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -77,16 +76,17 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testEachTaskDispatcherWhenMissingRequiredParameter() {
-        assertThrows(NullPointerException.class, () -> {
-            EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
-                taskExecutionService, taskFileStorage);
+        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+            contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
+            taskFileStorage);
 
-            dispatcher.dispatch(TaskExecution.builder()
-                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
+        dispatcher.dispatch(
+            TaskExecution.builder()
+                .workflowTask(
+                    new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
                 .build());
-            verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionErrorEvent.class));
-        });
+
+        verify(eventPublisher, times(1)).publishEvent(any(TaskExecutionErrorEvent.class));
     }
 
     @Test
