@@ -1,14 +1,21 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 
 const WorkflowExecutionBadge = ({status}: {status: string}) => {
+    const getStyleType = () => {
+        if (status === 'COMPLETED') {
+            return 'success-outline';
+        }
+
+        if (status === 'FAILED') {
+            return 'destructive-filled';
+        }
+
+        return 'secondary-filled';
+    };
+
     return (
         <div className="flex items-center">
-            <Badge
-                className="uppercase"
-                variant={status === 'COMPLETED' ? 'success' : status === 'FAILED' ? 'destructive' : 'secondary'}
-            >
-                {status ?? ''}
-            </Badge>
+            <Badge className="uppercase" label={status ?? ''} styleType={getStyleType()} />
         </div>
     );
 };
