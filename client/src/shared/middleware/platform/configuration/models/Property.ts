@@ -148,6 +148,7 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         if (json['type'] === 'TIME') {
             return TimePropertyFromJSONTyped(json, ignoreDiscriminator);
         }
+
     }
     return {
         

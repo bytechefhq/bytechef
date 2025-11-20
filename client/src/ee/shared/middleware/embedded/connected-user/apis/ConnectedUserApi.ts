@@ -195,11 +195,11 @@ export class ConnectedUserApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['createDateFrom'] != null) {
-            queryParameters['createDateFrom'] = (requestParameters['createDateFrom'] as any).toISOString().substring(0,10);
+            queryParameters['createDateFrom'] = requestParameters['createDateFrom'];
         }
 
         if (requestParameters['createDateTo'] != null) {
-            queryParameters['createDateTo'] = (requestParameters['createDateTo'] as any).toISOString().substring(0,10);
+            queryParameters['createDateTo'] = requestParameters['createDateTo'];
         }
 
         if (requestParameters['integrationId'] != null) {

@@ -113,11 +113,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         }
 
         if (requestParameters['jobStartDate'] != null) {
-            queryParameters['jobStartDate'] = (requestParameters['jobStartDate'] as any).toISOString();
+            queryParameters['jobStartDate'] = requestParameters['jobStartDate'];
         }
 
         if (requestParameters['jobEndDate'] != null) {
-            queryParameters['jobEndDate'] = (requestParameters['jobEndDate'] as any).toISOString();
+            queryParameters['jobEndDate'] = requestParameters['jobEndDate'];
         }
 
         if (requestParameters['projectId'] != null) {
