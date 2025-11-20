@@ -48,7 +48,7 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class VectorStoreConfiguration {
+public class VectorStoreLoaderConfiguration {
 
     private static final String CATEGORY = "category";
     private static final String COMPONENTS = "components";
@@ -64,7 +64,7 @@ public class VectorStoreConfiguration {
     private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
-    public VectorStoreConfiguration(
+    public VectorStoreLoaderConfiguration(
         VectorStore vectorStore, VectorStoreService vectorStoreService,
         // TODO Add dependency on ComponentDefinitionService, implement local ComponentDefinitionRegistry, that will
         // read generated component json definitions
