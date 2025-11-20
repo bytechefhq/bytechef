@@ -14,6 +14,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
@@ -24,7 +26,9 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -98,6 +102,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // add script advisor
             )
             .build();
+
+        systemPrompt = getSystemPrompt(systemPromptResource);
     }
 
     @Override
@@ -109,7 +115,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         return switch (context.source()) {
             case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
                 chatClientWorkflow.prompt()
-                    .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
+                    .system(this.systemPrompt)
                     .user(user -> user.text(USER_PROMPT)
                         .param(WORKFLOW, workflowDefinition)
                         .param(MESSAGE_ROUTE, message))
@@ -157,5 +163,18 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                 };
             }
         };
+    }
+
+    private String getSystemPrompt(Resource systemPromptResource) {
+        final String systemPrompt;
+        try {
+            InputStream inputStream = systemPromptResource.getInputStream();
+
+            systemPrompt = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading system prompt resource", e);
+        }
+
+        return systemPrompt;
     }
 }
