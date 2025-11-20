@@ -21,22 +21,22 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ExecuteWorkflows400ResponseModel
+ * ExecuteAction400ResponseModel
  */
 
-@JsonTypeName("executeWorkflows_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-07T14:49:44.122259+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
-public class ExecuteWorkflows400ResponseModel {
+@JsonTypeName("executeAction_400_response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:31.978624+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+public class ExecuteAction400ResponseModel {
 
   @Valid
   private List<@Valid ErrorsInnerModel> errors = new ArrayList<>();
 
-  public ExecuteWorkflows400ResponseModel errors(List<@Valid ErrorsInnerModel> errors) {
+  public ExecuteAction400ResponseModel errors(List<@Valid ErrorsInnerModel> errors) {
     this.errors = errors;
     return this;
   }
 
-  public ExecuteWorkflows400ResponseModel addErrorsItem(ErrorsInnerModel errorsItem) {
+  public ExecuteAction400ResponseModel addErrorsItem(ErrorsInnerModel errorsItem) {
     if (this.errors == null) {
       this.errors = new ArrayList<>();
     }
@@ -67,8 +67,8 @@ public class ExecuteWorkflows400ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecuteWorkflows400ResponseModel executeWorkflows400Response = (ExecuteWorkflows400ResponseModel) o;
-    return Objects.equals(this.errors, executeWorkflows400Response.errors);
+    ExecuteAction400ResponseModel executeAction400Response = (ExecuteAction400ResponseModel) o;
+    return Objects.equals(this.errors, executeAction400Response.errors);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class ExecuteWorkflows400ResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecuteWorkflows400ResponseModel {\n");
+    sb.append("class ExecuteAction400ResponseModel {\n");
     sb.append("    errors: ").append(toIndentedString(errors)).append("\n");
     sb.append("}");
     return sb.toString();

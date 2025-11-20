@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeploymentBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-07T14:49:45.643121+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:32.946393+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public class ProjectDeploymentBasicModel {
 
   private @Nullable String createdBy;
