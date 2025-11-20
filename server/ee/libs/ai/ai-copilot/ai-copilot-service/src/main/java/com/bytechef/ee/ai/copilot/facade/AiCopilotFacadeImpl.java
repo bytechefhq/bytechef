@@ -13,7 +13,6 @@ import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.ai.copilot.dto.ContextDTO;
-import com.bytechef.ee.ai.copilot.workflow.RoutingWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
@@ -41,51 +40,49 @@ import reactor.core.publisher.Flux;
 public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     private static final String MESSAGE_ROUTE = "message";
-    private static final String OTHER_ROUTE = "other";
-    private static final Map<String, String> ROUTES = Map.of(
-        "workflow",
-        "The prompt contains some kind of workflow or the user asks you to create, add or modify something.",
-        "other",
-        "The user wants something else.");
+//    private static final String OTHER_ROUTE = "other";
     private static final String WORKFLOW_EDITOR_SYSTEM_PROMPT =
         """
-            You are an expert in Bytechef automation software using tools. Your role is to design, build, and validate Bytechef workflows with maximum accuracy and efficiency.
+            You are an expert in ByteChef automation software. Your role is to design, build, and validate ByteChef workflows with maximum accuracy and efficiency using tools.
 
             ## Core Workflow Building Process
 
-            1. **Discovery Phase** - Find the right tasks:
-               - Think deeply about user request and the logic you are going to build to fulfill it. Ask follow-up questions to clarify the user's intent, if something is unclear. Then, proceed with the rest of your instructions.
+            1. **Get Context** - Get the context of the user's current workflow.
+               - `getWorkflow(workflowId)` - Get current workflow by id
+
+            2. **Discovery Phase** - Find the right tasks:
                - `searchTask(query, type)` - Search triggers, actions or task dispatchers by keywords
                - `listTasks(type, limit)` - list all tasks of certain type: action, trigger or taskDispatcher
+               - Think deeply about user request and the logic you are going to build to fulfill it. Ask follow-up questions to clarify the user's intent, if something is unclear. Then, proceed with the rest of your instructions.
 
-            2. **Configuration Phase** - Get task details efficiently:
+            3. **Configuration Phase** - Get task details efficiently:
                - `getTaskDefinition(type, name, componentName, version)` - Structure of the task
                - `getTaskProperties(type, name, componentName, version)` - Optional. Get a more detailed descriptions of its properties
                - `getTaskOutputProperty(type, name, componentName, version)` - Output properties of the task.
-            - If you get an error on getTaskOutputProperty() that says that the user needs to make a connection, warn the user that the final workflow might not complete if he doesn't have a connection. Repeat getTaskOutputProperty() if he makes a connection
+               - If you get an error on getTaskOutputProperty() that says that the user needs to make a connection, warn the user that the final workflow might not complete if he doesn't have a connection
 
-            3. **Pre-Validation Phase** - Validate BEFORE building:
+            4. **Pre-Validation Phase** - Validate BEFORE building:
                - `validateTask(task, type,  name, conponentName, version)` - Task related validation
                - Fix any errors before proceeding. Repeat task validation until all errors are gone
                - It is good common practice to show a visual representation of the workflow architecture to the user and asking for opinion, before moving forward.
 
-            4. **Building Phase** - Create the workflow:
+            5. **Building Phase** - Create the workflow:
                - `buildingInstructions()` - Start here!
                - `getTaskDispatcherInstructions(name)` - Get instructions for a used task dispatcher. Call this for every task dispatcher that's being used
                - Use validated configurations from step 3
                - Connect nodes with proper structure
-               - Build the workflow in an artifact for easy editing downstream (unless the user asked to create in Bytechef instance)
 
-            5. **Workflow Validation Phase** - Validate complete workflow:
+            6. **Workflow Validation Phase** - Validate complete workflow:
                - `validateWorkflow(workflow)` - Complete validation
-               - Fix any errors found. Repeat workflow validation until all errors are gone
+               - Fix any errors found. Repeat workflow validation until all errors are gone. If the only error is the one where the user needs to make a connection, deploy the workflow anyway
+               - Write the resulting workflow in json
 
-            6. **Deployment** - Deploy it on ByteChef:
-            - `searchWorkflows(query)` - search for a specific workflow
-            - `updateWorkflow(workflowId, workflow)` -
-            - `searchProjects(query)` - search for a specific project if asked to create a new one
-            - `createProject(name)` - create a new project if asked to create a new one
-            - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
+            7. **Deployment** - Deploy it on ByteChef:
+               - `updateWorkflow(workflowId, workflow)` - update the workflow
+               - `searchWorkflows(query)` - search for a specific workflow
+               - `searchProjects(query)` - search for a specific project if asked to create a new one
+               - `createProject(name)` - create a new project if asked to create a new one
+               - `createProjectWorkflow(projectId, definition)` - create a new workflow if asked
 
             ## Key Insights
 
@@ -102,18 +99,20 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             ### After Building:
             1. validateWorkflow() - Complete workflow validation
             2. If there are errors, fix them and validateWorkflow() again before proceeding
+            3. If the only error is the one where the user needs to make a connection, deploy the workflow
 
             ## Example Workflow
 
             ### 1. Discovery & Configuration
+            getWorkflow(workflowId)
             searchTask('slack', 'action')
             // Ask questions if something is unclear
 
             ### 2. Configuration Phase
             getTaskDefinition('action', 'slackActionName', 'slack', 1)
             getTaskOutputProperty('action', 'slackActionName', 'slack', 1)
-            // If getTaskOutputProperty() throws an error, remind them to make a connection before you proceed
             // Ask questions if something is unclear
+            // If getTaskOutputProperty() throws an error, remind them to make a connection for the component to work. Ask if they want to do it now or after deployment. If they say they made the connection, repeat from step 2.
 
             ### 3. Pre-Validation
             validateTask()
@@ -126,16 +125,11 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             validateWorkflow()
 
             ### 5. Deploy Workflow
-            // Ask the user what project and workflow you should deploy it to
-            // If provided:
-            searchWorkflows()
-            updateWorkflow()
-            // If asked to create a new one:
-            createProject()
-            createProjectWorkflow()
+            updateWorkflow(workflowId, workflow)
+            // If a component is still missing a connection, ask the user to create it
+            // When he does, repeat the process from step 2.
 
-            ## Important Rules
-
+            ## Important Rules:
             - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
             - Display condition is located in metadata if the property is an object or in between @@ if it's not. If the condition is false: the object is not part of the JSON definition. Otherwise it is a part of it.
             - Every task must have a unique name in format: componentName_{number}
@@ -161,7 +155,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientWorkflow;
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
-    private final RoutingWorkflow routingWorkflow;
     private final ProjectWorkflowTools projectWorkflowTools;
     private final ProjectTools projectTools;
     private final TaskTools taskTools;
@@ -213,8 +206,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // add script advisor
             )
             .build();
-
-        this.routingWorkflow = new RoutingWorkflow(this.chatClientWorkflow);
     }
 
     @Override
@@ -231,71 +222,68 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             workflow = null;
         }
 
-        String route = routingWorkflow.route(message, ROUTES);
+        return switch (context.source()) {
+            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
+                chatClientWorkflow.prompt()
+                    .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
+                    .user(user -> user.text(USER_PROMPT)
+                        .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
+                        .param(MESSAGE_ROUTE, message))
+                    .advisors(advisor -> advisor.param(
+                        ChatMemory.CONVERSATION_ID,
+                        Objects.requireNonNull(Objects.requireNonNull(workflow)
+                            .getId()))) // conversationId
+                    .tools(taskTools, projectWorkflowTools, projectTools)
+                    .stream()
+                    .content()
+                    .map(content -> Map.of(
+                        "text", content));
+            case CODE_EDITOR -> {
+                Map<String, ?> parameters = context.parameters();
 
-        return switch (route) {
-            case WORKFLOW_ROUTE -> switch (context.source()) {
-                case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
-                    chatClientWorkflow.prompt()
-                        .system(WORKFLOW_EDITOR_SYSTEM_PROMPT)
+                yield switch ((String) parameters.get("language")) {
+                    case "javascript" -> chatClientScript.prompt()
+                        .system("You are a javascript code generator, answer only with code.")
                         .user(user -> user.text(USER_PROMPT)
                             .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
                             .param(MESSAGE_ROUTE, message))
-                        .advisors(advisor -> advisor.param(
-                            ChatMemory.CONVERSATION_ID,
-                            Objects.requireNonNull(Objects.requireNonNull(workflow)
-                                .getId()))) // conversationId
-                        .tools(taskTools, projectWorkflowTools, projectTools)
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                         .stream()
                         .content()
-                        .map(content -> Map.of(
-                            "text", content));
-                case CODE_EDITOR -> {
-                    Map<String, ?> parameters = context.parameters();
-
-                    yield switch ((String) parameters.get("language")) {
-                        case "javascript" -> chatClientScript.prompt()
-                            .system("You are a javascript code generator, answer only with code.")
-                            .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
-                                .param(MESSAGE_ROUTE, message))
-                            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                            .stream()
-                            .content()
-                            .map(content -> Map.of("text", content));
-                        case "python" -> chatClientScript.prompt()
-                            .system("You are a python code generator, answer only with code.")
-                            .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
-                                .param(MESSAGE_ROUTE, message))
-                            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                            .stream()
-                            .content()
-                            .map(content -> Map.of("text", content));
-                        case "ruby" -> chatClientScript.prompt()
-                            .system("You are a ruby code generator, answer only with code.")
-                            .user(user -> user.text(USER_PROMPT)
-                                .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
-                                .param(MESSAGE_ROUTE, message))
-                            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                            .stream()
-                            .content()
-                            .map(content -> Map.of("text", content));
-                        default ->
-                            throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
-                    };
-                }
-            };
-            case OTHER_ROUTE ->
-                chatClientWorkflow.prompt()
-                    .system(MESSAGE_SYSTEM_PROMPT)
-                    .user(user -> user.text(message))
-                    .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
-                    .tools(projectTools, projectWorkflowTools)
-                    .stream()
-                    .content()
-                    .map(content -> Map.of("text", content));
-            default -> throw new IllegalStateException("Unexpected route: " + route);
+                        .map(content -> Map.of("text", content));
+                    case "python" -> chatClientScript.prompt()
+                        .system("You are a python code generator, answer only with code.")
+                        .user(user -> user.text(USER_PROMPT)
+                            .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
+                            .param(MESSAGE_ROUTE, message))
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                        .stream()
+                        .content()
+                        .map(content -> Map.of("text", content));
+                    case "ruby" -> chatClientScript.prompt()
+                        .system("You are a ruby code generator, answer only with code.")
+                        .user(user -> user.text(USER_PROMPT)
+                            .param(WORKFLOW_ROUTE, Objects.requireNonNull(currentWorkflow))
+                            .param(MESSAGE_ROUTE, message))
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                        .stream()
+                        .content()
+                        .map(content -> Map.of("text", content));
+                    default ->
+                        throw new IllegalStateException("Unexpected value: " + parameters.get("language"));
+                };
+            }
         };
+//            case OTHER_ROUTE ->
+//                chatClientWorkflow.prompt()
+//                    .system(MESSAGE_SYSTEM_PROMPT)
+//                    .user(user -> user.text(message))
+//                    .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+//                    .tools(projectTools, projectWorkflowTools)
+//                    .stream()
+//                    .content()
+//                    .map(content -> Map.of("text", content));
+//            default -> throw new IllegalStateException("Unexpected route: " + route);
+//        };
     }
 }
