@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.execution.public_.web.rest;
+package com.bytechef.ee.embedded.webhook;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

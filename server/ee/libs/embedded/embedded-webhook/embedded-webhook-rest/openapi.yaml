@@ -1,0 +1,237 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/embedded/v1"
+tags:
+  - name: "app-event-trigger"
+    description: "The Embedded App Event Trigger Public API"
+  - name: "request-trigger"
+    description: "The Embedded Request Trigger Public API"
+paths:
+  /app-events:
+    post:
+      description: "Execute workflows."
+      summary: "Execute workflows"
+      tags:
+        - "app-event-trigger"
+      operationId: "executeWorkflows"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "204":
+          description: "Successful operation."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
+  /workflows/{workflowUuid}:
+    post:
+      description: "Execute workflows."
+      summary: "Execute workflows"
+      tags:
+        - "request-trigger"
+      operationId: "executeWorkflow"
+      parameters:
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The list of active integrations."
+          content:
+            application/json:
+              schema:
+                type: "object"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
+components:
+  responses:
+    badRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    forbidden:
+      description: Forbidden
+      content:
+       application/json:
+         schema:
+           type: object
+           properties:
+             errors:
+               $ref: "#/components/schemas/Errors"
+    internalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    notFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    notImplemented:
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    remoteProviderError:
+      description: Remote provider error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    unprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+  schemas:
+    Environment:
+      $ref: "../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+    Errors:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: A unique identifier for the instance of the error. Provide this to support when contacting ByteChef.
+            example: 9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5
+          detail:
+            type: string
+            description: A detailed description of the error.
+          #      example: 'Property values were not valid: [{"isValid":false,"message":"Property "__about_us" does not exist","error":"PROPERTY_DOESNT_EXIST","name":"__about_us","localizedErrorMessage":"Property "__about_us" does not exist"}]'
+          problem_type:
+            type: string
+            description: The ByteChef error code associated with the error.
+            example: MISSING_REQUIRED_FIELD
+            deprecated: true
+          title:
+            type: string
+            description: A brief description of the error. The schema and type of message will vary by Provider.
+            example: |
+              Property values were not valid
+          code:
+            type: string
+            description: The ByteChef error code associated with the error.
+            example: MISSING_REQUIRED_FIELD
+          status:
+            type: string
+            description: The HTTP status code associated with the error.
+            example: '400'
+          meta:
+            type: object
+            description: Additional metadata about the error.
+            properties:
+              cause:
+                type: object
+                description: The cause of the error. Usually the underlying error from the remote Provider.
+              origin:
+                type: string
+                enum: [ remote-provider, bytechef ]
+                description: The origin of the error.
+                example: remote-provider
+              application_name:
+                type: string
+                description: The name of the application that generated the error.
+                example: MyCompany Production
+            required:
+              - origin
+            additionalProperties: true
+        required:
+          - id
+          - detail
+          - problem_type
+          - title
+          - code
+          - status
+          - meta

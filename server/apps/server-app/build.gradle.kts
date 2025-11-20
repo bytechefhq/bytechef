@@ -168,6 +168,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))
     implementation(project(":server:ee:libs:embedded:embedded-unified:embedded-unified-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-unified:embedded-unified-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-webhook:embedded-webhook-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))

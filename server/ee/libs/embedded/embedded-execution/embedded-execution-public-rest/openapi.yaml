@@ -6,20 +6,10 @@ info:
 servers:
   - url: "/api/embedded/v1"
 tags:
-  - name: "action"
-    description: "The Embedded Component Action Public API"
   - name: "app-event-trigger"
     description: "The Embedded App Event Trigger Public API"
-  - name: "component"
-    description: "The Embedded Component Public API"
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
-  - name: "tool"
-    description: "The Embedded AI Tool Public API"
-  - name: "trigger"
-    description: "The Embedded Component Trigger Public API"
-  - name: "trigger-subscription"
-    description: "The Embedded Component Trigger Subscription Public API"
 paths:
 #  /components:
 #    get:
@@ -90,41 +80,6 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
-  /app-events:
-    post:
-      description: "Execute workflows."
-      summary: "Execute workflows"
-      tags:
-        - "app-event-trigger"
-      operationId: "executeWorkflows"
-      parameters:
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-      responses:
-        "204":
-          description: "Successful operation."
-        "400":
-          $ref: "#/components/responses/badRequest"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/notFound"
-        "409":
-          $ref: "#/components/responses/conflict"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
-        "499":
-          $ref: "#/components/responses/remoteProviderError"
-        "500":
-          $ref: "#/components/responses/internalServerError"
-        "501":
-          $ref: "#/components/responses/notImplemented"
   /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}:
     post:
       description: "Executes an action of a component and returns the result as the response."
@@ -374,51 +329,6 @@ paths:
             application/json:
               schema:
                 type: object
-        "400":
-          $ref: "#/components/responses/badRequest"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/notFound"
-        "409":
-          $ref: "#/components/responses/conflict"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
-        "499":
-          $ref: "#/components/responses/remoteProviderError"
-        "500":
-          $ref: "#/components/responses/internalServerError"
-        "501":
-          $ref: "#/components/responses/notImplemented"
-  /workflows/{workflowUuid}:
-    post:
-      description: "Execute workflows."
-      summary: "Execute workflows"
-      tags:
-        - "request-trigger"
-      operationId: "executeWorkflow"
-      parameters:
-        - name: "workflowUuid"
-          description: "The workflow uuid."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "X-Environment"
-          description: "The environment."
-          in: "header"
-          required: false
-          schema:
-            $ref: '#/components/schemas/Environment'
-      responses:
-        "200":
-          description: "The list of active integrations."
-          content:
-            application/json:
-              schema:
-                type: "object"
         "400":
           $ref: "#/components/responses/badRequest"
         "401":

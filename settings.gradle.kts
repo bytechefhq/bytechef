@@ -491,6 +491,7 @@ include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user
 include("server:ee:libs:embedded:embedded-execution:embedded-execution-api")
 include("server:ee:libs:embedded:embedded-execution:embedded-execution-public-rest")
 include("server:ee:libs:embedded:embedded-execution:embedded-execution-service")
+include("server:ee:libs:embedded:embedded-webhook:embedded-webhook-rest")
 include("server:ee:libs:embedded:embedded-security:embedded-security-api")
 include("server:ee:libs:embedded:embedded-security:embedded-security-rest")
 include("server:ee:libs:embedded:embedded-security:embedded-security-service")
