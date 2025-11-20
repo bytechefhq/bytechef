@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateAiProvider_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-10-07T14:49:45.263320+02:00[Europe/Zagreb]", comments = "Generator version: 7.16.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:32.735520+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public class UpdateAiProviderRequestModel {
 
   private @Nullable String apiKey;
