@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
 const EnvironmentBadge = ({
@@ -16,7 +16,9 @@ const EnvironmentBadge = ({
         return <></>;
     }
 
-    return <Badge variant={variant}>{environment.name}</Badge>;
+    const styleType = variant === 'outline' ? 'outline-outline' : 'secondary-filled';
+
+    return <Badge label={environment.name} styleType={styleType} weight="semibold" />;
 };
 
 export default EnvironmentBadge;
