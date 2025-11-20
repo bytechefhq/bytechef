@@ -32,9 +32,7 @@ const ProjectDeploymentFilterTitle = ({
                 {searchParams.get('tagId') ? 'tag' : 'project'}:
             </span>
 
-            <Badge styleType="secondary-filled" weight="semibold">
-                <span className="text-sm">{pageTitle ?? 'All Projects'}</span>
-            </Badge>
+            <Badge label={`${pageTitle ?? 'All Projects'}`} styleType="secondary-filled" weight="semibold" />
         </div>
     );
 };
