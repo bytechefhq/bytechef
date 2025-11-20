@@ -16,7 +16,6 @@ import com.bytechef.ee.ai.copilot.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
