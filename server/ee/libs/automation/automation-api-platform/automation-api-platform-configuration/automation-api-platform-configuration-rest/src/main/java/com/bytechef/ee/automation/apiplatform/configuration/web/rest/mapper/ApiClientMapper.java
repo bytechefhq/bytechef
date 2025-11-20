@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.conf
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiClientModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
@@ -28,5 +29,6 @@ public interface ApiClientMapper extends Converter<ApiClient, ApiClientModel> {
 
     @InheritInverseConfiguration
     @DelegatingConverter
+    @Mapping(target = "environment", ignore = true)
     ApiClient invertConvert(ApiClientModel apiClientModel);
 }
