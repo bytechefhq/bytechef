@@ -34,7 +34,6 @@ import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
 import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import {getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
     clusterElementType?: string;
@@ -190,12 +189,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                ? getTaskDispatcherTask({
-                      taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
-                      tasks: workflowDefinitionTasks,
-                  })
-                : undefined;
+            const mainClusterRootTask = workflowDefinitionTasks?.find(
+                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
+            );
 
             if (!mainClusterRootTask) {
                 return;
