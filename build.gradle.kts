@@ -32,6 +32,7 @@ subprojects {
     dependencyManagement {
         dependencies {
             dependency("com.github.spotbugs:spotbugs-annotations:[4.9.3,)")
+            dependency("org.quartz-scheduler:quartz:${rootProject.libs.versions.quartz.get()}")
         }
     }
 
