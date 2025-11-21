@@ -83,6 +83,7 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import {getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
@@ -435,36 +436,127 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const currentClusterElementsConnections = useMemo(() => {
-        const mainClusterRootTask = workflow.tasks?.find(
-            (task) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
+        if (!rootClusterElementNodeData?.workflowNodeName) {
+            return undefined;
+        }
+
+        const mainClusterRootTask = getTaskDispatcherTask({
+            taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+            tasks: workflow.tasks || [],
+        });
 
         if (mainClusterRootTask?.connections && currentNode?.clusterElementType) {
             return mainClusterRootTask.connections.filter(
                 (connection) => connection.key === currentNode?.workflowNodeName
             );
         }
+
+        //This updates the connection tab in cluster elements when model is updated, but it doesn't handle selecting a connection
+        //Existing logic needs to be put here to replace this code
+        if (mainClusterRootTask?.clusterElements && (currentNode?.clusterRoot || rootClusterElementNodeData)) {
+            const connections: ComponentConnection[] = [];
+            const clusterElements = mainClusterRootTask.clusterElements;
+
+            // Handle each cluster element type
+            for (const [key, element] of Object.entries(clusterElements)) {
+                if (!element) continue;
+
+                // Handle array types (e.g., tools)
+                if (Array.isArray(element)) {
+                    element.forEach((item: any) => {
+                        if (item?.type) {
+                            const [componentName, versionStr] = item.type.split('/');
+                            const version = parseInt(versionStr?.replace('v', '') || '1');
+
+                            connections.push({
+                                componentName,
+                                componentVersion: version,
+                                key: item.name || key,
+                                required: false,
+                                workflowNodeName: mainClusterRootTask.name,
+                            });
+                        }
+                    });
+                }
+                // Handle object types (e.g., model, chatMemory, rag)
+                else if (typeof element === 'object' && (element as any).type) {
+                    const [componentName, versionStr] = (element as any).type.split('/');
+                    const version = parseInt(versionStr?.replace('v', '') || '1');
+
+                    connections.push({
+                        componentName,
+                        componentVersion: version,
+                        key,
+                        required: false,
+                        workflowNodeName: mainClusterRootTask.name,
+                    });
+                }
+            }
+
+            return connections;
+        }
+
+        return undefined;
     }, [
         currentNode?.clusterElementType,
+        currentNode?.clusterRoot,
+        currentNode?.name,
         currentNode?.workflowNodeName,
         rootClusterElementNodeData?.workflowNodeName,
         workflow.tasks,
     ]);
 
-    const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(
-        () =>
+    const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(() => {
+        const connections =
             currentWorkflowTask?.connections ||
             currentWorkflowTrigger?.connections ||
             currentClusterElementsConnections ||
-            [],
-        [currentWorkflowTask?.connections, currentWorkflowTrigger?.connections, currentClusterElementsConnections]
-    );
+            currentNode?.connections ||
+            [];
+
+        // This handles connections in task dispatchers
+        if (
+            connections.length === 0 &&
+            currentComponentDefinition?.connection &&
+            currentComponentDefinition?.name &&
+            currentComponentDefinition?.version &&
+            currentNode?.workflowNodeName &&
+            !currentNode?.clusterElementType
+        ) {
+            return [
+                {
+                    componentName: currentComponentDefinition.name,
+                    componentVersion: currentComponentDefinition.version,
+                    key: currentComponentDefinition.name,
+                    required: currentComponentDefinition.connectionRequired || false,
+                    workflowNodeName: currentNode.workflowNodeName,
+                },
+            ];
+        }
+
+        return connections;
+    }, [
+        currentWorkflowTask?.connections,
+        currentWorkflowTrigger?.connections,
+        currentClusterElementsConnections,
+        currentNode?.connections,
+        currentNode?.workflowNodeName,
+        currentNode?.clusterElementType,
+        currentComponentDefinition?.connection,
+        currentComponentDefinition?.connectionRequired,
+        currentComponentDefinition?.name,
+        currentComponentDefinition?.version,
+    ]);
 
     const nodeTabs = useMemo(
         () =>
             TABS.filter(({name}) => {
                 if (name === 'connection') {
-                    return currentWorkflowNodeConnections.length > 0;
+                    return (
+                        (currentWorkflowNodeConnections.length > 0 ||
+                            currentComponentDefinition?.connection !== undefined) &&
+                        !currentNode?.clusterElementType
+                    );
                 }
 
                 if (name === 'output') {
@@ -481,6 +573,8 @@ const WorkflowNodeDetailsPanel = ({
             }),
         [
             currentWorkflowNodeConnections,
+            currentComponentDefinition,
+            currentNode?.clusterElementType,
             showOutputTab,
             currentNode,
             currentTaskDispatcherDefinition,
@@ -562,9 +656,12 @@ const WorkflowNodeDetailsPanel = ({
         let filteredNodeNames = workflowNodeOutputs?.map((output) => output.workflowNodeName) || [];
 
         if (currentNode?.conditionData) {
-            const parentConditionTask = workflow.tasks?.find(
-                (task) => task.name === currentNode.conditionData?.conditionId
-            );
+            const parentConditionTask = currentNode.conditionData.conditionId
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.conditionData.conditionId,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined;
 
             if (!parentConditionTask) {
                 return [];
@@ -583,7 +680,12 @@ const WorkflowNodeDetailsPanel = ({
                 (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
             );
         } else if (currentNode?.branchData) {
-            const parentBranchTask = workflow.tasks?.find((task) => task.name === currentNode.branchData?.branchId);
+            const parentBranchTask = currentNode.branchData.branchId
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.branchData.branchId,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined;
 
             if (!parentBranchTask || !parentBranchTask.parameters) {
                 return [];
@@ -860,7 +962,12 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (activeTab === 'connection' && currentWorkflowNodeConnections.length === 0) {
+        if (
+            activeTab === 'connection' &&
+            (currentWorkflowNodeConnections.length === 0 &&
+                currentComponentDefinition?.connection === undefined ||
+                currentNode?.clusterElementType)
+        ) {
             setActiveTab('description');
 
             return;
@@ -988,9 +1095,12 @@ const WorkflowNodeDetailsPanel = ({
 
         const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-        const mainClusterRootTask = workflowDefinitionTasks?.find(
-            (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-        );
+        const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+            ? getTaskDispatcherTask({
+                  taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+                  tasks: workflowDefinitionTasks,
+              })
+            : undefined;
 
         if (!mainClusterRootTask) {
             return;
