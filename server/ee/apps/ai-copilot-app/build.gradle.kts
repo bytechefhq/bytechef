@@ -16,7 +16,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:jdbc-config"))
 
-    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-remote-rest"))
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:ee:libs:config:observability-config"))
 
