@@ -20,57 +20,62 @@ import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.PULL_REQUESTS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
 class GithubNewPullRequestTriggerTest {
 
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
     void testPoll() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, List.of(1)));
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(REPOSITORY, "testRepo"));
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(PULL_REQUESTS, List.of(1L)));
 
-        List<Map<String, ?>> responseList = List.of(Map.of(ID, 2));
+        List<Map<String, ?>> responseList = List.of(Map.of(ID, 2L));
 
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseList);
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
+            githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
+                .thenReturn("owner");
+            githubUtilsMockedStatic.when(() -> GithubUtils.getItems(
+                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                stringArgumentCaptor.capture()))
+                .thenReturn(responseList);
 
-        PollOutput pollOutput = GithubNewPullRequestTrigger.poll(
-            mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
+            when(mockedTriggerContext.isEditorEnvironment())
+                .thenReturn(false);
 
-        assertEquals(List.of(Map.of(ID, 2)), pollOutput.records());
-        assertEquals(Map.of(PULL_REQUESTS, List.of(2)), pollOutput.closureParameters());
-        assertFalse(pollOutput.pollImmediately());
-        assertEquals(List.of("sort", "created", "direction", "desc"), stringArgumentCaptor.getAllValues());
+            PollOutput pollOutput = GithubNewPullRequestTrigger.poll(
+                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
+
+            assertEquals(
+                new PollOutput(List.of(Map.of(ID, 2L)), Map.of(PULL_REQUESTS, List.of(2L)), false),
+                pollOutput);
+            assertEquals(
+                List.of("/repos/owner/testRepo/pulls", "sort", "created", "direction", "desc"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedTriggerContext, mockedTriggerContext), contextArgumentCaptor.getAllValues());
+            assertEquals(false, booleanArgumentCaptor.getValue());
+        }
     }
 }
