@@ -16,7 +16,7 @@ const WorkflowExecutionsTaskAccordionItem = ({
     taskTreeItem: TaskTreeItemProps;
 }) => {
     const hasChildren = taskTreeItem.children?.length > 0;
-    const hasIterations = taskTreeItem.iterations?.length && taskTreeItem.iterations?.length > 0;
+    const hasIterations = taskTreeItem.iterations && taskTreeItem.iterations.length > 0;
 
     return (
         <AccordionItem

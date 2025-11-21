@@ -66,15 +66,10 @@ export const getFilteredOutput = (
     jobInputs: {[key: string]: object} | undefined,
     workflowTriggerName: string | undefined
 ): object | undefined => {
-    let filteredOutput = output;
-
-    if (jobInputs && Object.keys(jobInputs).length) {
-        filteredOutput = Object.keys(jobInputs)
-            .filter((key) => key === workflowTriggerName)
-            .map((key) => jobInputs[key]);
+    if (jobInputs && workflowTriggerName && jobInputs[workflowTriggerName]) {
+        return jobInputs[workflowTriggerName];
     }
-
-    return filteredOutput;
+    return output;
 };
 
 export const getInitialSelectedItem = (
@@ -123,26 +118,40 @@ export const getDisplayValue = ({job, selectedItem, tab, triggerExecution}: GetD
     return selectedItem.output;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const hasValue = (value: any): boolean => {
+    if (value === undefined || value === null) {
+        return false;
+    }
+
+    if (typeof value !== 'object') {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.length > 0;
+    }
+
+    return Object.keys(value).length > 0;
+};
+
 export const hasDialogContentValue = ({job, selectedItem, tab, triggerExecution}: GetDisplayValueProps): boolean => {
     if (!selectedItem) {
         return false;
     }
 
     if (tab === 'input') {
-        return (
-            selectedItem.input !== undefined &&
-            (typeof selectedItem.input !== 'object' || Object.keys(selectedItem.input).length > 0)
-        );
+        return hasValue(selectedItem.input);
     }
 
     if (tab === 'error') {
-        return selectedItem.error !== undefined;
+        return hasValue(selectedItem.error);
     }
 
     if (tab === 'output') {
         const displayValue = getDisplayValue({job, selectedItem, tab, triggerExecution});
 
-        return displayValue !== undefined;
+        return hasValue(displayValue);
     }
 
     return false;
