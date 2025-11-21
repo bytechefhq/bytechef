@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class SlackSendMessageActionTest extends AbstractSlackActionTest {
+class SlackSendChannelMessageActionTest extends AbstractSlackActionTest {
 
     @Test
     void testPerform() {
-        Object result = SlackSendMessageAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = SlackSendChannelMessageAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedObject, result);
         assertEquals(mockedObject, result);

@@ -35,11 +35,11 @@ import com.bytechef.component.slack.util.SlackUtils;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-public class SlackSendMessageAction {
+public class SlackSendChannelMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
-        .title("Send Message")
-        .description("Sends a message to a public channel, private channel, or existing direct message conversation.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
+        .title("Send Channel Message")
+        .description("Sends a message to a public or private channel.")
         .properties(
             string(CHANNEL)
                 .label("Channel ID")
@@ -48,9 +48,9 @@ public class SlackSendMessageAction {
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
-        .perform(SlackSendMessageAction::perform);
+        .perform(SlackSendChannelMessageAction::perform);
 
-    private SlackSendMessageAction() {
+    private SlackSendChannelMessageAction() {
     }
 
     protected static Object perform(
