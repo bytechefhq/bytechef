@@ -62,13 +62,10 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
-import com.google.api.services.gmail.model.ListMessagesResponse;
-import com.google.api.services.gmail.model.ListThreadsResponse;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
-import com.google.api.services.gmail.model.Thread;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.activation.DataHandler;
 import jakarta.mail.MessagingException;
@@ -328,44 +325,6 @@ public class GoogleMailUtils {
         }
     }
 
-    public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        Gmail gmail = GoogleServices.getMail(connectionParameters);
-
-        List<Message> messages = new ArrayList<>();
-        String nextPageToken = null;
-
-        do {
-            ListMessagesResponse listMessagesResponse = null;
-            try {
-                listMessagesResponse = gmail.users()
-                    .messages()
-                    .list(ME)
-                    .setMaxResults(500L)
-                    .setPageToken(nextPageToken)
-                    .execute();
-            } catch (IOException e) {
-                throw translateGoogleIOException(e);
-            }
-
-            messages.addAll(listMessagesResponse.getMessages());
-
-            nextPageToken = listMessagesResponse.getNextPageToken();
-        } while (nextPageToken != null && messages.size() < 500);
-
-        for (Message message : messages) {
-            String id = message.getId();
-
-            options.add(option(id, id));
-        }
-
-        return options;
-    }
-
     public static OutputResponse getMessageOutput(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
@@ -514,43 +473,6 @@ public class GoogleMailUtils {
         } catch (IOException e) {
             throw translateGoogleIOException(e);
         }
-    }
-
-    public static List<Option<String>> getThreadIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ActionContext context) {
-
-        Gmail gmail = GoogleServices.getMail(connectionParameters);
-
-        List<Thread> threads = new ArrayList<>();
-
-        String nextPageToken = null;
-        do {
-            ListThreadsResponse listThreadsResponse = null;
-            try {
-                listThreadsResponse = gmail
-                    .users()
-                    .threads()
-                    .list(ME)
-                    .setMaxResults(500L)
-                    .setPageToken(nextPageToken)
-                    .execute();
-            } catch (IOException e) {
-                throw translateGoogleIOException(e);
-            }
-
-            threads.addAll(listThreadsResponse.getThreads());
-
-            nextPageToken = listThreadsResponse.getNextPageToken();
-        } while (nextPageToken != null);
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Thread thread : threads) {
-            options.add(option(thread.getId(), thread.getId()));
-        }
-
-        return options;
     }
 
     public static Message sendMail(Gmail service, Message message) {

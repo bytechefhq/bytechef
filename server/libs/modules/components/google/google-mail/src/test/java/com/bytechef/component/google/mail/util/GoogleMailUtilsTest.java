@@ -49,13 +49,10 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.ListLabelsResponse;
-import com.google.api.services.gmail.model.ListMessagesResponse;
-import com.google.api.services.gmail.model.ListThreadsResponse;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
-import com.google.api.services.gmail.model.Thread;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -63,7 +60,6 @@ import jakarta.mail.internet.MimeMultipart;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -76,16 +72,12 @@ import org.mockito.MockedStatic;
  */
 class GoogleMailUtilsTest {
 
-    private final ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
     private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Gmail mockedGmail = mock(Gmail.class);
     private final Gmail.Users.Labels mockedLabels = mock(Gmail.Users.Labels.class);
     private final Gmail.Users.Labels.List mockedLabelsList = mock(Gmail.Users.Labels.List.class);
-    private final Gmail.Users.Messages.List mockedMesagesList = mock(Gmail.Users.Messages.List.class);
     private Parameters parameters;
-    private final Gmail.Users.Threads mockedThreads = mock(Gmail.Users.Threads.class);
-    private final Gmail.Users.Threads.List mockedThreadsList = mock(Gmail.Users.Threads.List.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
@@ -157,47 +149,6 @@ class GoogleMailUtilsTest {
     }
 
     @Test
-    void testGetMessageIdOptions() throws IOException {
-        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
-
-        List<Message> messages = List.of(new Message().setId("id1"), new Message().setId("id2"));
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedGmail);
-            when(mockedGmail.users())
-                .thenReturn(mockedUsers);
-            when(mockedUsers.messages())
-                .thenReturn(mockedMessages);
-            when(mockedMessages.list(stringArgumentCaptor.capture()))
-                .thenReturn(mockedMesagesList);
-            when(mockedMesagesList.setMaxResults(longArgumentCaptor.capture()))
-                .thenReturn(mockedMesagesList);
-            when(mockedMesagesList.setPageToken(stringArgumentCaptor.capture()))
-                .thenReturn(mockedMesagesList);
-            when(mockedMesagesList.execute())
-                .thenReturn(new ListMessagesResponse().setMessages(messages));
-
-            List<Option<String>> messageIdOptions = GoogleMailUtils.getMessageIdOptions(
-                parameters, parameters, Map.of(), anyString(), mockedActionContext);
-
-            List<Option<String>> expectedOptions = List.of(option("id1", "id1"), option("id2", "id2"));
-
-            assertEquals(expectedOptions, messageIdOptions);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
-
-            List<String> strings = new ArrayList<>();
-
-            strings.add(ME);
-            strings.add(null);
-
-            assertEquals(strings, stringArgumentCaptor.getAllValues());
-            assertEquals(500L, longArgumentCaptor.getValue());
-        }
-    }
-
-    @Test
     void testGetSimpleMessage() {
         Message message = new Message()
             .setId("id")
@@ -220,45 +171,6 @@ class GoogleMailUtilsTest {
                 List.of(), "https://mail.google.com/mail/u/0/#all/id");
 
         assertEquals(expectedSimpleMessage, result);
-    }
-
-    @Test
-    void testGetThreadIdOptions() throws IOException {
-        parameters = MockParametersFactory.create(Map.of(ACCESS_TOKEN, "id"));
-
-        List<Thread> threads = List.of(new Thread().setId("id1"), new Thread().setId("id2"));
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedGmail);
-            when(mockedGmail.users())
-                .thenReturn(mockedUsers);
-            when(mockedUsers.threads())
-                .thenReturn(mockedThreads);
-            when(mockedThreads.list(stringArgumentCaptor.capture()))
-                .thenReturn(mockedThreadsList);
-            when(mockedThreadsList.setMaxResults(longArgumentCaptor.capture()))
-                .thenReturn(mockedThreadsList);
-            when(mockedThreadsList.setPageToken(stringArgumentCaptor.capture()))
-                .thenReturn(mockedThreadsList);
-            when(mockedThreadsList.execute())
-                .thenReturn(new ListThreadsResponse().setThreads(threads));
-
-            List<Option<String>> threadIdOptions = GoogleMailUtils.getThreadIdOptions(
-                parameters, parameters, Map.of(), anyString(), mockedActionContext);
-
-            List<Option<String>> expectedOptions = List.of(option("id1", "id1"), option("id2", "id2"));
-
-            assertEquals(expectedOptions, threadIdOptions);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
-            List<String> strings = new ArrayList<>();
-
-            strings.add(ME);
-            strings.add(null);
-
-            assertEquals(strings, stringArgumentCaptor.getAllValues());
-            assertEquals(500L, longArgumentCaptor.getValue());
-        }
     }
 
     @Test
