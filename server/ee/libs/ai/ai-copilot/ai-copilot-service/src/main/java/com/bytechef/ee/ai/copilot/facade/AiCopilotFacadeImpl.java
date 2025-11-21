@@ -73,7 +73,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ProjectWorkflowTools projectWorkflowTools;
     private final ProjectTools projectTools;
     private final TaskTools taskTools;
-    private final String systemPrompt;
+    private String systemPrompt;
+    private final Resource systemPromptResource;
 
     @SuppressFBWarnings("EI")
     public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder,
@@ -103,7 +104,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             )
             .build();
 
-        systemPrompt = getSystemPrompt(systemPromptResource);
+        this.systemPromptResource = systemPromptResource;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         return switch (context.source()) {
             case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
                 chatClientWorkflow.prompt()
-                    .system(this.systemPrompt)
+                    .system(this.getSystemPrompt(systemPromptResource))
                     .user(user -> user.text(USER_PROMPT)
                         .param(WORKFLOW, workflowDefinition)
                         .param(MESSAGE_ROUTE, message))
@@ -166,13 +167,14 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {
-        final String systemPrompt;
-        try {
-            InputStream inputStream = systemPromptResource.getInputStream();
+        if (systemPrompt == null) {
+            try {
+                InputStream inputStream = systemPromptResource.getInputStream();
 
-            systemPrompt = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Error reading system prompt resource", e);
+                systemPrompt = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                throw new RuntimeException("Error reading system prompt resource", e);
+            }
         }
 
         return systemPrompt;
