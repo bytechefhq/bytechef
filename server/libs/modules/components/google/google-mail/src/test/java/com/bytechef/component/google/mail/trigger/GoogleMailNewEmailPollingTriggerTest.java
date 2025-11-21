@@ -19,7 +19,7 @@ package com.bytechef.component.google.mail.trigger;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,7 @@ import org.mockito.MockedStatic;
 class GoogleMailNewEmailPollingTriggerTest {
 
     private final ArgumentCaptor<Calendar> calendarArgumentCaptor = ArgumentCaptor.forClass(Calendar.class);
+    private final ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
     private final Gmail mockedGmail = mock(Gmail.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Users.Messages.List mockedList = mock(Users.Messages.List.class);
@@ -60,17 +62,25 @@ class GoogleMailNewEmailPollingTriggerTest {
     private final Users mockedUsers = mock(Users.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = ArgumentCaptor.forClass(ZoneId.class);
 
     @Test
     void testPoll() throws IOException {
         String timezone = "Europe/Zagreb";
         List<Message> messages = List.of(new Message().setId("abc"));
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
         Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+        try (
+            MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS);
+            MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
+                .thenReturn(endDate);
+
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
@@ -88,23 +98,39 @@ class GoogleMailNewEmailPollingTriggerTest {
                 .thenReturn(mockedList);
             when(mockedList.setQ(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
+            when(mockedList.setMaxResults(longArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
             when(mockedList.execute())
                 .thenReturn(new ListMessagesResponse().setMessages(messages));
+
+            when(mockedTriggerContext.isEditorEnvironment())
+                .thenReturn(false);
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
+                .thenReturn(endDate);
 
             PollOutput pollOutput = GoogleMailNewEmailPollingTrigger.poll(
                 parameters, parameters, parameters, mockedTriggerContext);
 
-            assertEquals(messages, pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
+            assertEquals(new PollOutput(messages, Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
 
             ZoneId zoneId = ZoneId.of(timezone);
 
             ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
 
-            assertEquals(
-                List.of(ME, "is:unread after:" + zonedDateTime.toEpochSecond()), stringArgumentCaptor.getAllValues());
+            List<String> strings = new ArrayList<>();
+
+            strings.add(ME);
+            strings.add("is:unread after:" + zonedDateTime.toEpochSecond());
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(500L, longArgumentCaptor.getValue());
             assertEquals(List.of(parameters, parameters), parametersArgumentCaptor.getAllValues());
             assertEquals(mockedCalendar, calendarArgumentCaptor.getValue());
+            assertEquals(zoneId, zoneIdArgumentCaptor.getValue());
         }
     }
 }
