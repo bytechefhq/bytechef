@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.ai:spring-ai-advisors-vector-store")
+    implementation("org.springframework.ai:spring-ai-anthropic")
     implementation("org.springframework.ai:spring-ai-openai")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.postgresql:postgresql:42.7.5")

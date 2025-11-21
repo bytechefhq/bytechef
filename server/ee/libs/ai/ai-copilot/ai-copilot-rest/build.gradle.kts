@@ -1,7 +1,7 @@
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
-    implementation("org.springframework:spring-web")
+    implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(files("../libs/ag-ui/core-0.0.1.jar"))
     implementation(files("../libs/ag-ui/server-0.0.1.jar"))
