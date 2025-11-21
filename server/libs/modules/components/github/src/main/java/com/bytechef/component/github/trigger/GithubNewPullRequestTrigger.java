@@ -22,15 +22,14 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.PULL_REQUESTS;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.util.GithubUtils.getItems;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,28 +59,33 @@ public class GithubNewPullRequestTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        List<Integer> previousPullRequests = closureParameters.getList(PULL_REQUESTS, Integer.class, List.of());
-        List<Integer> allPullRequests = new ArrayList<>();
+        String url = "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/pulls";
 
-        List<Map<String, ?>> pullRequests = context.http(http -> http.get(
-            "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/pulls"))
-            .queryParameters("sort", "created", "direction", "desc")
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Map<String, ?>> pullRequests = getItems(
+            context, url, context.isEditorEnvironment(), "sort", "created", "direction", "desc");
+
+        List<Long> pullRequestIds = new ArrayList<>(pullRequests.size());
+
+        for (Map<String, ?> pullRequest : pullRequests) {
+            pullRequestIds.add((Long) pullRequest.get(ID));
+        }
+
+        List<Long> previousPullRequestIds = closureParameters.getList(PULL_REQUESTS, Long.class);
+
+        if (previousPullRequestIds == null) {
+            return new PollOutput(List.of(), Map.of(PULL_REQUESTS, pullRequestIds), false);
+        }
 
         List<Map<String, ?>> newPullRequests = new ArrayList<>();
 
         for (Map<String, ?> pullRequest : pullRequests) {
-            Integer id = (Integer) pullRequest.get(ID);
+            Long id = (Long) pullRequest.get(ID);
 
-            allPullRequests.add(id);
-
-            if (!previousPullRequests.contains(id)) {
+            if (!previousPullRequestIds.contains(id)) {
                 newPullRequests.add(pullRequest);
             }
         }
 
-        return new PollOutput(newPullRequests, Map.of(PULL_REQUESTS, allPullRequests), false);
+        return new PollOutput(newPullRequests, Map.of(PULL_REQUESTS, pullRequestIds), false);
     }
 }
