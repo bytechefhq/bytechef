@@ -436,8 +436,6 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
 include("server:ee:libs:ai:ai-copilot:ai-copilot-api")
-include("server:ee:libs:ai:ai-copilot:ai-copilot-remote-client")
-include("server:ee:libs:ai:ai-copilot:ai-copilot-remote-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")
