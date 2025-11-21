@@ -60,7 +60,6 @@ export type ComponentType = {
     connectionId?: number;
     description?: string;
     displayConditions?: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: boolean;
     };
     label?: string;

@@ -104,7 +104,6 @@ vi.mock('@/shared/queries/automation/workflows.queries', () => ({
 vi.mock('@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar', () => ({
     useProjectsLeftSidebar: () => ({
         calculateTimeDifference: vi.fn(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         createProjectWorkflowMutation: {mutate: vi.fn()},
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getFilteredWorkflows: (workflows: any[]) => workflows || [],

@@ -71,7 +71,6 @@ export function CopilotRuntimeProvider({
         const reader = result.body.getReader();
         let workflowUpdated = false;
 
-        /* eslint-disable no-constant-condition */
         while (true) {
             const {done, value} = await reader.read();
 
