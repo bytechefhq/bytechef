@@ -285,7 +285,7 @@ public class MultiTenantDriverDelegate extends StdJDBCDelegate {
         return execute(conn, (connection) -> {
             try {
                 return delegate.selectJobForTrigger(connection, loadHelper, triggerKey);
-            } catch (ClassNotFoundException | IOException e) {
+            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -299,7 +299,7 @@ public class MultiTenantDriverDelegate extends StdJDBCDelegate {
         return execute(conn, (connection) -> {
             try {
                 return delegate.selectJobForTrigger(connection, loadHelper, triggerKey, loadJobClass);
-            } catch (ClassNotFoundException | IOException e) {
+            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
