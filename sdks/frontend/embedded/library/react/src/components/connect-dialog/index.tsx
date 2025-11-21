@@ -477,7 +477,7 @@ export default function useConnectDialog({
                             method: 'PUT',
                         }
                     );
-                }, 500);
+                }, 600);
             }
 
             debouncedFetchesRef.current[debouncedFetchKey](body);
