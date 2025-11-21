@@ -1,7 +1,7 @@
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {Suspense, lazy, useMemo} from 'react';
 
-import {getFilteredOutput} from './WorkflowExecutionsUtils';
+import {getFilteredOutput, hasValue} from './WorkflowExecutionsUtils';
 
 const ReactJson = lazy(() => import('react-json-view'));
 
@@ -49,7 +49,7 @@ const WorkflowExecutionContent = ({
         return (
             <div className="space-y-2 rounded-md">
                 <div className="overflow-x-auto text-nowrap">
-                    {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
+                    {hasValue(input) ? (
                         typeof input === 'object' ? (
                             <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
                                 <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
@@ -65,27 +65,23 @@ const WorkflowExecutionContent = ({
         );
     }
 
-    if (output !== undefined || jobInputs !== undefined) {
+    if (output !== undefined || (jobInputs !== undefined && workflowTriggerName)) {
+        if (!hasValue(filteredOutput)) {
+            return <span className="text-sm">No output data.</span>;
+        }
+
         return (
-            <>
-                {filteredOutput ? (
-                    <div className="space-y-2 rounded-md p-2">
-                        <div className="overflow-x-auto text-nowrap">
-                            {typeof filteredOutput === 'object' ? (
-                                <Suspense
-                                    fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}
-                                >
-                                    <ReactJson enableClipboard={false} src={filteredOutput as object} />
-                                </Suspense>
-                            ) : (
-                                <span className="text-sm">{(filteredOutput as boolean).toString()}</span>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <span className="text-sm">No output data.</span>
-                )}
-            </>
+            <div className="space-y-2 rounded-md">
+                <div className="overflow-x-auto text-nowrap">
+                    {typeof filteredOutput === 'object' && filteredOutput !== null ? (
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
+                            <ReactJson enableClipboard={false} src={filteredOutput as object} />
+                        </Suspense>
+                    ) : (
+                        <span className="text-sm">{String(filteredOutput)}</span>
+                    )}
+                </div>
+            </div>
         );
     }
 

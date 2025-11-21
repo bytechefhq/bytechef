@@ -48,7 +48,7 @@ const WorkflowExecutionsTestOutput = ({
     return (
         <div className="flex size-full flex-col">
             <div className="flex items-center justify-between border-b border-stroke-neutral-secondary px-3 py-1">
-                {workflowTestExecution && job ? (
+                {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
                     <span className="text-sm uppercase">Test Output</span>
