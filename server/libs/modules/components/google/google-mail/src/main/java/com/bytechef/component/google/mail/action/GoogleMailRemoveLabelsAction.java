@@ -50,7 +50,6 @@ public class GoogleMailRemoveLabelsAction {
             string(ID)
                 .label("Message ID")
                 .description("ID of the message to add labels")
-                .options((OptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
             array(LABEL_IDS)
                 .label("Labels")

@@ -25,7 +25,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -47,7 +46,6 @@ public class GoogleMailGetMailAction {
             string(ID)
                 .label("Message ID")
                 .description("The ID of the message to retrieve.")
-                .options((OptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
