@@ -1,5 +1,5 @@
 import {ComponentDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ClusterElementsType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {ClusterElementsType, ComponentType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -41,46 +41,41 @@ export default function saveClusterElementFieldChange({
 
     const {componentName, name, workflowNodeName} = currentNode;
 
-    if (!rootClusterElementNodeData?.workflowNodeName || !rootClusterElementNodeData?.componentName) {
-        console.error('Root cluster element node data is missing required properties');
-
-        return;
-    }
-
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const mainClusterRootTask = getTaskDispatcherTask({
-        taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
-        tasks: workflowDefinitionTasks,
-    });
+    const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+        ? getTaskDispatcherTask({
+              taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+              tasks: workflowDefinitionTasks,
+          })
+        : undefined;
 
     if (!mainClusterRootTask) {
         return;
     }
 
-    let updatedMainRootData: NodeDataType;
+    let updatedMainRootData: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+        componentName?: string;
+        workflowNodeName?: string;
+    };
     let updatedClusterElements: ClusterElementsType;
 
     if (
         currentNode.clusterRoot &&
-        currentNode.workflowNodeName === rootClusterElementNodeData.workflowNodeName &&
+        currentNode.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
         !currentNode.isNestedClusterRoot
     ) {
         updatedMainRootData = updateClusterRootElementField({
             currentComponentDefinition,
             currentOperationProperties,
             fieldUpdate,
-            mainRootElement: {
-                ...mainClusterRootTask,
-                componentName: rootClusterElementNodeData.componentName,
-                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-            },
+            mainRootElement: mainClusterRootTask,
         });
     } else if (
         currentNode.clusterElementType &&
-        currentNode.workflowNodeName !== rootClusterElementNodeData.workflowNodeName
+        currentNode.workflowNodeName !== rootClusterElementNodeData?.workflowNodeName
     ) {
-        const clusterElements = mainClusterRootTask.clusterElements;
+        const clusterElements = mainClusterRootTask?.clusterElements;
 
         if (!clusterElements || Object.keys(clusterElements).length === 0) {
             return;
@@ -97,8 +92,6 @@ export default function saveClusterElementFieldChange({
         updatedMainRootData = {
             ...mainClusterRootTask,
             clusterElements: updatedClusterElements,
-            componentName: rootClusterElementNodeData.componentName,
-            workflowNodeName: rootClusterElementNodeData.workflowNodeName,
         };
     } else {
         console.error('Unknown cluster element type or root element mismatch');
@@ -111,7 +104,11 @@ export default function saveClusterElementFieldChange({
         invalidateWorkflowQueries,
         nodeData: updatedMainRootData,
         onSuccess: () => {
-            let commonUpdates: NodeDataType = {
+            let commonUpdates: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+                componentName?: string;
+                name: string;
+                workflowNodeName?: string;
+            } = {
                 componentName,
                 name,
                 workflowNodeName,
@@ -141,12 +138,12 @@ export default function saveClusterElementFieldChange({
             setCurrentNode({
                 ...currentNode,
                 ...commonUpdates,
-            });
+            } as NodeDataType);
 
             setCurrentComponent({
                 ...currentComponent,
                 ...commonUpdates,
-            });
+            } as ComponentType);
 
             if (rootClusterElementNodeData) {
                 if (currentNode.clusterRoot && !currentNode.isNestedClusterRoot) {

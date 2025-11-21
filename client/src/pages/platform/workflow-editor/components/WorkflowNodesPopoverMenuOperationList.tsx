@@ -188,25 +188,21 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 return;
             }
 
-            if (!rootClusterElementNodeData?.workflowNodeName || !rootClusterElementNodeData?.componentName) {
-                console.error('Root cluster element node data is missing required properties');
-
-                return;
-            }
-
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = getTaskDispatcherTask({
-                taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
-                tasks: workflowDefinitionTasks,
-            });
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+                      tasks: workflowDefinitionTasks,
+                  })
+                : undefined;
 
             if (!mainClusterRootTask) {
                 return;
             }
 
             const clusterElements = initializeClusterElementsObject({
-                clusterElementsData: mainClusterRootTask.clusterElements || {},
+                clusterElementsData: mainClusterRootTask?.clusterElements || {},
                 mainClusterRootComponentDefinition,
                 mainClusterRootTask,
             });
@@ -216,7 +212,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 clusterElements,
                 elementType: clusterElementType,
                 isMultipleElements,
-                mainRootId: rootClusterElementNodeData.workflowNodeName,
+                mainRootId: rootClusterElementNodeData?.workflowNodeName,
                 sourceNodeId,
             });
 
@@ -238,28 +234,22 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }
 
             if (workflowNodeDetailsPanelOpen && currentNode?.workflowNodeName === sourceNodeName) {
-                setCurrentNode({
-                    ...rootClusterElementNodeData,
-                    clusterElements: updatedClusterElements.nestedClusterElements,
-                });
+                if (rootClusterElementNodeData) {
+                    setCurrentNode({
+                        ...rootClusterElementNodeData,
+                        clusterElements: updatedClusterElements.nestedClusterElements,
+                    });
+                }
 
                 setWorkflowNodeDetailsPanelOpen(false);
             }
 
             saveWorkflowDefinition({
                 invalidateWorkflowQueries,
-                nodeData: {
-                    ...updatedNodeData,
-                    componentName: rootClusterElementNodeData.componentName,
-                    workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                },
+                nodeData: updatedNodeData,
                 onSuccess: () => {
                     handleComponentAddedSuccess({
-                        nodeData: {
-                            ...updatedNodeData,
-                            componentName: rootClusterElementNodeData.componentName,
-                            workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                        },
+                        nodeData: updatedNodeData,
                         queryClient,
                         workflow,
                     });
