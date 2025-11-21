@@ -23,6 +23,15 @@ const ProjectDeploymentListItemDropdownMenu = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" >
+                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>Edit</DropdownMenuItem>
+
+                <DropdownMenuItem className="dropdown-menu-item" onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
                 <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
@@ -37,6 +46,8 @@ const ProjectDeploymentListItemDropdownMenu = ({
 
                 <DropdownMenuSeparator className="m-0" />
 
+                <DropdownMenuItem className="text-destructive dropdown-menu-item" onClick={onDeleteClick}>
+                    Delete
                 <DropdownMenuItem className="dropdown-menu-item-destructive" onClick={onDeleteClick}>
                     <Trash2Icon /> Delete
                 </DropdownMenuItem>
