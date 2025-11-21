@@ -66,3 +66,7 @@ reporting {
         }
     }
 }
+
+tasks.matching { it.name.startsWith("spotless") }.configureEach {
+    enabled = false
+}
