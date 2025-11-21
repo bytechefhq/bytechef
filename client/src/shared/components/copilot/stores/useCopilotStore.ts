@@ -11,9 +11,8 @@ export enum MODE {
 }
 
 export enum Source {
-    WORKFLOW_EDITOR,
-    WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU,
-    CODE_EDITOR,
+    WORKFLOW_EDITOR = 'WORKFLOW_EDITOR',
+    CODE_EDITOR = 'CODE_EDITOR',
 }
 
 export type ContextType = {
@@ -91,7 +90,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                     const message = messages[i] as ThreadMessageLike;
 
                     if (message.role === 'assistant' && typeof message.content === 'string') {
-                        messages[i] = {...message, content: message.content + text} as ThreadMessageLike;
+                        messages[i] = {...message, content: text} as ThreadMessageLike;
 
                         return {...state, messages};
                     }
