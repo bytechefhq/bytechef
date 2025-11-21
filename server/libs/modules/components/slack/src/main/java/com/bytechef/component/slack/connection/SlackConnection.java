@@ -47,7 +47,7 @@ public class SlackConnection {
                 .authorizationUrl((connection, context) -> "https://slack.com/oauth/authorize")
                 .scopes((connection, context) -> List.of(
                     "channels:read", "channels:write", "channels:history", "chat:write:bot", "groups:read",
-                    "reactions:read", "mpim:read", "users:read", "incoming-webhook"))
+                    "reactions:read", "reactions:write", "mpim:read", "users:read", "incoming-webhook"))
                 .tokenUrl((connection, context) -> "https://slack.com/api/oauth.access"));
 
     private SlackConnection() {
