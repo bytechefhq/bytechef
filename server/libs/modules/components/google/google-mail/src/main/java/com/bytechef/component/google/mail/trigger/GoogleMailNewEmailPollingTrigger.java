@@ -36,10 +36,13 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,22 +84,51 @@ public class GoogleMailNewEmailPollingTrigger {
 
             LocalDateTime now = LocalDateTime.now(zoneId);
 
+            boolean editorEnvironment = context.isEditorEnvironment();
+
             LocalDateTime startDate = closureParameters.getLocalDateTime(
-                LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+                LAST_TIME_CHECKED, editorEnvironment ? now.minusHours(3) : now);
 
             Gmail gmail = GoogleServices.getMail(connectionParameters);
 
             ZonedDateTime zonedDateTime = startDate.atZone(ZoneId.of(timezone));
 
-            ListMessagesResponse listMessagesResponse = gmail.users()
-                .messages()
-                .list(ME)
-                .setQ("is:unread after:" + zonedDateTime.toEpochSecond())
-                .execute();
+            String query = "is:unread after:" + zonedDateTime.toEpochSecond();
 
-            return new PollOutput(listMessagesResponse.getMessages(), Map.of(LAST_TIME_CHECKED, now), false);
+            List<Message> messages = fetchUnreadMessages(gmail, query, editorEnvironment);
+
+            return new PollOutput(messages, Map.of(LAST_TIME_CHECKED, now), false);
         } catch (IOException e) {
             throw translateGoogleIOException(e);
         }
+    }
+
+    private static List<Message> fetchUnreadMessages(Gmail gmail, String query, boolean editorEnvironment)
+        throws IOException {
+
+        List<Message> messages = new ArrayList<>();
+
+        String nextPageToken = null;
+        long pageSize = editorEnvironment ? 1L : 500L;
+
+        do {
+            ListMessagesResponse listMessagesResponse = gmail.users()
+                .messages()
+                .list(ME)
+                .setQ(query)
+                .setMaxResults(pageSize)
+                .setPageToken(nextPageToken)
+                .execute();
+
+            messages.addAll(listMessagesResponse.getMessages());
+
+            nextPageToken = listMessagesResponse.getNextPageToken();
+
+            if (editorEnvironment) {
+                break;
+            }
+        } while (nextPageToken != null);
+
+        return messages;
     }
 }
