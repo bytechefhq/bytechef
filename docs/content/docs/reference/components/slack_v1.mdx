@@ -38,6 +38,63 @@ Version: 1
 ## Actions
 
 
+### Add Reaction
+Name: addReaction
+
+`Adds a reaction to a message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | Channel ID | STRING | ID of the channel, private group, or IM channel where the message is located. | true |
+| name | Emoji Name | STRING | Reaction (emoji) name to add. | true |
+| timestamp | Timestamp | STRING | Timestamp of the message to add reaction to. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Reaction",
+  "name" : "addReaction",
+  "parameters" : {
+    "channel" : "",
+    "name" : "",
+    "timestamp" : ""
+  },
+  "type" : "slack/v1/addReaction"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the reaction was successfully added. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(messages)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ok" : false,
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
+}
+```
+
+
 ### Send Approval Message
 Name: sendApprovalMessage
 
@@ -106,10 +163,10 @@ Type: OBJECT
 ```
 
 
-### Send Message
-Name: sendMessage
+### Send Channel Message
+Name: sendChannelMessage
 
-`Sends a message to a public channel, private channel, or existing direct message conversation.`
+`Sends a message to a public or private channel.`
 
 #### Properties
 
@@ -121,13 +178,13 @@ Name: sendMessage
 #### Example JSON Structure
 ```json
 {
-  "label" : "Send Message",
-  "name" : "sendMessage",
+  "label" : "Send Channel Message",
+  "name" : "sendChannelMessage",
   "parameters" : {
     "channel" : "",
     "text" : ""
   },
-  "type" : "slack/v1/sendMessage"
+  "type" : "slack/v1/sendChannelMessage"
 }
 ```
 
