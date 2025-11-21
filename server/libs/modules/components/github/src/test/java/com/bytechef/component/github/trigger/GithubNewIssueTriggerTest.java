@@ -16,19 +16,19 @@
 
 package com.bytechef.component.github.trigger;
 
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.trigger.GithubNewIssueTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.github.util.GithubUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,42 +44,43 @@ import org.mockito.Mockito;
  */
 class GithubNewIssueTriggerTest {
 
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
     void testPoll() {
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(REPOSITORY, "testRepo"));
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
-            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class);
+            MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+                LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
 
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
-
-            when(mockedTriggerContext.http(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
-            when(mockedResponse.getBody(any(TypeReference.class)))
+            githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
+                .thenReturn("owner");
+            githubUtilsMockedStatic.when(() -> GithubUtils.getItems(
+                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
+            when(mockedTriggerContext.isEditorEnvironment())
+                .thenReturn(false);
+
             PollOutput pollOutput = GithubNewIssueTrigger.poll(
-                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
+                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
 
-            assertEquals(List.of(), pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
-
-            assertEquals(List.of("since", "2000-01-01T01:01:01Z"), stringArgumentCaptor.getAllValues());
+            assertEquals(new PollOutput(List.of(), Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
+            assertEquals(List.of("/repos/owner/testRepo/issues", "since", "2000-01-01T01:01:01Z"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedTriggerContext, mockedTriggerContext), contextArgumentCaptor.getAllValues());
+            assertEquals(false, booleanArgumentCaptor.getValue());
         }
     }
 }

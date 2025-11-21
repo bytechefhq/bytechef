@@ -19,6 +19,7 @@ package com.bytechef.component.github.action;
 import static com.bytechef.component.github.constant.GithubConstants.FILTER;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,6 +39,7 @@ import org.mockito.MockedStatic;
  */
 class GithubListIssuesActionTest {
 
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILTER, "all", STATE, "all"));
@@ -48,14 +50,16 @@ class GithubListIssuesActionTest {
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class)) {
             githubUtilsMockedStatic
                 .when(() -> GithubUtils.getItems(
-                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture()))
                 .thenReturn(List.of());
 
             List<Map<String, ?>> result = GithubListIssuesAction.perform(mockedParameters, null, mockedContext);
 
             assertEquals(List.of(), result);
             assertEquals(List.of("/issues", FILTER, "all", STATE, "all"), stringArgumentCaptor.getAllValues());
+            assertFalse(booleanArgumentCaptor.getValue());
         }
     }
 }
