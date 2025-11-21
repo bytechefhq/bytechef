@@ -9,6 +9,7 @@ org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "1.1.3"
 org-springdoc = "2.8.14"
 pmd = "7.17.0"
+quartz = "2.5.0"
 spotbugs = "4.9.8"
 spring-ai = "1.1.0"
 spring-boot = "3.5.8"
@@ -41,6 +42,7 @@ org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.m
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.8"
+org-quartz-scheduler-quartz = { module = "org.quartz-scheduler:quartz", version.ref = "quartz" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.1"
