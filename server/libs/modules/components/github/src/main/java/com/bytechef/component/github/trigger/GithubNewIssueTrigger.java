@@ -22,15 +22,14 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.util.GithubUtils.getItems;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -61,23 +60,21 @@ public class GithubNewIssueTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        ZoneId zoneId = ZoneId.systemDefault();
+        ZoneId zoneId = ZoneId.of("UTC");
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
+        boolean editorEnvironment = context.isEditorEnvironment();
         LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+            LAST_TIME_CHECKED, editorEnvironment ? now.minusHours(3) : now);
 
         String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
             .withZone(zoneId));
 
-        List<Map<String, ?>> issues = context.http(
-            http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
-            .queryParameter("since", formattedStartDate)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String url = "/repos/%s/%s/issues".formatted(
+            getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
+
+        List<Map<String, ?>> issues = getItems(context, url, editorEnvironment, "since", formattedStartDate);
 
         return new PollOutput(issues, Map.of(LAST_TIME_CHECKED, now), false);
     }

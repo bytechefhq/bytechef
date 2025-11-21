@@ -49,7 +49,7 @@ public class GithubUtils {
         String url = "/repos/%s/%s/collaborators".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> collaborators = getItems(context, url);
+        List<Map<String, ?>> collaborators = getItems(context, url, false);
 
         return getOptions(collaborators, "login");
     }
@@ -78,7 +78,7 @@ public class GithubUtils {
         String url = "/repos/%s/%s/labels".formatted(
             getOwnerName(context), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> labels = getItems(context, url);
+        List<Map<String, ?>> labels = getItems(context, url, false);
 
         return getOptions(labels, NAME);
     }
@@ -96,7 +96,7 @@ public class GithubUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        List<Map<String, ?>> repos = getItems(context, "/user/repos");
+        List<Map<String, ?>> repos = getItems(context, "/user/repos", false);
 
         return getOptions(repos, NAME);
     }
@@ -118,7 +118,7 @@ public class GithubUtils {
         String url = "/repos/%s/%s/issues".formatted(
             inputParameters.getString(OWNER, getOwnerName(context)), inputParameters.getRequiredString(REPOSITORY));
 
-        List<Map<String, ?>> items = getItems(context, url, "state", "open");
+        List<Map<String, ?>> items = getItems(context, url, false, "state", "open");
 
         for (Map<String, ?> item : items) {
             Object pullRequest = item.get("pull_request");
@@ -131,14 +131,17 @@ public class GithubUtils {
         return issues;
     }
 
-    public static List<Map<String, ?>> getItems(Context context, String url, Object... queryParameters) {
+    public static List<Map<String, ?>> getItems(
+        Context context, String url, boolean isEditorEnvironment, Object... queryParameters) {
+
         List<Map<String, ?>> items = new ArrayList<>();
 
         int page = 1;
         boolean hasMoreItems = false;
+        int perPage = isEditorEnvironment ? 1 : 100;
 
         do {
-            List<Object> allQueryParameters = new ArrayList<>(List.of("per_page", 100, "page", page++));
+            List<Object> allQueryParameters = new ArrayList<>(List.of("per_page", perPage, "page", page++));
 
             if (queryParameters != null && queryParameters.length % 2 == 0) {
                 allQueryParameters.addAll(Arrays.asList(queryParameters));
@@ -150,6 +153,10 @@ public class GithubUtils {
                 .execute();
 
             items.addAll(response.getBody(new TypeReference<>() {}));
+
+            if (isEditorEnvironment) {
+                break;
+            }
 
             List<String> linkHeader = response.getHeader("link");
 
