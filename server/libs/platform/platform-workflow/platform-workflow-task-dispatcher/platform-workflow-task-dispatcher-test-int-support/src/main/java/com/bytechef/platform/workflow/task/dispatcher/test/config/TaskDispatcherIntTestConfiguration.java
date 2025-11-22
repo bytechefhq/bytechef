@@ -38,9 +38,12 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.tenant.TenantContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -51,8 +54,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -93,17 +96,42 @@ public class TaskDispatcherIntTestConfiguration {
 
     @Bean
     TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
-        ContextService contextService, CounterService counterService, Environment environment, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ContextService contextService, CounterService counterService, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            contextService, counterService, environment, jobService, taskExecutionService, taskFileStorage,
+            contextService, counterService, taskExecutor, jobService, taskExecutionService, taskFileStorage,
             workflowService);
     }
 
     @Bean
     TaskExecutionService taskExecutionService(CacheManager cacheManager) {
         return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
+    }
+
+    @Bean
+    TaskExecutor taskExecutor() {
+        return new TaskExecutor() {
+            private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
+
+            @Override
+            public void execute(Runnable task) {
+                String tenantId = TenantContext.getCurrentTenantId();
+
+                executor.execute(() -> {
+                    String currentTenantId = TenantContext.getCurrentTenantId();
+
+                    try {
+                        TenantContext.setCurrentTenantId(tenantId);
+
+                        task.run();
+                    } finally {
+                        TenantContext.setCurrentTenantId(currentTenantId);
+                    }
+                });
+            }
+        };
     }
 
     @Bean

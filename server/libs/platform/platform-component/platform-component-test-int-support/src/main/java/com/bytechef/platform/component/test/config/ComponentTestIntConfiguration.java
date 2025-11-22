@@ -64,8 +64,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -90,12 +90,12 @@ public class ComponentTestIntConfiguration {
 
     @Bean
     ComponentJobTestExecutor componentWorkflowTestSupport(
-        ContextService contextService, Environment environment, JobService jobService,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        ContextService contextService, JobService jobService, TaskExecutionService taskExecutionService,
+        Map<String, TaskHandler<?>> taskHandlerMap, TaskExecutor taskExecutor,
         TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
-            contextService, environment, SpelEvaluator.create(), jobService, taskExecutionService,
+            contextService, SpelEvaluator.create(), jobService, taskExecutor, taskExecutionService,
             MapUtils.concat(taskHandlerMap, taskHandlerProvider.getTaskHandlerMap()), workflowService);
     }
 
