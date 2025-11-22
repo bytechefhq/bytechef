@@ -120,7 +120,9 @@ public class GoogleMailNewEmailPollingTrigger {
                 .setPageToken(nextPageToken)
                 .execute();
 
-            messages.addAll(listMessagesResponse.getMessages());
+            if (listMessagesResponse.getMessages() != null) {
+                messages.addAll(listMessagesResponse.getMessages());
+            }
 
             nextPageToken = listMessagesResponse.getNextPageToken();
 
