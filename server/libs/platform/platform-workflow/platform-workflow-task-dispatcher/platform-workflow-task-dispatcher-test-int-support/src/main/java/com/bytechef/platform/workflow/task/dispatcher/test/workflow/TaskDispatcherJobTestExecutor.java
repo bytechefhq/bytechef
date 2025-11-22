@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 
 public class TaskDispatcherJobTestExecutor {
 
@@ -49,22 +49,22 @@ public class TaskDispatcherJobTestExecutor {
 
     private final ContextService contextService;
     private final CounterService counterService;
-    private final Environment environment;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
+    private final TaskExecutor taskExecutor;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
-        ContextService contextService, CounterService counterService, Environment environment, JobService jobService,
+        ContextService contextService, CounterService counterService, TaskExecutor taskExecutor, JobService jobService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
-        this.environment = environment;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
+        this.taskExecutor = taskExecutor;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
@@ -88,12 +88,12 @@ public class TaskDispatcherJobTestExecutor {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, environment, SpelEvaluator.create(), jobService, -1, () -> syncMessageBroker,
+            contextService, SpelEvaluator.create(), jobService, -1, () -> syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 createEventPublisher(syncMessageBroker), contextService, counterService, taskExecutionService),
-            taskExecutionService,
-            taskHandlerMapSupplier.get()::get, taskFileStorage, -1, workflowService);
+            taskExecutionService, taskExecutor, taskHandlerMapSupplier.get()::get, taskFileStorage, -1,
+            workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
     }

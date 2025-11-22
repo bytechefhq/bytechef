@@ -66,6 +66,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -79,7 +80,7 @@ public class WebhookConfiguration {
         Environment environment, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
@@ -89,14 +90,14 @@ public class WebhookConfiguration {
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, environment, evaluator, jobService, -1, () -> asyncMessageBroker,
-                getTaskCompletionHandlerFactories(
+                contextService, evaluator, jobService, -1, () -> asyncMessageBroker, getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, taskExecutor,
+                taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 

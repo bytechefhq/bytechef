@@ -63,6 +63,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +74,8 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -93,9 +95,6 @@ public class TaskCoordinatorIntTest {
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
 
     private final Evaluator evaluator = SpelEvaluator.create();
-
-    @Autowired
-    private Environment environment;
 
     @Autowired
     private ContextService contextService;
@@ -129,8 +128,15 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, environment, evaluator, jobService, -1, SyncMessageBroker::new, List.of(),
-            taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE, -1, workflowService);
+            contextService, evaluator, jobService, -1, SyncMessageBroker::new, List.of(), taskExecutionService,
+            new TaskExecutor() {
+                private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
+
+                @Override
+                public void execute(Runnable task) {
+                    executor.execute(task);
+                }
+            }, taskHandlerMap::get, TASK_FILE_STORAGE, -1, workflowService);
 
         return jobSyncExecutor.execute(
             new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")), true);
