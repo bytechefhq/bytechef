@@ -477,8 +477,7 @@ public class GoogleMailUtils {
 
     public static Message sendMail(Gmail service, Message message) {
         try {
-            return service
-                .users()
+            return service.users()
                 .messages()
                 .send(ME, message)
                 .execute();
