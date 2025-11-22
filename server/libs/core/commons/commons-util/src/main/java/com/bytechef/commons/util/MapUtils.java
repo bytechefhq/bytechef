@@ -376,7 +376,7 @@ public class MapUtils {
 
         if (list != null) {
             list = list.stream()
-                .map(value -> convert(value, Arrays.asList(elementTypes)))
+                .map(entryValue -> convert(entryValue, Arrays.asList(elementTypes)))
                 .toList();
         }
 
@@ -392,7 +392,7 @@ public class MapUtils {
             list = defaultValue;
         } else {
             list = list.stream()
-                .map(value -> convert(value, elementTypes))
+                .map(entryValue -> convert(entryValue, elementTypes))
                 .toList();
         }
 

@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
@@ -130,13 +130,10 @@ public class ConnectionApiController implements ConnectionApi {
                 MapUtils.toMap(
                     connectionModel.getAuthorizationParameters(),
                     Map.Entry::getKey,
-                    entry -> StringUtils.obfuscate(toString(entry.getValue()), 28, 8)));
+                    entry -> ObfuscateUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
     }
 
-    private static String toString(Object object) {
-        return object.toString();
-    }
 }
