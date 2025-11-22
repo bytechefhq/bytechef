@@ -133,4 +133,57 @@ class GoogleMailNewEmailPollingTriggerTest {
             assertEquals(zoneId, zoneIdArgumentCaptor.getValue());
         }
     }
+
+    @Test
+    void testPollWithNullMessages() throws IOException {
+        String timezone = "Europe/Zagreb";
+        LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
+
+        Parameters parameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+
+        try (
+            MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS);
+            MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
+                .thenReturn(endDate);
+
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedCalendar);
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.getCalendarTimezone(calendarArgumentCaptor.capture()))
+                .thenReturn(timezone);
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
+            when(mockedGmail.users())
+                .thenReturn(mockedUsers);
+            when(mockedUsers.messages())
+                .thenReturn(mockedMessages);
+            when(mockedMessages.list(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setQ(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setMaxResults(longArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.execute())
+                .thenReturn(new ListMessagesResponse().setMessages(null));
+
+            when(mockedTriggerContext.isEditorEnvironment())
+                .thenReturn(false);
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
+                .thenReturn(endDate);
+
+            PollOutput pollOutput = GoogleMailNewEmailPollingTrigger.poll(
+                parameters, parameters, parameters, mockedTriggerContext);
+
+            assertEquals(new PollOutput(List.of(), Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
+        }
+    }
 }
