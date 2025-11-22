@@ -41,7 +41,7 @@ import {
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
+import {QueryKey, UseMutationResult, useQueryClient, UseQueryResult} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CircleQuestionMarkIcon, ClipboardIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
@@ -49,6 +49,7 @@ import {useForm} from 'react-hook-form';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
+import {ModeType, useModeTypeStore} from "@/pages/home/stores/useModeTypeStore";
 
 export interface ConnectionDialogFormProps {
     authorizationType: string;
@@ -103,6 +104,7 @@ const ConnectionDialog = ({
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentType = useModeTypeStore((state) => state.currentType);
 
     const {toast} = useToast();
 
@@ -430,7 +432,7 @@ const ConnectionDialog = ({
                     {errors?.length > 0 && <Errors errors={errors} />}
 
                     <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
-                        {connection?.id && (
+                        {connection?.id && currentType === ModeType.EMBEDDED && (
                             <FormField
                                 control={control}
                                 name="id"
