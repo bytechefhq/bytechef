@@ -21,19 +21,6 @@ package com.bytechef.commons.util;
  */
 public class StringUtils {
 
-    public static String obfuscate(String string, int maxLength, int visibleLength) {
-        if (!org.apache.commons.lang3.StringUtils.isEmpty(string)) {
-            if (string.length() > maxLength) {
-                string = string.substring(string.length() - maxLength);
-            }
-
-            string =
-                ".".repeat(maxLength) + string.substring(string.length() - Math.min(string.length(), visibleLength));
-        }
-
-        return string;
-    }
-
     public static String sanitize(String name, int lengthLimit) {
         if (org.apache.commons.lang3.StringUtils.isBlank(name)) {
             return "";
