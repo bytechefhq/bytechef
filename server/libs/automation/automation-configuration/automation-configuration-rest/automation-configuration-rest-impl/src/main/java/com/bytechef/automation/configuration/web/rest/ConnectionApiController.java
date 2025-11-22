@@ -20,14 +20,12 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
@@ -112,10 +110,8 @@ public class ConnectionApiController implements ConnectionApi {
 
         Objects.requireNonNull(connectionModel)
             .authorizationParameters(
-                MapUtils.toMap(
-                    connectionModel.getAuthorizationParameters(),
-                    Map.Entry::getKey,
-                    entry -> StringUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
+                ObfuscateUtils.toObfuscatedMap(
+                    connectionModel.getAuthorizationParameters(), 28, 8));
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
