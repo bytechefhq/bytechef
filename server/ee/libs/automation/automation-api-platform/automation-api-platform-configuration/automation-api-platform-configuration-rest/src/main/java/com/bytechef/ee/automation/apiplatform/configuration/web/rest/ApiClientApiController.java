@@ -18,7 +18,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiClientModel;
@@ -93,6 +93,6 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     private static String obfuscate(String secretKey) {
-        return StringUtils.obfuscate(secretKey, 26, 6);
+        return ObfuscateUtils.obfuscate(secretKey, 26, 6);
     }
 }

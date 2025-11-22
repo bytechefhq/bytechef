@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.ee.platform.configuration.web.rest.model.AiProviderModel;
 import com.bytechef.ee.platform.configuration.web.rest.model.UpdateAiProviderRequestModel;
@@ -60,7 +60,7 @@ public class AiProviderApiController implements AiProviderApi {
                 .map(aiProviderDTO -> conversionService.convert(aiProviderDTO, AiProviderModel.class))
                 .peek(aiProviderModel -> {
                     if (aiProviderModel != null) {
-                        aiProviderModel.setApiKey(StringUtils.obfuscate(aiProviderModel.getApiKey(), 26, 6));
+                        aiProviderModel.setApiKey(ObfuscateUtils.obfuscate(aiProviderModel.getApiKey(), 26, 6));
                     }
                 })
                 .toList());
