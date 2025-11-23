@@ -27,9 +27,11 @@ const IntegrationsFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
 
-            <Badge styleType="secondary-filled" weight="semibold">
-                <span className="text-sm">{pageTitle ?? 'All Categories'}</span>
-            </Badge>
+            <Badge
+                label={typeof pageTitle === 'string' ? pageTitle : 'All Categories'}
+                styleType="secondary-filled"
+                weight="semibold"
+            />
         </div>
     );
 };
