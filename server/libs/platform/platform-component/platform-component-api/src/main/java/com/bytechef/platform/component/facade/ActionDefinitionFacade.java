@@ -33,7 +33,8 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
+        @Nullable Long connectionId);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
