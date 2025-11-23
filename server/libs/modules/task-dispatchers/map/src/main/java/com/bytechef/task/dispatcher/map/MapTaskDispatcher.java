@@ -40,6 +40,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -83,11 +84,12 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
     @Override
     public void doDispatch(TaskExecution taskExecution) {
         List<?> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
-        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) taskExecution.getParameters()
-            .get(ITERATEE))
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils
+            .getList(
+                taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
