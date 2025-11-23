@@ -3,11 +3,16 @@ import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workf
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
-import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinition,
+    ComponentDefinitionApi,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
+} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
-import {memo, useEffect, useState} from 'react';
+import {memo, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -66,6 +71,51 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const ff_797 = useFeatureFlagsStore()('ff-797');
 
+        const [fullComponents, setFullComponents] = useState<Record<string, ComponentDefinition>>({});
+
+        const fetchFullComponentInfo = async (name: string, version: number) => {
+            try {
+                const api = new ComponentDefinitionApi();
+                const response = await api.getComponentDefinition({
+                    componentName: name,
+                    componentVersion: version,
+                });
+
+                console.log(
+                    `%c[DEBUG] Full component info for ${name}@v${version}:`,
+                    'color: #22cc88; font-weight: bold;',
+                    response
+                );
+
+                setFullComponents((prev) => ({
+                    ...prev,
+                    [name]: response,
+                }));
+            } catch (error) {
+                console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
+            }
+        };
+
+        // --- Загрузка полных данных (debounced)
+        useEffect(() => {
+            if (!filter || !componentDefinitions.length) return;
+
+            const timeout = setTimeout(() => {
+                const matched = componentDefinitions.filter(
+                    ({actionsCount, triggersCount}) => (actionsCount ?? 0) > 0 || (triggersCount ?? 0) > 0
+                );
+
+                matched.forEach((component) => {
+                    if (!fullComponents[component.name]) {
+                        fetchFullComponentInfo(component.name, component.version);
+                    }
+                });
+            }, 400);
+
+            return () => clearTimeout(timeout);
+        }, [filter, componentDefinitions, fullComponents]);
+
+        // --- Task dispatchers фильтрация
         useEffect(
             () =>
                 setFilteredTaskDispatcherDefinitions(
@@ -74,40 +124,55 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
         );
 
-        useEffect(() => {
-            if (componentDefinitions) {
-                setFilteredActionComponentDefinitions(
-                    componentDefinitions
-                        .filter(
-                            ({actionsCount, name, title}) =>
-                                actionsCount &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
-                        .filter(({name}) => (!ff_797 && name !== 'dataStream') || ff_797)
-                );
+        // --- Основная фильтрация компонентов
+        const matchedComponents = useMemo(() => {
+            if (!componentDefinitions?.length) return [];
 
-                setFilteredTriggerComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({name, title, triggersCount}) =>
-                            triggersCount &&
-                            (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                title?.toLowerCase().includes(filter.toLowerCase()))
+            const lowerFilter = filter.toLowerCase();
+
+            return componentDefinitions.filter((component) => {
+                const full = fullComponents[component.name];
+
+                const matchesComponent =
+                    component.name?.toLowerCase().includes(lowerFilter) ||
+                    component.title?.toLowerCase().includes(lowerFilter);
+
+                const matchesAction =
+                    full?.actions?.some(
+                        (a: {name?: string; title?: string}) =>
+                            a.name?.toLowerCase().includes(lowerFilter) || a.title?.toLowerCase().includes(lowerFilter)
+                    ) ?? false;
+
+                const matchesTrigger =
+                    full?.triggers?.some(
+                        (t: {name?: string; title?: string}) =>
+                            t.name?.toLowerCase().includes(lowerFilter) || t.title?.toLowerCase().includes(lowerFilter)
+                    ) ?? false;
+
+                return matchesComponent || matchesAction || matchesTrigger;
+            });
+        }, [componentDefinitions, filter, fullComponents]);
+
+        useEffect(() => {
+            if (!componentDefinitions) return;
+
+            const matched = filter ? matchedComponents : componentDefinitions;
+
+            setFilteredActionComponentDefinitions(
+                matched.filter(({actionsCount, name}) => actionsCount && ((!ff_797 && name !== 'dataStream') || ff_797))
+            );
+
+            setFilteredTriggerComponentDefinitions(matched.filter(({triggersCount}) => triggersCount));
+
+            if (clusterElementType) {
+                setFilteredClusterElementComponentDefinitions(
+                    matched.filter(
+                        ({clusterElementsCount}) =>
+                            clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)]
                     )
                 );
-
-                if (clusterElementType) {
-                    setFilteredClusterElementComponentDefinitions(
-                        componentDefinitions.filter(
-                            ({clusterElementsCount, name, title}) =>
-                                clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
-                    );
-                }
             }
-        }, [componentDefinitions, filter, ff_797, clusterElementType]);
+        }, [componentDefinitions, filter, ff_797, clusterElementType, matchedComponents]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
@@ -217,7 +282,6 @@ const filterTaskDispatcherDefinitions = (
 
             if (isLoopSubtask(parentNode)) {
                 hasLoopTaskDispatcher = true;
-
                 break;
             }
 
