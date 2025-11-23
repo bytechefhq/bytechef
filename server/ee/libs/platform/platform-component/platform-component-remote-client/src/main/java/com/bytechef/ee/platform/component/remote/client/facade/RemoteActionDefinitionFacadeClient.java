@@ -44,8 +44,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),

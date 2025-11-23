@@ -138,7 +138,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
-                    lookupDependsOnPaths, connectionId);
+                    lookupDependsOnPaths, workflowId, connectionId);
             });
     }
 
