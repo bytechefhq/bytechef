@@ -35,6 +35,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
@@ -95,11 +96,12 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) loopTaskExecution.getParameters()
-            .get(ITERATEE))
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils
+            .getList(
+                loopTaskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         Map<String, Object> parentContextValue = updateParentContextValue(taskExecution, loopTaskExecution);
 
