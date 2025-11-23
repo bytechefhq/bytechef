@@ -96,7 +96,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             }
         };
 
-        // --- Загрузка полных данных (debounced)
         useEffect(() => {
             if (!filter || !componentDefinitions.length) return;
 
@@ -115,7 +114,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             return () => clearTimeout(timeout);
         }, [filter, componentDefinitions, fullComponents]);
 
-        // --- Task dispatchers фильтрация
         useEffect(
             () =>
                 setFilteredTaskDispatcherDefinitions(
@@ -124,7 +122,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
         );
 
-        // --- Основная фильтрация компонентов
         const matchedComponents = useMemo(() => {
             if (!componentDefinitions?.length) return [];
 
@@ -266,8 +263,6 @@ const filterTaskDispatcherDefinitions = (
             let parentId;
 
             const currentNodeData = currentNode.data as NodeDataType;
-
-            // If using edgeId (has full data), or using sourceNodeId (has restricted data)
             if (currentNode.data.workflowNodeName) {
                 parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
             } else {
