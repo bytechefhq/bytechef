@@ -17,7 +17,11 @@
 package com.bytechef.component.google.tasks.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.MAX_RESULTS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.PAGE_TOKEN;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -31,6 +35,7 @@ import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class GoogleTasksUtils {
 
@@ -41,40 +46,42 @@ public class GoogleTasksUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> response = context
-            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/users/@me/lists"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(response);
+        return fetchOptions(context, "https://tasks.googleapis.com/tasks/v1/users/@me/lists");
     }
 
     public static List<Option<String>> getTasksIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
-        Map<String, Object> response = actionContext
-            .http(http -> http.get(
-                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String url = "https://tasks.googleapis.com/tasks/v1/lists/%s/tasks"
+            .formatted(inputParameters.getRequiredString(LIST_ID));
 
-        return getOptions(response);
+        return fetchOptions(actionContext, url);
     }
 
-    private static List<Option<String>> getOptions(Map<String, Object> response) {
-        List<Option<String>> tasksId = new ArrayList<>();
+    private static List<Option<String>> fetchOptions(Context context, String url) {
+        List<Option<String>> options = new ArrayList<>();
+        String nextPageToken = null;
 
-        if (response.get("items") instanceof List<?> items) {
-            for (Object item : items) {
-                if (item instanceof Map<?, ?> map) {
-                    tasksId.add(option((String) map.get("title"), (String) map.get("id")));
+        do {
+            Map<String, Object> response = context
+                .http(http -> http.get(url))
+                .queryParameters(PAGE_TOKEN, nextPageToken, MAX_RESULTS, 100)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (response.get("items") instanceof List<?> items) {
+                for (Object item : items) {
+                    if (item instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("title"), (String) map.get(ID)));
+                    }
                 }
             }
-        }
 
-        return tasksId;
+            nextPageToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
+        } while (nextPageToken != null);
+
+        return options;
     }
 }

@@ -27,8 +27,12 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class GoogleTasksConstants {
 
     public static final String ALL_TASKS = "allTasks";
+    public static final String ID = "id";
     public static final String LIST_ID = "listId";
+    public static final String MAX_RESULTS = "maxResults";
+    public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String NOTES = "notes";
+    public static final String PAGE_TOKEN = "pageToken";
     public static final String SHOW_COMPLETED = "showCompleted";
     public static final String STATUS = "status";
     public static final String TASK_ID = "taskId";
