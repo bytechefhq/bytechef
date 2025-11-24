@@ -21,7 +21,11 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.ALL_TASKS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.MAX_RESULTS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.Context.Http;
@@ -91,7 +95,7 @@ public class GoogleTasksNewTaskTrigger {
             if (response.get("items") instanceof List<?> items) {
                 for (Object item : items) {
                     if (item instanceof Map<?, ?> task) {
-                        String id = (String) task.get("id");
+                        String id = (String) task.get(ID);
 
                         if (!tasksIds.contains(id)) {
                             tasksIds.add(id);
@@ -108,7 +112,7 @@ public class GoogleTasksNewTaskTrigger {
                 break;
             }
 
-            nextToken = (String) response.getOrDefault("nextPageToken", null);
+            nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
         } while (nextToken != null);
 
         return new PollOutput(
@@ -120,7 +124,7 @@ public class GoogleTasksNewTaskTrigger {
 
         return triggerContext
             .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/%s/tasks".formatted(listId)))
-            .queryParameters("pageToken", pageToken, "maxResults", maxResults, "updatedMin", updatedMin)
+            .queryParameters(PAGE_TOKEN, pageToken, MAX_RESULTS, maxResults, "updatedMin", updatedMin)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
