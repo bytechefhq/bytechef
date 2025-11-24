@@ -152,7 +152,9 @@ class GoogleFormUtilsTest {
         assertNotNull(capturedFunction);
 
         Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
         Http.Configuration configuration = configurationBuilder.build();
+
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
@@ -225,7 +227,9 @@ class GoogleFormUtilsTest {
         assertNotNull(capturedFunction);
 
         Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
         Http.Configuration configuration = configurationBuilder.build();
+
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());

@@ -61,8 +61,10 @@ class GoogleFormsNewResponseTriggerTest {
 
             instantMockedStatic.when(Instant::now)
                 .thenReturn(endDate);
-            googleFormsUtilsMockedStatic.when(() -> GoogleFormsUtils.getCustomResponses(
-                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+
+            googleFormsUtilsMockedStatic.when(() -> GoogleFormsUtils
+                .getCustomResponses(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(responseList);
             when(mockedTriggerContext.isEditorEnvironment())
                 .thenReturn(false);
