@@ -17,7 +17,7 @@
 package com.bytechef.platform.security.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -96,6 +96,6 @@ public class ApiKeyGraphQlController {
 
     @SchemaMapping(typeName = "ApiKey", field = "secretKey")
     public String secretKey(ApiKey apiKey) {
-        return StringUtils.obfuscate(apiKey.getSecretKey(), 26, 6);
+        return ObfuscateUtils.obfuscate(apiKey.getSecretKey(), 26, 6);
     }
 }
