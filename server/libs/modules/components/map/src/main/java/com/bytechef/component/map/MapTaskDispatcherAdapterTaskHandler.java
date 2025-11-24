@@ -111,7 +111,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         TaskWorker taskWorker = new TaskWorker(
             evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
-            taskFileStorage);
+            taskFileStorage, List.of());
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
             contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)), evaluator,
