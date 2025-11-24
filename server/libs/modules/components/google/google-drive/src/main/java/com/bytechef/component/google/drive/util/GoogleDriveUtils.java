@@ -51,21 +51,18 @@ public class GoogleDriveUtils {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext, boolean newFile) {
 
-        Instant now = Instant.now();
+        Drive drive = GoogleServices.getDrive(connectionParameters);
         boolean editorEnvironment = triggerContext.isEditorEnvironment();
+        Instant now = Instant.now();
+
         Instant startDate = closureParameters.get(
             LAST_TIME_CHECKED, Instant.class, editorEnvironment ? now.minus(Duration.ofHours(3)) : now);
+
         String timestamp = DateTimeFormatter.ISO_INSTANT.format(startDate);
 
-        String mimeType = newFile
-            ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
-            : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
         List<File> files = new ArrayList<>();
-        String nextPageToken = null;
         int pageSize = editorEnvironment ? 1 : 1000;
+        String nextPageToken = null;
 
         do {
             FileList fileList;
