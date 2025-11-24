@@ -1,4 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
@@ -11,7 +12,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Badge} from '@/components/ui/badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -137,13 +137,19 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         <div className="flex items-center justify-end gap-x-6">
                             <div className="flex min-w-52 flex-col items-end gap-y-4">
                                 {connection.credentialStatus === 'VALID' ? (
-                                    <Badge className="uppercase" variant={connection.active ? 'success' : 'secondary'}>
-                                        {connection.active ? 'Active' : 'Not Active'}
-                                    </Badge>
+                                    <Badge
+                                        className="uppercase"
+                                        label={connection.active ? 'Active' : 'Not Active'}
+                                        styleType={connection.active ? 'success-outline' : 'secondary-outline'}
+                                        weight="semibold"
+                                    />
                                 ) : (
-                                    <Badge className="uppercase" variant="destructive">
-                                        {connection.credentialStatus}
-                                    </Badge>
+                                    <Badge
+                                        className="uppercase"
+                                        label={connection.credentialStatus ?? 'INVALID'}
+                                        styleType="destructive-outline"
+                                        weight="semibold"
+                                    />
                                 )}
 
                                 {connection.createdDate && (
