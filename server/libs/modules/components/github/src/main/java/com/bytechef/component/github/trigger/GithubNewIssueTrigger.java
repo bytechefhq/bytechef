@@ -75,8 +75,7 @@ public class GithubNewIssueTrigger {
 
         List<Map<String, ?>> issues = getItems(context, url, editorEnvironment, "since", timestamp);
 
-        List<Map<String, ?>> filteredIssues = issues
-            .stream()
+        List<Map<String, ?>> filteredIssues = issues.stream()
             .filter(issue -> Instant.parse((String) issue.get("created_at"))
                 .compareTo(start) >= 0)
             .collect(Collectors.toList());

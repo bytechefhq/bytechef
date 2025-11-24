@@ -96,11 +96,11 @@ class GithubNewIssueTriggerTest {
             "id", 2, "created_at", "2024-01-01T00:00:00Z", "title", "Just new enough");
 
         try (MockedStatic<GithubUtils> githubUtilsMockedStatic = mockStatic(GithubUtils.class);
-            MockedStatic<Instant> instantMockedStatic = mockStatic(
-                Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            MockedStatic<Instant> instantMockedStatic = mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
 
             instantMockedStatic.when(Instant::now)
                 .thenReturn(endDate);
+
             githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
                 .thenReturn("owner");
             githubUtilsMockedStatic.when(() -> GithubUtils.getItems(
