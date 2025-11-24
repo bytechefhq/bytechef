@@ -36,6 +36,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
@@ -74,7 +75,13 @@ public class GithubNewIssueTrigger {
 
         List<Map<String, ?>> issues = getItems(context, url, editorEnvironment, "since", timestamp);
 
-        return new PollOutput(issues, Map.of(LAST_TIME_CHECKED, now), false);
+        List<Map<String, ?>> filteredIssues = issues
+            .stream()
+            .filter(issue -> Instant.parse((String) issue.get("created_at"))
+                .compareTo(start) >= 0)
+            .collect(Collectors.toList());
+
+        return new PollOutput(filteredIssues, Map.of(LAST_TIME_CHECKED, now), false);
     }
 
     private GithubNewIssueTrigger() {
