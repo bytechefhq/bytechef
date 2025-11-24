@@ -84,8 +84,8 @@ public class EachTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
 
     @Override
     public void doDispatch(TaskExecution taskExecution) {
-        Map<String, ?> workflowMap =
-            MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
+        Map<String, ?> workflowMap = MapUtils.getRequired(
+            taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {});
         WorkflowTask iteratee = new WorkflowTask(workflowMap);
         List<Object> items = MapUtils.getRequiredList(taskExecution.getParameters(), ITEMS, Object.class);
 
