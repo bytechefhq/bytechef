@@ -103,9 +103,10 @@ class GithubNewIssueTriggerTest {
 
             githubUtilsMockedStatic.when(() -> GithubUtils.getOwnerName(contextArgumentCaptor.capture()))
                 .thenReturn("owner");
-            githubUtilsMockedStatic.when(() -> GithubUtils.getItems(
-                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            githubUtilsMockedStatic.when(() -> GithubUtils
+                .getItems(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(List.of(oldIssue, newIssue));
 
             when(mockedTriggerContext.isEditorEnvironment())
