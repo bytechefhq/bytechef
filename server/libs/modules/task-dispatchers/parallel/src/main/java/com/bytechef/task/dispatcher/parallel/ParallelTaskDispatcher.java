@@ -34,9 +34,9 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,7 +79,12 @@ public class ParallelTaskDispatcher extends ErrorHandlingTaskDispatcher implemen
     @Override
     public void doDispatch(TaskExecution taskExecution) {
         List<WorkflowTask> workflowTasks = Validate.notNull(
-            MapUtils.getList(taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList()),
+            MapUtils
+                .getList(
+                    taskExecution.getParameters(), TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList(),
             "'workflowTasks' property must not be null");
 
         if (workflowTasks.isEmpty()) {
