@@ -75,42 +75,45 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 3.5.6
-- **Frontend**: React 19 with TypeScript, Vite, TailwindCSS
-- **Database**: PostgreSQL with Liquibase migrations
-- **Message Broker**: Redis (default), supports RabbitMQ, Kafka, JMS, AMQP
-- **Build System**: Gradle with Kotlin DSL
-- **Code Execution**: GraalVM Polyglot (Java, JavaScript, Python, Ruby)
+- **Backend**: Java 25 with Spring Boot 3.5.7
+- **Frontend**: React 19.2 with TypeScript 5.9, Vite 7.2, TailwindCSS 3.4
+- **Database**: PostgreSQL 15+ with Liquibase migrations
+- **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
+- **Build System**: Gradle 8+ with Kotlin DSL
+- **Code Execution**: GraalVM Polyglot 25.0.1 (Java, JavaScript, Python, Ruby)
+- **Testing**: JUnit 5, Vitest 4, Testcontainers
+- **Node.js**: Version 20.19+ required for client development
+- **Additional Tools**: MapStruct 1.6.3, Jackson 2.19.2, SpringDoc OpenAPI 2.8.14
 
 ### Main Server Module Structure
 
 #### Core Modules (`server/libs/`)
 - **`atlas/`** - Workflow engine core
-  - `atlas-coordinator/` - Orchestrates workflow execution
-  - `atlas-execution/` - Manages workflow execution lifecycle
-  - `atlas-worker/` - Task execution workers
-  - `atlas-configuration/` - Workflow configuration management
+    - `atlas-coordinator/` - Orchestrates workflow execution
+    - `atlas-execution/` - Manages workflow execution lifecycle
+    - `atlas-worker/` - Task execution workers
+    - `atlas-configuration/` - Workflow configuration management
 
 - **`automation/`** - iPaaS automation implementation
-  - `automation-configuration/` - Project and workflow configuration
-  - `automation-connection/` - Connection management
-  - `automation-workflow/` - Workflow coordination and execution
-  - `automation-task/` - Task management services
+    - `automation-configuration/` - Project and workflow configuration
+    - `automation-connection/` - Connection management
+    - `automation-workflow/` - Workflow coordination and execution
+    - `automation-task/` - Task management services
 
 - **`platform/`** - Core infrastructure services
-  - `platform-component/` - Component definition and management
-  - `platform-connection/` - Connection handling
-  - `platform-workflow/` - Workflow management
-  - `platform-scheduler/` - Scheduling services
-  - `platform-oauth2/` - OAuth2 authentication
-  - `platform-webhook/` - Webhook handling
-  - `platform-ai/` - AI integration services
+    - `platform-component/` - Component definition and management
+    - `platform-connection/` - Connection handling
+    - `platform-workflow/` - Workflow management
+    - `platform-scheduler/` - Scheduling services
+    - `platform-oauth2/` - OAuth2 authentication
+    - `platform-webhook/` - Webhook handling
+    - `platform-ai/` - AI integration services
 
 - **`core/`** - Foundational utilities
-  - `evaluator/` - Expression evaluation
-  - `file-storage/` - File storage abstraction
-  - `encryption/` - Encryption services
-  - `message/` - Message broker abstraction
+    - `evaluator/` - Expression evaluation
+    - `file-storage/` - File storage abstraction
+    - `encryption/` - Encryption services
+    - `message/` - Message broker abstraction
 
 #### Component System
 Components are located in `server/libs/modules/components/` and follow this pattern:
@@ -122,10 +125,30 @@ Components are located in `server/libs/modules/components/` and follow this patt
 ### Enterprise Edition (EE) Microservices
 The `server/ee/` directory contains microservices for distributed deployment:
 - `api-gateway-app/` - API Gateway with routing
+- `ai-copilot-app/` - AI Copilot service for workflow assistance
+- `config-server-app/` - Spring Cloud Config server
 - `configuration-app/` - Configuration management service
+- `connection-app/` - Connection management service
+- `coordinator-app/` - Workflow coordination service
 - `execution-app/` - Workflow execution service
+- `scheduler-app/` - Scheduling service
+- `webhook-app/` - Webhook handling service
 - `worker-app/` - Task execution workers
 - `runtime-job-app/` - Runtime job execution
+
+### Available Components
+ByteChef includes 160+ built-in components for integrating with various services. Examples include:
+- **CRM**: Salesforce, HubSpot, Pipedrive, Zoho CRM, Affinity, Agile CRM, Attio
+- **Project Management**: Asana, Jira, Monday, Trello, ClickUp, Airtable
+- **Communication**: Slack, Discord, Microsoft Teams, Telegram, WhatsApp
+- **Email Marketing**: Mailchimp, SendGrid, Brevo, ActiveCampaign
+- **E-commerce**: Shopify, WooCommerce, BigCommerce, Stripe, Square
+- **Cloud Storage**: Google Drive, Dropbox, Box, OneDrive, AWS S3
+- **Developer Tools**: GitHub, GitLab, Bitbucket, Docker, AWS
+- **AI/ML**: OpenAI, Google Gemini, Anthropic Claude, Stability AI
+- **Databases**: PostgreSQL, MySQL, MongoDB, Airtable, Baserow
+- **Productivity**: Google Workspace, Microsoft 365, Notion, Confluence
+- **Custom**: Bash scripting, HTTP requests, Custom code execution
 
 ## Development Patterns
 
@@ -145,13 +168,13 @@ public class ExampleComponentHandler implements ComponentHandler {
 ```
 
 2. **Testing Pattern**:
-   - Component tests are in `./src/test/java/com/bytechef/component/`
-   - Running tests auto-generates `.json` definition files in `./src/test/resources/definition/`
-   - Delete existing `.json` files before running tests to regenerate them
+    - Component tests are in `./src/test/java/com/bytechef/component/`
+    - Running tests auto-generates `.json` definition files in `./src/test/resources/definition/`
+    - Delete existing `.json` files before running tests to regenerate them
 
 3. **Documentation**:
-   - Component documentation goes in `./src/main/resources/README.md`
-   - Run `./gradlew generateDocumentation` to update docs
+    - Component documentation goes in `./src/main/resources/README.md`
+    - Run `./gradlew generateDocumentation` to update docs
 
 ### Code Quality Requirements
 - **Spotless**: Code formatting is enforced. Run `./gradlew spotlessApply` before commits
@@ -173,48 +196,48 @@ public class ExampleComponentHandler implements ComponentHandler {
 ### Spring Boot Best Practices
 
 1. **Prefer Constructor Injection over Field/Setter Injection**
-   - Declare all mandatory dependencies as `final` fields and inject them through the constructor
-   - Spring will auto-detect if there is only one constructor, no need to add `@Autowired`
-   - Constructor injection ensures proper initialization and enables easier unit testing
+    - Declare all mandatory dependencies as `final` fields and inject them through the constructor
+    - Spring will auto-detect if there is only one constructor, no need to add `@Autowired`
+    - Constructor injection ensures proper initialization and enables easier unit testing
 
 2. **Prefer package-private over public for Spring components**
-   - Declare Controllers, `@Configuration` classes and `@Bean` methods with default (package-private) visibility whenever possible
-   - Reinforces encapsulation while still allowing Spring's classpath scanning to work
+    - Declare Controllers, `@Configuration` classes and `@Bean` methods with default (package-private) visibility whenever possible
+    - Reinforces encapsulation while still allowing Spring's classpath scanning to work
 
 3. **Organize Configuration with Typed Properties**
-   - Group application-specific configuration properties with a common prefix
-   - Bind them to `@ConfigurationProperties` classes with validation annotations
-   - Prefer environment variables instead of profiles for different environments
+    - Group application-specific configuration properties with a common prefix
+    - Bind them to `@ConfigurationProperties` classes with validation annotations
+    - Prefer environment variables instead of profiles for different environments
 
 4. **Define Clear Transaction Boundaries**
-   - Define each Service-layer method as a transactional unit
-   - Annotate query-only methods with `@Transactional(readOnly = true)`
-   - Annotate data-modifying methods with `@Transactional`
-   - Keep transactions as brief as possible
+    - Define each Service-layer method as a transactional unit
+    - Annotate query-only methods with `@Transactional(readOnly = true)`
+    - Annotate data-modifying methods with `@Transactional`
+    - Keep transactions as brief as possible
 
 5. **Disable Open Session in View Pattern**
-   - Set `spring.jpa.open-in-view=false` in application properties
-   - Prevents N+1 select problems and forces explicit fetching strategies
+    - Set `spring.jpa.open-in-view=false` in application properties
+    - Prevents N+1 select problems and forces explicit fetching strategies
 
 6. **Separate Web Layer from Persistence Layer**
-   - Don't expose entities directly as responses in controllers
-   - Define explicit request and response record (DTO) classes
-   - Apply Jakarta Validation annotations on request records
+    - Don't expose entities directly as responses in controllers
+    - Define explicit request and response record (DTO) classes
+    - Apply Jakarta Validation annotations on request records
 
 7. **Follow REST API Design Principles**
-   - Use versioned, resource-oriented URLs: `/api/v{version}/resources`
-   - Consistent patterns for collections and sub-resources
-   - Use `ResponseEntity<T>` for explicit HTTP status codes
-   - Use pagination for unbounded collections
-   - Use snake_case or camelCase consistently in JSON
+    - Use versioned, resource-oriented URLs: `/api/v{version}/resources`
+    - Consistent patterns for collections and sub-resources
+    - Use `ResponseEntity<T>` for explicit HTTP status codes
+    - Use pagination for unbounded collections
+    - Use snake_case or camelCase consistently in JSON
 
 8. **Use Command Objects for Business Operations**
-   - Create purpose-built command records (e.g., `CreateOrderCommand`) to wrap input data
-   - Clearly communicates expected input data to callers
+    - Create purpose-built command records (e.g., `CreateOrderCommand`) to wrap input data
+    - Clearly communicates expected input data to callers
 
 9. **Centralize Exception Handling**
-   - Use `@ControllerAdvice` or `@RestControllerAdvice` with `@ExceptionHandler` methods
-   - Return consistent error responses using ProblemDetails format (RFC 9457)
+    - Use `@ControllerAdvice` or `@RestControllerAdvice` with `@ExceptionHandler` methods
+    - Return consistent error responses using ProblemDetails format (RFC 9457)
 
 10. **Actuator Security**
     - Expose only essential actuator endpoints (`/health`, `/info`, `/metrics`) without authentication
@@ -281,6 +304,66 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Migration files are in `server/libs/config/liquibase-config/`
 - Database changes are applied automatically on startup
 
+### Running Integration Tests
+Integration tests use Testcontainers to spin up real services:
+```bash
+# Run all integration tests
+./gradlew testIntegration
+
+# Run integration tests for a specific module
+./gradlew :server:libs:platform:platform-workflow:platform-workflow-service:testIntegration
+
+# Run with specific Docker image versions (recommended)
+# Integration tests automatically use Testcontainers with PostgreSQL 15
+```
+
+### Working with the Client
+```bash
+cd client
+
+# Development with hot reload
+npm run dev
+
+# Run full quality checks before committing
+npm run check  # Runs lint, typecheck, and tests with coverage
+
+# Format code
+npm run format
+
+# Build for production
+npm run build
+
+# Run Storybook for component development
+npm run storybook
+```
+
+### Debugging Workflows
+1. **Enable Debug Logging**: Set logging level to DEBUG for specific packages in `application.yml`
+2. **Use Workflow Test Mode**: Test workflows in the UI with step-by-step execution
+3. **Check Execution Logs**: View workflow execution logs in the UI or database
+4. **Inspect Variables**: Use the workflow editor to inspect variable values at each step
+5. **Test Actions Individually**: Use the component test feature to test individual actions
+
+### Code Quality Workflow
+Before committing code, ensure:
+```bash
+# Server-side
+./gradlew spotlessApply  # Format code
+./gradlew check          # Run all checks
+
+# Client-side
+cd client
+npm run format           # Format code
+npm run check            # Run lint, typecheck, and tests
+```
+
+### Creating Custom Components via CLI
+ByteChef includes a CLI tool for scaffolding components:
+```bash
+cd cli
+./gradlew :cli-app:bootRun --args="component init openapi --name=my-component --openapi-path=/path/to/openapi.yaml"
+```
+
 ## Build and Deployment
 
 ### Docker
@@ -298,17 +381,284 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Automated component documentation generation
 - Code quality checks are enforced
 
+## Testing Strategies
+
+### Unit Testing
+- Write unit tests for all business logic in service classes
+- Mock external dependencies using Mockito
+- Test component actions and triggers in isolation
+- Aim for high code coverage (target: 80%+)
+
+### Integration Testing
+- All integration test classes must end with `IntTest` suffix
+- Use `@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)`
+- Leverage Testcontainers for real service dependencies
+- Test configuration: `src/test/resources/config/application-testint.yml`
+- Example integration test structure:
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("testint")
+class WorkflowServiceIntTest {
+    @Autowired
+    private WorkflowService workflowService;
+
+    @Test
+    void testWorkflowExecution() {
+        // Test implementation
+    }
+}
+```
+
+### Component Testing
+- Component tests auto-generate JSON definition files in `src/test/resources/definition/`
+- Delete existing `.json` files before running tests to regenerate them
+- Test both actions and triggers
+- Verify connection configurations
+- Test error handling and edge cases
+
+### Client-Side Testing
+```bash
+cd client
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run all quality checks (includes tests)
+npm run check
+```
+
+### End-to-End Testing
+- Test complete workflows through the UI
+- Verify trigger activation and workflow execution
+- Test with real connections to external services (in staging)
+- Validate data transformations and error handling
+
+### CI/CD Testing
+GitHub Actions workflows automatically run:
+- Server tests: `./gradlew check jacocoTestReport sonar`
+- Client tests: `npm run check` (lint + typecheck + tests)
+- SonarCloud analysis for code quality
+- Integration tests with Testcontainers
+
+## Debugging Tips
+
+### Server-Side Debugging
+
+#### Enable Debug Logging
+Edit `application.yml` or set environment variables:
+```yaml
+logging:
+  level:
+    com.bytechef: DEBUG
+    com.bytechef.platform.workflow: TRACE
+    org.springframework.web: DEBUG
+```
+
+#### Remote Debugging
+Start the server with debug enabled:
+```bash
+./gradlew -p server/apps/server-app bootRun --debug-jvm
+# Connects on port 5005 by default
+```
+
+In IntelliJ IDEA:
+1. Run → Edit Configurations
+2. Add New Configuration → Remote JVM Debug
+3. Set port to 5005
+4. Start debugging
+
+#### Common Debugging Scenarios
+
+**Workflow Execution Issues:**
+- Check `atlas-execution` logs for execution details
+- Inspect workflow JSON definition for syntax errors
+- Verify component connections are properly configured
+- Check if triggers are enabled and properly configured
+
+**Component Action Failures:**
+- Enable DEBUG logging for `com.bytechef.component`
+- Verify input parameters match action definitions
+- Check connection credentials and permissions
+- Review component-specific logs in the execution logs
+
+**Database Issues:**
+- Check Liquibase changelog execution: `SELECT * FROM databasechangelog`
+- Verify connection pool settings if seeing connection timeouts
+- Check for transaction rollbacks in logs
+- Use `spring.jpa.show-sql=true` to see SQL queries (dev only)
+
+**Authentication/Authorization:**
+- Check JWT token validity and expiration
+- Verify user roles and permissions in database
+- Review Spring Security filter chain execution
+- Check CORS configuration for client-server communication
+
+### Client-Side Debugging
+
+#### Browser DevTools
+- Use React DevTools extension for component inspection
+- Monitor Network tab for API calls and responses
+- Check Console for error messages and warnings
+- Use Redux DevTools for state management debugging (if applicable)
+
+#### Debug Mode
+Run client in development mode with source maps:
+```bash
+npm run dev
+# Source maps enabled by default for debugging
+```
+
+#### Common Client Issues
+
+**API Call Failures:**
+- Check Network tab for failed requests
+- Verify API endpoint URLs are correct
+- Check request/response headers and payloads
+- Ensure authentication tokens are included
+
+**State Management:**
+- Use Zustand DevTools to inspect state changes
+- Check React Query DevTools for cache state
+- Verify state updates are triggering re-renders
+
+**Workflow Editor Issues:**
+- Check console for React Flow errors
+- Verify workflow JSON structure
+- Clear browser cache if seeing stale data
+- Check for JavaScript errors in component definitions
+
+### Performance Debugging
+
+#### Server Performance
+```bash
+# Enable JVM metrics
+./gradlew -p server/apps/server-app bootRun \
+  -Dmanagement.endpoints.web.exposure.include=metrics,health,prometheus
+
+# Access metrics at http://localhost:8080/actuator/metrics
+```
+
+#### Database Query Performance
+- Enable query logging: `logging.level.org.hibernate.SQL=DEBUG`
+- Monitor slow queries in PostgreSQL logs
+- Use EXPLAIN ANALYZE for query optimization
+- Check for N+1 query problems
+
+#### Memory Issues
+- Monitor heap usage: `/actuator/metrics/jvm.memory.used`
+- Generate heap dump: `jmap -dump:format=b,file=heap.bin <PID>`
+- Analyze with tools like Eclipse MAT or VisualVM
+
+### Docker Debugging
+
+```bash
+# View logs for specific container
+docker compose -f docker-compose.dev.infra.yml logs -f postgres
+
+# Access container shell
+docker exec -it bytechef-postgres bash
+
+# Check container resource usage
+docker stats
+
+# Restart services
+docker compose -f docker-compose.dev.infra.yml restart
+```
+
+### Useful Debugging Commands
+
+```bash
+# Check database connectivity
+psql -h localhost -U postgres -d bytechef
+
+# Monitor Redis
+redis-cli
+> MONITOR
+
+# Check port usage
+lsof -i :8080
+netstat -an | grep 8080
+
+# Tail application logs
+tail -f server/apps/server-app/build/logs/application.log
+```
+
 ## Troubleshooting
 
 ### Common Issues
-- **Port conflicts**: Check if ports 5432, 6379, 1025 are in use
-- **Java version**: Ensure Java 25+ is installed and JAVA_HOME is set
-- **Docker**: Make sure Docker is running for infrastructure services
-- **Database schema**: Use `docker compose down -v` to reset database
+
+**Port conflicts**
+- Check if ports 5432, 6379, 1025, 8080 are in use: `lsof -i :<port>`
+- Stop conflicting services or change port in configuration
+- On macOS: `sudo lsof -i -P | grep LISTEN | grep :<port>`
+
+**Java version mismatch**
+- Ensure Java 25+ is installed: `java -version`
+- Set JAVA_HOME environment variable
+- Use GraalVM distribution for full functionality
+- Check Gradle is using correct Java: `./gradlew -v`
+
+**Docker issues**
+- Make sure Docker Desktop is running
+- Check Docker daemon status: `docker info`
+- Verify Docker Compose version: `docker compose version`
+- Clear Docker cache: `docker system prune -a`
+
+**Database schema issues**
+- Reset database: `docker compose -f server/docker-compose.dev.infra.yml down -v`
+- Check Liquibase logs for migration errors
+- Manually run migrations: `./gradlew liquibaseUpdate`
+- Verify PostgreSQL version compatibility (15+)
+
+**Build failures**
+- Clean build: `./gradlew clean build`
+- Clear Gradle cache: `rm -rf ~/.gradle/caches`
+- Check for dependency conflicts: `./gradlew dependencies`
+- Ensure Spotless formatting: `./gradlew spotlessApply`
+
+**Client build issues**
+- Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
+- Clear npm cache: `npm cache clean --force`
+- Check Node.js version: `node -v` (should be 20.19+)
+- Verify package-lock.json is in sync: `npm ci`
+
+**Workflow execution failures**
+- Check Atlas worker logs for task execution errors
+- Verify component connections are active
+- Check Redis connectivity for message broker
+- Ensure workflow JSON is valid
+- Review component-specific documentation for required parameters
+
+**Integration test failures**
+- Ensure Docker is running (required for Testcontainers)
+- Check if ports are available for test containers
+- Verify test database initialization
+- Review test logs in `build/test-results/`
+- Increase test timeout if needed
 
 ### Performance
+
+**Gradle Build Optimization**
 - Gradle JVM is configured with 4GB heap in `gradle.properties`
 - Parallel builds are disabled by default but can be enabled
-- Use `./gradlew --build-cache` for faster builds
+- Use build cache: `./gradlew --build-cache build`
+- Use configuration cache: `./gradlew --configuration-cache build`
+- Gradle daemon runs by default for faster subsequent builds
+
+**Runtime Performance**
+- Monitor JVM metrics via `/actuator/metrics`
+- Adjust heap size via `JAVA_OPTS` environment variable
+- Use connection pooling for database (HikariCP configured)
+- Enable Redis for distributed caching in production
+- Scale workers horizontally for increased throughput
+
+**Client Performance**
+- Use production build: `npm run build`
+- Enable code splitting (configured in Vite)
+- Lazy load components where appropriate
+- Monitor bundle size: `npm run build` shows bundle analysis
 
 This architecture provides a solid foundation for building scalable integration workflows while maintaining flexibility for both embedded and standalone deployment scenarios.
