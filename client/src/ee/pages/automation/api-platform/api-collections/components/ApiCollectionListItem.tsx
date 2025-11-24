@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
-import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -149,9 +149,12 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                     <div className="flex items-center justify-end gap-x-6">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge className="flex space-x-1" variant="secondary">
-                                    V{apiCollection.projectVersion}
-                                </Badge>
+                                <Badge
+                                    className="flex space-x-1"
+                                    label={`V${apiCollection.projectVersion}`}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
                             </TooltipTrigger>
 
                             <TooltipContent>The project version</TooltipContent>

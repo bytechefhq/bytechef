@@ -1,7 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
-import {Badge} from '@/components/ui/badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -104,10 +104,10 @@ const ApiCollectionEndpointListItem = ({
                         apiCollectionEndpoint.httpMethod === 'PATCH' && 'bg-amber-400',
                         apiCollectionEndpoint.httpMethod === 'PUT' && 'bg-orange-400'
                     )}
-                    variant="secondary"
-                >
-                    {apiCollectionEndpoint.httpMethod}
-                </Badge>
+                    label={apiCollectionEndpoint.httpMethod}
+                    styleType="secondary-filled"
+                    weight="semibold"
+                />
 
                 <div className="flex flex-1 cursor-pointer items-center">
                     <div className="w-4/12 text-sm">{apiCollectionEndpoint.name}</div>

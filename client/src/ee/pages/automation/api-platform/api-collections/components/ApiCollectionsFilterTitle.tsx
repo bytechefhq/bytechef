@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import {ProjectBasic} from '@/ee/shared/middleware/automation/api-platform';
 import {Tag} from '@/shared/middleware/automation/configuration';
@@ -32,9 +32,11 @@ const ApiCollectionsFilterTitle = ({
                 {searchParams.get('tagId') ? 'tag' : 'project'}:
             </span>
 
-            <Badge variant="secondary">
-                <span className="text-sm">{pageTitle ?? 'All Projects'}</span>
-            </Badge>
+            <Badge
+                label={typeof pageTitle === 'string' ? pageTitle : 'All Projects'}
+                styleType="secondary-filled"
+                weight="semibold"
+            />
         </div>
     );
 };
