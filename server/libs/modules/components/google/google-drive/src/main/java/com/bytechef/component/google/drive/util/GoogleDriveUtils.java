@@ -52,6 +52,9 @@ public class GoogleDriveUtils {
         TriggerContext triggerContext, boolean newFile) {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
+        String mimeType = newFile
+            ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
+            : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
         boolean editorEnvironment = triggerContext.isEditorEnvironment();
         Instant now = Instant.now();
 
