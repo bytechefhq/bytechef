@@ -59,15 +59,20 @@ public class GithubNewPullRequestTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
+        boolean editorEnvironment = context.isEditorEnvironment();
         String url = "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/pulls";
 
         List<Map<String, ?>> pullRequests = getItems(
-            context, url, context.isEditorEnvironment(), "sort", "created", "direction", "desc");
+            context, url, editorEnvironment, "sort", "created", "direction", "desc");
 
         List<Long> pullRequestIds = new ArrayList<>(pullRequests.size());
 
         for (Map<String, ?> pullRequest : pullRequests) {
             pullRequestIds.add((Long) pullRequest.get(ID));
+        }
+
+        if (editorEnvironment) {
+            return new PollOutput(pullRequests, Map.of(PULL_REQUESTS, pullRequestIds), false);
         }
 
         List<Long> previousPullRequestIds = closureParameters.getList(PULL_REQUESTS, Long.class);
