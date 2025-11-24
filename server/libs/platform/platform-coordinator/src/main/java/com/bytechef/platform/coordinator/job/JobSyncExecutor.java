@@ -67,8 +67,8 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
+import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -96,7 +96,6 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
 
@@ -162,7 +161,8 @@ public class JobSyncExecutor {
             taskExecutor, maxTaskExecutions);
 
         TaskWorker taskWorker = new TaskWorker(
-            evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage);
+            evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage,
+            List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
 
         MemoryMessageBroker coordinatorMessageBroker = memoryMessageBrokerSupplier.get();
 
@@ -343,9 +343,9 @@ public class JobSyncExecutor {
 
         return taskExecutionService.fetchLastJobTaskExecution(jobId)
             .map(lastTaskExecution -> {
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(lastTaskExecution.getType());
+                Map<String, ?> metadata = lastTaskExecution.getMetadata();
 
-                if (WEBHOOK_COMPONENTS.contains(workflowNodeType.name())) {
+                if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
                     job.setOutputs(
                         taskFileStorage.storeJobOutputs(
                             jobId,

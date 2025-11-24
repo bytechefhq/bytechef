@@ -84,7 +84,7 @@ public class TaskWorkerTest {
         TaskWorker worker =
             new TaskWorker(
                 EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-                NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "done", taskFileStorage);
+                NEW_SINGLE_THREAD_EXECUTOR::execute, task -> taskExecution -> "done", taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -113,7 +113,7 @@ public class TaskWorkerTest {
             NEW_SINGLE_THREAD_EXECUTOR::execute,
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -154,7 +154,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -211,7 +211,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -274,7 +274,7 @@ public class TaskWorkerTest {
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
@@ -318,7 +318,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -364,7 +364,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
@@ -420,7 +420,7 @@ public class TaskWorkerTest {
                 }
 
                 return null;
-            }, taskFileStorage);
+            }, taskFileStorage, List.of());
 
         TaskExecution taskExecution1 = TaskExecution.builder()
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
