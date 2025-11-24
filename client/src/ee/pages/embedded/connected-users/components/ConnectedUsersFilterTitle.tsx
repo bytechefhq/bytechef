@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 const ConnectedUsersFilterTitle = ({
     filterData,
 }: {
@@ -14,9 +14,7 @@ const ConnectedUsersFilterTitle = ({
                 <>
                     <span className="text-sm uppercase text-muted-foreground">status:</span>
 
-                    <Badge variant="secondary">
-                        <span className="text-sm">{filterData.status}</span>
-                    </Badge>
+                    <Badge label={filterData.status} styleType="secondary-filled" weight="semibold" />
                 </>
             )}
         </div>

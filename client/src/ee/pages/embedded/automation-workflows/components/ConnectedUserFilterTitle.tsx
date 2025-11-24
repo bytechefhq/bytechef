@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 
 const ConnectedUserFilterTitle = ({
@@ -16,9 +16,7 @@ const ConnectedUserFilterTitle = ({
 
             <span className="text-sm uppercase text-muted-foreground">Connected User:</span>
 
-            <Badge variant="secondary">
-                <span className="text-sm">{pageTitle ?? 'All Users'}</span>
-            </Badge>
+            <Badge label={pageTitle ?? 'All Users'} styleType="secondary-filled" weight="semibold" />
         </div>
     );
 };
