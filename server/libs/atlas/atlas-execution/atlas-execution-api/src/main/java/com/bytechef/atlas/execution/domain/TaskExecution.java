@@ -458,7 +458,9 @@ public final class TaskExecution
     }
 
     public void setMetadata(Map<String, ?> metadata) {
-        if (metadata != null) {
+        if (metadata == null) {
+            this.metadata = new MapWrapper();
+        } else {
             this.metadata = new MapWrapper(metadata);
         }
     }
