@@ -47,7 +47,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Integration test to reproduce Quartz 2.5.1 column name case sensitivity bug. This test demonstrates the issue where
@@ -64,7 +63,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import({
     PostgreSQLContainerConfiguration.class, QuartzIntTest.QuartzJdbcConfiguration.class
 })
-@Testcontainers
 @SuppressFBWarnings("NP")
 public class QuartzIntTest {
 
