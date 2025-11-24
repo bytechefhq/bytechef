@@ -63,9 +63,10 @@ public class AiCopilotConfiguration {
 
     private final String anthropicApiKey;
     private final String anthropicModel;
-    private final Double temperature;
+    private final Double anthropicTemperature;
     private final String openAiApiKey;
     private final String openAiModel;
+    private final Double openAiTemperature;
     private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
     private final Resource systemPromptResource;
 
@@ -85,6 +86,7 @@ public class AiCopilotConfiguration {
             .getOptions();
 
         this.anthropicModel = anthropicChatOptions.getModel();
+        this.anthropicTemperature = anthropicChatOptions.getTemperature();
 
         ApplicationProperties.Ai.OpenAi openAi = copilot.getOpenAi();
 
@@ -94,7 +96,7 @@ public class AiCopilotConfiguration {
             .getOptions();
 
         this.openAiModel = openAiChatOptions.getModel();
-        this.temperature = openAiChatOptions.getTemperature();
+        this.openAiTemperature = openAiChatOptions.getTemperature();
 
         ApplicationProperties.Ai.Copilot.Vectorstore vectorstore = copilot.getVectorstore();
 
@@ -120,7 +122,7 @@ public class AiCopilotConfiguration {
             .defaultOptions(
                 AnthropicChatOptions.builder()
                     .model(anthropicModel)
-                    .temperature(temperature)
+                    .temperature(anthropicTemperature)
                     .build())
             .build();
     }
@@ -162,7 +164,7 @@ public class AiCopilotConfiguration {
             .defaultOptions(
                 OpenAiChatOptions.builder()
                     .model(openAiModel)
-                    .temperature(temperature)
+                    .temperature(openAiTemperature)
                     .build())
             .build();
     }
@@ -247,7 +249,8 @@ public class AiCopilotConfiguration {
 
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Error reading system prompt resource", e);
+            throw new IllegalStateException(
+                "Failed to read system prompt resource: " + systemPromptResource.getDescription(), e);
         }
     }
 }
