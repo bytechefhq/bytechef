@@ -21,8 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.MAX_RESULTS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.SHOW_COMPLETED;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
@@ -34,6 +36,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
 import com.bytechef.google.commons.GoogleUtils;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,15 +68,30 @@ public class GoogleTasksListTasksAction {
     private GoogleTasksListTasksAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static List<?> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<Object> tasks = new ArrayList<>();
+        String nextPageToken = null;
 
-        return context
-            .http(http -> http.get(
-                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
-            .queryParameters(SHOW_COMPLETED, inputParameters.getRequiredBoolean(SHOW_COMPLETED))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        do {
+            Map<String, Object> response = context
+                .http(http -> http.get(
+                    "https://tasks.googleapis.com/tasks/v1/lists/%s/tasks".formatted(
+                        inputParameters.getRequiredString(LIST_ID))))
+                .queryParameters(
+                    PAGE_TOKEN, nextPageToken,
+                    MAX_RESULTS, 100,
+                    SHOW_COMPLETED, inputParameters.getRequiredBoolean(SHOW_COMPLETED))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (response.get("items") instanceof List<?> items) {
+                tasks.addAll(items);
+            }
+
+            nextPageToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
+        } while (nextPageToken != null);
+
+        return tasks;
     }
 }
