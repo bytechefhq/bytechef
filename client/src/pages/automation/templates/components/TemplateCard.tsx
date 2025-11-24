@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {Badge} from '@/components/ui/badge';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Link} from 'react-router-dom';
@@ -30,9 +30,13 @@ export function TemplateCard({authorName, categories, description, icons, templa
                 <CardHeader>
                     <div className="flex items-center justify-end">
                         {categories.map((category, index) => (
-                            <Badge className="text-xs" key={index} variant="outline">
-                                {category}
-                            </Badge>
+                            <Badge
+                                className="text-xs"
+                                key={index}
+                                label={category}
+                                styleType="outline-outline"
+                                weight="semibold"
+                            />
                         ))}
                     </div>
 
