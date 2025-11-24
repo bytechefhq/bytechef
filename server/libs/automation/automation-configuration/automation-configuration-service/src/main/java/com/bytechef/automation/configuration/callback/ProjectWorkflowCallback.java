@@ -31,7 +31,7 @@ public class ProjectWorkflowCallback implements BeforeConvertCallback<ProjectWor
 
     @Override
     public ProjectWorkflow onBeforeConvert(ProjectWorkflow projectWorkflow) {
-        if (projectWorkflow.getId() == null) {
+        if (projectWorkflow.getId() == null && projectWorkflow.getUuid() == null) {
             projectWorkflow.setUuid(UUID.randomUUID());
         }
 
