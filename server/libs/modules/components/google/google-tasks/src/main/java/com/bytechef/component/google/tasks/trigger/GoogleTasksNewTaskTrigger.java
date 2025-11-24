@@ -33,11 +33,8 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
 import com.bytechef.google.commons.GoogleUtils;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +42,11 @@ import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class GoogleTasksNewTaskTrigger {
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newTask")
         .title("New Task")
@@ -74,42 +69,60 @@ public class GoogleTasksNewTaskTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        List<String> allTasks = closureParameters.getList(ALL_TASKS, String.class, List.of());
-        List<String> allTasksUpdate = new ArrayList<>();
+        List<String> previousTasksIds = closureParameters.getList(ALL_TASKS, String.class, List.of());
+        List<String> tasksIds = new ArrayList<>();
+        List<Map<?, ?>> tasks = new ArrayList<>();
+        Instant now = Instant.now();
 
-        ZoneId zoneId = ZoneId.systemDefault();
+        boolean editorEnvironment = triggerContext.isEditorEnvironment();
+        Instant start = closureParameters.get(
+            LAST_TIME_CHECKED, Instant.class, editorEnvironment ? now.minus(Duration.ofHours(3)) : now);
 
-        LocalDateTime now = LocalDateTime.now(zoneId);
+        String timestamp = DateTimeFormatter.ISO_INSTANT.format(start);
+        int maxResults = editorEnvironment ? 1 : 100;
+        String listId = inputParameters.getRequiredString(LIST_ID);
+        String nextToken = null;
+        boolean initialLoad = previousTasksIds.isEmpty() && !editorEnvironment;
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, LocalDateTime.ofInstant(Instant.EPOCH, zoneId));
-        String encode = URLEncoder.encode(
-            startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)), StandardCharsets.UTF_8);
+        do {
+            Map<String, Object> response = fetchTasksPage(
+                triggerContext, listId, nextToken, maxResults, initialLoad ? null : timestamp);
 
-        List<Map<?, ?>> newTasks = new ArrayList<>();
+            if (response.get("items") instanceof List<?> items) {
+                for (Object item : items) {
+                    if (item instanceof Map<?, ?> task) {
+                        String id = (String) task.get("id");
 
-        Map<String, Object> response = triggerContext
-            .http(http -> http.get(
-                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .queryParameter("updatedMin", encode)
-            .execute()
-            .getBody(new TypeReference<>() {});
+                        if (!tasksIds.contains(id)) {
+                            tasksIds.add(id);
+                        }
 
-        if (response.get("items") instanceof List<?> items) {
-            for (Object item : items) {
-                if (item instanceof Map<?, ?> task) {
-                    String id = (String) task.get("id");
-
-                    allTasksUpdate.add(id);
-
-                    if (!allTasks.contains(id)) {
-                        newTasks.add(task);
+                        if (!initialLoad && !previousTasksIds.contains(id)) {
+                            tasks.add(task);
+                        }
                     }
                 }
             }
-        }
 
-        return new PollOutput(newTasks, Map.of(ALL_TASKS, allTasksUpdate, LAST_TIME_CHECKED, now), false);
+            if (editorEnvironment) {
+                break;
+            }
+
+            nextToken = (String) response.getOrDefault("nextPageToken", null);
+        } while (nextToken != null);
+
+        return new PollOutput(
+            initialLoad ? List.of() : tasks, Map.of(ALL_TASKS, tasksIds, LAST_TIME_CHECKED, now), false);
+    }
+
+    private static Map<String, Object> fetchTasksPage(
+        TriggerContext triggerContext, String listId, String pageToken, int maxResults, String updatedMin) {
+
+        return triggerContext
+            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/%s/tasks".formatted(listId)))
+            .queryParameters("pageToken", pageToken, "maxResults", maxResults, "updatedMin", updatedMin)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
