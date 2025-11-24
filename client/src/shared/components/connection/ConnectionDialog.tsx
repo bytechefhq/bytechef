@@ -19,6 +19,7 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -41,7 +42,7 @@ import {
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {QueryKey, UseMutationResult, useQueryClient, UseQueryResult} from '@tanstack/react-query';
+import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CircleQuestionMarkIcon, ClipboardIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
@@ -49,7 +50,6 @@ import {useForm} from 'react-hook-form';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
-import {ModeType, useModeTypeStore} from "@/pages/home/stores/useModeTypeStore";
 
 export interface ConnectionDialogFormProps {
     authorizationType: string;
