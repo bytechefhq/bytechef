@@ -16,39 +16,50 @@
 
 package com.bytechef.component.github.action;
 
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static com.bytechef.component.github.constant.GithubConstants.*;
+import static com.bytechef.component.github.constant.GithubConstants.BASE;
+import static com.bytechef.component.github.constant.GithubConstants.BODY;
+import static com.bytechef.component.github.constant.GithubConstants.HEAD;
+import static com.bytechef.component.github.constant.GithubConstants.HEAD_REPO;
+import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Anas Elgarhy (@0x61nas)
+ * @author Monika Kušter
  */
 class GitHubCreatePullRequestActionTest extends AbstractGithubActionTest {
-    private final Map<String, Object> parameterMap = Map.of(TITLE, "name", HEAD, "feat/make-it-awesome",
-        HEAD_REPO, "happy-repo", BASE, "master", BODY, "description");
-    private final Parameters mockedParameters = MockParametersFactory.create(parameterMap);
+
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(
+            OWNER, "testOwner", REPOSITORY, "testRepo", TITLE, "name", HEAD, "feat/123",
+            HEAD_REPO, "head-repo", BASE, "master", BODY, "description"));
 
     @Test
-    void testPerform() {
+    void testPerform() throws Exception {
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of());
 
-        Map<String, Object> result = GitHubCreatePullRequestAction
-            .perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = executePerformFunction(GitHubCreatePullRequestAction.ACTION_DEFINITION, mockedParameters);
 
-        assertEquals(responseMap, result);
-
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(parameterMap, body.getContent());
+        assertEquals(Map.of(), result);
+        assertEquals("/repos/testOwner/testRepo/pulls", stringArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of(TITLE, "name", HEAD, "feat/123", HEAD_REPO, "head-repo", BASE, "master", BODY, "description"),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }
