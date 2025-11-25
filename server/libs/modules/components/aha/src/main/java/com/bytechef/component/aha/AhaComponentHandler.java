@@ -57,7 +57,7 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
                         .label("Product ID")
                         .description("ID of the product to which the release belongs.")
                         .options((OptionsFunction<String>) AhaUtils::getProductIdOptions)
-                        .required(true));
+                        .required(false));
 
                 modifiableActionDefinition.properties(properties);
             }

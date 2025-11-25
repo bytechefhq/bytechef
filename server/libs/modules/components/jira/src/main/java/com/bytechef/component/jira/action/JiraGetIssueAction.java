@@ -44,7 +44,7 @@ public class JiraGetIssueAction {
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
-                .required(true),
+                .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
