@@ -21,17 +21,24 @@ import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
+import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
+import static com.bytechef.component.jira.constant.JiraConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -44,26 +51,38 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class JiraOptionsUtilsTest {
 
-    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
-        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        forClass(ActionContext.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PROJECT, "test"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private List<Option<String>> result;
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
 
     @BeforeEach
     void beforeEach() {
-        when(mockedActionContext.http(any()))
+        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -71,14 +90,10 @@ class JiraOptionsUtilsTest {
 
     @Test
     void testGetIssueIdOptions() {
-        Map<String, Object> valuesMap = Map.of(ISSUES, List.of(Map.of(FIELDS, Map.of(SUMMARY, "abc"), ID, "123")));
-
-        when(mockedExecutor.queryParameters(
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(valuesMap);
+            .thenReturn(Map.of(ISSUES, List.of(Map.of(FIELDS, Map.of(SUMMARY, "abc"), ID, "123"))));
 
         try (MockedStatic<JiraUtils> jiraUtilsMockedStatic = mockStatic(JiraUtils.class)) {
             jiraUtilsMockedStatic
@@ -87,68 +102,147 @@ class JiraOptionsUtilsTest {
                     actionContextArgumentCaptor.capture()))
                 .thenReturn("PROJECT");
 
-            result = JiraOptionsUtils.getIssueIdOptions(
+            List<Option<String>> result = JiraOptionsUtils.getIssueIdOptions(
                 mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
             assertEquals(expectedOptions, result);
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
             assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
-            assertEquals(List.of(JQL, PROJECT + "=\"PROJECT\"", FIELDS, SUMMARY), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("/search/jql"), stringArgumentCaptor.getAllValues());
+
+            Object[] objects = {
+                JQL, PROJECT + "=\"PROJECT\"", FIELDS, SUMMARY, MAX_RESULTS, 5000, NEXT_PAGE_TOKEN, null
+            };
+
+            assertArrayEquals(objects, objectsArgumentCaptor.getValue());
+
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+            assertNotNull(capturedFunction);
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+            Http.Configuration configuration = configurationBuilder.build();
+
+            Http.ResponseType responseType = configuration.getResponseType();
+
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         }
     }
 
     @Test
     void testGetIssueTypesIdOptions() {
-        List<Object> list = List.of(Map.of(NAME, "abc", ID, "123"));
-
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(list);
+            .thenReturn(List.of(Map.of(NAME, "abc", ID, "123")));
 
-        result = JiraOptionsUtils.getIssueTypesIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+        List<Option<String>> result = JiraOptionsUtils.getIssueTypesIdOptions(
+            mockedParameters, null, null, null, mockedActionContext);
 
         assertEquals(expectedOptions, result);
-        assertEquals(List.of("projectId", "test"), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/issuetype/project", "projectId", "test"), stringArgumentCaptor.getAllValues());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 
     @Test
     void testPriorityIdOptions() {
-        List<Object> list = List.of(Map.of(NAME, "abc", ID, "123"));
-
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(list);
+            .thenReturn(List.of(Map.of(NAME, "abc", ID, "123")));
 
-        result = JiraOptionsUtils.getPriorityIdOptions(mockedParameters, mockedParameters, Map.of(), "",
-            mockedActionContext);
+        List<Option<String>> result = JiraOptionsUtils.getPriorityIdOptions(
+            mockedParameters, null, null, null, mockedActionContext);
 
         assertEquals(expectedOptions, result);
+        assertEquals("/priority", stringArgumentCaptor.getValue());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
     }
 
     @Test
     void testGetProjectIdOptions() {
-        Map<String, Object> valuesMap = Map.of("values", List.of(Map.of(NAME, "abc", ID, "123")));
-
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(valuesMap);
+            .thenReturn(Map.of("values", List.of(Map.of(NAME, "abc", ID, "123"))));
 
-        result = JiraOptionsUtils.getProjectIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+        List<Option<String>> result = JiraOptionsUtils.getProjectIdOptions(
+            mockedParameters, null, null, null, mockedActionContext);
 
         assertEquals(expectedOptions, result);
+        assertEquals("/project/search", stringArgumentCaptor.getValue());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+
+        Object[] objects = {
+            MAX_RESULTS, 100
+        };
+
+        assertArrayEquals(objects, objectsArgumentCaptor.getValue());
     }
 
     @Test
     void testGetUserIdOptions() {
-        List<Object> list = List.of(Map.of("displayName", "abc", "accountId", "123"));
-
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(list);
+            .thenReturn(List.of(
+                Map.of("displayName", "abc", "accountId", "123", "accountType", "atlassian"),
+                Map.of("displayName", "xyz", "accountId", "cde", "accountType", "apps")));
 
-        result = JiraOptionsUtils.getUserIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+        List<Option<String>> result = JiraOptionsUtils.getUserIdOptions(
+            mockedParameters, null, null, null, mockedActionContext);
 
         assertEquals(expectedOptions, result);
+        assertEquals("/users/search", stringArgumentCaptor.getValue());
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+
+        Object[] objects = {
+            MAX_RESULTS, 1000
+        };
+
+        assertArrayEquals(objects, objectsArgumentCaptor.getValue());
     }
 }
