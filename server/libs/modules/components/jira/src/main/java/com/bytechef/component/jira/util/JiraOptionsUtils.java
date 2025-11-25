@@ -35,7 +35,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -161,8 +160,12 @@ public class JiraOptionsUtils {
 
         for (Object object : body) {
             if (object instanceof Map<?, ?> map) {
-                String displayName = (String) map.get("displayName");
-                options.add(option(displayName == null ? "User" : displayName, (String) map.get("accountId")));
+                String accountType = (String) map.get("accountType");
+
+                if (accountType.equals("atlassian")) {
+                    String displayName = (String) map.get("displayName");
+                    options.add(option(displayName == null ? "User" : displayName, (String) map.get("accountId")));
+                }
             }
         }
 
