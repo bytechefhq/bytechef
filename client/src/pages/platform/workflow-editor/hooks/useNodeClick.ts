@@ -11,8 +11,15 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 
 export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], activeTab?: TabNameType) {
     const {setActiveTab, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
-    const {setRightSidebarOpen} = useRightSidebarStore();
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                setActiveTab: state.setActiveTab,
+                setCurrentComponent: state.setCurrentComponent,
+                setCurrentNode: state.setCurrentNode,
+                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+            }))
+        );
+    const setRightSidebarOpen = useRightSidebarStore((state) => state.setRightSidebarOpen);
 
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
