@@ -17,6 +17,7 @@
 package com.bytechef.component.airtable.util;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.OFFSET;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -53,24 +54,78 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
+    public static List<Object> fetchAllRecords(
+        Context context, String baseId, String tableId, boolean editorEnvironment,
+        Object... additionalQueryParameters) {
+
+        List<Object> records = new ArrayList<>();
+        String offset = null;
+        int pageSize = editorEnvironment ? 1 : 100;
+
+        do {
+            List<Object> queryParameters = new ArrayList<>();
+
+            queryParameters.add("pageSize");
+            queryParameters.add(pageSize);
+            queryParameters.add(OFFSET);
+            queryParameters.add(offset);
+
+            queryParameters.addAll(List.of(additionalQueryParameters));
+
+            Map<String, ?> body = context.http(http -> http.get("/%s/%s".formatted(baseId, tableId)))
+                .queryParameters(queryParameters.toArray())
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("records") instanceof List<?> list) {
+                records.addAll(list);
+            }
+
+            if (editorEnvironment) {
+                break;
+            }
+
+            offset = (String) body.get(OFFSET);
+        } while (offset != null);
+
+        return records;
+    }
+
     public static List<Option<String>> getBaseIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("/meta/bases"))
-            .configuration(Http.responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Option<String>> options = new ArrayList<>();
 
-        context.log(
-            logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
+        List<Object> bases = new ArrayList<>();
+        String offset = null;
 
-        if (body.containsKey("error")) {
-            throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        do {
+            Map<String, ?> body = context
+                .http(http -> http.get("/meta/bases"))
+                .queryParameters(OFFSET, offset)
+                .configuration(Http.responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            context.log(
+                logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
+
+            if (body.get("bases") instanceof List<?> list) {
+                bases.addAll(list);
+            }
+
+            offset = (String) body.get(OFFSET);
+        } while (offset != null);
+
+        for (Object o : bases) {
+            if (o instanceof Map<?, ?> map) {
+                options.add(option((String) map.get("name"), (String) map.get("id")));
+            }
         }
 
-        return getOptions(body, "bases", "name");
+        return options;
     }
 
     public static List<ModifiableValueProperty<?, ?>> getFieldsProperties(
@@ -155,23 +210,26 @@ public class AirtableUtils extends AbstractAirtableUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context.http(http -> http.get(
-            "/%s/%s".formatted(inputParameters.getRequiredString(BASE_ID),
-                inputParameters.getRequiredString(TABLE_ID))))
-            .configuration(Http.responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Option<String>> options = new ArrayList<>();
 
-        if (body.containsKey("error")) {
-            throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        List<Object> records = fetchAllRecords(
+            context, inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID), false);
+
+        for (Object record : records) {
+            if (record instanceof Map<?, ?> map) {
+                options.add(option((String) map.get("id"), (String) map.get("id")));
+            }
         }
 
-        return getOptions(body, "records", "id");
+        return options;
     }
 
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
         String url = "/meta/bases/%s/tables".formatted(inputParameters.getRequiredString(BASE_ID));
 
         Map<String, ?> body = context.http(http -> http.get(url))
@@ -185,17 +243,11 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
         context.log(log -> log.debug("Response for url='%s': %s".formatted(url, body)));
 
-        return getOptions(body, "tables", "name");
-    }
-
-    private static List<Option<String>> getOptions(Map<String, ?> response, String name, String label) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (response.get(name) instanceof List<?> list) {
+        if (body.get("tables") instanceof List<?> list) {
 
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(label), (String) map.get("id")));
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
                 }
             }
         }
