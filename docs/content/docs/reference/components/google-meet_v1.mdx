@@ -177,28 +177,32 @@ Name: listParticipants
 
 
 
-Type: OBJECT
+Type: ARRAY
+
+
+Items Type: OBJECT
 
 
 #### Properties
-
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| participants | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), &#123;&#125;\(user), STRING\(earliestStartTime), STRING\(latestEndTime)&#125;] </details> | List of participants in one page. |
+| name | STRING | Resource name of the participant.Format: conferenceRecords/&#123;conferenceRecord&#125;/participants/&#123;participant&#125; |
+| user | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | User can be of type: signedinUser, anonymousUser, phoneUser |
+| earliestStartTime | STRING | Time when the participant first joined the meeting. |
+| latestEndTime | STRING | Time when the participant left the meeting for the last time. This can be null if it's an active meeting. |
+
 
 
 
 
 #### Output Example
 ```json
-{
-  "participants" : [ {
-    "name" : "",
-    "user" : { },
-    "earliestStartTime" : "",
-    "latestEndTime" : ""
-  } ]
-}
+[ {
+  "name" : "",
+  "user" : { },
+  "earliestStartTime" : "",
+  "latestEndTime" : ""
+} ]
 ```
 
 
