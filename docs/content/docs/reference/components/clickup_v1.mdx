@@ -47,8 +47,8 @@ Name: createList
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING |  | true |
-| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| workspaceId | Workspace ID | STRING |  | false |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | false |
 | folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> | ID of the folder where new list will be created. | true |
 | name | Name | STRING | The name of the list. | true |
 
@@ -112,8 +112,8 @@ Name: createTask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING |  | true |
-| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| workspaceId | Workspace ID | STRING |  | false |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | false |
 | folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
 | listId | List ID | STRING <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | ID of the list where new task will be created. | true |
 | name | Name | STRING | The name of the task. | true |
@@ -189,7 +189,7 @@ Name: createFolder
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING |  | true |
+| workspaceId | Workspace ID | STRING |  | false |
 | spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
 | name | Name | STRING | The name of the folder. | true |
 
