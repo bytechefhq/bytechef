@@ -18,6 +18,7 @@ import {useShallow} from 'zustand/react/shallow';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
+import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 
 interface DescriptionTabProps {
     invalidateWorkflowQueries: () => void;
@@ -179,9 +180,14 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
         });
     }, 300);
 
-    let workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
-        (task) => task.name === currentNode?.workflowNodeName
-    );
+    let workflowTaskOrTrigger =
+        workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName) ||
+        (currentNode?.workflowNodeName
+            ? getTaskDispatcherTask({
+                  taskDispatcherId: currentNode.workflowNodeName,
+                  tasks: workflow.tasks || [],
+              })
+            : undefined);
 
     if (!workflowTaskOrTrigger && currentNode?.clusterElementType) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -2,6 +2,8 @@ import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workf
 import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelInputs';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 
+import {getTaskDispatcherTask} from '../../../../utils/taskDispatcherConfig';
+
 interface PropertyCodeEditorSheetConnectionsSheetRightPanelProps {
     componentConnections: ComponentConnection[];
     workflow: Workflow;
@@ -13,12 +15,15 @@ const PropertyCodeEditorSheetRightPanel = ({
     workflow,
     workflowNodeName,
 }: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
+    const currentTask = getTaskDispatcherTask({
+        taskDispatcherId: workflowNodeName,
+        tasks: workflow.tasks || [],
+    });
+
     return (
         <div className="flex w-96 flex-col divide-y divide-solid divide-muted">
             <div className="flex-1">
-                <PropertyCodeEditorSheetRightPanelInputs
-                    input={workflow.tasks?.find((task) => task.name === workflowNodeName)?.parameters?.input ?? {}}
-                />
+                <PropertyCodeEditorSheetRightPanelInputs input={currentTask?.parameters?.input ?? {}} />
             </div>
 
             <div className="flex-1">
