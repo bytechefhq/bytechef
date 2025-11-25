@@ -41,13 +41,13 @@ public class GoogleBigQueryUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        String nextPageToken = "";
+        String nextPageToken = null;
 
         do {
             Map<String, Object> response = context
                 .http(http -> http.get("https://bigquery.googleapis.com/bigquery/v2/projects"))
                 .configuration(responseType(Http.ResponseType.JSON))
-                .queryParameter(NEXT_PAGE_TOKEN, nextPageToken)
+                .queryParameters("pageToken", nextPageToken, "maxResults", 50)
                 .execute()
                 .getBody(new TypeReference<>() {});
 
