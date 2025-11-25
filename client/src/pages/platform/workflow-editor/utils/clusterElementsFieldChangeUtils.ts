@@ -12,7 +12,13 @@ type FieldUpdateType = {
 interface CreateUpdatedElementProps {
     currentComponentDefinition: ComponentDefinition;
     currentOperationProperties?: Array<PropertyAllType>;
-    element: ClusterElementItemType | NodeDataType;
+    element:
+        | ClusterElementItemType
+        | NodeDataType
+        | (Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+              componentName?: string;
+              workflowNodeName?: string;
+          });
     fieldUpdate: FieldUpdateType;
 }
 
@@ -59,7 +65,10 @@ interface UpdateClusterRootElementFieldProps {
     currentComponentDefinition: ComponentDefinition;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
-    mainRootElement: NodeDataType;
+    mainRootElement: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+        componentName?: string;
+        workflowNodeName?: string;
+    };
 }
 
 export function updateClusterRootElementField({
@@ -78,9 +87,9 @@ export function updateClusterRootElementField({
     return {
         ...mainRootElement,
         ...updatedElementData,
-        componentName: mainRootElement.componentName,
+        ...(mainRootElement.componentName ? {componentName: mainRootElement.componentName} : {}),
         name: mainRootElement.name,
-        workflowNodeName: mainRootElement.workflowNodeName,
+        ...(mainRootElement.workflowNodeName ? {workflowNodeName: mainRootElement.workflowNodeName} : {}),
     };
 }
 
