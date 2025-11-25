@@ -31,8 +31,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -47,7 +45,7 @@ public class JiraSearchForIssuesUsingJqlAction {
             string(JQL)
                 .label("JQL")
                 .description(
-                    "The JQL that defines the search. If no JQL expression is provided, all issues are returned")
+                    "The JQL that defines the search. If no JQL expression is provided, all issues are returned.")
                 .exampleValue("project = HSP")
                 .required(false),
             integer(MAX_RESULTS)
@@ -57,24 +55,20 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .minValue(1)
                 .maxValue(100)
                 .required(true))
-        .output(outputSchema(
-            array()
-                .items(ISSUE_OUTPUT_PROPERTY)))
+        .output(
+            outputSchema(
+                array()
+                    .items(ISSUE_OUTPUT_PROPERTY)))
         .perform(JiraSearchForIssuesUsingJqlAction::perform);
 
     private JiraSearchForIssuesUsingJqlAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        StringBuilder url = new StringBuilder("?maxResults=" + inputParameters.getRequiredInteger(MAX_RESULTS));
-        String jql = inputParameters.getString(JQL);
-
-        if (jql != null) {
-            url.append("&jql=")
-                .append(URLEncoder.encode(jql, StandardCharsets.UTF_8));
-        }
-
-        Map<String, Object> body = context.http(http -> http.get("/search" + url))
+        Map<String, Object> body = context.http(http -> http.get("/search"))
+            .queryParameters(
+                MAX_RESULTS, inputParameters.getRequiredInteger(MAX_RESULTS),
+                JQL, inputParameters.getString(JQL))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
