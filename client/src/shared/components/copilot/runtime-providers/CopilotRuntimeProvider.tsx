@@ -1,4 +1,5 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {getCookie} from '@/shared/util/cookie-utils';
@@ -31,6 +32,7 @@ export function CopilotRuntimeProvider({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
 
     const {projectId, projectWorkflowId} = useParams();
 
@@ -62,6 +64,7 @@ export function CopilotRuntimeProvider({
         });
         agent.setState({
             ...context,
+            currentSelectedNode: currentComponent?.name,
             workflowId: workflow.id,
         });
 
