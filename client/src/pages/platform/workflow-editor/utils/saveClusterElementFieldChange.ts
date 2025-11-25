@@ -1,5 +1,5 @@
 import {ComponentDefinition, Workflow} from '@/shared/middleware/platform/configuration';
-import {ClusterElementsType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {ClusterElementsType, ComponentType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -49,15 +49,15 @@ export default function saveClusterElementFieldChange({
               tasks: workflowDefinitionTasks,
           })
         : undefined;
-    // const mainClusterRootTask = workflowDefinitionTasks?.find(
-    //     (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-    // );
 
     if (!mainClusterRootTask) {
         return;
     }
 
-    let updatedMainRootData: NodeDataType;
+    let updatedMainRootData: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+        componentName?: string;
+        workflowNodeName?: string;
+    };
     let updatedClusterElements: ClusterElementsType;
 
     if (
@@ -104,7 +104,11 @@ export default function saveClusterElementFieldChange({
         invalidateWorkflowQueries,
         nodeData: updatedMainRootData,
         onSuccess: () => {
-            let commonUpdates: NodeDataType = {
+            let commonUpdates: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
+                componentName?: string;
+                name: string;
+                workflowNodeName?: string;
+            } = {
                 componentName,
                 name,
                 workflowNodeName,
@@ -134,12 +138,12 @@ export default function saveClusterElementFieldChange({
             setCurrentNode({
                 ...currentNode,
                 ...commonUpdates,
-            });
+            } as NodeDataType);
 
             setCurrentComponent({
                 ...currentComponent,
                 ...commonUpdates,
-            });
+            } as ComponentType);
 
             if (rootClusterElementNodeData) {
                 if (currentNode.clusterRoot && !currentNode.isNestedClusterRoot) {
