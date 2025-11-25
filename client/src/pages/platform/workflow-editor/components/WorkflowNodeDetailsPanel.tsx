@@ -686,78 +686,77 @@ const WorkflowNodeDetailsPanel = ({
         currentNode?.clusterElementType,
     ]);
 
-    const calculatedDataPills = useMemo(() => {
-        if (!previousComponentDefinitions || !workflowNodeOutputs) {
-            return [];
-        }
-
-        let filteredNodeNames = workflowNodeOutputs?.map((output) => output.workflowNodeName) || [];
-
-        if (currentNode?.conditionData) {
-            const parentConditionTask = currentNode.conditionData.conditionId
-                ? getTaskDispatcherTask({
-                      taskDispatcherId: currentNode.conditionData.conditionId,
-                      tasks: workflow.tasks || [],
-                  })
-                : undefined;
+    const filterNodeNamesForCondition = useCallback(
+        (nodeNames: string[], conditionData: {conditionId: string; conditionCase: string}) => {
+            const parentConditionTask = getTaskDispatcherTask({
+                taskDispatcherId: conditionData.conditionId,
+                tasks: workflow.tasks || [],
+            });
 
             if (!parentConditionTask) {
-                return [];
+                return null;
             }
 
-            const {conditionCase} = currentNode.conditionData;
-
             const oppositeConditionCase =
-                conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
+                conditionData.conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
 
             const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase].map(
                 (task: WorkflowTask) => task.name
             );
 
-            filteredNodeNames = filteredNodeNames.filter(
-                (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
-            );
-        } else if (currentNode?.branchData) {
-            const parentBranchTask = currentNode.branchData.branchId
-                ? getTaskDispatcherTask({
-                      taskDispatcherId: currentNode.branchData.branchId,
-                      tasks: workflow.tasks || [],
-                  })
-                : undefined;
+            return nodeNames.filter((nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName));
+        },
+        [workflow.tasks]
+    );
 
-            if (!parentBranchTask || !parentBranchTask.parameters) {
-                return [];
+    const filterNodeNamesForBranch = useCallback(
+        (nodeNames: string[], branchData: {branchId: string; caseKey: string | number}) => {
+            const parentBranchTask = getTaskDispatcherTask({
+                taskDispatcherId: branchData.branchId,
+                tasks: workflow.tasks || [],
+            });
+
+            if (!parentBranchTask?.parameters) {
+                return null;
             }
 
-            const {caseKey} = currentNode.branchData;
             const branchCases: BranchCaseType[] = [
                 {key: 'default', tasks: parentBranchTask.parameters.default},
                 ...parentBranchTask.parameters.cases,
             ];
 
-            let otherCaseKeys;
-
-            if (caseKey === 'default') {
-                otherCaseKeys = branchCases.map((caseItem) => caseItem.key);
-            } else {
-                otherCaseKeys = ['default'];
-
-                branchCases.forEach((caseItem) => {
-                    if (caseItem.key !== caseKey) {
-                        otherCaseKeys.push(caseItem.key);
-                    }
-                });
-            }
+            const otherCaseKeys =
+                branchData.caseKey === 'default'
+                    ? branchCases.map((caseItem) => caseItem.key)
+                    : ['default', ...branchCases.filter((c) => c.key !== branchData.caseKey).map((c) => c.key)];
 
             const otherCasesNodeNames = branchCases
                 .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
-                .map((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name))
-                .flat(Infinity);
+                .flatMap((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name));
 
-            filteredNodeNames = filteredNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
+            return nodeNames.filter((nodeName) => !otherCasesNodeNames.includes(nodeName));
+        },
+        [workflow.tasks]
+    );
+
+    const calculatedDataPills = useMemo(() => {
+        if (!previousComponentDefinitions || !workflowNodeOutputs) {
+            return [];
         }
 
-        const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions?.map(
+        let filteredNodeNames = workflowNodeOutputs.map((output) => output.workflowNodeName);
+
+        if (currentNode?.conditionData) {
+            const filtered = filterNodeNamesForCondition(filteredNodeNames, currentNode.conditionData);
+            if (filtered === null) return [];
+            filteredNodeNames = filtered;
+        } else if (currentNode?.branchData) {
+            const filtered = filterNodeNamesForBranch(filteredNodeNames, currentNode.branchData);
+            if (filtered === null) return [];
+            filteredNodeNames = filtered;
+        }
+
+        const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions.map(
             (componentDefinition, index) => {
                 const outputSchemaDefinition: PropertyAllType | undefined =
                     workflowNodeOutputs[index]?.outputResponse?.outputSchema;
@@ -774,15 +773,16 @@ const WorkflowNodeDetailsPanel = ({
             }
         );
 
-        const dataPills = getDataPillsFromProperties(componentProperties!, filteredNodeNames);
+        const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames);
 
         return dataPills.flat(Infinity);
     }, [
+        currentNode?.branchData,
+        currentNode?.conditionData,
+        filterNodeNamesForBranch,
+        filterNodeNamesForCondition,
         previousComponentDefinitions,
         workflowNodeOutputs,
-        currentNode?.conditionData,
-        currentNode?.branchData,
-        workflow.tasks,
     ]);
 
     const handleOperationSelectChange = useCallback(
