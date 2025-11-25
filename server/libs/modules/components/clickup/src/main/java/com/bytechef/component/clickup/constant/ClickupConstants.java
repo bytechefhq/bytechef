@@ -43,12 +43,12 @@ public class ClickupConstants {
         .label("Space ID")
         .options((OptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
         .optionsLookupDependsOn(WORKSPACE_ID)
-        .required(true);
+        .required(false);
 
     public static final ModifiableStringProperty WORKSPACE_ID_PROPERTY = string(WORKSPACE_ID)
         .label("Workspace ID")
         .options((OptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
-        .required(true);
+        .required(false);
 
     private ClickupConstants() {
     }

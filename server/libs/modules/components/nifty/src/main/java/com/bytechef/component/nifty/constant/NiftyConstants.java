@@ -36,7 +36,7 @@ public class NiftyConstants {
         .label("Project ID")
         .description("ID of the project within which the task will be created.")
         .options((OptionsFunction<String>) NiftyUtils::getProjectIdOptions)
-        .required(true);
+        .required(false);
 
     private NiftyConstants() {
     }

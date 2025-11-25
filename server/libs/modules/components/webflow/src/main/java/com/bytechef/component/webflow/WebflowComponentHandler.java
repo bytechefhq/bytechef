@@ -51,7 +51,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                     string(SITE_ID)
                         .label("Site ID")
                         .options((OptionsFunction<String>) WebflowUtils::getSiteIdOptions)
-                        .required(true));
+                        .required(false));
 
                 modifiableActionDefinition.properties(properties);
             }

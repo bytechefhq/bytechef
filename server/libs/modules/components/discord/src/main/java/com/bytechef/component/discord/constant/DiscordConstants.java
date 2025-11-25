@@ -35,7 +35,7 @@ public class DiscordConstants {
     public static final ModifiableStringProperty GUILD_ID_PROPERTY = string(GUILD_ID)
         .label("Guild ID")
         .options((OptionsFunction<String>) DiscordUtils::getGuildIdOptions)
-        .required(true);
+        .required(false);
 
     private DiscordConstants() {
     }

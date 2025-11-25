@@ -43,7 +43,7 @@ public class JiraAssignIssueAction {
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
-                .required(true),
+                .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue that will be assigned.")
@@ -61,7 +61,7 @@ public class JiraAssignIssueAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         context.http(http -> http.put("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/assignee"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(Map.of("accountId", inputParameters.getRequiredString(ACCOUNT_ID))))
+            .body(Http.Body.of(Map.of(ACCOUNT_ID, inputParameters.getRequiredString(ACCOUNT_ID))))
             .execute();
 
         return null;
