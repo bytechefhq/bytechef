@@ -431,7 +431,13 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const currentWorkflowTask = useMemo(
-        () => workflow.tasks?.find((task) => task.name === currentNode?.workflowNodeName),
+        () =>
+            currentNode?.workflowNodeName
+                ? getTaskDispatcherTask({
+                      taskDispatcherId: currentNode.workflowNodeName,
+                      tasks: workflow.tasks || [],
+                  })
+                : undefined,
         [workflow.tasks, currentNode]
     );
 
