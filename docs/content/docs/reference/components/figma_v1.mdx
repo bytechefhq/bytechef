@@ -155,6 +155,41 @@ Type: OBJECT
 
 
 
+## Triggers
+
+
+### New Comment
+Name: newComment
+
+`Triggers when new comment is posted.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| team_id | Team ID | STRING | The ID of the team. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Comment",
+  "name" : "newComment",
+  "parameters" : {
+    "team_id" : ""
+  },
+  "type" : "figma/v1/newComment"
+}
+```
+
+
+
 
 ## What to do if your action is not listed here?
 
