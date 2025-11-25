@@ -16,11 +16,7 @@ const WorkflowExecutionsFilterTitle = ({
                 <>
                     <span className="text-sm uppercase text-muted-foreground">status:</span>
 
-                    <Badge
-                        label={filterData.status}
-                        styleType="secondary-filled"
-                        weight="semibold"
-                    />
+                    <Badge label={filterData.status} styleType="secondary-filled" weight="semibold" />
                 </>
             )}
 
