@@ -1,115 +1,347 @@
 {
-  "actions": [ {
-    "batch": null,
-    "deprecated": null,
-    "description": "Adds a record into an Airtable table.",
-    "help": null,
-    "metadata": {
-      "path": "/{baseId}/{tableId}",
-      "responseType": {
-        "contentType": "application/json",
-        "type": "JSON"
-      },
-      "mimeType": "application/json",
-      "method": "POST",
-      "bodyContentType": "JSON"
-    },
-    "name": "createRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "perform": null,
-    "processErrorResponse": { },
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
+  "actions": [
+    {
+      "batch": null,
+      "deprecated": null,
+      "description": "Adds a record into an Airtable table.",
+      "help": null,
       "metadata": {
-        "type": "PATH"
+        "path": "/{baseId}/{tableId}",
+        "responseType": {
+          "contentType": "application/json",
+          "type": "JSON"
+        },
+        "mimeType": "application/json",
+        "method": "POST",
+        "bodyContentType": "JSON"
       },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
+      "name": "createRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
       },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The table where the record will be created.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "dynamicPropertiesDataSource": {
-        "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
-      },
-      "expressionEnabled": null,
-      "header": null,
-      "hidden": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "name": "fields",
-      "required": false,
-      "type": "DYNAMIC_PROPERTIES"
-    } ],
-    "title": "Create Record",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "deprecated": null,
-    "description": "Deletes a single record from a table.",
-    "help": null,
-    "metadata": {
-      "method": "DELETE",
-      "path": "/{baseId}/{tableId}/{recordId}"
+      "perform": null,
+      "processErrorResponse": {},
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The table where the record will be created.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "dynamicPropertiesDataSource": {
+            "properties": {},
+            "propertiesLookupDependsOn": [
+              "baseId",
+              "tableId"
+            ]
+          },
+          "expressionEnabled": null,
+          "header": null,
+          "hidden": null,
+          "metadata": {
+            "type": "BODY"
+          },
+          "name": "fields",
+          "required": false,
+          "type": "DYNAMIC_PROPERTIES"
+        }
+      ],
+      "title": "Create Record",
+      "workflowNodeDescription": null
     },
-    "name": "deleteRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
+    {
+      "batch": null,
+      "deprecated": null,
+      "description": "Update an existing record in an Airtable table.",
+      "help": null,
+      "metadata": {
+        "path": "/{baseId}/{tableId}/{recordId}",
+        "responseType": {
+          "contentType": "application/json",
+          "type": "JSON"
+        },
+        "mimeType": "application/json",
+        "method": "PATCH",
+        "bodyContentType": "JSON"
+      },
+      "name": "updateRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
+      },
+      "perform": null,
+      "processErrorResponse": {},
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be retrieved.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Row ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId",
+              "tableId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "dynamicPropertiesDataSource": {
+            "properties": {},
+            "propertiesLookupDependsOn": [
+              "baseId",
+              "tableId",
+              "recordId"
+            ]
+          },
+          "expressionEnabled": null,
+          "header": null,
+          "hidden": null,
+          "metadata": {
+            "type": "BODY"
+          },
+          "name": "fields",
+          "required": false,
+          "type": "DYNAMIC_PROPERTIES"
+        }
+      ],
+      "title": "Update Record",
+      "workflowNodeDescription": null
+    },
+    {
+      "batch": null,
+      "deprecated": null,
+      "description": "Deletes a single record from a table.",
+      "help": null,
+      "metadata": {
+        "method": "DELETE",
+        "path": "/{baseId}/{tableId}/{recordId}"
+      },
+      "name": "deleteRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": {
+          "outputSchema": {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": {
+              "responseType": {
+                "contentType": "application/json",
+                "type": "JSON"
+              }
+            },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [
+              {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The ID of the deleted record.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": null,
+                "languageId": null,
+                "maxLength": null,
+                "metadata": {},
+                "minLength": null,
+                "name": "id",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": false,
+                "type": "STRING"
+              },
+              {
+                "advancedOption": null,
+                "controlType": "SELECT",
+                "defaultValue": null,
+                "description": "Indicates if the record was deleted.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": null,
+                "metadata": {},
+                "name": "deleted",
+                "options": [
+                  {
+                    "description": null,
+                    "label": "True",
+                    "value": true
+                  },
+                  {
+                    "description": null,
+                    "label": "False",
+                    "value": false
+                  }
+                ],
+                "placeholder": null,
+                "required": false,
+                "type": "BOOLEAN"
+              }
+            ],
+            "required": null,
+            "type": "OBJECT"
+          },
+          "placeholder": null,
+          "sampleOutput": null
+        },
         "outputSchema": {
           "additionalProperties": null,
           "advancedOption": null,
@@ -132,427 +364,605 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "properties": [ {
-            "advancedOption": null,
-            "controlType": "TEXT",
-            "defaultValue": null,
-            "description": "The ID of the deleted record.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "languageId": null,
-            "maxLength": null,
-            "metadata": { },
-            "minLength": null,
-            "name": "id",
-            "options": null,
-            "optionsDataSource": null,
-            "optionsLoadedDynamically": null,
-            "placeholder": null,
-            "regex": null,
-            "required": false,
-            "type": "STRING"
-          }, {
-            "advancedOption": null,
-            "controlType": "SELECT",
-            "defaultValue": null,
-            "description": "Indicates if the record was deleted.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "metadata": { },
-            "name": "deleted",
-            "options": [ {
-              "description": null,
-              "label": "True",
-              "value": true
-            }, {
-              "description": null,
-              "label": "False",
-              "value": false
-            } ],
-            "placeholder": null,
-            "required": false,
-            "type": "BOOLEAN"
-          } ],
+          "properties": [
+            {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": "The ID of the deleted record.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": {},
+              "minLength": null,
+              "name": "id",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            },
+            {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Indicates if the record was deleted.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": {},
+              "name": "deleted",
+              "options": [
+                {
+                  "description": null,
+                  "label": "True",
+                  "value": true
+                },
+                {
+                  "description": null,
+                  "label": "False",
+                  "value": false
+                }
+              ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
+            }
+          ],
           "required": null,
           "type": "OBJECT"
         },
-        "placeholder": null,
         "sampleOutput": null
       },
-      "outputSchema": {
-        "additionalProperties": null,
-        "advancedOption": null,
-        "controlType": "OBJECT_BUILDER",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": {
-          "responseType": {
-            "contentType": "application/json",
-            "type": "JSON"
-          }
-        },
-        "multipleValues": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "properties": [ {
-          "advancedOption": null,
-          "controlType": "TEXT",
-          "defaultValue": null,
-          "description": "The ID of the deleted record.",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "languageId": null,
-          "maxLength": null,
-          "metadata": { },
-          "minLength": null,
-          "name": "id",
-          "options": null,
-          "optionsDataSource": null,
-          "optionsLoadedDynamically": null,
-          "placeholder": null,
-          "regex": null,
-          "required": false,
-          "type": "STRING"
-        }, {
+      "perform": null,
+      "processErrorResponse": {},
+      "properties": [
+        {
           "advancedOption": null,
           "controlType": "SELECT",
           "defaultValue": null,
-          "description": "Indicates if the record was deleted.",
+          "description": "ID of the base where table is located.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
           "hidden": null,
-          "label": null,
-          "metadata": { },
-          "name": "deleted",
-          "options": [ {
-            "description": null,
-            "label": "True",
-            "value": true
-          }, {
-            "description": null,
-            "label": "False",
-            "value": false
-          } ],
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
           "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be deleted.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Record ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "tableId",
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Delete Record",
+      "workflowNodeDescription": null
+    },
+    {
+      "batch": null,
+      "deprecated": null,
+      "description": "Retrieves a single record.",
+      "help": null,
+      "metadata": {
+        "method": "GET",
+        "path": "/{baseId}/{tableId}/{recordId}",
+        "responseType": {
+          "contentType": "application/json",
+          "type": "JSON"
+        }
+      },
+      "name": "getRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
+      },
+      "perform": null,
+      "processErrorResponse": {},
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be retrieved.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Record ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "tableId",
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Get Record",
+      "workflowNodeDescription": null
+    }
+  ],
+  "clusterElements": [
+    {
+      "description": "Adds a record into an Airtable table.",
+      "element": {},
+      "help": null,
+      "name": "createRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
+      },
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The table where the record will be created.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "dynamicPropertiesDataSource": {
+            "properties": {},
+            "propertiesLookupDependsOn": [
+              "baseId",
+              "tableId"
+            ]
+          },
+          "expressionEnabled": null,
+          "header": null,
+          "hidden": null,
+          "metadata": {
+            "type": "BODY"
+          },
+          "name": "fields",
           "required": false,
-          "type": "BOOLEAN"
-        } ],
-        "required": null,
-        "type": "OBJECT"
+          "type": "DYNAMIC_PROPERTIES"
+        }
+      ],
+      "title": "Create Record",
+      "type": {
+        "key": "tools",
+        "label": "Tools",
+        "multipleElements": true,
+        "name": "TOOLS",
+        "required": false
       },
-      "sampleOutput": null
+      "workflowNodeDescription": null
     },
-    "perform": null,
-    "processErrorResponse": { },
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
+    {
+      "description": "Update an existing record in an Airtable table.",
+      "element": {},
+      "help": null,
+      "name": "updateRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
       },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be retrieved.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Row ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId",
+              "tableId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "dynamicPropertiesDataSource": {
+            "properties": {},
+            "propertiesLookupDependsOn": [
+              "baseId",
+              "tableId",
+              "recordId"
+            ]
+          },
+          "expressionEnabled": null,
+          "header": null,
+          "hidden": null,
+          "metadata": {
+            "type": "BODY"
+          },
+          "name": "fields",
+          "required": false,
+          "type": "DYNAMIC_PROPERTIES"
+        }
+      ],
+      "title": "Update Record",
+      "type": {
+        "key": "tools",
+        "label": "Tools",
+        "multipleElements": true,
+        "name": "TOOLS",
+        "required": false
       },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the record that will be deleted.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Record ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "recordId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Delete Record",
-    "workflowNodeDescription": null
-  }, {
-    "batch": null,
-    "deprecated": null,
-    "description": "Retrieves a single record.",
-    "help": null,
-    "metadata": {
-      "method": "GET",
-      "path": "/{baseId}/{tableId}/{recordId}",
-      "responseType": {
-        "contentType": "application/json",
-        "type": "JSON"
-      }
+      "workflowNodeDescription": null
     },
-    "name": "getRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "perform": null,
-    "processErrorResponse": { },
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the record that will be retrieved.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Record ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "recordId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Get Record",
-    "workflowNodeDescription": null
-  } ],
-  "clusterElements": [ {
-    "description": "Adds a record into an Airtable table.",
-    "element": { },
-    "help": null,
-    "name": "createRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The table where the record will be created.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "dynamicPropertiesDataSource": {
-        "properties": { },
-        "propertiesLookupDependsOn": [ "baseId", "tableId" ]
-      },
-      "expressionEnabled": null,
-      "header": null,
-      "hidden": null,
-      "metadata": {
-        "type": "BODY"
-      },
-      "name": "fields",
-      "required": false,
-      "type": "DYNAMIC_PROPERTIES"
-    } ],
-    "title": "Create Record",
-    "type": {
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "name": "TOOLS",
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
-    "description": "Deletes a single record from a table.",
-    "element": { },
-    "help": null,
-    "name": "deleteRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": {
+    {
+      "description": "Deletes a single record from a table.",
+      "element": {},
+      "help": null,
+      "name": "deleteRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": {
+          "outputSchema": {
+            "additionalProperties": null,
+            "advancedOption": null,
+            "controlType": "OBJECT_BUILDER",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": {
+              "responseType": {
+                "contentType": "application/json",
+                "type": "JSON"
+              }
+            },
+            "multipleValues": null,
+            "name": null,
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "properties": [
+              {
+                "advancedOption": null,
+                "controlType": "TEXT",
+                "defaultValue": null,
+                "description": "The ID of the deleted record.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": null,
+                "languageId": null,
+                "maxLength": null,
+                "metadata": {},
+                "minLength": null,
+                "name": "id",
+                "options": null,
+                "optionsDataSource": null,
+                "optionsLoadedDynamically": null,
+                "placeholder": null,
+                "regex": null,
+                "required": false,
+                "type": "STRING"
+              },
+              {
+                "advancedOption": null,
+                "controlType": "SELECT",
+                "defaultValue": null,
+                "description": "Indicates if the record was deleted.",
+                "displayCondition": null,
+                "exampleValue": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "label": null,
+                "metadata": {},
+                "name": "deleted",
+                "options": [
+                  {
+                    "description": null,
+                    "label": "True",
+                    "value": true
+                  },
+                  {
+                    "description": null,
+                    "label": "False",
+                    "value": false
+                  }
+                ],
+                "placeholder": null,
+                "required": false,
+                "type": "BOOLEAN"
+              }
+            ],
+            "required": null,
+            "type": "OBJECT"
+          },
+          "placeholder": null,
+          "sampleOutput": null
+        },
         "outputSchema": {
           "additionalProperties": null,
           "advancedOption": null,
@@ -575,514 +985,483 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "properties": [ {
-            "advancedOption": null,
-            "controlType": "TEXT",
-            "defaultValue": null,
-            "description": "The ID of the deleted record.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "languageId": null,
-            "maxLength": null,
-            "metadata": { },
-            "minLength": null,
-            "name": "id",
-            "options": null,
-            "optionsDataSource": null,
-            "optionsLoadedDynamically": null,
-            "placeholder": null,
-            "regex": null,
-            "required": false,
-            "type": "STRING"
-          }, {
-            "advancedOption": null,
-            "controlType": "SELECT",
-            "defaultValue": null,
-            "description": "Indicates if the record was deleted.",
-            "displayCondition": null,
-            "exampleValue": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "label": null,
-            "metadata": { },
-            "name": "deleted",
-            "options": [ {
-              "description": null,
-              "label": "True",
-              "value": true
-            }, {
-              "description": null,
-              "label": "False",
-              "value": false
-            } ],
-            "placeholder": null,
-            "required": false,
-            "type": "BOOLEAN"
-          } ],
+          "properties": [
+            {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": "The ID of the deleted record.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": {},
+              "minLength": null,
+              "name": "id",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            },
+            {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Indicates if the record was deleted.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": {},
+              "name": "deleted",
+              "options": [
+                {
+                  "description": null,
+                  "label": "True",
+                  "value": true
+                },
+                {
+                  "description": null,
+                  "label": "False",
+                  "value": false
+                }
+              ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
+            }
+          ],
           "required": null,
           "type": "OBJECT"
         },
-        "placeholder": null,
         "sampleOutput": null
       },
-      "outputSchema": {
-        "additionalProperties": null,
-        "advancedOption": null,
-        "controlType": "OBJECT_BUILDER",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": {
-          "responseType": {
-            "contentType": "application/json",
-            "type": "JSON"
-          }
-        },
-        "multipleValues": null,
-        "name": null,
-        "options": null,
-        "optionsDataSource": null,
-        "placeholder": null,
-        "properties": [ {
-          "advancedOption": null,
-          "controlType": "TEXT",
-          "defaultValue": null,
-          "description": "The ID of the deleted record.",
-          "displayCondition": null,
-          "exampleValue": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "label": null,
-          "languageId": null,
-          "maxLength": null,
-          "metadata": { },
-          "minLength": null,
-          "name": "id",
-          "options": null,
-          "optionsDataSource": null,
-          "optionsLoadedDynamically": null,
-          "placeholder": null,
-          "regex": null,
-          "required": false,
-          "type": "STRING"
-        }, {
+      "processErrorResponse": null,
+      "properties": [
+        {
           "advancedOption": null,
           "controlType": "SELECT",
           "defaultValue": null,
-          "description": "Indicates if the record was deleted.",
+          "description": "ID of the base where table is located.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
           "hidden": null,
-          "label": null,
-          "metadata": { },
-          "name": "deleted",
-          "options": [ {
-            "description": null,
-            "label": "True",
-            "value": true
-          }, {
-            "description": null,
-            "label": "False",
-            "value": false
-          } ],
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
           "placeholder": null,
-          "required": false,
-          "type": "BOOLEAN"
-        } ],
-        "required": null,
-        "type": "OBJECT"
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be deleted.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Record ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "tableId",
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Delete Record",
+      "type": {
+        "key": "tools",
+        "label": "Tools",
+        "multipleElements": true,
+        "name": "TOOLS",
+        "required": false
       },
-      "sampleOutput": null
+      "workflowNodeDescription": null
     },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
+    {
+      "description": "Retrieves a single record.",
+      "element": {},
+      "help": null,
+      "name": "getRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
       },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the record that will be retrieved.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Record ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {
+            "type": "PATH"
+          },
+          "minLength": null,
+          "name": "recordId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "tableId",
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Get Record",
+      "type": {
+        "key": "tools",
+        "label": "Tools",
+        "multipleElements": true,
+        "name": "TOOLS",
+        "required": false
       },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the record that will be deleted.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Record ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "recordId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Delete Record",
-    "type": {
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "name": "TOOLS",
-      "required": false
+      "workflowNodeDescription": null
     },
-    "workflowNodeDescription": null
-  }, {
-    "description": "Retrieves a single record.",
-    "element": { },
-    "help": null,
-    "name": "getRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
+    {
+      "description": "Reads a single row from a table.",
+      "element": {},
+      "help": null,
+      "name": "read",
+      "outputDefinition": null,
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the table where the record is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Read table row",
+      "type": {
+        "key": "source",
+        "label": "Source",
+        "multipleElements": false,
+        "name": "SOURCE",
+        "required": false
+      },
+      "workflowNodeDescription": null
     },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
+    {
+      "description": "Writes a list of rows to a table.",
+      "element": {},
+      "help": null,
+      "name": "write",
+      "outputDefinition": null,
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base where table is located.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The table where the record will be created.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "Write tabel rows",
+      "type": {
+        "key": "destination",
+        "label": "Destination",
+        "multipleElements": false,
+        "name": "DESTINATION",
+        "required": false
       },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the record that will be retrieved.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Record ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": {
-        "type": "PATH"
-      },
-      "minLength": null,
-      "name": "recordId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Get Record",
-    "type": {
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "name": "TOOLS",
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
-    "description": "Reads a single row from a table.",
-    "element": { },
-    "help": null,
-    "name": "read",
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the table where the record is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Read table row",
-    "type": {
-      "key": "source",
-      "label": "Source",
-      "multipleElements": false,
-      "name": "SOURCE",
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
-    "description": "Writes a list of rows to a table.",
-    "element": { },
-    "help": null,
-    "name": "write",
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base where table is located.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The table where the record will be created.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "Write tabel rows",
-    "type": {
-      "key": "destination",
-      "label": "Destination",
-      "multipleElements": false,
-      "name": "DESTINATION",
-      "required": false
-    },
-    "workflowNodeDescription": null
-  } ],
-  "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
-  } ],
+      "workflowNodeDescription": null
+    }
+  ],
+  "componentCategories": [
+    {
+      "label": "Productivity and Collaboration",
+      "name": "productivity-and-collaboration"
+    }
+  ],
   "connection": {
     "authorizationRequired": null,
-    "authorizations": [ {
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "description": null,
-      "detectOn": null,
-      "name": "bearer_token",
-      "oauth2AuthorizationExtraQueryParameters": null,
-      "pkce": null,
-      "properties": [ {
-        "advancedOption": null,
-        "controlType": "TEXT",
-        "defaultValue": null,
+    "authorizations": [
+      {
+        "acquire": null,
+        "apply": null,
+        "authorizationCallback": null,
+        "authorizationUrl": null,
+        "clientId": null,
+        "clientSecret": null,
         "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Token",
-        "languageId": null,
-        "maxLength": null,
-        "metadata": { },
-        "minLength": null,
-        "name": "token",
-        "options": null,
-        "optionsDataSource": null,
-        "optionsLoadedDynamically": null,
-        "placeholder": null,
-        "regex": null,
-        "required": true,
-        "type": "STRING"
-      } ],
-      "refresh": null,
-      "refreshOn": null,
-      "refreshToken": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "title": "Bearer Token",
-      "tokenUrl": null,
-      "type": "BEARER_TOKEN"
-    } ],
-    "baseUri": { },
+        "detectOn": null,
+        "name": "bearer_token",
+        "oauth2AuthorizationExtraQueryParameters": null,
+        "pkce": null,
+        "properties": [
+          {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": null,
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Token",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": {},
+            "minLength": null,
+            "name": "token",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": true,
+            "type": "STRING"
+          }
+        ],
+        "refresh": null,
+        "refreshOn": null,
+        "refreshToken": null,
+        "refreshUrl": null,
+        "scopes": null,
+        "title": "Bearer Token",
+        "tokenUrl": null,
+        "type": "BEARER_TOKEN"
+      }
+    ],
+    "baseUri": {},
     "properties": null,
     "test": null,
     "version": 1
@@ -1096,108 +1475,116 @@
   "resources": null,
   "tags": null,
   "title": "Airtable",
-  "triggers": [ {
-    "batch": null,
-    "deduplicate": null,
-    "deprecated": null,
-    "description": "Trigger off when a new entry is added to the table that you have selected.",
-    "dynamicWebhookRefresh": null,
-    "help": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "name": "newRecord",
-    "outputDefinition": {
-      "output": null,
-      "outputResponse": null,
-      "outputSchema": null,
-      "sampleOutput": null
-    },
-    "poll": { },
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "ID of the base which contains the table that you want to monitor.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Base ID",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "baseId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": null
+  "triggers": [
+    {
+      "batch": null,
+      "deduplicate": null,
+      "deprecated": null,
+      "description": "Trigger off when a new entry is added to the table that you have selected.",
+      "dynamicWebhookRefresh": null,
+      "help": null,
+      "listenerDisable": null,
+      "listenerEnable": null,
+      "name": "newRecord",
+      "outputDefinition": {
+        "output": null,
+        "outputResponse": null,
+        "outputSchema": null,
+        "sampleOutput": null
       },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "The table to monitor for new records.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Table",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "tableId",
-      "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "baseId" ]
-      },
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    }, {
-      "advancedOption": null,
-      "controlType": "TEXT",
-      "defaultValue": null,
-      "description": "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Trigger Field",
-      "languageId": null,
-      "maxLength": null,
-      "metadata": { },
-      "minLength": null,
-      "name": "triggerField",
-      "options": null,
-      "optionsDataSource": null,
-      "optionsLoadedDynamically": null,
-      "placeholder": null,
-      "regex": null,
-      "required": true,
-      "type": "STRING"
-    } ],
-    "title": "New Record",
-    "type": "POLLING",
-    "webhookDisable": null,
-    "webhookEnable": null,
-    "webhookRawBody": null,
-    "webhookRequest": null,
-    "webhookValidate": null,
-    "webhookValidateOnEnable": null,
-    "workflowNodeDescription": null,
-    "workflowSyncExecution": null
-  } ],
+      "poll": {},
+      "processErrorResponse": null,
+      "properties": [
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "ID of the base which contains the table that you want to monitor.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Base ID",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "baseId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": null
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "The table to monitor for new records.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Table",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "tableId",
+          "options": null,
+          "optionsDataSource": {
+            "options": {},
+            "optionsLookupDependsOn": [
+              "baseId"
+            ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Trigger Field",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": {},
+          "minLength": null,
+          "name": "triggerField",
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }
+      ],
+      "title": "New Record",
+      "type": "POLLING",
+      "webhookDisable": null,
+      "webhookEnable": null,
+      "webhookRawBody": null,
+      "webhookRequest": null,
+      "webhookValidate": null,
+      "webhookValidateOnEnable": null,
+      "workflowNodeDescription": null,
+      "workflowSyncExecution": null
+    }
+  ],
   "unifiedApi": null,
   "version": 1
 }

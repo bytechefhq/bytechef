@@ -71,6 +71,42 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Update Record
+Name: updateRecord
+
+`Update an existing record in an Airtable table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
+| recordId | Row ID | STRING <details> <summary> Depends On </summary> baseId, tableId </details> | ID of the record that will be retrieved. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId, recordId </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Record",
+  "name" : "updateRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : "",
+    "fields" : { }
+  },
+  "type" : "airtable/v1/updateRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Delete Record
 Name: deleteRecord
 
