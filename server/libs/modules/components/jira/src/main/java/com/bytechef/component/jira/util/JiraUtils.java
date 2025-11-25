@@ -53,10 +53,10 @@ public class JiraUtils {
     public static Integer subscribeWebhook(
         Parameters inputParameters, String webhookUrl, TriggerContext context, String event) {
 
-        StringBuilder jqlFitler = new StringBuilder(PROJECT + " = " + inputParameters.getRequiredString(PROJECT));
+        StringBuilder jqlFilter = new StringBuilder(PROJECT + " = " + inputParameters.getRequiredString(PROJECT));
 
         if (inputParameters.getString(ISSUETYPE) != null) {
-            jqlFitler
+            jqlFilter
                 .append(" AND ")
                 .append(ISSUETYPE)
                 .append(" = ")
@@ -70,7 +70,7 @@ public class JiraUtils {
                 "webhooks", List.of(
                     Map.of(
                         "events", List.of(event),
-                        "jqlFilter", jqlFitler.toString()))))
+                        "jqlFilter", jqlFilter.toString()))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
