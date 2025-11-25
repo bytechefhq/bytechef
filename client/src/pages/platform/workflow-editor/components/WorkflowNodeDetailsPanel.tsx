@@ -445,68 +445,100 @@ const WorkflowNodeDetailsPanel = ({
             tasks: workflow.tasks || [],
         });
 
-        if (mainClusterRootTask?.connections && currentNode?.clusterElementType) {
+        if (!mainClusterRootTask) {
+            return undefined;
+        }
+
+        if (mainClusterRootTask.connections && currentNode?.clusterElementType) {
             return mainClusterRootTask.connections.filter(
                 (connection) => connection.key === currentNode?.workflowNodeName
             );
         }
 
-        //This updates the connection tab in cluster elements when model is updated, but it doesn't handle selecting a connection
-        //Existing logic needs to be put here to replace this code
-        if (mainClusterRootTask?.clusterElements && (currentNode?.clusterRoot || rootClusterElementNodeData)) {
+        if (currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot && mainClusterRootTask.clusterElements) {
             const connections: ComponentConnection[] = [];
             const clusterElements = mainClusterRootTask.clusterElements;
 
-            // Handle each cluster element type
-            for (const [key, element] of Object.entries(clusterElements)) {
-                if (!element) continue;
+            const extractConnection = (
+                elementData: {name?: string},
+                componentName?: string,
+                componentVersion?: number
+            ) => {
+                if (!elementData || !elementData.name || !componentName || !componentVersion) {
+                    return null;
+                }
 
-                // Handle array types (e.g., tools)
+                return {
+                    componentName,
+                    componentVersion,
+                    key: elementData.name,
+                    required: false,
+                    workflowNodeName: elementData.name,
+                };
+            };
+
+            const extractConnectionsRecursively = (element: unknown): void => {
+                if (!element || typeof element !== 'object') {
+                    return;
+                }
+
                 if (Array.isArray(element)) {
-                    element.forEach((item: any) => {
-                        if (item?.type) {
-                            const [componentName, versionStr] = item.type.split('/');
-                            const version = parseInt(versionStr?.replace('v', '') || '1');
+                    element.forEach((item) => extractConnectionsRecursively(item));
+                    return;
+                }
 
-                            connections.push({
-                                componentName,
-                                componentVersion: version,
-                                key: item.name || key,
-                                required: false,
-                                workflowNodeName: mainClusterRootTask.name,
-                            });
-                        }
+                const elementObj = element as {
+                    clusterElements?: unknown;
+                    name?: string;
+                    type?: string;
+                };
+
+                if (elementObj.type && elementObj.name) {
+                    const typeParts = elementObj.type.split('/');
+                    const componentName = typeParts[0];
+                    const componentVersion = parseInt(typeParts[1]?.replace('v', '') || '1');
+
+                    const connection = extractConnection(elementObj, componentName, componentVersion);
+                    if (connection) {
+                        connections.push(connection);
+                    }
+                }
+
+                if (elementObj.clusterElements) {
+                    const nestedElements = elementObj.clusterElements as Record<string, unknown>;
+                    Object.values(nestedElements).forEach((nestedElement) => {
+                        extractConnectionsRecursively(nestedElement);
                     });
                 }
-                // Handle object types (e.g., model, chatMemory, rag)
-                else if (typeof element === 'object' && (element as any).type) {
-                    const [componentName, versionStr] = (element as any).type.split('/');
-                    const version = parseInt(versionStr?.replace('v', '') || '1');
+            };
 
-                    connections.push({
-                        componentName,
-                        componentVersion: version,
-                        key,
-                        required: false,
-                        workflowNodeName: mainClusterRootTask.name,
-                    });
-                }
-            }
+            Object.values(clusterElements).forEach((element) => {
+                extractConnectionsRecursively(element);
+            });
 
-            return connections;
+            return connections.length > 0 ? connections : undefined;
         }
 
         return undefined;
     }, [
         currentNode?.clusterElementType,
         currentNode?.clusterRoot,
-        currentNode?.name,
+        currentNode?.isNestedClusterRoot,
         currentNode?.workflowNodeName,
         rootClusterElementNodeData?.workflowNodeName,
         workflow.tasks,
     ]);
 
     const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(() => {
+        if (currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot) {
+            return (
+                currentWorkflowTask?.connections ||
+                currentWorkflowTrigger?.connections ||
+                currentClusterElementsConnections ||
+                []
+            );
+        }
+
         const connections =
             currentWorkflowTask?.connections ||
             currentWorkflowTrigger?.connections ||
@@ -514,7 +546,6 @@ const WorkflowNodeDetailsPanel = ({
             currentNode?.connections ||
             [];
 
-        // This handles connections in task dispatchers
         if (
             connections.length === 0 &&
             currentComponentDefinition?.connection &&
@@ -536,16 +567,18 @@ const WorkflowNodeDetailsPanel = ({
 
         return connections;
     }, [
-        currentWorkflowTask?.connections,
-        currentWorkflowTrigger?.connections,
         currentClusterElementsConnections,
-        currentNode?.connections,
-        currentNode?.workflowNodeName,
-        currentNode?.clusterElementType,
         currentComponentDefinition?.connection,
         currentComponentDefinition?.connectionRequired,
         currentComponentDefinition?.name,
         currentComponentDefinition?.version,
+        currentNode?.clusterElementType,
+        currentNode?.clusterRoot,
+        currentNode?.connections,
+        currentNode?.isNestedClusterRoot,
+        currentNode?.workflowNodeName,
+        currentWorkflowTask?.connections,
+        currentWorkflowTrigger?.connections,
     ]);
 
     const nodeTabs = useMemo(
@@ -572,13 +605,12 @@ const WorkflowNodeDetailsPanel = ({
                 return true;
             }),
         [
-            currentWorkflowNodeConnections,
             currentComponentDefinition,
-            currentNode?.clusterElementType,
-            showOutputTab,
             currentNode,
-            currentTaskDispatcherDefinition,
             currentOperationProperties,
+            currentTaskDispatcherDefinition,
+            currentWorkflowNodeConnections,
+            showOutputTab,
         ]
     );
 
@@ -964,8 +996,7 @@ const WorkflowNodeDetailsPanel = ({
     useEffect(() => {
         if (
             activeTab === 'connection' &&
-            (currentWorkflowNodeConnections.length === 0 &&
-                currentComponentDefinition?.connection === undefined ||
+            ((currentWorkflowNodeConnections.length === 0 && currentComponentDefinition?.connection === undefined) ||
                 currentNode?.clusterElementType)
         ) {
             setActiveTab('description');
