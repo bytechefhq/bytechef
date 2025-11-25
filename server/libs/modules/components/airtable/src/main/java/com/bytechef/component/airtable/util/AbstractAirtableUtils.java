@@ -59,4 +59,11 @@ public abstract class AbstractAirtableUtils {
 
         return List.of();
     }
+
+    public static List<ComponentDsl.ModifiableValueProperty<?, ?>> getFieldsProperties(
+        Parameters inputParameters, Parameters connectionParameters,
+        Map<String, String> lookupDependsOnPaths, Context context) {
+
+        return List.of();
+    }
 }
