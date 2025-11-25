@@ -25,16 +25,24 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.CONFERENCE_RECORDS;
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NAME;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.PAGE_SIZE;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.PAGE_TOKEN;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.meet.util.GoogleMeetUtils;
 import com.bytechef.google.commons.GoogleUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class GoogleMeetListParticipantsAction {
 
@@ -50,38 +58,50 @@ public class GoogleMeetListParticipantsAction {
                 .required(true))
         .output(
             outputSchema(
-                object()
-                    .properties(
-                        array("participants")
-                            .description("List of participants in one page.")
-                            .items(
-                                object()
-                                    .properties(
-                                        string(NAME)
-                                            .description(
-                                                "Resource name of the participant.Format: " +
-                                                    "conferenceRecords/{conferenceRecord}/participants/{participant}"),
-                                        object("user")
-                                            .description("User can be of type: signedinUser, anonymousUser, phoneUser"),
-                                        string("earliestStartTime")
-                                            .description("Time when the participant first joined the meeting."),
-                                        string("latestEndTime")
-                                            .description(
-                                                "Time when the participant left the meeting for the last time. This " +
-                                                    "can be null if it's an active meeting."))))))
+                array()
+                    .description("List of participants.")
+                    .items(
+                        object()
+                            .properties(
+                                string(NAME)
+                                    .description(
+                                        "Resource name of the participant.Format: " +
+                                            "conferenceRecords/{conferenceRecord}/participants/{participant}"),
+                                object("user")
+                                    .description("User can be of type: signedinUser, anonymousUser, phoneUser"),
+                                string("earliestStartTime")
+                                    .description("Time when the participant first joined the meeting."),
+                                string("latestEndTime")
+                                    .description(
+                                        "Time when the participant left the meeting for the last time. This " +
+                                            "can be null if it's an active meeting.")))))
         .perform(GoogleMeetListParticipantsAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 
     private GoogleMeetListParticipantsAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.get(
-                "https://meet.googleapis.com/v2/%s/participants".formatted(
-                    inputParameters.getRequiredString(CONFERENCE_RECORDS))))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody();
+    public static List<?> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<Object> participants = new ArrayList<>();
+        String nextPageToken = null;
+
+        do {
+            Map<String, ?> body = context
+                .http(http -> http.get(
+                    "https://meet.googleapis.com/v2/%s/participants".formatted(
+                        inputParameters.getRequiredString(CONFERENCE_RECORDS))))
+                .queryParameters(PAGE_SIZE, 250, PAGE_TOKEN, nextPageToken)
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("participants") instanceof List<?> list) {
+                participants.addAll(list);
+            }
+
+            nextPageToken = (String) body.get(NEXT_PAGE_TOKEN);
+        } while (nextPageToken != null);
+
+        return participants;
     }
 }

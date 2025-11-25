@@ -29,6 +29,9 @@ public class GoogleMeetConstants {
     public static final String ACCESS_TYPE = "accessType";
     public static final String CONFERENCE_RECORDS = "conferenceRecords";
     public static final String NAME = "name";
+    public static final String NEXT_PAGE_TOKEN = "nextPageToken";
+    public static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_TOKEN = "pageToken";
 
     public static final ModifiableObjectProperty MEETING_SPACE_OUTPUT_PROPERTY =
         object()

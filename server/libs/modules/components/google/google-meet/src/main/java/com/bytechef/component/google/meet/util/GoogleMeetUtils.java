@@ -18,6 +18,9 @@ package com.bytechef.component.google.meet.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.PAGE_SIZE;
+import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.PAGE_TOKEN;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -30,6 +33,7 @@ import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class GoogleMeetUtils {
 
@@ -37,23 +41,29 @@ public class GoogleMeetUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         List<Option<String>> options = new ArrayList<>();
+        String nextPageToken = null;
 
-        if (body.get("conferenceRecords") instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    String name = (String) map.get("name");
+        do {
+            Map<String, ?> body = context
+                .http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
+                .queryParameters(PAGE_SIZE, 100, PAGE_TOKEN, nextPageToken)
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-                    options.add(option(name.substring("conferenceRecords/".length()), name));
+            if (body.get("conferenceRecords") instanceof List<?> list) {
+                for (Object object : list) {
+                    if (object instanceof Map<?, ?> map) {
+                        String name = (String) map.get("name");
+
+                        options.add(option(name.substring("conferenceRecords/".length()), name));
+                    }
                 }
             }
-        }
+
+            nextPageToken = (String) body.get(NEXT_PAGE_TOKEN);
+        } while (nextPageToken != null);
 
         return options;
     }
