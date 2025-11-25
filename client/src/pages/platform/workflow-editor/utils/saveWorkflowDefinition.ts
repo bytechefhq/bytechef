@@ -17,10 +17,7 @@ type UpdateWorkflowRequestType = {
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
     invalidateWorkflowQueries: () => void;
-    nodeData?: Omit<NodeDataType, 'componentName' | 'workflowNodeName'> & {
-        componentName?: string;
-        workflowNodeName?: string;
-    };
+    nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
