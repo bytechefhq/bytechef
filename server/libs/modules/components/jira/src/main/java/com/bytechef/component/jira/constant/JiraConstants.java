@@ -41,6 +41,8 @@ public class JiraConstants {
     public static final String KEY = "key";
     public static final String MAX_RESULTS = "maxResults";
     public static final String NAME = "name";
+    public static final String NEXT_PAGE = "nextPage";
+    public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PARENT = "parent";
     public static final String PRIORITY = "priority";
     public static final String PROJECT = "project";

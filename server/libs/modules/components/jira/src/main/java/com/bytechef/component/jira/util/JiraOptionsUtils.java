@@ -21,7 +21,10 @@ import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
+import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
+import static com.bytechef.component.jira.constant.JiraConstants.NEXT_PAGE;
+import static com.bytechef.component.jira.constant.JiraConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.util.JiraUtils.getProjectName;
@@ -32,6 +35,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,22 +54,30 @@ public class JiraOptionsUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/search/jql"))
-            .queryParameters(
-                JQL, PROJECT + "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"",
-                FIELDS, SUMMARY)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        String nextPageToken = null;
 
-        if (body.get(ISSUES) instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map && map.get(FIELDS) instanceof Map<?, ?> fields) {
-                    options.add(option((String) fields.get(SUMMARY), (String) map.get(ID)));
+        do {
+            Map<String, Object> body = context
+                .http(http -> http.get("/search/jql"))
+                .queryParameters(
+                    JQL, PROJECT + "=\"" + getProjectName(inputParameters, connectionParameters, context) + "\"",
+                    FIELDS, SUMMARY,
+                    MAX_RESULTS, 5000,
+                    NEXT_PAGE_TOKEN, nextPageToken)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get(ISSUES) instanceof List<?> list) {
+                for (Object object : list) {
+                    if (object instanceof Map<?, ?> map && map.get(FIELDS) instanceof Map<?, ?> fields) {
+                        options.add(option((String) fields.get(SUMMARY), (String) map.get(ID)));
+                    }
                 }
             }
-        }
+
+            nextPageToken = (String) body.get(NEXT_PAGE_TOKEN);
+        } while (nextPageToken != null);
 
         return options;
     }
@@ -105,16 +117,30 @@ public class JiraOptionsUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get("/project/search"))
+            .queryParameters(MAX_RESULTS, 100)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         if (body.get("values") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
+            options.addAll(getOptions(list));
+        }
+
+        String nextPage = (String) body.get(NEXT_PAGE);
+
+        while (nextPage != null) {
+            String url = nextPage;
+
+            Map<String, Object> body1 = context.http(http -> http.get(url))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body1.get("values") instanceof List<?> list) {
+                options.addAll(getOptions(list));
             }
+
+            nextPage = (String) body1.get(NEXT_PAGE);
         }
 
         return options;
@@ -128,6 +154,7 @@ public class JiraOptionsUtils {
 
         List<Object> body = context
             .http(http -> http.get("/users/search"))
+            .queryParameters(MAX_RESULTS, 1000)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -142,7 +169,7 @@ public class JiraOptionsUtils {
         return options;
     }
 
-    private static List<Option<String>> getOptions(List<Object> body) {
+    private static List<Option<String>> getOptions(List<?> body) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object object : body) {
