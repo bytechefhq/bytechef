@@ -19,6 +19,7 @@ package com.bytechef.component.google.bigquery.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.bigquery.constant.GoogleBigQueryConstants.ID;
 import static com.bytechef.component.google.bigquery.constant.GoogleBigQueryConstants.NEXT_PAGE_TOKEN;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -56,6 +57,7 @@ class GoogleBigQueryUtilsTest {
     private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
     private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -70,7 +72,7 @@ class GoogleBigQueryUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -98,14 +100,33 @@ class GoogleBigQueryUtilsTest {
         assertNotNull(capturedFunction);
 
         Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
         Configuration configuration = configurationBuilder.build();
+
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
 
         assertEquals(
-            List.of("https://bigquery.googleapis.com/bigquery/v2/projects", NEXT_PAGE_TOKEN, "",
-                "https://bigquery.googleapis.com/bigquery/v2/projects", NEXT_PAGE_TOKEN, "token"),
+            List.of(
+                "https://bigquery.googleapis.com/bigquery/v2/projects",
+                "https://bigquery.googleapis.com/bigquery/v2/projects"),
             stringArgumentCaptor.getAllValues());
+
+        List<Object[]> allQueryParams = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(2, allQueryParams.size());
+
+        Object[] queryParameters1 = {
+            "pageToken", null,
+            "maxResults", 50
+        };
+        Object[] queryParameters2 = {
+            "pageToken", "token",
+            "maxResults", 50
+        };
+
+        assertArrayEquals(queryParameters1, allQueryParams.get(0));
+        assertArrayEquals(queryParameters2, allQueryParams.get(1));
     }
 }
