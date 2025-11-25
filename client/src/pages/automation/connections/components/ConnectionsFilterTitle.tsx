@@ -34,9 +34,11 @@ const ConnectionsFilterTitle = ({
                 {searchParams.get('tagId') ? 'tag' : 'component'}:
             </span>
 
-            <Badge styleType="secondary-filled" weight="semibold">
-                <span className="text-sm">{pageTitle ?? 'All Components'}</span>
-            </Badge>
+            <Badge
+                label={typeof pageTitle === 'string' ? pageTitle : 'All Components'}
+                styleType="secondary-filled"
+                weight="semibold"
+            />
         </div>
     );
 };
