@@ -33,12 +33,15 @@ import org.springframework.ai.tool.ToolCallback;
  */
 public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
-    private static final String ADDITIONAL_RULES = """
-        ## Additional Rules:
+    private static final String ADDITIONAL_RULES =
+        """
+            ## Additional Rules
 
-        - Don't send Visual Representations. as part of the response
-        - If you are in CHAT mode don't try to modify the workflow definition
-        """;
+            - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
+            - When operating in CHAT mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain.
+            - If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
+            - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses.
+            """;
 
     private final WorkflowService workflowService;
 
