@@ -135,7 +135,7 @@ public class ComponentInitOpenApiGenerator {
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
     private final Map<String, String> dynamicOptionsMap = new HashMap<>();
-    private final List<String> dynamicProperties = new ArrayList<>();
+    private final Set<String> dynamicProperties = new HashSet<>();
     private final List<ClassName> aiAgentTools = new ArrayList<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
