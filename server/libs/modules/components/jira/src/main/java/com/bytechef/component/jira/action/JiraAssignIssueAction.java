@@ -54,7 +54,6 @@ public class JiraAssignIssueAction {
                 .label("Account ID")
                 .description("ID of the account user who will be assigned the issue.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
-                .optionsLookupDependsOn(PROJECT)
                 .required(true))
         .perform(JiraAssignIssueAction::perform);
 
