@@ -28,8 +28,10 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.figma.trigger.FigmaNewCommentTrigger;
 import com.google.auto.service.AutoService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -41,6 +43,11 @@ import javax.naming.ConfigurationException;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(FigmaNewCommentTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
