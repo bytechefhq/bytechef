@@ -18,19 +18,22 @@ package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
+import static com.bytechef.component.jira.constant.JiraConstants.NEXT_PAGE_TOKEN;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,39 +43,49 @@ public class JiraSearchForIssuesUsingJqlAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchForIssuesUsingJql")
         .title("Search Issues")
-        .description("Search for issues using JQL")
+        .description("Search for issues using JQL.")
         .properties(
             string(JQL)
                 .label("JQL")
                 .description(
                     "The JQL that defines the search. If no JQL expression is provided, all issues are returned.")
                 .exampleValue("project = HSP")
-                .required(false),
-            integer(MAX_RESULTS)
-                .label("Max Results")
-                .description("The maximum number of items to return per page.")
-                .defaultValue(50)
-                .minValue(1)
-                .maxValue(100)
                 .required(true))
         .output(
             outputSchema(
                 array()
-                    .items(ISSUE_OUTPUT_PROPERTY)))
+                    .items(
+                        object()
+                            .properties(
+                                string(ID)
+                                    .description("The ID of the issue.")))))
         .perform(JiraSearchForIssuesUsingJqlAction::perform);
 
     private JiraSearchForIssuesUsingJqlAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        Map<String, Object> body = context.http(http -> http.get("/search"))
-            .queryParameters(
-                MAX_RESULTS, inputParameters.getRequiredInteger(MAX_RESULTS),
-                JQL, inputParameters.getString(JQL))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+    public static List<Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<Object> issues = new ArrayList<>();
 
-        return body.get(ISSUES);
+        String nextPageToken = null;
+
+        do {
+            Map<String, Object> body = context.http(http -> http.get("/search/jql"))
+                .queryParameters(
+                    MAX_RESULTS, 5000,
+                    NEXT_PAGE_TOKEN, nextPageToken,
+                    JQL, inputParameters.getString(JQL))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get(ISSUES) instanceof List<?> list) {
+                issues.addAll(list);
+            }
+
+            nextPageToken = (String) body.get(NEXT_PAGE_TOKEN);
+        } while (nextPageToken != null);
+
+        return issues;
     }
 }
