@@ -1,6 +1,6 @@
 /* eslint-disable tailwindcss/no-custom-classname */
 
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {
     Command,
@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/command';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Separator} from '@/components/ui/separator';
-import {type VariantProps, cva} from 'class-variance-authority';
 import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
 import {ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -28,30 +27,10 @@ export type MultiSelectOptionType = {
 };
 
 /**
- * Variants for the multi-select component to handle different styles.
- * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
+ * Props for MultiSelect component - Variant style for the Badge component
  */
-const multiSelectVariants = cva(
-    'mr-1 cursor-default text-xs font-normal shadow-none transition delay-150 duration-300 ease-in-out',
-    {
-        defaultVariants: {
-            variant: 'default',
-        },
-        variants: {
-            variant: {
-                default: 'bg-surface-brand-secondary text-content-neutral-primary hover:bg-surface-brand-secondary',
-                destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-                inverted: 'inverted',
-                secondary: 'border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80',
-            },
-        },
-    }
-);
-
-/**
- * Props for MultiSelect component
- */
-interface MultiSelectProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof multiSelectVariants> {
+interface MultiSelectProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: 'default' | 'destructive' | 'secondary';
     /**
      * Icon component to display on the left side of the multi-select component.
      * Optional, defaults to undefined.
@@ -217,13 +196,19 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                         {selectedValues?.length > 0 && !optionsLoading && (
                             <div className="flex w-full items-center justify-between">
-                                <div className={twMerge('flex flex-wrap items-center', leadingIcon && 'pl-9')}>
+                                <div className={twMerge('flex flex-wrap items-center gap-y-2', leadingIcon && 'pl-9')}>
                                     {selectedValues.slice(0, maxCount).map((value) => {
                                         const option = options.find((o) => o.value === value);
                                         const IconComponent = option?.icon;
+                                        const badgeStyleType =
+                                            variant === 'destructive' ? 'destructive-filled' : 'secondary-filled';
 
                                         return (
-                                            <Badge className={twMerge(multiSelectVariants({variant}))} key={value}>
+                                            <Badge
+                                                className="mr-1 cursor-default shadow-none transition delay-150 duration-300 ease-in-out"
+                                                key={value}
+                                                styleType={badgeStyleType}
+                                            >
                                                 {IconComponent && <IconComponent className="mr-2 size-4" />}
 
                                                 <span aria-label={`${option?.label ?? option?.value}-selected`}>
@@ -245,10 +230,8 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                     {selectedValues.length > maxCount && (
                                         <Badge
                                             aria-label="more-count"
-                                            className={twMerge(
-                                                multiSelectVariants({variant}),
-                                                'border-stroke-neutral-secondary bg-white hover:bg-white'
-                                            )}
+                                            className="mr-1 cursor-default shadow-none transition delay-150 duration-300 ease-in-out"
+                                            styleType="outline-outline"
                                         >
                                             {`+ ${selectedValues.length - maxCount} more`}
 
