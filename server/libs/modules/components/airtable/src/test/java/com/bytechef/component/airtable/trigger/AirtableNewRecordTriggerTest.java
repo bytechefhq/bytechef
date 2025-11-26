@@ -71,7 +71,7 @@ class AirtableNewRecordTriggerTest {
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
 
-            airtableUtilsMockedStatic.when(() -> AirtableUtils.fetchAllRecords(
+            airtableUtilsMockedStatic.when(() -> AirtableUtils.getAllRecords(
                 contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
                 booleanArgumentCaptor.capture(), objectArgumentCaptor.capture()))
                 .thenReturn(List.of());
