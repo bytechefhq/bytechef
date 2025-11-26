@@ -27,9 +27,11 @@ const McpServersFilterTitle = ({
                 <>
                     <span className="text-sm uppercase text-muted-foreground">tag:</span>
 
-                    <Badge styleType="secondary-filled" weight="semibold">
-                        <span className="text-sm">{pageTitle ?? 'Unknown Tag'}</span>
-                    </Badge>
+                    <Badge
+                        label={typeof pageTitle === 'string' ? pageTitle : 'Unknown Tag'}
+                        styleType="secondary-filled"
+                        weight="semibold"
+                    />
                 </>
             )}
 

@@ -44,7 +44,6 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                                     (tool, index) =>
                                         tool?.name && (
                                             <Badge
-                                                className="text-xs"
                                                 key={index}
                                                 label={tool.name}
                                                 styleType="secondary-filled"
