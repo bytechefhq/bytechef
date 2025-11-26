@@ -86,7 +86,8 @@ class GoogleTasksUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(responseMap)
+            .thenReturn(Map.of());
     }
 
     @Test
