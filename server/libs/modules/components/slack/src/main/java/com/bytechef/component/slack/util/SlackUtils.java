@@ -48,7 +48,7 @@ public class SlackUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        List<Object> channels = fetchAll(
+        List<Object> channels = getAll(
             context, "/conversations.list", "channels",
             "types", "public_channel,private_channel", "exclude_archived", true, "limit", 1000);
 
@@ -59,7 +59,7 @@ public class SlackUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        List<Object> users = fetchAll(context, "/users.list", "members", "limit", 1000);
+        List<Object> users = getAll(context, "/users.list", "members", "limit", 1000);
 
         return getOptions(users);
     }
@@ -85,7 +85,7 @@ public class SlackUtils {
         }
     }
 
-    private static List<Object> fetchAll(
+    private static List<Object> getAll(
         ActionContext context, String endpoint, String listKey, Object... baseQueryParameters) {
 
         String cursor = null;
