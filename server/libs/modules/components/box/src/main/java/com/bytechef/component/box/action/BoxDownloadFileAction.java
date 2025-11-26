@@ -45,7 +45,7 @@ public class BoxDownloadFileAction {
                 .description("ID of the folder from which you want to download the file.")
                 .options((OptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
-                .required(true),
+                .required(false),
             string(FILE_ID)
                 .label("File ID")
                 .description("ID of the file to download.")

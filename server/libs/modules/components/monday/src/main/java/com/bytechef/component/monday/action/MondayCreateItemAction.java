@@ -51,7 +51,7 @@ public class MondayCreateItemAction {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-                .required(true),
+                .required(false),
             string(BOARD_ID)
                 .label("Board ID")
                 .description("ID of the board where new item will be created.")

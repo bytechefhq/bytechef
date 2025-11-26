@@ -47,7 +47,7 @@ public class LinearCreateCommentAction {
                 .label("Team ID")
                 .description("The ID of the team where this issue should be created.")
                 .options((OptionsFunction<String>) LinearUtils::getTeamOptions)
-                .required(true),
+                .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("The identifier of the issue to update.")
