@@ -76,12 +76,12 @@ public class CouchbaseConnection {
                         .description(
                             "The name of the Couchbase scope, parent of the collection. Search queries will be " +
                                 "executed in the scope context.")
-                        .defaultValue("default")
+                        .defaultValue("_default")
                         .required(false),
                     string(COLLECTION_NAME)
                         .label("Collection Name")
                         .description("The name of the Couchbase collection to store the Documents.")
-                        .defaultValue("default")
+                        .defaultValue("_default")
                         .required(false),
                     integer(DIMENSIONS)
                         .label("Dimensions")
@@ -107,7 +107,7 @@ public class CouchbaseConnection {
                     bool(INITIALIZE_SCHEMA)
                         .label("Initialize Schema")
                         .description("Whether to initialize the schema.")
-                        .defaultValue(false)
+                        .defaultValue(true)
                         .required(false)));
 
     private CouchbaseConnection() {
