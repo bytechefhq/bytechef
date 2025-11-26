@@ -136,14 +136,14 @@ public class GoogleCalendarUtils {
         String searchText, Context context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-        List<CalendarListEntry> calendarListEntries = fetchAllCalendarListEntries(calendar);
+        List<CalendarListEntry> calendarListEntries = getAllCalendarListEntries(calendar);
 
         return calendarListEntries.stream()
             .map(entry -> option(entry.getSummary(), entry.getId()))
             .collect(Collectors.toList());
     }
 
-    private static List<CalendarListEntry> fetchAllCalendarListEntries(Calendar calendar) {
+    private static List<CalendarListEntry> getAllCalendarListEntries(Calendar calendar) {
         List<CalendarListEntry> calendarListEntries = new ArrayList<>();
         String nextPageToken = null;
 
@@ -270,7 +270,7 @@ public class GoogleCalendarUtils {
         String searchText, Context context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-        List<Event> events = fetchAllCalendarEvents(calendar, inputParameters.getRequiredString(CALENDAR_ID));
+        List<Event> events = getAllCalendarEvents(calendar, inputParameters.getRequiredString(CALENDAR_ID));
 
         return events.stream()
             .map(event -> {
@@ -282,7 +282,7 @@ public class GoogleCalendarUtils {
             .collect(Collectors.toList());
     }
 
-    private static List<Event> fetchAllCalendarEvents(Calendar calendar, String calendarId) {
+    private static List<Event> getAllCalendarEvents(Calendar calendar, String calendarId) {
         List<Event> allEvents = new ArrayList<>();
         String nextPageToken = null;
 
