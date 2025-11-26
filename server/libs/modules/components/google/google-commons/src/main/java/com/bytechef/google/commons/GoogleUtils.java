@@ -101,7 +101,7 @@ public class GoogleUtils {
     }
 
     public static String getCalendarTimezone(Calendar calendar) {
-        List<Setting> settings = fetchAllCalendarSettings(calendar);
+        List<Setting> settings = getAllCalendarSettings(calendar);
 
         return settings.stream()
             .filter(setting -> Objects.equals(setting.getId(), "timezone"))
@@ -148,7 +148,7 @@ public class GoogleUtils {
         return new ProviderException(e);
     }
 
-    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
+    private static List<Setting> getAllCalendarSettings(Calendar calendar) {
         List<Setting> allSettings = new ArrayList<>();
 
         String nextPageToken = null;
