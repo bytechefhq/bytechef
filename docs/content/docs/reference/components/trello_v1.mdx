@@ -79,7 +79,7 @@ Name: createCard
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | ID of the board. | true |
+| idBoard | Board ID | STRING | ID of the board. | false |
 | idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | ID of the list where the card should be created in. | true |
 | name | Name | STRING | The name for the card. | false |
 | desc | Description | STRING | The description for the card. | false |
@@ -140,7 +140,7 @@ Name: getCard
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | ID of the board where card is located. | true |
+| idBoard | Board ID | STRING | ID of the board where card is located. | false |
 | id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | true |
 
 #### Example JSON Structure
@@ -203,7 +203,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING |  | true |
+| idBoard | Board ID | STRING |  | false |
 | idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | false |
 
 

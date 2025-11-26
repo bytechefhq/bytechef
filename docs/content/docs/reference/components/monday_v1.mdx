@@ -99,7 +99,7 @@ Name: createColumn
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | true |
+| workspace_id | Workspace ID | STRING |  | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where the new column should be created. | true |
 | title | Title | STRING | The new column's title. | true |
 | column_type | Column Type | STRING <details> <summary> Options </summary> <span>auto_number</span>, <span>board_relation</span>, <span>button</span>, <span>checkbox</span>, <span>color_picker</span>, <span>country</span>, <span>creation_log</span>, <span>date</span>, <span>dependency</span>, <span>doc</span>, <span>dropdown</span>, <span>email</span>, <span>file</span>, <span>formula</span>, <span>hour</span>, <span>item_assignees</span>, <span>item_id</span>, <span>last_updated</span>, <span>link</span>, <span>location</span>, <span>long_text</span>, <span>mirror</span>, <span>name</span>, <span>numbers</span>, <span>people</span>, <span>phone</span>, <span>progress</span>, <span>rating</span>, <span>status</span>, <span>subtasks</span>, <span>tags</span>, <span>team</span>, <span>text</span>, <span>timeline</span>, <span>time_tracking</span>, <span>vote</span>, <span>week</span>, <span>world_clock</span>, <span>unsupported</span> </details> | The type of column to create. | true |
@@ -155,7 +155,7 @@ Name: createGroup
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | true |
+| workspace_id | Workspace ID | STRING |  | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | Id of the board where new item will be created. | true |
 | group_name | Group Name | STRING |  | true |
 
@@ -209,7 +209,7 @@ Name: createItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | true |
+| workspace_id | Workspace ID | STRING |  | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where new item will be created. | true |
 | group_id | Group ID | STRING <details> <summary> Depends On </summary> workspace_id, board_id </details> | The item's group. | false |
 | item_name | Item Name | STRING | The item's name. | true |
@@ -267,8 +267,8 @@ Name: deleteItem
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | true |
-| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. | true |
+| workspace_id | Workspace ID | STRING |  | false |
+| board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> | ID of the board where the item is located. | false |
 | item_id | Item ID | STRING <details> <summary> Depends On </summary> board_id, workspace_id </details> | ID of the item to delete. | true |
 
 #### Example JSON Structure
@@ -307,7 +307,7 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspace_id | Workspace ID | STRING |  | true |
+| workspace_id | Workspace ID | STRING |  | false |
 | board_id | Board ID | STRING <details> <summary> Depends On </summary> workspace_id </details> |  | true |
 
 
