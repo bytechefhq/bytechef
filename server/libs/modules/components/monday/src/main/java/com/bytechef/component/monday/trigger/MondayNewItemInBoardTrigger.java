@@ -67,7 +67,7 @@ public class MondayNewItemInBoardTrigger {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-                .required(true),
+                .required(false),
             string(BOARD_ID)
                 .label("Board ID")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)

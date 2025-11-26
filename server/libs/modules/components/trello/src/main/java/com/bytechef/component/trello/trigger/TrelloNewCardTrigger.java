@@ -55,7 +55,7 @@ public class TrelloNewCardTrigger {
             string(ID_BOARD)
                 .label("Board ID")
                 .options((OptionsFunction<String>) TrelloUtils::getBoardOptions)
-                .required(true),
+                .required(false),
             string(ID_LIST)
                 .label("List ID")
                 .options((OptionsFunction<String>) TrelloUtils::getListOptions)

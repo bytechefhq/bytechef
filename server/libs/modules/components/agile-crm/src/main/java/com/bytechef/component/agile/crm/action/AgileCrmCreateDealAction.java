@@ -68,7 +68,7 @@ public class AgileCrmCreateDealAction {
                 .label("Pipeline ID")
                 .description("ID of the pipeline that the deal follows.")
                 .options((OptionsFunction<Long>) AgileCrmUtils::getPipelineIdOptions)
-                .required(true),
+                .required(false),
             string(MILESTONE)
                 .label("Milestone")
                 .description("Milestone the deal is currently at.")

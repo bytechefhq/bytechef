@@ -55,7 +55,7 @@ public class AITableConstants {
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
         .label("Space ID")
         .options((OptionsFunction<String>) AITableUtils::getSpaceIdOptions)
-        .required(true);
+        .required(false);
 
     private AITableConstants() {
     }
