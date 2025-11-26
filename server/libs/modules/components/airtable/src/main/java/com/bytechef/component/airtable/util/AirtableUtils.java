@@ -54,7 +54,7 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    public static List<Object> fetchAllRecords(
+    public static List<Object> getAllRecords(
         Context context, String baseId, String tableId, boolean editorEnvironment,
         Object... additionalQueryParameters) {
 
@@ -212,7 +212,7 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Object> records = fetchAllRecords(
+        List<Object> records = getAllRecords(
             context, inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID), false);
 
         for (Object record : records) {

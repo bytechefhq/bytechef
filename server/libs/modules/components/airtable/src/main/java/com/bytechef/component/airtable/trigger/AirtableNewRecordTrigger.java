@@ -18,7 +18,7 @@ package com.bytechef.component.airtable.trigger;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.component.airtable.util.AirtableUtils.fetchAllRecords;
+import static com.bytechef.component.airtable.util.AirtableUtils.getAllRecords;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
@@ -86,7 +86,7 @@ public class AirtableNewRecordTrigger {
             inputParameters.getRequiredString(TRIGGER_FIELD),
             startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        List<Object> records = fetchAllRecords(
+        List<Object> records = getAllRecords(
             triggerContext, inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID),
             editorEnvironment, "filterByFormula", filterByFormula);
 
