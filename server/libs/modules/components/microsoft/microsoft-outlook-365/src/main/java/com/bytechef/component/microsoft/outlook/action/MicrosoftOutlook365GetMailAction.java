@@ -69,7 +69,7 @@ public class MicrosoftOutlook365GetMailAction {
         Format format = inputParameters.getRequired(FORMAT, Format.class);
 
         if (format.equals(SIMPLE)) {
-            return createSimpleMessage(context, messageBody, id);
+            return createSimpleMessage(context, messageBody);
         } else {
             return messageBody;
         }
