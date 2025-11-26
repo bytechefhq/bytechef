@@ -17,7 +17,7 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.google.commons.GoogleUtils.fetchAllFiles;
+import static com.bytechef.google.commons.GoogleUtils.getAllFiles;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
@@ -101,6 +101,6 @@ public class GoogleDriveUtils {
         String query = "mimeType %s '%s' and trashed = false and parents in '%s'".formatted(
             operator, APPLICATION_VND_GOOGLE_APPS_FOLDER, folderId);
 
-        return fetchAllFiles(connectionParameters, query);
+        return getAllFiles(connectionParameters, query);
     }
 }
