@@ -29,7 +29,7 @@ import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tip
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -45,6 +45,7 @@ interface PropertyMentionsInputEditorProps {
     controlType?: string;
     dataPills: DataPillType[];
     elementId?: string;
+    labelId?: string;
     isFormulaMode?: boolean;
     path?: string;
     onChange?: (value: string) => void;
@@ -66,6 +67,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             dataPills,
             elementId,
             isFormulaMode,
+            labelId,
             onChange,
             onFocus,
             path,
@@ -81,6 +83,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
+
+        // Saving coordination to avoid parallel saves (which can cause optimistic lock exceptions)
+        const lastSavedRef = useRef<string | number | null | undefined>(undefined);
+        const savingRef = useRef<Promise<void> | null>(null);
+        const pendingValueRef = useRef<string | number | null | undefined>(undefined);
 
         const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
@@ -155,6 +162,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             return;
                         }
 
+                        const workflowId = workflow.id as string;
+
                         saveProperty({
                             includeInMetadata: true,
                             path,
@@ -162,7 +171,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             updateClusterElementParameterMutation,
                             updateWorkflowNodeParameterMutation,
                             value: null,
-                            workflowId: workflow.id,
+                            workflowId,
                         });
                     },
                     setIsFormulaMode: setIsFormulaMode || (() => {}),
@@ -243,38 +252,84 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            let value = editorValue;
+            // Capture workflowId to preserve the non-undefined type through closures
+            const workflowId = workflow.id as string;
+
+            // Normalize and transform the incoming value similar to the previous logic
+            let transformed: string | number | null = editorValue;
 
             if (
                 !isFormulaMode &&
                 (type === 'INTEGER' || type === 'NUMBER') &&
-                typeof value === 'string' &&
-                !value.startsWith('${')
+                typeof transformed === 'string' &&
+                !transformed.startsWith('${')
             ) {
-                value = parseInt(value);
+                transformed = parseInt(transformed);
             }
 
-            if (typeof value === 'string') {
+            if (typeof transformed === 'string') {
                 if (controlType !== 'RICH_TEXT') {
-                    value = decode(sanitizeHtml(value, {allowedTags: []}));
+                    transformed = decode(sanitizeHtml(transformed, {allowedTags: []}));
                 }
 
-                value = transformValueForObjectAccess(value);
+                transformed = transformValueForObjectAccess(transformed);
 
-                if (isFormulaMode && !value.startsWith('=')) {
-                    value = `=${value}`;
+                if (isFormulaMode && !transformed.startsWith('=')) {
+                    transformed = `=${transformed}`;
                 }
             }
 
-            saveProperty({
-                includeInMetadata: true,
-                path,
-                type,
-                updateClusterElementParameterMutation,
-                updateWorkflowNodeParameterMutation,
-                value: value || null,
-                workflowId: workflow.id,
-            });
+            // Keep original semantics for empty values (may turn 0 into null as before)
+            const normalized: string | number | null = transformed ? transformed : null;
+
+            // Drop if it's already saved or already queued
+            if (normalized === lastSavedRef.current || normalized === pendingValueRef.current) {
+                return;
+            }
+
+            // Enqueue the latest value
+            pendingValueRef.current = normalized;
+
+            // If nothing is currently saving, start the save loop
+            if (!savingRef.current) {
+                const run = () => {
+                    const toSave = pendingValueRef.current;
+                    // clear pending slot before sending
+                    pendingValueRef.current = undefined;
+
+                    if (toSave === undefined) {
+                        savingRef.current = null;
+                        return;
+                    }
+
+                    savingRef.current = Promise.resolve(
+                        saveProperty({
+                            includeInMetadata: true,
+                            path,
+                            type,
+                            updateClusterElementParameterMutation,
+                            updateWorkflowNodeParameterMutation,
+                            value: toSave,
+                            workflowId,
+                        })
+                    )
+                        .then(() => {
+                            lastSavedRef.current = toSave;
+                        })
+                        .catch(() => {
+                            // Swallow errors here; upstream UI may already handle them.
+                        })
+                        .finally(() => {
+                            savingRef.current = null;
+                            // If a newer value was enqueued while we were saving, process it next
+                            if (pendingValueRef.current !== undefined) {
+                                run();
+                            }
+                        });
+                };
+
+                run();
+            }
         }, 600);
 
         const onUpdate = useCallback(
@@ -305,8 +360,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     });
                 }
 
-                if (value !== editorValue) {
+                const valueChanged = value !== editorValue;
+
+                if (valueChanged) {
                     setEditorValue(value);
+                    saveMentionInputValue(value);
                 }
 
                 if (onChange) {
@@ -316,8 +374,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 const propertyMentions = value.match(/property-mention/g);
 
                 setMentionOccurences(propertyMentions?.length || 0);
-
-                saveMentionInputValue(value);
             },
             [editorValue, onChange, saveMentionInputValue]
         );
@@ -373,6 +429,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             editorProps: {
                 attributes: {
+                    ...(labelId ? {'aria-labelledby': labelId} : {}),
+                    'aria-multiline': 'true',
                     class: twMerge(
                         'text-sm outline-none max-w-full border-none ring-0 break-words whitespace-pre-wrap w-full min-w-0 break-all',
                         controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
@@ -380,6 +438,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ),
                     id: elementId ?? '',
                     path: path ?? '',
+                    role: 'textbox',
                     type: type ?? '',
                 },
                 handleClick: (view, pos) => moveCursorToEnd(view, pos),
@@ -494,7 +553,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             <>
                 <EditorContent
                     editor={editor}
-                    id={elementId}
                     onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
                     value={editorValue}
                 />
