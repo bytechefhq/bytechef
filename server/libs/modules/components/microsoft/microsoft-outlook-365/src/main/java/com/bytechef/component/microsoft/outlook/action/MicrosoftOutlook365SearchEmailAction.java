@@ -17,16 +17,17 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createSimpleMessage;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -35,7 +36,9 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,7 @@ public class MicrosoftOutlook365SearchEmailAction {
         .title("Search Email")
         .description("Get the messages in the signed-in user's mailbox")
         .properties(
+            FORMAT_PROPERTY,
             string(FROM)
                 .label("From")
                 .description("The address sending the mail")
@@ -67,14 +71,14 @@ public class MicrosoftOutlook365SearchEmailAction {
                 .description("Messages in a certain category")
                 .options((OptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCategoryOptions)
                 .required(false))
-        .output(outputSchema(array().items(FULL_MESSAGE_OUTPUT_PROPERTY)))
+        .output(MicrosoftOutlook365Utils::getArrayMessageOutput)
         .perform(MicrosoftOutlook365SearchEmailAction::perform)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftOutlook365SearchEmailAction() {
     }
 
-    public static List<Map<?, ?>> perform(
+    public static List<?> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -102,7 +106,19 @@ public class MicrosoftOutlook365SearchEmailAction {
 
         emails.addAll(getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context));
 
-        return emails;
+        Format format = inputParameters.getRequired(FORMAT, Format.class);
+
+        if (format.equals(SIMPLE)) {
+            List<MicrosoftOutlook365Utils.SimpleMessage> simpleMessages = new ArrayList<>();
+
+            for (Map<?, ?> email : emails) {
+                simpleMessages.add(createSimpleMessage(context, email));
+            }
+
+            return simpleMessages;
+        } else {
+            return emails;
+        }
     }
 
     private static void addParameter(StringBuilder stringBuilder, String parameterName, String parameterValue) {
