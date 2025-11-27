@@ -119,7 +119,6 @@ public class NotionUtils {
         Context context) {
 
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
-
         String databaseId = inputParameters.getRequiredString(ID);
 
         Map<String, ?> body = getDatabase(databaseId, context);
