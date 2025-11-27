@@ -277,7 +277,7 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGePageOrDatabaseIdOptions() throws Exception {
+    void testGetPageOrDatabaseIdOptions() throws Exception {
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
                 ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
@@ -311,7 +311,7 @@ class NotionUtilsTest {
                                     "title", List.of(Map.of(TEXT, Map.of(CONTENT, "cde")))))))));
 
         List<? extends Option<String>> options = NotionUtils
-            .gePageOrDatabaseIdOptions(true)
+            .getPageOrDatabaseIdOptions(true)
             .apply(null, null, null, null, mockedActionContext);
 
         assertEquals(List.of(option("abc", "123"), option("cde", "345")), options);

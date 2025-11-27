@@ -42,7 +42,7 @@ public class NotionGetDatabaseAction {
             string(ID)
                 .label("Database ID")
                 .description("The ID of the database to retrieve.")
-                .options(NotionUtils.gePageOrDatabaseIdOptions(false))
+                .options(NotionUtils.getPageOrDatabaseIdOptions(false))
                 .required(true))
         .output(
             outputSchema(

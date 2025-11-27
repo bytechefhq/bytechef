@@ -44,7 +44,7 @@ public class NotionCreateDatabaseItemAction {
             string(ID)
                 .label("Database ID")
                 .description("The ID of the database.")
-                .options(NotionUtils.gePageOrDatabaseIdOptions(false))
+                .options(NotionUtils.getPageOrDatabaseIdOptions(false))
                 .required(true),
             dynamicProperties(FIELDS)
                 .properties((PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)
