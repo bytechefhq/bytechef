@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -129,7 +129,7 @@
         "maxLength": null,
         "metadata": { },
         "minLength": null,
-        "name": "connection-string",
+        "name": "connectionString",
         "options": null,
         "optionsDataSource": null,
         "optionsLoadedDynamically": null,
