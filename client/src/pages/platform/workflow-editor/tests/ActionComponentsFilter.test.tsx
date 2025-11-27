@@ -92,13 +92,13 @@ it('should open the dropdown and show the list of categories, but have the "Dese
 it('should call "toggleCategory" with correct category name on click', async () => {
     renderActionComponentsFilter();
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    await userEvent.click(screen.getByLabelText('Filter actions'));
 
-    await waitFor(() => {
-        userEvent.click(screen.getByText('Category1'));
+    const category = await screen.findByText('Category1');
 
-        expect(mockToggleCategory).toHaveBeenCalledWith('Category1');
-    });
+    await userEvent.click(category);
+
+    expect(mockToggleCategory).toHaveBeenCalledWith('Category1');
 });
 
 it('should call "setSearchValue" with correct value when the search input value changes', async () => {
@@ -182,13 +182,11 @@ it('should call "deselectAllCategories" when "Deselect" button is clicked', asyn
         selectedCategories: ['Category1'],
     });
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    await userEvent.click(screen.getByLabelText('Filter actions'));
 
-    await waitFor(() => {
-        expect(screen.getByLabelText('Deselect button')).not.toHaveClass('hidden');
+    const deselect = await screen.findByLabelText('Deselect button');
 
-        userEvent.click(screen.getByLabelText('Deselect button'));
+    await userEvent.click(deselect);
 
-        expect(mockDeselectAllCategories).toHaveBeenCalled();
-    });
+    expect(mockDeselectAllCategories).toHaveBeenCalled();
 });
