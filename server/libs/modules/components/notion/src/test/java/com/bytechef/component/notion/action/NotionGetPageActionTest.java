@@ -16,10 +16,7 @@
 
 package com.bytechef.component.notion.action;
 
-import static com.bytechef.component.notion.constant.NotionConstants.CONTENT;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
-import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
-import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -34,7 +31,6 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,19 +38,18 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  */
-class NotionCreatePageActionTest {
+class NotionGetPageActionTest {
 
     private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
         forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
         forClass(ContextFunction.class);
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "123", TITLE, "test"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "123"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -66,9 +61,7 @@ class NotionCreatePageActionTest {
 
                 return value.apply(mockedHttp);
             });
-        when(mockedHttp.post(stringArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -77,7 +70,7 @@ class NotionCreatePageActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = NotionCreatePageAction.perform(mockedParameters, null, mockedContext);
+        Object result = NotionGetPageAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
@@ -92,15 +85,6 @@ class NotionCreatePageActionTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/pages", stringArgumentCaptor.getValue());
-
-        Map<String, Object> expectedBody = Map.of(
-            "parent", Map.of("page_id", "123"),
-            "properties",
-            Map.of(
-                TITLE, Map.of(
-                    TITLE, List.of(Map.of(TEXT, Map.of(CONTENT, "test"))))));
-
-        assertEquals(Http.Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals("/pages/123", stringArgumentCaptor.getValue());
     }
 }
