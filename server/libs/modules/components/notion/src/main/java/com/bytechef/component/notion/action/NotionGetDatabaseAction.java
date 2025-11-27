@@ -23,12 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
+import static com.bytechef.component.notion.util.NotionUtils.getDatabase;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.notion.util.NotionUtils;
 
 /**
@@ -100,9 +99,6 @@ public class NotionGetDatabaseAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.get("/databases/%s".formatted(inputParameters.getRequiredString(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return getDatabase(inputParameters.getRequiredString(ID), context);
     }
 }
