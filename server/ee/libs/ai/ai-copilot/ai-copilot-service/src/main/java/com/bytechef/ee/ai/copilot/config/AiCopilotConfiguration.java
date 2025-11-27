@@ -16,6 +16,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.ee.ai.copilot.model.SafeStreamingChatModel;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -106,7 +107,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
     AnthropicApi anthropicApi() {
         return AnthropicApi.builder()
             .apiKey(anthropicApiKey)
@@ -115,16 +116,19 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
     AnthropicChatModel anthropicChatModel() {
-        return AnthropicChatModel.builder()
+        AnthropicChatModel anthropicChatModel = AnthropicChatModel.builder()
             .anthropicApi(anthropicApi())
             .defaultOptions(
                 AnthropicChatOptions.builder()
                     .model(anthropicModel)
                     .temperature(anthropicTemperature)
+                    .maxTokens(64000)
                     .build())
             .build();
+
+        return anthropicChatModel;//new SafeStreamingChatModel(anthropicChatModel);
     }
 
     @Bean
@@ -148,7 +152,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
     OpenAiApi openAiApi() {
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
@@ -157,7 +161,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
     OpenAiChatModel openAiChatModel() {
         return OpenAiChatModel.builder()
             .openAiApi(openAiApi())

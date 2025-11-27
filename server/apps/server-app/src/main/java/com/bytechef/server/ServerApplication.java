@@ -23,7 +23,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Ivica Cardic
  */
-@SpringBootApplication(scanBasePackages = "com.bytechef")
+@SpringBootApplication(
+    scanBasePackages = "com.bytechef",
+    exclude = {
+        org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration.class,
+        org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration.class
+    }
+)
 public class ServerApplication extends AbstractApplication {
 
     /**
