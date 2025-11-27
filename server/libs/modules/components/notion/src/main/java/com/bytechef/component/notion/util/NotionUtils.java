@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.notion.constant.NotionConstants.CONTENT;
@@ -50,7 +49,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.notion.constant.NotionConstants;
 import com.bytechef.component.notion.constant.NotionPropertyType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,39 +159,49 @@ public class NotionUtils {
 
     public static OptionsFunction<String> gePageOrDatabaseIdOptions(boolean isPage) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            String objectType = isPage ? "page" : "database";
-
-            Map<String, Object> body = context
-                .http(http -> http.post("/search"))
-                .body(Http.Body.of("filter", Map.of("property", "object", "value", objectType)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
-
             List<Option<String>> options = new ArrayList<>();
 
-            Object resultsObject = body.get("results");
+            String objectType = isPage ? "page" : "database";
 
-            if (isPage) {
-                if (resultsObject instanceof List<?> results) {
-                    for (Object result : results) {
-                        if (result instanceof Map<?, ?> resultMap &&
-                            resultMap.get("properties") instanceof Map<?, ?> properties &&
-                            properties.get(TITLE) instanceof Map<?, ?> title) {
+            String startCursor = null;
 
-                            options.add(getOption((String) resultMap.get(ID), title));
+            do {
+                Map<String, Object> body = context
+                    .http(http -> http.post("/search"))
+                    .body(
+                        Http.Body.of(
+                            "filter", Map.of("property", "object", "value", objectType),
+                            "page_size", 100,
+                            "start_cursor", startCursor))
+                    .configuration(Http.responseType(Http.ResponseType.JSON))
+                    .execute()
+                    .getBody(new TypeReference<>() {});
+
+                Object resultsObject = body.get("results");
+
+                if (isPage) {
+                    if (resultsObject instanceof List<?> results) {
+                        for (Object result : results) {
+                            if (result instanceof Map<?, ?> resultMap &&
+                                resultMap.get("properties") instanceof Map<?, ?> properties &&
+                                properties.get(TITLE) instanceof Map<?, ?> title) {
+
+                                options.add(getOption((String) resultMap.get(ID), title));
+                            }
+                        }
+                    }
+                } else {
+                    if (resultsObject instanceof List<?> results) {
+                        for (Object object : results) {
+                            if (object instanceof Map<?, ?> map) {
+                                options.add(getOption((String) map.get(ID), map));
+                            }
                         }
                     }
                 }
-            } else {
-                if (resultsObject instanceof List<?> results) {
-                    for (Object object : results) {
-                        if (object instanceof Map<?, ?> map) {
-                            options.add(getOption((String) map.get(ID), map));
-                        }
-                    }
-                }
-            }
+
+                startCursor = (String) body.get("next_cursor");
+            } while (startCursor != null);
 
             return options;
         };
@@ -223,7 +231,7 @@ public class NotionUtils {
                 Object value = property.getValue();
 
                 if (value instanceof Map<?, ?> map) {
-                    columnIdTypeMap.put(propertyName, (String) map.get(NotionConstants.TYPE));
+                    columnIdTypeMap.put(propertyName, (String) map.get(TYPE));
                 }
             }
         }
