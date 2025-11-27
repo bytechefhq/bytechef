@@ -461,9 +461,8 @@ const WorkflowNodeDetailsPanel = ({
             );
         }
 
-        if (currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot && mainClusterRootTask.clusterElements) {
+        if (currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot) {
             const connections: ComponentConnection[] = [];
-            const clusterElements = mainClusterRootTask.clusterElements;
 
             const extractConnection = (
                 elementData: {name?: string},
@@ -483,44 +482,66 @@ const WorkflowNodeDetailsPanel = ({
                 };
             };
 
-            const extractConnectionsRecursively = (element: unknown): void => {
-                if (!element || typeof element !== 'object') {
-                    return;
-                }
+            if (mainClusterRootTask.type && mainClusterRootTask.name) {
+                const typeParts = mainClusterRootTask.type.split('/');
+                const componentName = typeParts[0];
+                const componentVersion = parseInt(typeParts[1]?.replace('v', '') || '1');
 
-                if (Array.isArray(element)) {
-                    element.forEach((item) => extractConnectionsRecursively(item));
-                    return;
-                }
+                if (currentComponentDefinition?.connection) {
+                    const mainConnection = {
+                        componentName,
+                        componentVersion,
+                        key: componentName,
+                        required: currentComponentDefinition.connectionRequired || false,
+                        workflowNodeName: mainClusterRootTask.name,
+                    };
 
-                const elementObj = element as {
-                    clusterElements?: unknown;
-                    name?: string;
-                    type?: string;
+                    connections.push(mainConnection);
+                }
+            }
+
+            if (mainClusterRootTask.clusterElements) {
+                const clusterElements = mainClusterRootTask.clusterElements;
+
+                const extractConnectionsRecursively = (element: unknown): void => {
+                    if (!element || typeof element !== 'object') {
+                        return;
+                    }
+
+                    if (Array.isArray(element)) {
+                        element.forEach((item) => extractConnectionsRecursively(item));
+                        return;
+                    }
+
+                    const elementObj = element as {
+                        clusterElements?: unknown;
+                        name?: string;
+                        type?: string;
+                    };
+
+                    if (elementObj.type && elementObj.name) {
+                        const typeParts = elementObj.type.split('/');
+                        const componentName = typeParts[0];
+                        const componentVersion = parseInt(typeParts[1]?.replace('v', '') || '1');
+
+                        const connection = extractConnection(elementObj, componentName, componentVersion);
+                        if (connection) {
+                            connections.push(connection);
+                        }
+                    }
+
+                    if (elementObj.clusterElements) {
+                        const nestedElements = elementObj.clusterElements as Record<string, unknown>;
+                        Object.values(nestedElements).forEach((nestedElement) => {
+                            extractConnectionsRecursively(nestedElement);
+                        });
+                    }
                 };
 
-                if (elementObj.type && elementObj.name) {
-                    const typeParts = elementObj.type.split('/');
-                    const componentName = typeParts[0];
-                    const componentVersion = parseInt(typeParts[1]?.replace('v', '') || '1');
-
-                    const connection = extractConnection(elementObj, componentName, componentVersion);
-                    if (connection) {
-                        connections.push(connection);
-                    }
-                }
-
-                if (elementObj.clusterElements) {
-                    const nestedElements = elementObj.clusterElements as Record<string, unknown>;
-                    Object.values(nestedElements).forEach((nestedElement) => {
-                        extractConnectionsRecursively(nestedElement);
-                    });
-                }
-            };
-
-            Object.values(clusterElements).forEach((element) => {
-                extractConnectionsRecursively(element);
-            });
+                Object.values(clusterElements).forEach((element) => {
+                    extractConnectionsRecursively(element);
+                });
+            }
 
             return connections.length > 0 ? connections : undefined;
         }
@@ -533,6 +554,8 @@ const WorkflowNodeDetailsPanel = ({
         currentNode?.workflowNodeName,
         rootClusterElementNodeData?.workflowNodeName,
         workflow.tasks,
+        currentComponentDefinition?.connection,
+        currentComponentDefinition?.connectionRequired,
     ]);
 
     const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(() => {
