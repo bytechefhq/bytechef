@@ -1,8 +1,7 @@
 import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {ComponentDefinition,ComponentDefinitionApi,ComponentDefinitionBasic,TaskDispatcherDefinition,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinition,ComponentDefinitionApi,ComponentDefinitionBasic,TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
