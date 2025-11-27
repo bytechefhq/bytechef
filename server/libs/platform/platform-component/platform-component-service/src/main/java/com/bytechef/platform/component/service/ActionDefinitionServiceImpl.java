@@ -81,8 +81,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return propertiesFunction
                 .apply(
                     convertResult.inputParameters, convertResult.connectionParameters,
-                    convertResult.lookupDependsOnPathsMap,
-                    context)
+                    convertResult.lookupDependsOnPathsMap, context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();

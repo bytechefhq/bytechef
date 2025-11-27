@@ -19,9 +19,9 @@ package com.bytechef.component.google.forms.trigger;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.trigger.GoogleFormsNewResponseTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -29,12 +29,13 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Monika Kušter
@@ -47,26 +48,33 @@ class GoogleFormsNewResponseTriggerTest {
 
     @Test
     void testPoll() {
-        LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        Instant startDate = Instant.parse("2000-01-01T01:01:01Z");
+        Instant endDate = Instant.parse("2024-01-02T00:00:00Z");
 
-        Parameters mockedParameters =
-            MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate, FORM_ID, "formId"));
+        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+        Parameters mockedInputParameters = MockParametersFactory.create(Map.of(FORM_ID, "123"));
 
-        try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class)) {
-            List<Map<String, String>> responseList = List.of(Map.of("id", "abc"));
+        List<Map<String, String>> responseList = List.of(Map.of("id", "abc"));
 
-            googleFormsUtilsMockedStatic.when(() -> GoogleFormsUtils.getCustomResponses(
-                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+        try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class);
+            MockedStatic<Instant> instantMockedStatic = mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
+
+            instantMockedStatic.when(Instant::now)
+                .thenReturn(endDate);
+
+            googleFormsUtilsMockedStatic.when(() -> GoogleFormsUtils
+                .getCustomResponses(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(responseList);
+            when(mockedTriggerContext.isEditorEnvironment())
+                .thenReturn(false);
 
             PollOutput pollOutput = GoogleFormsNewResponseTrigger.poll(
-                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
+                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
 
-            assertEquals(responseList, pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
-
+            assertEquals(new PollOutput(responseList, Map.of(LAST_TIME_CHECKED, endDate), false), pollOutput);
             assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of("formId", "2000-01-01T01:01:01.000Z"), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("123", "2000-01-01T01:01:01Z"), stringArgumentCaptor.getAllValues());
         }
     }
 }

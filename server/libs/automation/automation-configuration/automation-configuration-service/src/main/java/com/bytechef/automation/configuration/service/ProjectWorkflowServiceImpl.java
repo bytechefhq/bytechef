@@ -184,6 +184,6 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         curProjectWorkflow.setWorkflowId(projectWorkflow.getWorkflowId());
         curProjectWorkflow.setUuid(projectWorkflow.getUuidAsString());
 
-        return projectWorkflowRepository.save(projectWorkflow);
+        return projectWorkflowRepository.save(curProjectWorkflow);
     }
 }

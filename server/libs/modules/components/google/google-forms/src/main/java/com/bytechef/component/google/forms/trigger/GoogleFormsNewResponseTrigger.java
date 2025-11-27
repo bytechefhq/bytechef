@@ -28,8 +28,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.google.commons.GoogleUtils;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +40,6 @@ import java.util.Map;
 public class GoogleFormsNewResponseTrigger {
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newResponse")
         .title("New Response")
@@ -65,16 +62,16 @@ public class GoogleFormsNewResponseTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        ZoneId zoneId = ZoneId.systemDefault();
+        Instant now = Instant.now();
 
-        LocalDateTime now = LocalDateTime.now(zoneId);
+        Instant start = closureParameters.get(
+            LAST_TIME_CHECKED, Instant.class,
+            triggerContext.isEditorEnvironment() ? now.minus(Duration.ofHours(3)) : now);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
+        String timestamp = DateTimeFormatter.ISO_INSTANT.format(start);
 
         List<Map<String, Object>> customResponses = getCustomResponses(
-            triggerContext, inputParameters.getRequiredString(FORM_ID),
-            startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)));
+            triggerContext, inputParameters.getRequiredString(FORM_ID), timestamp);
 
         return new PollOutput(customResponses, Map.of(LAST_TIME_CHECKED, now), false);
     }

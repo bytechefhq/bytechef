@@ -16,37 +16,101 @@
 
 package com.bytechef.component.google.tasks.action;
 
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.MAX_RESULTS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.SHOW_COMPLETED;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
-class GoogleTasksListTasksActionTest extends AbstractGoogleTasksActionTest {
+class GoogleTasksListTasksActionTest {
 
+    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(Configuration.ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(TITLE, "test", SHOW_COMPLETED, true));
-    private final ArgumentCaptor<String> queryKeyCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Object> queryValueCaptor = ArgumentCaptor.forClass(Object.class);
+        Map.of(LIST_ID, "id-1", TITLE, "test", SHOW_COMPLETED, true));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Object[]> objectArgumentCapture = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedExecutor.queryParameters(queryKeyCaptor.capture(), queryValueCaptor.capture()))
+    @SuppressWarnings("unchecked")
+    void testPerform() throws Exception {
+        Optional<PerformFunction> performFunction = GoogleTasksListTasksAction.ACTION_DEFINITION.getPerform();
+
+        assertTrue(performFunction.isPresent());
+
+        SingleConnectionPerformFunction singleConnectionPerformFunction =
+            (SingleConnectionPerformFunction) performFunction.get();
+
+        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectArgumentCapture.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("items", List.of(Map.of("id", "1"))));
 
-        Object result = GoogleTasksListTasksAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(List.of(Map.of("id", "1")), result);
 
-        assertEquals(SHOW_COMPLETED, queryKeyCaptor.getValue());
-        assertEquals(true, queryValueCaptor.getValue());
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+
+        assertEquals("https://tasks.googleapis.com/tasks/v1/lists/id-1/tasks", stringArgumentCaptor.getValue());
+
+        Object[] objects = {
+            PAGE_TOKEN, null, MAX_RESULTS, 100, SHOW_COMPLETED, true
+        };
+        assertArrayEquals(objects, objectArgumentCapture.getValue());
     }
 }

@@ -20,6 +20,7 @@ package com.bytechef.atlas.execution.domain;
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
@@ -32,7 +33,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,7 +41,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -123,8 +122,8 @@ public final class TaskExecution
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    @Transient
-    private Map<String, Object> metadata = new HashMap<>();
+    @Column
+    private MapWrapper metadata = new MapWrapper();
 
     @Column
     private int maxRetries;
@@ -285,7 +284,7 @@ public final class TaskExecution
     }
 
     public Map<String, ?> getMetadata() {
-        return Collections.unmodifiableMap(metadata);
+        return Collections.unmodifiableMap(metadata.getMap());
     }
 
     @JsonIgnore
@@ -419,7 +418,11 @@ public final class TaskExecution
     }
 
     public TaskExecution putMetadata(String key, Object value) {
-        metadata.put(key, value);
+        Map<String, Object> map = new java.util.HashMap<>(metadata.getMap());
+
+        map.put(key, value);
+
+        metadata = new MapWrapper(map);
 
         return this;
     }
@@ -456,9 +459,9 @@ public final class TaskExecution
 
     public void setMetadata(Map<String, ?> metadata) {
         if (metadata == null) {
-            this.metadata = new HashMap<>();
+            this.metadata = new MapWrapper();
         } else {
-            this.metadata = new HashMap<>(metadata);
+            this.metadata = new MapWrapper(metadata);
         }
     }
 

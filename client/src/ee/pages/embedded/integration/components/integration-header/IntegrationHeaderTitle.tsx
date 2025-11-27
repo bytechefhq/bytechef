@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
@@ -37,7 +37,7 @@ const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
             <h1>{integration?.name}</h1>
 
             {integration && (
-                <Badge className="flex space-x-1" variant="secondary">
+                <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
                     <span>V{integration.lastIntegrationVersion}</span>
 
                     <span>{integration.lastStatus}</span>

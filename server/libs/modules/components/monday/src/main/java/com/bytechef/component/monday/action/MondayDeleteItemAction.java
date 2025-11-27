@@ -41,13 +41,13 @@ public class MondayDeleteItemAction {
             string(WORKSPACE_ID)
                 .label("Workspace ID")
                 .options((OptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-                .required(true),
+                .required(false),
             string(BOARD_ID)
                 .label("Board ID")
                 .description("ID of the board where the item is located.")
                 .options((OptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
-                .required(true),
+                .required(false),
             string(ITEM_ID)
                 .label("Item ID")
                 .description("ID of the item to delete.")

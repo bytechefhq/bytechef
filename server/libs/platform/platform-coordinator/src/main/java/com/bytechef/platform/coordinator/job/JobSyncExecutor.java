@@ -67,8 +67,8 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
+import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -76,8 +76,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,10 +84,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 
 /**
@@ -99,7 +96,6 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
 
@@ -114,28 +110,28 @@ public class JobSyncExecutor {
     private final long timeout;
 
     public JobSyncExecutor(
-        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
-        int maxTaskExecutions, Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        TaskFileStorage taskFileStorage, long timeout, WorkflowService workflowService) {
+        ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
+        Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
+        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
+        long timeout, WorkflowService workflowService) {
 
         this(
-            contextService, environment, evaluator, jobService, maxTaskExecutions, memoryMessageBrokerSupplier,
-            List.of(), List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry,
+            contextService, evaluator, jobService, maxTaskExecutions, memoryMessageBrokerSupplier, List.of(), List.of(),
+            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
             taskFileStorage, timeout, workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
-        int maxTaskExecutions, Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
+        ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
+        Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, long timeout,
-        WorkflowService workflowService) {
+        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
+        long timeout, WorkflowService workflowService) {
 
         this.contextService = contextService;
 
@@ -162,10 +158,11 @@ public class JobSyncExecutor {
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         JobSyncAsyncTaskExecutor jobSyncAsyncTaskExecutor = new JobSyncAsyncTaskExecutor(
-            environment, maxTaskExecutions);
+            taskExecutor, maxTaskExecutions);
 
         TaskWorker taskWorker = new TaskWorker(
-            evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage);
+            evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage,
+            List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
 
         MemoryMessageBroker coordinatorMessageBroker = memoryMessageBrokerSupplier.get();
 
@@ -346,9 +343,9 @@ public class JobSyncExecutor {
 
         return taskExecutionService.fetchLastJobTaskExecution(jobId)
             .map(lastTaskExecution -> {
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(lastTaskExecution.getType());
+                Map<String, ?> metadata = lastTaskExecution.getMetadata();
 
-                if (WEBHOOK_COMPONENTS.contains(workflowNodeType.name())) {
+                if (metadata.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
                     job.setOutputs(
                         taskFileStorage.storeJobOutputs(
                             jobId,
@@ -482,34 +479,18 @@ public class JobSyncExecutor {
 
     private class JobSyncAsyncTaskExecutor implements AsyncTaskExecutor {
 
-        private final Executor executor;
         private final int maxTaskExecutions;
         private final Map<String, AtomicInteger> taskExecutionCounters = new ConcurrentHashMap<>();
+        private final TaskExecutor taskExecutor;
 
-        private JobSyncAsyncTaskExecutor(Environment environment, int maxTaskExecutions) {
+        private JobSyncAsyncTaskExecutor(TaskExecutor taskExecutor, int maxTaskExecutions) {
             this.maxTaskExecutions = maxTaskExecutions;
-            if (Threading.VIRTUAL.isActive(environment)) {
-                executor = Executors.newVirtualThreadPerTaskExecutor();
-            } else {
-                executor = Executors.newCachedThreadPool();
-            }
+            this.taskExecutor = taskExecutor;
         }
 
         @Override
         public void execute(Runnable task) {
-            String tenantId = TenantContext.getCurrentTenantId();
-
-            executor.execute(() -> {
-                String currentTenantId = TenantContext.getCurrentTenantId();
-
-                try {
-                    TenantContext.setCurrentTenantId(tenantId);
-
-                    task.run();
-                } finally {
-                    TenantContext.setCurrentTenantId(currentTenantId);
-                }
-            });
+            taskExecutor.execute(task);
         }
 
         private void incrementAndCheck(TaskExecutionEvent taskExecutionEvent) {

@@ -213,9 +213,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
+        Map<String, ?> extensions = evaluator.evaluate(workflowTask.getExtensions(), outputs);
+
         Object value = actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            null, inputParameters, connectionIds, Map.of(), true);
+            null, inputParameters, connectionIds, extensions, true);
 
         if (value == null) {
             return null;

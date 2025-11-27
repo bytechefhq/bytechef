@@ -77,6 +77,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -87,8 +88,9 @@ public class TestExecutorConfiguration {
     @Bean
     JobTestExecutor jobTestExecutor(
         CacheManager cacheManager, ComponentDefinitionService componentDefinitionService, Environment environment,
-        Evaluator evaluator, ObjectMapper objectMapper, TaskHandlerRegistry taskHandlerRegistry,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService, WorkflowService workflowService) {
+        Evaluator evaluator, ObjectMapper objectMapper, TaskExecutor taskExecutor,
+        TaskHandlerRegistry taskHandlerRegistry, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
@@ -105,7 +107,7 @@ public class TestExecutorConfiguration {
         return new JobTestExecutor(
             componentDefinitionService, contextService, evaluator, jobService,
             new JobSyncExecutor(
-                contextService, environment, evaluator, jobService, 1000, () -> asyncMessageBroker,
+                contextService, evaluator, jobService, 1000, () -> asyncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(
@@ -114,7 +116,7 @@ public class TestExecutorConfiguration {
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
     }
 

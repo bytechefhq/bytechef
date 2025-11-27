@@ -33,7 +33,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ class GoogleDriveUtilsTest {
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
+        Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, Instant.parse("2000-01-01T01:01:01Z")));
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -91,9 +91,9 @@ class GoogleDriveUtilsTest {
             List<String> strings = new ArrayList<>();
 
             strings.add(
-                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'");
+                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01Z'");
             strings.add("files(id, name, mimeType, webViewLink, kind)");
-            strings.add("createdTime asc");
+            strings.add("createdTime desc");
             strings.add(null);
 
             assertEquals(strings, stringArgumentCaptor.getAllValues());

@@ -43,46 +43,51 @@ public class GithubConstants {
     public static final String REPOSITORY = "repository";
     public static final String STATE = "state";
     public static final String TITLE = "title";
+    public static final String HEAD = "head";
+    public static final String HEAD_REPO = "head_repo";
+    public static final String BASE = "base";
+    public static final String DRAFT = "draft";
 
-    public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object().properties(
-        string("url")
-            .description("The URL linking directly to the issue on GitHub."),
-        string("repository_url")
-            .description("The URL of the repository where the issue is located."),
-        number(ID)
-            .description("ID of the issue."),
-        integer("number")
-            .description("A unique number identifying the issue within its repository."),
-        string(TITLE)
-            .description("The title or headline of the issue."),
-        string("state")
-            .description("The current state of the issue, such as open or closed."),
-        array(ASSIGNEES)
-            .description("A list of users assigned to the issue.")
-            .items(
-                object()
-                    .properties(
-                        string("login")
-                            .description("The username of the assignee."),
-                        string(ID)
-                            .description("ID of the assignee."),
-                        string("html_url")
-                            .description("The URL to the assignee's profile page."),
-                        string("type")
-                            .description("The type of user, e.g., User or Organization."))),
-        array(LABELS)
-            .description("A collection of labels associated with the issue.")
-            .items(
-                object()
-                    .properties(
-                        string(ID)
-                            .description("ID of the label."),
-                        string(NAME)
-                            .description("Name of the label"),
-                        string("description")
-                            .description("A brief description of the label's purpose."))),
-        string(BODY)
-            .description("The main content of the issue."));
+    public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
+        .properties(
+            string("url")
+                .description("The URL linking directly to the issue on GitHub."),
+            string("repository_url")
+                .description("The URL of the repository where the issue is located."),
+            number(ID)
+                .description("ID of the issue."),
+            integer("number")
+                .description("A unique number identifying the issue within its repository."),
+            string(TITLE)
+                .description("The title or headline of the issue."),
+            string("state")
+                .description("The current state of the issue, such as open or closed."),
+            array(ASSIGNEES)
+                .description("A list of users assigned to the issue.")
+                .items(
+                    object()
+                        .properties(
+                            string("login")
+                                .description("The username of the assignee."),
+                            string(ID)
+                                .description("ID of the assignee."),
+                            string("html_url")
+                                .description("The URL to the assignee's profile page."),
+                            string("type")
+                                .description("The type of user, e.g., User or Organization."))),
+            array(LABELS)
+                .description("A collection of labels associated with the issue.")
+                .items(
+                    object()
+                        .properties(
+                            string(ID)
+                                .description("ID of the label."),
+                            string(NAME)
+                                .description("Name of the label"),
+                            string("description")
+                                .description("A brief description of the label's purpose."))),
+            string(BODY)
+                .description("The main content of the issue."));
 
     public static final ModifiableStringProperty OWNER_PROPERTY = string(OWNER)
         .label("User/Organization")

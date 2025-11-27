@@ -80,16 +80,7 @@ publishing {
 
 repositories {
     mavenLocal()
-
     mavenCentral()
-
-    maven {
-        url = uri("https://repo.spring.io/release")
-    }
-
-    maven {
-        url = uri("https://repo.spring.io/artifactory/milestone/")
-    }
 }
 
 spotbugs {
@@ -185,13 +176,21 @@ spotless {
         endWithNewline()
     }
     yaml {
-        target("cli/**/src/**/*.yaml", "server/**/src/**/*.yaml")
+        target(
+            // All YAML files under standard source/resource directories
+            "src/**/*.yaml"
+        )
 
+        // Pretty-print YAML using Jackson
         jackson()
     }
     json {
-        target("cli/**/src/**/*.json", "server/**/src/**/*.json")
+        target(
+            // All JSON files under standard source/resource directories
+            "src/**/*.json"
+        )
 
+        // Pretty-print JSON using Jackson
         jackson()
     }
 }

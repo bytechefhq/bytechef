@@ -28,11 +28,13 @@ import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
+import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.event.MessageEvent;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -81,16 +83,20 @@ public class TaskWorker {
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
     private final TaskFileStorage taskFileStorage;
+    private final List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors;
 
+    @SuppressFBWarnings("EI")
     public TaskWorker(
         Evaluator evaluator, ApplicationEventPublisher eventPublisher, AsyncTaskExecutor taskExecutor,
-        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
+        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage,
+        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
 
         this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.taskExecutor = taskExecutor;
         this.taskHandlerResolver = taskHandlerResolver;
         this.taskFileStorage = taskFileStorage;
+        this.taskExecutionPostOutputProcessors = taskExecutionPostOutputProcessors;
     }
 
     /**
@@ -194,6 +200,10 @@ public class TaskWorker {
             Object output = taskHandler.handle(taskExecution.clone());
 
             if (output != null) {
+                for (TaskExecutionPostOutputProcessor taskExecutionPostOutputProcessor : taskExecutionPostOutputProcessors) {
+                    output = taskExecutionPostOutputProcessor.process(taskExecution, output);
+                }
+
                 taskExecution.setOutput(
                     taskFileStorage.storeTaskExecutionOutput(Validate.notNull(taskExecution.getId(), "id"), output));
             }

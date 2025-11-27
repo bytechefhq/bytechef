@@ -18,26 +18,27 @@ package com.bytechef.component.airtable.trigger;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
+import static com.bytechef.component.airtable.util.AirtableUtils.getAllRecords;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Ivica Cardic
+ * @author Monika Kušter
+ */
 public class AirtableNewRecordTrigger {
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
@@ -77,25 +78,18 @@ public class AirtableNewRecordTrigger {
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
+        boolean editorEnvironment = triggerContext.isEditorEnvironment();
         LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
+            LAST_TIME_CHECKED, editorEnvironment ? now.minusHours(3) : now);
 
-        String filterByFormula = URLEncoder.encode(
-            String.format(
-                "IS_AFTER({%s}, DATETIME_PARSE('%s', 'YYYY-MM-DD HH:mm:ss'))",
-                inputParameters.getRequiredString(TRIGGER_FIELD),
-                startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
-            StandardCharsets.UTF_8);
+        String filterByFormula = "IS_AFTER({%s}, DATETIME_PARSE('%s', 'YYYY-MM-DD HH:mm:ss'))".formatted(
+            inputParameters.getRequiredString(TRIGGER_FIELD),
+            startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        Http.Response response = triggerContext.http(http -> http.get(
-            String.format(
-                "/%s/%s", inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID))))
-            .queryParameter("filterByFormula", filterByFormula)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute();
+        List<Object> records = getAllRecords(
+            triggerContext, inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID),
+            editorEnvironment, "filterByFormula", filterByFormula);
 
-        Map<String, List<?>> body = response.getBody(new TypeReference<>() {});
-
-        return new PollOutput(body.get("records"), Map.of(LAST_TIME_CHECKED, now), false);
+        return new PollOutput(records, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }

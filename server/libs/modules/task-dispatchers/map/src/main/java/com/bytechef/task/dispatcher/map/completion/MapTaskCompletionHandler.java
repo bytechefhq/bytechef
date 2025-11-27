@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -117,11 +118,12 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecutionParentId);
 
-        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) mapTaskExecution.getParameters()
-            .get(ITERATEE))
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils
+            .getList(
+                mapTaskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         if (taskExecution.getTaskNumber() < iterateeWorkflowTasks.size()) {
             WorkflowTask iterationWorkflowTask = iterateeWorkflowTasks.get(taskExecution.getTaskNumber());

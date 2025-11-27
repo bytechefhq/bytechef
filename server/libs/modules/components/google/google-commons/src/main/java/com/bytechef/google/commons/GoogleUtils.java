@@ -75,7 +75,7 @@ public class GoogleUtils {
         }
     }
 
-    public static List<File> fetchAllFiles(Parameters connectionParameters, String query) {
+    public static List<File> getAllFiles(Parameters connectionParameters, String query) {
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
         List<File> files = new ArrayList<>();
@@ -101,7 +101,7 @@ public class GoogleUtils {
     }
 
     public static String getCalendarTimezone(Calendar calendar) {
-        List<Setting> settings = fetchAllCalendarSettings(calendar);
+        List<Setting> settings = getAllCalendarSettings(calendar);
 
         return settings.stream()
             .filter(setting -> Objects.equals(setting.getId(), "timezone"))
@@ -148,7 +148,7 @@ public class GoogleUtils {
         return new ProviderException(e);
     }
 
-    private static List<Setting> fetchAllCalendarSettings(Calendar calendar) {
+    private static List<Setting> getAllCalendarSettings(Calendar calendar) {
         List<Setting> allSettings = new ArrayList<>();
 
         String nextPageToken = null;
@@ -178,7 +178,7 @@ public class GoogleUtils {
         String operator = isEqualMimetype ? "=" : "!=";
         String query = String.format("mimeType %s '%s' and trashed = false", operator, mimeType);
 
-        List<File> files = fetchAllFiles(connectionParameters, query);
+        List<File> files = getAllFiles(connectionParameters, query);
 
         return files.stream()
             .map(folder -> option(folder.getName(), folder.getId()))

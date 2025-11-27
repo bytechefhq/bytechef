@@ -46,7 +46,7 @@ Name: sendChannelMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| guildId | Guild ID | STRING |  | true |
+| guildId | Guild ID | STRING |  | false |
 | channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | ID of the channel where to send the message. | true |
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
 | tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if this is a TTS message | false |
@@ -221,7 +221,7 @@ Name: sendDirectMessage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| guildId | Guild ID | STRING |  | true |
+| guildId | Guild ID | STRING |  | false |
 | recipient_id | Recipient | STRING <details> <summary> Depends On </summary> guildId </details> | The recipient to open a DM channel with. | true |
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
 | tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if this is a TTS message | false |

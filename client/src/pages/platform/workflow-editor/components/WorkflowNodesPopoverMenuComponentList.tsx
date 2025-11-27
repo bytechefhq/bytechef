@@ -204,8 +204,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         placeholder="Filter components"
                         value={filter}
                     />
-
-                    <CopilotButton parameters={{edgeId}} source={Source.WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU} />
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">

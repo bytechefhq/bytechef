@@ -41,7 +41,6 @@ import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -89,8 +88,12 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
         Map<String, ?> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
-            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
+            List<WorkflowTask> subWorkflowTasks = MapUtils
+                .getList(
+                    selectedCase, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
 
             if (subWorkflowTasks.isEmpty()) {
                 taskExecution.setStartDate(Instant.now());

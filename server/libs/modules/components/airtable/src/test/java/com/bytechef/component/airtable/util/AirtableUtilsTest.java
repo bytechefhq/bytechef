@@ -17,6 +17,7 @@
 package com.bytechef.component.airtable.util;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.OFFSET;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -25,7 +26,10 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,10 +37,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.airtable.util.AirtableUtils.AirtableChoice;
 import com.bytechef.component.airtable.util.AirtableUtils.AirtableField;
 import com.bytechef.component.airtable.util.AirtableUtils.AirtableOptions;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -46,38 +51,72 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
 class AirtableUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testGetBaseIdOptions() {
         Parameters parameters = MockParametersFactory.create(Map.of());
 
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("bases", List.of(Map.of("name", "abc", "id", "123"))));
 
-        List<Option<String>> result =
-            AirtableUtils.getBaseIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+        List<Option<String>> result = AirtableUtils.getBaseIdOptions(parameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("abc", "123")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/meta/bases", stringArgumentCaptor.getValue());
+
+        Object[] objects = {
+            OFFSET, null
+        };
+
+        assertArrayEquals(objects, objectsArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetFieldsProperties() throws Exception {
+    void testGetFieldsProperties() {
         Parameters parameters = MockParametersFactory.create(Map.of(BASE_ID, "123", TABLE_ID, "table123"));
 
         String fieldName = "filedName";
@@ -123,7 +162,7 @@ class AirtableUtilsTest {
                         new AirtableOptions(List.of(new AirtableChoice("123", "abc", ""))))),
                 "description", "type", List.of())));
 
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -135,7 +174,7 @@ class AirtableUtilsTest {
             .thenReturn(tablesMap);
 
         List<? extends ValueProperty<?>> result = AirtableUtils.getFieldsProperties(
-            parameters, parameters, Map.of(), mockedActionContext);
+            parameters, parameters, Map.of(), mockedContext);
 
         List<ModifiableObjectProperty> expectedProperties = List.of(object("fields")
             .label("Fields")
@@ -216,39 +255,93 @@ class AirtableUtilsTest {
 
     @Test
     void testGetRecordIdOptions() {
-        Parameters parameters = MockParametersFactory.create(Map.of(BASE_ID, "123"));
+        Parameters parameters = MockParametersFactory.create(Map.of(BASE_ID, "123", TABLE_ID, "testTable"));
 
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("records", List.of(Map.of("name", "abc", "id", "123"))));
+            .thenReturn(
+                Map.of("records", List.of(Map.of("id", "123")), OFFSET, "of1"),
+                Map.of("records", List.of(Map.of("id", "456"))));
 
-        List<Option<String>> result =
-            AirtableUtils.getRecordIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+        List<Option<String>> result = AirtableUtils.getRecordIdOptions(
+            parameters, null, null, null, mockedContext);
 
-        assertEquals(List.of(option("123", "123")), result);
+        assertEquals(List.of(option("123", "123"), option("456", "456")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/123/testTable", stringArgumentCaptor.getValue());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        Object[] objects = {
+            "pageSize", 100, OFFSET, null
+        };
+        Object[] objects2 = {
+            "pageSize", 100, OFFSET, "of1"
+        };
+
+        assertEquals(2, objectsArgumentCaptorAllValues.size());
+        assertArrayEquals(objects, objectsArgumentCaptorAllValues.getFirst());
+        assertArrayEquals(objects2, objectsArgumentCaptorAllValues.getLast());
     }
 
     @Test
     void testGetTableIdOptions() {
         Parameters parameters = MockParametersFactory.create(Map.of(BASE_ID, "123"));
 
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("tables", List.of(Map.of("name", "abc", "id", "123"))));
 
-        List<Option<String>> result =
-            AirtableUtils.getTableIdOptions(parameters, parameters, Map.of(), "", mockedContext);
+        List<Option<String>> result = AirtableUtils.getTableIdOptions(parameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("abc", "123")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/meta/bases/123/tables", stringArgumentCaptor.getValue());
     }
 }

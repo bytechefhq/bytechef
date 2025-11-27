@@ -24,6 +24,7 @@ import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
+import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
@@ -72,9 +73,11 @@ public class TaskWorkerConfiguration {
     @Bean
     TaskWorker taskWorker(
         Evaluator evaluator, ApplicationEventPublisher eventPublisher, Executor taskExecutor,
-        TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver) {
+        TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver,
+        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
 
         return new TaskWorker(
-            evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage);
+            evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver, taskFileStorage,
+            taskExecutionPostOutputProcessors);
     }
 }

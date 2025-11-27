@@ -31,9 +31,9 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,15 +97,11 @@ public class GoogleFormsUtils {
         String nextToken = null;
         String formId = inputParameters.getRequiredString(FORM_ID);
         do {
-            Http.Executor executor = context
+            Map<String, Object> response = context
                 .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
-                .configuration(Http.responseType(Http.ResponseType.JSON));
-
-            if (nextToken != null) {
-                executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
-            }
-
-            Map<String, Object> response = executor.execute()
+                .queryParameters(NEXT_PAGE_TOKEN, nextToken)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
                 .getBody(new TypeReference<>() {});
 
             nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
@@ -123,7 +119,6 @@ public class GoogleFormsUtils {
                     }
                 }
             }
-
         } while (nextToken != null);
 
         return formResponses;
@@ -134,37 +129,35 @@ public class GoogleFormsUtils {
         String nextToken = null;
 
         do {
-            Http.Executor executor = createHttpExecutor(formId, context, timestamp, nextToken);
+            List<Object> queryParameters = new ArrayList<>();
 
-            Map<String, Object> response = executor.execute()
+            queryParameters.add("pageSize");
+            queryParameters.add(5000);
+
+            if (nextToken != null) {
+                queryParameters.add(NEXT_PAGE_TOKEN);
+                queryParameters.add(nextToken);
+            }
+
+            if (timestamp != null) {
+                queryParameters.add("filter");
+                queryParameters.add("timestamp > " + timestamp);
+            }
+
+            Map<String, Object> response = context
+                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
+                .queryParameters(queryParameters.toArray())
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
                 .getBody(new TypeReference<>() {});
 
-            nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
-
             extractResponses(response, formResponses);
-
+            nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
         } while (nextToken != null);
 
-        return formResponses;
-    }
+        formResponses.sort(Comparator.comparing(map -> Instant.parse((String) map.get("createTime"))));
 
-    private static Http.Executor createHttpExecutor(
-        String formId, Context context, String timestamp, String nextToken) {
-
-        Http.Executor executor = context
-            .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
-            .configuration(Http.responseType(Http.ResponseType.JSON));
-
-        if (timestamp != null) {
-            String encode = URLEncoder.encode("timestamp > " + timestamp, StandardCharsets.UTF_8);
-            executor.queryParameter("filter", encode);
-        }
-
-        if (nextToken != null) {
-            executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
-        }
-
-        return executor;
+        return formResponses.reversed();
     }
 
     private static void extractResponses(Map<String, Object> response, List<Map<?, ?>> formResponses) {

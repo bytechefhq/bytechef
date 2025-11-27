@@ -330,6 +330,126 @@ Type: OBJECT
 ```
 
 
+### Create Pull Request
+Name: createPullRequest
+
+`Creates a new pull request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository where new pull request will be created. | true |
+| title | Title | STRING | Title of the new pull request. | false |
+| body | Body | STRING | The contents of the pull request. | false |
+| head | Head | STRING | The name of the branch where your changes are implemented. For cross-repository pull requests in the same network, namespace head with a user like this: username:branch. | true |
+| head_repo | Head Repo | STRING | The name of the repository where the changes in the pull request were made. This field is required for cross-repository pull requests if both repositories are owned by the same organization. | false |
+| base | Base | STRING | The name of the branch you want the changes pulled into. This should be an existing branch on the current repository. You cannot submit a pull request to one repository that requests a merge to a base of another repository. | true |
+| issue | Issue | INTEGER | An issue in the repository to convert to a pull request. The issue title, body, and comments will become the title, body, and comments on the new pull request. Required unless title is specified. | false |
+| draft | Draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the pull request is a draft. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Pull Request",
+  "name" : "createPullRequest",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "title" : "",
+    "body" : "",
+    "head" : "",
+    "head_repo" : "",
+    "base" : "",
+    "issue" : 1,
+    "draft" : false
+  },
+  "type" : "github/v1/createPullRequest"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL of the created pull request. |
+| id | INTEGER | ID of the created pull request. |
+| node_id | STRING |  |
+| html_url | STRING |  |
+| diff_url | STRING |  |
+| patch_url | STRING |  |
+| issue_url | STRING |  |
+| commits_url | STRING |  |
+| review_comment_url | STRING |  |
+| comments_url | STRING |  |
+| statuses_url | STRING |  |
+| number | INTEGER | Number uniquely identifying the pull request within its repository. |
+| state | STRING | The state of the pull request. Either open or closed. |
+| locked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| title | STRING | The title of the pull request. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)&#125; </details> | A GitHub user. |
+| body | STRING | The contents of the pull request. |
+| labels | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name), STRING\(description)&#125;] </details> |  |
+| comments | INTEGER | The number of comments on the pull request. |
+| review_comments | INTEGER | The number of comments for review on the pull request. |
+| maintainer_can_modify | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether maintainers can modify the pull request. |
+| commits | INTEGER | The number of commits in the pull request. |
+| additions | INTEGER | The number of additions in the pull request. |
+| deletions | INTEGER | The number of deletions in the pull request. |
+| changed_files | INTEGER | The number of changed files in the pull request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "id" : 1,
+  "node_id" : "",
+  "html_url" : "",
+  "diff_url" : "",
+  "patch_url" : "",
+  "issue_url" : "",
+  "commits_url" : "",
+  "review_comment_url" : "",
+  "comments_url" : "",
+  "statuses_url" : "",
+  "number" : 1,
+  "state" : "",
+  "locked" : false,
+  "title" : "",
+  "user" : {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  },
+  "body" : "",
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "comments" : 1,
+  "review_comments" : 1,
+  "maintainer_can_modify" : false,
+  "commits" : 1,
+  "additions" : 1,
+  "deletions" : 1,
+  "changed_files" : 1
+}
+```
+
+
 ### Get Issue
 Name: getIssue
 

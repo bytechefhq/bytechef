@@ -50,7 +50,7 @@ public class JiraCreateIssueCommentAction {
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
-                .required(true),
+                .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue where the comment will be added.")

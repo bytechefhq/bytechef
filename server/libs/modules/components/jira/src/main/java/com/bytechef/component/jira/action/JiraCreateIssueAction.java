@@ -82,7 +82,6 @@ public class JiraCreateIssueAction {
                 .label("Assignee ID")
                 .description("ID of the user who will be assigned to the issue.")
                 .options((OptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
-                .optionsLookupDependsOn(PROJECT)
                 .required(false),
             string(PRIORITY)
                 .label("Priority ID")

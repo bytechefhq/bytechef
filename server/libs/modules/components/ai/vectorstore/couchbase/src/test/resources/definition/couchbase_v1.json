@@ -228,7 +228,7 @@
       }, {
         "advancedOption": null,
         "controlType": "TEXT",
-        "defaultValue": "default",
+        "defaultValue": "_default",
         "description": "The name of the Couchbase scope, parent of the collection. Search queries will be executed in the scope context.",
         "displayCondition": null,
         "exampleValue": null,
@@ -250,7 +250,7 @@
       }, {
         "advancedOption": null,
         "controlType": "TEXT",
-        "defaultValue": "default",
+        "defaultValue": "_default",
         "description": "The name of the Couchbase collection to store the Documents.",
         "displayCondition": null,
         "exampleValue": null,
@@ -351,7 +351,7 @@
       }, {
         "advancedOption": null,
         "controlType": "SELECT",
-        "defaultValue": false,
+        "defaultValue": true,
         "description": "Whether to initialize the schema.",
         "displayCondition": null,
         "exampleValue": null,

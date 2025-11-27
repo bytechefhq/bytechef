@@ -48,9 +48,9 @@ Name: assignIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
 | issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue that will be assigned. | true |
-| accountId | Account ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the account user who will be assigned the issue. | true |
+| accountId | Account ID | STRING | ID of the account user who will be assigned the issue. | true |
 
 #### Example JSON Structure
 ```json
@@ -86,7 +86,7 @@ Name: createIssue
 | summary | Summary | STRING | A brief summary of the issue. | true |
 | issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | Id of the issue type. | true |
 | parent | Parent Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the parent issue. | true |
-| assignee | Assignee ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the user who will be assigned to the issue. | false |
+| assignee | Assignee ID | STRING | ID of the user who will be assigned to the issue. | false |
 | priority | Priority ID | STRING | ID of the priority of the issue. | false |
 | description | Description | STRING | Description of the issue. | false |
 
@@ -145,7 +145,7 @@ Name: createIssueComment
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
 | issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue where the comment will be added. | true |
 | comment | Comment | STRING | The text of the comment. | true |
 
@@ -224,7 +224,7 @@ Name: getIssue
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
 | issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> |  | true |
 
 #### Example JSON Structure
@@ -291,14 +291,13 @@ Type: OBJECT
 ### Search Issues
 Name: searchForIssuesUsingJql
 
-`Search for issues using JQL`
+`Search for issues using JQL.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| jql | JQL | STRING | The JQL that defines the search. If no JQL expression is provided, all issues are returned | false |
-| maxResults | Max Results | INTEGER | The maximum number of items to return per page. | true |
+| jql | JQL | STRING | The JQL that defines the search. If no JQL expression is provided, all issues are returned. | true |
 
 #### Example JSON Structure
 ```json
@@ -306,8 +305,7 @@ Name: searchForIssuesUsingJql
   "label" : "Search Issues",
   "name" : "searchForIssuesUsingJql",
   "parameters" : {
-    "jql" : "",
-    "maxResults" : 1
+    "jql" : ""
   },
   "type" : "jira/v1/searchForIssuesUsingJql"
 }
@@ -327,9 +325,6 @@ Items Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | STRING | The ID of the issue. |
-| key | STRING | The key of the issue. |
-| self | STRING | The URL of the issue details. |
-| fields | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(name)&#125;\(issuetype), &#123;STRING\(id), STRING\(name)&#125;\(project), &#123;STRING\(id), STRING\(name)&#125;\(priority), &#123;STRING\(accountId), STRING\(displayName)&#125;\(assignee), STRING\(summary)&#125; </details> |  |
 
 
 
@@ -338,28 +333,7 @@ Items Type: OBJECT
 #### Output Example
 ```json
 [ {
-  "id" : "",
-  "key" : "",
-  "self" : "",
-  "fields" : {
-    "issuetype" : {
-      "id" : "",
-      "name" : ""
-    },
-    "project" : {
-      "id" : "",
-      "name" : ""
-    },
-    "priority" : {
-      "id" : "",
-      "name" : ""
-    },
-    "assignee" : {
-      "accountId" : "",
-      "displayName" : ""
-    },
-    "summary" : ""
-  }
+  "id" : ""
 } ]
 ```
 

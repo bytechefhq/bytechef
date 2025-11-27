@@ -315,7 +315,11 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     }
 
     public void setMetadata(Map<String, ?> metadata) {
-        this.metadata = new MapWrapper(metadata);
+        if (metadata == null) {
+            this.metadata = new MapWrapper();
+        } else {
+            this.metadata = new MapWrapper(metadata);
+        }
     }
 
     public void setOutputs(FileEntry outputs) {

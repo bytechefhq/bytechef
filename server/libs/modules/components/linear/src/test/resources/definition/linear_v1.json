@@ -1934,7 +1934,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -4081,7 +4081,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,

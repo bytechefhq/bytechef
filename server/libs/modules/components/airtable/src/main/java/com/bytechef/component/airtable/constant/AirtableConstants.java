@@ -22,7 +22,7 @@ package com.bytechef.component.airtable.constant;
 public class AirtableConstants {
 
     public static final String BASE_ID = "baseId";
-    public static final String RECORD_ID = "recordId";
+    public static final String OFFSET = "offset";
     public static final String TABLE_ID = "tableId";
 
     private AirtableConstants() {

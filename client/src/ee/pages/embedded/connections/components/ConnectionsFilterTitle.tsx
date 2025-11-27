@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/ee/pages/embedded/connections/Connections';
 import {Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -34,9 +34,11 @@ const ConnectionsFilterTitle = ({
                 {searchParams.get('tagId') ? 'tag' : 'component'}:
             </span>
 
-            <Badge variant="secondary">
-                <span className="text-sm">{pageTitle ?? 'All Components'}</span>
-            </Badge>
+            <Badge
+                label={typeof pageTitle === 'string' ? pageTitle : 'All Components'}
+                styleType="secondary-filled"
+                weight="semibold"
+            />
         </div>
     );
 };

@@ -50,8 +50,7 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
                 propertiesRequest.propertyName, propertiesRequest.inputParameters,
-                propertiesRequest.lookupDependsOnPaths,
-                propertiesRequest.connectionId));
+                propertiesRequest.lookupDependsOnPaths, propertiesRequest.workflowId, propertiesRequest.connectionId));
     }
 
     @RequestMapping(

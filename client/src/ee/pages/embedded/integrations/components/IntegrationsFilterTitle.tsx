@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/ee/pages/embedded/integrations/Integrations';
 import {Category, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {ReactNode} from 'react';
@@ -27,9 +27,11 @@ const IntegrationsFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
 
-            <Badge variant="secondary">
-                <span className="text-sm">{pageTitle ?? 'All Categories'}</span>
-            </Badge>
+            <Badge
+                label={typeof pageTitle === 'string' ? pageTitle : 'All Categories'}
+                styleType="secondary-filled"
+                weight="semibold"
+            />
         </div>
     );
 };

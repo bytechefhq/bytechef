@@ -28,8 +28,10 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.figma.trigger.FigmaNewCommentTrigger;
 import com.google.auto.service.AutoService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -43,6 +45,11 @@ import javax.naming.ConfigurationException;
 public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
 
     @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(FigmaNewCommentTrigger.TRIGGER_DEFINITION);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
@@ -51,53 +58,55 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
     }
 
     @Override
-    public ModifiableConnectionDefinition
-        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://api.figma.com")
-            .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
-                .scopes((connection, context) -> List.of("file_comments:write", "files:read"))
-                .tokenUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/token")
-                .refreshUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/refresh")
-                .authorizationCallback((connectionParameters, code, redirectUri, codeVerifier, context) -> {
-                    String clientId = connectionParameters.getString(CLIENT_ID);
-                    String clientSecret = connectionParameters.getString(CLIENT_SECRET);
-                    String valueToEncode = clientId + ":" + clientSecret;
-                    String encode = context.encoder(
-                        encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
+            .authorizations(
+                authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                    .title("OAuth2 Authorization Code")
+                    .properties(
+                        string(CLIENT_ID)
+                            .label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true))
+                    .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
+                    .scopes((connection, context) -> List.of("file_comments:write", "files:read", "webhooks:write"))
+                    .tokenUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/token")
+                    .refreshUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/refresh")
+                    .authorizationCallback((connectionParameters, code, redirectUri, codeVerifier, context) -> {
+                        String clientId = connectionParameters.getString(CLIENT_ID);
+                        String clientSecret = connectionParameters.getString(CLIENT_SECRET);
+                        String valueToEncode = clientId + ":" + clientSecret;
+                        String encode = context.encoder(
+                            encoder -> encoder.base64EncodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)));
 
-                    Http.Response response = context.http(http -> http.post("https://api.figma.com/v1/oauth/token"))
-                        .headers(
-                            Map.of(
-                                "Accept", List.of("application/json"),
-                                "Content-Type", List.of("application/x-www-form-urlencoded"),
-                                AUTHORIZATION, List.of("Basic " + encode)))
-                        .body(Http.Body.of(
-                            Map.of(
-                                "code", code,
-                                "redirect_uri", redirectUri,
-                                "grant_type", "authorization_code")))
-                        .configuration(Http.responseType(Http.ResponseType.JSON))
-                        .execute();
+                        Http.Response response = context.http(http -> http.post("https://api.figma.com/v1/oauth/token"))
+                            .headers(
+                                Map.of(
+                                    "Accept", List.of("application/json"),
+                                    "Content-Type", List.of("application/x-www-form-urlencoded"),
+                                    AUTHORIZATION, List.of("Basic " + encode)))
+                            .body(Http.Body.of(
+                                Map.of(
+                                    "code", code,
+                                    "redirect_uri", redirectUri,
+                                    "grant_type", "authorization_code")))
+                            .configuration(Http.responseType(Http.ResponseType.JSON))
+                            .execute();
 
-                    if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
-                        throw new ConfigurationException("Invalid claim");
-                    }
+                        if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
+                            throw new ConfigurationException("Invalid claim");
+                        }
 
-                    if (response.getBody() == null) {
-                        throw new ConfigurationException("Invalid claim");
-                    }
+                        if (response.getBody() == null) {
+                            throw new ConfigurationException("Invalid claim");
+                        }
 
-                    return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
-                }));
+                        return new AuthorizationCallbackResponse(response.getBody(new TypeReference<>() {}));
+                    }));
     }
 }

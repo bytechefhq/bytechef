@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import * as React from 'react';
@@ -62,13 +62,13 @@ const IntegrationsSidebar = ({integrationId}: {integrationId: number}) => {
                             </div>
 
                             {curIntegration.lastPublishedDate && curIntegration.lastIntegrationVersion ? (
-                                <Badge className="flex space-x-1" variant="success">
+                                <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
                                     <span>V{curIntegration.lastIntegrationVersion - 1}</span>
 
                                     <span>PUBLISHED</span>
                                 </Badge>
                             ) : (
-                                <Badge className="flex space-x-1" variant="outline">
+                                <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
                                     <span>V{curIntegration.lastIntegrationVersion}</span>
 
                                     <span>{curIntegration.lastStatus}</span>

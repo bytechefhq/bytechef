@@ -118,24 +118,24 @@ const ThreadSuggestions: FC = () => {
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 pb-4 @md:grid-cols-2">
       {[
         {
-          title: "What's the weather",
-          label: "in San Francisco?",
-          action: "What's the weather in San Francisco?",
+          title: "Describe what this workflow",
+          label: "does end-to-end.",
+          action: "Describe what this workflow does end-to-end",
         },
         {
-          title: "Explain React hooks",
-          label: "like useState and useEffect",
-          action: "Explain React hooks like useState and useEffect",
+          title: "Which properties",
+          label: "of this node are required?",
+          action: "Which properties of this node are required?",
         },
         {
-          title: "Write a SQL query",
-          label: "to find top customers",
-          action: "Write a SQL query to find top customers",
+          title: "Search for an action",
+          label: "that can send an email",
+          action: "Search for an action that can send an email",
         },
         {
-          title: "Create a meal plan",
-          label: "for healthy weight loss",
-          action: "Create a meal plan for healthy weight loss",
+          title: "How do I implement",
+          label: "conditional branching in workflows?",
+          action: "How do I implement conditional branching in workflows?",
         },
       ].map((suggestedAction, index) => (
         <m.div

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
@@ -77,6 +78,56 @@ public class ProjectWorkflowServiceIntTest {
 
         assertThat(projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()))
             .contains("workflow2");
+    }
+
+    @Test
+    public void testPublishWorkflow() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+        int initialVersion = project.getLastProjectVersion();
+
+        var initialWorkflow = projectWorkflowService.addWorkflow(projectId, initialVersion, "workflow1");
+
+        var workflowUuid = initialWorkflow.getUuid();
+
+        assertThat(workflowUuid).isNotNull();
+
+        var workflowsBeforePublish = projectWorkflowService.getProjectWorkflows(projectId, workflowUuid.toString());
+
+        assertThat(workflowsBeforePublish).hasSize(1);
+
+        ProjectWorkflow firstProjectWorkflow = workflowsBeforePublish.getFirst();
+
+        assertThat(firstProjectWorkflow.getWorkflowId()).isEqualTo("workflow1");
+
+        int newVersion = initialVersion + 1;
+        String newWorkflowId = "workflow1_v2";
+
+        var workflowToPublish = projectWorkflowService.getProjectWorkflow(initialWorkflow.getId());
+
+        workflowToPublish.setProjectVersion(newVersion);
+        workflowToPublish.setWorkflowId(newWorkflowId);
+
+        projectWorkflowService.publishWorkflow(projectId, initialVersion, "workflow1", workflowToPublish);
+
+        var workflowsAfterPublish = projectWorkflowService.getProjectWorkflows(projectId, workflowUuid.toString());
+
+        assertThat(workflowsAfterPublish).hasSize(2);
+
+        assertThat(workflowsAfterPublish)
+            .extracting("uuid")
+            .containsOnly(workflowUuid);
+
+        assertThat(workflowsAfterPublish)
+            .anyMatch(
+                workflow -> workflow.getProjectVersion() == initialVersion &&
+                    "workflow1".equals(workflow.getWorkflowId()));
+
+        assertThat(workflowsAfterPublish)
+            .anyMatch(
+                workflow -> workflow.getProjectVersion() == newVersion &&
+                    newWorkflowId.equals(workflow.getWorkflowId()));
     }
 
     private Project getProject() {

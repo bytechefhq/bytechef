@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.WebhookResponse;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.platform.component.definition.WebhookResponse;
 import java.util.List;
 import java.util.Map;
 

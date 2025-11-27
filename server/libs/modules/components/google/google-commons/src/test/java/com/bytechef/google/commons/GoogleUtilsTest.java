@@ -106,7 +106,7 @@ class GoogleUtilsTest {
     }
 
     @Test
-    void testFetchAllFiles() throws IOException {
+    void testGetAllFiles() throws IOException {
         when(mockedDrive.files())
             .thenReturn(mockedFiles);
         when(mockedFiles.list())
@@ -131,7 +131,7 @@ class GoogleUtilsTest {
             strings.add("query");
             strings.add(null);
 
-            List<File> files = GoogleUtils.fetchAllFiles(mockedParameters, "query");
+            List<File> files = GoogleUtils.getAllFiles(mockedParameters, "query");
 
             assertEquals(List.of(testFile), files);
             assertEquals(strings, stringArgumentCaptor.getAllValues());

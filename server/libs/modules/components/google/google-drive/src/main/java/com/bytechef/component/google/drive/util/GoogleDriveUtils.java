@@ -17,20 +17,20 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.google.commons.GoogleUtils.fetchAllFiles;
+import static com.bytechef.google.commons.GoogleUtils.getAllFiles;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.google.commons.GoogleServices;
-import com.bytechef.google.commons.constant.GoogleCommonsContants;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,20 +51,20 @@ public class GoogleDriveUtils {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext, boolean newFile) {
 
-        ZoneId zoneId = ZoneId.systemDefault();
-
-        LocalDateTime now = LocalDateTime.now(zoneId);
-
-        LocalDateTime startDate = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
-
+        Drive drive = GoogleServices.getDrive(connectionParameters);
         String mimeType = newFile
             ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
             : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
+        boolean editorEnvironment = triggerContext.isEditorEnvironment();
+        Instant now = Instant.now();
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
+        Instant startDate = closureParameters.get(
+            LAST_TIME_CHECKED, Instant.class, editorEnvironment ? now.minus(Duration.ofHours(3)) : now);
+
+        String timestamp = DateTimeFormatter.ISO_INSTANT.format(startDate);
 
         List<File> files = new ArrayList<>();
+        int pageSize = editorEnvironment ? 1 : 1000;
         String nextPageToken = null;
 
         do {
@@ -73,13 +73,12 @@ public class GoogleDriveUtils {
             try {
                 fileList = drive.files()
                     .list()
-                    .setQ(mimeType + " and '" + inputParameters.getRequiredString(GoogleCommonsContants.FOLDER_ID)
+                    .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID)
                         + "' in parents and " +
-                        "trashed = false and createdTime > '" +
-                        startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")) + "'")
+                        "trashed = false and createdTime > '" + timestamp + "'")
                     .setFields("files(id, name, mimeType, webViewLink, kind)")
-                    .setOrderBy("createdTime asc")
-                    .setPageSize(1000)
+                    .setOrderBy("createdTime desc")
+                    .setPageSize(pageSize)
                     .setPageToken(nextPageToken)
                     .execute();
             } catch (IOException e) {
@@ -88,6 +87,10 @@ public class GoogleDriveUtils {
 
             files.addAll(fileList.getFiles());
             nextPageToken = fileList.getNextPageToken();
+
+            if (editorEnvironment) {
+                break;
+            }
         } while (nextPageToken != null);
 
         return new PollOutput(files, Map.of(LAST_TIME_CHECKED, now), false);
@@ -98,6 +101,6 @@ public class GoogleDriveUtils {
         String query = "mimeType %s '%s' and trashed = false and parents in '%s'".formatted(
             operator, APPLICATION_VND_GOOGLE_APPS_FOLDER, folderId);
 
-        return fetchAllFiles(connectionParameters, query);
+        return getAllFiles(connectionParameters, query);
     }
 }

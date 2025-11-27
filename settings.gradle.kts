@@ -10,12 +10,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-
         mavenCentral()
-
-        maven {
-            url = uri("https://repo.spring.io/release")
-        }
     }
 }
 
@@ -166,6 +161,7 @@ include("server:libs:platform:platform-webhook:platform-webhook-api")
 include("server:libs:platform:platform-webhook:platform-webhook-impl")
 include("server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api")
 include("server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-impl")
+include("server:libs:platform:platform-worker")
 include("server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api")
 include("server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-impl")
 include("server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api")
@@ -441,8 +437,6 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
 include("server:ee:libs:ai:ai-copilot:ai-copilot-api")
-include("server:ee:libs:ai:ai-copilot:ai-copilot-remote-client")
-include("server:ee:libs:ai:ai-copilot:ai-copilot-remote-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")

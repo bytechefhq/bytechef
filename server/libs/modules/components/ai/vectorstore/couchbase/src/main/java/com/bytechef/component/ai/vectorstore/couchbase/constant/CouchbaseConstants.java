@@ -51,9 +51,9 @@ public class CouchbaseConstants {
             .builder(cluster, embeddingModel)
             .vectorIndexName(connectionParameters.getRequiredString(INDEX_NAME))
             .bucketName(connectionParameters.getString(BUCKET_NAME, "default"))
-            .scopeName(connectionParameters.getString(SCOPE_NAME, "default"))
-            .collectionName(connectionParameters.getString(COLLECTION_NAME, "default"))
-            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false))
+            .scopeName(connectionParameters.getString(SCOPE_NAME, "_default"))
+            .collectionName(connectionParameters.getString(COLLECTION_NAME, "_default"))
+            .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, true))
             .dimensions(connectionParameters.getInteger(DIMENSIONS, 1536))
             .similarityFunction(connectionParameters.getRequired(SIMILARITY, CouchbaseSimilarityFunction.class))
             .indexOptimization(connectionParameters.get(

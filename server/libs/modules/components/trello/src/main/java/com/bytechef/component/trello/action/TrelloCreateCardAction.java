@@ -46,7 +46,7 @@ public class TrelloCreateCardAction {
                 .label("Board ID")
                 .description("ID of the board.")
                 .options((OptionsFunction<String>) TrelloUtils::getBoardOptions)
-                .required(true),
+                .required(false),
             string(ID_LIST)
                 .label("List ID")
                 .description("ID of the list where the card should be created in.")

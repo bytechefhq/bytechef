@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collections;
@@ -81,11 +82,12 @@ public class LoopTaskDispatcher extends ErrorHandlingTaskDispatcher implements T
     @Override
     public void doDispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        List<WorkflowTask> iterateeWorkflowTasks = ((List<Map<String, ?>>) taskExecution.getParameters()
-            .get(ITERATEE))
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils
+            .getList(
+                taskExecution.getParameters(), ITERATEE, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         List<?> items = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
         taskExecution.setStartDate(Instant.now());

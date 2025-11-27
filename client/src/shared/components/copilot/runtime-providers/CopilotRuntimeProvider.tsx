@@ -1,6 +1,10 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {getCookie} from '@/shared/util/cookie-utils';
+import {getRandomId} from '@/shared/util/random-utils';
+import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -28,8 +32,18 @@ export function CopilotRuntimeProvider({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
 
     const {projectId, projectWorkflowId} = useParams();
+
+    const agent = new HttpAgent({
+        agentId: Source[context.source],
+        headers: {
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+        },
+        threadId: conversationId!,
+        url: `/api/platform/internal/ai/sse/${Source[context.source].toLowerCase()}`,
+    });
 
     const queryClient = useQueryClient();
 
@@ -43,97 +57,40 @@ export function CopilotRuntimeProvider({
         addMessage({content: input, role: 'user'});
         setIsRunning(true);
 
-        const result = await fetch('/api/platform/internal/ai/chat', {
-            body: JSON.stringify({
-                context: {
-                    ...context,
-                    workflowId: workflow.id,
-                },
-                message: input,
-            }),
-            headers: {
-                Accept: 'application/x-ndjson',
-                'Content-Type': 'application/json',
-                'X-Copilot-Conversation-Id': conversationId!,
-            },
-            method: 'POST',
+        agent.addMessage({
+            content: input,
+            id: getRandomId(),
+            role: 'user',
         });
-
-        if (!result.body) {
-            throw new Error('No response body');
-        }
+        agent.setState({
+            ...context,
+            currentSelectedNode: currentComponent?.name,
+            workflowId: workflow.id,
+        });
 
         // Prepare an empty assistant message to stream into
         addMessage({content: '', role: 'assistant'});
 
-        let buffer = '';
-        const decoder = new TextDecoder('utf-8');
-        const reader = result.body.getReader();
-        let workflowUpdated = false;
+        const subscriber: AgentSubscriber = {
+            onTextMessageContentEvent: ({textMessageBuffer}) => {
+                appendToLastAssistantMessage(textMessageBuffer);
+            },
+        };
 
-        /* eslint-disable no-constant-condition */
-        while (true) {
-            const {done, value} = await reader.read();
-
-            if (done) {
-                break;
-            }
-
-            buffer += decoder.decode(value, {stream: true});
-
-            let index;
-
-            while ((index = buffer.indexOf('\n')) !== -1) {
-                const line = buffer.slice(0, index).trim();
-
-                if (!line) {
-                    continue;
-                }
-
-                buffer = buffer.slice(index + 1);
-
-                try {
-                    const obj = JSON.parse(line) as {text?: string; workflowUpdated?: boolean};
-
-                    if (obj.text) {
-                        appendToLastAssistantMessage(obj.text);
-                    }
-
-                    if (obj.workflowUpdated) {
-                        workflowUpdated = true;
-                    }
-                    /* eslint-disable @typescript-eslint/no-unused-vars */
-                } catch (e) {
-                    // ignore malformed lines
-                }
-            }
-        }
-
-        // Flush the remaining buffer (in case the stream didn't end with a newline)
-        const remaining = buffer.trim();
-
-        if (remaining) {
-            try {
-                const obj = JSON.parse(remaining) as {text?: string; workflowUpdated?: boolean};
-
-                if (obj.text) {
-                    appendToLastAssistantMessage(obj.text);
-                }
-                if (obj.workflowUpdated) {
-                    workflowUpdated = true;
-                }
-            } catch {
-                // ignore
-            }
-        }
+        await agent.runAgent(
+            {
+                runId: getRandomId(),
+            },
+            subscriber
+        );
 
         setIsRunning(false);
 
-        if (workflowUpdated) {
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-            });
-        }
+        // if (workflowUpdated) {
+        queryClient.invalidateQueries({
+            queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+        });
+        // }
     };
 
     const runtime = useExternalStoreRuntime({

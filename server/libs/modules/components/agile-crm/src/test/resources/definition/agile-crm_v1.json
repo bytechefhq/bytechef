@@ -4730,7 +4730,7 @@
         "optionsLookupDependsOn": null
       },
       "placeholder": null,
-      "required": true,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": null,
@@ -11036,7 +11036,7 @@
         "optionsLookupDependsOn": null
       },
       "placeholder": null,
-      "required": true,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": null,
