@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.notion.constant;
+package com.bytechef.component.notion.util;
 
 /**
  * @author Monika Kušter
