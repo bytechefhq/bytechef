@@ -38,6 +38,38 @@ Version: 1
 ## Actions
 
 
+### Create Database Item
+Name: createDatabaseItem
+
+`.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> id </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Database Item",
+  "name" : "createDatabaseItem",
+  "parameters" : {
+    "id" : "",
+    "fields" : { }
+  },
+  "type" : "notion/v1/createDatabaseItem"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Create Page
 Name: createPage
 
