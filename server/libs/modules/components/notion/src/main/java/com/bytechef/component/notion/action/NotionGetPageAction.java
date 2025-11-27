@@ -41,7 +41,7 @@ public class NotionGetPageAction {
             string(ID)
                 .label("Page ID")
                 .description("The ID of the page to retrieve.")
-                .options(NotionUtils.gePageOrDatabaseIdOptions(true))
+                .options(NotionUtils.getPageOrDatabaseIdOptions(true))
                 .required(true))
         .output(outputSchema(PAGE_OUTPUT_PROPERTY))
         .perform(NotionGetPageAction::perform);

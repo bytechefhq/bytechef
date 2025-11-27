@@ -157,7 +157,7 @@ public class NotionUtils {
             .getBody(new TypeReference<>() {});
     }
 
-    public static OptionsFunction<String> gePageOrDatabaseIdOptions(boolean isPage) {
+    public static OptionsFunction<String> getPageOrDatabaseIdOptions(boolean isPage) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             List<Option<String>> options = new ArrayList<>();
 

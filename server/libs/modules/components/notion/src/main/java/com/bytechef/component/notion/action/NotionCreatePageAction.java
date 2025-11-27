@@ -46,7 +46,7 @@ public class NotionCreatePageAction {
         .properties(
             string(ID)
                 .label("Parent page ID")
-                .options(NotionUtils.gePageOrDatabaseIdOptions(true))
+                .options(NotionUtils.getPageOrDatabaseIdOptions(true))
                 .required(true),
             string(TITLE)
                 .label("Title")
