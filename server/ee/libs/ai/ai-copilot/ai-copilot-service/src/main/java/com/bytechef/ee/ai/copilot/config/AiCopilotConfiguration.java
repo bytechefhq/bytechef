@@ -117,7 +117,7 @@ public class AiCopilotConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
-    AnthropicChatModel anthropicChatModel() {
+    ChatModel anthropicChatModel() {
         AnthropicChatModel anthropicChatModel = AnthropicChatModel.builder()
             .anthropicApi(anthropicApi())
             .defaultOptions(
@@ -128,7 +128,7 @@ public class AiCopilotConfiguration {
                     .build())
             .build();
 
-        return anthropicChatModel;//new SafeStreamingChatModel(anthropicChatModel);
+        return new SafeStreamingChatModel(anthropicChatModel);
     }
 
     @Bean
