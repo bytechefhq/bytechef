@@ -24,6 +24,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -62,6 +63,13 @@ public class TerminateTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     private void updateParentTaskExecutions(TaskExecution taskExecution) {
-    }
+        while (taskExecution.getParentId() != null) {
+            taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setStatus(TaskExecution.Status.CANCELLED);
+
+            taskExecution = taskExecutionService.update(taskExecution);
+        }
+    }
 }
