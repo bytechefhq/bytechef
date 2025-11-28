@@ -8,7 +8,6 @@
 package com.bytechef.ee.ai.copilot.model;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -19,6 +18,8 @@ import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Flux;
+
+import java.util.Collections;
 
 /**
  * Wrapper for ChatModel that ensures ChatResponse.getResult() is never null during streaming. This fixes compatibility
@@ -63,15 +64,9 @@ public class SafeStreamingChatModel implements ChatModel, StreamingChatModel {
      * libraries that assume getResult() is always non-null.
      */
     private ChatResponse ensureNonNullResult(ChatResponse response) {
-        if (response == null) {
-            logger.debug("Received null response");
-            return null;
-        }
-
         try {
             Generation result = response.getResult();
             if (result != null && result.getOutput() != null) {
-                // Result exists and is valid, return as-is
                 logger.debug("Response has valid result, passing through");
                 return response;
             }
