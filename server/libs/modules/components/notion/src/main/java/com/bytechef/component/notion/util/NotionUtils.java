@@ -69,43 +69,45 @@ public class NotionUtils {
 
         Map<String, String> propertyNameTypeMap = createPropertyNameTypeMap(databaseId, context);
 
-        for (Map.Entry<String, ?> entry : fields.entrySet()) {
-            String fieldName = entry.getKey();
-            Object fieldValue = entry.getValue();
+        if (fields != null) {
+            for (Map.Entry<String, ?> entry : fields.entrySet()) {
+                String fieldName = entry.getKey();
+                Object fieldValue = entry.getValue();
 
-            String name = propertyNameTypeMap.get(fieldName);
-            NotionPropertyType enumType = getPropertyTypeByName(name);
+                String name = propertyNameTypeMap.get(fieldName);
+                NotionPropertyType enumType = getPropertyTypeByName(name);
 
-            if (SUPPORTED_PROPERTY_TYPES.contains(enumType)) {
-                switch (enumType) {
-                    case CHECKBOX -> propertiesMap.put(fieldName, Map.of(CHECKBOX.getName(), fieldValue));
-                    case DATE -> propertiesMap.put(fieldName, Map.of(DATE.getName(), Map.of("start", fieldValue)));
-                    case EMAIL -> propertiesMap.put(fieldName, Map.of(EMAIL.getName(), fieldValue));
-                    case SELECT -> propertiesMap.put(fieldName, Map.of(SELECT.getName(), Map.of(NAME, fieldValue)));
-                    case MULTI_SELECT -> {
-                        if (fieldValue instanceof List<?> list) {
-                            List<Map<String, String>> multiSelectValues = list.stream()
-                                .map(item -> Map.of(NAME, item.toString()))
-                                .toList();
+                if (SUPPORTED_PROPERTY_TYPES.contains(enumType)) {
+                    switch (enumType) {
+                        case CHECKBOX -> propertiesMap.put(fieldName, Map.of(CHECKBOX.getName(), fieldValue));
+                        case DATE -> propertiesMap.put(fieldName, Map.of(DATE.getName(), Map.of("start", fieldValue)));
+                        case EMAIL -> propertiesMap.put(fieldName, Map.of(EMAIL.getName(), fieldValue));
+                        case SELECT -> propertiesMap.put(fieldName, Map.of(SELECT.getName(), Map.of(NAME, fieldValue)));
+                        case MULTI_SELECT -> {
+                            if (fieldValue instanceof List<?> list) {
+                                List<Map<String, String>> multiSelectValues = list.stream()
+                                    .map(item -> Map.of(NAME, item.toString()))
+                                    .toList();
 
-                            propertiesMap.put(fieldName, Map.of(MULTI_SELECT.getName(), multiSelectValues));
+                                propertiesMap.put(fieldName, Map.of(MULTI_SELECT.getName(), multiSelectValues));
+                            }
                         }
+                        case STATUS -> propertiesMap.put(fieldName, Map.of(STATUS.getName(), Map.of(NAME, fieldValue)));
+                        case NUMBER -> propertiesMap.put(fieldName, Map.of(NUMBER.getName(), fieldValue));
+                        case PHONE_NUMBER -> propertiesMap.put(fieldName, Map.of(PHONE_NUMBER.getName(), fieldValue));
+                        case RICH_TEXT -> propertiesMap.put(fieldName, Map.of(
+                            RICH_TEXT.getName(), List.of(
+                                Map.of(
+                                    TYPE, TEXT,
+                                    TEXT, Map.of(CONTENT, fieldValue)))));
+                        case TITLE -> propertiesMap.put(fieldName, Map.of(
+                            NotionPropertyType.TITLE.getName(), List.of(
+                                Map.of(
+                                    TYPE, TEXT,
+                                    TEXT, Map.of(CONTENT, fieldValue)))));
+                        case URL -> propertiesMap.put(fieldName, Map.of(URL.getName(), fieldValue));
+                        default -> context.log(log -> log.info("Property with type '{}' is not supported yet.", name));
                     }
-                    case STATUS -> propertiesMap.put(fieldName, Map.of(STATUS.getName(), Map.of(NAME, fieldValue)));
-                    case NUMBER -> propertiesMap.put(fieldName, Map.of(NUMBER.getName(), fieldValue));
-                    case PHONE_NUMBER -> propertiesMap.put(fieldName, Map.of(PHONE_NUMBER.getName(), fieldValue));
-                    case RICH_TEXT -> propertiesMap.put(fieldName, Map.of(
-                        RICH_TEXT.getName(), List.of(
-                            Map.of(
-                                TYPE, TEXT,
-                                TEXT, Map.of(CONTENT, fieldValue)))));
-                    case TITLE -> propertiesMap.put(fieldName, Map.of(
-                        NotionPropertyType.TITLE.getName(), List.of(
-                            Map.of(
-                                TYPE, TEXT,
-                                TEXT, Map.of(CONTENT, fieldValue)))));
-                    case URL -> propertiesMap.put(fieldName, Map.of(URL.getName(), fieldValue));
-                    default -> context.log(log -> log.info("Property with type '{}' is not supported yet.", name));
                 }
             }
         }
