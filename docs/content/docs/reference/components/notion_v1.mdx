@@ -41,14 +41,15 @@ Version: 1
 ### Create Database Item
 Name: createDatabaseItem
 
-`.`
+`Creates a new item in Notion database.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Database ID | STRING | The ID of the database. | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> id </details> |  | null |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> id </details> |  | true |
+| content | Content | STRING | The content to append to item. | false |
 
 #### Example JSON Structure
 ```json
@@ -57,7 +58,8 @@ Name: createDatabaseItem
   "name" : "createDatabaseItem",
   "parameters" : {
     "id" : "",
-    "fields" : { }
+    "fields" : { },
+    "content" : ""
   },
   "type" : "notion/v1/createDatabaseItem"
 }
@@ -346,6 +348,41 @@ Type: OBJECT
   },
   "url" : "",
   "request_id" : ""
+}
+```
+
+
+
+## Triggers
+
+
+### New Database Item
+Name: newDatabaseItem
+
+`Triggers when a new item is added to the database.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Database Item",
+  "name" : "newDatabaseItem",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "notion/v1/newDatabaseItem"
 }
 ```
 
