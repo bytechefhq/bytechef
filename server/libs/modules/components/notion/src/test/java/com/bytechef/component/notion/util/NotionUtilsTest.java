@@ -27,6 +27,7 @@ import static com.bytechef.component.notion.constant.NotionConstants.CONTENT;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
 import static com.bytechef.component.notion.constant.NotionConstants.NAME;
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
+import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -240,6 +241,53 @@ class NotionUtilsTest {
     }
 
     @Test
+    void testGetAllItems() {
+        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("results", List.of(Map.of(ID, "123")), "next_cursor", "nc"),
+                Map.of("results", List.of(Map.of(ID, "345"))));
+
+        List<Object> result = NotionUtils.getAllItems(mockedActionContext, "url", false, "filter", "x");
+
+        assertEquals(List.of(Map.of(ID, "123"), Map.of(ID, "345")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(List.of("url", "url"), stringArgumentCaptor.getAllValues());
+
+        assertEquals(
+            List.of(
+                Http.Body.of(Map.of("filter", "x", "page_size", 100), Http.BodyContentType.JSON),
+                Http.Body.of(
+                    Map.of("filter", "x", "page_size", 100, "start_cursor", "nc"),
+                    Http.BodyContentType.JSON)),
+            bodyArgumentCaptor.getAllValues());
+    }
+
+    @Test
     void testGetDatabase() {
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
@@ -277,11 +325,10 @@ class NotionUtilsTest {
     }
 
     @Test
-    void testGetPageOrDatabaseIdOptions() throws Exception {
+    void testGetDatabaseIdOptions() {
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
                 ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
                 return value.apply(mockedHttp);
             });
         when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -292,53 +339,94 @@ class NotionUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+
+        Map<String, Object> db1 = Map.of(
+            ID, "db1",
+            TITLE, List.of(Map.of(
+                "type", TEXT,
+                TEXT, Map.of(CONTENT, "DB One"))));
+        Map<String, Object> db2 = Map.of(
+            ID, "db2",
+            TITLE, List.of(Map.of(
+                "type", TEXT,
+                TEXT, Map.of(CONTENT, "DB Two"))));
+
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(
-                Map.of(
-                    "results", List.of(
-                        Map.of(
-                            ID, "123",
-                            "properties", Map.of(
-                                "title", Map.of(
-                                    "title", List.of(Map.of(TEXT, Map.of(CONTENT, "abc"))))))),
-                    "next_cursor", "nc"),
-                Map.of(
-                    "results", List.of(
-                        Map.of(
-                            ID, "345",
-                            "properties", Map.of(
-                                "title", Map.of(
-                                    "title", List.of(Map.of(TEXT, Map.of(CONTENT, "cde")))))))));
+            .thenReturn(Map.of("results", List.of(db1, db2)));
 
-        List<? extends Option<String>> options = NotionUtils
-            .getPageOrDatabaseIdOptions(true)
-            .apply(null, null, null, null, mockedActionContext);
+        List<Option<String>> result = NotionUtils.getDatabaseIdOptions(null, null, null, null, mockedActionContext);
 
-        assertEquals(List.of(option("abc", "123"), option("cde", "345")), options);
+        assertEquals(List.of(option("DB One", "db1"), option("DB Two", "db2")), result);
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
+            .build();
 
-        Http.Configuration configuration = configurationBuilder.build();
-
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(List.of("/search", "/search"), stringArgumentCaptor.getAllValues());
-
+        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
+            .getType());
+        assertEquals("/search", stringArgumentCaptor.getValue());
         assertEquals(
-            List.of(
-                Http.Body.of(
-                    Map.of("filter", Map.of("property", "object", "value", "page"), "page_size", 100),
-                    Http.BodyContentType.JSON),
-                Http.Body.of(
-                    Map.of(
-                        "filter", Map.of("property", "object", "value", "page"), "page_size", 100,
-                        "start_cursor", "nc"),
-                    Http.BodyContentType.JSON)),
-            bodyArgumentCaptor.getAllValues());
+            Http.Body.of(
+                Map.of("filter", Map.of("property", "object", "value", "database"), "page_size", 100),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetPageIdOptions() {
+        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        Map<String, Object> page1 = Map.of(
+            ID, "p1",
+            "properties", Map.of(
+                TITLE, Map.of(
+                    TITLE, List.of(Map.of(
+                        "type", TEXT,
+                        TEXT, Map.of(CONTENT, "Page One"))))));
+
+        Map<String, Object> page2 = Map.of(
+            ID, "p2",
+            "properties", Map.of(
+                TITLE, Map.of(
+                    TITLE, List.of(Map.of(
+                        "type", TEXT,
+                        TEXT, Map.of(CONTENT, "Page Two"))))));
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("results", List.of(page1, page2)));
+
+        List<Option<String>> result = NotionUtils.getPageIdOptions(null, null, null, null, mockedActionContext);
+        assertEquals(List.of(option("Page One", "p1"), option("Page Two", "p2")), result);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        Http.Configuration configuration = configurationBuilderArgumentCaptor.getValue()
+            .build();
+
+        assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
+            .getType());
+        assertEquals("/search", stringArgumentCaptor.getValue());
+        assertEquals(
+            Http.Body.of(
+                Map.of("filter", Map.of("property", "object", "value", "page"), "page_size", 100),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
 }

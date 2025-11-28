@@ -16,8 +16,10 @@
 
 package com.bytechef.component.notion.action;
 
+import static com.bytechef.component.notion.constant.NotionConstants.CONTENT;
 import static com.bytechef.component.notion.constant.NotionConstants.FIELDS;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
+import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,8 +58,8 @@ class NotionCreateDatabaseItemActionTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(ID, "123", FIELDS, Map.of("checkbox", true)));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ID, "123", FIELDS, Map.of("checkbox", true), CONTENT, "A"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
@@ -111,7 +113,9 @@ class NotionCreateDatabaseItemActionTest {
 
             Map<String, Object> expectedBody = Map.of(
                 "parent", Map.of(TYPE, "database_id", "database_id", "123"),
-                "properties", Map.of("ABC", Map.of("checkbox", true)));
+                "properties", Map.of("ABC", Map.of("checkbox", true)),
+                "children", List.of(Map.of("object", "block", TYPE, "paragraph", "paragraph",
+                    Map.of("rich_text", List.of(Map.of(TYPE, TEXT, TEXT, Map.of(CONTENT, "A")))))));
 
             assertEquals(Http.Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
         }
