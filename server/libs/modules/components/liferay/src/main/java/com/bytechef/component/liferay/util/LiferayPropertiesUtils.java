@@ -27,9 +27,8 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,23 +41,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class LiferayPropertiesUtils {
 
-    private static final Cache<String, PropertiesContainer> PROPERTIES_CONTAINER_CACHE =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
-
     private LiferayPropertiesUtils() {
     }
 
     public static PropertiesContainer createPropertiesForParameters(
         String application, String endpoint, ActionContext context) {
 
-        String applicationOpenApiUrl = "/o/" + application + "/openapi.json";
-        String applicationEndpointCacheKey = application + "/" + endpoint;
+        String url = "/o/" + application + "/openapi.json";
 
-        return PROPERTIES_CONTAINER_CACHE.get(
-            applicationEndpointCacheKey, key -> getPropertiesContainer(applicationOpenApiUrl, endpoint, context));
+        return getPropertiesContainer(url, endpoint, context);
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(
@@ -197,6 +188,24 @@ public class LiferayPropertiesUtils {
         };
     }
 
+    private static ModifiableValueProperty<?, ?> createHiddenProperty(
+        List<String> bodyParameters,
+        List<String> headerParameters,
+        List<String> pathParameters,
+        List<String> queryParameters) {
+
+        Map<String, List<String>> hiddenMap = Map.of(
+            "body", bodyParameters,
+            "header", headerParameters,
+            "path", pathParameters,
+            "query", queryParameters
+        );
+
+        return array("hiddenProperties")
+            .hidden(true)
+            .defaultValue(hiddenMap);
+    }
+
     private static PropertiesContainer getPropertiesContainer(String url, String endpoint, ActionContext context) {
         Map<String, ?> body = context.http(http -> http.get(url))
             .configuration(responseType(ResponseType.JSON))
@@ -264,13 +273,17 @@ public class LiferayPropertiesUtils {
         List<String> pathParameters = new ArrayList<>();
         List<String> queryParameters = new ArrayList<>();
 
-        return new PropertiesContainer(
-            new ArrayList<>(
-                parameters.stream()
-                    .map(parameterMap -> createProperty(
-                        parameterMap, bodyParameters, headerParameters, pathParameters, queryParameters))
-                    .filter(Objects::nonNull)
-                    .toList()),
-            bodyParameters, headerParameters, pathParameters, queryParameters);
+        List<Property.ValueProperty<?>> properties = new ArrayList<> (parameters.stream()
+                .map(parameterMap -> createProperty(
+                    parameterMap, bodyParameters, headerParameters, pathParameters, queryParameters))
+                .filter(Objects::nonNull)
+                .toList());
+
+        properties.add(createHiddenProperty(bodyParameters, headerParameters, pathParameters, queryParameters));
+        properties.add(string("test")
+            .hidden(true)
+            .defaultValue("test"));
+
+        return new PropertiesContainer(properties, bodyParameters, headerParameters, pathParameters, queryParameters);
     }
 }
