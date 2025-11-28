@@ -242,7 +242,7 @@ public class ProjectWorkflowTools {
     @Tool(
         description = "Update the workflow definition. Returns the updated workflow id, name and definition.")
     public WorkflowInfo updateWorkflow(
-        @ToolParam(description = "The ID of the workflow to update") long workflowId,
+        @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
                 DEFAULT_DEFINITION) String definition) {
