@@ -24,7 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY_HTML_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY_TEXT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY_TYPE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
@@ -38,7 +40,6 @@ import static com.bytechef.component.google.mail.util.GoogleMailUtils.sendMail;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -73,11 +74,9 @@ public class GoogleMailReplyToEmailAction {
                 .description("Cc recipients email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
-            string(BODY)
-                .label("Body")
-                .description("Body text of the email")
-                .controlType(ControlType.TEXT_AREA)
-                .required(true),
+            BODY_TYPE_PROPERTY,
+            BODY_TEXT_PROPERTY,
+            BODY_HTML_PROPERTY,
             array(ATTACHMENTS)
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
