@@ -56,6 +56,7 @@ public class GoogleSheetsGetRowsAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
+        List<Map<String, Object>> rows = new ArrayList<>();
         List<List<Object>> values;
 
         try {
@@ -70,14 +71,14 @@ public class GoogleSheetsGetRowsAction {
             throw GoogleUtils.translateGoogleIOException(e);
         }
 
-        if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
-            values = values.subList(1, values.size());
-        }
+        if (values != null && values.size() > 1) {
+            if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
+                values = values.subList(1, values.size());
+            }
 
-        List<Map<String, Object>> rows = new ArrayList<>();
-
-        for (List<Object> row : values) {
-            rows.add(getMapOfValuesForRow(inputParameters, sheets, row));
+            for (List<Object> row : values) {
+                rows.add(getMapOfValuesForRow(inputParameters, sheets, row));
+            }
         }
 
         return rows;

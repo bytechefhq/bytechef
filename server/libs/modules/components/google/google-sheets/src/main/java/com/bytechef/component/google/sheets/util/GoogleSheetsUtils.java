@@ -243,8 +243,9 @@ public class GoogleSheetsUtils {
         }
     }
 
-    public static Map<String, Object>
-        getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row) {
+    public static Map<String, Object> getMapOfValuesForRow(
+        Parameters inputParameters, Sheets sheets, List<Object> row) {
+
         Map<String, Object> valuesMap;
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
