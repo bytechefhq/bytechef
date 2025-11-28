@@ -408,6 +408,8 @@ include("server:libs:modules:task-dispatchers:map")
 include("server:libs:modules:task-dispatchers:on-error")
 include("server:libs:modules:task-dispatchers:parallel")
 include("server:libs:modules:task-dispatchers:subflow")
+include("server:libs:modules:task-dispatchers:terminate")
+
 
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
