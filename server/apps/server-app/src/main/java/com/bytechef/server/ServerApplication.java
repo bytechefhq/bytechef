@@ -28,8 +28,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     exclude = {
         org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration.class,
         org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration.class
-    }
-)
+    })
 public class ServerApplication extends AbstractApplication {
 
     /**
