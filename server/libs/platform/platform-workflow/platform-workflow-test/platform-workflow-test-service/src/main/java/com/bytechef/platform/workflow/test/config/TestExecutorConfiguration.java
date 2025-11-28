@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
@@ -69,6 +70,7 @@ import com.bytechef.task.dispatcher.on.error.OnErrorTaskDispatcher;
 import com.bytechef.task.dispatcher.on.error.completition.OnErrorTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -190,6 +192,7 @@ public class TestExecutorConfiguration {
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
+            (taskDispatcher) -> new ControlTaskDispatcher(eventPublisher),
             (taskDispatcher) -> new EachTaskDispatcher(
                 contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
@@ -206,6 +209,7 @@ public class TestExecutorConfiguration {
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, eventPublisher, taskDispatcher, taskExecutionService,
-                taskFileStorage));
+                taskFileStorage),
+            (taskDispatcher) -> new TerminateTaskDispatcher(eventPublisher, taskExecutionService));
     }
 }
