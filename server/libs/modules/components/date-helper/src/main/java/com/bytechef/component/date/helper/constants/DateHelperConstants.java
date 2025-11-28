@@ -75,7 +75,9 @@ public class DateHelperConstants {
             option("MM/dd/yy", "MM/dd/yy", "09/17/23"),
             option("dd-MM-yyyy", "dd-MM-yyyy", "17-09-2023"),
             option("dd/MM/yyyy", "dd/MM/yyyy", "17/09/2023"),
+            option("dd.MM.yyyy", "dd.MM.yyyy", "17.09.2023"),
             option("dd/MM/yy", "dd/MM/yy", "17/09/23"),
+            option("dd.MM.yy", "dd.MM.yy", "17.09.23"),
             option("Time in unix format", UNIX_TIMESTAMP, "1694949838"))
         .required(true);
 
