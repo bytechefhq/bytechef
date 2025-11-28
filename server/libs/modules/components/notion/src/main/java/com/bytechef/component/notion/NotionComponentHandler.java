@@ -27,6 +27,7 @@ import com.bytechef.component.notion.action.NotionCreatePageAction;
 import com.bytechef.component.notion.action.NotionGetDatabaseAction;
 import com.bytechef.component.notion.action.NotionGetPageAction;
 import com.bytechef.component.notion.connection.NotionConnection;
+import com.bytechef.component.notion.trigger.NotionNewDatabaseItemTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -50,7 +51,8 @@ public class NotionComponentHandler implements ComponentHandler {
             tool(NotionCreateDatabaseItemAction.ACTION_DEFINITION),
             tool(NotionCreatePageAction.ACTION_DEFINITION),
             tool(NotionGetDatabaseAction.ACTION_DEFINITION),
-            tool(NotionGetPageAction.ACTION_DEFINITION));
+            tool(NotionGetPageAction.ACTION_DEFINITION))
+        .triggers(NotionNewDatabaseItemTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

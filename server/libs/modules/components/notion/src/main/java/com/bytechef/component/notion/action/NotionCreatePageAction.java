@@ -26,6 +26,7 @@ import static com.bytechef.component.notion.constant.NotionConstants.PAGE_OUTPUT
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TITLE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -46,7 +47,7 @@ public class NotionCreatePageAction {
         .properties(
             string(ID)
                 .label("Parent page ID")
-                .options(NotionUtils.getPageOrDatabaseIdOptions(true))
+                .options((OptionsFunction<String>) NotionUtils::getPageIdOptions)
                 .required(true),
             string(TITLE)
                 .label("Title")
