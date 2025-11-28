@@ -25,6 +25,7 @@ import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
@@ -50,6 +51,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
@@ -148,8 +150,6 @@ public class JobSyncExecutor {
         this.timeout = timeout;
         this.workflowService = workflowService;
 
-        receive(memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, event -> {});
-
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
@@ -165,6 +165,13 @@ public class JobSyncExecutor {
             List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
 
         MemoryMessageBroker coordinatorMessageBroker = memoryMessageBrokerSupplier.get();
+
+        receive(
+            coordinatorMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {
+                CancelControlTaskEvent cancelControlTaskEvent = (CancelControlTaskEvent) event;
+
+                taskWorker.onCancelControlTaskEvent(cancelControlTaskEvent);
+            });
 
         receive(
             coordinatorMessageBroker, TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, event -> {
@@ -248,11 +255,14 @@ public class JobSyncExecutor {
                 }
             });
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
-            event -> taskCoordinator.onTaskExecutionCompleteEvent((TaskExecutionCompleteEvent) event));
-        receive(
             memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
             event -> taskCoordinator.onStartJobEvent((StartJobEvent) event));
+        receive(
+            memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
+            event -> taskCoordinator.onStopJobEvent((StopJobEvent) event));
+        receive(
+            memoryMessageBroker, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            event -> taskCoordinator.onTaskExecutionCompleteEvent((TaskExecutionCompleteEvent) event));
     }
 
     public Job execute(JobParametersDTO jobParametersDTO, boolean checkForError) {
