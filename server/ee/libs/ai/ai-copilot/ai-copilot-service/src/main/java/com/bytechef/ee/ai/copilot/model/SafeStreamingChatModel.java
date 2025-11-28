@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.model;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -18,8 +19,6 @@ import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Flux;
-
-import java.util.Collections;
 
 /**
  * Wrapper for ChatModel that ensures ChatResponse.getResult() is never null during streaming. This fixes compatibility
