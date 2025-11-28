@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
 import static com.bytechef.component.notion.constant.NotionConstants.PAGE_OUTPUT_PROPERTY;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -41,7 +42,7 @@ public class NotionGetPageAction {
             string(ID)
                 .label("Page ID")
                 .description("The ID of the page to retrieve.")
-                .options(NotionUtils.getPageOrDatabaseIdOptions(true))
+                .options((OptionsFunction<String>) NotionUtils::getPageIdOptions)
                 .required(true))
         .output(outputSchema(PAGE_OUTPUT_PROPERTY))
         .perform(NotionGetPageAction::perform);

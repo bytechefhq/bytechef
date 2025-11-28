@@ -25,6 +25,7 @@ import static com.bytechef.component.notion.constant.NotionConstants.ID;
 import static com.bytechef.component.notion.constant.NotionConstants.TEXT;
 import static com.bytechef.component.notion.constant.NotionConstants.TYPE;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -48,7 +49,7 @@ public class NotionCreateDatabaseItemAction {
             string(ID)
                 .label("Database ID")
                 .description("The ID of the database.")
-                .options(NotionUtils.getPageOrDatabaseIdOptions(false))
+                .options((OptionsFunction<String>) NotionUtils::getDatabaseIdOptions)
                 .required(true),
             dynamicProperties(FIELDS)
                 .properties((PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)

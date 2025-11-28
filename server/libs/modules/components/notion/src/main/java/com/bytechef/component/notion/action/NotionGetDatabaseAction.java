@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.notion.constant.NotionConstants.ID;
 import static com.bytechef.component.notion.util.NotionUtils.getDatabase;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -42,7 +43,7 @@ public class NotionGetDatabaseAction {
             string(ID)
                 .label("Database ID")
                 .description("The ID of the database to retrieve.")
-                .options(NotionUtils.getPageOrDatabaseIdOptions(false))
+                .options((OptionsFunction<String>) NotionUtils::getDatabaseIdOptions)
                 .required(true))
         .output(
             outputSchema(
