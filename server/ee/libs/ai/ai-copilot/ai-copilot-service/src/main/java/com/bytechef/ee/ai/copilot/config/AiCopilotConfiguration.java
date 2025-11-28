@@ -34,10 +34,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -152,8 +155,8 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
-    OpenAiApi openAiApi() {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
+    OpenAiApi openAiApiForEmbedding() {
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
             .restClientBuilder(getRestClientBuilder())
@@ -162,15 +165,35 @@ public class AiCopilotConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
-    OpenAiChatModel openAiChatModel() {
+    OpenAiApi openAiApiForChat() {
+        return OpenAiApi.builder()
+            .apiKey(openAiApiKey)
+            .restClientBuilder(getRestClientBuilder())
+            .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
+    OpenAiChatModel openAiChatModel(OpenAiApi openAiApiForChat) {
         return OpenAiChatModel.builder()
-            .openAiApi(openAiApi())
+            .openAiApi(openAiApiForChat)
             .defaultOptions(
                 OpenAiChatOptions.builder()
                     .model(openAiModel)
                     .temperature(openAiTemperature)
                     .build())
             .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
+    OpenAiEmbeddingModel openAiEmbeddingModel(OpenAiApi openAiApiForEmbedding) {
+        return new OpenAiEmbeddingModel(
+            openAiApiForEmbedding,
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model("text-embedding-3-small")
+                .build());
     }
 
     DataSource pgVectorDataSource() {
@@ -235,7 +258,10 @@ public class AiCopilotConfiguration {
         HttpClient httpClient = Methanol.newBuilder()
             .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofSeconds(60))
-            .defaultHeaders(httpHeaders -> httpHeaders.setHeader("Accept-Encoding", "gzip, deflate"))
+            .defaultHeaders(httpHeaders -> {
+                httpHeaders.setHeader("Accept-Encoding", "gzip, deflate");
+                httpHeaders.setHeader("anthropic-beta", "fine-grained-tool-streaming-2025-05-14");
+            })
             .headersTimeout(Duration.ofSeconds(60))
             .readTimeout(Duration.ofSeconds(60))
             .requestTimeout(Duration.ofSeconds(60))
