@@ -19,6 +19,7 @@ package com.bytechef.component.google.mail.util;
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY_TYPE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
@@ -231,7 +232,7 @@ class GoogleMailUtilsTest {
         String body = "Mail s hrvatskim slovima: š, č, ć, đ, Ž.";
 
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TO, List.of("to@example.com"), SUBJECT, croatianText, BODY, body));
+            Map.of(TO, List.of("to@example.com"), SUBJECT, croatianText, BODY, body, BODY_TYPE, "plain"));
 
         String encodedEmail = GoogleMailUtils.getEncodedEmail(mockedParameters, mockedActionContext, null);
 
@@ -278,7 +279,9 @@ class GoogleMailUtilsTest {
         Message toReply = new Message().setPayload(messagePart);
 
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(TO, List.of("to@example.com"), SUBJECT, "ignored subject when replying", BODY, newBody));
+            Map.of(
+                TO, List.of("to@example.com"), SUBJECT, "ignored subject when replying", BODY, newBody,
+                BODY_TYPE, "plain"));
 
         String encodedEmail = GoogleMailUtils.getEncodedEmail(mockedParameters, mockedActionContext, toReply);
 
