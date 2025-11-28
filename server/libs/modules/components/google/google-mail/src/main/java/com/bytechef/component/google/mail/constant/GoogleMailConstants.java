@@ -29,7 +29,7 @@ import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.google.mail.definition.Format;
 
 /**
@@ -43,6 +43,7 @@ public class GoogleMailConstants {
     public static final String ATTACHMENTS = "attachments";
     public static final String BCC = "bcc";
     public static final String BODY = "body";
+    public static final String BODY_TYPE = "bodyType";
     public static final String CATEGORY = "category";
     public static final String CC = "cc";
     public static final String FORMAT = "format";
@@ -72,9 +73,31 @@ public class GoogleMailConstants {
     public static final String TOPIC_NAME = "topicName";
     public static final String VALUE = "value";
 
+    public static final ModifiableStringProperty BODY_HTML_PROPERTY = string(BODY)
+        .label("Body - HTML")
+        .description("The body of the message in HTML format.")
+        .controlType(ControlType.RICH_TEXT)
+        .displayCondition("bodyType == '%s'".formatted("html"))
+        .required(true);
+
+    public static final ModifiableStringProperty BODY_TEXT_PROPERTY = string(BODY)
+        .label("Body - Text")
+        .description("The body of the message in text format.")
+        .controlType(ControlType.TEXT_AREA)
+        .displayCondition("bodyType == '%s'".formatted("plain"))
+        .required(true);
+
+    public static final ModifiableStringProperty BODY_TYPE_PROPERTY = string(BODY_TYPE)
+        .label("Body Type")
+        .options(
+            option("Text", "plain"),
+            option("HTML", "html"))
+        .defaultValue("plain")
+        .required(true);
+
     public static final ModifiableStringProperty EMAIL_PROPERTY = string()
         .label("Email address")
-        .controlType(Property.ControlType.EMAIL);
+        .controlType(ControlType.EMAIL);
 
     public static final ModifiableStringProperty FORMAT_PROPERTY = string(FORMAT)
         .label("Format")

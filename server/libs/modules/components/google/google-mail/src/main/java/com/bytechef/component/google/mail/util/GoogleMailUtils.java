@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY_TYPE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
@@ -205,15 +206,16 @@ public class GoogleMailUtils {
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
-        mimeBodyPart.setText(inputParameters.getRequiredString(BODY), StandardCharsets.UTF_8.name());
+        mimeBodyPart.setText(
+            inputParameters.getRequiredString(BODY), StandardCharsets.UTF_8.name(),
+            inputParameters.getRequiredString(BODY_TYPE));
 
         Multipart multipart = new MimeMultipart();
 
         multipart.addBodyPart(mimeBodyPart);
 
-        MimeBodyPart attachmentBodyPart = new MimeBodyPart();
-
         for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
+            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
             attachmentBodyPart.setDataHandler(
                 new DataHandler(
                     new ByteArrayDataSource(
@@ -247,7 +249,6 @@ public class GoogleMailUtils {
             jakarta.mail.Message.RecipientType.TO,
             InternetAddress.parse(String.join(",", inputParameters.getRequiredList(TO, String.class))));
 
-        mimeMessage.setText(inputParameters.getRequiredString(BODY), StandardCharsets.UTF_8.name());
         mimeMessage.setRecipients(
             jakarta.mail.Message.RecipientType.CC,
             InternetAddress.parse(String.join(",", inputParameters.getList(CC, String.class, List.of()))));
