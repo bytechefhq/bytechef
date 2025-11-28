@@ -48,7 +48,9 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
     public EmbeddedApiKeySecurityConfigurer(ConnectedUserService connectedUserService,
         SigningKeyService signingKeyService) {
         super(
-            "^/api/embedded/v[0-9]+/.+|^/api/(?:automation|embedded|platform)/internal/.+",
+            request -> regexMatcher("^/api/embedded/v[0-9]+/.+").matches(request) ||
+                (regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) &&
+                    request.getHeader("Authorization") != null),
             new EmbeddedApiKeyAuthenticationConverter(signingKeyService),
             new EmbeddedApiKeyAuthenticationProvider(connectedUserService));
     }
@@ -57,7 +59,9 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
     protected void registerCsrfOverride(CsrfConfigurer<?> csrf) {
         csrf.ignoringRequestMatchers(regexMatcher("^/api/embedded/v[0-9]+/.+"));
         // For internal calls from the embedded workflow builder
-        csrf.ignoringRequestMatchers(request -> request.getHeader("Authorization") != null);
+        csrf.ignoringRequestMatchers(
+            request -> regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) &&
+                request.getHeader("Authorization") != null);
     }
 
     private static class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
