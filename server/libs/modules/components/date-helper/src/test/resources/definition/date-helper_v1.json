@@ -147,9 +147,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
@@ -795,9 +803,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
@@ -1302,9 +1318,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
@@ -1579,9 +1603,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
@@ -2243,9 +2275,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
@@ -2762,9 +2802,17 @@
         "label": "dd/MM/yyyy",
         "value": "dd/MM/yyyy"
       }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
         "description": "17/09/23",
         "label": "dd/MM/yy",
         "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
       }, {
         "description": "1694949838",
         "label": "Time in unix format",
