@@ -47,7 +47,7 @@ dependencies {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock", ":server:libs:modules:components:data-stream") }
+            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock", ":server:libs:modules:components:data-stream", ":server:libs:modules:components:example") }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }
