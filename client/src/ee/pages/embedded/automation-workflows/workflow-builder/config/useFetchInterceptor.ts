@@ -2,25 +2,16 @@ import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useEffect, useState} from 'react';
+import fetchIntercept from 'fetch-intercept';
 
 export default function useFetchInterceptor() {
     const clearAuthentication = useAuthenticationStore((state) => state.clearAuthentication);
     const clearCurrentEnvironmentId = useEnvironmentStore((state) => state.clearCurrentEnvironmentId);
     const clearCurrentWorkspaceId = useWorkspaceStore((state) => state.clearCurrentWorkspaceId);
-    const [fetchIntercept, setFetchIntercept] = useState<typeof import('fetch-intercept') | null>(null);
 
     const {toast} = useToast();
 
     const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
-
-    useEffect(() => {
-        import('fetch-intercept').then((module) => setFetchIntercept(module));
-    }, []);
-
-    if (!fetchIntercept) {
-        return {unregister: () => {}};
-    }
 
     const unregister = fetchIntercept.register({
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
