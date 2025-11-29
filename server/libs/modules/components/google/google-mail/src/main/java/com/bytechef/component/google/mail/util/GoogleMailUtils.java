@@ -216,6 +216,7 @@ public class GoogleMailUtils {
 
         for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
             MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+
             attachmentBodyPart.setDataHandler(
                 new DataHandler(
                     new ByteArrayDataSource(
