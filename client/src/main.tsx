@@ -64,7 +64,11 @@ async function renderApp() {
         init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
     }
 
-    if (!publicRoutes.includes(window.location.pathname) && !authenticationStore.getState().sessionHasBeenFetched) {
+    if (
+        !isEmbeddedWorkflowBuilder &&
+        !publicRoutes.includes(window.location.pathname) &&
+        !authenticationStore.getState().sessionHasBeenFetched
+    ) {
         const result = await authenticationStore.getState().getAccount();
 
         if (!result && window.location.pathname !== '/login') {
