@@ -72,15 +72,16 @@ public class AbstractApiKeyHttpConfigurer
     public void configure(HttpSecurity http) {
         var authenticationManager = http.getSharedObject(AuthenticationManager.class);
 
-        ApiKeyAuthenticationFilter filter;
+        RequestMatcher requestMatcher;
 
         if (pathPattern instanceof String) {
-            filter = new ApiKeyAuthenticationFilter(
-                regexMatcher((String) pathPattern), authenticationConverter, authenticationManager);
+            requestMatcher = regexMatcher((String) pathPattern);
         } else {
-            filter = new ApiKeyAuthenticationFilter(
-                (RequestMatcher) pathPattern, authenticationConverter, authenticationManager);
+            requestMatcher = (RequestMatcher) pathPattern;
         }
+
+        ApiKeyAuthenticationFilter filter = new ApiKeyAuthenticationFilter(
+            requestMatcher, authenticationConverter, authenticationManager);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }
