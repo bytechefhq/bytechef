@@ -32,5 +32,4 @@ public interface JobFacade {
     void resumeJob(long id);
 
     void stopJob(long id);
-
 }
