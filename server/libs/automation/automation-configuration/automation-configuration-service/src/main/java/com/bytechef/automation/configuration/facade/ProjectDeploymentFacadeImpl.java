@@ -635,6 +635,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 enableWorkflowTriggers(projectDeploymentWorkflow);
             } else {
                 disableWorkflowTriggers(projectDeploymentWorkflow);
+                // Also stop any currently running jobs for this workflow under this project deployment
+                stopRunningJobs(projectDeploymentWorkflow);
             }
         }
 
@@ -665,6 +667,34 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
                 getWebhookUrl(workflowExecutionId));
+        }
+    }
+
+    private void stopRunningJobs(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        List<Long> principalIds = List.of(projectDeploymentWorkflow.getProjectDeploymentId());
+        List<String> workflowIds = List.of(projectDeploymentWorkflow.getWorkflowId());
+
+        int pageNumber = 0;
+
+        while (true) {
+            org.springframework.data.domain.Page<Long> page = principalJobService.getJobIds(
+                Job.Status.STARTED, null, null, principalIds, ModeType.AUTOMATION, workflowIds, pageNumber);
+
+            List<Long> jobIds = page.getContent();
+
+            if (jobIds.isEmpty()) {
+                break;
+            }
+
+            for (Long jobId : jobIds) {
+                jobFacade.stopJob(jobId);
+            }
+
+            if (page.hasNext()) {
+                pageNumber++;
+            } else {
+                break;
+            }
         }
     }
 
