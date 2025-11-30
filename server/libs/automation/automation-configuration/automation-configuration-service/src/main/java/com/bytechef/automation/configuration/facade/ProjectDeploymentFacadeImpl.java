@@ -412,21 +412,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, List.of());
     }
 
-    private Optional<ProjectDeploymentWorkflow> getFirst(
-        ProjectWorkflow curProjectWorkflow, List<ProjectDeploymentWorkflow> oldProjectDeploymentWorkflows,
-        ProjectDeployment projectDeployment) {
-        return oldProjectDeploymentWorkflows.stream()
-            .filter(curProjectDeploymentWorkflow -> {
-                String projectDeploymentWorkflowUuid =
-                    projectWorkflowService.getProjectDeploymentWorkflowUuid(
-                        projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
-
-                return Objects.equals(
-                    projectDeploymentWorkflowUuid, curProjectWorkflow.getUuidAsString());
-            })
-            .findFirst();
-    }
-
     @Override
     public void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
@@ -704,6 +689,21 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentId, workflowId, workflowNodeName, workflowConnectionKey)
             .map(ProjectDeploymentWorkflowConnection::getConnectionId)
             .orElse(null);
+    }
+
+    private Optional<ProjectDeploymentWorkflow> getFirst(
+        ProjectWorkflow curProjectWorkflow, List<ProjectDeploymentWorkflow> oldProjectDeploymentWorkflows,
+        ProjectDeployment projectDeployment) {
+        return oldProjectDeploymentWorkflows.stream()
+            .filter(curProjectDeploymentWorkflow -> {
+                String projectDeploymentWorkflowUuid =
+                    projectWorkflowService.getProjectDeploymentWorkflowUuid(
+                        projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
+
+                return Objects.equals(
+                    projectDeploymentWorkflowUuid, curProjectWorkflow.getUuidAsString());
+            })
+            .findFirst();
     }
 
     private Instant getJobEndDate(Long jobId) {
