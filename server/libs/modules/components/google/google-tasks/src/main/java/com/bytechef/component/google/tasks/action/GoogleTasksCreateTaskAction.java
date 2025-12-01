@@ -78,8 +78,7 @@ public class GoogleTasksCreateTaskAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context
-            .http(http -> http.post(
-                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
+            .http(http -> http.post("/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

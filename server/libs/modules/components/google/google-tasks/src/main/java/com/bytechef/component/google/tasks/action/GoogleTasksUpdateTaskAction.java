@@ -85,7 +85,7 @@ public class GoogleTasksUpdateTaskAction {
 
         return context
             .http(http -> http.patch(
-                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) +
+                "/lists/" + inputParameters.getRequiredString(LIST_ID) +
                     "/tasks/" + inputParameters.getRequiredString(TASK_ID)))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(

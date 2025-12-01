@@ -26,6 +26,7 @@ import java.util.List;
 public class GoogleBigQueryConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
+        "https://bigquery.googleapis.com/bigquery/v2",
         (connection, context) -> List.of(
             "https://www.googleapis.com/auth/bigquery",
             "https://www.googleapis.com/auth/cloud-platform",

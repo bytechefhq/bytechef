@@ -59,7 +59,7 @@ public class GoogleChatUtils {
 
     private static Map<String, ?> fetchSpaces(Context context, String pageToken) {
         return context
-            .http(http -> http.get("https://chat.googleapis.com/v1/spaces"))
+            .http(http -> http.get("/spaces"))
             .queryParameters("pageSize", 1000, "pageToken", pageToken)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()

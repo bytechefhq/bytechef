@@ -123,7 +123,7 @@ public class GoogleTasksNewTaskTrigger {
         TriggerContext triggerContext, String listId, String pageToken, int maxResults, String updatedMin) {
 
         return triggerContext
-            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/%s/tasks".formatted(listId)))
+            .http(http -> http.get("/lists/%s/tasks".formatted(listId)))
             .queryParameters(PAGE_TOKEN, pageToken, MAX_RESULTS, maxResults, "updatedMin", updatedMin)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

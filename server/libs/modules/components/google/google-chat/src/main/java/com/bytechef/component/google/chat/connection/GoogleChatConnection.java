@@ -26,7 +26,7 @@ import java.util.List;
 public class GoogleChatConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of(
+        "https://chat.googleapis.com/v1", (connection, context) -> List.of(
             "https://www.googleapis.com/auth/chat.spaces", "https://www.googleapis.com/auth/chat.spaces.create",
             "https://www.googleapis.com/auth/chat.messages", "https://www.googleapis.com/auth/chat.messages.create"));
 
