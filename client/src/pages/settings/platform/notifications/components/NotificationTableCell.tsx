@@ -1,18 +1,21 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {Notification, NotificationEvent} from '@/shared/middleware/platform/notification';
 import {PenIcon, TrashIcon} from 'lucide-react';
 
 export const EventsCell = ({notificationEvents}: {notificationEvents: NotificationEvent[]}) => (
     <div className="space-y-1">
-        {notificationEvents.map((event) => (
-            <Badge
-                className="ml-1 bg-surface-neutral-tertiary font-medium text-content-neutral-primary shadow-none hover:bg-surface-neutral-tertiary"
-                key={event.id}
-            >
-                {event.type}
-            </Badge>
-        ))}
+        {notificationEvents.map((event) =>
+            event.type ? (
+                <Badge
+                    className="ml-1"
+                    key={event.id}
+                    label={event.type}
+                    styleType="secondary-filled"
+                    weight="semibold"
+                />
+            ) : null
+        )}
     </div>
 );
 
