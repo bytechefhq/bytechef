@@ -16,17 +16,20 @@
 
 package com.bytechef.component.mattermost;
 
-import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.mattermost.constant.MattermostConstants.DOMAIN;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Marija Horvat
@@ -45,17 +48,26 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addFirst(
+                string(DOMAIN)
+                    .label("Domain")
+                    .required(true));
+
+            modifiableAuthorization
+                .properties(properties);
+        }
+
         return modifiableConnectionDefinition
-            .authorizations(
-                authorization(AuthorizationType.BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(DOMAIN)
-                            .label("Domain")
-                            .required(true),
-                        string(TOKEN)
-                            .label("Token")
-                            .required(true)))
             .baseUri((connectionParameters, context) -> "http://" + connectionParameters.getRequiredString(DOMAIN) +
                 "/api/v4");
     }

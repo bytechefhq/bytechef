@@ -16,18 +16,20 @@
 
 package com.bytechef.component.jotform;
 
-import static com.bytechef.component.definition.Authorization.KEY;
-import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -49,25 +51,28 @@ public class JotformComponentHandler extends AbstractJotformComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addFirst(
+                string(REGION)
+                    .label("Region")
+                    .options(
+                        option("US (jotform.com)", "us"),
+                        option("EU (eu.jotform.com)", "eu"))
+                    .required(true));
+
+            modifiableAuthorization.properties(properties);
+        }
+
         return modifiableConnectionDefinition
-            .authorizations(
-                authorization(AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(REGION)
-                            .label("Region")
-                            .options(
-                                option("US (jotform.com)", "us"),
-                                option("EU (eu.jotform.com)", "eu"))
-                            .required(true),
-                        string(KEY)
-                            .label("Key")
-                            .required(true)
-                            .defaultValue("APIKEY")
-                            .hidden(true),
-                        string(VALUE)
-                            .label("API Key")
-                            .required(true)))
             .baseUri((connectionParameters, context) -> {
                 String region = connectionParameters.getRequiredString(REGION);
 
