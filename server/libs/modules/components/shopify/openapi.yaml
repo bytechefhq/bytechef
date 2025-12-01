@@ -230,3 +230,4 @@ components:
       type: "apiKey"
       in: "header"
       name: "X-Shopify-Access-Token"
+      x-title: "Access Token"
