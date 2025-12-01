@@ -16,10 +16,43 @@
 
 package com.bytechef.component.google.search.console.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.Context.Http.responseType;
+
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 public class GoogleSearchConsoleUtils extends AbstractGoogleSearchConsoleUtils {
+
     private GoogleSearchConsoleUtils() {
+    }
+
+    public static List<Option<String>> getSiteUrlOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, List<Map<String, ?>>> body = context.http(http -> http.get("/sites"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        for (Map<String, ?> site : body.get("siteEntry")) {
+            String siteUrl = (String) site.get("siteUrl");
+
+            options.add(option(siteUrl, siteUrl));
+        }
+
+        return options;
     }
 }
