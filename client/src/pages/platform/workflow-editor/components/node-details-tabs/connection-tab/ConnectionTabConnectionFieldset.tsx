@@ -22,7 +22,7 @@ const ConnectionTabConnectionFieldset = ({
         componentVersion: componentConnection.componentVersion,
     });
 
-    if (!componentDefinition || !componentDefinition.connection) {
+    if (!componentDefinition?.connection) {
         return <></>;
     }
 
