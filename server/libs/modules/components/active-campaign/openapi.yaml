@@ -191,3 +191,4 @@ components:
       type: "apiKey"
       in: "header"
       name: "Api-Token"
+      x-title: "API Key"
