@@ -3,5 +3,5 @@
   "description": "The reference guide",
   "icon": "Settings2",
   "root": true,
-  "pages": [ "components", "flow-controls", "expressions"]
+  "pages": [ "index", "components", "flow-controls", "expressions"]
 }
