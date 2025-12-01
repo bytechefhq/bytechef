@@ -194,14 +194,14 @@ public class LiferayPropertiesUtils {
         List<String> pathParameters,
         List<String> queryParameters) {
 
-        Map<String, List<String>> hiddenMap = Map.of(
+        Map<String, Object> hiddenMap = Map.of(
             "body", bodyParameters,
             "header", headerParameters,
             "path", pathParameters,
             "query", queryParameters
         );
 
-        return array("hiddenProperties")
+        return object("hiddenProperties")
             .hidden(true)
             .defaultValue(hiddenMap);
     }
@@ -280,9 +280,6 @@ public class LiferayPropertiesUtils {
                 .toList());
 
         properties.add(createHiddenProperty(bodyParameters, headerParameters, pathParameters, queryParameters));
-        properties.add(string("test")
-            .hidden(true)
-            .defaultValue("test"));
 
         return new PropertiesContainer(properties, bodyParameters, headerParameters, pathParameters, queryParameters);
     }
