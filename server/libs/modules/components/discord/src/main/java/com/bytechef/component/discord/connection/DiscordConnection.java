@@ -36,7 +36,7 @@ public class DiscordConnection {
             .title("Bearer Token")
             .properties(
                 string(TOKEN)
-                    .label("Token")
+                    .label("Bot Token")
                     .required(true)));
 
     private DiscordConnection() {
