@@ -18,13 +18,12 @@ package com.bytechef.component.stripe;
 
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
-import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -33,6 +32,7 @@ import com.bytechef.component.stripe.trigger.StripeNewInvoiceTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -57,19 +57,20 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        return modifiableConnectionDefinition
-            .baseUri((connectionParameters, context) -> "https://api.stripe.com/v1")
-            .authorizations(
-                authorization(AuthorizationType.BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(TOKEN)
-                            .label("Token")
-                            .required(true))
-                    .apply((connectionParameters, context) -> ApplyResponse
-                        .ofHeaders(
-                            Map.of(
-                                "Content-Type", List.of("application/x-www-form-urlencoded"),
-                                AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN))))));
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            modifiableAuthorization.apply((connectionParameters, context) -> ApplyResponse
+                .ofHeaders(
+                    Map.of(
+                        "Content-Type", List.of("application/x-www-form-urlencoded"),
+                        AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN)))));
+        }
+
+        return modifiableConnectionDefinition;
     }
 }
