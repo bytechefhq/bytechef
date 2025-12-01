@@ -7043,7 +7043,7 @@
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": true,
-        "label": "Access token",
+        "label": "Key",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
