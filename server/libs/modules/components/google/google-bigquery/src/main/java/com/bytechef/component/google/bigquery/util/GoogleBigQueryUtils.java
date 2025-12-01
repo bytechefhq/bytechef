@@ -45,7 +45,7 @@ public class GoogleBigQueryUtils {
 
         do {
             Map<String, Object> response = context
-                .http(http -> http.get("https://bigquery.googleapis.com/bigquery/v2/projects"))
+                .http(http -> http.get("/projects"))
                 .configuration(responseType(Http.ResponseType.JSON))
                 .queryParameters("pageToken", nextPageToken, "maxResults", 50)
                 .execute()

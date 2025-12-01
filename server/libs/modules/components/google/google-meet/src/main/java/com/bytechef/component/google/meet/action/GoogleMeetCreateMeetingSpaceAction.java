@@ -63,7 +63,7 @@ public class GoogleMeetCreateMeetingSpaceAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.post("https://meet.googleapis.com/v2/spaces"))
+        return context.http(http -> http.post("/spaces"))
             .body(Http.Body.of("config", Map.of(ACCESS_TYPE, inputParameters.getString(ACCESS_TYPE))))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()

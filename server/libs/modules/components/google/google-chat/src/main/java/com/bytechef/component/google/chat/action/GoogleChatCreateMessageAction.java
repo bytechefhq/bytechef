@@ -89,9 +89,7 @@ public class GoogleChatCreateMessageAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.post(
-                "https://chat.googleapis.com/v1/" + inputParameters.getRequiredString(SPACE) + "/messages"))
+        return context.http(http -> http.post("/" + inputParameters.getRequiredString(SPACE) + "/messages"))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(
                 Body.of(

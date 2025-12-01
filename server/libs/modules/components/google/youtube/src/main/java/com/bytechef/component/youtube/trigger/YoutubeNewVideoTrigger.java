@@ -127,7 +127,7 @@ public class YoutubeNewVideoTrigger {
         ZonedDateTime startZonedDate = startDate.atZone(zoneId);
 
         Map<String, Object> response =
-            triggerContext.http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
+            triggerContext.http(http -> http.get("/search"))
                 .queryParameters(
                     "part", SNIPPET,
                     "channelId", channelId,

@@ -87,9 +87,8 @@ public class GoogleMeetListParticipantsAction {
 
         do {
             Map<String, ?> body = context
-                .http(http -> http.get(
-                    "https://meet.googleapis.com/v2/%s/participants".formatted(
-                        inputParameters.getRequiredString(CONFERENCE_RECORDS))))
+                .http(http -> http.get("/%s/participants".formatted(
+                    inputParameters.getRequiredString(CONFERENCE_RECORDS))))
                 .queryParameters(PAGE_SIZE, 250, PAGE_TOKEN, nextPageToken)
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute()

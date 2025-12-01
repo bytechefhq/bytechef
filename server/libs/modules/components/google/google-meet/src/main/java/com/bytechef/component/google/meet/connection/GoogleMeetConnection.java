@@ -26,6 +26,7 @@ import java.util.List;
 public class GoogleMeetConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
+        "https://meet.googleapis.com/v2",
         (connection, context) -> List.of("https://www.googleapis.com/auth/meetings.space.created"));
 
     private GoogleMeetConnection() {

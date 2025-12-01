@@ -51,7 +51,7 @@ public class GoogleMeetGetMeetingSpaceAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
-            .http(http -> http.get("https://meet.googleapis.com/v2/" + inputParameters.getRequiredString(NAME)))
+            .http(http -> http.get("/" + inputParameters.getRequiredString(NAME)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
