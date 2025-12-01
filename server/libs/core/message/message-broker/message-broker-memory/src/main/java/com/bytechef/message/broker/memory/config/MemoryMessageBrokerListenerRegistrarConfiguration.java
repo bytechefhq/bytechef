@@ -48,6 +48,7 @@ public class MemoryMessageBrokerListenerRegistrarConfiguration
 
     private final List<MessageBrokerConfigurer<MemoryListenerEndpointRegistrar>> messageBrokerConfigurers;
     private final MemoryMessageBroker memoryMessageBroker;
+    private MemoryListenerEndpointRegistrar listenerEndpointRegistrar;
 
     @SuppressFBWarnings("EI")
     public MemoryMessageBrokerListenerRegistrarConfiguration(
@@ -61,8 +62,7 @@ public class MemoryMessageBrokerListenerRegistrarConfiguration
 
     @Override
     public void afterSingletonsInstantiated() {
-        MemoryListenerEndpointRegistrar listenerEndpointRegistrar = new MemoryListenerEndpointRegistrar(
-            memoryMessageBroker);
+        listenerEndpointRegistrar = new MemoryListenerEndpointRegistrar(memoryMessageBroker);
 
         for (MessageBrokerConfigurer<MemoryListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
 
@@ -82,5 +82,19 @@ public class MemoryMessageBrokerListenerRegistrarConfiguration
         }
 
         listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
+    }
+
+    @Override
+    public void stopListenerEndpoints() {
+        if (listenerEndpointRegistrar != null) {
+            listenerEndpointRegistrar.stop();
+        }
+    }
+
+    @Override
+    public void startListenerEndpoints() {
+        if (listenerEndpointRegistrar != null) {
+            listenerEndpointRegistrar.start();
+        }
     }
 }
