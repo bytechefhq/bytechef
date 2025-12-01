@@ -229,7 +229,7 @@ public class ComponentInitOpenApiGenerator {
                     "Properties)",
                 ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
                 ClassName.get(
-                    "com.bytechef.component." + componentName + ".util",
+                    "com.bytechef.component." + StringUtils.replaceChars(componentName, "-_", ".") + ".util",
                     getComponentClassName(componentName) + "Utils"));
 
             this.dynamicProperties.add(buildOptionsFunctionsName(propertyName));
@@ -2156,7 +2156,7 @@ public class ComponentInitOpenApiGenerator {
                 ".options(($T.OptionsFunction<" + optionType + ">)$T::get"
                     + buildOptionsFunctionsName(propertyName) + "Options)",
                 ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
-                ClassName.get("com.bytechef.component." + componentName + ".util",
+                ClassName.get("com.bytechef.component." + StringUtils.replaceChars(componentName, "-_", ".") + ".util",
                     getComponentClassName(componentName) + "Utils"));
 
             if (extensionMap.get("x-dynamic-options-dependency") instanceof List<?> dependencies) {
