@@ -2,7 +2,7 @@ import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workf
 import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelInputs';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 
-import {getTaskDispatcherTask} from '../../../../utils/taskDispatcherConfig';
+import {getTask} from '../../../../utils/taskDispatcherConfig';
 
 interface PropertyCodeEditorSheetConnectionsSheetRightPanelProps {
     componentConnections: ComponentConnection[];
@@ -15,7 +15,7 @@ const PropertyCodeEditorSheetRightPanel = ({
     workflow,
     workflowNodeName,
 }: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
-    const currentTask = getTaskDispatcherTask({
+    const currentTask = getTask({
         taskDispatcherId: workflowNodeName,
         tasks: workflow.tasks || [],
     });

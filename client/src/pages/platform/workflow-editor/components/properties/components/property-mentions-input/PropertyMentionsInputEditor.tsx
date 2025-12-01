@@ -10,7 +10,7 @@ import {
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {getTaskDispatcherTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
+import {getTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -142,7 +142,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
                 const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                    ? getTaskDispatcherTask({
+                    ? getTask({
                           taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
                           tasks: workflowDefinitionTasks,
                       })
