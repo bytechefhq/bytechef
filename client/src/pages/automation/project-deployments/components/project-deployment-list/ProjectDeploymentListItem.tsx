@@ -9,6 +9,7 @@ import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-depl
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
+
 import {
     useDeleteProjectDeploymentMutation,
     useEnableProjectDeploymentMutation,
@@ -17,7 +18,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
@@ -37,47 +38,32 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     );
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
-
     const queryClient = useQueryClient();
 
     const deleteProjectDeploymentMutation = useDeleteProjectDeploymentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectDeploymentKeys.projectDeployments,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
-            });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
         },
     });
 
     const updateProjectDeploymentTagsMutation = useUpdateProjectDeploymentTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectDeploymentKeys.projectDeployments,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
-            });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
         },
     });
 
     const enableProjectDeploymentMutation = useEnableProjectDeploymentMutation({
         onSuccess: () => {
             captureProjectDeploymentEnabled();
-
-            queryClient.invalidateQueries({
-                queryKey: ProjectDeploymentKeys.projectDeployments,
-            });
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
         },
     });
 
     const handleOnCheckedChange = (value: boolean) => {
         enableProjectDeploymentMutation.mutate(
-            {
-                enable: value,
-                id: projectDeployment.id!,
-            },
+            {enable: value, id: projectDeployment.id!},
             {
                 onSuccess: () => {
                     setProjectDeploymentEnabled(projectDeployment.id!, !projectDeployment.enabled);
@@ -87,9 +73,38 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         );
     };
 
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+    const handleCardClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+            'button',
+            'input',
+            'svg',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        workflowsCollapsibleTriggerRef.current?.click();
+    }, []);
+
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+                onClick={(event) => handleCardClick(event)}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -110,7 +125,10 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-muted-foreground">
+                                <CollapsibleTrigger
+                                    className="group mr-4 flex text-xs font-semibold text-muted-foreground"
+                                    ref={workflowsCollapsibleTriggerRef}
+                                >
                                     <span className="mr-1">
                                         {projectDeployment.projectDeploymentWorkflows?.length === 1
                                             ? `1 workflow`
@@ -120,14 +138,12 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.preventDefault()}>
+                                <div onClick={(event) => event.stopPropagation()}>
                                     {projectDeployment.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequest: {
-                                                    tags: tags || [],
-                                                },
+                                                updateTagsRequest: {tags: tags || []},
                                             })}
                                             id={projectDeployment.id!}
                                             remainingTags={remainingTags}
@@ -161,6 +177,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                                     checked={projectDeployment.enabled}
                                     disabled={enableProjectDeploymentMutation.isPending}
                                     onCheckedChange={handleOnCheckedChange}
+                                    onClick={(event) => event.stopPropagation()}
                                 />
                             </div>
 
