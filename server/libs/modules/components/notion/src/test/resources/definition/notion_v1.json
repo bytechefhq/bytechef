@@ -4408,6 +4408,86 @@
     } ],
     "title": "Get Page",
     "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Update specific fields in a Notion database item.",
+    "help": null,
+    "metadata": null,
+    "name": "updateDatabaseItem",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the database.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Database ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The ID of the database item to update.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Database Item ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "databaseItemId",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "id" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "name": "fields",
+      "required": true,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "title": "Update Database Item",
+    "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
     "description": "Creates a new item in Notion database.",
@@ -8834,6 +8914,90 @@
       "required": false
     },
     "workflowNodeDescription": null
+  }, {
+    "description": "Update specific fields in a Notion database item.",
+    "element": { },
+    "help": null,
+    "name": "updateDatabaseItem",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the database.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Database ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "id",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The ID of the database item to update.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Database Item ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "databaseItemId",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "dynamicPropertiesDataSource": {
+        "properties": { },
+        "propertiesLookupDependsOn": [ "id" ]
+      },
+      "expressionEnabled": null,
+      "header": null,
+      "hidden": null,
+      "metadata": { },
+      "name": "fields",
+      "required": true,
+      "type": "DYNAMIC_PROPERTIES"
+    } ],
+    "title": "Update Database Item",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "label": "Productivity and Collaboration",
@@ -8912,7 +9076,7 @@
     "test": null,
     "version": 1
   },
-  "customAction": null,
+  "customAction": true,
   "customActionHelp": null,
   "description": "Notion is an all-in-one workspace for notes, tasks, wikis, and databases.",
   "icon": "path:assets/notion.svg",
