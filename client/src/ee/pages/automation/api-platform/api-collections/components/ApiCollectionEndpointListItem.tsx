@@ -19,9 +19,16 @@ import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/h
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {useQueryClient} from '@tanstack/react-query';
-import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
+import {
+    CloudDownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    FolderSyncIcon,
+    SendToBackIcon,
+    Trash2Icon,
+    UploadIcon,
+} from 'lucide-react';
+import {useMemo, useState} from 'react';
 
 const ApiCollectionEndpointListItem = ({
     apiCollectionEndpoint,
@@ -92,20 +99,50 @@ const ApiCollectionEndpointListItem = ({
         }
     };
 
+    const {icon, textColor} = useMemo(() => {
+        const method = apiCollectionEndpoint.httpMethod;
+        switch (method) {
+            case 'GET':
+                return {
+                    icon: <CloudDownloadIcon className="size-3" />,
+                    textColor: 'text-content-brand-primary',
+                };
+            case 'POST':
+                return {
+                    icon: <UploadIcon className="size-3" />,
+                    textColor: 'text-content-success-primary',
+                };
+            case 'PUT':
+                return {
+                    icon: <SendToBackIcon className="size-3" />,
+                    textColor: 'text-content-warning-primary',
+                };
+            case 'PATCH':
+                return {
+                    icon: <FolderSyncIcon className="size-3" />,
+                    textColor: 'text-orange-700',
+                };
+            case 'DELETE':
+                return {
+                    icon: <Trash2Icon className="size-3" />,
+                    textColor: 'text-content-destructive-primary',
+                };
+            default:
+                return {
+                    icon: undefined,
+                    textColor: '',
+                };
+        }
+    }, [apiCollectionEndpoint.httpMethod]);
+
     return (
         <>
             <div className="flex flex-1 items-center" onClick={handleWorkflowClick}>
                 <Badge
-                    className={twMerge(
-                        'mr-4 w-20 border-transparent',
-                        apiCollectionEndpoint.httpMethod === 'DELETE' && 'bg-red-400',
-                        apiCollectionEndpoint.httpMethod === 'GET' && 'bg-green-400',
-                        apiCollectionEndpoint.httpMethod === 'POST' && 'bg-yellow-400',
-                        apiCollectionEndpoint.httpMethod === 'PATCH' && 'bg-amber-400',
-                        apiCollectionEndpoint.httpMethod === 'PUT' && 'bg-orange-400'
-                    )}
+                    className={`mr-4 w-20 ${textColor}`}
+                    icon={icon}
                     label={apiCollectionEndpoint.httpMethod}
-                    styleType="secondary-filled"
+                    styleType="outline-outline"
                     weight="semibold"
                 />
 
