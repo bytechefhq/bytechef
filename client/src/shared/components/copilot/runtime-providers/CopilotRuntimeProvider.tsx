@@ -42,7 +42,7 @@ export function CopilotRuntimeProvider({
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         threadId: conversationId!,
-        url: `/api/platform/internal/ai/sse/${Source[context.source].toLowerCase()}`,
+        url: `/api/platform/internal/ai/chat/${Source[context.source].toLowerCase()}`,
     });
 
     const queryClient = useQueryClient();
