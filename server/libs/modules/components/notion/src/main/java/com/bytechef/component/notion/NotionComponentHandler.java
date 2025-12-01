@@ -43,6 +43,7 @@ public class NotionComponentHandler implements ComponentHandler {
         .connection(NotionConnection.CONNECTION_DEFINITION)
         .icon("path:assets/notion.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
+        .customAction(true)
         .actions(
             NotionCreateDatabaseItemAction.ACTION_DEFINITION,
             NotionCreatePageAction.ACTION_DEFINITION,
