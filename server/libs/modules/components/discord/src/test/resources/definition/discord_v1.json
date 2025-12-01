@@ -7954,7 +7954,7 @@
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Bot token",
+        "label": "Bot Token",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
