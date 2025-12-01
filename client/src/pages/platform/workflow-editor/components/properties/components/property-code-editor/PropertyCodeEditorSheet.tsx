@@ -23,7 +23,7 @@ import {PlayIcon, RefreshCwIcon, SaveIcon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {getTaskDispatcherTask} from '../../../../utils/taskDispatcherConfig';
+import {getTask} from '../../../../utils/taskDispatcherConfig';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 const ReactJson = lazy(() => import('react-json-view'));
@@ -56,7 +56,7 @@ const PropertyCodeEditorSheet = ({
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const currentWorkflowTask = getTaskDispatcherTask({
+    const currentWorkflowTask = getTask({
         taskDispatcherId: workflowNodeName,
         tasks: workflow.tasks || [],
     });

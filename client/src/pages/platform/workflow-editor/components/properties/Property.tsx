@@ -18,7 +18,7 @@ import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/p
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {getTaskDispatcherTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
+import {getTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
 import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,

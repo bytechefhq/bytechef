@@ -570,3 +570,39 @@ export function getTaskDispatcherTask({
 
     return undefined;
 }
+
+export function getTask({taskDispatcherId, tasks}: GetParentTaskDispatcherTaskType): WorkflowTask | undefined {
+    for (const task of tasks) {
+        if (task?.name === taskDispatcherId) {
+            return task;
+        }
+
+        if (task.parameters) {
+            for (const collectionName of ALL_COLLECTION_NAMES) {
+                let subtasks = task.parameters[collectionName];
+
+                if (collectionName === 'cases') {
+                    subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
+                } else if (collectionName === 'branches') {
+                    subtasks = subtasks?.flat();
+                } else if (collectionName === 'iteratee') {
+                    if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
+                        subtasks = [subtasks];
+                    } else if (!Array.isArray(subtasks)) {
+                        subtasks = [];
+                    }
+                }
+
+                if (Array.isArray(subtasks) && subtasks.length > 0) {
+                    const foundTask = getTaskDispatcherTask({taskDispatcherId, tasks: subtasks});
+
+                    if (foundTask) {
+                        return foundTask;
+                    }
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
