@@ -183,9 +183,11 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
                         {root && <span>Extra fields</span>}
 
                         {extraFields?.length > 0 && (
-                            <Badge styleType={isMenuOpen ? 'primary-filled' : 'secondary-filled'} weight="semibold">
-                                {extraFields.length}
-                            </Badge>
+                            <Badge
+                                label={`${extraFields.length}`}
+                                styleType={isMenuOpen ? 'primary-filled' : 'secondary-filled'}
+                                weight="semibold"
+                            />
                         )}
                     </Button>
                 </SchemaMenuPopover>
