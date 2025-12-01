@@ -30,9 +30,6 @@ public class AiCopilotEnvironmentPostProcessor implements EnvironmentPostProcess
             source.put("spring.ai.model.chat", environment.getProperty("bytechef.ai.copilot.chat.provider"));
             source.put("spring.ai.model.embedding", environment.getProperty("bytechef.ai.copilot.embedding.provider"));
             source.put("spring.ai.vectorstore.type", "pgvector");
-            source.put("spring.autoconfigure.exclude",
-                "org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration," +
-                    "org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration");
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom AI Copilot Config", source);
