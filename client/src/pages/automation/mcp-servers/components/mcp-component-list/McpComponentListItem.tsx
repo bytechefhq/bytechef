@@ -41,10 +41,10 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                             {mcpComponent.mcpTools
                                 .slice(0, 4)
                                 .map(
-                                    (tool, index) =>
+                                    (tool) =>
                                         tool?.name && (
                                             <Badge
-                                                key={index}
+                                                key={tool.name}
                                                 label={tool.name}
                                                 styleType="secondary-filled"
                                                 weight="semibold"
