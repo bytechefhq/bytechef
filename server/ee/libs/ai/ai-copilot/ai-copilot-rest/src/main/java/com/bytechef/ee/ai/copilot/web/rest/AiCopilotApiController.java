@@ -47,8 +47,8 @@ public class AiCopilotApiController {
     }
 
     @Validated
-    @PostMapping(value = "/ai/sse/{agentId}")
-    public SseEmitter sse(
+    @PostMapping(value = "/ai/chat/{agentId}")
+    public SseEmitter chat(
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
         LocalAgent localAgent = localAgentMap.get(agentId);
