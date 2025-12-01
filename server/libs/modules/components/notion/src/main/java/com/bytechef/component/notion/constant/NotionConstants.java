@@ -31,6 +31,7 @@ import java.util.List;
 public class NotionConstants {
 
     public static final String CONTENT = "content";
+    public static final String DATABASE_ITEM_ID = "databaseItemId";
     public static final String ID = "id";
     public static final String FIELDS = "fields";
     public static final String NAME = "name";

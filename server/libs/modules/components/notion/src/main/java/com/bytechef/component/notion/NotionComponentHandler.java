@@ -26,6 +26,7 @@ import com.bytechef.component.notion.action.NotionCreateDatabaseItemAction;
 import com.bytechef.component.notion.action.NotionCreatePageAction;
 import com.bytechef.component.notion.action.NotionGetDatabaseAction;
 import com.bytechef.component.notion.action.NotionGetPageAction;
+import com.bytechef.component.notion.action.NotionUpdateDatabaseItemAction;
 import com.bytechef.component.notion.connection.NotionConnection;
 import com.bytechef.component.notion.trigger.NotionNewDatabaseItemTrigger;
 import com.google.auto.service.AutoService;
@@ -46,12 +47,14 @@ public class NotionComponentHandler implements ComponentHandler {
             NotionCreateDatabaseItemAction.ACTION_DEFINITION,
             NotionCreatePageAction.ACTION_DEFINITION,
             NotionGetDatabaseAction.ACTION_DEFINITION,
-            NotionGetPageAction.ACTION_DEFINITION)
+            NotionGetPageAction.ACTION_DEFINITION,
+            NotionUpdateDatabaseItemAction.ACTION_DEFINITION)
         .clusterElements(
             tool(NotionCreateDatabaseItemAction.ACTION_DEFINITION),
             tool(NotionCreatePageAction.ACTION_DEFINITION),
             tool(NotionGetDatabaseAction.ACTION_DEFINITION),
-            tool(NotionGetPageAction.ACTION_DEFINITION))
+            tool(NotionGetPageAction.ACTION_DEFINITION),
+            tool(NotionUpdateDatabaseItemAction.ACTION_DEFINITION))
         .triggers(NotionNewDatabaseItemTrigger.TRIGGER_DEFINITION);
 
     @Override
