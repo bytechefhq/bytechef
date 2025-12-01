@@ -1,0 +1,261 @@
+---
+title: "Oracle SQL"
+description: "Select, insert, update and delete data from Oracle Databases."
+---
+
+
+
+Type: oracleSql/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Query
+Name: query
+
+`Execute an SQL query.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The list of properties which should be used as query parameters. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Query",
+  "name" : "query",
+  "parameters" : {
+    "query" : "",
+    "parameters" : { }
+  },
+  "type" : "oracleSql/v1/query"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Insert
+Name: insert
+
+`Insert rows in database.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to insert data to. | true |
+| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be inserted. | false |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Insert",
+  "name" : "insert",
+  "parameters" : {
+    "schema" : "",
+    "table" : "",
+    "columns" : [ {
+      "name" : "",
+      "type" : ""
+    } ],
+    "values" : { }
+  },
+  "type" : "oracleSql/v1/insert"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Update
+Name: update
+
+`Update rows in database.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to update data in. | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
+| columns | Columns | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type)&#125;] </details> | The list of the table column names where corresponding values would be updated. | false |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update",
+  "name" : "update",
+  "parameters" : {
+    "schema" : "",
+    "table" : "",
+    "condition" : "",
+    "columns" : [ {
+      "name" : "",
+      "type" : ""
+    } ],
+    "values" : { }
+  },
+  "type" : "oracleSql/v1/update"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Delete
+Name: delete
+
+`Delete rows from database.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to update data in. | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete",
+  "name" : "delete",
+  "parameters" : {
+    "schema" : "",
+    "table" : "",
+    "condition" : ""
+  },
+  "type" : "oracleSql/v1/delete"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Execute
+Name: execute
+
+`Execute an SQL DML or DML statement.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| execute | Execute | STRING | The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
+| columns | Fields to select | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of fields to select from. | false |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The list of values which should be used to replace corresponding criteria parameters. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute",
+  "name" : "execute",
+  "parameters" : {
+    "execute" : "",
+    "columns" : [ { } ],
+    "parameters" : { }
+  },
+  "type" : "oracleSql/v1/execute"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+## Triggers
+
+
+### New Row
+Name: newRow
+
+`Triggers when new row is added.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to update data in. | true |
+| orderBy | Colum To Order By | STRING | Use something like a created timestamp or an auto-incrementing ID. | true |
+| orderDirection | Order Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> | The direction to sort by such that the newest rows are fetched first. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Row",
+  "name" : "newRow",
+  "parameters" : {
+    "schema" : "",
+    "table" : "",
+    "orderBy" : "",
+    "orderDirection" : ""
+  },
+  "type" : "oracleSql/v1/newRow"
+}
+```
+
+
+
+
