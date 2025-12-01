@@ -106,7 +106,7 @@ class GoogleTasksUpdateTaskActionTest {
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
 
-        assertEquals("https://tasks.googleapis.com/tasks/v1/lists/id-1/tasks/task", stringArgumentCaptor.getValue());
+        assertEquals("/lists/id-1/tasks/task", stringArgumentCaptor.getValue());
         assertEquals(
             Http.Body.of(Map.of(TITLE, "test", STATUS, "needsAction", NOTES, "abc"), Http.BodyContentType.JSON),
             bodyArgumentCaptor.getValue());

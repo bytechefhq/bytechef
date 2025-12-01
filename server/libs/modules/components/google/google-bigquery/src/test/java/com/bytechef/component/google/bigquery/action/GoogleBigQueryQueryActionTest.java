@@ -111,8 +111,6 @@ class GoogleBigQueryQueryActionTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Type.JSON, responseType.getType());
-        assertEquals(
-            "https://bigquery.googleapis.com/bigquery/v2/projects/projectId/queries",
-            stringArgumentCaptor.getValue());
+        assertEquals("/projects/projectId/queries", stringArgumentCaptor.getValue());
     }
 }
