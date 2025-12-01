@@ -6,7 +6,7 @@
   "pages": [
     "---Getting Started---",
     "index",
-    "registerAndLogIn",
+    "register-login",
     "glossary",
     "quick-start",
     "---Build---",
