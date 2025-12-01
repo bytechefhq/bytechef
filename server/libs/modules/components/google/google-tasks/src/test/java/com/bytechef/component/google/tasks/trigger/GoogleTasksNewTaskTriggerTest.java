@@ -116,7 +116,7 @@ class GoogleTasksNewTaskTriggerTest {
             Http.ResponseType responseType = configuration.getResponseType();
 
             assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-            assertEquals("https://tasks.googleapis.com/tasks/v1/lists/list-1/tasks", stringArgumentCaptor.getValue());
+            assertEquals("/lists/list-1/tasks", stringArgumentCaptor.getValue());
 
             Object[] objects = new Object[] {
                 PAGE_TOKEN, null,
@@ -180,10 +180,7 @@ class GoogleTasksNewTaskTriggerTest {
             Http.ResponseType responseType = configuration.getResponseType();
 
             assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-            assertEquals(
-                List.of("https://tasks.googleapis.com/tasks/v1/lists/list-1/tasks",
-                    "https://tasks.googleapis.com/tasks/v1/lists/list-1/tasks"),
-                stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("/lists/list-1/tasks", "/lists/list-1/tasks"), stringArgumentCaptor.getAllValues());
 
             List<Object[]> allQueryParams = objectArgumentCapture.getAllValues();
             assertEquals(2, allQueryParams.size());
@@ -254,7 +251,7 @@ class GoogleTasksNewTaskTriggerTest {
             Http.ResponseType responseType = configuration.getResponseType();
 
             assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-            assertEquals("https://tasks.googleapis.com/tasks/v1/lists/list-1/tasks", stringArgumentCaptor.getValue());
+            assertEquals("/lists/list-1/tasks", stringArgumentCaptor.getValue());
 
             Object[] expectedQuery = new Object[] {
                 PAGE_TOKEN, null,
