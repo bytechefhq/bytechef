@@ -9,7 +9,6 @@ import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-depl
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
-
 import {
     useDeleteProjectDeploymentMutation,
     useEnableProjectDeploymentMutation,
@@ -33,11 +32,14 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
 
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
     const setProjectDeploymentEnabled = useProjectDeploymentsEnabledStore(
         ({setProjectDeploymentEnabled}) => setProjectDeploymentEnabled
     );
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
+
     const queryClient = useQueryClient();
 
     const deleteProjectDeploymentMutation = useDeleteProjectDeploymentMutation({
@@ -73,9 +75,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         );
     };
 
-    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
-
-    const handleCardClick = useCallback((event: React.MouseEvent) => {
+    const handleProjectDeploymentListItemClick = useCallback((event: React.MouseEvent) => {
         const target = event.target as HTMLElement;
 
         const interactiveSelectors = [
@@ -92,6 +92,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         if (target.closest(interactiveSelectors)) {
             return;
         }
+
         if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
             return;
         }
@@ -103,7 +104,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
         <>
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
-                onClick={(event) => handleCardClick(event)}
+                onClick={(event) => handleProjectDeploymentListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
