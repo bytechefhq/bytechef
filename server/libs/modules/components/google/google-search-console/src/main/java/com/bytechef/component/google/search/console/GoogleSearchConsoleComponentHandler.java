@@ -17,11 +17,33 @@
 package com.bytechef.component.google.search.console;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.google.commons.GoogleConnection;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class GoogleSearchConsoleComponentHandler extends AbstractGoogleSearchConsoleComponentHandler {
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return GoogleConnection.createConnection(
+            "https://searchconsole.googleapis.com/webmasters/v3",
+            (connection, context) -> List.of("https://www.googleapis.com/auth/webmasters"));
+    }
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/google-search-console.svg")
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    }
 }
