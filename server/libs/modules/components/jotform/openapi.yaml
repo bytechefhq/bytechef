@@ -55,3 +55,4 @@ components:
       type: "apiKey"
       in: "header"
       name: "APIKEY"
+      x-title: "API Key"
