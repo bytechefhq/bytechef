@@ -71,7 +71,6 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
                             options={allOptions.filter(
                                 (option) => !displayFields.some((field) => field.value === option.value)
                             )}
-                            // Use Lingui macro for string props
                             placeholder={t`Description, Required, etc.`}
                             value={null}
                         />
