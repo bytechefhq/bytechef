@@ -19,8 +19,9 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const projectDeploymentWorkflow = undefined;
 
-    const {icon, textColor} = useMemo(() => {
-        const method = apiConnectorEndpoint.httpMethod;
+    const method = apiConnectorEndpoint.httpMethod;
+
+    const httpMethodStyles = useMemo(() => {
         switch (method) {
             case 'GET':
                 return {
@@ -53,7 +54,9 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                     textColor: '',
                 };
         }
-    }, [apiConnectorEndpoint.httpMethod]);
+    }, [method]);
+
+    const {icon, textColor} = httpMethodStyles;
 
     return (
         <>
