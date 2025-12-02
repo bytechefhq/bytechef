@@ -1,0 +1,40 @@
+---
+label: "Terminate Task Dispatcher"
+tasks:
+  - name: "on_error_1"
+    type: "on-error/v1"
+    parameters:
+      main-branch:
+        - name: "mainBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "main branch"
+        - name: "httpClient_error_1"
+          type: "httpClient/v1/get"
+          parameters:
+            allowUnauthorizedCerts: false
+            responseType: "JSON"
+            responseContentType: "application/octet-stream"
+            fullResponse: false
+            followAllRedirects: false
+            followRedirect: false
+            ignoreResponseCode: false
+            timeout: 1000
+            uri: "https://localhost:8080"
+      on-error-branch:
+        - name: "beforeTerminateErrorBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "before terminate in error branch"
+        - name: "terminate_1"
+          type: "terminate/v1"
+          parameters:
+            message: "Stopping job after exception"
+        - name: "afterTerminateErrorBranchVar"
+          type: "var/v1/set"
+          parameters:
+            value: "you should not see this"
+  - name: "endVar"
+    type: "var/v1/set"
+    parameters:
+      value: "end"

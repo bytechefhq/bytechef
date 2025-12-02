@@ -51,3 +51,24 @@ bytechef:
     remember-me:
       key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2
   webhook-url: http://127.0.0.1:9555/webhooks/{id}
+  feature-flags:
+    - ff-207
+    - ff-445
+    - ff-520
+    - ff-743
+    - ff-797
+    - ff-1023
+    - ff-1024
+    - ff-1025
+    - ff-1039
+    - ff-1057
+    - ff-1779
+    - ff-1570
+    - ff-1840
+    - ff-1874
+    - ff-2445
+    - ff-2500
+    - ff-2501
+    - ff-2502
+    - ff-2503
+    - ff-2504

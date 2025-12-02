@@ -1,0 +1,15 @@
+---
+label: "Terminate Task Dispatcher"
+tasks:
+  - name: "startVar"
+    type: "var/v1/set"
+    parameters:
+      value: "start"
+  - name: "terminate_1"
+    type: "terminate/v1"
+    parameters:
+      message: "Stopping job"
+  - name: "endVar"
+    type: "var/v1/set"
+    parameters:
+      value: "end"
