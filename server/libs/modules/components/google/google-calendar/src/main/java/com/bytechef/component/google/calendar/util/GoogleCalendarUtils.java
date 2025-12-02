@@ -123,12 +123,17 @@ public class GoogleCalendarUtils {
     }
 
     public static CustomEvent createCustomEvent(Event event, String timezone) {
+        Temporal start = convertToTemporalFromEventDateTime(event.getStart(), timezone);
+        Temporal end = convertToTemporalFromEventDateTime(event.getEnd(), timezone);
+
+        if (end instanceof LocalDate localDateEnd) {
+            end = localDateEnd.minusDays(1);
+        }
+
         return new CustomEvent(
-            event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
-            convertToTemporalFromEventDateTime(event.getStart(), timezone),
-            convertToTemporalFromEventDateTime(event.getEnd(), timezone),
-            event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
-            event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
+            event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(), start, end, event.getEtag(),
+            event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(), event.getHangoutLink(),
+            event.getAttendees(), event.getAttachments(), event.getReminders());
     }
 
     public static List<Option<String>> getCalendarIdOptions(
@@ -148,7 +153,7 @@ public class GoogleCalendarUtils {
         String nextPageToken = null;
 
         do {
-            CalendarList calendarList = null;
+            CalendarList calendarList;
             try {
                 calendarList = calendar
                     .calendarList()
