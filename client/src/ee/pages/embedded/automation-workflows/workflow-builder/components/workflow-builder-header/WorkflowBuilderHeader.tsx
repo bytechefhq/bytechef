@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import LoaderNotification from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/LoaderNotification';
 import OutputPanelButton from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/components/OutputButton';
@@ -68,9 +68,7 @@ const WorkflowBuilderHeader = ({
 
                 <div></div>
 
-                <Badge className="flex space-x-1 bg-white" variant="outline">
-                    <span>{`V${(workflowVersion ?? 0) + 1} DRAFT`}</span>
-                </Badge>
+                <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
             </div>
 
             <div className="flex items-center space-x-2">
