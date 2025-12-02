@@ -900,6 +900,7 @@ const WorkflowNodeDetailsPanel = ({
         currentActionFetched,
         currentOperationProperties?.length,
         currentComponentDefinition?.name,
+        currentWorkflowNodeConnections.length,
     ]);
 
     // If the current component requires a connection, set the active tab to 'connection'
