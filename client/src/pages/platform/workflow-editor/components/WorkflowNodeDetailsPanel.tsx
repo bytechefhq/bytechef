@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
@@ -1129,45 +1129,51 @@ const WorkflowNodeDetailsPanel = ({
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
                 <div className="flex h-full flex-col divide-y divide-muted bg-background">
-                    <header className="flex items-center p-4 text-lg font-medium">
-                        {currentWorkflowNode.icon && (
-                            <InlineSVG
-                                className="mr-2 size-6"
-                                loader={<LoadingIcon className="ml-0 mr-2 size-6 text-muted-foreground" />}
-                                src={currentWorkflowNode.icon}
-                            />
-                        )}
+                    <header className="flex items-start justify-between p-4 text-lg font-medium">
+                        <div className="flex items-center gap-2">
+                            {currentWorkflowNode.icon && (
+                                <InlineSVG
+                                    className="size-8"
+                                    loader={<LoadingIcon className="ml-0 mr-2 size-6 text-muted-foreground" />}
+                                    src={currentWorkflowNode.icon}
+                                />
+                            )}
 
-                        {currentNode?.label}
+                            <div className="flex flex-col items-start">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg font-semibold">{currentNode?.label}</span>
 
-                        <span className="mx-2 text-sm text-muted-foreground">({currentNode?.workflowNodeName})</span>
+                                    {currentWorkflowNode.description && (
+                                        <Tooltip delayDuration={500}>
+                                            <TooltipTrigger>
+                                                <InfoIcon className="size-4 shrink-0" />
+                                            </TooltipTrigger>
 
-                        {currentWorkflowNode.description && (
-                            <Tooltip delayDuration={500}>
-                                <TooltipTrigger>
-                                    <InfoIcon className="size-4" />
-                                </TooltipTrigger>
+                                            <TooltipPortal>
+                                                <TooltipContent className="max-w-md" side="bottom">
+                                                    {currentComponentDefinition
+                                                        ? currentComponentDefinition.description
+                                                        : currentTaskDispatcherDefinition?.description}
+                                                </TooltipContent>
+                                            </TooltipPortal>
+                                        </Tooltip>
+                                    )}
+                                </div>
 
-                                <TooltipPortal>
-                                    <TooltipContent className="max-w-md" side="bottom">
-                                        {currentComponentDefinition
-                                            ? currentComponentDefinition.description
-                                            : currentTaskDispatcherDefinition?.description}
-                                    </TooltipContent>
-                                </TooltipPortal>
-                            </Tooltip>
-                        )}
+                                <span className="text-sm text-muted-foreground">({currentNode?.workflowNodeName})</span>
+                            </div>
+                        </div>
 
                         {closeButton ? (
                             closeButton
                         ) : (
-                            <button
+                            <Button
                                 aria-label="Close the node details dialog"
-                                className="ml-auto pr-0"
+                                icon={<XIcon aria-hidden="true" />}
                                 onClick={handlePanelClose}
-                            >
-                                <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
-                            </button>
+                                size="icon"
+                                variant="ghost"
+                            />
                         )}
                     </header>
 
@@ -1211,17 +1217,16 @@ const WorkflowNodeDetailsPanel = ({
                                 {nodeTabs.map((tab) => (
                                     <Button
                                         className={twMerge(
-                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-border bg-background py-5 text-sm font-medium text-muted-foreground hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-border bg-content-onsurface-primary py-5 text-sm font-medium text-content-neutral-secondary hover:border-stroke-brand-primary hover:text-content-brand-primary focus:border-stroke-brand-primary focus:text-content-brand-primary focus:outline-none',
                                             activeTab === tab?.name &&
-                                                'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                'border-stroke-brand-primary text-content-brand-primary hover:text-content-brand-primary'
                                         )}
                                         key={tab.name}
+                                        label={tab.label}
                                         name={tab.name}
                                         onClick={() => setActiveTab(tab.name)}
                                         variant="ghost"
-                                    >
-                                        {tab.label}
-                                    </Button>
+                                    />
                                 ))}
                             </div>
                         )}

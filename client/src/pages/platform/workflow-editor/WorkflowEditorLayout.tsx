@@ -4,7 +4,7 @@ import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
@@ -181,14 +181,7 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                             className="fixed inset-y-0 right-0 rounded-l-none"
                             closeButton={
                                 <DialogClose asChild>
-                                    <Button
-                                        className="absolute right-2 top-2"
-                                        size="icon"
-                                        title="Close the canvas"
-                                        variant="ghost"
-                                    >
-                                        <XIcon />
-                                    </Button>
+                                    <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
                                 </DialogClose>
                             }
                             invalidateWorkflowQueries={invalidateWorkflowQueries!}
