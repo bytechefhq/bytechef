@@ -1,103 +1,24 @@
 ## Connection Setup
 
-### Setting Up OAuth2
+### Create OAuth 2.0 Application
 
-[Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Click on the project dropdown in the top navigation bar.
-3. Click **New Project**.
-4. Enter a project name and click **Create**.
-5. Click on the project dropdown again.
-6. Select the project you just created.
-7. Go to the **APIs & Services**.
-8. Go to the **OAuth consent screen**.
-9. Click **Get Started**.
-10. Enter an App name and add user support email. Click **Next**.
-11. Select your Audience and click **Next**.
-12. Add email addresses and click **Next**.
-13. Agree to the terms and click **Create**.
-14. Go to **Data Access**.
-15. Click on **Add or Remove Scopes**.
-16. Select all necessary scopes.
-17. Click **Update**.
-18. Click **Save**.
-19. Go to the **Clients**.
-20. Click on **Create Client**.
-21. Click on application type dropdown.
-22. Choose **Web application** as the application type.
-23. Click on **Add Uri**.
-24. Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`. Click **Create**.
-25. Click on the client you just created.
-26. Copy the **Client ID** and **Client Secret**. Use these credentials to create a connection in ByteChef.
+### Enable Gmail API
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
-### Turning on Gmail API
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Click on **APIs & Services**.
-3. In search bar enter "Gmail API".
-4. Click on **Gmail API**.
-5. Click on **Enable**.
-6. Done 🚀
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "gmail api" in the search bar.
+5. Click on **Gmail API**.
+6. Click **Enable**.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
 <iframe src="https://www.guidejar.com/embed/2d7279c7-91c3-43c9-9004-99f08d7e30ff?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
-## Trigger Setup
+## Troubleshooting
 
-### New Email Trigger Setup
+### Access Blocked: Verification Process Not Completed
 
-Setting up Pub/Sub service
-
-1. Deploy project that has **New Mail Trigger**.
-2. Click this icon to copy the static webhook URL.
-3. In search bar enter "pub/sub".
-4. Click on **Pub/Sub**.
-5. Click on **Create topic**.
-6. Enter your topic name.
-7. Click on **Create**.
-8. Click on **Subscriptions**.
-9. Click on your automatically created subscription.
-10. Click on **Edit**.
-11. Select **Push**.
-12. Click on **Endpoint URL** and paste previously copied URL.
-13. Select **Never expire**.
-14. Click on **Update**.
-15. Click on **Topics**.
-16. Click here.
-17. Click on **Add principal**.
-18. Add **gmail-api-push@system.gserviceaccount.com** as new principal.
-19. Click here.
-20. Click on **Pub/Sub Publisher**.
-21. Click on **Save**.
-22. Click on **MyTopic**.
-23. This is your **topic name**.
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/934ccb3b-1052-440e-bcfa-9cd5d27b8a91?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
-### New Email Pooling Trigger Setup
-
-Turning on Google Calendar API
-
-Gmail doesn’t manage its own time zone; it inherits the time zone from your Google Calendar settings, so we rely on the Calendar API to resolve times correctly.
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Click on **APIs & Services**.
-3. In search bar enter "Google Calendar API".
-4. Click on **Google Calendar API**.
-5. Click on **Enable**.
-6. Done 🚀
-
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/157feabc-9dec-4ac4-a538-5aa6a0bb0928?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
-
-
-![anl-c-google-mail-md](https://static.scarf.sh/a.png?x-pxid=2bfa99dc-2ceb-4a8f-9b0e-26650c2f0f95)
+Documentation for how to add a test user can be found [here](/reference/components/google-application-setup_v1#access-blocked-verification-process-not-completed)
