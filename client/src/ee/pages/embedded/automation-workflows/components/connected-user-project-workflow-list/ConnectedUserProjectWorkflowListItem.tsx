@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ConnectedUserProjectWorkflow} from '@/shared/middleware/graphql';
 
@@ -19,28 +19,34 @@ const ConnectedUserProjectWorkflowListItem = ({
                 <div className="ml-6 flex space-x-1"></div>
             </div>
 
-            <div className="flex items-center gap-x-56 text-gray-500">
+            <div className="flex items-center gap-x-4 text-gray-500">
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Badge variant="secondary">V{connectedUserProjectWorkflow.workflowVersion}</Badge>
+                        <Badge
+                            label={`V${connectedUserProjectWorkflow.workflowVersion}`}
+                            styleType="secondary-filled"
+                            weight="semibold"
+                        />
                     </TooltipTrigger>
 
                     <TooltipContent>The workflow version</TooltipContent>
                 </Tooltip>
 
-                {connectedUserProjectWorkflow?.lastExecutionDate ? (
-                    <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm">
-                            <span className="text-xs">
-                                {`Executed at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
-                            </span>
-                        </TooltipTrigger>
+                <div className="w-48">
+                    {connectedUserProjectWorkflow?.lastExecutionDate ? (
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center justify-end text-sm">
+                                <span className="text-xs">
+                                    {`Executed at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                                </span>
+                            </TooltipTrigger>
 
-                        <TooltipContent>Last Execution Date</TooltipContent>
-                    </Tooltip>
-                ) : (
-                    <span className="text-xs">No executions</span>
-                )}
+                            <TooltipContent>Last Execution Date</TooltipContent>
+                        </Tooltip>
+                    ) : (
+                        <span className="text-xs">No executions</span>
+                    )}
+                </div>
             </div>
         </li>
     );
