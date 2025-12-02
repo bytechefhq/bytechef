@@ -53,7 +53,7 @@ const ProjectSelect = ({projectId, projects, selectedProjectId, setSelectedProje
                 )}
             </Tooltip>
 
-            <SelectContent className="w-80">
+            <SelectContent className="w-full">
                 <SelectItem
                     className="cursor-pointer rounded-none hover:bg-surface-neutral-primary-hover [&>span]:truncate"
                     value={projectId.toString()}
