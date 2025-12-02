@@ -99,8 +99,9 @@ const ApiCollectionEndpointListItem = ({
         }
     };
 
-    const {icon, textColor} = useMemo(() => {
-        const method = apiCollectionEndpoint.httpMethod;
+    const method = apiCollectionEndpoint.httpMethod;
+
+    const httpMethodStyles = useMemo(() => {
         switch (method) {
             case 'GET':
                 return {
@@ -133,7 +134,9 @@ const ApiCollectionEndpointListItem = ({
                     textColor: '',
                 };
         }
-    }, [apiCollectionEndpoint.httpMethod]);
+    }, [method]);
+
+    const {icon, textColor} = httpMethodStyles;
 
     return (
         <>
