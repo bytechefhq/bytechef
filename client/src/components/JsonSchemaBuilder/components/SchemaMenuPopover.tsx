@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {X as CloseIcon} from 'lucide-react';
@@ -72,14 +72,12 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
 
                     <Button
                         className="absolute right-1 top-1 size-8 p-0 hover:bg-transparent hover:text-content-destructive"
+                        icon={<CloseIcon className="size-4" />}
                         onClick={() => handleOpenChange(false)}
                         size="icon"
+                        title="Close"
                         variant="ghost"
-                    >
-                        <CloseIcon className="size-4" />
-
-                        <span className="sr-only">Close</span>
-                    </Button>
+                    />
 
                     <SchemaMenuList fields={displayFields} onChange={onChange} schema={schema} />
                 </div>
