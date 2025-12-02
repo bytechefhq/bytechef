@@ -252,49 +252,43 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            // Capture workflowId to preserve the non-undefined type through closures
             const workflowId = workflow.id as string;
 
-            // Normalize and transform the incoming value similar to the previous logic
-            let transformed: string | number | null = editorValue;
+            let transformedValue: string | number | null = editorValue;
 
             if (
                 !isFormulaMode &&
                 (type === 'INTEGER' || type === 'NUMBER') &&
-                typeof transformed === 'string' &&
-                !transformed.startsWith('${')
+                typeof transformedValue === 'string' &&
+                !transformedValue.startsWith('${')
             ) {
-                transformed = parseInt(transformed);
+                transformedValue = parseInt(transformedValue);
             }
 
-            if (typeof transformed === 'string') {
+            if (typeof transformedValue === 'string') {
                 if (controlType !== 'RICH_TEXT') {
-                    transformed = decode(sanitizeHtml(transformed, {allowedTags: []}));
+                    transformedValue = decode(sanitizeHtml(transformedValue, {allowedTags: []}));
                 }
 
-                transformed = transformValueForObjectAccess(transformed);
+                transformedValue = transformValueForObjectAccess(transformedValue);
 
-                if (isFormulaMode && !transformed.startsWith('=')) {
-                    transformed = `=${transformed}`;
+                if (isFormulaMode && !transformedValue.startsWith('=')) {
+                    transformedValue = `=${transformedValue}`;
                 }
             }
 
-            // Keep original semantics for empty values (may turn 0 into null as before)
-            const normalized: string | number | null = transformed ? transformed : null;
+            const normalizedValue: string | number | null = transformedValue ? transformedValue : null;
 
-            // Drop if it's already saved or already queued
-            if (normalized === lastSavedRef.current || normalized === pendingValueRef.current) {
+            if (normalizedValue === lastSavedRef.current || normalizedValue === pendingValueRef.current) {
                 return;
             }
 
-            // Enqueue the latest value
-            pendingValueRef.current = normalized;
+            pendingValueRef.current = normalizedValue;
 
-            // If nothing is currently saving, start the save loop
             if (!savingRef.current) {
-                const run = () => {
+                const runSaveProperty = () => {
                     const toSave = pendingValueRef.current;
-                    // clear pending slot before sending
+
                     pendingValueRef.current = undefined;
 
                     if (toSave === undefined) {
@@ -316,19 +310,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         .then(() => {
                             lastSavedRef.current = toSave;
                         })
-                        .catch(() => {
-                            // Swallow errors here; upstream UI may already handle them.
-                        })
+                        .catch(() => {})
                         .finally(() => {
                             savingRef.current = null;
-                            // If a newer value was enqueued while we were saving, process it next
+
                             if (pendingValueRef.current !== undefined) {
-                                run();
+                                runSaveProperty();
                             }
                         });
                 };
 
-                run();
+                runSaveProperty();
             }
         }, 600);
 
