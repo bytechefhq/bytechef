@@ -18,6 +18,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
 
 /**
@@ -25,6 +26,7 @@ import reactor.core.publisher.Flux;
  * issues with the agui library which doesn't handle null results.
  *
  * @version ee
+ *
  * @author Marko Kriskovic
  */
 @SuppressFBWarnings("EI")
@@ -37,12 +39,17 @@ public class SafeStreamingChatModel implements ChatModel, StreamingChatModel {
 
     public SafeStreamingChatModel(ChatModel chatModel) {
         this.delegate = chatModel;
-        this.streamingDelegate = (StreamingChatModel) chatModel;
-        logger.info("SafeStreamingChatModel initialized with delegate: {}", chatModel.getClass()
-            .getName());
+        this.streamingDelegate = chatModel;
+
+        Class<? extends ChatModel> chatModelClass = chatModel.getClass();
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("SafeStreamingChatModel initialized with delegate: {}", chatModelClass.getName());
+        }
     }
 
     @Override
+    @NonNull
     public ChatResponse call(Prompt prompt) {
         return delegate.call(prompt);
     }
@@ -53,6 +60,7 @@ public class SafeStreamingChatModel implements ChatModel, StreamingChatModel {
     }
 
     @Override
+    @NonNull
     public Flux<ChatResponse> stream(Prompt prompt) {
         return streamingDelegate.stream(prompt)
             .map(this::ensureNonNullResult);
@@ -65,21 +73,22 @@ public class SafeStreamingChatModel implements ChatModel, StreamingChatModel {
     private ChatResponse ensureNonNullResult(ChatResponse response) {
         try {
             Generation result = response.getResult();
+
             if (result != null && result.getOutput() != null) {
-                logger.debug("Response has valid result, passing through");
                 return response;
             }
-            logger.warn("Response getResult() returned null or output is null, creating safe response");
         } catch (Exception e) {
-            // If getResult() throws, we need to create a safe response
-            logger.warn("Exception checking getResult(): {}", e.getMessage());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Exception checking getResult(): {}", e.getMessage());
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Response getResult() returned null or output is null, creating safe response");
         }
 
         Generation safeGeneration = new Generation(new AssistantMessage(""));
-        logger.info("Created safe ChatResponse with empty generation");
 
-        return new ChatResponse(
-            Collections.singletonList(safeGeneration),
-            response.getMetadata());
+        return new ChatResponse(Collections.singletonList(safeGeneration), response.getMetadata());
     }
 }
