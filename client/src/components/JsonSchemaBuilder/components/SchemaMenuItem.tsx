@@ -112,7 +112,7 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {i18n} = useLingui();
 
     const options = useMemo(
-        () => translateLabels((s: string) => i18n._(s), field.optionList),
+        () => translateLabels((string: string) => i18n._(string), field.optionList),
         [field.optionList, i18n]
     );
 
