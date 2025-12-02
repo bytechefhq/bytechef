@@ -11,7 +11,7 @@ import tailwindcss from 'eslint-plugin-tailwindcss';
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
 import bytechef from 'eslint-plugin-bytechef';
 import storybook from 'eslint-plugin-storybook';
-import pluginLingui from "eslint-plugin-lingui";
+import pluginLingui from 'eslint-plugin-lingui';
 
 // TypeScript flat configs (provides parser + recommended rules)
 import tseslint from 'typescript-eslint';
@@ -40,7 +40,7 @@ export default [
   ...tseslint.configs.recommended,
 
   // Lingui plugin recommended rules
-  pluginLingui.configs["flat/recommended"],
+  pluginLingui.configs['flat/recommended'],
 
   // Plugin presets intentionally not auto-included; rules are set explicitly below.
 

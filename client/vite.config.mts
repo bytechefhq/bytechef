@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { lingui } from "@lingui/vite-plugin";
+import { lingui } from '@lingui/vite-plugin';
 
 // https://vitejs.dev/config/
 export default ({mode}) => {
@@ -44,7 +44,7 @@ export default ({mode}) => {
         plugins: [
             react({
                 babel: {
-                    plugins: ["@lingui/babel-plugin-lingui-macro"],
+                    plugins: ['@lingui/babel-plugin-lingui-macro'],
                 },
             }),
             lingui(),

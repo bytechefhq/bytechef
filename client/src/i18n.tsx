@@ -11,8 +11,6 @@ async function loadLocale(locale: string) {
     i18n.activate(locale);
 }
 
-loadLocale(defaultLocale);
-
 function I18n({children}: {children: ReactNode}) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [locale, setLocale] = useState(defaultLocale);
