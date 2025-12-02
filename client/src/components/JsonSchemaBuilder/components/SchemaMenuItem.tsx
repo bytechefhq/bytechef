@@ -100,7 +100,7 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                         onChange(setSchemaField(field.value, optionsToStrings(options), schema))
                     }
                     options={allOptions}
-                    placeholder={t({id: 'Options', message: 'Options'})}
+                    placeholder={t`Options`}
                     value={allOptions}
                 />
             </fieldset>
