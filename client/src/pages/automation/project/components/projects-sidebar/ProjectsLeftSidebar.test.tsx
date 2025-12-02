@@ -27,6 +27,7 @@ vi.mock('@/components/Button/Button', () => ({
     default: ({children, icon, label, ...props}: any) => (
         <button data-testid="btn" {...props}>
             {icon}
+
             {label ?? children}
         </button>
     ),
