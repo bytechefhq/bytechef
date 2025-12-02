@@ -1,0 +1,204 @@
+openapi: 3.0.3
+info:
+  title: "Dev.to"
+  version: "v1"
+  description: "Dev.to is an online community and platform where software developers share articles, tutorials, and discussions about programming and technology."
+servers:
+  - url: "https://dev.to/api"
+paths:
+  /articles:
+    post:
+      summary: "Create Article"
+      description: "Creates a new article."
+      operationId: "createArticle"
+      responses:
+        201:
+          description: "An Article"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                article:
+                  type: object
+                  title: "Article"
+                  properties:
+                    title:
+                      type: string
+                      description: "The title of the article."
+                      required: true
+                    body_markdown:
+                      type: string
+                      description: "The body of the article in markdown format."
+                      required: true
+                    published:
+                      type: boolean
+                      description: "Whether the article should be published immediately."
+                      default: false
+                      required: false
+                    description:
+                      type: string
+                      description: "The description of the article."
+                      required: false
+  /articles/{articleId}:
+    get:
+      summary: "Get Article"
+      description: "Get article by id."
+      operationId: "getArticle"
+      parameters:
+        - name: articleId
+          in: path
+          description: "The unique identifier of the article."
+          required: true
+          schema:
+            type: integer
+            title: "Article ID"
+            x-dynamic-options: true
+      responses:
+        200:
+          description: "An Article"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+    put:
+      summary: "Update Article"
+      description: "Updates an existing article."
+      operationId: "updateArticle"
+      parameters:
+        - name: articleId
+          in: path
+          description: "The unique identifier of the article."
+          required: true
+          schema:
+            type: integer
+            title: "Article ID"
+            x-dynamic-options: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - article
+              properties:
+                article:
+                  type: object
+                  title: "Article"
+                  properties:
+                    title:
+                      type: string
+                      description: "The title of the article."
+                    body_markdown:
+                      type: string
+                      description: "The body of the article in markdown format."
+                    published:
+                      type: boolean
+                      description: "Whether the article should be published immediately."
+                    description:
+                      type: string
+                      description: "The description of the article."
+      responses:
+        200:
+          description: "An Article"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+components:
+  securitySchemes:
+    api-key:
+      type: "apiKey"
+      name: "api-key"
+      in: "header"
+      x-title: "API Key"
+  schemas:
+    ArticleResponse:
+      type: object
+      properties:
+        type_of:
+          type: string
+        id:
+          type: integer
+          description: "The unique identifier of the article."
+        title:
+          type: string
+          description: "The title of the article."
+        description:
+          type: string
+          description: "The description of the article."
+        slug:
+          type: string
+        path:
+          type: string
+          description: "The path of the article."
+        url:
+          type: string
+          description: "The URL of the article."
+        comments_count:
+          type: integer
+          description: "The number of comments on the article."
+        public_reactions_count:
+          type: integer
+          description: "The number of public reactions on the article."
+        positive_reactions_count:
+          type: integer
+          description: "The number of positive reactions on the article."
+        created_at:
+          type: string
+          description: "The date and time when the article was created."
+          format: date-time
+        edited_at:
+          type: string
+          description: "The date and time when the article was last edited."
+          format: date-time
+        crossposted_at:
+          type: string
+          description: "The date and time when the article was crossposted."
+          format: date-time
+        published_at:
+          type: string
+          description: "The date and time when the article was published."
+          format: date-time
+        last_comment_at:
+          type: string
+          description: "The date and time of the last comment on the article."
+          format: date-time
+        reading_time_minutes:
+          type: integer
+          description: "The estimated reading time of the article in minutes."
+        tag_list:
+          type: string
+          description: "The tags of the article."
+        tags:
+          type: array
+          description: "The tags of the article."
+          items:
+            type: string
+        body_html:
+          type: string
+          description: "The body of the article in HTML format."
+        body_markdown:
+          type: string
+          description: "The body of the article in markdown format."
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              description: "The name of the author of the article."
+            username:
+              type: string
+              description: "The username of the author of the article."
+            twitter_username:
+              type: string
+              description: "The Twitter username of the author of the article."
+            github_username:
+              type: string
+              description: "The GitHub username of the author of the article."
+            user_id:
+              type: integer
+              description: "The unique identifier of the author of the article."
