@@ -1,8 +1,8 @@
 /// <reference types="vite-plugin-svgr/client" />
 
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
@@ -300,12 +300,11 @@ const OutputTab = ({
                                     <Button
                                         className="flex items-center gap-2"
                                         disabled={!webhookTestCancelEnabled}
+                                        label="Cancel"
                                         onClick={handleTestCancelClick}
                                         size="sm"
                                         variant="outline"
-                                    >
-                                        Cancel
-                                    </Button>
+                                    />
                                 )}
                         </div>
 
