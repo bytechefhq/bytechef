@@ -52,7 +52,7 @@ public class NotificationEvent {
                 }
             }
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format("Invalid source %s and value %s", source, value));
         }
     }
 
