@@ -1,8 +1,8 @@
+import Button from '@/components/Button/Button';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import SchemaMenuPopover from '@/components/JsonSchemaBuilder/components/SchemaMenuPopover';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -81,20 +81,24 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
                     schema={schema}
                 >
                     <Button
-                        className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
+                        className={twMerge(
+                            'group px-2.5',
+                            isMenuOpen &&
+                                'bg-surface-brand-secondary text-content-brand-primary hover:text-content-brand-primary'
+                        )}
+                        icon={<CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />}
                         onClick={() => setIsMenuOpen((open) => !open)}
                         title="Extra fields"
                         variant="ghost"
                     >
-                        <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
-
                         {root && <span>Extra fields</span>}
 
                         {extraFields?.length > 0 && (
                             <Badge
                                 className={twMerge(
                                     'group-hover:bg-surface-neutral-secondary-hover',
-                                    isMenuOpen && 'bg-surface-brand-primary text-white'
+                                    isMenuOpen &&
+                                        'bg-surface-brand-primary text-white group-hover:bg-surface-brand-primary'
                                 )}
                                 variant="secondary"
                             >
@@ -106,32 +110,33 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
 
                 {typeof onDelete === 'function' && (
                     <Button
-                        className="text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
+                        icon={<TrashIcon />}
                         onClick={onDelete}
                         size="icon"
                         title="Delete"
-                        variant="ghost"
-                    >
-                        <TrashIcon />
-                    </Button>
+                        variant="destructiveGhost"
+                    />
                 )}
 
-                {(typeof onAdd === 'function' || isObjectSchema) && (
-                    <Button
-                        className={twMerge(
-                            root && 'ml-auto bg-surface-brand-primary hover:bg-surface-brand-primary-hover'
-                        )}
-                        disabled={!isObjectSchema}
-                        onClick={onAdd || (() => onChange(addSchemaProperty(schema)))}
-                        size={root ? 'default' : 'icon'}
-                        title="Add Property"
-                        variant={root ? 'default' : 'ghost'}
-                    >
-                        <PlusIcon />
-
-                        {root && <span>Add Data Pill</span>}
-                    </Button>
-                )}
+                {(typeof onAdd === 'function' || isObjectSchema) &&
+                    (root ? (
+                        <Button
+                            disabled={!isObjectSchema}
+                            icon={<PlusIcon />}
+                            label="Add Data Pill"
+                            onClick={onAdd || (() => onChange(addSchemaProperty(schema)))}
+                            title="Add Property"
+                        />
+                    ) : (
+                        <Button
+                            disabled={!isObjectSchema}
+                            icon={<PlusIcon />}
+                            onClick={onAdd || (() => onChange(addSchemaProperty(schema)))}
+                            size="icon"
+                            title="Add Property"
+                            variant="ghost"
+                        />
+                    ))}
             </div>
         </div>
     );
@@ -170,20 +175,24 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
                     schema={schema}
                 >
                     <Button
-                        className={twMerge('group px-2.5', isMenuOpen && 'bg-surface-brand-secondary')}
+                        className={twMerge(
+                            'group px-2.5',
+                            isMenuOpen &&
+                                'bg-surface-brand-secondary text-content-brand-primary hover:text-content-brand-primary'
+                        )}
+                        icon={<CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />}
                         onClick={() => setIsMenuOpen((open) => !open)}
                         title="Extra fields"
                         variant="ghost"
                     >
-                        <CircleEllipsisIcon className={twMerge(isMenuOpen && 'text-content-brand-primary')} />
-
                         {root && <span>Extra fields</span>}
 
                         {extraFields?.length > 0 && (
                             <Badge
                                 className={twMerge(
                                     'group-hover:bg-surface-neutral-secondary-hover',
-                                    isMenuOpen && 'bg-surface-brand-primary text-white'
+                                    isMenuOpen &&
+                                        'bg-surface-brand-primary text-white group-hover:bg-surface-brand-primary'
                                 )}
                                 variant="secondary"
                             >
@@ -194,9 +203,7 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
                 </SchemaMenuPopover>
 
                 {typeof onAdd === 'function' && (
-                    <Button onClick={onAdd} size="icon" title="Add" variant="ghost">
-                        <PlusIcon />
-                    </Button>
+                    <Button icon={<PlusIcon />} onClick={onAdd} size="icon" title="Add" variant="ghost" />
                 )}
             </div>
         </div>

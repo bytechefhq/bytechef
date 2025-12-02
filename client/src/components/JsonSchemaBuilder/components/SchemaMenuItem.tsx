@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import {Label} from '@/components/ui/label';
 import {FormEvent, FunctionComponent, ReactNode, useMemo} from 'react';
@@ -22,7 +23,6 @@ import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 
 import '../../CreatableSelect/CreatableSelect.css';
 
-import {Button} from '@/components/ui/button';
 import {Toggle} from '@/components/ui/toggle';
 import {TrashIcon} from 'lucide-react';
 
@@ -35,14 +35,7 @@ const Item = ({children, onDelete}: ItemProps) => (
     <div className="flex w-full items-end justify-between gap-2">
         <div className="min-w-0 flex-1">{children}</div>
 
-        <Button
-            className="shrink-0 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
-            onClick={onDelete}
-            size="icon"
-            variant="ghost"
-        >
-            <TrashIcon />
-        </Button>
+        <Button className="shrink-0" icon={<TrashIcon />} onClick={onDelete} size="icon" variant="destructiveGhost" />
     </div>
 );
 
