@@ -1,5 +1,3 @@
-// i18n is provided globally via I18nProvider in src/main.tsx
-
 import SchemaCreator from '@/components/JsonSchemaBuilder/components/SchemaCreator';
 import {isEmpty} from '@/components/JsonSchemaBuilder/utils/helpers';
 import {useEffect, useState} from 'react';
