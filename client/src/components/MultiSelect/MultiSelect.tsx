@@ -1,5 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
-
 import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {
