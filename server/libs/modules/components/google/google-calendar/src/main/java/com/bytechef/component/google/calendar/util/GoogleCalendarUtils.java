@@ -32,6 +32,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -141,14 +142,28 @@ public class GoogleCalendarUtils {
         String searchText, Context context) {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-        List<CalendarListEntry> calendarListEntries = getAllCalendarListEntries(calendar);
+        List<CalendarListEntry> calendarListEntries = getAllCalendarListEntries(calendar, "writer");
 
+        return createOptionsFromCalendarList(calendarListEntries);
+    }
+
+    public static OptionsFunction<String> getCalendarIdOptions(String minAccessRole) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+
+            Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+            List<CalendarListEntry> calendarListEntries = getAllCalendarListEntries(calendar, minAccessRole);
+
+            return createOptionsFromCalendarList(calendarListEntries);
+        };
+    }
+
+    private static List<Option<String>> createOptionsFromCalendarList(List<CalendarListEntry> calendarListEntries) {
         return calendarListEntries.stream()
             .map(entry -> option(entry.getSummary(), entry.getId()))
             .collect(Collectors.toList());
     }
 
-    private static List<CalendarListEntry> getAllCalendarListEntries(Calendar calendar) {
+    private static List<CalendarListEntry> getAllCalendarListEntries(Calendar calendar, String minAccessRole) {
         List<CalendarListEntry> calendarListEntries = new ArrayList<>();
         String nextPageToken = null;
 
@@ -158,7 +173,7 @@ public class GoogleCalendarUtils {
                 calendarList = calendar
                     .calendarList()
                     .list()
-                    .setMinAccessRole("writer")
+                    .setMinAccessRole(minAccessRole)
                     .setMaxResults(250)
                     .setPageToken(nextPageToken)
                     .execute();

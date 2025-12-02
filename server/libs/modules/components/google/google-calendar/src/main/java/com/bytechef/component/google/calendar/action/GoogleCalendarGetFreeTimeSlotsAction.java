@@ -21,7 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
@@ -31,6 +32,7 @@ import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.ge
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,7 +51,10 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
         .title("Get Free Time Slots")
         .description("Get free time slots from Google Calendar.")
         .properties(
-            CALENDAR_ID_PROPERTY,
+            string(CALENDAR_ID)
+                .label("Calendar Identifier")
+                .options(GoogleCalendarUtils.getCalendarIdOptions(null))
+                .required(true),
             object(DATE_RANGE)
                 .label("Date Range")
                 .description("Date range to find free time.")

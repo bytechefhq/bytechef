@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
@@ -49,7 +49,10 @@ public class GoogleCalendarGetEventsAction {
         .title("Get Events")
         .description("List events from the specified Google Calendar.")
         .properties(
-            CALENDAR_ID_PROPERTY,
+            string(CALENDAR_ID)
+                .label("Calendar Identifier")
+                .options(GoogleCalendarUtils.getCalendarIdOptions(null))
+                .required(true),
             array(EVENT_TYPE)
                 .label("Event Type")
                 .description("Event types to return.")
