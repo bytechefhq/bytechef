@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
@@ -64,7 +65,7 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 <div className="flex flex-1 items-center">
                     {apiConnectorEndpoint.httpMethod && (
                         <Badge
-                            className={`mr-4 w-20 ${textColor}`}
+                            className={twMerge('mr-4 w-20', textColor)}
                             icon={icon}
                             label={apiConnectorEndpoint.httpMethod}
                             styleType="outline-outline"
