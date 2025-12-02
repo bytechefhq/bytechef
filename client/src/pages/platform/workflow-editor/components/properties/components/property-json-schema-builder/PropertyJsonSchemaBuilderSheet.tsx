@@ -11,20 +11,13 @@ import {Suspense, lazy} from 'react';
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 interface PropertyJsonSchemaBuilderSheetProps {
-    locale?: string;
     onChange?: (newSchema: SchemaRecordType) => void;
     onClose?: () => void;
     schema?: SchemaRecordType;
     title?: string;
 }
 
-const PropertyJsonSchemaBuilderSheet = ({
-    locale,
-    onChange,
-    onClose,
-    schema,
-    title,
-}: PropertyJsonSchemaBuilderSheetProps) => {
+const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
     return (
         <Sheet onOpenChange={onClose} open>
             <SheetContent
@@ -64,7 +57,7 @@ const PropertyJsonSchemaBuilderSheet = ({
                         )}
 
                         <TabsContent value="designer">
-                            <JsonSchemaBuilder locale={locale} onChange={onChange} schema={schema} />
+                            <JsonSchemaBuilder onChange={onChange} schema={schema} />
                         </TabsContent>
 
                         <TabsContent className="h-full" value="editor">

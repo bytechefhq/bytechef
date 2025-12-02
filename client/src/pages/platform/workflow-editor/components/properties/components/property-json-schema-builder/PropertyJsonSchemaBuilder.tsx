@@ -16,7 +16,6 @@ interface PropertyJsonSchemaBuilderProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
-    locale?: string;
     name: string;
     onChange?: (newSchema: SchemaRecordType) => void;
     required?: boolean;
@@ -33,7 +32,6 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
             handleInputTypeSwitchButtonClick,
             label,
             leadingIcon,
-            locale,
             name,
             onChange,
             required,
@@ -110,7 +108,6 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                 {showPropertyJsonSchemaBuilder && (
                     <PropertyJsonSchemaBuilderSheet
-                        locale={locale}
                         onChange={onChange}
                         onClose={() => setShowPropertyJsonSchemaBuilder(false)}
                         schema={schema}
