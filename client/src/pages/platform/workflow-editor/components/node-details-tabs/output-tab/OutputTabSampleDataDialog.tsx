@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogCloseButton,
@@ -106,15 +106,14 @@ const OutputTabSampleDataDialog = ({onClose, onUpload, open, placeholder}: Outpu
                 <DialogFooter>
                     <Button
                         disabled={!value}
+                        label="Upload"
                         onClick={() => {
                             if (value) {
                                 onUpload(value && JSON.stringify(value));
                             }
                         }}
                         type="submit"
-                    >
-                        Upload
-                    </Button>
+                    />
                 </DialogFooter>
             </DialogContent>
         </Dialog>
