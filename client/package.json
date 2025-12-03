@@ -107,7 +107,7 @@
     "use-debounce": "^10.0.6",
     "vite-plugin-svgr": "^4.5.0",
     "whatwg-fetch": "^3.6.20",
-    "zod": "^3.25.76",
+    "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
