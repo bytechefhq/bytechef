@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
@@ -199,7 +199,7 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                                 <div className="mt-6">
                                     <PropertyCodeEditorSheetRightPanelConnectionsPopover
                                         onSubmit={handleOnSubmit}
-                                        triggerNode={<Button>Add Component</Button>}
+                                        triggerNode={<Button label="Add Component" />}
                                     />
                                 </div>
                             </div>
@@ -210,13 +210,14 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                                 <div className="flex items-center pb-2">
                                     <span className="font-medium">Note</span>
 
-                                    <button
-                                        className="ml-auto p-0"
+                                    <Button
+                                        className="ml-auto hover:bg-transparent active:bg-transparent active:text-content-neutral-primary"
+                                        icon={<XIcon aria-hidden="true" />}
                                         onClick={() => setShowConnectionNote(false)}
+                                        size="iconXs"
                                         title="Close the note"
-                                    >
-                                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
-                                    </button>
+                                        variant="ghost"
+                                    />
                                 </div>
 
                                 <p className="text-sm text-gray-800">

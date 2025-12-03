@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import LoadingDots from '@/components/LoadingDots';
 import {
     AlertDialog,
@@ -9,7 +10,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -107,15 +107,13 @@ const PropertyCodeEditorSheet = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        className="[&_svg]:size-5"
                                         disabled={!dirty}
+                                        icon={<SaveIcon />}
                                         onClick={() => onChange(newValue)}
                                         size="icon"
                                         type="submit"
                                         variant="ghost"
-                                    >
-                                        <SaveIcon />
-                                    </Button>
+                                    />
                                 </TooltipTrigger>
 
                                 <TooltipContent>Save current workflow</TooltipContent>
@@ -126,14 +124,12 @@ const PropertyCodeEditorSheet = ({
                                     <TooltipTrigger asChild>
                                         <span tabIndex={0}>
                                             <Button
-                                                className="[&_svg]:size-5"
                                                 disabled={dirty}
+                                                icon={<PlayIcon className="text-success" />}
                                                 onClick={handleRunClick}
                                                 size="icon"
                                                 variant="ghost"
-                                            >
-                                                <PlayIcon className="text-success" />
-                                            </Button>
+                                            />
                                         </span>
                                     </TooltipTrigger>
 
@@ -143,15 +139,13 @@ const PropertyCodeEditorSheet = ({
 
                             {scriptIsRunning && (
                                 <Button
-                                    className="[&_svg]:size-5"
+                                    icon={<SquareIcon />}
                                     onClick={() => {
                                         // TODO
                                     }}
                                     size="icon"
                                     variant="destructive"
-                                >
-                                    <SquareIcon />
-                                </Button>
+                                />
                             )}
 
                             <CopilotButton parameters={{language}} source={Source.CODE_EDITOR} />
