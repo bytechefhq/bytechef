@@ -213,6 +213,25 @@ public class NotionUtils {
         return options;
     }
 
+    public static List<Option<String>> getDatabasePropertyOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, ?> body = getDatabase(inputParameters.getRequiredString(ID), context);
+
+        if (body.get("properties") instanceof Map<?, ?> map) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                String propertyName = (String) entry.getKey();
+
+                options.add(option(propertyName, propertyName));
+            }
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getPageIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {

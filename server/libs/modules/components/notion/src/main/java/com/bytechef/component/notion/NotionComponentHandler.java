@@ -26,6 +26,8 @@ import com.bytechef.component.notion.action.NotionCreateDatabaseItemAction;
 import com.bytechef.component.notion.action.NotionCreatePageAction;
 import com.bytechef.component.notion.action.NotionGetDatabaseAction;
 import com.bytechef.component.notion.action.NotionGetPageAction;
+import com.bytechef.component.notion.action.NotionGetPageOrBlockChildrenAction;
+import com.bytechef.component.notion.action.NotionListDatabaseItemsAction;
 import com.bytechef.component.notion.action.NotionUpdateDatabaseItemAction;
 import com.bytechef.component.notion.connection.NotionConnection;
 import com.bytechef.component.notion.trigger.NotionNewDatabaseItemTrigger;
@@ -49,6 +51,8 @@ public class NotionComponentHandler implements ComponentHandler {
             NotionCreatePageAction.ACTION_DEFINITION,
             NotionGetDatabaseAction.ACTION_DEFINITION,
             NotionGetPageAction.ACTION_DEFINITION,
+            NotionGetPageOrBlockChildrenAction.ACTION_DEFINITION,
+            NotionListDatabaseItemsAction.ACTION_DEFINITION,
             NotionUpdateDatabaseItemAction.ACTION_DEFINITION)
         .clusterElements(
             tool(NotionCreateDatabaseItemAction.ACTION_DEFINITION),
