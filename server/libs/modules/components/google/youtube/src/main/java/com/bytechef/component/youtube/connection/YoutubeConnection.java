@@ -26,7 +26,7 @@ import java.util.List;
 public class YoutubeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of(
+        "https://www.googleapis.com/youtube/v3", (connection, context) -> List.of(
             "https://www.googleapis.com/auth/youtube", "https://www.googleapis.com/auth/youtube.upload"));
 
     private YoutubeConnection() {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+               http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="1764674356" author="Matija Petanjek">
+        <insert tableName="notification_event">
+            <column name="id" value="6" />
+            <column name="type" value="5" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

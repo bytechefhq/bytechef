@@ -74,9 +74,8 @@ public class GoogleTasksListTasksAction {
 
         do {
             Map<String, Object> response = context
-                .http(http -> http.get(
-                    "https://tasks.googleapis.com/tasks/v1/lists/%s/tasks".formatted(
-                        inputParameters.getRequiredString(LIST_ID))))
+                .http(http -> http.get("/lists/%s/tasks".formatted(
+                    inputParameters.getRequiredString(LIST_ID))))
                 .queryParameters(
                     PAGE_TOKEN, nextPageToken,
                     MAX_RESULTS, 100,

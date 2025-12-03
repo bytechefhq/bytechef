@@ -19,18 +19,17 @@ package com.bytechef.component.discord;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -93,17 +92,18 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        return modifiableConnectionDefinition
-            .authorizations(
-                authorization(AuthorizationType.BEARER_TOKEN)
-                    .title("Bearer Token")
-                    .properties(
-                        string(TOKEN)
-                            .label("Bot token")
-                            .required(true))
-                    .apply((connectionParameters, context) -> ofHeaders(
-                        Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN))))))
-            .baseUri((connectionParameters, context) -> "https://discord.com/api/v10");
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            modifiableAuthorization.apply((connectionParameters, context) -> ofHeaders(
+                Map.of(AUTHORIZATION, List.of("Bot " + connectionParameters.getRequiredString(TOKEN)))));
+        }
+
+        return modifiableConnectionDefinition;
     }
 
     @Override

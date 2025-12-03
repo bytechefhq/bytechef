@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.security.web.configurer;
 
+import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
+
 import com.bytechef.platform.security.web.filter.ApiKeyAuthenticationFilter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -24,6 +26,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -33,7 +36,7 @@ public class AbstractApiKeyHttpConfigurer
 
     private final AuthenticationConverter authenticationConverter;
     private final AuthenticationProvider authenticationProvider;
-    private final String pathPatternRegex;
+    private final Object pathPattern;
 
     public AbstractApiKeyHttpConfigurer(
         String pathPatternRegex, AuthenticationConverter authenticationConverter,
@@ -41,7 +44,16 @@ public class AbstractApiKeyHttpConfigurer
 
         this.authenticationConverter = authenticationConverter;
         this.authenticationProvider = authenticationProvider;
-        this.pathPatternRegex = pathPatternRegex;
+        this.pathPattern = pathPatternRegex;
+    }
+
+    public AbstractApiKeyHttpConfigurer(
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
+        AuthenticationProvider authenticationProvider) {
+
+        this.authenticationConverter = authenticationConverter;
+        this.authenticationProvider = authenticationProvider;
+        this.pathPattern = requestMatcher;
     }
 
     @Override
@@ -60,7 +72,16 @@ public class AbstractApiKeyHttpConfigurer
     public void configure(HttpSecurity http) {
         var authenticationManager = http.getSharedObject(AuthenticationManager.class);
 
-        var filter = new ApiKeyAuthenticationFilter(pathPatternRegex, authenticationConverter, authenticationManager);
+        RequestMatcher requestMatcher;
+
+        if (pathPattern instanceof String) {
+            requestMatcher = regexMatcher((String) pathPattern);
+        } else {
+            requestMatcher = (RequestMatcher) pathPattern;
+        }
+
+        ApiKeyAuthenticationFilter filter = new ApiKeyAuthenticationFilter(
+            requestMatcher, authenticationConverter, authenticationManager);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }

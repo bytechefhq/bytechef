@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {Tag} from '@/shared/middleware/graphql';
 import {ReactNode} from 'react';
@@ -27,9 +27,11 @@ const McpServersFilterTitle = ({
                 <>
                     <span className="text-sm uppercase text-muted-foreground">tag:</span>
 
-                    <Badge variant="secondary">
-                        <span className="text-sm">{pageTitle ?? 'Unknown Tag'}</span>
-                    </Badge>
+                    <Badge
+                        label={typeof pageTitle === 'string' ? pageTitle : 'Unknown Tag'}
+                        styleType="secondary-filled"
+                        weight="semibold"
+                    />
                 </>
             )}
 

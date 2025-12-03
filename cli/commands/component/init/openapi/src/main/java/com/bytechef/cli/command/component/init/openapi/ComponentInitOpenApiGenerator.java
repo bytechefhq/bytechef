@@ -229,7 +229,7 @@ public class ComponentInitOpenApiGenerator {
                     "Properties)",
                 ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
                 ClassName.get(
-                    "com.bytechef.component." + componentName + ".util",
+                    "com.bytechef.component." + StringUtils.replaceChars(componentName, "-_", ".") + ".util",
                     getComponentClassName(componentName) + "Utils"));
 
             this.dynamicProperties.add(buildOptionsFunctionsName(propertyName));
@@ -966,8 +966,16 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
-    private CodeBlock getAuthorizationBearerCodeBlock() {
+    private CodeBlock getAuthorizationBearerCodeBlock(SecurityScheme securityScheme) {
         CodeBlock.Builder builder = CodeBlock.builder();
+
+        Map<String, Object> extensions = securityScheme.getExtensions();
+
+        String label = "Token";
+
+        if (extensions != null && extensions.get("x-title") != null) {
+            label = (String) extensions.get("x-title");
+        }
 
         builder.add(
             """
@@ -980,7 +988,7 @@ public class ComponentInitOpenApiGenerator {
                     )
                 """,
             "Bearer Token",
-            "Token",
+            label,
             true);
 
         return builder.build();
@@ -1145,7 +1153,7 @@ public class ComponentInitOpenApiGenerator {
                     if (Objects.equals(scheme, "basic")) {
                         codeBlocks.add(getAuthorizationBasicCodeBlock());
                     } else if (Objects.equals(scheme, "bearer")) {
-                        codeBlocks.add(getAuthorizationBearerCodeBlock());
+                        codeBlocks.add(getAuthorizationBearerCodeBlock(securityScheme));
                     } else {
                         throw new IllegalArgumentException("Security scheme: %s not supported".formatted(scheme));
                     }
@@ -2156,7 +2164,7 @@ public class ComponentInitOpenApiGenerator {
                 ".options(($T.OptionsFunction<" + optionType + ">)$T::get"
                     + buildOptionsFunctionsName(propertyName) + "Options)",
                 ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
-                ClassName.get("com.bytechef.component." + componentName + ".util",
+                ClassName.get("com.bytechef.component." + StringUtils.replaceChars(componentName, "-_", ".") + ".util",
                     getComponentClassName(componentName) + "Utils"));
 
             if (extensionMap.get("x-dynamic-options-dependency") instanceof List<?> dependencies) {

@@ -58,7 +58,7 @@ class GoogleSheetsGetRowsActionTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void perform() throws Exception {
+    void testPerform() throws Exception {
         Map<String, Object> rowMap = Map.of("first-name", "John", "last-name", "Doe", "year", 2023);
         List<Object> firstRow = List.of("John", "Doe", 2023);
 
@@ -89,6 +89,39 @@ class GoogleSheetsGetRowsActionTest {
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of("spreadsheetId", "sheetName"), stringArgumentCaptor.getAllValues());
             assertEquals(List.of(firstRow), listArgumentCaptor.getAllValues());
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPerformForNullValues() throws Exception {
+        Map<String, Object> rowMap = Map.of("first-name", "John", "last-name", "Doe", "year", 2023);
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
+
+            googleSheetsUtilsMockedStatic
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(
+                    parametersArgumentCaptor.capture(), sheetsArgumentCaptor.capture(), listArgumentCaptor.capture()))
+                .thenReturn(rowMap);
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedSheets);
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.values())
+                .thenReturn(mockedValues);
+            when(mockedValues.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(new ValueRange());
+
+            Object result = GoogleSheetsGetRowsAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+            assertEquals(List.of(), result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of("spreadsheetId", "sheetName"), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(), listArgumentCaptor.getAllValues());
         }
     }
 }

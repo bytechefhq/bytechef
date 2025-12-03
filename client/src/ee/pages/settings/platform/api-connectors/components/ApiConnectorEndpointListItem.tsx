@@ -1,34 +1,77 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
-import {CalendarIcon, EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
+import {
+    CalendarIcon,
+    CloudDownloadIcon,
+    EllipsisVerticalIcon,
+    FolderSyncIcon,
+    SendToBackIcon,
+    Trash2Icon,
+    UploadIcon,
+} from 'lucide-react';
+import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const projectDeploymentWorkflow = undefined;
+
+    const method = apiConnectorEndpoint.httpMethod;
+
+    const httpMethodStyles = useMemo(() => {
+        switch (method) {
+            case 'GET':
+                return {
+                    icon: <CloudDownloadIcon className="size-3" />,
+                    textColor: 'text-content-brand-primary',
+                };
+            case 'POST':
+                return {
+                    icon: <UploadIcon className="size-3" />,
+                    textColor: 'text-content-success-primary',
+                };
+            case 'PUT':
+                return {
+                    icon: <SendToBackIcon className="size-3" />,
+                    textColor: 'text-content-warning-primary',
+                };
+            case 'PATCH':
+                return {
+                    icon: <FolderSyncIcon className="size-3" />,
+                    textColor: 'text-orange-700',
+                };
+            case 'DELETE':
+                return {
+                    icon: <Trash2Icon className="size-3" />,
+                    textColor: 'text-content-destructive-primary',
+                };
+            default:
+                return {
+                    icon: undefined,
+                    textColor: '',
+                };
+        }
+    }, [method]);
+
+    const {icon, textColor} = httpMethodStyles;
 
     return (
         <>
             <Link className="flex flex-1 items-center" to={`/automation/projects/${1}/workflows/${1}`}>
                 <div className="flex flex-1 items-center">
-                    <Badge
-                        className={twMerge(
-                            'mr-4 w-20 border-transparent',
-                            apiConnectorEndpoint.httpMethod === 'DELETE' && 'bg-red-400',
-                            apiConnectorEndpoint.httpMethod === 'GET' && 'bg-blue-400',
-                            apiConnectorEndpoint.httpMethod === 'POST' && 'bg-green-400',
-                            apiConnectorEndpoint.httpMethod === 'PUT' && 'bg-amber-400'
-                        )}
-                        variant="secondary"
-                    >
-                        {apiConnectorEndpoint.httpMethod}
-                    </Badge>
+                    {method && (
+                        <Badge
+                            className={twMerge('mr-4 w-20', textColor)}
+                            icon={icon}
+                            label={method}
+                            styleType="outline-outline"
+                            weight="semibold"
+                        />
+                    )}
 
                     <div className="w-2/6 text-sm font-semibold">{apiConnectorEndpoint.name}</div>
 

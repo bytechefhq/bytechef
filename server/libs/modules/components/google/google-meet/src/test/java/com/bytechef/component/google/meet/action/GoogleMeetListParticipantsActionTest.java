@@ -96,10 +96,7 @@ class GoogleMeetListParticipantsActionTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(
-            List.of(
-                "https://meet.googleapis.com/v2/test/participants", "https://meet.googleapis.com/v2/test/participants"),
-            stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/test/participants", "/test/participants"), stringArgumentCaptor.getAllValues());
 
         List<Object[]> allQueryParams = objectsArgumentCaptor.getAllValues();
 

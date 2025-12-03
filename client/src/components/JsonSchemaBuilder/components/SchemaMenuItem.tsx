@@ -1,7 +1,9 @@
+import Button from '@/components/Button/Button';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import {Label} from '@/components/ui/label';
+import {t} from '@lingui/core/macro';
+import {Trans, useLingui} from '@lingui/react';
 import {FormEvent, FunctionComponent, ReactNode, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
@@ -22,7 +24,6 @@ import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 
 import '../../CreatableSelect/CreatableSelect.css';
 
-import {Button} from '@/components/ui/button';
 import {Toggle} from '@/components/ui/toggle';
 import {TrashIcon} from 'lucide-react';
 
@@ -35,14 +36,7 @@ const Item = ({children, onDelete}: ItemProps) => (
     <div className="flex w-full items-end justify-between gap-2">
         <div className="min-w-0 flex-1">{children}</div>
 
-        <Button
-            className="shrink-0 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
-            onClick={onDelete}
-            size="icon"
-            variant="ghost"
-        >
-            <TrashIcon />
-        </Button>
+        <Button className="shrink-0" icon={<TrashIcon />} onClick={onDelete} size="icon" variant="destructiveGhost" />
     </div>
 );
 
@@ -101,12 +95,12 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage="No Options"
+                    noOptionsMessage={t`No options`}
                     onChange={(options: {value: string}[]) =>
                         onChange(setSchemaField(field.value, optionsToStrings(options), schema))
                     }
                     options={allOptions}
-                    placeholder="Options"
+                    placeholder={t`Options`}
                     value={allOptions}
                 />
             </fieldset>
@@ -115,9 +109,12 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
 };
 
 export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
-    const {t: translation} = useTranslation();
+    const {i18n} = useLingui();
 
-    const options = useMemo(() => translateLabels(translation, field.optionList), [field.optionList, translation]);
+    const options = useMemo(
+        () => translateLabels((string: string) => i18n._(string), field.optionList),
+        [field.optionList, i18n]
+    );
 
     const option = getSchemaField(schema, field.value);
 
@@ -126,17 +123,19 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
     return (
         <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <fieldset className="w-full space-y-1">
-                <Label>Options</Label>
+                <Label>
+                    <Trans id="Options" />
+                </Label>
 
                 <Select
                     autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
-                    noOptionsMessage="No options"
+                    noOptionsMessage={t`No options`}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(option: any) => onChange(setSchemaField(field.value, option.value, schema))}
                     options={options}
-                    placeholder="Options"
+                    placeholder={t`Options`}
                     value={selected}
                 />
             </fieldset>
@@ -162,12 +161,12 @@ export const RequiredMultiSelectItem: FunctionComponent<ItemTypeProps> = ({field
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage="No option"
+                    noOptionsMessage={t`No options`}
                     onChange={(options: {value: string}[]) =>
                         onChange(setSchemaField(field.value, optionsToStrings(options), schema))
                     }
                     options={allOptions}
-                    placeholder="Options"
+                    placeholder={t`Options`}
                     value={requiredOptions}
                 />
             </fieldset>

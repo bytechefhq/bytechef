@@ -696,29 +696,60 @@ ${getCustomActionString()}
                     moduleDocsDir.mkdirs()
                 }
 
-                definitionDir.listFiles { file -> file.isFile && file.extension.equals("json", ignoreCase = true) }
-                    ?.forEach { jsonFile ->
-                        val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
-                        val json = jsonObject.toString()
+                val definitionJsonFiles = definitionDir.listFiles { file ->
+                    file.isFile && file.extension.equals("json", ignoreCase = true)
+                }?.toList().orEmpty()
 
-                        val path = when (isComponentsDir) {
-                            true -> componentsPath
-                            false -> taskDispatchersPath
-                        }
+                definitionJsonFiles.forEach { jsonFile ->
+                    val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
+                    val json = jsonObject.toString()
 
-                        val docsDir = File(path)
-                        if (!docsDir.exists()) {
-                            docsDir.mkdirs()
-                        }
-
-                        val mdFile = File(path, "${jsonFile.nameWithoutExtension}.mdx")
-                        mdFile.writeText(json)
-
-                        if (readmeFile.exists()) {
-                            mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
-                            mdFile.appendText(readmeFile.readText())
-                        }
+                    val path = when (isComponentsDir) {
+                        true -> componentsPath
+                        false -> taskDispatchersPath
                     }
+
+                    val docsDir = File(path)
+                    if (!docsDir.exists()) {
+                        docsDir.mkdirs()
+                    }
+
+                    val mdFile = File(path, "${jsonFile.nameWithoutExtension}.mdx")
+                    mdFile.writeText(json)
+
+                    if (readmeFile.exists()) {
+                        mdFile.appendText("<hr />\n\n# Additional Instructions\n\n")
+                        mdFile.appendText(readmeFile.readText())
+                    }
+                }
+
+                run {
+                    val docsPath = if (isComponentsDir) componentsPath else taskDispatchersPath
+                    val docsDir = File(docsPath)
+
+                    if (docsDir.exists()) {
+                        val expectedNames = definitionJsonFiles.map { it.nameWithoutExtension }.toSet()
+
+                        val prefixes: Set<String> = if (expectedNames.isNotEmpty()) {
+                            expectedNames.map { it.substringBefore("_v") }.toSet()
+                        } else {
+                            setOf(File(currentPath).name)
+                        }
+
+                        docsDir.listFiles { file -> file.isFile && file.extension.equals("mdx", ignoreCase = true) }
+                            ?.forEach { mdxFile ->
+                                val nameWithoutExt = mdxFile.nameWithoutExtension
+                                val belongsToThisModule = prefixes.any { prefix ->
+                                    nameWithoutExt == prefix || nameWithoutExt.startsWith("${prefix}_v")
+                                }
+                                val hasDefinition = expectedNames.contains(nameWithoutExt)
+
+                                if (belongsToThisModule && !hasDefinition) {
+                                    mdxFile.delete()
+                                }
+                            }
+                    }
+                }
             }
         }
     }

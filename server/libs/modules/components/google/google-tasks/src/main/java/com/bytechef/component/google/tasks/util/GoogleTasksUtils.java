@@ -46,14 +46,14 @@ public class GoogleTasksUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        return fetchOptions(context, "https://tasks.googleapis.com/tasks/v1/users/@me/lists");
+        return fetchOptions(context, "/users/@me/lists");
     }
 
     public static List<Option<String>> getTasksIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
-        String url = "https://tasks.googleapis.com/tasks/v1/lists/%s/tasks"
+        String url = "/lists/%s/tasks"
             .formatted(inputParameters.getRequiredString(LIST_ID));
 
         return fetchOptions(actionContext, url);

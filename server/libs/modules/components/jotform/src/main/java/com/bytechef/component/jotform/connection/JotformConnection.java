@@ -42,7 +42,7 @@ public class JotformConnection {
                     .defaultValue("APIKEY")
                     .hidden(true),
                 string(VALUE)
-                    .label("Value")
+                    .label("API Key")
                     .required(true)
 
             ));

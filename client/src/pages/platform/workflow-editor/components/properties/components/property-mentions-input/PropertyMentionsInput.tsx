@@ -107,6 +107,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         };
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
+        const labelId = useMemo(() => `${elementId}-label`, [elementId]);
 
         const handleEditorValueChange = useCallback(
             (newValue?: string | number) => {
@@ -160,7 +161,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
                             <div className="flex items-center">
-                                <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
+                                <Label
+                                    className={twMerge(description && 'mr-1', 'leading-normal')}
+                                    htmlFor={elementId}
+                                    id={labelId}
+                                >
                                     {label}
 
                                     {required && <RequiredMark />}
@@ -234,6 +239,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             dataPills={dataPills}
                             elementId={elementId}
                             isFormulaMode={isFormulaMode}
+                            labelId={labelId}
                             onChange={(value) => handleEditorValueChange(value)}
                             onFocus={onFocus}
                             path={path}

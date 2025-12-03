@@ -29,7 +29,7 @@ public class GoogleSlidesConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of(
+        "https://slides.googleapis.com/v1", (connection, context) -> List.of(
             "https://www.googleapis.com/auth/drive",
             "https://www.googleapis.com/auth/presentations"));
 }

@@ -227,7 +227,7 @@ export default function handleDeleteTask({
                 });
 
                 if (currentNode?.name === data.name) {
-                    useWorkflowNodeDetailsPanelStore.getState().reset();
+                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
 
                     setCurrentNode({
                         ...rootClusterElementNodeData,

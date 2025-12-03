@@ -97,7 +97,7 @@ class GoogleTasksUtilsTest {
 
         assertEquals(expectedOptions, result);
 
-        performCommonAssertions("https://tasks.googleapis.com/tasks/v1/users/@me/lists");
+        performCommonAssertions("/users/@me/lists");
     }
 
     @Test
@@ -107,7 +107,7 @@ class GoogleTasksUtilsTest {
 
         assertEquals(expectedOptions, result);
 
-        performCommonAssertions("https://tasks.googleapis.com/tasks/v1/lists/abc/tasks");
+        performCommonAssertions("/lists/abc/tasks");
     }
 
     private void performCommonAssertions(String expectedUrl) {

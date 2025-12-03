@@ -30,5 +30,5 @@ public class GoogleDriveConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of("https://www.googleapis.com/auth/drive"));
+        null, (connection, context) -> List.of("https://www.googleapis.com/auth/drive"));
 }

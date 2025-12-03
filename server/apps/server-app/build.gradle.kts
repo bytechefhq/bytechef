@@ -12,13 +12,11 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
-    implementation("org.apache.activemq:artemis-jakarta-server")
     implementation("org.springframework.ai:spring-ai-starter-model-anthropic")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
-    implementation("org.springframework.boot:spring-boot-starter-artemis")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
@@ -119,7 +117,7 @@ dependencies {
         rootProject.subprojects
             .asSequence()
             .filter { it.path.startsWith(":server:libs:modules:components") }
-            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock") }
+            .filterNot { it.path in setOf(":server:libs:modules:components:ai:llm:amazon-bedrock", ":server:libs:modules:components:example") }
             .sortedBy { it.path }
             .forEach { implementation(project(it.path)) }
     }

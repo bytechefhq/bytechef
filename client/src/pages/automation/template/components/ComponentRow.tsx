@@ -28,14 +28,16 @@ const ComponentRow = ({
                 <span className="font-medium text-gray-900">{componentDefinition.title}</span>
             </div>
 
-            {componentDefinition.connection && false && (
-                <Button
-                    disabled={isConnected(componentDefinition.name)}
-                    onClick={() => setConnectedComponents((prev) => [...prev, componentDefinition.name])}
-                >
-                    {isConnected(componentDefinition.name) ? 'Connected' : 'Connect'}
-                </Button>
-            )}
+            {
+                /* eslint-disable no-constant-binary-expression */ componentDefinition.connection && false && (
+                    <Button
+                        disabled={isConnected(componentDefinition.name)}
+                        onClick={() => setConnectedComponents((prev) => [...prev, componentDefinition.name])}
+                    >
+                        {isConnected(componentDefinition.name) ? 'Connected' : 'Connect'}
+                    </Button>
+                )
+            }
         </div>
     );
 };

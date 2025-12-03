@@ -42,7 +42,7 @@ public class ShopifyConnection {
                     .defaultValue("X-Shopify-Access-Token")
                     .hidden(true),
                 string(VALUE)
-                    .label("Value")
+                    .label("Access Token")
                     .required(true)
 
             ));

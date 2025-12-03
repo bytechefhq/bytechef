@@ -1,0 +1,181 @@
+### Data Storage: Scopes, getValue behavior, defaults, and examples
+
+This guide complements the component reference and answers common questions with concrete examples.
+
+For the full property list of every action, see the reference page: `/docs/reference/components/data-storage_v1`.
+
+---
+
+### Scopes explained with examples
+
+Data Storage actions accept a `scope` that defines how broadly the value is visible and how long it lives.
+
+- CURRENT_EXECUTION
+  - Visibility: Only within the currently running workflow execution (this single run).
+  - Lifetime: Disappears when this execution finishes.
+  - Example: Accumulate items in a loop and emit at the end of the run.
+
+- WORKFLOW
+  - Visibility: All future and parallel executions of the same workflow (same workflow definition + same deployment) can read it.
+  - Lifetime: Persists until explicitly deleted or overwritten by the workflow.
+  - Example: Cache a per‑workflow token or “last processed timestamp”.
+
+- PRINCIPAL
+  - Visibility: All workflows within the same deployment (principal) can share it.
+  - Lifetime: Persists across all workflows in that deployment until deleted/overwritten.
+  - Example: Share a rate‑limit counter across multiple workflows inside the same deployment/environment.
+
+- ACCOUNT
+  - Visibility: Global for your ByteChef account across deployments and workflows.
+  - Lifetime: Persists until deleted/overwritten.
+  - Example: Organization‑wide configuration or shared lookup tables used by many workflows.
+
+Notes
+- Keys must be unique within a chosen scope; otherwise the new write overwrites the existing value.
+- When you need safe concurrent numeric increments from multiple executions, use `Atomic Increment`.
+- Keys must be smaller than 1024 bytes (see Set Value reference).
+
+---
+
+### Worked example: building and reading a list (heroes)
+
+Imagine a loop where you append three objects to a list under key `heroes`:
+
+```
+Append Value to List (scope: CURRENT_EXECUTION, key: heroes, type: OBJECT, value: {"name":"Peter","secondName":"Pan"})
+Append Value to List (scope: CURRENT_EXECUTION, key: heroes, type: OBJECT, value: {"name":"Donald","secondName":"Duck"})
+Append Value to List (scope: CURRENT_EXECUTION, key: heroes, type: OBJECT, value: {"name":"Mickey","secondName":"Mouse"})
+```
+
+Next, add `Get Value` with `key: heroes`, `scope: CURRENT_EXECUTION`, `type: ARRAY`. Suppose the designer auto‑names this step `dataStorage_2`.
+
+#### What does `{dataStorage_2}` contain?
+
+It evaluates to the array of objects you stored. Using the example above:
+
+```json
+[
+  { "name": "Peter",  "secondName": "Pan" },
+  { "name": "Donald", "secondName": "Duck" },
+  { "name": "Mickey", "secondName": "Mouse" }
+]
+```
+
+Common projections you can use in expressions:
+- `{dataStorage_2[0].name}` → `Peter`
+- `{dataStorage_2[1].secondName}` → `Duck`
+- Iterate in a downstream loop over `{dataStorage_2}` to process each item.
+
+#### Can I rename `dataStorage_2` to `heroesArray`?
+
+Yes. In the workflow designer, rename the step to a meaningful handle (e.g., `heroesArray`). Thereafter `{heroesArray}` refers to the same output. The handle must be unique within the workflow.
+
+Auto‑naming currently uses the component name with an index (e.g., `dataStorage_2`). It does not derive names from the `key`/`type`. We recommend manually renaming important steps using a clear convention such as:
+- `heroesArray`
+- `counterInteger`
+- `yearString`
+- `birthDate`
+
+---
+
+### getValue: type, validation and transformations
+
+`Get Value` retrieves what was previously stored under the given `key` and `scope`.
+
+- If you omit `type`:
+  - The step returns the stored JSON value “as is”.
+
+- If you provide `type`:
+  - The runtime validates/deserializes the stored value as that type.
+  - For complex types (ARRAY/OBJECT), the structure must match.
+  - For numeric sub‑types, requesting `NUMBER` for an integer will yield a number; requesting `INTEGER` for a non‑integer number is invalid.
+  - If the stored value is incompatible with the requested `type`, the action fails validation rather than silently changing your data.
+
+Important
+- `Get Value` does not mutate what is stored. The `type` is about how the output is interpreted/validated at read time, not how it is persisted.
+- To avoid surprises, store values using the intended type up front (via `Set Value` / `Append Value to List`).
+
+---
+
+### Default Value: when and how to use it
+
+`defaultValue` on `Get Value` is returned when the key does not exist in the chosen scope. Examples:
+
+- Return an empty list if `heroes` is missing:
+  - `type: ARRAY`, `defaultValue: []`
+- Return `0` for a missing counter:
+  - `type: INTEGER`, `defaultValue: 0`
+
+Behavior
+- If the key is absent → you receive `defaultValue` (if provided) or `null`.
+- If the key exists but the stored value is incompatible with the requested `type` → the step fails validation; `defaultValue` is not used to repair type mismatches.
+
+Why does the “Default Value” input sometimes disappear when I choose an expression?
+- Some property editors in the UI switch between “literal” and “expression” modes. When you supply an expression for a consuming field, the editor may hide literal defaults to avoid conflicts. Use one of these strategies:
+  1) Put the fallback directly on the `Get Value` step via its `defaultValue` property; or
+  2) Handle fallback at the consumption site (for example, ensure the downstream component can handle empty arrays or use a Script step to coalesce).
+
+---
+
+### Recipes
+
+#### A) Export the list to CSV
+
+Goal: Save the `heroes` array as CSV text with two columns `name,secondName`.
+
+One simple approach is to build rows and then send CSV text to a component that accepts file/content input (e.g., HTTP upload, drive/storage, email attachment). You can assemble a CSV string with a Script step:
+
+```javascript
+// Script (JavaScript) step
+function perform(input, context) {
+  const rows = context.input.heroes; // pass {heroesArray} into the script's input mapping
+  const header = ['name','secondName'];
+  const lines = [header.join(',')];
+  for (const r of rows) {
+    const safe = [r.name, r.secondName].map(v => typeof v === 'string' ? '"' + v.replaceAll('"', '""') + '"' : '');
+    lines.push(safe.join(','));
+  }
+  return { csv: lines.join('\n') };
+}
+```
+
+Then send `output.csv` to your destination using the corresponding component. Map the Script output field (e.g., `{script.csv}`) to the file content/body.
+
+Tips
+- If your workspace includes a dedicated CSV component, you can map the array of objects and headers directly instead of scripting.
+
+#### B) Append rows to Google Sheets
+
+Goal: Append each hero as a new row in a Google Sheet with columns A: `name`, B: `secondName`.
+
+High‑level steps:
+1. Ensure your `Get Value` step returns the array (rename the step to `heroesArray` for readability).
+2. Add Google Sheets → Append Values (or similar) action.
+3. Provide a 2D array where each inner array is a row `[name, secondName]`.
+
+If you need to reshape objects to rows, insert a tiny Script step:
+
+```javascript
+function perform(input, context) {
+  const rows = context.input.heroes.map(h => [h.name, h.secondName]);
+  return { rows };
+}
+```
+
+Set the Google Sheets “values”/“rows” parameter to `{script.rows}` and configure the target spreadsheet, sheet/tab, and insertion mode.
+
+---
+
+### FAQ
+
+Can I append a list as a single item?
+- Yes. In `Append Value to List`, set `appendListAsSingleItem: true` to push the entire list as one element instead of concatenating.
+
+How do deletes work?
+- Use `Delete Value` to remove any key, or `Delete Value from List` to remove by index within a stored list.
+
+How do I see everything stored in a scope?
+- Use `Get All Entries (Keys and Values)` with the desired `scope`.
+
+Where can I find the full schema for each action?
+- See the component reference: `/docs/reference/components/data-storage_v1`.

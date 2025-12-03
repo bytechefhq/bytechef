@@ -1,5 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -38,14 +38,19 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 {mcpComponent.mcpTools && mcpComponent.mcpTools.length > 0 && (
                     <div className="flex items-center gap-x-1">
                         <div className="flex items-center gap-x-1">
-                            {mcpComponent.mcpTools.slice(0, 4).map(
-                                (tool, index) =>
-                                    tool?.name && (
-                                        <Badge className="text-xs" key={index} variant="secondary">
-                                            {tool.name}
-                                        </Badge>
-                                    )
-                            )}
+                            {mcpComponent.mcpTools
+                                .slice(0, 4)
+                                .map(
+                                    (tool) =>
+                                        tool?.name && (
+                                            <Badge
+                                                key={tool.name}
+                                                label={tool.name}
+                                                styleType="secondary-filled"
+                                                weight="semibold"
+                                            />
+                                        )
+                                )}
 
                             {mcpComponent.mcpTools.length > 4 && (
                                 <span className="text-xs text-gray-500">+{mcpComponent.mcpTools.length - 4} more</span>

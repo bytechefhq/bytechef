@@ -105,8 +105,7 @@ class GoogleTasksListTasksActionTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-        assertEquals("https://tasks.googleapis.com/tasks/v1/lists/id-1/tasks", stringArgumentCaptor.getValue());
+        assertEquals("/lists/id-1/tasks", stringArgumentCaptor.getValue());
 
         Object[] objects = {
             PAGE_TOKEN, null, MAX_RESULTS, 100, SHOW_COMPLETED, true

@@ -248,3 +248,4 @@ components:
     bearerAuth:
       type: "http"
       scheme: "bearer"
+      x-title: "Bot Token"

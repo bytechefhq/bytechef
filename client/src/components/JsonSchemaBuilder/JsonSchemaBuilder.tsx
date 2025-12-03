@@ -1,23 +1,16 @@
+import SchemaCreator from '@/components/JsonSchemaBuilder/components/SchemaCreator';
+import {isEmpty} from '@/components/JsonSchemaBuilder/utils/helpers';
 import {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 
 import {SchemaRecordType} from './utils/types';
 
-import './utils/i18n';
-
-import SchemaCreator from '@/components/JsonSchemaBuilder/components/SchemaCreator';
-import {isEmpty} from '@/components/JsonSchemaBuilder/utils/helpers';
-
 interface JsonSchemaBuilderProps {
-    locale?: string;
     onChange?: (newSchema: SchemaRecordType) => void;
     schema?: SchemaRecordType;
 }
 
-const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderProps) => {
+const JsonSchemaBuilder = ({onChange, schema}: JsonSchemaBuilderProps) => {
     const [curSchema, setCurSchema] = useState<SchemaRecordType>();
-
-    const {i18n, ready} = useTranslation('null', {useSuspense: false});
 
     useEffect(() => {
         setCurSchema(
@@ -34,12 +27,7 @@ const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderP
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        i18n.changeLanguage(locale);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [locale]);
-
-    if (!ready || !curSchema) {
+    if (!curSchema) {
         return null;
     }
 

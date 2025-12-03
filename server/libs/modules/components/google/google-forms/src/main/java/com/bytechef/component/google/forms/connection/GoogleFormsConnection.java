@@ -29,7 +29,7 @@ public class GoogleFormsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of(
+        "https://forms.googleapis.com/v1", (connection, context) -> List.of(
             "https://www.googleapis.com/auth/drive.readonly",
             "https://www.googleapis.com/auth/forms.responses.readonly"));
 }

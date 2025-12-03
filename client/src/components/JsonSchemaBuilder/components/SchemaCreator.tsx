@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {AsteriskIcon, ChevronDownIcon} from 'lucide-react';
 import {PropsWithChildren, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -164,12 +164,13 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
         >
             <Button
                 className="absolute -left-3 top-0 size-6"
+                icon={
+                    <ChevronDownIcon className={twMerge('transition-all duration-200', isCollapsed && 'rotate-180')} />
+                }
                 onClick={() => setIsCollapsed((prev) => !prev)}
                 size="icon"
                 variant="outline"
-            >
-                <ChevronDownIcon className={twMerge('transition-all duration-200', isCollapsed && 'rotate-180')} />
-            </Button>
+            />
 
             {isCollapsed ? <Badge variant="secondary">{itemCount} items nested</Badge> : <div>{children}</div>}
         </div>

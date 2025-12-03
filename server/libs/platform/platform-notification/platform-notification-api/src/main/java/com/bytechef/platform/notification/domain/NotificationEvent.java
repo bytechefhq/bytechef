@@ -34,7 +34,8 @@ public class NotificationEvent {
     public enum Type {
 
         JOB_CANCELLED(Source.JOB, "CANCELLED"), JOB_CREATED(Source.JOB, "CREATED"),
-        JOB_COMPLETED(Source.JOB, "COMPLETED"), JOB_FAILED(Source.JOB, "FAILED"), JOB_STARTED(Source.JOB, "STARTED");
+        JOB_COMPLETED(Source.JOB, "COMPLETED"), JOB_FAILED(Source.JOB, "FAILED"),
+        JOB_STARTED(Source.JOB, "STARTED"), JOB_STOPPED(Source.JOB, "STOPPED");
 
         private final Source source;
         private final String value;
@@ -51,7 +52,7 @@ public class NotificationEvent {
                 }
             }
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format("Invalid source %s and value %s", source, value));
         }
     }
 

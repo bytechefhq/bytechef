@@ -32,7 +32,7 @@ public class CouchbaseConstants {
 
     public static final String BUCKET_NAME = "bucketName";
     public static final String COLLECTION_NAME = "collectionName";
-    public static final String CONNECTION_STRING = "connection-string";
+    public static final String CONNECTION_STRING = "connectionString";
     public static final String COUCHBASE = "couchbase";
     public static final String DIMENSIONS = "dimensions";
     public static final String INDEX_NAME = "indexName";

@@ -33,8 +33,9 @@ import java.util.Map;
  */
 public class GoogleConnection {
 
-    public static ModifiableConnectionDefinition createConnection(Authorization.ScopesFunction scopes) {
+    public static ModifiableConnectionDefinition createConnection(String baseUri, Authorization.ScopesFunction scopes) {
         return connection()
+            .baseUri((connectionParameters, context) -> baseUri)
             .authorizations(
                 authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")

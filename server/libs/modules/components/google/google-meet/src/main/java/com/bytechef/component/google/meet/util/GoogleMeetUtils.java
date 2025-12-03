@@ -46,7 +46,7 @@ public class GoogleMeetUtils {
 
         do {
             Map<String, ?> body = context
-                .http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
+                .http(http -> http.get("/conferenceRecords"))
                 .queryParameters(PAGE_SIZE, 100, PAGE_TOKEN, nextPageToken)
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute()

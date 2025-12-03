@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {ScrollArea} from '@/components/ui/scroll-area';
@@ -145,11 +145,11 @@ const ProjectsLeftSidebar = ({
                                         <TooltipTrigger asChild>
                                             <Button
                                                 aria-label="New project"
-                                                className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                                icon={<PlusIcon />}
+                                                size="icon"
                                                 variant="outline"
-                                            >
-                                                <PlusIcon />
-                                            </Button>
+                                            />
                                         </TooltipTrigger>
                                     </DropdownMenuTrigger>
 
@@ -157,19 +157,28 @@ const ProjectsLeftSidebar = ({
                                 </Tooltip>
 
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => setShowProjectDialog(true)}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => setShowProjectDialog(true)}
+                                    >
                                         <PlusIcon className="mr-2 size-4" />
                                         From Scratch
                                     </DropdownMenuItem>
 
                                     {ff_1041 && (
-                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={() => navigate(`templates`)}
+                                        >
                                             <LayoutTemplateIcon className="mr-2 size-4" />
                                             From Template
                                         </DropdownMenuItem>
                                     )}
 
-                                    <DropdownMenuItem onClick={() => projectHiddenFileInputRef.current?.click()}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => projectHiddenFileInputRef.current?.click()}
+                                    >
                                         <UploadIcon className="mr-2 size-4" />
                                         Import Project
                                     </DropdownMenuItem>
@@ -181,11 +190,11 @@ const ProjectsLeftSidebar = ({
                                 triggerNode={
                                     <Button
                                         aria-label="New project"
-                                        className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                        className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                        icon={<PlusIcon />}
+                                        size="icon"
                                         variant="outline"
-                                    >
-                                        <PlusIcon />
-                                    </Button>
+                                    />
                                 }
                             />
                         )}
@@ -202,37 +211,35 @@ const ProjectsLeftSidebar = ({
 
                 <ButtonGroup className="w-full">
                     <Button
-                        className="w-full bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"
+                        className="w-full [&_svg]:size-5"
+                        icon={<PlusIcon />}
+                        label="Workflow"
                         onClick={() => setShowWorkflowDialog(true)}
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <div className="flex items-center justify-center gap-2">
-                            <PlusIcon />
-
-                            <span>Workflow</span>
-                        </div>
-                    </Button>
+                        variant="secondary"
+                    />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                className="bg-surface-neutral-secondary py-2 hover:bg-background [&_svg]:size-5"
+                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                icon={<ChevronDownIcon />}
                                 size="icon"
-                                variant="ghost"
-                            >
-                                <ChevronDownIcon />
-                            </Button>
+                                variant="secondary"
+                            />
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
                             {ff_1041 && (
-                                <DropdownMenuItem onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}>
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
+                                >
                                     <LayoutTemplateIcon /> From Template
                                 </DropdownMenuItem>
                             )}
 
                             <DropdownMenuItem
+                                className="cursor-pointer"
                                 onClick={() => {
                                     if (workflowHiddenFileInputRef.current) {
                                         workflowHiddenFileInputRef.current.click();
@@ -266,7 +273,7 @@ const ProjectsLeftSidebar = ({
                                     />
                                 ))
                             ) : (
-                                <span className="text-sm text-muted-foreground">Now workflows found</span>
+                                <span className="text-sm text-muted-foreground">No workflows found</span>
                             ))}
 
                         {selectedProjectId !== 0 && filteredWorkflowsList.length > 0 ? (
@@ -282,7 +289,7 @@ const ProjectsLeftSidebar = ({
                                 />
                             ))
                         ) : (
-                            <span className="text-sm text-muted-foreground">Now workflows found</span>
+                            <span className="text-sm text-muted-foreground">No workflows found</span>
                         )}
                     </ul>
                 )}

@@ -17,9 +17,6 @@
 package com.bytechef.component.accelo;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.DEPLOYMENT;
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
@@ -27,10 +24,14 @@ import com.bytechef.component.accelo.action.AcceloCreateTaskAction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -55,29 +56,36 @@ public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addFirst(
+                string(DEPLOYMENT)
+                    .label("Deployment")
+                    .description(
+                        "Actual deployment identifier or name to target a specific deployment within the " +
+                            "Accelo platform.")
+                    .required(true));
+
+            modifiableAuthorization.properties(properties);
+            modifiableAuthorization.authorizationUrl(
+                (connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                    ".api.accelo.com/oauth2/v0/authorize");
+            modifiableAuthorization.scopes((connection, context) -> List.of("write(all)"));
+            modifiableAuthorization
+                .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                    ".api.accelo.com/oauth2/v0/token");
+        }
+
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(DEPLOYMENT)
-                + ".api.accelo.com/api/v0")
-            .authorizations(
-                authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .title("OAuth2 Authorization Code")
-                    .properties(
-                        string(DEPLOYMENT)
-                            .label("Deployment")
-                            .description(
-                                "Actual deployment identifier or name to target a specific deployment within the " +
-                                    "Accelo platform.")
-                            .required(true),
-                        string(CLIENT_ID)
-                            .label("Client Id")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                    .authorizationUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
-                        ".api.accelo.com/oauth2/v0/authorize")
-                    .scopes((connection, context) -> List.of("write(all)"))
-                    .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
-                        ".api.accelo.com/oauth2/v0/token"));
+                + ".api.accelo.com/api/v0");
     }
 }

@@ -148,7 +148,9 @@ spring:
   autoconfigure:
     exclude:
       org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,
-      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,
+      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
+      org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:

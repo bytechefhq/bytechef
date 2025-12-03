@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 
 interface OutputSchemaCreationControlsProps {
     handleTestOperationClick: () => void;
@@ -49,11 +49,10 @@ const OutputSchemaCreationControls = ({
                     <div className="flex w-full flex-col gap-3">
                         <Button
                             disabled={saveWorkflowNodeTestOutputMutationPending}
+                            label={`Test ${trigger ? 'Trigger' : 'Action'}`}
                             onClick={handleTestOperationClick}
                             type="button"
-                        >
-                            {`Test ${trigger ? 'Trigger' : 'Action'}`}
-                        </Button>
+                        />
 
                         {showUploadSampleOutputButton && <span className="text-center">or</span>}
                     </div>

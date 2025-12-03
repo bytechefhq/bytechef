@@ -1,0 +1,276 @@
+---
+title: "Google Search Console"
+description: "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: googleSearchConsole/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### List Sites
+Name: listSites
+
+`Lists the user's Search Console sites.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Sites",
+  "name" : "listSites",
+  "type" : "googleSearchConsole/v1/listSites"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| siteEntry | ARRAY <details> <summary> Items </summary> [&#123;STRING\(permissionLevel), STRING\(siteUrl)&#125;] </details> | Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999). |
+
+
+
+
+#### Output Example
+```json
+{
+  "siteEntry" : [ {
+    "permissionLevel" : "",
+    "siteUrl" : ""
+  } ]
+}
+```
+
+
+### Delete Site
+Name: deleteSite
+
+`Removes a site from the set of the user's Search Console sites.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteUrl | Site URL | STRING | The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Site",
+  "name" : "deleteSite",
+  "parameters" : {
+    "siteUrl" : ""
+  },
+  "type" : "googleSearchConsole/v1/deleteSite"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Get Site
+Name: getSite
+
+`Retrieves information about specific site.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteUrl | Site URL | STRING | The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Site",
+  "name" : "getSite",
+  "parameters" : {
+    "siteUrl" : ""
+  },
+  "type" : "googleSearchConsole/v1/getSite"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| permissionLevel | STRING <details> <summary> Options </summary> <span>SITE_PERMISSION_LEVEL_UNSPECIFIED</span>, <span>SITE_OWNER</span>, <span>SITE_FULL_USER</span>, <span>SITE_RESTRICTED_USER</span>, <span>SITE_UNVERIFIED_USER</span> </details> | The user's permission level for the site. |
+| siteUrl | STRING | The URL of the site. |
+
+
+
+
+#### Output Example
+```json
+{
+  "permissionLevel" : "",
+  "siteUrl" : ""
+}
+```
+
+
+### Add Site
+Name: addSite
+
+`Adds a site to the set of the user's sites in Search Console.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteUrl | Site URL | STRING | The URL of the site to add. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Site",
+  "name" : "addSite",
+  "parameters" : {
+    "siteUrl" : ""
+  },
+  "type" : "googleSearchConsole/v1/addSite"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Search Analytics
+Name: searchAnalytics
+
+`Query your data with filters and parameters that you define.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteUrl | Site URL | STRING | The site's URL, including protocol. For example: `http://www.example.com/`. | true |
+| startDate | Start Date | DATE | Start date of the requested date range. This value is included in the range. | true |
+| endDate | End Date | DATE | End date of the requested date range. This value is included in the range. | true |
+| dimensions | Dimensions | ARRAY <details> <summary> Items </summary> [STRING] </details> | Dimensions to group results by. Dimensions are the group-by values in the Search Analytics page. | false |
+| type | Type | STRING <details> <summary> Options </summary> <span>WEB</span>, <span>IMAGE</span>, <span>VIDEO</span>, <span>NEWS</span>, <span>DISCOVER</span>, <span>GOOGLE_NEWS</span> </details> | Filter results to the following type. | false |
+| dimensionFilterGroups | Filters | ARRAY <details> <summary> Items </summary> [&#123;[&#123;STRING\(dimension), STRING\(operator), STRING\(expression)&#125;]\(filters), STRING\(groupType)&#125;] </details> | Filters to apply to the dimension grouping values. | false |
+| searchType | Search Type | STRING <details> <summary> Options </summary> <span>WEB</span>, <span>IMAGE</span>, <span>VIDEO</span>, <span>NEWS</span>, <span>DISCOVER</span>, <span>GOOGLE_NEWS</span> </details> | The search type to filter for. | false |
+| aggregationType | Aggregation Type | STRING <details> <summary> Options </summary> <span>AUTO</span>, <span>BY_PROPERTY</span>, <span>BY_PAGE</span> </details> | How data is aggregated. | false |
+| rowLimit | Row Limit | INTEGER | The maximum number of rows to return. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Analytics",
+  "name" : "searchAnalytics",
+  "parameters" : {
+    "siteUrl" : "",
+    "startDate" : "2021-01-01",
+    "endDate" : "2021-01-01",
+    "dimensions" : [ "" ],
+    "type" : "",
+    "dimensionFilterGroups" : [ {
+      "filters" : [ {
+        "dimension" : "",
+        "operator" : "",
+        "expression" : ""
+      } ],
+      "groupType" : ""
+    } ],
+    "searchType" : "",
+    "aggregationType" : "",
+    "rowLimit" : 1
+  },
+  "type" : "googleSearchConsole/v1/searchAnalytics"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| responseAggregationType | STRING <details> <summary> Options </summary> <span>AUTO</span>, <span>BY_PROPERTY</span>, <span>BY_PAGE</span> </details> | How the results were aggregated. |
+| rows | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(clicks), NUMBER\(ctr), NUMBER\(impressions), [STRING]\(keys), NUMBER\(position)&#125;] </details> | A list of rows grouped by the key values in the order given in the query. |
+
+
+
+
+#### Output Example
+```json
+{
+  "responseAggregationType" : "",
+  "rows" : [ {
+    "clicks" : 0.0,
+    "ctr" : 0.0,
+    "impressions" : 0.0,
+    "keys" : [ "" ],
+    "position" : 0.0
+  } ]
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+

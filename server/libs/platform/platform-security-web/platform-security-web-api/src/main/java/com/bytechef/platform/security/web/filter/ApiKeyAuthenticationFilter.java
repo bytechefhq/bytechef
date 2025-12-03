@@ -39,7 +39,6 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -66,12 +65,12 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher requestMatcher;
 
     public ApiKeyAuthenticationFilter(
-        String pathPatternRegex, AuthenticationConverter authenticationConverter,
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
         AuthenticationManager authenticationManager) {
 
         this.authenticationConverter = authenticationConverter;
         this.authenticationManager = authenticationManager;
-        this.requestMatcher = new NegatedRequestMatcher(RegexRequestMatcher.regexMatcher(pathPatternRegex));
+        this.requestMatcher = new NegatedRequestMatcher(requestMatcher);
     }
 
     @Override

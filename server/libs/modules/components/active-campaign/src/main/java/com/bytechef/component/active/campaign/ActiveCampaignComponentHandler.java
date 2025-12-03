@@ -16,26 +16,26 @@
 
 package com.bytechef.component.active.campaign;
 
-import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.Authorization.VALUE;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.util.ActiveCampaignUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
-import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,26 +58,28 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addFirst(
+                string(USERNAME)
+                    .label("Account name")
+                    .description("Your account name, e.g. https://{youraccountname}.api-us1.com")
+                    .required(true));
+
+            modifiableAuthorization.properties(properties);
+        }
+
         return modifiableConnectionDefinition
-            .authorizations(
-                authorization(AuthorizationType.API_KEY)
-                    .title("API Key")
-                    .properties(
-                        string(USERNAME)
-                            .label("Account name")
-                            .description("Your account name, e.g. https://{youraccountname}.api-us1.com")
-                            .required(true),
-                        string(KEY)
-                            .label("Key")
-                            .required(true)
-                            .defaultValue("Api-Token")
-                            .hidden(true),
-                        string(VALUE)
-                            .label("API Key")
-                            .required(true)))
-            .baseUri(
-                (connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME) +
-                    ".api-us1.com/api/3");
+            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME) +
+                ".api-us1.com/api/3");
     }
 
     @Override
