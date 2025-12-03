@@ -10,7 +10,7 @@ import {NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {ArrowLeftRightIcon, ComponentIcon, PinOff, TrashIcon} from 'lucide-react';
+import {ArrowLeftRightIcon, ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -214,11 +214,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             )}
 
             {isClusterElement && (
-                <div className="invisible absolute left-[-80px] z-50 grid grid-cols-2 gap-1 pr-8 group-hover:visible">
+                <div
+                    className={twMerge(
+                        'invisible absolute left-[-80px] z-50 flex gap-1 pr-8 group-hover:visible',
+                        data.multipleClusterElementsNode &&
+                            !hasSavedClusterElementPosition &&
+                            'left-workflow-node-popover-hover'
+                    )}
+                >
                     <Button
                         className={twMerge(
-                            'col-start-1 row-span-2 self-center bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm',
-                            data.multipleClusterElementsNode && !hasSavedClusterElementPosition && 'col-start-2'
+                            'bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm',
+                            !data.multipleClusterElementsNode && hasSavedClusterElementPosition && 'self-center'
                         )}
                         onClick={() => handleDeleteNodeClick(data)}
                         title="Delete a node"
@@ -227,36 +234,38 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <TrashIcon className="size-4" />
                     </Button>
 
-                    {!data.multipleClusterElementsNode && (
-                        <WorkflowNodesPopoverMenu
-                            clusterElementType={data.clusterElementType}
-                            hideActionComponents={!!data.clusterElementType}
-                            hideClusterElementComponents={!data.clusterElementType}
-                            hideTaskDispatchers={!!data.clusterElementType}
-                            hideTriggerComponents
-                            sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
-                            sourceNodeName={data.workflowNodeName}
-                        >
+                    <div className="flex flex-col gap-1">
+                        {!data.multipleClusterElementsNode && (
+                            <WorkflowNodesPopoverMenu
+                                clusterElementType={data.clusterElementType}
+                                hideActionComponents={!!data.clusterElementType}
+                                hideClusterElementComponents={!data.clusterElementType}
+                                hideTaskDispatchers={!!data.clusterElementType}
+                                hideTriggerComponents
+                                sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
+                                sourceNodeName={data.workflowNodeName}
+                            >
+                                <Button
+                                    className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                                    title={`Change ${data.clusterElementType} component`}
+                                    variant="outline"
+                                >
+                                    <ArrowLeftRightIcon className="size-4" />
+                                </Button>
+                            </WorkflowNodesPopoverMenu>
+                        )}
+
+                        {hasSavedClusterElementPosition && (
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                                title={`Change ${data.clusterElementType} component`}
+                                onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
+                                title="Remove saved node position"
                                 variant="outline"
                             >
-                                <ArrowLeftRightIcon className="size-4" />
+                                <PinOffIcon className="size-4" />
                             </Button>
-                        </WorkflowNodesPopoverMenu>
-                    )}
-
-                    {hasSavedClusterElementPosition && (
-                        <Button
-                            className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                            onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
-                            title="Remove saved node position"
-                            variant="outline"
-                        >
-                            <PinOff className="size-4" />
-                        </Button>
-                    )}
+                        )}
+                    </div>
                 </div>
             )}
 
