@@ -174,7 +174,7 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="p-3" value="output">
-                        {selectedItem?.output ? (
+                        {selectedItem?.output !== undefined ? (
                             <WorkflowExecutionContent
                                 jobInputs={isTriggerExecution ? job.inputs : undefined}
                                 output={isTriggerExecution ? undefined : selectedItem?.output}
