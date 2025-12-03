@@ -67,6 +67,88 @@ Type: STRING
 
 
 
+### Compare Dates
+Name: compareDates
+
+`Compares two dates.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| dateA | Date A | DATE_TIME | First date that will be compared. | true |
+| dateB | Date B | DATE_TIME | Second date that will be compared. | true |
+| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. | true |
+| comparison | Comparison | STRING <details> <summary> Options </summary> <span>Is After</span>, <span>Is After or Equal</span>, <span>Is Before</span>, <span>Is Before or Equal</span>, <span>Is Equal</span> </details> | The type of comparison to be performed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Compare Dates",
+  "name" : "compareDates",
+  "parameters" : {
+    "dateA" : "2021-01-01T00:00:00",
+    "dateB" : "2021-01-01T00:00:00",
+    "resolution" : "",
+    "comparison" : ""
+  },
+  "type" : "dateHelper/v1/compareDates"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Compare Times
+Name: compareTimes
+
+`Compare two time values, ignoring the dates/days.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| dateA | Date A | DATE_TIME | First date that will be compared. | true |
+| dateB | Date B | DATE_TIME | Second date that will be compared. | true |
+| comparison | Comparison | STRING <details> <summary> Options </summary> <span>Is After</span>, <span>Is After or Equal</span>, <span>Is Before</span>, <span>Is Before or Equal</span>, <span>Is Equal</span> </details> | The type of comparison to be performed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Compare Times",
+  "name" : "compareTimes",
+  "parameters" : {
+    "dateA" : "2021-01-01T00:00:00",
+    "dateB" : "2021-01-01T00:00:00",
+    "comparison" : ""
+  },
+  "type" : "dateHelper/v1/compareTimes"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
 ### Convert Date Timestamp
 Name: convertUnixTimestampToIso8601
 
@@ -145,6 +227,48 @@ Type: NUMBER
 
 
 
+### Date Is in the Last
+Name: dateIsInLast
+
+`Allows you to easily check if a given date has occurred in the last X number of seconds, minutes, hours, or days.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| date | Date | DATE_TIME | Date for which you want to check is it in the last X number of selected time units. | true |
+| timeZone | Time Zone | STRING | Time zone to use when checking the date. | true |
+| inLast | In Last | INTEGER | Number of how many time units. | true |
+| unit | Unit | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The unit of difference between the two dates. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Date Is in the Last",
+  "name" : "dateIsInLast",
+  "parameters" : {
+    "date" : "2021-01-01T00:00:00",
+    "timeZone" : "",
+    "inLast" : 1,
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/dateIsInLast"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
 ### Extract Date Units
 Name: extractDateUnits
 
@@ -173,6 +297,44 @@ Name: extractDateUnits
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Format Date
+Name: formatDate
+
+`Format date to a desired format.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| date | Date | DATE_TIME | Date which you want to format | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> <span title="Sun Sep 17 2023 11:23:58">EEE MMM dd yyyy HH:mm:ss</span>, <span title="Sun Sep 17 11:23:58 2023">EEE MMM dd HH:mm:ss yyyy</span>, <span title="September 17 2023 11:23:58">MMMM dd yyyy HH:mm:ss</span>, <span title="September 17 2023">MMMM dd yyyy</span>, <span title="Sep 17 2023">MMM dd yyyy</span>, <span title="2023-09-17T11:23:58">yyyy-MM-dd'T'HH:mm:ss</span>, <span title="2023-09-17 11:23:58">yyyy-MM-dd HH:mm:ss</span>, <span title="2023-09-17">yyyy-MM-dd</span>, <span title="09-17-2023">MM-dd-yyyy</span>, <span title="09/17/2023">MM/dd/yyyy</span>, <span title="09/17/23">MM/dd/yy</span>, <span title="17-09-2023">dd-MM-yyyy</span>, <span title="17/09/2023">dd/MM/yyyy</span>, <span title="17.09.2023">dd.MM.yyyy</span>, <span title="17/09/23">dd/MM/yy</span>, <span title="17.09.23">dd.MM.yy</span>, <span title="1694949838">UnixTimestamp</span> </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Format Date",
+  "name" : "formatDate",
+  "parameters" : {
+    "date" : "2021-01-01T00:00:00",
+    "dateFormat" : ""
+  },
+  "type" : "dateHelper/v1/formatDate"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
 
 
 
@@ -207,6 +369,265 @@ Name: getCurrentDate
 
 
 Type: STRING
+
+
+
+
+
+
+
+
+### Get Days Between
+Name: getDaysBetween
+
+`Get the number of days between two dates, rounded to the nearest day. If the second date is before the first date, the result will be negative.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
+| dateB | End Date | DATE_TIME | End date of the interval. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Days Between",
+  "name" : "getDaysBetween",
+  "parameters" : {
+    "dateA" : "2021-01-01T00:00:00",
+    "dateB" : "2021-01-01T00:00:00"
+  },
+  "type" : "dateHelper/v1/getDaysBetween"
+}
+```
+
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
+
+
+
+### Get Duration
+Name: getDuration
+
+`Given a total number of seconds, minutes, etc. – return human readable text containing how long the duration was approximately, in the units of your choosing.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| duration | Duration | INTEGER | The duration value. | true |
+| unit | Unit | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The unit of difference between the two dates. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Duration",
+  "name" : "getDuration",
+  "parameters" : {
+    "duration" : 1,
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/getDuration"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Time Between
+Name: getTimeBetween
+
+`Get the time between two dates, as hh:mm:ss. If the second date is before the first date, the result will be negative.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
+| dateB | End Date | DATE_TIME | End date of the interval. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Time Between",
+  "name" : "getTimeBetween",
+  "parameters" : {
+    "dateA" : "2021-01-01T00:00:00",
+    "dateB" : "2021-01-01T00:00:00"
+  },
+  "type" : "dateHelper/v1/getTimeBetween"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| year | INTEGER | Number of years in between dates. |
+| month | INTEGER | Number of months in between dates. |
+| day | INTEGER | Number of days in between dates. |
+| hour | INTEGER | Number of hours in between dates. |
+| minute | INTEGER | Number of minutes in between dates. |
+| second | INTEGER | Number of seconds in between dates. |
+
+
+
+
+#### Output Example
+```json
+{
+  "year" : 1,
+  "month" : 1,
+  "day" : 1,
+  "hour" : 1,
+  "minute" : 1,
+  "second" : 1
+}
+```
+
+
+### Get Time From Now
+Name: getTimeFromNow
+
+`Returns a human readable date relative to the current time, such as “in 2 months”, or “14 days ago”`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| date | Date | DATE_TIME | Date to which time will be calculated. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Time From Now",
+  "name" : "getTimeFromNow",
+  "parameters" : {
+    "date" : "2021-01-01T00:00:00"
+  },
+  "type" : "dateHelper/v1/getTimeFromNow"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Is Between Dates?
+Name: IsBetweenDates
+
+`Check to see whether a date falls within a date range.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| date | Date | DATE_TIME | Date to check if it is in the range. | true |
+| dateA | Start Date | DATE_TIME | Start date of the interval. | true |
+| dateB | End Date | DATE_TIME | End date of the interval. | true |
+| resolution | Resolution | STRING <details> <summary> Options </summary> <span>year</span>, <span>month</span>, <span>day</span>, <span>hour</span>, <span>minute</span>, <span>second</span> </details> | The resolution at which the dates will be compared. | true |
+| inclusive | Inclusive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the boundary is inclusive or not. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Between Dates?",
+  "name" : "IsBetweenDates",
+  "parameters" : {
+    "date" : "2021-01-01T00:00:00",
+    "dateA" : "2021-01-01T00:00:00",
+    "dateB" : "2021-01-01T00:00:00",
+    "resolution" : "",
+    "inclusive" : false
+  },
+  "type" : "dateHelper/v1/IsBetweenDates"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Is Between Times?
+Name: IsBetweenTimes
+
+`Check to see whether a date falls within a time range.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| date | Date | DATE_TIME | Date to check if it is in the range. | true |
+| timeA | Start Time | TIME | Start time of the interval. | true |
+| timeB | End Time | TIME | End time of the interval. | true |
+| inclusive | Inclusive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the boundary is inclusive or not. | false |
+| inclusiveSeconds | Inclusive Seconds | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the seconds will be compared. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Between Times?",
+  "name" : "IsBetweenTimes",
+  "parameters" : {
+    "date" : "2021-01-01T00:00:00",
+    "timeA" : "00:00:00",
+    "timeB" : "00:00:00",
+    "inclusive" : false,
+    "inclusiveSeconds" : false
+  },
+  "type" : "dateHelper/v1/IsBetweenTimes"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
 
 
 
