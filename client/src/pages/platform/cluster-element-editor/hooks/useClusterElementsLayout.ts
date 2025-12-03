@@ -15,6 +15,7 @@ import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataSt
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
+import {getTaskDispatcherTask} from '../../workflow-editor/utils/taskDispatcherConfig';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import {isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
@@ -106,13 +107,16 @@ const useClusterElementsLayout = () => {
         return JSON.parse(workflow.definition).tasks;
     }, [workflow.definition]);
 
-    const mainRootClusterElementTask = useMemo(
-        () =>
-            workflowDefinitionTasks.find(
-                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-            ),
-        [workflowDefinitionTasks, rootClusterElementNodeData?.workflowNodeName]
-    );
+    const mainRootClusterElementTask = useMemo(() => {
+        if (!rootClusterElementNodeData?.workflowNodeName || !workflowDefinitionTasks.length) {
+            return undefined;
+        }
+
+        return getTaskDispatcherTask({
+            taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+            tasks: workflowDefinitionTasks,
+        });
+    }, [workflowDefinitionTasks, rootClusterElementNodeData?.workflowNodeName]);
 
     const clusterElements = useMemo(
         () => mainRootClusterElementTask?.clusterElements || {},

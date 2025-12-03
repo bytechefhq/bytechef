@@ -23,6 +23,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {
     GetClusterElementParameterDisplayConditions200Response,
@@ -622,9 +623,12 @@ const Property = ({
         if (currentNode.clusterElementType) {
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = workflowDefinitionTasks?.find(
-                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-            );
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTask({
+                      tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                  })
+                : undefined;
 
             if (mainClusterRootTask?.clusterElements) {
                 return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
