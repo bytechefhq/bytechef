@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {XIcon} from 'lucide-react';
@@ -11,9 +11,7 @@ interface DeletePropertyButtonProps {
 const DeletePropertyButton = ({onClick, propertyName}: DeletePropertyButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <Button className="size-auto p-0.5" onClick={() => onClick()} size="icon" variant="ghost">
-                <XIcon className="size-4 cursor-pointer text-destructive" />
-            </Button>
+            <Button icon={<XIcon />} onClick={() => onClick()} size="iconXs" variant="destructiveGhost" />
         </TooltipTrigger>
 
         <TooltipPortal>
