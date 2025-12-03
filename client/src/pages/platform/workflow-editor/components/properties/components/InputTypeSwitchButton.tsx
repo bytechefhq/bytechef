@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
@@ -6,13 +6,12 @@ import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
 const InputTypeSwitchButton = ({handleClick, mentionInput}: {handleClick: () => void; mentionInput: boolean}) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <Button className="size-auto p-0.5" onClick={handleClick} size="icon" variant="ghost">
-                {mentionInput ? (
-                    <FormInputIcon className="size-5 text-gray-600 hover:text-gray-800" />
-                ) : (
-                    <FunctionSquareIcon className="size-5 text-gray-600 hover:text-gray-800" />
-                )}
-            </Button>
+            <Button
+                icon={mentionInput ? <FormInputIcon /> : <FunctionSquareIcon />}
+                onClick={handleClick}
+                size="iconXs"
+                variant="secondary"
+            />
         </TooltipTrigger>
 
         <TooltipPortal>
