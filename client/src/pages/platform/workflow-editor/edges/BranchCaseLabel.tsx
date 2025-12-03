@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -216,18 +216,20 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
                         <Button
                             className="absolute right-2 top-1/2 size-4 -translate-y-1/2 cursor-pointer text-content-neutral-primary/50 hover:bg-transparent hover:text-content-neutral-primary [&_svg]:size-3"
+                            icon={
+                                isCaseKeyEditable ? <CheckIcon className="text-content-brand-primary" /> : <PenIcon />
+                            }
                             onClick={isCaseKeyEditable ? handleSaveCaseClick : handleEditCaseClick}
                             size="icon"
                             variant="ghost"
-                        >
-                            {isCaseKeyEditable ? <CheckIcon className="text-content-brand-primary" /> : <PenIcon />}
-                        </Button>
+                        />
                     </div>
                 )}
 
                 {!isDefaultCase && branchCases?.length > 1 && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive [&_svg]:size-4"
+                        icon={isDeleteConfirmationVisible ? <CheckIcon /> : <TrashIcon />}
                         onClick={
                             isDeleteConfirmationVisible
                                 ? () => handleDeleteCaseClick(caseKey)
@@ -235,20 +237,17 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
                         }
                         size="icon"
                         variant="ghost"
-                    >
-                        {isDeleteConfirmationVisible ? <CheckIcon /> : <TrashIcon />}
-                    </Button>
+                    />
                 )}
 
                 {isLastCase && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-neutral-primary/50 hover:bg-surface-neutral-primary-hover hover:text-content-neutral-primary [&_svg]:size-4"
+                        icon={<PlusIcon />}
                         onClick={handleCreateCaseClick}
                         size="icon"
                         variant="ghost"
-                    >
-                        <PlusIcon />
-                    </Button>
+                    />
                 )}
             </div>
         </EdgeLabelRenderer>
