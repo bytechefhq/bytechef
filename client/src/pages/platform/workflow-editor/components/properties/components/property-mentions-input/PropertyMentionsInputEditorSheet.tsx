@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import {
@@ -46,9 +46,7 @@ const PropertyMentionsInputEditorSheet = ({
         }}
     >
         <SheetTrigger asChild>
-            <Button className="size-auto p-0.5" size="icon" variant="ghost">
-                <MaximizeIcon className="size-4" />
-            </Button>
+            <Button icon={<MaximizeIcon />} size="iconXs" variant="secondary" />
         </SheetTrigger>
 
         <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
