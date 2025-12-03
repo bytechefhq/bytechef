@@ -299,7 +299,6 @@ const filterTaskDispatcherDefinitions = (
             let parentId;
 
             const currentNodeData = currentNode.data as NodeDataType;
-
             if (currentNode.data.workflowNodeName) {
                 parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
             } else {
