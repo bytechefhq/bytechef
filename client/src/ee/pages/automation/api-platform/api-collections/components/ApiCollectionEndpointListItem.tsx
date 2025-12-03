@@ -29,6 +29,7 @@ import {
     UploadIcon,
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 const ApiCollectionEndpointListItem = ({
     apiCollectionEndpoint,
@@ -142,7 +143,7 @@ const ApiCollectionEndpointListItem = ({
         <>
             <div className="flex flex-1 items-center" onClick={handleWorkflowClick}>
                 <Badge
-                    className={`mr-4 w-20 ${textColor}`}
+                    className={twMerge('mr-4 w-20', textColor)}
                     icon={icon}
                     label={method}
                     styleType="outline-outline"
