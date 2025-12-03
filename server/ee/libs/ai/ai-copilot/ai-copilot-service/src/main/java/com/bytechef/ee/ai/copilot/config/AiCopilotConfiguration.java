@@ -14,9 +14,11 @@ import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Ai.Copilot.Anthropic;
+import com.bytechef.config.ApplicationProperties.Ai.Copilot.OpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Copilot.Vectorstore;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
-import com.bytechef.ee.ai.copilot.model.SafeStreamingChatModel;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -66,12 +68,14 @@ import org.springframework.web.client.RestClient;
 public class AiCopilotConfiguration {
 
     private final String anthropicApiKey;
-    private final String anthropicModel;
-    private final Double anthropicTemperature;
+    private final String anthropicChatModel;
+    private final Double anthropicChatTemperature;
+    private final String anthropicEmbeddingModel;
     private final String openAiApiKey;
-    private final String openAiModel;
-    private final Double openAiTemperature;
-    private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
+    private final String openAiChatModel;
+    private final Double openAiChatTemperature;
+    private final String openAiEmbeddingModel;
+    private final Vectorstore.PgVector pgVector;
     private final Resource systemPromptResource;
 
     @SuppressFBWarnings("EI")
@@ -82,27 +86,38 @@ public class AiCopilotConfiguration {
         ApplicationProperties.Ai.Copilot copilot = applicationProperties.getAi()
             .getCopilot();
 
-        ApplicationProperties.Ai.Anthropic anthropic = copilot.getAnthropic();
+        Anthropic anthropic = copilot.getAnthropic();
 
         this.anthropicApiKey = anthropic.getApiKey();
 
-        ApplicationProperties.Ai.Anthropic.Chat.Options anthropicChatOptions = anthropic.getChat()
+        Anthropic.Chat.Options anthropicChatOptions = anthropic.getChat()
             .getOptions();
 
-        this.anthropicModel = anthropicChatOptions.getModel();
-        this.anthropicTemperature = anthropicChatOptions.getTemperature();
+        this.anthropicChatModel = anthropicChatOptions.getModel();
+        this.anthropicChatTemperature = anthropicChatOptions.getTemperature();
 
-        ApplicationProperties.Ai.OpenAi openAi = copilot.getOpenAi();
+        Anthropic.Embedding.OpenAi.Options anthropicEmbeddingOpenAiOptions = anthropic.getEmbedding()
+            .getOpenAi()
+            .getOptions();
+
+        this.anthropicEmbeddingModel = anthropicEmbeddingOpenAiOptions.getModel();
+
+        OpenAi openAi = copilot.getOpenAi();
 
         this.openAiApiKey = openAi.getApiKey();
 
-        ApplicationProperties.Ai.OpenAi.Chat.Options openAiChatOptions = openAi.getChat()
+        OpenAi.Chat.Options openAiChatOptions = openAi.getChat()
             .getOptions();
 
-        this.openAiModel = openAiChatOptions.getModel();
-        this.openAiTemperature = openAiChatOptions.getTemperature();
+        this.openAiChatModel = openAiChatOptions.getModel();
+        this.openAiChatTemperature = openAiChatOptions.getTemperature();
 
-        ApplicationProperties.Ai.Copilot.Vectorstore vectorstore = copilot.getVectorstore();
+        OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
+            .getOptions();
+
+        openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
+
+        Vectorstore vectorstore = copilot.getVectorstore();
 
         this.pgVector = vectorstore.getPgVector();
 
@@ -110,7 +125,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
     AnthropicApi anthropicApi() {
         return AnthropicApi.builder()
             .apiKey(anthropicApiKey)
@@ -119,19 +134,28 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
-    ChatModel anthropicChatModel() {
-        AnthropicChatModel anthropicChatModel = AnthropicChatModel.builder()
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    AnthropicChatModel anthropicChatModel() {
+        return AnthropicChatModel.builder()
             .anthropicApi(anthropicApi())
             .defaultOptions(
                 AnthropicChatOptions.builder()
-                    .model(anthropicModel)
-                    .temperature(anthropicTemperature)
+                    .model(anthropicChatModel)
+                    .temperature(anthropicChatTemperature)
                     .maxTokens(64000)
                     .build())
             .build();
+    }
 
-        return new SafeStreamingChatModel(anthropicChatModel);
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    OpenAiEmbeddingModel anthropicEmbeddingModel(OpenAiApi openAiApi) {
+        return new OpenAiEmbeddingModel(
+            openAiApi,
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model(anthropicEmbeddingModel)
+                .build());
     }
 
     @Bean
@@ -155,8 +179,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
-    OpenAiApi openAiApiForEmbedding() {
+    OpenAiApi openAiApi() {
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
             .restClientBuilder(getRestClientBuilder())
@@ -164,35 +187,26 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
-    OpenAiApi openAiApiForChat() {
-        return OpenAiApi.builder()
-            .apiKey(openAiApiKey)
-            .restClientBuilder(getRestClientBuilder())
-            .build();
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
-    OpenAiChatModel openAiChatModel(OpenAiApi openAiApiForChat) {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    OpenAiChatModel openAiChatModel(OpenAiApi openAiApi) {
         return OpenAiChatModel.builder()
-            .openAiApi(openAiApiForChat)
+            .openAiApi(openAiApi)
             .defaultOptions(
                 OpenAiChatOptions.builder()
-                    .model(openAiModel)
-                    .temperature(openAiTemperature)
+                    .model(openAiChatModel)
+                    .temperature(openAiChatTemperature)
                     .build())
             .build();
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
-    OpenAiEmbeddingModel openAiEmbeddingModel(OpenAiApi openAiApiForEmbedding) {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    OpenAiEmbeddingModel openAiEmbeddingModel(OpenAiApi openAiApi) {
         return new OpenAiEmbeddingModel(
-            openAiApiForEmbedding,
+            openAiApi,
             MetadataMode.ALL,
             OpenAiEmbeddingOptions.builder()
-                .model("text-embedding-3-small")
+                .model(openAiEmbeddingModel)
                 .build());
     }
 
@@ -260,7 +274,6 @@ public class AiCopilotConfiguration {
             .connectTimeout(Duration.ofSeconds(60))
             .defaultHeaders(httpHeaders -> {
                 httpHeaders.setHeader("Accept-Encoding", "gzip, deflate");
-                httpHeaders.setHeader("anthropic-beta", "fine-grained-tool-streaming-2025-05-14");
             })
             .headersTimeout(Duration.ofSeconds(60))
             .readTimeout(Duration.ofSeconds(60))
