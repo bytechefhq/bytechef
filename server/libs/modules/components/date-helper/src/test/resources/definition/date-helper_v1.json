@@ -1,9 +1,6 @@
 {
   "actions": [ {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add time to the date.",
     "help": null,
@@ -287,15 +284,348 @@
       "required": false,
       "type": "INTEGER"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Add Time",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Compares two dates.",
+    "help": null,
+    "metadata": null,
+    "name": "compareDates",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Result of comparison.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Result of comparison.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "First date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date A",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Second date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date B",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The resolution at which the dates will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Resolution",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "resolution",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of comparison to be performed.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Comparison",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "comparison",
+      "options": [ {
+        "description": null,
+        "label": "Is After",
+        "value": "Is After"
+      }, {
+        "description": null,
+        "label": "Is After or Equal",
+        "value": "Is After or Equal"
+      }, {
+        "description": null,
+        "label": "Is Before",
+        "value": "Is Before"
+      }, {
+        "description": null,
+        "label": "Is Before or Equal",
+        "value": "Is Before or Equal"
+      }, {
+        "description": null,
+        "label": "Is Equal",
+        "value": "Is Equal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Compare Dates",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Compare two time values, ignoring the dates/days.",
+    "help": null,
+    "metadata": null,
+    "name": "compareTimes",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Result of comparison.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Result of comparison.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "First date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date A",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Second date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date B",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of comparison to be performed.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Comparison",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "comparison",
+      "options": [ {
+        "description": null,
+        "label": "Is After",
+        "value": "Is After"
+      }, {
+        "description": null,
+        "label": "Is After or Equal",
+        "value": "Is After or Equal"
+      }, {
+        "description": null,
+        "label": "Is Before",
+        "value": "Is Before"
+      }, {
+        "description": null,
+        "label": "Is Before or Equal",
+        "value": "Is Before or Equal"
+      }, {
+        "description": null,
+        "label": "Is Equal",
+        "value": "Is Equal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Compare Times",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
     "deprecated": null,
     "description": "Converts UNIX timestamp to ISO8601 format.",
     "help": null,
@@ -410,15 +740,10 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Convert Date Timestamp",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the difference between two dates.",
     "help": null,
@@ -561,15 +886,187 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Date Difference",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Allows you to easily check if a given date has occurred in the last X number of seconds, minutes, hours, or days.",
+    "help": null,
+    "metadata": null,
+    "name": "dateIsInLast",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date is in the last X number of selected time units.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date is in the last X number of selected time units.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date for which you want to check is it in the last X number of selected time units.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Time zone to use when checking the date.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Time Zone",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "timeZone",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Number of how many time units.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "In Last",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "inLast",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The unit of difference between the two dates.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Unit",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "unit",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Date Is in the Last",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
     "deprecated": null,
     "description": "Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or time) from a given date.",
     "help": null,
@@ -663,15 +1160,179 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Extract Date Units",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Format date to a desired format.",
+    "help": null,
+    "metadata": null,
+    "name": "formatDate",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": "Date in desired format.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": null,
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": "Date in desired format.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": null,
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date which you want to format",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": [ {
+        "description": "Sun Sep 17 2023 11:23:58",
+        "label": "EEE MMM dd yyyy HH:mm:ss",
+        "value": "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "Sun Sep 17 11:23:58 2023",
+        "label": "EEE MMM dd HH:mm:ss yyyy",
+        "value": "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description": "September 17 2023 11:23:58",
+        "label": "MMMM dd yyyy HH:mm:ss",
+        "value": "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "September 17 2023",
+        "label": "MMMM dd yyyy",
+        "value": "MMMM dd yyyy"
+      }, {
+        "description": "Sep 17 2023",
+        "label": "MMM dd yyyy",
+        "value": "MMM dd yyyy"
+      }, {
+        "description": "2023-09-17T11:23:58",
+        "label": "yyyy-MM-ddTHH:mm:ss",
+        "value": "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description": "2023-09-17 11:23:58",
+        "label": "yyyy-MM-dd HH:mm:ss",
+        "value": "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description": "2023-09-17",
+        "label": "yyyy-MM-dd",
+        "value": "yyyy-MM-dd"
+      }, {
+        "description": "09-17-2023",
+        "label": "MM-dd-yyyy",
+        "value": "MM-dd-yyyy"
+      }, {
+        "description": "09/17/2023",
+        "label": "MM/dd/yyyy",
+        "value": "MM/dd/yyyy"
+      }, {
+        "description": "09/17/23",
+        "label": "MM/dd/yy",
+        "value": "MM/dd/yy"
+      }, {
+        "description": "17-09-2023",
+        "label": "dd-MM-yyyy",
+        "value": "dd-MM-yyyy"
+      }, {
+        "description": "17/09/2023",
+        "label": "dd/MM/yyyy",
+        "value": "dd/MM/yyyy"
+      }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
+        "description": "17/09/23",
+        "label": "dd/MM/yy",
+        "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
+      }, {
+        "description": "1694949838",
+        "label": "Time in unix format",
+        "value": "UnixTimestamp"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Format Date",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
     "deprecated": null,
     "description": "Get current date in the specified format.",
     "help": null,
@@ -849,15 +1510,1002 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Get Current Date",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
+    "deprecated": null,
+    "description": "Get the number of days between two dates, rounded to the nearest day. If the second date is before the first date, the result will be negative.",
+    "help": null,
+    "metadata": null,
+    "name": "getDaysBetween",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of days between start and end date. If the end date was before start date number will be negative.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "INTEGER",
+        "defaultValue": null,
+        "description": "Number of days between start and end date. If the end date was before start date number will be negative.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "maxValue": null,
+        "metadata": { },
+        "minValue": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": null,
+        "type": "INTEGER"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Days Between",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Given a total number of seconds, minutes, etc. – return human readable text containing how long the duration was approximately, in the units of your choosing.",
+    "help": null,
+    "metadata": null,
+    "name": "getDuration",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Human readable duration text.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Human readable duration text.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The duration value.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Duration",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "duration",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The unit of difference between the two dates.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Unit",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "unit",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Get Duration",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Get the time between two dates, as hh:mm:ss. If the second date is before the first date, the result will be negative.",
+    "help": null,
+    "metadata": null,
+    "name": "getTimeBetween",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": "Time between two dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of years in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "year",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of months in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "month",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of days in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "day",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of hours in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "hour",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of minutes in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "minute",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of seconds in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "second",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": "Time between two dates.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of years in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "year",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of months in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "month",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of days in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "day",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of hours in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "hour",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of minutes in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "minute",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of seconds in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "second",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Time Between",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Returns a human readable date relative to the current time, such as “in 2 months”, or “14 days ago”",
+    "help": null,
+    "metadata": null,
+    "name": "getTimeFromNow",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Human readable time to inputted date.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Human readable time to inputted date.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to which time will be calculated.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Time From Now",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Check to see whether a date falls within a date range.",
+    "help": null,
+    "metadata": null,
+    "name": "IsBetweenDates",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date falls within given date range.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date falls within given date range.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to check if it is in the range.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The resolution at which the dates will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Resolution",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "resolution",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether the boundary is inclusive or not.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive",
+      "metadata": { },
+      "name": "inclusive",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "Is Between Dates?",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Check to see whether a date falls within a time range.",
+    "help": null,
+    "metadata": null,
+    "name": "IsBetweenTimes",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date falls within given date range.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date falls within given date range.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to check if it is in the range.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "TIME",
+      "defaultValue": null,
+      "description": "Start time of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Time",
+      "metadata": { },
+      "name": "timeA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "TIME",
+      "defaultValue": null,
+      "description": "End time of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Time",
+      "metadata": { },
+      "name": "timeB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether the boundary is inclusive or not.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive",
+      "metadata": { },
+      "name": "inclusive",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Whether the seconds will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive Seconds",
+      "metadata": { },
+      "name": "inclusiveSeconds",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "Is Between Times?",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
     "deprecated": null,
     "description": "Check to see if it's business hours or not.",
     "help": null,
@@ -1094,15 +2742,10 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Business Hours?",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Check if the current date is a weekend.",
     "help": null,
@@ -1211,15 +2854,10 @@
       "required": true,
       "type": "STRING"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Is Weekend?",
     "workflowNodeDescription": null
   }, {
     "batch": null,
-    "beforeResume": null,
-    "beforeSuspend": null,
-    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Subtract time from date",
     "help": null,
@@ -1493,16 +3131,14 @@
       "required": false,
       "type": "INTEGER"
     } ],
-    "resumePerform": null,
-    "suspendPerform": null,
     "title": "Subtract Time",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
-    "name": "addTime",
     "description": "Add time to the date.",
     "element": { },
     "help": null,
+    "name": "addTime",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1782,18 +3418,364 @@
     } ],
     "title": "Add Time",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "convertUnixTimestampToIso8601",
+    "description": "Compares two dates.",
+    "element": { },
+    "help": null,
+    "name": "compareDates",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Result of comparison.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Result of comparison.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "First date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date A",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Second date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date B",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The resolution at which the dates will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Resolution",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "resolution",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of comparison to be performed.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Comparison",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "comparison",
+      "options": [ {
+        "description": null,
+        "label": "Is After",
+        "value": "Is After"
+      }, {
+        "description": null,
+        "label": "Is After or Equal",
+        "value": "Is After or Equal"
+      }, {
+        "description": null,
+        "label": "Is Before",
+        "value": "Is Before"
+      }, {
+        "description": null,
+        "label": "Is Before or Equal",
+        "value": "Is Before or Equal"
+      }, {
+        "description": null,
+        "label": "Is Equal",
+        "value": "Is Equal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Compare Dates",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Compare two time values, ignoring the dates/days.",
+    "element": { },
+    "help": null,
+    "name": "compareTimes",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Result of comparison.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Result of comparison.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "First date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date A",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Second date that will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date B",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The type of comparison to be performed.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Comparison",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "comparison",
+      "options": [ {
+        "description": null,
+        "label": "Is After",
+        "value": "Is After"
+      }, {
+        "description": null,
+        "label": "Is After or Equal",
+        "value": "Is After or Equal"
+      }, {
+        "description": null,
+        "label": "Is Before",
+        "value": "Is Before"
+      }, {
+        "description": null,
+        "label": "Is Before or Equal",
+        "value": "Is Before or Equal"
+      }, {
+        "description": null,
+        "label": "Is Equal",
+        "value": "Is Equal"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Compare Times",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "description": "Converts UNIX timestamp to ISO8601 format.",
     "element": { },
     "help": null,
+    "name": "convertUnixTimestampToIso8601",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1904,18 +3886,18 @@
     } ],
     "title": "Convert Date Timestamp",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "dateDifference",
     "description": "Get the difference between two dates.",
     "element": { },
     "help": null,
+    "name": "dateDifference",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2054,18 +4036,199 @@
     } ],
     "title": "Date Difference",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "extractDateUnits",
+    "description": "Allows you to easily check if a given date has occurred in the last X number of seconds, minutes, hours, or days.",
+    "element": { },
+    "help": null,
+    "name": "dateIsInLast",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date is in the last X number of selected time units.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date is in the last X number of selected time units.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date for which you want to check is it in the last X number of selected time units.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Time zone to use when checking the date.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Time Zone",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "timeZone",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Number of how many time units.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "In Last",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "inLast",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The unit of difference between the two dates.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Unit",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "unit",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Date Is in the Last",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "description": "Extracts specific units (year, month, day, hour, minute, second, day of week, month name, date, or time) from a given date.",
     "element": { },
     "help": null,
+    "name": "extractDateUnits",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -2155,18 +4318,191 @@
     } ],
     "title": "Extract Date Units",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "getCurrentDate",
+    "description": "Format date to a desired format.",
+    "element": { },
+    "help": null,
+    "name": "formatDate",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": "Date in desired format.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": null,
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": "Date in desired format.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": null,
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date which you want to format",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date Format",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "dateFormat",
+      "options": [ {
+        "description": "Sun Sep 17 2023 11:23:58",
+        "label": "EEE MMM dd yyyy HH:mm:ss",
+        "value": "EEE MMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "Sun Sep 17 11:23:58 2023",
+        "label": "EEE MMM dd HH:mm:ss yyyy",
+        "value": "EEE MMM dd HH:mm:ss yyyy"
+      }, {
+        "description": "September 17 2023 11:23:58",
+        "label": "MMMM dd yyyy HH:mm:ss",
+        "value": "MMMM dd yyyy HH:mm:ss"
+      }, {
+        "description": "September 17 2023",
+        "label": "MMMM dd yyyy",
+        "value": "MMMM dd yyyy"
+      }, {
+        "description": "Sep 17 2023",
+        "label": "MMM dd yyyy",
+        "value": "MMM dd yyyy"
+      }, {
+        "description": "2023-09-17T11:23:58",
+        "label": "yyyy-MM-ddTHH:mm:ss",
+        "value": "yyyy-MM-dd'T'HH:mm:ss"
+      }, {
+        "description": "2023-09-17 11:23:58",
+        "label": "yyyy-MM-dd HH:mm:ss",
+        "value": "yyyy-MM-dd HH:mm:ss"
+      }, {
+        "description": "2023-09-17",
+        "label": "yyyy-MM-dd",
+        "value": "yyyy-MM-dd"
+      }, {
+        "description": "09-17-2023",
+        "label": "MM-dd-yyyy",
+        "value": "MM-dd-yyyy"
+      }, {
+        "description": "09/17/2023",
+        "label": "MM/dd/yyyy",
+        "value": "MM/dd/yyyy"
+      }, {
+        "description": "09/17/23",
+        "label": "MM/dd/yy",
+        "value": "MM/dd/yy"
+      }, {
+        "description": "17-09-2023",
+        "label": "dd-MM-yyyy",
+        "value": "dd-MM-yyyy"
+      }, {
+        "description": "17/09/2023",
+        "label": "dd/MM/yyyy",
+        "value": "dd/MM/yyyy"
+      }, {
+        "description": "17.09.2023",
+        "label": "dd.MM.yyyy",
+        "value": "dd.MM.yyyy"
+      }, {
+        "description": "17/09/23",
+        "label": "dd/MM/yy",
+        "value": "dd/MM/yy"
+      }, {
+        "description": "17.09.23",
+        "label": "dd.MM.yy",
+        "value": "dd.MM.yy"
+      }, {
+        "description": "1694949838",
+        "label": "Time in unix format",
+        "value": "UnixTimestamp"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Format Date",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "description": "Get current date in the specified format.",
     "element": { },
     "help": null,
+    "name": "getCurrentDate",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2340,18 +4676,1034 @@
     } ],
     "title": "Get Current Date",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "isBusinessHours",
+    "description": "Get the number of days between two dates, rounded to the nearest day. If the second date is before the first date, the result will be negative.",
+    "element": { },
+    "help": null,
+    "name": "getDaysBetween",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of days between start and end date. If the end date was before start date number will be negative.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "INTEGER",
+        "defaultValue": null,
+        "description": "Number of days between start and end date. If the end date was before start date number will be negative.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "maxValue": null,
+        "metadata": { },
+        "minValue": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": null,
+        "type": "INTEGER"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Days Between",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Given a total number of seconds, minutes, etc. – return human readable text containing how long the duration was approximately, in the units of your choosing.",
+    "element": { },
+    "help": null,
+    "name": "getDuration",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Human readable duration text.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Human readable duration text.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "The duration value.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Duration",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "duration",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The unit of difference between the two dates.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Unit",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "unit",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Get Duration",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Get the time between two dates, as hh:mm:ss. If the second date is before the first date, the result will be negative.",
+    "element": { },
+    "help": null,
+    "name": "getTimeBetween",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": "Time between two dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of years in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "year",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of months in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "month",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of days in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "day",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of hours in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "hour",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of minutes in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "minute",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "Number of seconds in between dates.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "second",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": null,
+            "type": "INTEGER"
+          } ],
+          "required": null,
+          "type": "OBJECT"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": "Time between two dates.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of years in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "year",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of months in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "month",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of days in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "day",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of hours in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "hour",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of minutes in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "minute",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        }, {
+          "advancedOption": null,
+          "controlType": "INTEGER",
+          "defaultValue": null,
+          "description": "Number of seconds in between dates.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "maxValue": null,
+          "metadata": { },
+          "minValue": null,
+          "name": "second",
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "required": null,
+          "type": "INTEGER"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Time Between",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Returns a human readable date relative to the current time, such as “in 2 months”, or “14 days ago”",
+    "element": { },
+    "help": null,
+    "name": "getTimeFromNow",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Human readable time to inputted date.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": null,
+          "type": "STRING"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": "Human readable time to inputted date.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to which time will be calculated.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    } ],
+    "title": "Get Time From Now",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Check to see whether a date falls within a date range.",
+    "element": { },
+    "help": null,
+    "name": "IsBetweenDates",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date falls within given date range.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date falls within given date range.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to check if it is in the range.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Start date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Date",
+      "metadata": { },
+      "name": "dateA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "End date of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Date",
+      "metadata": { },
+      "name": "dateB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The resolution at which the dates will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Resolution",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "resolution",
+      "options": [ {
+        "description": null,
+        "label": "Year",
+        "value": "year"
+      }, {
+        "description": null,
+        "label": "Month",
+        "value": "month"
+      }, {
+        "description": null,
+        "label": "Day",
+        "value": "day"
+      }, {
+        "description": null,
+        "label": "Hour",
+        "value": "hour"
+      }, {
+        "description": null,
+        "label": "Minute",
+        "value": "minute"
+      }, {
+        "description": null,
+        "label": "Second",
+        "value": "second"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether the boundary is inclusive or not.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive",
+      "metadata": { },
+      "name": "inclusive",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "Is Between Dates?",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Check to see whether a date falls within a time range.",
+    "element": { },
+    "help": null,
+    "name": "IsBetweenTimes",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the date falls within given date range.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": null,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": null,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the date falls within given date range.",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": null,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "DATE_TIME",
+      "defaultValue": null,
+      "description": "Date to check if it is in the range.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Date",
+      "metadata": { },
+      "name": "date",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "DATE_TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "TIME",
+      "defaultValue": null,
+      "description": "Start time of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Start Time",
+      "metadata": { },
+      "name": "timeA",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "TIME",
+      "defaultValue": null,
+      "description": "End time of the interval.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "End Time",
+      "metadata": { },
+      "name": "timeB",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "TIME"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether the boundary is inclusive or not.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive",
+      "metadata": { },
+      "name": "inclusive",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Whether the seconds will be compared.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Inclusive Seconds",
+      "metadata": { },
+      "name": "inclusiveSeconds",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "Is Between Times?",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "description": "Check to see if it's business hours or not.",
     "element": { },
     "help": null,
+    "name": "isBusinessHours",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2584,18 +5936,18 @@
     } ],
     "title": "Is Business Hours?",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "isWeekend",
     "description": "Check if the current date is a weekend.",
     "element": { },
     "help": null,
+    "name": "isWeekend",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2700,18 +6052,18 @@
     } ],
     "title": "Is Weekend?",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
-    "name": "subtractTime",
     "description": "Subtract time from date",
     "element": { },
     "help": null,
+    "name": "subtractTime",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2981,17 +6333,17 @@
     } ],
     "title": "Subtract Time",
     "type": {
-      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
+      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "name": "helpers",
-    "label": "Helpers"
+    "label": "Helpers",
+    "name": "helpers"
   } ],
   "connection": null,
   "customAction": null,
