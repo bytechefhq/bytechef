@@ -144,7 +144,7 @@ const ApiCollectionEndpointListItem = ({
                 <Badge
                     className={`mr-4 w-20 ${textColor}`}
                     icon={icon}
-                    label={apiCollectionEndpoint.httpMethod}
+                    label={method}
                     styleType="outline-outline"
                     weight="semibold"
                 />
