@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
 import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -391,16 +391,14 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 />
             ) : (
                 <Button
-                    className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    className="mt-3 rounded-sm"
+                    icon={<PlusIcon />}
                     key={`${path}_${name}_addPropertyPopoverButton`}
+                    label={property.placeholder || 'Add array item'}
                     onClick={handleAddItemClick}
                     size="sm"
-                    variant="ghost"
-                >
-                    <PlusIcon className="size-4" />
-
-                    {property.placeholder || 'Add array item'}
-                </Button>
+                    variant="secondary"
+                />
             )}
         </Fragment>
     );
