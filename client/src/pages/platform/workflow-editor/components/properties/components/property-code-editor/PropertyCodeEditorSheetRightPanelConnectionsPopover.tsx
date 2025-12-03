@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox';
-import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
@@ -46,13 +46,7 @@ const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                {triggerNode ? (
-                    triggerNode
-                ) : (
-                    <Button size="sm" variant="secondary">
-                        Add Component
-                    </Button>
-                )}
+                {triggerNode ? triggerNode : <Button label="Add Component" size="sm" variant="secondary" />}
             </PopoverTrigger>
 
             <PopoverContent align="end" className="min-w-property-code-editor-sheet-connections-sheet-width">
@@ -133,7 +127,7 @@ const PropertyCodeEditorSheetRightPanelConnectionsPopover = ({
                         </main>
 
                         <footer className="flex items-center justify-end space-x-2">
-                            <Button type="submit">Add</Button>
+                            <Button label="Add" type="submit" />
                         </footer>
                     </form>
                 </Form>

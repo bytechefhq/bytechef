@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -95,13 +95,13 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
                     </SelectTrigger>
 
                     <Button
-                        className="mt-auto p-2"
+                        className="mt-auto"
+                        icon={<PlusIcon />}
                         onClick={() => setShowNewConnectionDialog(true)}
+                        size="icon"
                         title="Create a new connection"
                         variant="outline"
-                    >
-                        <PlusIcon className="size-5" />
-                    </Button>
+                    />
                 </div>
 
                 <SelectContent>

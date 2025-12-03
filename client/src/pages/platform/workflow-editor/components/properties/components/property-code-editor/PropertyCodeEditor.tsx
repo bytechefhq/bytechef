@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
-import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheet';
@@ -85,12 +85,11 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
 
                             <Button
                                 className="ml-10 flex-1 rounded-l-none"
+                                label="Open Code Editor"
                                 onClick={() => setShowPropertyCodeEditorSheet(true)}
                                 ref={ref}
                                 variant="outline"
-                            >
-                                Open Code Editor
-                            </Button>
+                            />
 
                             {error && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
