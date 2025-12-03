@@ -63,11 +63,11 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
         <>
             <Link className="flex flex-1 items-center" to={`/automation/projects/${1}/workflows/${1}`}>
                 <div className="flex flex-1 items-center">
-                    {apiConnectorEndpoint.httpMethod && (
+                    {method && (
                         <Badge
                             className={twMerge('mr-4 w-20', textColor)}
                             icon={icon}
-                            label={apiConnectorEndpoint.httpMethod}
+                            label={method}
                             styleType="outline-outline"
                             weight="semibold"
                         />
