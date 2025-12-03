@@ -63,7 +63,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
 
         const ff_797 = useFeatureFlagsStore()('ff-797');
-        const ff_1652 = useFeatureFlagsStore()('ff-1652');
+        const ff_1652 = true;
 
         useEffect(
             () =>

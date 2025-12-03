@@ -67,6 +67,7 @@ export type ComponentType = {
         ui?: {
             condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
+            fromAi?: Array<string>;
         };
     };
     name?: string;
