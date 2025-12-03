@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import DataPill from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
