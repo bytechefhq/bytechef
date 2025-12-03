@@ -148,9 +148,7 @@ spring:
   autoconfigure:
     exclude:
       org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,
-      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,
-      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
-      org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
   cache:
     type: ${bytechef.cache.provider}
   cloud:
@@ -269,16 +267,21 @@ bytechef:
           options:
             model: claude-sonnet-4-5
             temperature: 0.5
-      chat:
-        provider: openai
-      embedding:
-        provider: openai
+        embedding:
+          provider: openai
+          openai:
+            options:
+              model: text-embedding-3-small
+      provider: openai
       enabled: false
       openai:
         chat:
           options:
             model: gpt-4.1
             temperature: 0.5
+        embedding:
+          options:
+            model: text-embedding-3-small
   analytics:
     enabled: false
   cache:
