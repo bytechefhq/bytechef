@@ -1,9 +1,16 @@
 import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {ComponentDefinition,ComponentDefinitionApi,ComponentDefinitionBasic,TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinition,
+    ComponentDefinitionApi,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
+} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {Node} from '@xyflow/react';
 import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -38,7 +45,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
-        const [fullComponents, setFullComponents] = useState<Record<string, ComponentDefinition>>({});
+        const [allComponentDefinitions, setAllComponentDefinitions] = useState<Record<string, ComponentDefinition>>({});
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
@@ -63,40 +70,51 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_797 = useFeatureFlagsStore()('ff-797');
         const ff_1652 = useFeatureFlagsStore()('ff-1652');
 
+        const queryClient = useQueryClient();
+
         const fetchingComponentsRef = useRef<Set<string>>(new Set());
 
-        const fetchFullComponentInfo = useCallback(async (name: string, version: number) => {
-            const componentKey = `${name}@${version}`;
+        const fetchFullComponentInfo = useCallback(
+            async (name: string, version: number) => {
+                const componentKey = `${name}@${version}`;
 
-            if (fetchingComponentsRef.current.has(componentKey)) {
-                return;
-            }
+                if (fetchingComponentsRef.current.has(componentKey)) {
+                    return;
+                }
 
-            fetchingComponentsRef.current.add(componentKey);
+                fetchingComponentsRef.current.add(componentKey);
 
-            try {
-                const api = new ComponentDefinitionApi();
-                const response = await api.getComponentDefinition({
-                    componentName: name,
-                    componentVersion: version,
-                });
+                try {
+                    const response = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ComponentDefinitionApi().getComponentDefinition({
+                                componentName: name,
+                                componentVersion: version,
+                            }),
+                        queryKey: ComponentDefinitionKeys.componentDefinition({
+                            componentName: name,
+                            componentVersion: version,
+                        }),
+                    });
 
-                setFullComponents((previousComponents) => {
-                    if (previousComponents[name]) {
-                        return previousComponents;
-                    }
+                    setAllComponentDefinitions((previousComponents) => {
+                        if (previousComponents[name]) {
+                            return previousComponents;
+                        }
 
-                    return {
-                        ...previousComponents,
-                        [name]: response,
-                    };
-                });
-            } catch (error) {
-                console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
-            } finally {
-                fetchingComponentsRef.current.delete(componentKey);
-            }
-        }, []);
+                        return {
+                            ...previousComponents,
+                            [name]: response,
+                        };
+                    });
+                } catch (error) {
+                    console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
+                } finally {
+                    fetchingComponentsRef.current.delete(componentKey);
+                }
+            },
+            [queryClient]
+        );
 
         useEffect(() => {
             if (!filter || !componentDefinitions?.length) {
@@ -108,13 +126,15 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     ({actionsCount, triggersCount}) => (actionsCount ?? 0) > 0 || (triggersCount ?? 0) > 0
                 );
 
-                candidates.forEach((component) => {
-                    void fetchFullComponentInfo(component.name, component.version);
+                candidates.forEach((componentDefinition) => {
+                    if (!allComponentDefinitions[componentDefinition.name]) {
+                        void fetchFullComponentInfo(componentDefinition.name, componentDefinition.version);
+                    }
                 });
             }, 400);
 
             return () => clearTimeout(timeout);
-        }, [filter, componentDefinitions, fetchFullComponentInfo]);
+        }, [filter, componentDefinitions, allComponentDefinitions, fetchFullComponentInfo]);
 
         useEffect(
             () =>
@@ -135,22 +155,22 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 return componentDefinitions;
             }
 
-            return componentDefinitions.filter((component) => {
-                const full = fullComponents[component.name];
+            return componentDefinitions.filter((componentDefinition) => {
+                const matchingComponentDefinition = allComponentDefinitions[componentDefinition.name];
 
                 const matchesComponent =
-                    component.name?.toLowerCase().includes(normalizedFilter) ||
-                    component.title?.toLowerCase().includes(normalizedFilter);
+                    componentDefinition.name?.toLowerCase().includes(normalizedFilter) ||
+                    componentDefinition.title?.toLowerCase().includes(normalizedFilter);
 
                 const matchesAction =
-                    full?.actions?.some(
+                    matchingComponentDefinition?.actions?.some(
                         (action: {name?: string; title?: string}) =>
                             action.name?.toLowerCase().includes(normalizedFilter) ||
                             action.title?.toLowerCase().includes(normalizedFilter)
                     ) ?? false;
 
                 const matchesTrigger =
-                    full?.triggers?.some(
+                    matchingComponentDefinition?.triggers?.some(
                         (trigger: {name?: string; title?: string}) =>
                             trigger.name?.toLowerCase().includes(normalizedFilter) ||
                             trigger.title?.toLowerCase().includes(normalizedFilter)
@@ -158,17 +178,17 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
                 return matchesComponent || matchesAction || matchesTrigger;
             });
-        }, [componentDefinitions, filter, fullComponents]);
+        }, [componentDefinitions, filter, allComponentDefinitions]);
 
         useEffect(() => {
             if (!componentDefinitions) {
                 return;
             }
 
-            const baseList = filter ? matchedComponents : componentDefinitions;
+            const baseComponentDefinitionList = filter ? matchedComponents : componentDefinitions;
 
             setFilteredActionComponentDefinitions(
-                baseList.filter(
+                baseComponentDefinitionList.filter(
                     ({actionsCount, name}) =>
                         actionsCount &&
                         ((!ff_797 && name !== 'dataStream') || ff_797) &&
@@ -176,13 +196,15 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 )
             );
 
-            setFilteredTriggerComponentDefinitions(baseList.filter(({triggersCount}) => triggersCount));
+            setFilteredTriggerComponentDefinitions(
+                baseComponentDefinitionList.filter(({triggersCount}) => triggersCount)
+            );
 
             if (clusterElementType) {
                 const clusterKey = convertNameToSnakeCase(clusterElementType as string);
 
                 setFilteredClusterElementComponentDefinitions(
-                    baseList.filter(({clusterElementsCount}) => clusterElementsCount?.[clusterKey])
+                    baseComponentDefinitionList.filter(({clusterElementsCount}) => clusterElementsCount?.[clusterKey])
                 );
             }
         }, [componentDefinitions, filter, ff_797, ff_1652, clusterElementType, matchedComponents]);
