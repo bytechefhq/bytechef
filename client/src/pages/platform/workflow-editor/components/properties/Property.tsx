@@ -17,8 +17,8 @@ import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/componen
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {getTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
 import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,

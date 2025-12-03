@@ -9,6 +9,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {
     ActionDefinition,
@@ -83,7 +84,7 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveClusterElementFieldChange from '../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import {getTask, getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
+import {getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
@@ -434,8 +435,8 @@ const WorkflowNodeDetailsPanel = ({
         () =>
             currentNode?.workflowNodeName
                 ? getTask({
-                      taskDispatcherId: currentNode.workflowNodeName,
                       tasks: workflow.tasks || [],
+                      workflowNodeName: currentNode.workflowNodeName,
                   })
                 : undefined,
         [workflow.tasks, currentNode]
@@ -492,6 +493,7 @@ const WorkflowNodeDetailsPanel = ({
 
                     if (Array.isArray(clusterElement)) {
                         clusterElement.forEach((subClusterElement) => getConnectionsRecursively(subClusterElement));
+
                         return;
                     }
 
@@ -506,15 +508,16 @@ const WorkflowNodeDetailsPanel = ({
                         const componentName = typeParts[0];
                         const componentVersion = parseInt(typeParts[1]?.replace('v', '') || '1');
 
-                        const connection = {
+                        const connection: ComponentConnection = {
                             componentName,
                             componentVersion,
                             key: clusterElementObj.name,
                             required: false,
                             workflowNodeName: clusterElementObj.name,
                         };
+
                         if (connection) {
-                            connections.push(connection as ComponentConnection);
+                            connections.push(connection);
                         }
                     }
 

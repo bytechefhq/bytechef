@@ -9,8 +9,8 @@ import {
     encodePath,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {getTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -143,8 +143,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
                     ? getTask({
-                          taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
                           tasks: workflowDefinitionTasks,
+                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
                       })
                     : undefined;
 
