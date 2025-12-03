@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
@@ -46,14 +46,12 @@ const SubPropertyPopover = ({
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    className="mt-3 rounded-sm"
+                    icon={<PlusIcon />}
+                    label={buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
                     size="sm"
-                    variant="ghost"
-                >
-                    <PlusIcon className="size-4" />
-
-                    {buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
-                </Button>
+                    variant="secondary"
+                />
             </PopoverTrigger>
 
             <PopoverContent className="min-w-sub-property-popover-width space-y-4 p-4">
@@ -124,14 +122,7 @@ const SubPropertyPopover = ({
 
                 <footer className="flex items-center justify-end space-x-2">
                     <PopoverClose asChild>
-                        <Button
-                            className="cursor-pointer"
-                            disabled={!array && !newPropertyName}
-                            onClick={handleClick}
-                            size="sm"
-                        >
-                            Add
-                        </Button>
+                        <Button disabled={!array && !newPropertyName} label="Add" onClick={handleClick} size="sm" />
                     </PopoverClose>
                 </footer>
             </PopoverContent>
