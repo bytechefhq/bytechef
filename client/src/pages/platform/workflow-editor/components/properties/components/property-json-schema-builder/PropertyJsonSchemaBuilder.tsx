@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
-import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
@@ -86,12 +86,11 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                             <Button
                                 className="ml-10 flex-1 rounded-l-none"
+                                label="Open JSON Schema Builder"
                                 onClick={() => setShowPropertyJsonSchemaBuilder(true)}
                                 ref={ref}
                                 variant="outline"
-                            >
-                                Open JSON Schema Builder
-                            </Button>
+                            />
 
                             {error && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
