@@ -14,7 +14,7 @@ const notificationsFormSchema = z.object({
     security_emails: z.boolean(),
     social_emails: z.boolean().default(false).optional(),
     type: z.enum(['all', 'mentions', 'none'], {
-        required_error: 'You need to select a notification type.',
+        message: 'You need to select a notification type.',
     }),
 });
 

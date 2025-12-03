@@ -28,7 +28,7 @@ const formSchema = z.object({
     notificationEventIds: z.array(z.string()).nonempty('Please select at least one notification event.'),
     settings: z.record(z.string(), z.any()),
     type: z.enum(['EMAIL', 'WEBHOOK'], {
-        required_error: 'Please select a notification type.',
+        message: 'Please select a notification type.',
     }),
 });
 
