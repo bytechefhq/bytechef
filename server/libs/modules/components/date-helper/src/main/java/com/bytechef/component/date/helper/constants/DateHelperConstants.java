@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 /**
  * @author Igor Beslic
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 public class DateHelperConstants {
 
@@ -31,18 +32,33 @@ public class DateHelperConstants {
     public static final String BUSINESS_HOURS_END = "businessHoursEnd";
     public static final String BUSINESS_WEEK_START = "businessWeekStart";
     public static final String BUSINESS_WEEK_END = "businessWeekEnd";
+    public static final String COMPARISON = "comparison";
     public static final String DATE = "date";
+    public static final String DATE_A = "dateA";
+    public static final String DATE_B = "dateB";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String DATE_TIMESTAMP = "dateTimestamp";
     public static final String DAY = "day";
     public static final String DAY_OF_WEEK = "dayOfWeek";
+    public static final String DURATION = "duration";
     public static final String HOUR = "hour";
+    public static final String INCLUSIVE = "inclusive";
+    public static final String INCLUSIVE_SECONDS = "inclusiveSeconds";
     public static final String INPUT_DATE = "inputDate";
+    public static final String IN_LAST = "inLast";
+    public static final String IS_AFTER = "Is After";
+    public static final String IS_AFTER_OR_EQUAL = "Is After or Equal";
+    public static final String IS_BEFORE = "Is Before";
+    public static final String IS_BEFORE_OR_EQUAL = "Is Before or Equal";
+    public static final String IS_EQUAL = "Is Equal";
     public static final String MINUTE = "minute";
     public static final String MONTH = "month";
     public static final String MONTH_NAME = "monthName";
+    public static final String RESOLUTION = "resolution";
     public static final String SECOND = "second";
     public static final String TIME = "time";
+    public static final String TIME_A = "timeA";
+    public static final String TIME_B = "timeB";
     public static final String TIME_ZONE = "timeZone";
     public static final String UNIT = "unit";
     public static final String UNIX_TIMESTAMP = "UnixTimestamp";
@@ -79,6 +95,31 @@ public class DateHelperConstants {
             option("dd/MM/yy", "dd/MM/yy", "17/09/23"),
             option("dd.MM.yy", "dd.MM.yy", "17.09.23"),
             option("Time in unix format", UNIX_TIMESTAMP, "1694949838"))
+        .required(true);
+
+    public static final ModifiableStringProperty RESOLUTION_PROPERTY = string(RESOLUTION)
+        .label("Resolution")
+        .description(
+            "The resolution at which the dates will be compared.")
+        .options(
+            option("Year", YEAR),
+            option("Month", MONTH),
+            option("Day", DAY),
+            option("Hour", HOUR),
+            option("Minute", MINUTE),
+            option("Second", SECOND))
+        .required(true);
+
+    public static final ModifiableStringProperty UNIT_PROPERTY = string(UNIT)
+        .label("Unit")
+        .description("The unit of difference between the two dates.")
+        .options(
+            option("Year", YEAR),
+            option("Month", MONTH),
+            option("Day", DAY),
+            option("Hour", HOUR),
+            option("Minute", MINUTE),
+            option("Second", SECOND))
         .required(true);
 
     private DateHelperConstants() {

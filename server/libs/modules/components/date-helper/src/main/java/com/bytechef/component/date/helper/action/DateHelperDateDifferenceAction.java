@@ -16,19 +16,13 @@
 
 package com.bytechef.component.date.helper.action;
 
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT;
-import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIT_PROPERTY;
+import static com.bytechef.component.date.helper.util.DateHelperUtils.getChronoUnit;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -54,17 +48,7 @@ public class DateHelperDateDifferenceAction {
             dateTime(END_DATE)
                 .label("End Date")
                 .required(true),
-            string(UNIT)
-                .label("Unit")
-                .description("The unit of difference between the two dates.")
-                .options(
-                    option("Year", YEAR),
-                    option("Month", MONTH),
-                    option("Day", DAY),
-                    option("Hour", HOUR),
-                    option("Minute", MINUTE),
-                    option("Second", SECOND))
-                .required(true))
+            UNIT_PROPERTY)
         .output(outputSchema(number().description("Difference between two dates.")))
         .perform(DateHelperDateDifferenceAction::perform);
 
@@ -76,15 +60,7 @@ public class DateHelperDateDifferenceAction {
 
         String unitDifference = inputParameters.getRequiredString(UNIT);
 
-        ChronoUnit chronoUnit = switch (unitDifference) {
-            case YEAR -> ChronoUnit.YEARS;
-            case MONTH -> ChronoUnit.MONTHS;
-            case DAY -> ChronoUnit.DAYS;
-            case HOUR -> ChronoUnit.HOURS;
-            case MINUTE -> ChronoUnit.MINUTES;
-            case SECOND -> ChronoUnit.SECONDS;
-            default -> throw new IllegalArgumentException("Unsupported unit " + unitDifference);
-        };
+        ChronoUnit chronoUnit = getChronoUnit(unitDifference);
 
         LocalDateTime startDate = inputParameters.getRequiredLocalDateTime(START_DATE);
         LocalDateTime endDate = inputParameters.getRequiredLocalDateTime(END_DATE);
