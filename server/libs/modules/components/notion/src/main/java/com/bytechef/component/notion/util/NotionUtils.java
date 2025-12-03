@@ -76,7 +76,7 @@ public class NotionUtils {
                 String name = propertyNameTypeMap.get(fieldName);
                 NotionPropertyType enumType = getPropertyTypeByName(name);
 
-                if (SUPPORTED_PROPERTY_TYPES.contains(enumType)) {
+                if (SUPPORTED_PROPERTY_TYPES.contains(enumType) && fieldValue != null) {
                     switch (enumType) {
                         case CHECKBOX -> propertiesMap.put(fieldName, Map.of(CHECKBOX.getName(), fieldValue));
                         case DATE -> propertiesMap.put(fieldName, Map.of(DATE.getName(), Map.of("start", fieldValue)));
