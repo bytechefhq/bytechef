@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogCloseButton,
@@ -94,7 +94,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogTrigger asChild>
-                <Button variant="outline">Generate</Button>
+                <Button label="Generate" variant="outline" />
             </DialogTrigger>
 
             <DialogContent className="max-w-output-tab-sample-data-dialog-width">
@@ -130,9 +130,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
                 </div>
 
                 <DialogFooter>
-                    <Button disabled={!curSchema} onClick={handleOnSubmit} type="submit">
-                        Generate
-                    </Button>
+                    <Button disabled={!curSchema} label="Generate" onClick={handleOnSubmit} type="submit" />
                 </DialogFooter>
             </DialogContent>
         </Dialog>
