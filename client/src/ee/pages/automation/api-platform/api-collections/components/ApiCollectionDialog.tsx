@@ -50,6 +50,9 @@ const formSchema = z.object({
     workspaceId: z.number(),
 });
 
+type FormInputType = z.input<typeof formSchema>;
+type FormOutputType = z.output<typeof formSchema>;
+
 interface ApiCollectionDialogProps {
     apiCollection?: ApiCollection;
     onClose?: () => void;
@@ -63,7 +66,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<FormInputType, void, FormOutputType>({
         defaultValues: {
             collectionVersion: apiCollection?.collectionVersion || 1,
             contextPath: apiCollection?.contextPath || '',
@@ -113,15 +116,17 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     };
 
     function saveOpenApiCollection() {
+        const values = formSchema.parse(getValues());
+
         if (apiCollection?.id) {
             updateOpenApiCollectionMutation.mutate({
                 ...apiCollection,
-                ...getValues(),
+                ...values,
             });
         } else {
             createOpenApiCollectionMutation.mutate({
                 ...apiCollection,
-                ...getValues(),
+                ...values,
                 environmentId: currentEnvironmentId,
             });
         }
@@ -225,7 +230,13 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                     <FormLabel>Name</FormLabel>
 
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input
+                                            name={field.name}
+                                            onBlur={field.onBlur}
+                                            onChange={field.onChange}
+                                            ref={field.ref}
+                                            value={String(field.value ?? '')}
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
@@ -257,7 +268,13 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                     <FormLabel>Context Path</FormLabel>
 
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input
+                                            name={field.name}
+                                            onBlur={field.onBlur}
+                                            onChange={field.onChange}
+                                            ref={field.ref}
+                                            value={String(field.value ?? '')}
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
@@ -273,7 +290,14 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                     <FormLabel>Collection Version</FormLabel>
 
                                     <FormControl>
-                                        <Input type="number" {...field} />
+                                        <Input
+                                            name={field.name}
+                                            onBlur={field.onBlur}
+                                            onChange={field.onChange}
+                                            ref={field.ref}
+                                            type="number"
+                                            value={field.value as number | string | undefined}
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
