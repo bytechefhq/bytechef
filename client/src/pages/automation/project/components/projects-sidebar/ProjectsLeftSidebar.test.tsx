@@ -22,11 +22,13 @@ const createTestQueryClient = () =>
 let queryClient: QueryClient;
 
 // Mocks for UI components used inside dropdown/scroll
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/Button/Button', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Button: ({children, ...props}: any) => (
+    default: ({children, icon, label, ...props}: any) => (
         <button data-testid="btn" {...props}>
-            {children}
+            {icon}
+
+            {label ?? children}
         </button>
     ),
 }));
@@ -104,7 +106,6 @@ vi.mock('@/shared/queries/automation/workflows.queries', () => ({
 vi.mock('@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar', () => ({
     useProjectsLeftSidebar: () => ({
         calculateTimeDifference: vi.fn(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         createProjectWorkflowMutation: {mutate: vi.fn()},
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getFilteredWorkflows: (workflows: any[]) => workflows || [],

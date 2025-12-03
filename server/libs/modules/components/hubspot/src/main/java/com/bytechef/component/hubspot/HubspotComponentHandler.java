@@ -16,24 +16,25 @@
 
 package com.bytechef.component.hubspot;
 
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.HAPIKEY;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.hubspot.trigger.HubspotNewContactTrigger;
 import com.bytechef.component.hubspot.trigger.HubspotNewDealTrigger;
 import com.bytechef.component.hubspot.trigger.HubspotNewTicketTrigger;
 import com.bytechef.component.hubspot.unified.HubspotUnifiedApi;
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -62,26 +63,25 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        return modifiableConnectionDefinition
-            .baseUri((connectionParameters, context) -> "https://api.hubapi.com")
-            .authorizations(authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true),
-                    string(HAPIKEY)
-                        .label("Hubspot API Key")
-                        .description("API Key is used for registering webhooks.")
-                        .required(false))
-                .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
-                .scopes((connection, context) -> List.of("crm.objects.contacts.read", "crm.objects.contacts.write",
-                    "crm.objects.deals.read", "crm.objects.deals.write", "crm.schemas.deals.read",
-                    "crm.objects.owners.read", "tickets"))
-                .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
-                .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addLast(
+                string(HAPIKEY)
+                    .label("Hubspot API Key")
+                    .description("API Key is used for registering webhooks.")
+                    .required(false));
+
+            modifiableAuthorization.properties(properties);
+        }
+
+        return modifiableConnectionDefinition;
     }
 }

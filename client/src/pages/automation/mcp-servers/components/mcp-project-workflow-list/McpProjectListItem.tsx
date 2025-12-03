@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {McpProject} from '@/shared/middleware/graphql';
@@ -44,9 +44,11 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     {mcpProject.projectVersion && (
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge className="flex space-x-1" variant="secondary">
-                                    v{mcpProject.projectVersion}
-                                </Badge>
+                                <Badge
+                                    label={`v${mcpProject.projectVersion}`}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
                             </TooltipTrigger>
 
                             <TooltipContent>Project Version</TooltipContent>

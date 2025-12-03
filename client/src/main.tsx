@@ -6,6 +6,7 @@ import './styles/components.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {getRouter as getEmbeddedRouter} from '@/embeddedWorkflowBuilderRoutes';
+import I18n from '@/i18n';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -64,7 +65,11 @@ async function renderApp() {
         init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
     }
 
-    if (!publicRoutes.includes(window.location.pathname) && !authenticationStore.getState().sessionHasBeenFetched) {
+    if (
+        !isEmbeddedWorkflowBuilder &&
+        !publicRoutes.includes(window.location.pathname) &&
+        !authenticationStore.getState().sessionHasBeenFetched
+    ) {
         const result = await authenticationStore.getState().getAccount();
 
         if (!result && window.location.pathname !== '/login') {
@@ -74,17 +79,19 @@ async function renderApp() {
 
     root.render(
         <StrictMode>
-            <ThemeProvider defaultTheme="light">
-                <QueryClientProvider client={queryClient}>
-                    <ConditionalPostHogProvider>
-                        <TooltipProvider>
-                            <RouterProvider router={router} />
-                        </TooltipProvider>
-                    </ConditionalPostHogProvider>
+            <I18n>
+                <ThemeProvider defaultTheme="light">
+                    <QueryClientProvider client={queryClient}>
+                        <ConditionalPostHogProvider>
+                            <TooltipProvider>
+                                <RouterProvider router={router} />
+                            </TooltipProvider>
+                        </ConditionalPostHogProvider>
 
-                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-                </QueryClientProvider>
-            </ThemeProvider>
+                        <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+                    </QueryClientProvider>
+                </ThemeProvider>
+            </I18n>
         </StrictMode>
     );
 }

@@ -101,7 +101,10 @@ public class OpenApiClientUtils {
         for (Property property : properties) {
             if (MapUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
                 path = path.replace(
-                    "{" + property.getName() + "}", MapUtils.getRequiredString(inputParameters, property.getName()));
+                    "{" + property.getName() + "}",
+                    URLEncoder.encode(
+                        MapUtils.getRequiredString(inputParameters, property.getName()),
+                        StandardCharsets.UTF_8));
             }
         }
 

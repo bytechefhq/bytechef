@@ -1,0 +1,3 @@
+{
+    "plugins": ["@lingui/babel-plugin-lingui-macro"]
+}

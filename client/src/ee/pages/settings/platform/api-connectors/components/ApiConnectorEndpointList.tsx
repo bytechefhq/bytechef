@@ -2,7 +2,6 @@ import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connecto
 
 import ApiConnectorEndpointListItem from './ApiConnectorEndpointListItem';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ApiConnectorEndpointList = ({apiConnectorEndpoints}: {apiConnectorEndpoints?: Array<ApiConnectorEndpoint>}) => {
     return (
         <div className="border-b border-b-border/50 py-3 pl-4">

@@ -66,10 +66,7 @@ public class GoogleCalendarEventTrigger {
         .properties(
             string(CALENDAR_ID)
                 .label("Calendar Identifier")
-                .options(
-                    (OptionsFunction<String>) (
-                        inputParameters, connectionParameters, arrayIndex, searchText, context) -> GoogleCalendarUtils
-                            .getCalendarIdOptions(inputParameters, connectionParameters, null, null, context))
+                .options((OptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
                 .required(true))
         .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .webhookEnable(GoogleCalendarEventTrigger::webhookEnable)

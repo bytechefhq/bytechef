@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
@@ -125,7 +125,7 @@ const AccountProfileDetails = () => {
                         />
 
                         <div className="flex justify-end">
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </div>
                     </form>
                 </Form>

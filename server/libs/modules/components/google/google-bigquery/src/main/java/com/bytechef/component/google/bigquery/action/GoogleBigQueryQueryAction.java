@@ -190,8 +190,7 @@ public class GoogleBigQueryQueryAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(
-            http -> http.post("https://bigquery.googleapis.com/bigquery/v2/projects/%s/queries"
-                .formatted(inputParameters.getRequiredString(PROJECT_ID))))
+            http -> http.post("/projects/%s/queries".formatted(inputParameters.getRequiredString(PROJECT_ID))))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(
                 Body.of(

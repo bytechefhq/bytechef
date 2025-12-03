@@ -83,7 +83,7 @@ public class GoogleFormsUtils {
 
     public static Map<String, Object> getForm(String formId, Context context) {
         return context
-            .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId))
+            .http(http -> http.get("/forms/" + formId))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -98,7 +98,7 @@ public class GoogleFormsUtils {
         String formId = inputParameters.getRequiredString(FORM_ID);
         do {
             Map<String, Object> response = context
-                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
+                .http(http -> http.get("/forms/%s/responses".formatted(formId)))
                 .queryParameters(NEXT_PAGE_TOKEN, nextToken)
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
@@ -145,7 +145,7 @@ public class GoogleFormsUtils {
             }
 
             Map<String, Object> response = context
-                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
+                .http(http -> http.get("/forms/%s/responses".formatted(formId)))
                 .queryParameters(queryParameters.toArray())
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()

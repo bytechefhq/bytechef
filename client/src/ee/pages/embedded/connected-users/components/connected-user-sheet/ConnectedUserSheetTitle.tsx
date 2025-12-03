@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -36,7 +36,7 @@ const ConnectedUserSheetTitle = ({connectedUser}: {connectedUser: ConnectedUser}
                     {connectedUser.name ?? connectedUser.externalId}
                 </h3>
 
-                {!connectedUser.enabled && <Badge variant="destructive">Disabled</Badge>}
+                {!connectedUser.enabled && <Badge label="Disabled" styleType="destructive-outline" weight="semibold" />}
             </div>
 
             <div className="mr-6">

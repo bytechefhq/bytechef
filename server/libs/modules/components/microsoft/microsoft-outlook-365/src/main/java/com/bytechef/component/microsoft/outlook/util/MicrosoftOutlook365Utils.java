@@ -16,6 +16,7 @@
 
 package com.bytechef.component.microsoft.outlook.util;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
@@ -68,7 +69,7 @@ public class MicrosoftOutlook365Utils {
             .toList();
     }
 
-    public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody, String id) {
+    public static SimpleMessage createSimpleMessage(Context context, Map<?, ?> messageBody) {
         String from = null;
 
         if (messageBody.get(FROM) instanceof Map<?, ?> fromMap &&
@@ -83,11 +84,12 @@ public class MicrosoftOutlook365Utils {
             bodyHtml = (String) map.get(CONTENT);
         }
 
+        String id = (String) messageBody.get(ID);
         Pair<List<FileEntry>, List<FileEntry>> attachments = getFileEntries(id, context);
 
         return new SimpleMessage(
-            (String) messageBody.get(ID), (String) messageBody.get("conversationId"), (String) messageBody.get(SUBJECT),
-            from, getRecipients(messageBody, TO_RECIPIENTS), getRecipients(messageBody, CC_RECIPIENTS),
+            id, (String) messageBody.get("conversationId"), (String) messageBody.get(SUBJECT), from,
+            getRecipients(messageBody, TO_RECIPIENTS), getRecipients(messageBody, CC_RECIPIENTS),
             getRecipients(messageBody, BCC_RECIPIENTS), (String) messageBody.get("bodyPreview"), bodyHtml,
             attachments.getLeft(), attachments.getRight(), (String) messageBody.get("webLink"));
     }
@@ -173,6 +175,13 @@ public class MicrosoftOutlook365Utils {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class)));
+    }
+
+    public static OutputResponse getArrayMessageOutput(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return OutputResponse
+            .of(array().items(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class))));
     }
 
     public static ModifiableObjectProperty getMessageOutputProperty(Format format) {

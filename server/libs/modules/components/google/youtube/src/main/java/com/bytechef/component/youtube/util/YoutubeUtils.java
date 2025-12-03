@@ -42,7 +42,7 @@ public class YoutubeUtils {
         String channelId = "";
 
         Map<String, Object> response = triggerContext
-            .http(http -> http.get("https://www.googleapis.com/youtube/v3/search"))
+            .http(http -> http.get("/search"))
             .queryParameters(
                 "part", SNIPPET,
                 "type", "channel",

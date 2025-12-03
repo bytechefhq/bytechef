@@ -255,7 +255,9 @@ Name: replyToEmail
 | to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Recipients email addresses. | true |
 | bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING] </details> | Bcc recipients email addresses. | false |
 | cc | Cc | ARRAY <details> <summary> Items </summary> [STRING] </details> | Cc recipients email addresses. | false |
-| body | Body | STRING | Body text of the email | true |
+| bodyType | Body Type | STRING <details> <summary> Options </summary> <span>plain</span>, <span>html</span> </details> |  | true |
+| body | Body - Text | STRING | The body of the message in text format. | true |
+| body | Body - HTML | STRING | The body of the message in HTML format. | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 
 #### Example JSON Structure
@@ -268,6 +270,7 @@ Name: replyToEmail
     "to" : [ "" ],
     "bcc" : [ "" ],
     "cc" : [ "" ],
+    "bodyType" : "",
     "body" : "",
     "attachments" : [ {
       "extension" : "",
@@ -390,7 +393,9 @@ Name: sendEmail
 | bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING] </details> | Bcc recipients email addresses. | false |
 | cc | Cc | ARRAY <details> <summary> Items </summary> [STRING] </details> | Cc recipients email addresses. | false |
 | replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Reply-to email addresses. | false |
-| body | Body | STRING | Body text of the email | true |
+| bodyType | Body Type | STRING <details> <summary> Options </summary> <span>plain</span>, <span>html</span> </details> |  | true |
+| body | Body - Text | STRING | The body of the message in text format. | true |
+| body | Body - HTML | STRING | The body of the message in HTML format. | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 
 #### Example JSON Structure
@@ -404,6 +409,7 @@ Name: sendEmail
     "bcc" : [ "" ],
     "cc" : [ "" ],
     "replyTo" : [ "" ],
+    "bodyType" : "",
     "body" : "",
     "attachments" : [ {
       "extension" : "",
@@ -533,15 +539,25 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 
 ## Connection Setup
 
-[Setting up OAuth2](https://support.google.com/googleapi/answer/6158849?hl=en)
+### Create OAuth 2.0 Application
 
-<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-<iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
-</div>
+Creation of OAuth 2.0 application is documented [here](/reference/components/google-application-setup_v1#create-oauth-20-application).
 
-Turning on Gmail API
+### Enable Gmail API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "gmail api" in the search bar.
+5. Click on **Gmail API**.
+6. Click **Enable**.
+
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
 <iframe src="https://www.guidejar.com/embed/2d7279c7-91c3-43c9-9004-99f08d7e30ff?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
-![anl-c-google-mail-md](https://static.scarf.sh/a.png?x-pxid=2bfa99dc-2ceb-4a8f-9b0e-26650c2f0f95)
+## Troubleshooting
+
+### Access Blocked: Verification Process Not Completed
+
+Documentation for how to add a test user can be found [here](/reference/components/google-application-setup_v1#access-blocked-verification-process-not-completed)

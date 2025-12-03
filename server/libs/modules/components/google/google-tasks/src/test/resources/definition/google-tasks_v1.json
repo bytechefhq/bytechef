@@ -2141,7 +2141,7 @@
       "tokenUrl": { },
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
-    "baseUri": null,
+    "baseUri": { },
     "properties": null,
     "test": null,
     "version": 1

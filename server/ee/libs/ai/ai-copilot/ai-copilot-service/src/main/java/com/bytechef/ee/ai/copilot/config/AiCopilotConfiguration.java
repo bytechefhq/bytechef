@@ -16,6 +16,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.ee.ai.copilot.model.SafeStreamingChatModel;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,10 +34,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -106,7 +110,7 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
     AnthropicApi anthropicApi() {
         return AnthropicApi.builder()
             .apiKey(anthropicApiKey)
@@ -115,16 +119,19 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    AnthropicChatModel anthropicChatModel() {
-        return AnthropicChatModel.builder()
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "anthropic")
+    ChatModel anthropicChatModel() {
+        AnthropicChatModel anthropicChatModel = AnthropicChatModel.builder()
             .anthropicApi(anthropicApi())
             .defaultOptions(
                 AnthropicChatOptions.builder()
                     .model(anthropicModel)
                     .temperature(anthropicTemperature)
+                    .maxTokens(64000)
                     .build())
             .build();
+
+        return new SafeStreamingChatModel(anthropicChatModel);
     }
 
     @Bean
@@ -148,8 +155,8 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiApi openAiApi() {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
+    OpenAiApi openAiApiForEmbedding() {
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)
             .restClientBuilder(getRestClientBuilder())
@@ -157,16 +164,36 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
-    OpenAiChatModel openAiChatModel() {
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
+    OpenAiApi openAiApiForChat() {
+        return OpenAiApi.builder()
+            .apiKey(openAiApiKey)
+            .restClientBuilder(getRestClientBuilder())
+            .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.chat", name = "provider", havingValue = "openai")
+    OpenAiChatModel openAiChatModel(OpenAiApi openAiApiForChat) {
         return OpenAiChatModel.builder()
-            .openAiApi(openAiApi())
+            .openAiApi(openAiApiForChat)
             .defaultOptions(
                 OpenAiChatOptions.builder()
                     .model(openAiModel)
                     .temperature(openAiTemperature)
                     .build())
             .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider", havingValue = "openai")
+    OpenAiEmbeddingModel openAiEmbeddingModel(OpenAiApi openAiApiForEmbedding) {
+        return new OpenAiEmbeddingModel(
+            openAiApiForEmbedding,
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model("text-embedding-3-small")
+                .build());
     }
 
     DataSource pgVectorDataSource() {
@@ -231,7 +258,10 @@ public class AiCopilotConfiguration {
         HttpClient httpClient = Methanol.newBuilder()
             .autoAcceptEncoding(true)
             .connectTimeout(Duration.ofSeconds(60))
-            .defaultHeaders(httpHeaders -> httpHeaders.setHeader("Accept-Encoding", "gzip, deflate"))
+            .defaultHeaders(httpHeaders -> {
+                httpHeaders.setHeader("Accept-Encoding", "gzip, deflate");
+                httpHeaders.setHeader("anthropic-beta", "fine-grained-tool-streaming-2025-05-14");
+            })
             .headersTimeout(Duration.ofSeconds(60))
             .readTimeout(Duration.ofSeconds(60))
             .requestTimeout(Duration.ofSeconds(60))

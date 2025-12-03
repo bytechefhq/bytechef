@@ -1,0 +1,284 @@
+openapi: 3.0.0
+servers:
+  - url: "https://www.googleapis.com/webmasters/v3"
+info:
+  description: "The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)."
+  title: "Google Search Console"
+  version: "v1"
+externalDocs:
+  url: "https://developers.google.com/webmaster-tools/search-console-api/"
+paths:
+  /sites:
+    get:
+      summary: "List Sites"
+      description: "Lists the user's Search Console sites."
+      operationId: "listSites"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SitesListResponse"
+          description: Successful response
+  "/sites/{siteUrl}":
+    delete:
+      summary: "Delete Site"
+      description: "Removes a site from the set of the user's Search Console sites."
+      operationId: "deleteSite"
+      parameters:
+        - description: "The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`."
+          in: "path"
+          name: "siteUrl"
+          required: true
+          schema:
+            type: "string"
+            title: "Site URL"
+            x-dynamic-options: true
+      responses:
+        "200":
+          description: "Successful response"
+    get:
+      summary: "Get Site"
+      description: "Retrieves information about specific site."
+      operationId: "getSite"
+      parameters:
+        - description: "The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`."
+          in: "path"
+          name: "siteUrl"
+          required: true
+          schema:
+            title: "Site URL"
+            type: "string"
+            x-dynamic-options: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WmxSite"
+          description: "Successful response"
+    put:
+      summary: "Add Site"
+      description: "Adds a site to the set of the user's sites in Search Console."
+      operationId: "addSite"
+      parameters:
+        - description: "The URL of the site to add."
+          in: "path"
+          name: "siteUrl"
+          required: true
+          schema:
+            type: "string"
+            title: "Site URL"
+      responses:
+        "200":
+          description: "Successful response"
+  "/sites/{siteUrl}/searchAnalytics/query":
+    post:
+      summary: "Search Analytics"
+      description: "Query your data with filters and parameters that you define."
+      operationId: "searchAnalytics"
+      parameters:
+        - description: "The site's URL, including protocol. For example: `http://www.example.com/`."
+          in: "path"
+          name: "siteUrl"
+          required: true
+          schema:
+            type: "string"
+            title: "Site URL"
+            x-dynamic-options: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchAnalyticsQueryRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchAnalyticsQueryResponse"
+          description: Successful response
+components:
+  schemas:
+    ApiDataRow:
+      properties:
+        clicks:
+          format: "double"
+          type: "number"
+        ctr:
+          format: "double"
+          type: "number"
+        impressions:
+          format: "double"
+          type: "number"
+        keys:
+          items:
+            type: "string"
+          type: "array"
+        position:
+          format: "double"
+          type: "number"
+      type: "object"
+    ApiDimensionFilter:
+      required:
+        - "expression"
+        - "dimension"
+        - "operator"
+      properties:
+        dimension:
+          description: "The dimension that this filter applies to. You can filter by any dimension listed here, even if you are not grouping by that dimension."
+          enum:
+            - "QUERY"
+            - "PAGE"
+            - "COUNTRY"
+            - "DEVICE"
+            - "SEARCH_APPEARANCE"
+          type: "string"
+        operator:
+          description: "How your specified value must match (or not match) the dimension value for the row."
+          enum:
+            - "EQUALS"
+            - "NOT_EQUALS"
+            - "CONTAINS"
+            - "NOT_CONTAINS"
+            - "INCLUDING_REGEX"
+            - "EXCLUDING_REGEX"
+          type: "string"
+          default: "EQUALS"
+        expression:
+          description: "The value for the filter to match or exclude, depending on the operator."
+          type: "string"
+      type: "object"
+    ApiDimensionFilterGroup:
+      properties:
+        filters:
+          items:
+            $ref: "#/components/schemas/ApiDimensionFilter"
+          type: "array"
+        groupType:
+          enum:
+            - "AND"
+          type: "string"
+          default: "AND"
+      type: "object"
+    SearchAnalyticsQueryRequest:
+      required:
+        - "startDate"
+        - "endDate"
+      properties:
+        startDate:
+          description: "Start date of the requested date range. This value is included in the range."
+          type: "string"
+          format: "date"
+        endDate:
+          description: "End date of the requested date range. This value is included in the range."
+          type: "string"
+          format: "date"
+        dimensions:
+          description: "Dimensions to group results by. Dimensions are the group-by values in the Search Analytics page."
+          items:
+            enum:
+              - "DATE"
+              - "QUERY"
+              - "PAGE"
+              - "COUNTRY"
+              - "DEVICE"
+              - "SEARCH_APPEARANCE"
+            type: "string"
+          type: "array"
+        type:
+          description: "Filter results to the following type."
+          enum:
+            - "WEB"
+            - "IMAGE"
+            - "VIDEO"
+            - "NEWS"
+            - "DISCOVER"
+            - "GOOGLE_NEWS"
+          type: "string"
+          default: "WEB"
+        dimensionFilterGroups:
+          description: "Filters to apply to the dimension grouping values."
+          items:
+            $ref: "#/components/schemas/ApiDimensionFilterGroup"
+          type: "array"
+          title: "Filters"
+        searchType:
+          description: "The search type to filter for."
+          enum:
+            - "WEB"
+            - "IMAGE"
+            - "VIDEO"
+            - "NEWS"
+            - "DISCOVER"
+            - "GOOGLE_NEWS"
+          type: "string"
+          default: "WEB"
+        aggregationType:
+          default: "AUTO"
+          description: "How data is aggregated."
+          enum:
+            - "AUTO"
+            - "BY_PROPERTY"
+            - "BY_PAGE"
+          type: "string"
+        rowLimit:
+          description: "The maximum number of rows to return."
+          format: "int32"
+          type: "integer"
+          default: 1000
+          minimum: 1
+          maximum: 25000
+      type: "object"
+    SearchAnalyticsQueryResponse:
+      description: "A list of rows, one per result, grouped by key. Metrics in each row are aggregated for all data grouped by that key either by page or property, as specified by the aggregation type parameter."
+      properties:
+        responseAggregationType:
+          description: "How the results were aggregated."
+          enum:
+            - "AUTO"
+            - "BY_PROPERTY"
+            - "BY_PAGE"
+          type: "string"
+        rows:
+          description: "A list of rows grouped by the key values in the order given in the query."
+          items:
+            $ref: "#/components/schemas/ApiDataRow"
+          type: "array"
+      type: "object"
+    SitesListResponse:
+      description: "List of sites with access level information."
+      properties:
+        siteEntry:
+          description: "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999)."
+          items:
+            $ref: "#/components/schemas/WmxSite"
+          type: "array"
+      type: "object"
+    WmxSite:
+      description: "Contains permission level information about a Search Console site. For more information, see [Permissions in Search Console](https://support.google.com/webmasters/answer/2451999)."
+      properties:
+        permissionLevel:
+          description: "The user's permission level for the site."
+          enum:
+            - "SITE_PERMISSION_LEVEL_UNSPECIFIED"
+            - "SITE_OWNER"
+            - "SITE_FULL_USER"
+            - "SITE_RESTRICTED_USER"
+            - "SITE_UNVERIFIED_USER"
+          type: "string"
+        siteUrl:
+          description: "The URL of the site."
+          type: "string"
+      type: "object"
+  securitySchemes:
+    Oauth2c:
+      description: Oauth 2.0 authorizationCode authentication
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://accounts.google.com/o/oauth2/auth"
+          scopes:
+            https://www.googleapis.com/auth/webmasters: View and manage Search Console data for your verified sites
+            https://www.googleapis.com/auth/webmasters.readonly: View Search Console data for your verified sites
+          tokenUrl: "https://accounts.google.com/o/oauth2/token"
+      type: "oauth2"

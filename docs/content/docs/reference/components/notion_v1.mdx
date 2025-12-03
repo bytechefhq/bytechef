@@ -38,6 +38,40 @@ Version: 1
 ## Actions
 
 
+### Create Database Item
+Name: createDatabaseItem
+
+`Creates a new item in Notion database.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> id </details> |  | true |
+| content | Content | STRING | The content to append to item. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Database Item",
+  "name" : "createDatabaseItem",
+  "parameters" : {
+    "id" : "",
+    "fields" : { },
+    "content" : ""
+  },
+  "type" : "notion/v1/createDatabaseItem"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Create Page
 Name: createPage
 
@@ -318,5 +352,80 @@ Type: OBJECT
 ```
 
 
+### Update Database Item
+Name: updateDatabaseItem
 
+`Update specific fields in a Notion database item.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+| databaseItemId | Database Item ID | STRING | The ID of the database item to update. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> id </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Database Item",
+  "name" : "updateDatabaseItem",
+  "parameters" : {
+    "id" : "",
+    "databaseItemId" : "",
+    "fields" : { }
+  },
+  "type" : "notion/v1/updateDatabaseItem"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+## Triggers
+
+
+### New Database Item
+Name: newDatabaseItem
+
+`Triggers when a new item is added to the database.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Database ID | STRING | The ID of the database. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Database Item",
+  "name" : "newDatabaseItem",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "notion/v1/newDatabaseItem"
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 

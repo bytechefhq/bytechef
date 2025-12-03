@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {
     DropdownMenu,
@@ -51,36 +51,30 @@ const OutputSchemaDisplay = ({
                     {!variablePropertiesDefined && (
                         <Button
                             disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                            label={`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
                             onClick={handleTestOperationClick}
                             variant="outline"
-                        >
-                            {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
-                        </Button>
+                        />
                     )}
 
                     {variablePropertiesDefined && (
                         <Button
                             disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                            label="Upload Sample Output"
                             onClick={() => setShowUploadDialog(true)}
                             variant="outline"
-                        >
-                            Upload Sample Output
-                        </Button>
+                        />
                     )}
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
                                 aria-label="More Options"
-                                asChild
                                 disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                icon={<MoreHorizontalIcon />}
                                 size="icon"
                                 variant="outline"
-                            >
-                                <span>
-                                    <MoreHorizontalIcon />
-                                </span>
-                            </Button>
+                            />
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" className="w-52">

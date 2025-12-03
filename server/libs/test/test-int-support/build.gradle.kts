@@ -12,8 +12,4 @@ dependencies {
 
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
-
-    runtimeOnly("org.apache.activemq:artemis-jakarta-server")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-artemis")
-    runtimeOnly(project(":server:libs:core:message:message-broker:message-broker-jms"))
 }

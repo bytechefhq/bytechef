@@ -1,6 +1,6 @@
 import './radioCard.css';
 
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogCloseButton,
@@ -159,20 +159,23 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
 
                 <DialogFooter>
                     {currentType !== undefined && (
-                        <Button aria-label="cancel" onClick={handleDialogClose} type="button" variant="outline">
-                            Cancel
-                        </Button>
+                        <Button
+                            aria-label="cancel"
+                            label="Cancel"
+                            onClick={handleDialogClose}
+                            type="button"
+                            variant="outline"
+                        />
                     )}
 
                     <Button
                         aria-label="confirm"
                         className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
                         disabled={selectedType === undefined}
+                        label="Confirm"
                         onClick={handleChangeModeType}
                         type="button"
-                    >
-                        Confirm
-                    </Button>
+                    />
                 </DialogFooter>
             </DialogContent>
         </Dialog>

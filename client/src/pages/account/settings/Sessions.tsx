@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {useToast} from '@/hooks/use-toast';
 import {useSessionsStore} from '@/pages/account/settings/stores/useSessionsStore';
@@ -62,7 +62,7 @@ const Sessions = () => {
                 <Header
                     centerTitle={true}
                     position="main"
-                    right={<Button onClick={refreshList}>Refresh</Button>}
+                    right={<Button label="Refresh" onClick={refreshList} />}
                     title={`Active sessions for [${account?.login}]`}
                 />
             }
@@ -96,7 +96,7 @@ const Sessions = () => {
                                         <TableCell>{s.tokenDate}</TableCell>
 
                                         <TableCell className="flex justify-end">
-                                            <Button onClick={doSessionInvalidation(s.series)}>Invalidate</Button>
+                                            <Button label="Invalidate" onClick={doSessionInvalidation(s.series)} />
                                         </TableCell>
                                     </TableRow>
                                 ))}

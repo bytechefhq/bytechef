@@ -29,5 +29,6 @@ public class GoogleContactsConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
+        null,
         (connection, context) -> List.of("https://www.googleapis.com/auth/contacts"));
 }

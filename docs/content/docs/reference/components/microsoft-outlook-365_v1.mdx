@@ -397,6 +397,7 @@ Name: searchEmail
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
 | from | From | STRING | The address sending the mail | false |
 | to | To | STRING | The address receiving the new mail | false |
 | subject | Subject | STRING | Words in the subject line | false |
@@ -408,6 +409,7 @@ Name: searchEmail
   "label" : "Search Email",
   "name" : "searchEmail",
   "parameters" : {
+    "format" : "",
     "from" : "",
     "to" : "",
     "subject" : "",
@@ -419,106 +421,9 @@ Name: searchEmail
 
 #### Output
 
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| bccRecipients | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125;] </details> | The Bcc: recipients for the message. |
-| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | The body of the message. It can be in HTML or text format. |
-| bodyPreview | STRING | The first 255 characters of the message body. It is in text format. |
-| ccRecipients | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125;] </details> | The Cc: recipients for the message. |
-| conversationId | STRING | ID of the conversation the email belongs to. |
-| conversationIndex | STRING | Indicates the position of the message within the conversation. |
-| createdDateTime | STRING | The date and time the message was created. |
-| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125; </details> | The owner of the mailbox from which the message is sent. |
-| hasAttachments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the message has attachments. |
-| id | STRING | ID of the message. |
-| importance | STRING | The importance of the message: low, normal, high. |
-| isDeliveryReceiptRequested | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether a delivery receipt is requested for the message. |
-| isDraft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet. |
-| isReadReceiptRequested | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates whether a read receipt is requested for the message. |
-| lastModifiedDateTime | STRING | The date and time the message was last changed. |
-| parentFolderId | STRING | The unique identifier for the message's parent mailFolder. |
-| receivedDateTime | STRING | The date and time the message was received. |
-| replyTo | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125;] </details> | The email addresses to use when replying. |
-| sender | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125; </details> | The account that is used to generate the message. In most cases, this value is the same as the from property. |
-| sendDateTime | STRING | The date and time the message was sent. |
-| subject | STRING | Subject of the message. |
-| toRecipients | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(name), STRING\(address)&#125;\(emailAddress)&#125;] </details> | The Cc: recipients for the message. |
-| webLink | STRING | The URL to open the message in Outlook on the web. |
-
-
-
-
-
-#### Output Example
-```json
-[ {
-  "bccRecipients" : [ {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  } ],
-  "body" : {
-    "contentType" : "",
-    "content" : ""
-  },
-  "bodyPreview" : "",
-  "ccRecipients" : [ {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  } ],
-  "conversationId" : "",
-  "conversationIndex" : "",
-  "createdDateTime" : "",
-  "from" : {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  },
-  "hasAttachments" : false,
-  "id" : "",
-  "importance" : "",
-  "isDeliveryReceiptRequested" : false,
-  "isDraft" : false,
-  "isReadReceiptRequested" : false,
-  "lastModifiedDateTime" : "",
-  "parentFolderId" : "",
-  "receivedDateTime" : "",
-  "replyTo" : [ {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  } ],
-  "sender" : {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  },
-  "sendDateTime" : "",
-  "subject" : "",
-  "toRecipients" : [ {
-    "emailAddress" : {
-      "name" : "",
-      "address" : ""
-    }
-  } ],
-  "webLink" : ""
-} ]
-```
 
 
 ### Send Email

@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
@@ -107,9 +107,11 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             {integrationInstance && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Badge variant="secondary">
-                                            V{integrationInstance.integrationInstanceConfiguration?.integrationVersion}
-                                        </Badge>
+                                        <Badge
+                                            label={`V${integrationInstance.integrationInstanceConfiguration?.integrationVersion}`}
+                                            styleType="secondary-filled"
+                                            weight="semibold"
+                                        />
                                     </TooltipTrigger>
 
                                     <TooltipContent>The integration version</TooltipContent>

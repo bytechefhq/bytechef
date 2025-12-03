@@ -53,12 +53,6 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
 
         if (!!data.clusterRoot && !clusterElementsCanvasOpen) {
             setClusterElementsCanvasOpen(true);
-
-            setCurrentComponent(undefined);
-
-            setWorkflowNodeDetailsPanelOpen(false);
-
-            return;
         }
 
         setWorkflowNodeDetailsPanelOpen(true);

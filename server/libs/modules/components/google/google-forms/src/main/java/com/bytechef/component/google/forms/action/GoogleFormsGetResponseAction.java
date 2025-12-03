@@ -67,7 +67,7 @@ public class GoogleFormsGetResponseAction {
         String responseId = inputParameters.getRequiredString(RESPONSE_ID);
 
         Map<String, Object> response = actionContext
-            .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses/" + responseId))
+            .http(http -> http.get("/forms/" + formId + "/responses/" + responseId))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

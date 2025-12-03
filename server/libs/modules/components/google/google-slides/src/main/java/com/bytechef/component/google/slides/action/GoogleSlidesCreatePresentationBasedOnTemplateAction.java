@@ -99,8 +99,7 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
         Context context, String presentationId, List<Map<String, Map<String, Object>>> requests) {
 
         return context
-            .http(http -> http
-                .post("https://slides.googleapis.com/v1/presentations/%s:batchUpdate".formatted(presentationId)))
+            .http(http -> http.post("/presentations/%s:batchUpdate".formatted(presentationId)))
             .body(Http.Body.of("requests", requests))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

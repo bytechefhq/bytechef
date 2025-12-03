@@ -106,12 +106,7 @@ class GoogleBigQueryUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-
-        assertEquals(
-            List.of(
-                "https://bigquery.googleapis.com/bigquery/v2/projects",
-                "https://bigquery.googleapis.com/bigquery/v2/projects"),
-            stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/projects", "/projects"), stringArgumentCaptor.getAllValues());
 
         List<Object[]> allQueryParams = objectsArgumentCaptor.getAllValues();
 

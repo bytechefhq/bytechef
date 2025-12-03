@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.outlook.trigger;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT_PROPERTY;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
@@ -103,7 +102,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
             List<MicrosoftOutlook365Utils.SimpleMessage> simpleMessages = new ArrayList<>();
 
             for (Map<?, ?> email : emails) {
-                simpleMessages.add(createSimpleMessage(context, email, (String) email.get(ID)));
+                simpleMessages.add(createSimpleMessage(context, email));
             }
 
             return new PollOutput(simpleMessages, Map.of(LAST_TIME_CHECKED, now), false);

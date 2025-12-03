@@ -29,5 +29,6 @@ public class GoogleTasksConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
+        "https://tasks.googleapis.com/tasks/v1",
         (connection, context) -> List.of("https://www.googleapis.com/auth/tasks"));
 }

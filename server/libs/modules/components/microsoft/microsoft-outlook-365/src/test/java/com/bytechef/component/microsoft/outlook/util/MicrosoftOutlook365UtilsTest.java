@@ -103,7 +103,7 @@ class MicrosoftOutlook365UtilsTest {
         messageBody.put("conversationId", "conversationId");
 
         MicrosoftOutlook365Utils.SimpleMessage result = MicrosoftOutlook365Utils.createSimpleMessage(
-            mockedContext, messageBody, "messageId");
+            mockedContext, messageBody);
 
         assertEquals(
             new MicrosoftOutlook365Utils.SimpleMessage(

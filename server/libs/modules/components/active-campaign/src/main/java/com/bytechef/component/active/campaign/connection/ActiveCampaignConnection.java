@@ -42,7 +42,7 @@ public class ActiveCampaignConnection {
                     .defaultValue("Api-Token")
                     .hidden(true),
                 string(VALUE)
-                    .label("Value")
+                    .label("API Key")
                     .required(true)
 
             ));

@@ -4,7 +4,7 @@ import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
@@ -177,37 +177,28 @@ const WorkflowEditorLayout = ({includeComponents, runDisabled, showWorkflowInput
                     <DialogContent className="absolute bottom-4 left-16 top-12 h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 gap-2 bg-surface-main p-0">
                         <ClusterElementsWorkflowEditor />
 
-                        {currentComponent && (
-                            <>
-                                <WorkflowNodeDetailsPanel
-                                    className="fixed inset-y-0 right-0 rounded-l-none border-none"
-                                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                        <WorkflowNodeDetailsPanel
+                            className="fixed inset-y-0 right-0 rounded-l-none"
+                            closeButton={
+                                <DialogClose asChild>
+                                    <Button icon={<XIcon />} size="icon" title="Close the canvas" variant="ghost" />
+                                </DialogClose>
+                            }
+                            invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                            previousComponentDefinitions={previousComponentDefinitions}
+                            updateWorkflowMutation={updateWorkflowMutation!}
+                            workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                        />
+
+                        {dataPillPanelOpen && (
+                            <Suspense fallback={<DataPillPanelSkeleton />}>
+                                <DataPillPanel
+                                    className="fixed inset-y-0 right-[465px] rounded-none"
                                     previousComponentDefinitions={previousComponentDefinitions}
-                                    updateWorkflowMutation={updateWorkflowMutation!}
                                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                                 />
-
-                                {dataPillPanelOpen && (
-                                    <Suspense fallback={<DataPillPanelSkeleton />}>
-                                        <DataPillPanel
-                                            className="fixed inset-y-0 right-[465px] rounded-none"
-                                            previousComponentDefinitions={previousComponentDefinitions}
-                                            workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                                        />
-                                    </Suspense>
-                                )}
-                            </>
+                            </Suspense>
                         )}
-
-                        <DialogClose asChild>
-                            <Button
-                                className="absolute right-2 top-2 size-10 border bg-white p-2 shadow-none [&_svg]:size-5"
-                                title="Close the canvas"
-                                variant="ghost"
-                            >
-                                <XIcon />
-                            </Button>
-                        </DialogClose>
                     </DialogContent>
                 </Dialog>
             )}

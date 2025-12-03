@@ -18,9 +18,6 @@ package com.bytechef.component.aha;
 
 import static com.bytechef.component.aha.constant.AhaConstants.PRODUCT_ID;
 import static com.bytechef.component.aha.constant.AhaConstants.SUBDOMAIN;
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
@@ -29,6 +26,7 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property;
@@ -78,27 +76,34 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        return modifiableConnectionDefinition
-            .baseUri((connectionParameters, context) -> "https://%s.aha.io/api/v1"
-                .formatted(connectionParameters.getRequiredString(SUBDOMAIN)))
-            .authorizations(authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .title("OAuth2 Authorization Code")
-                .properties(
-                    string(SUBDOMAIN)
-                        .label("Subdomain")
-                        .description(
-                            "The subdomain of your Aha! account. For example, if your Aha! URL is " +
-                                "https://mycompany.aha.io, then the subdomain is mycompany.")
-                        .required(true),
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
+
+            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+
+            properties.addFirst(
+                string(SUBDOMAIN)
+                    .label("Subdomain")
+                    .description(
+                        "The subdomain of your Aha! account. For example, if your Aha! URL is " +
+                            "https://mycompany.aha.io, then the subdomain is mycompany.")
+                    .required(true));
+
+            modifiableAuthorization
+                .properties(properties)
                 .authorizationUrl((connectionParameters, context) -> "https://%s.aha.io/oauth/authorize"
                     .formatted(connectionParameters.getRequiredString(SUBDOMAIN)))
                 .tokenUrl((connectionParameters, context) -> "https://%s.aha.io/oauth/token"
-                    .formatted(connectionParameters.getRequiredString(SUBDOMAIN))));
+                    .formatted(connectionParameters.getRequiredString(SUBDOMAIN)));
+        }
+
+        return modifiableConnectionDefinition
+            .baseUri((connectionParameters, context) -> "https://%s.aha.io/api/v1"
+                .formatted(connectionParameters.getRequiredString(SUBDOMAIN)));
     }
 }

@@ -22,10 +22,13 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.notion.action.NotionCreateDatabaseItemAction;
 import com.bytechef.component.notion.action.NotionCreatePageAction;
 import com.bytechef.component.notion.action.NotionGetDatabaseAction;
 import com.bytechef.component.notion.action.NotionGetPageAction;
+import com.bytechef.component.notion.action.NotionUpdateDatabaseItemAction;
 import com.bytechef.component.notion.connection.NotionConnection;
+import com.bytechef.component.notion.trigger.NotionNewDatabaseItemTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -40,14 +43,20 @@ public class NotionComponentHandler implements ComponentHandler {
         .connection(NotionConnection.CONNECTION_DEFINITION)
         .icon("path:assets/notion.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
+        .customAction(true)
         .actions(
+            NotionCreateDatabaseItemAction.ACTION_DEFINITION,
             NotionCreatePageAction.ACTION_DEFINITION,
             NotionGetDatabaseAction.ACTION_DEFINITION,
-            NotionGetPageAction.ACTION_DEFINITION)
+            NotionGetPageAction.ACTION_DEFINITION,
+            NotionUpdateDatabaseItemAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(NotionCreateDatabaseItemAction.ACTION_DEFINITION),
             tool(NotionCreatePageAction.ACTION_DEFINITION),
             tool(NotionGetDatabaseAction.ACTION_DEFINITION),
-            tool(NotionGetPageAction.ACTION_DEFINITION));
+            tool(NotionGetPageAction.ACTION_DEFINITION),
+            tool(NotionUpdateDatabaseItemAction.ACTION_DEFINITION))
+        .triggers(NotionNewDatabaseItemTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

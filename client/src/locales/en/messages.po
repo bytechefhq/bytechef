@@ -1,0 +1,38 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-11-14 16:16+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. js-lingui-explicit-id
+#: src/components/JsonSchemaBuilder/components/SchemaMenuPopover.tsx:66
+msgid "Add a field"
+msgstr "Add a field"
+
+#. js-lingui-explicit-id
+#: src/components/JsonSchemaBuilder/components/SchemaMenuPopover.tsx:92
+msgid "Close"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+#: src/components/JsonSchemaBuilder/components/SchemaMenuPopover.tsx:78
+msgid "Description, Required, etc."
+msgstr "Description, Required, etc."
+
+#. js-lingui-explicit-id
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:106
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:143
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:174
+msgid "No options"
+msgstr "No options"
+
+#. js-lingui-explicit-id
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:111
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:136
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:147
+#: src/components/JsonSchemaBuilder/components/SchemaMenuItem.tsx:179
+msgid "Options"
+msgstr "Options"

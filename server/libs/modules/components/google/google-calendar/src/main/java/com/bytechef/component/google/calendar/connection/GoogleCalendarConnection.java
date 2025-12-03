@@ -29,6 +29,6 @@ public class GoogleCalendarConnection {
     }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
-        (connection, context) -> List.of(
+        null, (connection, context) -> List.of(
             "https://www.googleapis.com/auth/calendar.events", "https://www.googleapis.com/auth/calendar.readonly"));
 }

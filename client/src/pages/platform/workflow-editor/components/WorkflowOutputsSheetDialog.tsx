@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -174,10 +174,10 @@ const WorkflowOutputsSheetDialog = ({
 
                         <div className="flex justify-end space-x-2">
                             <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
+                                <Button label="Cancel" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </div>
                     </form>
                 </Form>

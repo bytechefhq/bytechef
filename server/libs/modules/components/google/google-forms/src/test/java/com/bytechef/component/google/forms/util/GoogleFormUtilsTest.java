@@ -114,7 +114,7 @@ class GoogleFormUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("https://forms.googleapis.com/v1/forms/form-123", stringArgumentCaptor.getValue());
+        assertEquals("/forms/form-123", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -158,8 +158,7 @@ class GoogleFormUtilsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(List.of("https://forms.googleapis.com/v1/forms/123/responses",
-            "https://forms.googleapis.com/v1/forms/123/responses"), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of("/forms/123/responses", "/forms/123/responses"), stringArgumentCaptor.getAllValues());
 
         List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
 
@@ -234,11 +233,7 @@ class GoogleFormUtilsTest {
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
         assertEquals(
-            List.of(
-                "https://forms.googleapis.com/v1/forms/form-xyz/responses",
-                "https://forms.googleapis.com/v1/forms/form-xyz/responses",
-                "https://forms.googleapis.com/v1/forms/form-xyz",
-                "https://forms.googleapis.com/v1/forms/form-xyz"),
+            List.of("/forms/form-xyz/responses", "/forms/form-xyz/responses", "/forms/form-xyz", "/forms/form-xyz"),
             stringArgumentCaptor.getAllValues());
 
         List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();

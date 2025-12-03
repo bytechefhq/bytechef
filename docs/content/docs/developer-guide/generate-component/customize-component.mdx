@@ -30,6 +30,75 @@ If your component requires custom authentication parameters, override the `modif
 
 Refer to examples like [`ShopifyComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/shopify/src/main/java/com/bytechef/component/shopify/ShopifyComponentHandler.java#L72), [`DiscordComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/discord/src/main/java/com/bytechef/component/discord/DiscordComponentHandler.java#L92), or [`PipelinerComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/pipeliner/src/main/java/com/bytechef/component/pipeliner/PipelinerComponentHandler.java#L57) for guidance.
 
+#### API Key Labels via OpenAPI `x-title`
+
+You can customize user‑friendly labels for API key properties in the generated connection definition by using the `x-title` OpenAPI extension on security scheme properties. When present, ByteChef’s generator uses `x-title` as the label for the corresponding property.
+
+Example OpenAPI snippet:
+
+```yaml
+components:
+  securitySchemes:
+    ApiKeyQuery:
+      type: "apiKey"
+      in: "query"
+      name: "appid"
+      x-title: "App ID"
+```
+
+Expected generated code:
+
+```java
+public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    .authorizations(authorization(AuthorizationType.API_KEY)
+        .title("API Key")
+        .properties(
+            string(KEY)
+                .label("Key")
+                .required(true)
+                .defaultValue("appid")
+                .hidden(true),
+            string(VALUE)
+                .label("App ID") // comes from x-title
+                .required(true),
+            string(ADD_TO)
+                .label("Add to")
+                .required(true)
+                .defaultValue(ApiTokenLocation.QUERY_PARAMETERS.name())
+                .hidden(true)
+        ));
+```
+
+#### Bearer Token Labels via OpenAPI `x-title`
+
+You can also customize the label of the bearer token field using the same `x-title` OpenAPI extension. When the generator processes a Bearer Token authorization scheme, it maps `x-title` to the `.label(...)` of the generated token property.
+
+Example OpenAPI snippet:
+
+```yaml
+components:
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+      x-title: "Access Token"
+```
+
+Expected generated code:
+
+```java
+public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    .authorizations(
+        authorization(AuthorizationType.BEARER_TOKEN)
+            .title("Bearer Token")
+            .properties(
+                string(TOKEN)
+                    .label("Access Token") // comes from x-title
+                    .required(true)
+            )
+    );
+```
+
 ### Action
 
 If some actions require properties not specified in the OpenAPI schema, override the `modifyActions(ModifiableActionDefinition... actionDefinitions)` method in `NewComponentComponentHandler`.
@@ -86,3 +155,4 @@ For implementation details, refer to examples from existing components such as [
    ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
     ``
 For implementation details, refer to examples from existing components such as [`Airtable`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/airtable).
+

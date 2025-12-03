@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 
 const AppEventsFilterTitle = ({
@@ -14,9 +14,7 @@ const AppEventsFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm uppercase text-muted-foreground">Filter by workflow:</span>
 
-            <Badge variant="secondary">
-                <span className="text-sm">{label ?? 'All Workflows'}</span>
-            </Badge>
+            <Badge label={label ?? 'All Workflows'} styleType="secondary-filled" weight="semibold" />
         </div>
     );
 };

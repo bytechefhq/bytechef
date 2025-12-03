@@ -1,4 +1,4 @@
-import {Badge} from '@/components/ui/badge';
+import Badge from '@/components/Badge/Badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
@@ -24,9 +24,14 @@ const Title = ({customComponent}: {customComponent: CustomComponent}) => {
             <div className="flex space-x-1">
                 <div className="font-semibold">{customComponent.title}</div>
 
-                <Badge className="flex items-center justify-center" variant="secondary">
-                    {customComponent.componentVersion}
-                </Badge>
+                {customComponent.componentVersion && (
+                    <Badge
+                        className="flex items-center justify-center"
+                        label={`v${customComponent.componentVersion}`}
+                        styleType="secondary-filled"
+                        weight="semibold"
+                    />
+                )}
             </div>
 
             <div className="text-sm">{customComponent.name}</div>
@@ -95,9 +100,14 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div>
-                        <Badge className="flex w-24 items-center justify-center" variant="secondary">
-                            {customComponent.language}
-                        </Badge>
+                        {customComponent.language && (
+                            <Badge
+                                className="flex w-24 items-center justify-center"
+                                label={customComponent.language}
+                                styleType="secondary-filled"
+                                weight="semibold"
+                            />
+                        )}
                     </div>
 
                     <div className="flex flex-col items-end gap-y-4">

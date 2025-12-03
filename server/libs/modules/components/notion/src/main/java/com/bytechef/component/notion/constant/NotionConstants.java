@@ -21,7 +21,9 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.notion.util.NotionPropertyType;
+import java.util.List;
 
 /**
  * @author Monika Kušter
@@ -29,11 +31,15 @@ import com.bytechef.component.definition.ComponentDsl;
 public class NotionConstants {
 
     public static final String CONTENT = "content";
+    public static final String DATABASE_ITEM_ID = "databaseItemId";
     public static final String ID = "id";
+    public static final String FIELDS = "fields";
+    public static final String NAME = "name";
     public static final String TITLE = "title";
     public static final String TEXT = "text";
+    public static final String TYPE = "type";
 
-    public static final ComponentDsl.ModifiableObjectProperty PAGE_OUTPUT_PROPERTY = object()
+    public static final ModifiableObjectProperty PAGE_OUTPUT_PROPERTY = object()
         .properties(
             string("object")
                 .description("The type of the object returned."),
@@ -103,6 +109,19 @@ public class NotionConstants {
                 .description("The URL of the page."),
             string("request_id")
                 .description("The ID of the request."));
+
+    public static final List<NotionPropertyType> SUPPORTED_PROPERTY_TYPES = List.of(
+        NotionPropertyType.CHECKBOX,
+        NotionPropertyType.DATE,
+        NotionPropertyType.EMAIL,
+        NotionPropertyType.SELECT,
+        NotionPropertyType.MULTI_SELECT,
+        NotionPropertyType.STATUS,
+        NotionPropertyType.NUMBER,
+        NotionPropertyType.PHONE_NUMBER,
+        NotionPropertyType.RICH_TEXT,
+        NotionPropertyType.TITLE,
+        NotionPropertyType.URL);
 
     private NotionConstants() {
     }
