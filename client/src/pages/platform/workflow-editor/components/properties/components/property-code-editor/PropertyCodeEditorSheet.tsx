@@ -14,6 +14,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanel';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -22,8 +23,6 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlayIcon, RefreshCwIcon, SaveIcon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import {getTask} from '../../../../utils/taskDispatcherConfig';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 const ReactJson = lazy(() => import('react-json-view'));
@@ -57,8 +56,8 @@ const PropertyCodeEditorSheet = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const currentWorkflowTask = getTask({
-        taskDispatcherId: workflowNodeName,
         tasks: workflow.tasks || [],
+        workflowNodeName: workflowNodeName,
     });
 
     const handleRunClick = () => {

@@ -23,8 +23,8 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {getTask} from '@/pages/platform/workflow-editor/utils/taskDispatcherConfig';
 import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,
@@ -625,8 +625,8 @@ const Property = ({
 
             const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
                 ? getTask({
-                      taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
                       tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
                   })
                 : undefined;
 

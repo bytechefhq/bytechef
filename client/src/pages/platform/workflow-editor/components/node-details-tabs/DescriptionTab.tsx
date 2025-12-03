@@ -3,6 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {
     ClusterElementDefinition,
     ComponentDefinition,
@@ -18,7 +19,6 @@ import {useShallow} from 'zustand/react/shallow';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
-import {getTask} from '../../utils/taskDispatcherConfig';
 
 interface DescriptionTabProps {
     invalidateWorkflowQueries: () => void;
@@ -184,8 +184,8 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
         workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName) ||
         (currentNode?.workflowNodeName
             ? getTask({
-                  taskDispatcherId: currentNode.workflowNodeName,
                   tasks: workflow.tasks || [],
+                  workflowNodeName: currentNode.workflowNodeName,
               })
             : undefined);
 
