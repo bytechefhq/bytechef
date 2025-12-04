@@ -1,4 +1,4 @@
-import {Extension} from '@tiptap/react';
+import {Extension} from '@tiptap/core';
 
 export interface FormulaModeOptionsI {
     saveNullValue?: () => void;
@@ -10,6 +10,12 @@ declare module '@tiptap/core' {
     interface Commands<ReturnType> {
         formulaMode: {
             toggleFormulaMode: (value: boolean) => ReturnType;
+        };
+    }
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    interface Storage {
+        FormulaMode: {
+            isFormulaMode: boolean;
         };
     }
 }
