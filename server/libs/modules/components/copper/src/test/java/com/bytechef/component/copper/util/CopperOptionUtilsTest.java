@@ -49,7 +49,7 @@ class CopperOptionUtilsTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(any()))

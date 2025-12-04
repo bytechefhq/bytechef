@@ -67,7 +67,7 @@ class ComponentToolsTest {
     private ConnectionService connectionService;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
             componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService);

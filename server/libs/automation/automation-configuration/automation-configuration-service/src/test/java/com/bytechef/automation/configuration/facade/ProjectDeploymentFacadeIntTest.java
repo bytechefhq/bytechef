@@ -120,7 +120,7 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
 
         projectDeploymentFacadeHelper = new ProjectDeploymentFacadeHelper(

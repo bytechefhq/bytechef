@@ -48,8 +48,7 @@ class RuntimeTaskDispatcherPreSendProcessorTest {
     }
 
     @BeforeEach
-    void setUp() {
-        // Setup mock application arguments with connection parameters
+    void beforeEach() {
         applicationArguments = mock(ApplicationArguments.class);
 
         List<String> connectionValues = List.of(

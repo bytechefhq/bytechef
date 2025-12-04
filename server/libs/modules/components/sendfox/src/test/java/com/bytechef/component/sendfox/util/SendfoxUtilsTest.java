@@ -48,7 +48,7 @@ class SendfoxUtilsTest {
         Map.of("email", "testEmail2", "id", 2, "name", "testName2")));
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))

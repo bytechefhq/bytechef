@@ -43,7 +43,7 @@ public abstract class AbstractDropboxActionTest {
     protected ArgumentCaptor<String> pathArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         dropboxUtilsMockedStatic = mockStatic(DropboxUtils.class);
     }
 

@@ -48,7 +48,7 @@ class CsvFileAppendActionTest {
     private ByteArrayOutputStream capturedOutputStream;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         mockContext = mock(ActionContext.class);
         mockParameters = mock(Parameters.class);
         mockFileEntry = mock(FileEntry.class);

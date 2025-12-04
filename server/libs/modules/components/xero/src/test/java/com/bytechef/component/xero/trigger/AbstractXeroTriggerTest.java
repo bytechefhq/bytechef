@@ -47,7 +47,7 @@ public abstract class AbstractXeroTriggerTest {
     protected MockedStatic<XeroUtils> xeroUtilsMockedStatic;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         xeroUtilsMockedStatic = mockStatic(XeroUtils.class);
     }
 

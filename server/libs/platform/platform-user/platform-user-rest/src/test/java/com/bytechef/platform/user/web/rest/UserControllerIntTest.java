@@ -105,50 +105,12 @@ class UserControllerIntTest {
 
     @BeforeEach
     @SuppressFBWarnings("NP")
-    public void setup() {
+    public void beforeEach() {
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)
             .clear();
         cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)
             .clear();
-    }
 
-    /**
-     * Create a User.
-     *
-     * This is a static method, as tests for other entities might also need it, if they test an entity which has a
-     * required relationship to the User entity.
-     */
-    public static User createEntity() {
-        User user = new User();
-
-        user.setLogin(DEFAULT_LOGIN + RandomStringUtils.randomAlphabetic(5));
-        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
-        user.setActivated(true);
-        user.setEmail(RandomStringUtils.randomAlphabetic(5) + DEFAULT_EMAIL);
-        user.setFirstName(DEFAULT_FIRSTNAME);
-        user.setLastName(DEFAULT_LASTNAME);
-        user.setImageUrl(DEFAULT_IMAGEURL);
-        user.setLangKey(DEFAULT_LANGKEY);
-
-        return user;
-    }
-
-    /**
-     * Setups the database with one user.
-     */
-    public static User initTestUser(UserRepository userRepository) {
-        userRepository.deleteAll();
-
-        User user = createEntity();
-
-        user.setLogin(DEFAULT_LOGIN);
-        user.setEmail(DEFAULT_EMAIL);
-
-        return user;
-    }
-
-    @BeforeEach
-    public void initTest() {
         user = initTestUser(userRepository);
     }
 
@@ -195,7 +157,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void createUserWithExistingId() throws Exception {
+    void tetsCreateUserWithExistingId() throws Exception {
         List<User> allUsers = userRepository.findAll();
 
         int databaseSizeBeforeCreate = allUsers.size();
@@ -226,7 +188,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void createUserWithExistingLogin() throws Exception {
+    void testCreateUserWithExistingLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -258,7 +220,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void createUserWithExistingEmail() throws Exception {
+    void testCreateUserWithExistingEmail() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -290,7 +252,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void getAllUsers() throws Exception {
+    void testGetAllUsers() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -310,7 +272,7 @@ class UserControllerIntTest {
     @Test
     @Transactional
     @SuppressFBWarnings("NP")
-    void getUser() throws Exception {
+    void testGetUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -337,14 +299,14 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void getNonExistingUser() throws Exception {
+    void testGetNonExistingUser() throws Exception {
         restUserMockMvc.perform(get("/api/platform/internal/users/unknown"))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    void updateUser() throws Exception {
+    void testUpdateUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -397,7 +359,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void updateUserLogin() throws Exception {
+    void testUpdateUserLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -453,7 +415,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void updateUserExistingEmail() throws Exception {
+    void testUpdateUserExistingEmail() throws Exception {
         // Initialize the database with 2 users
         userRepository.save(user);
 
@@ -500,7 +462,7 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    void updateUserExistingLogin() throws Exception {
+    void testUpdateUserExistingLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -548,7 +510,7 @@ class UserControllerIntTest {
     @Test
     @Transactional
     @SuppressFBWarnings("NP")
-    void deleteUser() throws Exception {
+    void testDeleteUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
 
@@ -665,5 +627,31 @@ class UserControllerIntTest {
 
     private void assertPersistedUsers(Consumer<List<User>> userAssertion) {
         userAssertion.accept(userRepository.findAll());
+    }
+
+    private static User createEntity() {
+        User user = new User();
+
+        user.setLogin(DEFAULT_LOGIN + RandomStringUtils.randomAlphabetic(5));
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(true);
+        user.setEmail(RandomStringUtils.randomAlphabetic(5) + DEFAULT_EMAIL);
+        user.setFirstName(DEFAULT_FIRSTNAME);
+        user.setLastName(DEFAULT_LASTNAME);
+        user.setImageUrl(DEFAULT_IMAGEURL);
+        user.setLangKey(DEFAULT_LANGKEY);
+
+        return user;
+    }
+
+    private static User initTestUser(UserRepository userRepository) {
+        userRepository.deleteAll();
+
+        User user = createEntity();
+
+        user.setLogin(DEFAULT_LOGIN);
+        user.setEmail(DEFAULT_EMAIL);
+
+        return user;
     }
 }

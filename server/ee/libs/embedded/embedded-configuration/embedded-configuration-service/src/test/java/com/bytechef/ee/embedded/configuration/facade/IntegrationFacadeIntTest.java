@@ -98,7 +98,7 @@ public class IntegrationFacadeIntTest {
     private WorkflowCrudRepository workflowRepository;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         Mockito.when(componentDefinitionService.getComponentDefinition(Mockito.anyString(), Mockito.any()))
             .thenReturn(new ComponentDefinition("componentName"));
     }

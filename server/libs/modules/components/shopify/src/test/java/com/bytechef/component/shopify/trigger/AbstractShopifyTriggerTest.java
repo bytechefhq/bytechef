@@ -48,12 +48,12 @@ public abstract class AbstractShopifyTriggerTest {
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         shopifyUtilsMockedStatic = mockStatic(ShopifyUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         shopifyUtilsMockedStatic.close();
     }
 }

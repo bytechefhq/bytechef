@@ -52,7 +52,7 @@ public class TaskDispatcherDefinitionApiControllerIntTest {
     private WebTestClient webTestClient;
 
     @BeforeEach
-    public void setup() {
+    public void beforeEach() {
         this.webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
     }

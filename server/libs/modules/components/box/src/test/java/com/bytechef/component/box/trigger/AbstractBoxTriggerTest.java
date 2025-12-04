@@ -48,7 +48,7 @@ public abstract class AbstractBoxTriggerTest {
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         boxUtilsMockedStatic = mockStatic(BoxUtils.class);
     }
 

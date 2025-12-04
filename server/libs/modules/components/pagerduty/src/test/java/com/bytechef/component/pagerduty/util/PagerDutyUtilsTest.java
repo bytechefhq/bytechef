@@ -63,7 +63,7 @@ class PagerDutyUtilsTest {
     private static final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
