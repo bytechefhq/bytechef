@@ -16,10 +16,49 @@
 
 package com.bytechef.component.devto.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 public class DevtoUtils extends AbstractDevtoUtils {
+
+    public static List<Option<Long>> getArticleIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<Long>> options = new ArrayList<>();
+
+        int page = 1;
+
+        while (true) {
+            List<Map<String, ?>> body = context.http(http -> http.get("/articles/me/all"))
+                .queryParameters("per_page", 1000, "page", page++)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.isEmpty()) {
+                break;
+            }
+
+            for (Map<String, ?> article : body) {
+                options.add(option((String) article.get("title"), ((Integer) article.get("id")).intValue()));
+            }
+        }
+
+        return options;
+    }
+
     private DevtoUtils() {
     }
 }
