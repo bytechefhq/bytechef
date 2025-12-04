@@ -56,7 +56,7 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                 .run();
         },
         items: ({editor, query}: {editor: Editor; query: string}): DataPillType[] => {
-            const dataPills: DataPillType[] = editor.storage.MentionStorage.dataPills;
+            const dataPills: DataPillType[] = editor.storage.MentionStorage.dataPills ?? [];
 
             return dataPills.filter((dataPill) => dataPill.value.toLowerCase().startsWith(query.toLowerCase()));
         },
