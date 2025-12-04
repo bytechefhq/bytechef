@@ -32,9 +32,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 const PropertyMentionsInputEditorSheet = lazy(
     () =>
-        import(
-            '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet'
-        )
+        import('@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet')
 );
 
 interface PropertyMentionsInputProps {
