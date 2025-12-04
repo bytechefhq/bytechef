@@ -46,6 +46,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
         const [allComponentDefinitions, setAllComponentDefinitions] = useState<Record<string, ComponentDefinition>>({});
+        const [isLoadingFullDefinitions, setIsLoadingFullDefinitions] = useState(false);
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
@@ -75,11 +76,11 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const fetchingComponentsRef = useRef<Set<string>>(new Set());
 
         const fetchFullComponentInfo = useCallback(
-            async (name: string, version: number) => {
+            async (name: string, version: number): Promise<{name: string; definition: ComponentDefinition} | null> => {
                 const componentKey = `${name}@${version}`;
 
                 if (fetchingComponentsRef.current.has(componentKey)) {
-                    return;
+                    return null;
                 }
 
                 fetchingComponentsRef.current.add(componentKey);
@@ -97,45 +98,62 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         }),
                     });
 
-                    setAllComponentDefinitions((previousComponents) => {
-                        if (previousComponents[name]) {
-                            return previousComponents;
-                        }
-
-                        return {
-                            ...previousComponents,
-                            [name]: response,
-                        };
-                    });
+                    return {definition: response, name};
                 } catch (error) {
                     console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
+                    return null;
                 } finally {
                     fetchingComponentsRef.current.delete(componentKey);
                 }
             },
             [queryClient]
         );
-
         useEffect(() => {
             if (!filter || !componentDefinitions?.length) {
+                setIsLoadingFullDefinitions(false);
                 return;
             }
 
-            const timeout = setTimeout(() => {
+            const timeout = setTimeout(async () => {
                 const candidates = componentDefinitions.filter(
                     ({actionsCount, triggersCount}) => (actionsCount ?? 0) > 0 || (triggersCount ?? 0) > 0
                 );
 
-                candidates.forEach((componentDefinition) => {
-                    if (!allComponentDefinitions[componentDefinition.name]) {
-                        void fetchFullComponentInfo(componentDefinition.name, componentDefinition.version);
-                    }
-                });
+                const fetchPromises = candidates
+                    .filter((componentDefinition) => !allComponentDefinitions[componentDefinition.name])
+                    .map((componentDefinition) =>
+                        fetchFullComponentInfo(componentDefinition.name, componentDefinition.version)
+                    );
+
+                if (fetchPromises.length > 0) {
+                    setIsLoadingFullDefinitions(true);
+                }
+
+                const results = await Promise.all(fetchPromises);
+
+                const fetchedComponents = results.filter(
+                    (result): result is {name: string; definition: ComponentDefinition} => result !== null
+                );
+
+                if (fetchedComponents.length > 0) {
+                    setAllComponentDefinitions((previousComponents) => {
+                        const newComponents = {...previousComponents};
+
+                        fetchedComponents.forEach(({definition, name}) => {
+                            if (!newComponents[name]) {
+                                newComponents[name] = definition;
+                            }
+                        });
+
+                        return newComponents;
+                    });
+                }
+
+                setIsLoadingFullDefinitions(false);
             }, 400);
 
             return () => clearTimeout(timeout);
         }, [filter, componentDefinitions, allComponentDefinitions, fetchFullComponentInfo]);
-
         useEffect(
             () =>
                 setFilteredTaskDispatcherDefinitions(
@@ -211,7 +229,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
-                <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
+                <header className="flex flex-col items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <Input
                         className="bg-white shadow-none"
                         name="workflowNodeFilter"
@@ -219,6 +237,10 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         placeholder="Filter components"
                         value={filter}
                     />
+
+                    {isLoadingFullDefinitions && (
+                        <span className="whitespace-nowrap text-xs text-gray-500">Loading...</span>
+                    )}
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">
