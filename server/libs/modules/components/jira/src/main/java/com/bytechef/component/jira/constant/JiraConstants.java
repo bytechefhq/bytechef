@@ -50,7 +50,6 @@ public class JiraConstants {
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
-    public static final String YOUR_DOMAIN = "yourDomain";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
         .properties(

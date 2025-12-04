@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
-import static com.bytechef.component.jira.constant.JiraConstants.YOUR_DOMAIN;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
@@ -42,10 +41,6 @@ public class JiraConnection {
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
-                    string(YOUR_DOMAIN)
-                        .label("Your domain")
-                        .description("e.g https://{yourDomain}}.atlassian.net")
-                        .required(true),
                     string(CLIENT_ID)
                         .label("Client Id")
                         .required(true),
