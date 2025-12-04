@@ -749,7 +749,7 @@ export const useProperty = ({
 
             const paramValue = resolvePath(encodedParameters, encodedPath);
 
-            if (paramValue !== undefined || paramValue !== null) {
+            if (paramValue !== undefined && paramValue !== null) {
                 setPropertyParameterValue(paramValue);
 
                 if (typeof paramValue === 'string' && paramValue.startsWith('=')) {
@@ -765,7 +765,6 @@ export const useProperty = ({
         // save hidden property to definition on render
         if (
             hidden &&
-            currentComponent &&
             path &&
             objectName === undefined &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
@@ -830,7 +829,7 @@ export const useProperty = ({
         if (controlType === 'SELECT' && propertyParameterValue !== undefined) {
             if (propertyParameterValue === null) {
                 setSelectValue('null');
-            } else if (propertyParameterValue !== undefined) {
+            } else {
                 if (type === 'BOOLEAN') {
                     setSelectValue(propertyParameterValue.toString());
                 } else {
@@ -850,7 +849,8 @@ export const useProperty = ({
         if (
             isNumericalInput &&
             (inputValue === null || inputValue === undefined) &&
-            (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
+            propertyParameterValue !== null &&
+            propertyParameterValue !== undefined &&
             parameterValue
         ) {
             setInputValue(propertyParameterValue);
@@ -858,8 +858,10 @@ export const useProperty = ({
 
         if (
             isNumericalInput &&
-            (inputValue !== null || inputValue !== undefined) &&
-            (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
+            inputValue !== null &&
+            inputValue !== undefined &&
+            propertyParameterValue !== null &&
+            propertyParameterValue !== undefined &&
             propertyParameterValue !== inputValue
         ) {
             setInputValue(propertyParameterValue);
@@ -868,7 +870,7 @@ export const useProperty = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue, mentionInput, controlType, inputValue]);
 
-    // set lookup dependencies
+    // set options lookup dependencies
     useEffect(() => {
         if (!currentComponent?.parameters || !optionsDataSource?.optionsLookupDependsOn) {
             return;
@@ -882,7 +884,7 @@ export const useProperty = ({
         setLookupDependsOnValues(optionsLookupDependsOnValues);
     }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
-    // set lookup dependencies
+    // set properties lookup dependencies
     useEffect(() => {
         if (!currentComponent?.parameters || !propertiesDataSource?.propertiesLookupDependsOn) {
             return;
