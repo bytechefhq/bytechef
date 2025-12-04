@@ -11,6 +11,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import {decodePath} from './encodingUtils';
 
 interface SavePropertyProps {
+    fromAi?: boolean;
     includeInMetadata?: boolean;
     path: string;
     successCallback?: () => void;
@@ -33,6 +34,7 @@ interface SavePropertyProps {
 }
 
 export default function saveProperty({
+    fromAi = false,
     includeInMetadata = false,
     path,
     successCallback,
@@ -61,6 +63,7 @@ export default function saveProperty({
                 environmentId: environmentStore.getState().currentEnvironmentId,
                 id: workflowId,
                 updateClusterElementParameterRequest: {
+                    fromAiInMetadata: fromAi,
                     includeInMetadata,
                     path: decodedPath,
                     type,

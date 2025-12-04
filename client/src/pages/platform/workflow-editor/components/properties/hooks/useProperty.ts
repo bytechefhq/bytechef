@@ -67,6 +67,7 @@ type UsePropertyReturnType = {
     formattedOptions: Array<Option> | undefined;
     handleCodeEditorChange: (value?: string) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
+    handleFromAiClick: (fromAi: boolean) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
@@ -78,6 +79,7 @@ type UsePropertyReturnType = {
     inputValue: string;
     isDisplayConditionsPending: boolean;
     isFetchingCurrentDisplayCondition: boolean;
+    isFromAi: boolean;
     isFormulaMode: boolean;
     isNumericalInput: boolean;
     isValidControlType: boolean | undefined;
@@ -651,6 +653,54 @@ export const useProperty = ({
         ]
     );
 
+    const handleFromAiClick = useCallback(
+        (fromAi: boolean) => {
+            if (!path || !workflow.id) {
+                return;
+            }
+
+            let value = propertyParameterValue;
+
+            if (fromAi) {
+                if (editorRef.current) {
+                    editorRef.current.commands.setContent(`fromAi(${property.name}, 'description')`);
+                    editorRef.current.setEditable(false);
+
+                    value = `fromAi(${property.name}, 'description')`;
+                }
+            }
+
+            saveProperty({
+                fromAi,
+                includeInMetadata: custom,
+                path,
+                type,
+                updateClusterElementParameterMutation,
+                updateWorkflowNodeParameterMutation,
+                value,
+                workflowId: workflow.id,
+            });
+        },
+        [
+            custom,
+            path,
+            property.name,
+            propertyParameterValue,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
+    );
+
+    const isFromAi = useMemo(() => {
+        if (!currentComponent?.metadata?.ui?.fromAi || !path) {
+            return false;
+        }
+
+        return currentComponent.metadata.ui.fromAi.includes(path);
+    }, [currentComponent?.metadata?.ui?.fromAi, path]);
+
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
             (node) => node.name === currentNode?.name
@@ -1015,6 +1065,7 @@ export const useProperty = ({
         formattedOptions,
         handleCodeEditorChange,
         handleDeleteCustomPropertyClick,
+        handleFromAiClick,
         handleInputChange,
         handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
@@ -1026,6 +1077,7 @@ export const useProperty = ({
         inputValue,
         isDisplayConditionsPending,
         isFetchingCurrentDisplayCondition,
+        isFromAi,
         isFormulaMode,
         isNumericalInput,
         isValidControlType,

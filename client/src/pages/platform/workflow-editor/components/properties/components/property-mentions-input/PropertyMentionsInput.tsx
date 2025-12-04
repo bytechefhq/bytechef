@@ -41,7 +41,9 @@ interface PropertyMentionsInputProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    handleFromAiClick?: (fromAi: boolean) => void;
     handleInputTypeSwitchButtonClick?: () => void;
+    isFromAi?: boolean;
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
@@ -62,8 +64,10 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             defaultValue,
             deletePropertyButton,
             description,
+            handleFromAiClick,
             handleInputTypeSwitchButtonClick,
             isFormulaMode,
+            isFromAi,
             label,
             leadingIcon,
             path,
@@ -248,7 +252,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
+                            handleFromAiClick={handleFromAiClick}
                             isFormulaMode={isFormulaMode}
+                            isFromAi={isFromAi}
                             labelId={labelId}
                             onChange={(value) => handleEditorValueChange(value)}
                             onFocus={onFocus}
