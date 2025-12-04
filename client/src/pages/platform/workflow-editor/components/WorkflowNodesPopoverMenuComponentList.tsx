@@ -100,7 +100,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
                     return {definition: response, name};
                 } catch (error) {
-                    console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
                     return null;
                 } finally {
                     fetchingComponentsRef.current.delete(componentKey);
