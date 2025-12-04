@@ -115,7 +115,7 @@ public class AiCopilotConfiguration {
         OpenAi.Embedding.Options openAiEmbeddingOptions = openAi.getEmbedding()
             .getOptions();
 
-        openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
+        this.openAiEmbeddingModel = openAiEmbeddingOptions.getModel();
 
         Vectorstore vectorstore = copilot.getVectorstore();
 
@@ -149,7 +149,7 @@ public class AiCopilotConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
-    OpenAiEmbeddingModel anthropicEmbeddingModel(OpenAiApi openAiApi) {
+    OpenAiEmbeddingModel anthropicOpenAiEmbeddingModel(OpenAiApi openAiApi) {
         return new OpenAiEmbeddingModel(
             openAiApi,
             MetadataMode.ALL,
