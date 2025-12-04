@@ -1,6 +1,7 @@
 import './PropertyMentionsInputBubbleMenu.css';
 
-import {BubbleMenu, Editor, useEditorState} from '@tiptap/react';
+import {Editor, useEditorState} from '@tiptap/react';
+import {BubbleMenu} from '@tiptap/react/menus';
 
 const PropertyMentionsInputBubbleMenu = ({editor}: {editor: Editor}) => {
     const editorState = useEditorState({

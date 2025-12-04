@@ -18,14 +18,15 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ClusterElementItemType, DataPillType} from '@/shared/types';
-import Document from '@tiptap/extension-document';
+import {Extension, mergeAttributes} from '@tiptap/core';
+import {Document} from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
-import Paragraph from '@tiptap/extension-paragraph';
-import Placeholder from '@tiptap/extension-placeholder';
-import Text from '@tiptap/extension-text';
+import {Paragraph} from '@tiptap/extension-paragraph';
+import {Placeholder} from '@tiptap/extension-placeholder';
+import {Text} from '@tiptap/extension-text';
 import {TextSelection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
-import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
+import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
@@ -476,8 +477,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
             if (editor && !isLocalUpdate) {
-                editor.commands.setContent(getContent(editorValue as string)!, false, {
-                    preserveWhitespace: 'full',
+                editor.commands.setContent(getContent(editorValue as string)!, {
+                    emitUpdate: false,
+                    parseOptions: {preserveWhitespace: 'full'},
                 });
             }
         }, [editor, getContent, editorValue, isLocalUpdate]);
@@ -511,8 +513,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
             if (editor && !isLocalUpdate && memoizedContent !== undefined) {
-                editor.commands.setContent(memoizedContent, false, {
-                    preserveWhitespace: 'full',
+                editor.commands.setContent(memoizedContent, {
+                    emitUpdate: false,
+                    parseOptions: {preserveWhitespace: 'full'},
                 });
             }
         }, [editor, memoizedContent, isLocalUpdate]);
@@ -530,9 +533,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             if (isFormulaMode !== undefined) {
                 editor.commands.toggleFormulaMode(isFormulaMode);
 
-                if (editor.storage.formulaMode) {
-                    editor.storage.formulaMode.isFormulaMode = isFormulaMode;
-                }
+                editor.storage.FormulaMode.isFormulaMode = isFormulaMode;
             }
         }, [editor, value, isFormulaMode, setIsFormulaMode]);
 
