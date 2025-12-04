@@ -80,6 +80,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     ) => {
         const [isFocused, setIsFocused] = useState(false);
         const isInitialLoadRef = useRef(true);
+        const localEditorRef = useRef<Editor | null>(null);
 
         const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
             useShallow((state) => ({
@@ -119,9 +120,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                         const processedValue = newValue.trim().substring(1);
 
-                        if (ref && typeof ref === 'object' && 'current' in ref && ref.current?.commands) {
-                            ref.current.commands.setContent(processedValue);
-                        }
+                        localEditorRef.current?.commands?.setContent(processedValue);
 
                         return false;
                     }
@@ -129,18 +128,18 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 return true;
             },
-            [ref, setIsFormulaMode]
+            [setIsFormulaMode]
         );
 
         useEffect(() => {
-            if (!focusedInput) {
+            if (!focusedInput || !localEditorRef.current) {
                 setIsFocused(false);
 
                 return;
             }
 
-            setIsFocused((focusedInput.view.props.attributes as {[name: string]: string}).id === elementId);
-        }, [focusedInput, elementId]);
+            setIsFocused(focusedInput === localEditorRef.current);
+        }, [focusedInput]);
 
         // Check initial value for formula mode
         useEffect(() => {
@@ -244,7 +243,19 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             onFocus={onFocus}
                             path={path}
                             placeholder={placeholder}
-                            ref={ref}
+                            ref={(instance) => {
+                                // keep a local reference to avoid accessing the editor.view before mount
+                                localEditorRef.current = instance as Editor | null;
+
+                                // forward to parent ref
+                                if (typeof ref === 'function') {
+                                    ref(instance as Editor | null);
+                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
+                                } else if (ref && 'current' in (ref as any)) {
+                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
+                                    (ref as any).current = instance;
+                                }
+                            }}
                             setIsFormulaMode={setIsFormulaMode}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
