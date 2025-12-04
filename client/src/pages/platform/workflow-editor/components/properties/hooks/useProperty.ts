@@ -749,6 +749,8 @@ export const useProperty = ({
             } else {
                 setMentionInput(false);
             }
+
+            return;
         }
 
         if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
@@ -804,12 +806,12 @@ export const useProperty = ({
             const encodedParameters = encodeParameters(parameters);
             const encodedPath = encodePath(path);
 
-            const paramValue = resolvePath(encodedParameters, encodedPath);
+            const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
 
-            if (paramValue !== undefined && paramValue !== null) {
-                setPropertyParameterValue(paramValue);
+            if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
+                setPropertyParameterValue(valueFromDefinition);
 
-                if (typeof paramValue === 'string' && paramValue.startsWith('=')) {
+                if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
                     setMentionInput(true);
 
                     setIsFormulaMode(true);
@@ -850,6 +852,26 @@ export const useProperty = ({
     useEffect(() => {
         // Skip updating if a save operation is in progress
         if (isSavingRef.current) {
+            return;
+        }
+
+        // STOPPED HERE, IDK WHAT THE FUCK IS GOING ON HERE
+
+        console.log(
+            path,
+            'mentionInput: ',
+            mentionInput,
+            'isFromAi: ',
+            isFromAi,
+            'propertyParameterValue: ',
+            propertyParameterValue,
+            'mentionInputValue: ',
+            mentionInputValue
+        );
+
+        if (propertyParameterValue && isFromAi) {
+            setMentionInputValue(propertyParameterValue);
+
             return;
         }
 

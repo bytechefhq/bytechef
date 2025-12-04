@@ -84,6 +84,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         const isInitialLoadRef = useRef(true);
         const localEditorRef = useRef<Editor | null>(null);
 
+        console.log('PropertyMentionsInput value: ', value);
+
         const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
             useShallow((state) => ({
                 componentDefinitions: state.componentDefinitions,
