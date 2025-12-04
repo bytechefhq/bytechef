@@ -60,7 +60,7 @@ public class McpServerGraphQlControllerTest {
     private McpServerGraphQlController mcpServerGraphQlController;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         // McpServerGraphQlController constructor reads publicUrl from ApplicationProperties
         when(applicationProperties.getPublicUrl()).thenReturn("http://localhost:8080");
 

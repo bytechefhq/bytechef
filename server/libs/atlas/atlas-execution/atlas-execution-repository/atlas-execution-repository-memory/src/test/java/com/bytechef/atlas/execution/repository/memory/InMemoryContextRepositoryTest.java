@@ -43,7 +43,7 @@ class InMemoryContextRepositoryTest {
     private InMemoryContextRepository repository;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         TenantContext.resetCurrentTenantId();
 
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(CACHE_NAME);

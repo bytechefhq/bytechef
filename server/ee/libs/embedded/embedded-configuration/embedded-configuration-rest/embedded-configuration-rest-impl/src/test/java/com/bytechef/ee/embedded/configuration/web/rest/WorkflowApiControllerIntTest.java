@@ -117,7 +117,7 @@ public class WorkflowApiControllerIntTest {
     private ComponentConnectionFacade componentConnectionFacade;
 
     @BeforeEach
-    public void setup() {
+    void beforeEach() {
         this.webTestClient = MockMvcWebTestClient
             .bindTo(mockMvc)
             .build();

@@ -52,7 +52,7 @@ class InMemoryTaskExecutionRepositoryTest {
     private InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         TenantContext.resetCurrentTenantId();
 
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(TASK_EXECUTION_CACHE_NAME);

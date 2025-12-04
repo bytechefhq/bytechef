@@ -77,7 +77,7 @@ public class IntegrationApiControllerIntTest {
     private WebTestClient webTestClient;
 
     @BeforeEach
-    public void setup() {
+    void beforeEach() {
         this.webTestClient = MockMvcWebTestClient
             .bindTo(mockMvc)
             .build();

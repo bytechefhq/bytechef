@@ -94,7 +94,7 @@ class SingleTenantUserDetailsServiceIntTest {
     private UserDetailsService singleTenantUserDetailsService;
 
     @BeforeEach
-    public void init() {
+    void beforeEach() {
         User userOne = new User();
 
         userOne.setLogin(USER_ONE_LOGIN);

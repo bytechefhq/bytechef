@@ -71,9 +71,9 @@ class AwsTriggerSchedulerTest {
     private MockedStatic<JsonUtils> jsonUtilsMock;
 
     @BeforeEach
-    void setUp() {
-        // Mock JsonUtils.write to return a simple JSON string
+    void beforeEach() {
         jsonUtilsMock = mockStatic(JsonUtils.class);
+
         jsonUtilsMock.when(() -> JsonUtils.write(any()))
             .thenReturn("{\"mocked\":\"json\"}");
 

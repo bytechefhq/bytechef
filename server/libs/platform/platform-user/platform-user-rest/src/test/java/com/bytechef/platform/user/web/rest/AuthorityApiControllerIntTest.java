@@ -95,7 +95,7 @@ class AuthorityApiControllerIntTest {
     }
 
     @BeforeEach
-    public void initTest() {
+    public void beforeEach() {
         authorityRepository.deleteAll();
 
         authority = createEntity();

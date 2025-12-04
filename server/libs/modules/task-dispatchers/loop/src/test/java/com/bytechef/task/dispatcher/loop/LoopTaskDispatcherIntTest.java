@@ -72,7 +72,7 @@ public class LoopTaskDispatcherIntTest {
     private TaskFileStorage taskFileStorage;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(
             (valueMap, name, value) -> {
                 List<Object> list = valueMap.computeIfAbsent(name, k -> new ArrayList<>());
