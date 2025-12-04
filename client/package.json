@@ -82,7 +82,7 @@
     "fetch-intercept": "^2.4.0",
     "html-entities": "^2.6.0",
     "lucide-react": "^0.553.0",
-    "monaco-editor": "^0.54.0",
+    "monaco-editor": "^0.55.1",
     "monaco-yaml": "^5.4.0",
     "motion": "^12.23.24",
     "posthog-js": "^1.292.0",

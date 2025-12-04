@@ -16,12 +16,8 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
-
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -30,20 +26,26 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.shopify.util.ShopifyUtils;
-import java.util.Map;
 
-/**
- * @author Monika Domiter
- */
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+
 public class ShopifyNewOrderTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newOrder")
         .title("New Order")
         .description("Triggers when new order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)))
+        .output(outputSchema(object().properties()))
         .webhookEnable(ShopifyNewOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewOrderTrigger::webhookDisable)
         .webhookRequest(ShopifyNewOrderTrigger::webhookRequest);

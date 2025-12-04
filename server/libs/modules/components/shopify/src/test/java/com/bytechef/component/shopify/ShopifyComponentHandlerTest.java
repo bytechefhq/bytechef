@@ -16,8 +16,13 @@
 
 package com.bytechef.component.shopify;
 
-/**
- * @author Monika Domiter
- */
-public class ShopifyComponentHandlerTest extends AbstractShopifyComponentHandlerTest {
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
+class ShopifyComponentHandlerTest {
+
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/example_v1.json", new ShopifyComponentHandler().getDefinition());
+    }
 }

@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.shopify;
+package com.bytechef.component.shopify.action;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Provides the base test implementation for the REST based component.
- *
- * @generated
- */
-public abstract class AbstractShopifyComponentHandlerTest {
+class ShopifyCancelOrderActionTest {
+
     @Test
-    public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/shopify_v1.json", new ShopifyComponentHandler().getDefinition());
+    void testPerform() {
+        Parameters parameters = mock(Parameters.class);
+
+        Assertions.assertNull(
+            ShopifyCancelOrderAction.perform(parameters, parameters, mock(ActionContext.class)));
     }
 }

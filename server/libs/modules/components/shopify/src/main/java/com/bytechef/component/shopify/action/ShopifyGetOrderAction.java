@@ -16,38 +16,24 @@
 
 package com.bytechef.component.shopify.action;
 
-import com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.shopify.util.ShopifyUtils;
-
-import java.util.Map;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-public class ShopifyDeleteOrderAction {
+public class ShopifyGetOrderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
-        .title("Delete Order")
-        .description("Deletes an order. Orders that interact with an online gateway can't be deleted.")
-        .properties(
-            integer("orderId").label("Order ID")
-                .description("ID of the order to delete.")
-                .required(true)
-                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.PATH))
-        )
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getOrder")
+        .title("Get Order")
+        .description("Get order by id.")
+        .properties()
         .output(outputSchema(string()))
-        .perform(ShopifyDeleteOrderAction::perform);
+        .perform(ShopifyGetOrderAction::perform);
 
-    private ShopifyDeleteOrderAction() {
+    private ShopifyGetOrderAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {

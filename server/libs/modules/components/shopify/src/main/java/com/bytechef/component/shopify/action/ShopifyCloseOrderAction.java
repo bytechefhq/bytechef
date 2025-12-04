@@ -16,47 +16,79 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.shopify.util.ShopifyUtils;
+
+import java.util.Map;
+
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.NOTIFY_CUSTOMER;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.QUERY;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.REASON;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.RESTOCK;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.STAFF_NOTE;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.VARIABLES;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
-import java.util.Map;
-
-/**
- * Provides a list of the component actions.
- *
- * @generated
- */
 public class ShopifyCloseOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("closeOrder")
-        .title("Close Order")
-        .description(
-            "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.")
-        .metadata(
-            Map.of(
-                "method", "POST",
-                "path", "/orders/{orderId}/close.json"
 
-            ))
-        .properties(integer("orderId").label("Order ID")
-            .description("ID of the order to close.")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)))
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("closeOrder")
+        .title("Close Order")
+        .description("Closes an open order.")
+        .properties(
+            integer(ORDER_ID)
+                .label("Order ID")
+                .description("ID of the order to close.")
+                .required(true)
+                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("order")
+                            .description("The closed order.")
+                            .properties(
+                                array("additionalFees")
+                                    .description("A list of additional fees applied to an order, such as duties, import fees, or tax lines.")
+                            ),
+                        array("userErrors")
+                            .description("The list of errors that occurred from executing the mutation.")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("field")
+                                            .description("The path to the input field that caused the error."),
+                                        string("message")
+                                            .description("The error message.")))
+                    )))
+        .perform(ShopifyCloseOrderAction::perform);
 
     private ShopifyCloseOrderAction() {
+    }
+
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return context.http(http -> http.post(""))
+            .body(
+                Http.Body.of(
+                    Map.of(
+                        QUERY, "mutation OrderClose($input: OrderCloseInput!) { orderClose(input: $input) { order { canMarkAsPaid cancelReason cancelledAt clientIp confirmed customer { displayName email } discountCodes } userErrors { field message } } }",
+                        VARIABLES, Map.of(
+                            "input", Map.of(
+                            ORDER_ID, inputParameters.getRequiredString(ORDER_ID) // "gid://shopify/Order/148977776"
+                            )))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }

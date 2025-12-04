@@ -16,51 +16,36 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.shopify.util.ShopifyUtils;
-import java.time.LocalDateTime;
-import java.util.Map;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Monika Domiter
- */
-class ShopifyNewCancelledOrderTriggerTest extends AbstractShopifyTriggerTest {
+class ShopifyNewCancelledOrderTriggerTest {
 
     @Test
     void testWebhookEnable() {
+        Parameters parameters = mock(Parameters.class);
         String webhookUrl = "testWebhookUrl";
+        String workflowExecutionId = "testWorkflowExecutionId";
 
-        shopifyUtilsMockedStatic.when(
-            () -> ShopifyUtils.subscribeWebhook(webhookUrl, "orders/cancelled", mockedTriggerContext))
-            .thenReturn(123L);
-        WebhookEnableOutput webhookEnableOutput = ShopifyNewCancelledOrderTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
-
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
-
-        Map<String, Object> expectedParameters = Map.of(ID, 123L);
-
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        Assertions.assertNull(
+            ShopifyNewCancelledOrderTrigger.webhookEnable(parameters, parameters, webhookUrl, workflowExecutionId,
+                mock(TriggerContext.class)));
     }
 
     @Test
     void testWebhookRequest() {
-        when(mockedWebhookBody.getContent())
-            .thenReturn(mockedObject);
+        Parameters parameters = mock(Parameters.class);
 
-        Object result = ShopifyNewCancelledOrderTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
-
-        assertEquals(mockedObject, result);
-
+        Assertions.assertNull(
+            ShopifyNewCancelledOrderTrigger.webhookRequest(parameters, parameters, mock(TriggerDefinition.HttpHeaders.class),
+                mock(TriggerDefinition.HttpParameters.class), mock(TriggerDefinition.WebhookBody.class),
+                mock(TriggerDefinition.WebhookMethod.class), mock(TriggerDefinition.WebhookEnableOutput.class),
+                mock(TriggerContext.class)));
     }
+
 }

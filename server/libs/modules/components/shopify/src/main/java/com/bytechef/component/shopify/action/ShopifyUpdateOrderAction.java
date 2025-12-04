@@ -16,66 +16,61 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.shopify.util.ShopifyUtils;
+
+import java.util.Map;
+
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
-import java.util.Map;
-
-/**
- * Provides a list of the component actions.
- *
- * @generated
- */
 public class ShopifyUpdateOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateOrder")
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateOrder")
         .title("Update Order")
         .description("Update an existing order.")
-        .metadata(
-            Map.of(
-                "method", "PUT",
-                "path", "/orders/{orderId}.json", "bodyContentType", BodyContentType.JSON, "mimeType",
-                "application/json"
-
-            ))
-        .properties(integer("orderId").label("Order ID")
-            .description("ID of the order to update.")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)),
+        .properties(
+            integer("orderId").label("Order ID")
+                .description("ID of the order to update.")
+                .required(true)
+                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.PATH)),
             object("order").properties(string("note").label("Note")
-                .description("An optional note that a shop owner can attach to the order.")
-                .required(false),
-                string("email").label("Email")
-                    .description("The customer's email address.")
-                    .required(false),
-                string("phone").label("Phone")
-                    .description("The customer's phone number for receiving SMS notifications.")
-                    .required(false),
-                string("tags").label("Tags")
-                    .description("Tags attached to the order, formatted as a string of comma-separated values.")
-                    .required(false))
+                        .description("An optional note that a shop owner can attach to the order.")
+                        .required(false),
+                    string("email").label("Email")
+                        .description("The customer's email address.")
+                        .required(false),
+                    string("phone").label("Phone")
+                        .description("The customer's phone number for receiving SMS notifications.")
+                        .required(false),
+                    string("tags").label("Tags")
+                        .description("Tags attached to the order, formatted as a string of comma-separated values.")
+                        .required(false))
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY))
                 .label("Order")
-                .required(false))
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+                .required(false)
+        )
+        .output(outputSchema(string()))
+        .perform(ShopifyUpdateOrderAction::perform);
 
     private ShopifyUpdateOrderAction() {
+    }
+
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        // TODO
+
+        return null;
     }
 }

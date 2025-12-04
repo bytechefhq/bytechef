@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * @author Monika Domiter
  */
-public class ShopifyUtils extends AbstractShopifyUtils {
+public class ShopifyUtils {
 
     private ShopifyUtils() {
     }
