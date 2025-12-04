@@ -1,0 +1,26 @@
+## Connection Setup
+
+Follow these steps to generate a Dev.to API Key and configure the ByteChef connection.
+
+Prerequisites:
+- You have an active account at [dev.to](https://dev.to/)
+
+Steps to generate an API Key on Dev.to:
+1. Log in to your [dev.to](https://dev.to/) account.
+2. Open Settings: click your avatar (top‑right) → Settings, or go directly to [https://dev.to/settings](https://dev.to/settings).
+3. In the left sidebar, select **Extensions**, or go directly to [https://dev.to/settings/extensions](https://dev.to/settings/extensions).
+4. Scroll to the section **DEV Community API Keys**.
+5. Enter a description/name for the key and click **Generate API Key**.
+6. A dropdown will appear under the button. Expand it to reveal your new API key.
+7. Copy the API key and store it securely. You can revoke it at any time from the same page.
+
+Configure the ByteChef Dev.to connection:
+1. In ByteChef, create a new Dev.to connection.
+2. Paste the API key into the "API Key" field.
+3. Save the connection. ByteChef will use this key by sending it in the `api-key` HTTP header to `https://dev.to/api`.
+
+Notes and troubleshooting:
+- Treat the API key like a password. Do not share it or commit it to source control.
+- If you receive 401 Unauthorized errors, verify that the key is correct and has not been revoked.
+- You can create multiple keys (e.g., for different environments) and revoke them individually.
+- Dev.to API reference and authentication details: https://developers.forem.com/api/#section/Authentication
