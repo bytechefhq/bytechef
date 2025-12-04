@@ -1,0 +1,369 @@
+---
+title: "Dev.to"
+description: "Dev.to is an online community and platform where software developers share articles, tutorials, and discussions about programming and technology."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: devto/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | API Key | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Article
+Name: createArticle
+
+`Creates a new article.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| article | Article | OBJECT <details> <summary> Properties </summary> &#123;STRING\(title), STRING\(body_markdown), BOOLEAN\(published), STRING\(description)&#125; </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Article",
+  "name" : "createArticle",
+  "parameters" : {
+    "article" : {
+      "title" : "",
+      "body_markdown" : "",
+      "published" : false,
+      "description" : ""
+    }
+  },
+  "type" : "devto/v1/createArticle"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type_of | STRING |  |
+| id | INTEGER | The unique identifier of the article. |
+| title | STRING | The title of the article. |
+| description | STRING | The description of the article. |
+| slug | STRING |  |
+| path | STRING | The path of the article. |
+| url | STRING | The URL of the article. |
+| comments_count | INTEGER | The number of comments on the article. |
+| public_reactions_count | INTEGER | The number of public reactions on the article. |
+| positive_reactions_count | INTEGER | The number of positive reactions on the article. |
+| created_at | DATE_TIME | The date and time when the article was created. |
+| edited_at | DATE_TIME | The date and time when the article was last edited. |
+| crossposted_at | DATE_TIME | The date and time when the article was crossposted. |
+| published_at | DATE_TIME | The date and time when the article was published. |
+| last_comment_at | DATE_TIME | The date and time of the last comment on the article. |
+| reading_time_minutes | INTEGER | The estimated reading time of the article in minutes. |
+| tag_list | STRING | The tags of the article. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags of the article. |
+| body_html | STRING | The body of the article in HTML format. |
+| body_markdown | STRING | The body of the article in markdown format. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(username), STRING\(twitter_username), STRING\(github_username), INTEGER\(user_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "type_of" : "",
+  "id" : 1,
+  "title" : "",
+  "description" : "",
+  "slug" : "",
+  "path" : "",
+  "url" : "",
+  "comments_count" : 1,
+  "public_reactions_count" : 1,
+  "positive_reactions_count" : 1,
+  "created_at" : "2021-01-01T00:00:00",
+  "edited_at" : "2021-01-01T00:00:00",
+  "crossposted_at" : "2021-01-01T00:00:00",
+  "published_at" : "2021-01-01T00:00:00",
+  "last_comment_at" : "2021-01-01T00:00:00",
+  "reading_time_minutes" : 1,
+  "tag_list" : "",
+  "tags" : [ "" ],
+  "body_html" : "",
+  "body_markdown" : "",
+  "user" : {
+    "name" : "",
+    "username" : "",
+    "twitter_username" : "",
+    "github_username" : "",
+    "user_id" : 1
+  }
+}
+```
+
+
+### Get Article
+Name: getArticle
+
+`Get article by id.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| articleId | Article ID | INTEGER | The unique identifier of the article. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Article",
+  "name" : "getArticle",
+  "parameters" : {
+    "articleId" : 1
+  },
+  "type" : "devto/v1/getArticle"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type_of | STRING |  |
+| id | INTEGER | The unique identifier of the article. |
+| title | STRING | The title of the article. |
+| description | STRING | The description of the article. |
+| slug | STRING |  |
+| path | STRING | The path of the article. |
+| url | STRING | The URL of the article. |
+| comments_count | INTEGER | The number of comments on the article. |
+| public_reactions_count | INTEGER | The number of public reactions on the article. |
+| positive_reactions_count | INTEGER | The number of positive reactions on the article. |
+| created_at | DATE_TIME | The date and time when the article was created. |
+| edited_at | DATE_TIME | The date and time when the article was last edited. |
+| crossposted_at | DATE_TIME | The date and time when the article was crossposted. |
+| published_at | DATE_TIME | The date and time when the article was published. |
+| last_comment_at | DATE_TIME | The date and time of the last comment on the article. |
+| reading_time_minutes | INTEGER | The estimated reading time of the article in minutes. |
+| tag_list | STRING | The tags of the article. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags of the article. |
+| body_html | STRING | The body of the article in HTML format. |
+| body_markdown | STRING | The body of the article in markdown format. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(username), STRING\(twitter_username), STRING\(github_username), INTEGER\(user_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "type_of" : "",
+  "id" : 1,
+  "title" : "",
+  "description" : "",
+  "slug" : "",
+  "path" : "",
+  "url" : "",
+  "comments_count" : 1,
+  "public_reactions_count" : 1,
+  "positive_reactions_count" : 1,
+  "created_at" : "2021-01-01T00:00:00",
+  "edited_at" : "2021-01-01T00:00:00",
+  "crossposted_at" : "2021-01-01T00:00:00",
+  "published_at" : "2021-01-01T00:00:00",
+  "last_comment_at" : "2021-01-01T00:00:00",
+  "reading_time_minutes" : 1,
+  "tag_list" : "",
+  "tags" : [ "" ],
+  "body_html" : "",
+  "body_markdown" : "",
+  "user" : {
+    "name" : "",
+    "username" : "",
+    "twitter_username" : "",
+    "github_username" : "",
+    "user_id" : 1
+  }
+}
+```
+
+
+### Update Article
+Name: updateArticle
+
+`Updates an existing article.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| articleId | Article ID | INTEGER | The unique identifier of the article. | true |
+| article | Article | OBJECT <details> <summary> Properties </summary> &#123;STRING\(title), STRING\(body_markdown), BOOLEAN\(published), STRING\(description)&#125; </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Article",
+  "name" : "updateArticle",
+  "parameters" : {
+    "articleId" : 1,
+    "article" : {
+      "title" : "",
+      "body_markdown" : "",
+      "published" : false,
+      "description" : ""
+    }
+  },
+  "type" : "devto/v1/updateArticle"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type_of | STRING |  |
+| id | INTEGER | The unique identifier of the article. |
+| title | STRING | The title of the article. |
+| description | STRING | The description of the article. |
+| slug | STRING |  |
+| path | STRING | The path of the article. |
+| url | STRING | The URL of the article. |
+| comments_count | INTEGER | The number of comments on the article. |
+| public_reactions_count | INTEGER | The number of public reactions on the article. |
+| positive_reactions_count | INTEGER | The number of positive reactions on the article. |
+| created_at | DATE_TIME | The date and time when the article was created. |
+| edited_at | DATE_TIME | The date and time when the article was last edited. |
+| crossposted_at | DATE_TIME | The date and time when the article was crossposted. |
+| published_at | DATE_TIME | The date and time when the article was published. |
+| last_comment_at | DATE_TIME | The date and time of the last comment on the article. |
+| reading_time_minutes | INTEGER | The estimated reading time of the article in minutes. |
+| tag_list | STRING | The tags of the article. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags of the article. |
+| body_html | STRING | The body of the article in HTML format. |
+| body_markdown | STRING | The body of the article in markdown format. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(username), STRING\(twitter_username), STRING\(github_username), INTEGER\(user_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "type_of" : "",
+  "id" : 1,
+  "title" : "",
+  "description" : "",
+  "slug" : "",
+  "path" : "",
+  "url" : "",
+  "comments_count" : 1,
+  "public_reactions_count" : 1,
+  "positive_reactions_count" : 1,
+  "created_at" : "2021-01-01T00:00:00",
+  "edited_at" : "2021-01-01T00:00:00",
+  "crossposted_at" : "2021-01-01T00:00:00",
+  "published_at" : "2021-01-01T00:00:00",
+  "last_comment_at" : "2021-01-01T00:00:00",
+  "reading_time_minutes" : 1,
+  "tag_list" : "",
+  "tags" : [ "" ],
+  "body_html" : "",
+  "body_markdown" : "",
+  "user" : {
+    "name" : "",
+    "username" : "",
+    "twitter_username" : "",
+    "github_username" : "",
+    "user_id" : 1
+  }
+}
+```
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Follow these steps to generate a Dev.to API Key and configure the ByteChef connection.
+
+Prerequisites:
+- You have an active account at [dev.to](https://dev.to/)
+
+Steps to generate an API Key on Dev.to:
+1. Log in to your [dev.to](https://dev.to/) account.
+2. Open Settings: click your avatar (top‑right) → Settings, or go directly to [https://dev.to/settings](https://dev.to/settings).
+3. In the left sidebar, select **Extensions**, or go directly to [https://dev.to/settings/extensions](https://dev.to/settings/extensions).
+4. Scroll to the section **DEV Community API Keys**.
+5. Enter a description/name for the key and click **Generate API Key**.
+6. A dropdown will appear under the button. Expand it to reveal your new API key.
+7. Copy the API key and store it securely. You can revoke it at any time from the same page.
+
+Configure the ByteChef Dev.to connection:
+1. In ByteChef, create a new Dev.to connection.
+2. Paste the API key into the "API Key" field.
+3. Save the connection. ByteChef will use this key by sending it in the `api-key` HTTP header to `https://dev.to/api`.
+
+Notes and troubleshooting:
+- Treat the API key like a password. Do not share it or commit it to source control.
+- If you receive 401 Unauthorized errors, verify that the key is correct and has not been revoked.
+- You can create multiple keys (e.g., for different environments) and revoke them individually.
+- Dev.to API reference and authentication details: https://developers.forem.com/api/#section/Authentication
