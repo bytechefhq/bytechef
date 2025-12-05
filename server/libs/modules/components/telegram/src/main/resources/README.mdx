@@ -1,0 +1,21 @@
+## Connection Setup
+
+Connect Telegram to ByteChef using a Bot Token created via BotFather.
+
+### Create a Telegram Bot and get the Bot Token
+1. In Telegram, start a chat with (`BotFather`)[https://telegram.me/BotFather].
+2. Send the `/newbot` command and follow the prompts:
+   - Choose a display name (can be changed later).
+   - Choose a unique username that ends with `bot` (e.g., `my_bytechef_bot`).
+3. Copy the Bot Token provided by BotFather (format: `1234567890:AA...`). Keep it secret.
+
+Helpful links:
+- Telegram Bot API: https://core.telegram.org/bots/api
+
+### Add a Telegram connection in ByteChef
+1. In ByteChef, go to Connections → New Connection → Telegram.
+2. Fill in the fields:
+   - Bot Token: paste the token you received from BotFather.
+3. Save the connection.
+
+That’s it — ByteChef will call `https://api.telegram.org/bot<your-token>` to access the Telegram Bot API.
