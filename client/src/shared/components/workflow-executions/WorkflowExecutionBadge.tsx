@@ -8,7 +8,7 @@ const STYLE_MAP: Record<string, StyleType> = {
     FAILED: 'destructive-filled',
 };
 
-const WorkflowExecutionBadge = ({ status }: { status: string }) => {
+const WorkflowExecutionBadge = ({status}: {status: string}) => {
     return (
         <div className="flex items-center">
             <Badge
