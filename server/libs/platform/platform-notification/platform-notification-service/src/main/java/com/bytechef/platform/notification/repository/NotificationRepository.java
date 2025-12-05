@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 public interface NotificationRepository extends ListCrudRepository<Notification, Long> {
 
     @Query("""
-            SELECT * FROM notification
+            SELECT notification.* FROM notification
             JOIN notification_notification_event ON notification.id = notification_notification_event.notification_id
             JOIN notification_event ON notification_notification_event.event_id = notification_event.id
             WHERE notification_event.type = :type
