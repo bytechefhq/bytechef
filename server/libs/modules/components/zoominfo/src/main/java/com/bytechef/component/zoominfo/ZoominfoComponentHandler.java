@@ -17,6 +17,7 @@
 package com.bytechef.component.zoominfo;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -41,6 +42,11 @@ public class ZoominfoComponentHandler implements ComponentHandler {
         .icon("path:assets/zoominfo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ZoominfoConnection.CONNECTION_DEFINITION)
+        .clusterElements(
+            tool(ZoominfoEnrichCompanyAction.ACTION_DEFINITION),
+            tool(ZoominfoEnrichContactAction.ACTION_DEFINITION),
+            tool(ZoominfoSearchCompanyAction.ACTION_DEFINITION),
+            tool(ZoominfoSearchContactAction.ACTION_DEFINITION))
         .actions(
             ZoominfoEnrichCompanyAction.ACTION_DEFINITION,
             ZoominfoEnrichContactAction.ACTION_DEFINITION,
