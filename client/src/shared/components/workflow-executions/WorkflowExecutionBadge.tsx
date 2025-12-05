@@ -8,12 +8,15 @@ const STYLE_MAP: Record<string, StyleType> = {
     FAILED: 'destructive-filled',
 };
 
-const WorkflowExecutionBadge = ({status}: {status: string}) => {
-    const styleType: StyleType = STYLE_MAP[status] ?? 'secondary-filled';
-
+const WorkflowExecutionBadge = ({ status }: { status: string }) => {
     return (
         <div className="flex items-center">
-            <Badge className="uppercase" label={status ?? ''} styleType={styleType} weight="semibold" />
+            <Badge
+                className="uppercase"
+                label={status ?? ''}
+                styleType={STYLE_MAP[status] ?? 'secondary-filled'}
+                weight="semibold"
+            />
         </div>
     );
 };
