@@ -55,12 +55,20 @@
         "value": "claude-3-sonnet-20240229"
       }, {
         "description": null,
+        "label": "claude-haiku-4-5",
+        "value": "claude-haiku-4-5"
+      }, {
+        "description": null,
         "label": "claude-opus-4-0",
         "value": "claude-opus-4-0"
       }, {
         "description": null,
         "label": "claude-opus-4-1",
         "value": "claude-opus-4-1"
+      }, {
+        "description": null,
+        "label": "claude-opus-4-5",
+        "value": "claude-opus-4-5"
       }, {
         "description": null,
         "label": "claude-sonnet-4-0",
@@ -746,12 +754,20 @@
         "value": "claude-3-sonnet-20240229"
       }, {
         "description": null,
+        "label": "claude-haiku-4-5",
+        "value": "claude-haiku-4-5"
+      }, {
+        "description": null,
         "label": "claude-opus-4-0",
         "value": "claude-opus-4-0"
       }, {
         "description": null,
         "label": "claude-opus-4-1",
         "value": "claude-opus-4-1"
+      }, {
+        "description": null,
+        "label": "claude-opus-4-5",
+        "value": "claude-opus-4-5"
       }, {
         "description": null,
         "label": "claude-sonnet-4-0",
