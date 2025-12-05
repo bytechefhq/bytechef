@@ -103,6 +103,45 @@ class GoogleDriveUtilsTest {
     }
 
     @Test
+    void testGetPollOutputWithLastTimeCheckedAsStringFractionalNanos() throws IOException {
+        Parameters closureParameters = MockParametersFactory.create(
+            Map.of(LAST_TIME_CHECKED, "2025-12-05T16:55:49.682110827"));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files()).thenReturn(mockedFiles);
+            when(mockedFiles.list()).thenReturn(mockedList);
+            when(mockedList.setQ(stringArgumentCaptor.capture())).thenReturn(mockedList);
+            when(mockedList.setFields(stringArgumentCaptor.capture())).thenReturn(mockedList);
+            when(mockedList.setOrderBy(stringArgumentCaptor.capture())).thenReturn(mockedList);
+            when(mockedList.setPageSize(integerArgumentCaptor.capture())).thenReturn(mockedList);
+            when(mockedList.setPageToken(stringArgumentCaptor.capture())).thenReturn(mockedList);
+            when(mockedList.execute()).thenReturn(new FileList().setFiles(files));
+
+            PollOutput pollOutput = GoogleDriveUtils.getPollOutput(
+                mockedParameters, mockedParameters, closureParameters, mockedTriggerContext, false);
+
+            assertEquals(files, pollOutput.records());
+            assertFalse(pollOutput.pollImmediately());
+
+            List<String> strings = new ArrayList<>();
+
+            strings.add(
+                "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and " +
+                    "createdTime > '2025-12-05T16:55:49.682110827Z'");
+            strings.add("files(id, name, mimeType, webViewLink, kind)");
+            strings.add("createdTime desc");
+            strings.add(null);
+
+            assertEquals(strings, stringArgumentCaptor.getAllValues());
+            assertEquals(1000, integerArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
     void testListFiles() throws IOException {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
