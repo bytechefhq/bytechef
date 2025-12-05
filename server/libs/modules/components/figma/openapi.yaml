@@ -27,36 +27,39 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                description: "List of comments."
-                items:
-                  type: "object"
-                  properties:
-                    id:
-                      type: "string"
-                      description: "ID of the comment."
-                    file_key:
-                      type: "string"
-                      description: "File key of the file the comment is on."
-                    parent_id:
-                      type: "string"
-                      description: "ID of comment this comment is a reply to."
-                    user:
+                type: "object"
+                properties:
+                  comments:
+                    type: "array"
+                    description: "List of comments."
+                    items:
                       type: "object"
-                      description: "User who posted the comment."
                       properties:
                         id:
                           type: "string"
-                          description: "ID of the user."
-                        handle:
+                          description: "ID of the comment."
+                        file_key:
                           type: "string"
-                          description: "Name of the user."
-                        img_url:
+                          description: "File key of the file the comment is on."
+                        parent_id:
                           type: "string"
-                          description: "URL of the user's profile image."
-                        email:
-                          type: "string"
-                          description: "Email of the user."
+                          description: "ID of comment this comment is a reply to."
+                        user:
+                          type: "object"
+                          description: "User who posted the comment."
+                          properties:
+                            id:
+                              type: "string"
+                              description: "ID of the user."
+                            handle:
+                              type: "string"
+                              description: "Name of the user."
+                            img_url:
+                              type: "string"
+                              description: "URL of the user's profile image."
+                            email:
+                              type: "string"
+                              description: "Email of the user."
     post:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
@@ -114,6 +117,6 @@ components:
           tokenUrl: "https://api.figma.com/v1/oauth/token"
           refreshUrl: "https://api.figma.com/v1/oauth/refresh"
           scopes:
+            file_comments:read : "Read comments in files."
             file_comments:write: "Post and delete comments and comment reactions in files."
-            files:read: "Read files, projects, users, versions, comments, components & styles, and webhooks."
-            webhooks:write: " "
+            webhooks:write: "Create and manage webhooks."
