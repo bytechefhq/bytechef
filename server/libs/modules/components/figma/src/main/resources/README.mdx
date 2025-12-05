@@ -1,0 +1,28 @@
+## Connection Setup
+
+### Create a Figma OAuth App
+
+1. Go to https://www.figma.com/developers/apps (or click “My Apps” in the top toolbar).
+2. Click **Create a new app** (top-right).
+3. Enter a name for your OAuth app and select a Team/Organization. The app must be associated with a team or organization.
+4. Click **Create**.
+5. Copy the **Client ID** and **Client Secret** and store them securely.
+   - Figma shows the Client Secret only once. You’ll need it for token exchange and refreshing access tokens.
+
+### Configure OAuth Scopes
+
+On the OAuth scopes page, select the scopes your app needs. For the ByteChef Figma connector, enable:
+
+- `file_comments:read`
+- `file_comments:write`
+- `webhooks:write`
+
+### Set the Redirect URI
+
+Add the ByteChef OAuth2 callback URL as a Redirect URI in your Figma app:
+
+- Example cloud URL: `https://app.bytechef.io/callback`
+- Example local URL: `http://127.0.0.1:5173/callback`
+
+If you run ByteChef with a custom domain, the pattern is: `<YOUR_PUBLIC_URL>/callback`.
+
