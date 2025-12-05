@@ -44,7 +44,7 @@ public class FigmaConnection {
                     .label("Client Secret")
                     .required(true))
             .authorizationUrl((connectionParameters, context) -> "https://www.figma.com/oauth")
-            .scopes((connection, context) -> List.of("file_comments:write", "files:read", "webhooks:write"))
+            .scopes((connection, context) -> List.of("file_comments:read", "file_comments:write", "webhooks:write"))
             .tokenUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/token")
             .refreshUrl((connectionParameters, context) -> "https://api.figma.com/v1/oauth/refresh"));
 

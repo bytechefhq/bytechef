@@ -48,27 +48,32 @@ public class FigmaGetCommentsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(outputSchema(array().items(object().properties(string("id").description("ID of the comment.")
-            .required(false),
-            string("file_key").description("File key of the file the comment is on.")
-                .required(false),
-            string("parent_id").description("ID of comment this comment is a reply to.")
-                .required(false),
-            object("user").properties(string("id").description("ID of the user.")
-                .required(false),
-                string("handle").description("Name of the user.")
-                    .required(false),
-                string("img_url").description("URL of the user's profile image.")
-                    .required(false),
-                string("email").description("Email of the user.")
-                    .required(false))
-                .description("User who posted the comment.")
-                .required(false))
-            .description("List of comments."))
-            .description("List of comments.")
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output(
+            outputSchema(
+                object()
+                    .properties(array("comments")
+                        .items(object().properties(string("id").description("ID of the comment.")
+                            .required(false),
+                            string("file_key").description("File key of the file the comment is on.")
+                                .required(false),
+                            string("parent_id").description("ID of comment this comment is a reply to.")
+                                .required(false),
+                            object("user").properties(string("id").description("ID of the user.")
+                                .required(false),
+                                string("handle").description("Name of the user.")
+                                    .required(false),
+                                string("img_url").description("URL of the user's profile image.")
+                                    .required(false),
+                                string("email").description("Email of the user.")
+                                    .required(false))
+                                .description("User who posted the comment.")
+                                .required(false))
+                            .description("List of comments."))
+                        .description("List of comments.")
+                        .required(false))
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private FigmaGetCommentsAction() {
     }
