@@ -65,37 +65,33 @@ Name: getComments
 
 
 
-Type: ARRAY
-
-
-Items Type: OBJECT
+Type: OBJECT
 
 
 #### Properties
+
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the comment. |
-| file_key | STRING | File key of the file the comment is on. |
-| parent_id | STRING | ID of comment this comment is a reply to. |
-| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)&#125; </details> | User who posted the comment. |
-
+| comments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(file_key), STRING\(parent_id), &#123;STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)&#125;\(user)&#125;] </details> | List of comments. |
 
 
 
 
 #### Output Example
 ```json
-[ {
-  "id" : "",
-  "file_key" : "",
-  "parent_id" : "",
-  "user" : {
+{
+  "comments" : [ {
     "id" : "",
-    "handle" : "",
-    "img_url" : "",
-    "email" : ""
-  }
-} ]
+    "file_key" : "",
+    "parent_id" : "",
+    "user" : {
+      "id" : "",
+      "handle" : "",
+      "img_url" : "",
+      "email" : ""
+    }
+  } ]
+}
 ```
 
 
@@ -196,4 +192,36 @@ The output for this action is dynamic and may vary depending on the input parame
 If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+### Create a Figma OAuth App
+
+1. Go to https://www.figma.com/developers/apps (or click “My Apps” in the top toolbar).
+2. Click **Create a new app** (top-right).
+3. Enter a name for your OAuth app and select a Team/Organization. The app must be associated with a team or organization.
+4. Click **Create**.
+5. Copy the **Client ID** and **Client Secret** and store them securely.
+   - Figma shows the Client Secret only once. You’ll need it for token exchange and refreshing access tokens.
+
+### Configure OAuth Scopes
+
+On the OAuth scopes page, select the scopes your app needs. For the ByteChef Figma connector, enable:
+
+- `file_comments:read`
+- `file_comments:write`
+- `webhooks:write`
+
+### Set the Redirect URI
+
+Add the ByteChef OAuth2 callback URL as a Redirect URI in your Figma app:
+
+- Example cloud URL: `https://app.bytechef.io/callback`
+- Example local URL: `http://127.0.0.1:5173/callback`
+
+If you run ByteChef with a custom domain, the pattern is: `<YOUR_PUBLIC_URL>/callback`.
 
