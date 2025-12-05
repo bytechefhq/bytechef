@@ -72,6 +72,45 @@ public class FilesystemFileStorageServiceTest {
     }
 
     @Test
+    public void testStoreAndReadFilesWithoutExtension() {
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+            "data", "LICENSE", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileEntry.getExtension())
+            .isNull();
+        Assertions.assertThat(fileEntry.getMimeType())
+            .isNull();
+        Assertions.assertThat(fileEntry.getUrl())
+            .doesNotContain("LICENSE");
+
+        fileEntry = fileStorageService.storeFileContent(
+            "data", ".env", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileEntry.getExtension())
+            .isNull();
+        Assertions.assertThat(fileEntry.getMimeType())
+            .isNull();
+        Assertions.assertThat(fileEntry.getUrl())
+            .doesNotContain(".env");
+
+        fileEntry = fileStorageService.storeFileContent(
+            "data", ".config.json", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileEntry.getExtension())
+            .isEqualTo("json");
+        Assertions.assertThat(fileEntry.getMimeType())
+            .isEqualTo("application/json");
+        Assertions.assertThat(fileEntry.getUrl())
+            .doesNotContain(".config.json");
+    }
+
+    @Test
     public void testWrite() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
             "data", "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
