@@ -1,0 +1,29 @@
+---
+title: "Microsoft Application Setup"
+description: "Steps for setting up Microsoft Graph API for every Microsoft component."
+---
+
+## Connection Setup
+
+Connect Microsoft Graph to ByteChef using OAuth 2.0 Authorization Code.
+
+1. Open the Azure Portal: https://portal.azure.com/
+2. Go to **Microsoft Entra ID** tab.
+3. Click on **App registrations**.
+4. Click on **+New registration**.
+5. Fill the form:
+    - Name: e.g., "ByteChef Integration"
+    - Supported account types: pick one based on who will log in
+    - Redirect URI (optional for now): Platform = Web, URI = your ByteChef callback, e.g.:
+      - `https://app.bytechef.io/callback` (Cloud)
+      - `http://localhost:5173/callback` (Local dev)
+6. Click "Register".
+7. After registration, copy:
+    - Application (client) ID - used as Client Id in ByteChef
+    - Directory (tenant) ID - used as Tenant Id in ByteChef
+8. In your app, open **Certificates & secrets**
+9. Click on **+New client secret**.
+10. Add a description and choose an expiry.
+11. Create and copy the generated secret value → used as Client Secret in ByteChef. Store it securely.
+
+For Microsoft Graph, the base URL is: https://graph.microsoft.com/v1.0
