@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -82,7 +82,7 @@ class TypeformNewSubmissionTriggerTest {
                 "event_types", List.of(Map.of("form_response", true))), content);
 
             Map<String, ?> webhookParameters = webhookEnableOutput.parameters();
-            LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+            Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
             Map<String, Object> expectedParameters = Map.of(ID, uuid.toString());
 

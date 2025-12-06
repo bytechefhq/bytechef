@@ -35,7 +35,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -76,11 +76,11 @@ class TrelloNewCardTriggerTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "abc"));
 
-        WebhookEnableOutput dynamicWebhookEnableOutput = TrelloNewCardTrigger.dynamicWebhookEnable(
+        WebhookEnableOutput webhookEnableOutput = TrelloNewCardTrigger.dynamicWebhookEnable(
             mockedParameters, mockedParameters, webhookUrl, TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
 
-        Map<String, ?> parameters = dynamicWebhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+        Map<String, ?> parameters = webhookEnableOutput.parameters();
+        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         assertEquals(Map.of(ID, "abc"), parameters);
         assertNull(webhookExpirationDate);

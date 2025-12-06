@@ -90,7 +90,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         String workflowExecutionIdString = workflowExecutionId.toString();
@@ -106,7 +106,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .name(DYNAMIC_WEBHOOK_TRIGGER_REFRESH + workflowExecutionIdString.substring(0, 16))
             .target(sqsTarget)
             .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .startDate(webhookExpirationDate.toInstant(ZoneOffset.UTC)));
+            .startDate(webhookExpirationDate));
     }
 
     @Override

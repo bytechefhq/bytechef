@@ -18,7 +18,6 @@ package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -29,7 +28,8 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Date;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -57,7 +57,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         String workflowExecutionId = jobDataMap.getString("workflowExecutionId");
         Long connectionId = jobDataMap.getLong("connectionID");
 
-        LocalDateTime webhookExpirationDate = refreshDynamicWebhookTrigger(
+        Instant webhookExpirationDate = refreshDynamicWebhookTrigger(
             WorkflowExecutionId.parse(workflowExecutionId), connectionId);
 
         if (webhookExpirationDate != null) {
@@ -69,7 +69,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
                     triggerKey,
                     TriggerBuilder.newTrigger()
                         .withIdentity(triggerKey)
-                        .startAt(DateUtils.toDate(webhookExpirationDate))
+                        .startAt(Date.from(webhookExpirationDate))
                         .build());
             } catch (SchedulerException e) {
                 throw new JobExecutionException(e);
@@ -113,10 +113,10 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         return WorkflowNodeType.ofType(workflowTrigger.getType());
     }
 
-    private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
+    private Instant refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
         WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
-        LocalDateTime webhookExpirationDate = null;
+        Instant webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
             workflowNodeType.name(), workflowNodeType.version(),

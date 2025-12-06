@@ -17,6 +17,7 @@
 package com.bytechef.platform.scheduler;
 
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public interface TriggerScheduler {
     void cancelPollingTrigger(String workflowExecutionId);
 
     void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId);
 
     void scheduleScheduleTrigger(

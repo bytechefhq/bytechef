@@ -22,8 +22,10 @@ import com.bytechef.platform.scheduler.config.QuartzJdbcTestConfiguration;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Properties;
 import javax.sql.DataSource;
@@ -164,7 +166,8 @@ public class QuartzIntTest {
 
         LocalDateTime now = LocalDateTime.now();
 
-        LocalDateTime webhookExpirationDate = now.plusMinutes(5);
+        Instant webhookExpirationDate = now.plusMinutes(5)
+            .toInstant(ZoneOffset.UTC);
 
         String componentName = "testComponent";
         int componentVersion = 1;

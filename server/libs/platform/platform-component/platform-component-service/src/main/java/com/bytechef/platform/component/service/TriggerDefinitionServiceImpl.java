@@ -63,7 +63,6 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -648,7 +647,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
 
         return new WebhookEnableOutput(
-            (Map<String, ?>) triggerState.get("parameters"), (LocalDateTime) triggerState.get("webhookExpirationDate"));
+            (Map<String, ?>) triggerState.get("parameters"), (Instant) triggerState.get("webhookExpirationDate"));
     }
 
     private static WrapResult wrap(

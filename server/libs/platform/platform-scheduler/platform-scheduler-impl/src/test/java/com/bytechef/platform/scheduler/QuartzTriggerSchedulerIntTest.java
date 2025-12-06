@@ -22,8 +22,10 @@ import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfigur
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -165,8 +167,9 @@ public class QuartzTriggerSchedulerIntTest {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 123L, "test-webhook-workflow", "testTrigger");
-        LocalDateTime webhookExpirationDate = LocalDateTime.now()
-            .plus(Duration.ofSeconds(2));
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plus(Duration.ofSeconds(2))
+            .toInstant(ZoneOffset.UTC);
         String componentName = "testComponent";
         int componentVersion = 1;
         Long connectionId = 456L;
@@ -246,8 +249,9 @@ public class QuartzTriggerSchedulerIntTest {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 111L, "test-cancel-webhook", "testTrigger");
-        LocalDateTime webhookExpirationDate = LocalDateTime.now()
-            .plus(Duration.ofMinutes(5));
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
 
         // Schedule first
         quartzTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
