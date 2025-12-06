@@ -23,6 +23,7 @@ import javax.sql.DataSource;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("SQL_INJECTION_JDBC")
 public class MultiTenantDataSource implements DataSource {
 
     private final DataSource dataSource;
