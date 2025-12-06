@@ -44,7 +44,7 @@ interface DataPillPanelBodyProps {
 }
 
 const DataPillPanelBody = ({dataPillFilterQuery, operations, workflowInputs}: DataPillPanelBodyProps) => (
-    <ScrollArea className="w-full">
+    <ScrollArea className="h-full w-full">
         <Accordion className="size-full max-w-data-pill-panel-width" collapsible type="single">
             {!!workflowInputs?.length && (
                 <AccordionItem className="group" value="inputs">
