@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class PipedriveUpdatedPersonTriggerTest extends AbstractPipedriveTriggerTest {
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, 123);
 

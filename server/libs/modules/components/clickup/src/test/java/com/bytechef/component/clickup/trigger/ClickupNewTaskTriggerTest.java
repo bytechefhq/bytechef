@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ class ClickupNewTaskTriggerTest extends AbstractClickupTriggerTest {
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
         Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
 
         Map<String, Object> expectedParameters = Map.of(ID, "abc");
 

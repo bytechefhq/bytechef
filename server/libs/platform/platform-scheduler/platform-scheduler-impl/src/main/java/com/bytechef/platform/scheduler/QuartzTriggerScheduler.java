@@ -25,8 +25,10 @@ import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import org.quartz.CronScheduleBuilder;
@@ -72,7 +74,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleDynamicWebhookTriggerRefresh(
-        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(DynamicWebhookTriggerRefreshJob.class)
@@ -83,7 +85,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .startAt(DateUtils.toDate(webhookExpirationDate))
+            .startAt(Date.from(webhookExpirationDate))
             .build();
 
         schedule(jobDetail, trigger);

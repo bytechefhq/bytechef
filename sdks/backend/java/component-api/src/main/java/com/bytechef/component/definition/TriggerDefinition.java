@@ -20,7 +20,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -607,7 +607,7 @@ public interface TriggerDefinition {
      * @param webhookExpirationDate
      */
     @SuppressFBWarnings("EI")
-    record WebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
+    record WebhookEnableOutput(Map<String, ?> parameters, Instant webhookExpirationDate) {
     }
 
     @SuppressFBWarnings("EI")

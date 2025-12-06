@@ -29,7 +29,9 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
@@ -200,8 +202,9 @@ class AwsTriggerSchedulerTest {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 101L, "test-webhook-workflow", "test-trigger");
-        LocalDateTime webhookExpirationDate = LocalDateTime.now()
-            .plusHours(1);
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plusHours(1)
+            .toInstant(ZoneOffset.UTC);
         String componentName = "testComponent";
         int componentVersion = 1;
         Long connectionId = 456L;
