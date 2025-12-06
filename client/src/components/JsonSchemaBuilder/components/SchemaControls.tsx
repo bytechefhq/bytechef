@@ -1,8 +1,8 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import SchemaMenuPopover from '@/components/JsonSchemaBuilder/components/SchemaMenuPopover';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
-import {Badge} from '@/components/ui/badge';
 import {CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -95,15 +95,10 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
 
                         {extraFields?.length > 0 && (
                             <Badge
-                                className={twMerge(
-                                    'group-hover:bg-surface-neutral-secondary-hover',
-                                    isMenuOpen &&
-                                        'bg-surface-brand-primary text-white group-hover:bg-surface-brand-primary'
-                                )}
-                                variant="secondary"
-                            >
-                                {extraFields.length}
-                            </Badge>
+                                label={`${extraFields.length}`}
+                                styleType={isMenuOpen ? 'primary-filled' : 'secondary-filled'}
+                                weight="semibold"
+                            />
                         )}
                     </Button>
                 </SchemaMenuPopover>
@@ -189,15 +184,10 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
 
                         {extraFields?.length > 0 && (
                             <Badge
-                                className={twMerge(
-                                    'group-hover:bg-surface-neutral-secondary-hover',
-                                    isMenuOpen &&
-                                        'bg-surface-brand-primary text-white group-hover:bg-surface-brand-primary'
-                                )}
-                                variant="secondary"
-                            >
-                                {extraFields.length}
-                            </Badge>
+                                label={`${extraFields.length}`}
+                                styleType={isMenuOpen ? 'primary-filled' : 'secondary-filled'}
+                                weight="semibold"
+                            />
                         )}
                     </Button>
                 </SchemaMenuPopover>

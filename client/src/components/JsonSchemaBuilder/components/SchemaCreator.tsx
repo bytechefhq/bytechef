@@ -1,5 +1,5 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {Badge} from '@/components/ui/badge';
 import {AsteriskIcon, ChevronDownIcon} from 'lucide-react';
 import {PropsWithChildren, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -172,7 +172,13 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
                 variant="outline"
             />
 
-            {isCollapsed ? <Badge variant="secondary">{itemCount} items nested</Badge> : <div>{children}</div>}
+            {isCollapsed ? (
+                <Badge styleType="secondary-filled" weight="semibold">
+                    {itemCount !== undefined ? `${itemCount} items nested` : 'items nested'}
+                </Badge>
+            ) : (
+                <div>{children}</div>
+            )}
         </div>
     );
 };
