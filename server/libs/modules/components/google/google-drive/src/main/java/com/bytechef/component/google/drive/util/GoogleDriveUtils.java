@@ -73,9 +73,9 @@ public class GoogleDriveUtils {
             try {
                 fileList = drive.files()
                     .list()
-                    .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID)
-                        + "' in parents and " +
-                        "trashed = false and createdTime > '" + timestamp + "'")
+                    .setQ(
+                        mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID) + "' in parents and " +
+                            "trashed = false and createdTime > '" + timestamp + "'")
                     .setFields("files(id, name, mimeType, webViewLink, kind)")
                     .setOrderBy("createdTime desc")
                     .setPageSize(pageSize)

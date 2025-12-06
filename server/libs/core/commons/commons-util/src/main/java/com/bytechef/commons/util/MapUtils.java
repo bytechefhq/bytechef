@@ -24,9 +24,13 @@ import com.jayway.jsonpath.PathNotFoundException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -841,6 +845,43 @@ public class MapUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
+        // Special handling for Instant: attempts the ISO_INSTANT format first, then falls back to
+        // ISO_LOCAL_DATE_TIME assuming UTC timezone if no timezone information is present
+        if (elementType == Instant.class) {
+            if (value == null) {
+                return null;
+            }
+
+            if (value instanceof Instant) {
+                return elementType.cast(value);
+            }
+
+            if (value instanceof String string) {
+                try {
+                    // Try strict ISO_INSTANT first (expects 'Z' or offset)
+                    return elementType.cast(Instant.parse(string));
+                } catch (DateTimeParseException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "Failed to parse Instant using ISO_INSTANT from value '{}'; attempting ISO_LOCAL_DATE_TIME assuming UTC",
+                            string, e);
+                    }
+                    try {
+                        LocalDateTime localDateTime = LocalDateTime.parse(
+                            string, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+                        return elementType.cast(localDateTime.toInstant(ZoneOffset.UTC));
+                    } catch (DateTimeParseException e2) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(
+                                "Failed to parse Instant using ISO_LOCAL_DATE_TIME from value '{}'; falling back to ObjectMapper.convertValue",
+                                string, e2);
+                        }
+                    }
+                }
+            }
+        }
+
         return objectMapper.convertValue(value, elementType);
     }
 
