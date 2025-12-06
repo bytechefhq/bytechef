@@ -263,9 +263,16 @@ public class FilesystemFileStorageService implements FileStorageService {
 
         Path filePath = directoryPath;
 
-        filePath = filePath.resolve(
-            generateFilename
-                ? UUID.randomUUID() + filename.substring(filename.lastIndexOf(".")) : filename);
+        if (generateFilename) {
+            int dotIndex = filename.lastIndexOf('.');
+            UUID uuid = UUID.randomUUID();
+
+            String generatedName = dotIndex > 0 ? uuid + filename.substring(dotIndex) : uuid.toString();
+
+            filePath = filePath.resolve(generatedName);
+        } else {
+            filePath = filePath.resolve(filename);
+        }
 
         try {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);

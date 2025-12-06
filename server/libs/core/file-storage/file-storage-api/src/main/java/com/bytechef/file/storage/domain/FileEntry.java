@@ -51,8 +51,10 @@ public class FileEntry {
 
         this.name = filename.substring(indexOfLastSeparator(filename) + 1);
 
-        if (name.contains(".")) {
-            this.extension = name.substring(name.lastIndexOf(".") + 1);
+        int lastDotIndex = name.lastIndexOf(".");
+
+        if (lastDotIndex > 0) {
+            this.extension = name.substring(lastDotIndex + 1);
 
             this.mimeType = MimeTypeUtils.getMimeType(extension);
         }
@@ -80,7 +82,15 @@ public class FileEntry {
 
         String[] parts = decodedString.split(SPLITTER);
 
-        return new FileEntry(parts[2], parts[0], parts[1], parts[3]);
+        if (parts.length != 4) {
+            throw new IllegalArgumentException(
+                "Invalid FileEntry id format: expected exactly 4 parts but got " + parts.length);
+        }
+
+        String extension = parts[0].isEmpty() ? null : parts[0];
+        String mimeType = parts[1].isEmpty() ? null : parts[1];
+
+        return new FileEntry(parts[2], extension, mimeType, parts[3]);
     }
 
     public boolean equals(Object o) {
@@ -119,7 +129,8 @@ public class FileEntry {
     }
 
     public String toId() {
-        String string = String.join(SPLITTER, extension, mimeType, name, url);
+        String string = String.join(
+            SPLITTER, Objects.toString(extension, ""), Objects.toString(mimeType, ""), name, url);
 
         return EncodingUtils.base64EncodeToString(string.getBytes(StandardCharsets.UTF_8));
     }

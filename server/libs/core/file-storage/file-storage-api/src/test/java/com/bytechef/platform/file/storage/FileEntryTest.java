@@ -39,16 +39,22 @@ public class FileEntryTest {
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     @Test
-    public void testOf1() {
+    public void testFileEntryWithExtension() {
         Assertions.assertThat(new FileEntry("fileName.txt", "base64:///tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "fileName.txt")
             .hasFieldOrPropertyWithValue("url", "base64:///tmp/fileName.txt");
+
+        Assertions.assertThat(new FileEntry(".config.json", "base64:///tmp/.config.json"))
+            .hasFieldOrPropertyWithValue("extension", "json")
+            .hasFieldOrPropertyWithValue("mimeType", "application/json")
+            .hasFieldOrPropertyWithValue("name", ".config.json")
+            .hasFieldOrPropertyWithValue("url", "base64:///tmp/.config.json");
     }
 
     @Test
-    public void testOf2() {
+    public void testFileEntryWithDifferentNameAndUrl() {
         Assertions.assertThat(new FileEntry("name.txt", "base64:///tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
@@ -57,12 +63,64 @@ public class FileEntryTest {
     }
 
     @Test
-    public void testSpelEvaluation() {
+    public void testSpELEvaluation() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
             Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "base64:///tmp/fileName.txt")));
 
         assertEquals(
             "sample.txt base64:///tmp/fileName.txt", MapUtils.getString(map, "result"));
+    }
+
+    @Test
+    public void testParseFileEntryWithoutExtension() {
+        FileEntry original = new FileEntry("LICENSE", "base64:///tmp/LICENSE");
+
+        Assertions.assertThat(original.getExtension())
+            .isNull();
+        Assertions.assertThat(original.getMimeType())
+            .isNull();
+
+        String id = original.toId();
+
+        Assertions.assertThat(id)
+            .isNotNull()
+            .isNotEmpty();
+
+        FileEntry parsed = FileEntry.parse(id);
+
+        Assertions.assertThat(parsed)
+            .isEqualTo(original);
+        Assertions.assertThat(parsed.getExtension())
+            .isNull();
+        Assertions.assertThat(parsed.getMimeType())
+            .isNull();
+        Assertions.assertThat(parsed.getName())
+            .isEqualTo("LICENSE");
+        Assertions.assertThat(parsed.getUrl())
+            .isEqualTo("base64:///tmp/LICENSE");
+    }
+
+    @Test
+    public void testParseFileEntryWithDotPrefix() {
+        FileEntry original = new FileEntry(".env", "base64:///tmp/.env");
+
+        Assertions.assertThat(original.getExtension())
+            .isNull();
+
+        String id = original.toId();
+
+        FileEntry parsed = FileEntry.parse(id);
+
+        Assertions.assertThat(parsed)
+            .isEqualTo(original);
+        Assertions.assertThat(parsed.getExtension())
+            .isNull();
+        Assertions.assertThat(parsed.getMimeType())
+            .isEqualTo(original.getMimeType());
+        Assertions.assertThat(parsed.getName())
+            .isEqualTo(".env");
+        Assertions.assertThat(parsed.getUrl())
+            .isEqualTo("base64:///tmp/.env");
     }
 }
