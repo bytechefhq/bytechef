@@ -18,10 +18,10 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.STATUS_CODE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.definition.WebhookResponse;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Map;
 
@@ -99,7 +99,7 @@ public class WebhookResponseToWebhookRequestAction {
                 STATUS_CODE, inputParameters.getInteger(STATUS_CODE, 200)));
     }
 
-    protected static Object perform(
+    protected static WebhookResponse perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
