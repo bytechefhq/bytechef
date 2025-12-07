@@ -18,7 +18,7 @@ package com.bytechef.platform.worker.task;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
-import com.bytechef.component.definition.WebhookResponse;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 
 /**

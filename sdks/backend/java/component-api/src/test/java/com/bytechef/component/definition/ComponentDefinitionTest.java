@@ -47,7 +47,9 @@ public class ComponentDefinitionTest {
         ActionDefinition action = ComponentDsl.action("name")
             .title("title")
             .description("description")
-            .perform((inputParameters, connectionParameters, context) -> null);
+            .perform(
+                (ActionDefinition.SingleConnectionPerformFunction) (
+                    inputParameters, connectionParameters, context) -> null);
 
         jsonAssertEquals(
             """

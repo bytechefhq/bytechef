@@ -24,12 +24,12 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.component.definition.WebhookResponse;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.ee.component.apiplatform.constant.ResponseType;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -87,7 +87,9 @@ public class ApiPlatformResponseToApiRequestAction {
         return OutputResponse.of(response);
     }
 
-    protected Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    protected WebhookResponse perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         Object response = getResponse(inputParameters);
 
         if (response == null) {

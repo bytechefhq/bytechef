@@ -327,6 +327,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableActionDefinition perform(WebhookResponsePerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
         public ModifiableActionDefinition help(String body) {
             this.help = new HelpImpl(body, null);
 
