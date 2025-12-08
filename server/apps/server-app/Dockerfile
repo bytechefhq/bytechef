@@ -1,5 +1,5 @@
 # docker/dockerfile:1
-FROM ghcr.io/graalvm/graalvm-community:25.0.0  AS bytechef-server-base
+FROM ghcr.io/graalvm/graalvm-community:21.0.2  AS bytechef-server-base
 
 ARG ARG_APPLICATION_HOME=/opt/bytechef
 
