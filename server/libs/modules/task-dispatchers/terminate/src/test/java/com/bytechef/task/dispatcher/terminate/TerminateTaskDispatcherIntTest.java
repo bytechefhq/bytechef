@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -42,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,6 +102,7 @@ public class TerminateTaskDispatcherIntTest {
             this::getTaskHandlerMap);
 
         Assertions.assertEquals(Job.Status.STOPPED, job.getStatus());
+        assertParentTasksStopped(job);
         Assertions.assertEquals("main branch", testVarTaskHandler.get("mainBranchVar"));
         Assertions.assertEquals(
             "before terminate in error branch", testVarTaskHandler.get("beforeTerminateErrorBranchVar"));
@@ -118,11 +121,30 @@ public class TerminateTaskDispatcherIntTest {
             this::getTaskHandlerMap);
 
         Assertions.assertEquals(Job.Status.STOPPED, job.getStatus());
+        assertParentTasksStopped(job);
         Assertions.assertEquals("start", testVarTaskHandler.get("startVar"));
         Assertions.assertEquals(7, testVarTaskHandler.get("loopCounterVar"));
         Assertions.assertNull(testVarTaskHandler.get("end"));
     }
 
+    private void assertParentTasksStopped(Job job) {
+        Long jobId = Objects.requireNonNull(job.getId(), "job id");
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+        TaskExecution taskExecution =
+            taskExecutions.stream()
+                .filter(te -> Objects.equals(te.getName(), "terminate_1"))
+                .findFirst()
+                .orElseThrow();
+
+        while (taskExecution.getParentId() != null) {
+            taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+
+            Assertions.assertEquals(TaskExecution.Status.CANCELLED, taskExecution.getStatus());
+        }
+    }
+
+    @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         CounterService counterService, TaskExecutionService taskExecutionService) {
 
@@ -140,8 +162,8 @@ public class TerminateTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ApplicationEventPublisher eventPublisher, ContextService contextService,
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
+        TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
