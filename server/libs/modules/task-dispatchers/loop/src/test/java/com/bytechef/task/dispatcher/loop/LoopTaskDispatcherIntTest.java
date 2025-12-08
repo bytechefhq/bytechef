@@ -34,7 +34,6 @@ import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatch
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
-import com.bytechef.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +78,6 @@ public class LoopTaskDispatcherIntTest {
 
                 list.add(value);
             });
-
-        TenantContext.setCurrentTenantId("test");
     }
 
     @Test
