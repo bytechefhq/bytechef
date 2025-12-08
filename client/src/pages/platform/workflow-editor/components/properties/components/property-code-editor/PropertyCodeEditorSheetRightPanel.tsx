@@ -16,7 +16,7 @@ const PropertyCodeEditorSheetRightPanel = ({
 }: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
     const currentTask = getTask({
         tasks: workflow.tasks || [],
-        workflowNodeName: workflowNodeName,
+        workflowNodeName,
     });
 
     return (
