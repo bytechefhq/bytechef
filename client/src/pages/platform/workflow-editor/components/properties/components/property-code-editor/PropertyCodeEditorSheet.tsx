@@ -57,7 +57,7 @@ const PropertyCodeEditorSheet = ({
 
     const currentWorkflowTask = getTask({
         tasks: workflow.tasks || [],
-        workflowNodeName: workflowNodeName,
+        workflowNodeName,
     });
 
     const handleRunClick = () => {
