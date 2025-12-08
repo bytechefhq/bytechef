@@ -8,6 +8,9 @@ RUN mkdir ${ARG_APPLICATION_HOME}/server
 RUN mkdir ${ARG_APPLICATION_HOME}/server/tmp
 RUN mkdir ${ARG_APPLICATION_HOME}/server/logs
 RUN mkdir ${ARG_APPLICATION_HOME}/external_jars
+RUN mkdir ${ARG_APPLICATION_HOME}/tls
+RUN mkdir ${ARG_APPLICATION_HOME}/tls/bytechef
+RUN mkdir ${ARG_APPLICATION_HOME}/tls/trusted
 
 WORKDIR /opt/bytechef
 
@@ -20,6 +23,8 @@ ENTRYPOINT exec \
      -Dserver.tomcat.basedir=/opt/bytechef/server \
      -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs \
      -Dloader.path=/opt/bytechef/external_jars \
+     -Dserver.ssl.key-store=file:/opt/bytechef/server/tls/bytechef/keystore.jks \
+     -Dserver.ssl.trust-store=file:/opt/bytechef/server/tls/trusted/truststore.jks \
      -jar server/server-app.jar
 
 FROM bytechef-server-base AS bytechef-server
