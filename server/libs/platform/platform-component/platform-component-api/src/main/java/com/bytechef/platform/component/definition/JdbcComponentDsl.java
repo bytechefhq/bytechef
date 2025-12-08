@@ -35,9 +35,9 @@ public class JdbcComponentDsl {
 
     public static final class ModifiableJdbcComponentDefinition implements JdbcComponentDefinition {
 
-        private String databaseJdbcName;
         private String icon;
         private String jdbcDriverClassName;
+        private String urlTemplate;
         private String description;
         private final String name;
         private Resources resources;
@@ -48,14 +48,14 @@ public class JdbcComponentDsl {
             this.name = Objects.requireNonNull(name);
         }
 
-        public ModifiableJdbcComponentDefinition databaseJdbcName(String databaseJdbcName) {
-            this.databaseJdbcName = databaseJdbcName;
+        public ModifiableJdbcComponentDefinition jdbcDriverClassName(String jdbcDriverClassName) {
+            this.jdbcDriverClassName = jdbcDriverClassName;
 
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition jdbcDriverClassName(String jdbcDriverClassName) {
-            this.jdbcDriverClassName = jdbcDriverClassName;
+        public ModifiableJdbcComponentDefinition urlTemplate(String urlTemplate) {
+            this.urlTemplate = urlTemplate;
 
             return this;
         }
@@ -108,26 +108,26 @@ public class JdbcComponentDsl {
                 return false;
             }
 
-            return version == that.version && Objects.equals(databaseJdbcName, that.databaseJdbcName)
-                && Objects.equals(icon, that.icon) && Objects.equals(jdbcDriverClassName, that.jdbcDriverClassName)
+            return version == that.version && Objects.equals(icon, that.icon)
+                && Objects.equals(jdbcDriverClassName, that.jdbcDriverClassName)
+                && Objects.equals(urlTemplate, that.urlTemplate)
                 && Objects.equals(description, that.description) && Objects.equals(name, that.name)
                 && Objects.equals(resources, that.resources) && Objects.equals(title, that.title);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(databaseJdbcName, icon, jdbcDriverClassName, description, name, resources, title,
-                version);
-        }
-
-        @Override
-        public String getDatabaseJdbcName() {
-            return databaseJdbcName;
+            return Objects.hash(icon, jdbcDriverClassName, urlTemplate, description, name, resources, title, version);
         }
 
         @Override
         public String getJdbcDriverClassName() {
             return Objects.requireNonNull(jdbcDriverClassName);
+        }
+
+        @Override
+        public String getUrlTemplate() {
+            return Objects.requireNonNull(urlTemplate);
         }
 
         @Override

@@ -28,17 +28,15 @@ import org.springframework.util.Assert;
 public class DataSourceFactory {
 
     public static SingleConnectionDataSource getDataSource(
-        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
+        Map<String, ?> connectionParameters, String urlTemplate, String jdbcDriverClassName) {
 
-        Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
+        Assert.notNull(urlTemplate, "'urlTemplate' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
-        String url = "jdbc:" + databaseJdbcName + "://"
-            + MapUtils.getString(connectionParameters, JdbcConstants.HOST)
-            + ":"
-            + MapUtils.getString(connectionParameters, JdbcConstants.PORT)
-            + "/"
-            + MapUtils.getString(connectionParameters, JdbcConstants.DATABASE);
+        String url = urlTemplate
+            .replace("{host}", MapUtils.getString(connectionParameters, JdbcConstants.HOST))
+            .replace("{port}", MapUtils.getString(connectionParameters, JdbcConstants.PORT))
+            .replace("{database}", MapUtils.getString(connectionParameters, JdbcConstants.DATABASE));
         String username = MapUtils.getString(connectionParameters, JdbcConstants.USERNAME);
         String password = MapUtils.getString(connectionParameters, JdbcConstants.PASSWORD);
 

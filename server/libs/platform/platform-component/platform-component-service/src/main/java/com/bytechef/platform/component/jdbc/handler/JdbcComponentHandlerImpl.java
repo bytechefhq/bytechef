@@ -286,7 +286,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .poll(this::poll));
 
     private final ComponentDefinition componentDefinition;
-    private final String databaseJdbcName;
+    private final String urlTemplate;
     private final DeleteJdbcOperation deleteJdbcOperation;
     private final ExecuteJdbcOperation executeJdbcOperation;
     private final InsertJdbcOperation insertJdbcOperation;
@@ -295,13 +295,13 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     private final UpdateJdbcOperation updateJdbcOperation;
 
     public JdbcComponentHandlerImpl(JdbcComponentDefinition jdbcComponentDefinition) {
-        this.databaseJdbcName = jdbcComponentDefinition.getDatabaseJdbcName();
+        this.urlTemplate = jdbcComponentDefinition.getUrlTemplate();
         this.jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
 
         this.componentDefinition = getComponentDefinition(
             OptionalUtils.orElse(jdbcComponentDefinition.getDescription(), null), jdbcComponentDefinition.getName(),
             OptionalUtils.orElse(jdbcComponentDefinition.getIcon(), null),
-            OptionalUtils.orElse(jdbcComponentDefinition.getTitle(), null), databaseJdbcName, jdbcDriverClassName);
+            OptionalUtils.orElse(jdbcComponentDefinition.getTitle(), null), jdbcDriverClassName);
 
         this.deleteJdbcOperation = new DeleteJdbcOperation();
         this.executeJdbcOperation = new ExecuteJdbcOperation();
@@ -357,8 +357,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     }
 
     private ComponentDefinition getComponentDefinition(
-        String description, String name, String icon, String title, String databaseJdbcName,
-        String jdbcDriverClassName) {
+        String description, String name, String icon, String title, String jdbcDriverClassName) {
 
         return component(name)
             .description(description)
@@ -367,7 +366,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .connection(CONNECTION_DEFINITION)
             .actions(actionDefinitions)
             .triggers(triggerDefinitions)
-            .clusterElements(JdbcItemWriter.clusterElementDefinition(databaseJdbcName, jdbcDriverClassName));
+            .clusterElements(JdbcItemWriter.clusterElementDefinition(urlTemplate, jdbcDriverClassName));
     }
 
     protected PollOutput poll(
@@ -432,7 +431,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     }
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {
-        return DataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName);
+        return DataSourceFactory.getDataSource(connectionParameters, urlTemplate, jdbcDriverClassName);
     }
 
     public static List<ValueProperty<?>> createProperties(

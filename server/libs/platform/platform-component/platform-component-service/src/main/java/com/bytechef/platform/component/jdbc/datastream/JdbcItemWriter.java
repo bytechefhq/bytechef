@@ -48,24 +48,24 @@ public class JdbcItemWriter implements ItemWriter {
 
     private final InsertJdbcOperation insertJdbcOperation;
     private Parameters inputParameters;
-    private final String databaseJdbcName;
+    private final String urlTemplate;
     private SingleConnectionDataSource dataSource;
     private final String jdbcDriverClassName;
 
-    public JdbcItemWriter(String databaseJdbcName, String jdbcDriverClassName) {
-        this.databaseJdbcName = databaseJdbcName;
+    public JdbcItemWriter(String urlTemplate, String jdbcDriverClassName) {
+        this.urlTemplate = urlTemplate;
         this.jdbcDriverClassName = jdbcDriverClassName;
         this.insertJdbcOperation = new InsertJdbcOperation();
     }
 
     public static ModifiableClusterElementDefinition<?> clusterElementDefinition(
-        String databaseJdbcName, String jdbcDriverClassName) {
+        String urlTemplate, String jdbcDriverClassName) {
 
         return clusterElement("writer")
             .title("Write table rows")
             .description("Writes a list of rows to a table.")
             .type(DESTINATION)
-            .object(() -> new JdbcItemWriter(databaseJdbcName, jdbcDriverClassName))
+            .object(() -> new JdbcItemWriter(urlTemplate, jdbcDriverClassName))
             .properties(
                 string(SCHEMA)
                     .label("Schema")
@@ -112,7 +112,7 @@ public class JdbcItemWriter implements ItemWriter {
         ExecutionContext executionContext) {
 
         this.inputParameters = inputParameters;
-        this.dataSource = DataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName);
+        this.dataSource = DataSourceFactory.getDataSource(connectionParameters, urlTemplate, jdbcDriverClassName);
     }
 
     @Override

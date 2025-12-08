@@ -32,7 +32,7 @@ public class OracleJdbcComponentHandler implements JdbcComponentHandler {
         .title("Oracle SQL")
         .description("Select, insert, update and delete data from Oracle Databases.")
         .icon("path:assets/oracle.svg")
-        .databaseJdbcName("oracle")
+        .urlTemplate("jdbc:oracle:thin:@{host}:{port}:{database}")
         .jdbcDriverClassName("oracle.jdbc.OracleDriver");
 
     @Override
