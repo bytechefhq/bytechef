@@ -129,6 +129,19 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             [setIsFormulaMode]
         );
 
+        const getPropertyMentionsInputEditorRef = useCallback(
+            (instance: Editor | null) => {
+                localEditorRef.current = instance;
+
+                if (typeof ref === 'function') {
+                    ref(instance as Editor | null);
+                } else if (ref && 'current' in ref) {
+                    ref.current = instance;
+                }
+            },
+            [ref]
+        );
+
         useEffect(() => {
             if (!focusedInput || !localEditorRef.current) {
                 setIsFocused(false);
@@ -241,19 +254,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             onFocus={onFocus}
                             path={path}
                             placeholder={placeholder}
-                            ref={(instance) => {
-                                // keep a local reference to avoid accessing the editor.view before mount
-                                localEditorRef.current = instance as Editor | null;
-
-                                // forward to parent ref
-                                if (typeof ref === 'function') {
-                                    ref(instance as Editor | null);
-                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
-                                } else if (ref && 'current' in (ref as any)) {
-                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
-                                    (ref as any).current = instance;
-                                }
-                            }}
+                            ref={getPropertyMentionsInputEditorRef}
                             setIsFormulaMode={setIsFormulaMode}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
