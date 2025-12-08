@@ -35,7 +35,7 @@ cd server/apps/server-app
 
 for tag in "$@"; do
     echo "Building docker image with tag \`$tag\`"
-    docker build --platform linux/amd64 --no-cache -t $dckr_img_registry_bytechef_server:$tag .
+    docker build --progress=plain --platform linux/amd64 --no-cache -t $dckr_img_registry_bytechef_server:$tag .
 done
 
 cd ../../../client
@@ -48,7 +48,7 @@ cd ..
 
 for tag in "$@"; do
     echo "Building docker image with tag \`$tag\`"
-    docker build --platform linux/amd64 -t $dckr_img_registry_bytechef:$tag .
+    docker build --progress=plain --platform linux/amd64 --no-cache -t $dckr_img_registry_bytechef:$tag .
 done
 
 echo "Push images to the remote docker registry \`$dckr_img_registry_bytechef\`"
