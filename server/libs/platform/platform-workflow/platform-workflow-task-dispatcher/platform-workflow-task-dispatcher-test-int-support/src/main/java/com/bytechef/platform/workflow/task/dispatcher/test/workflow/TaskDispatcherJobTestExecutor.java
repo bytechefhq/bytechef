@@ -32,23 +32,24 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.SpelEvaluator;
-import com.bytechef.message.broker.memory.SyncMessageBroker;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 
 public class TaskDispatcherJobTestExecutor {
 
-    private static final String TEST_TENANT_ID = "test";
-
     private final ContextService contextService;
     private final CounterService counterService;
+    private final Environment environment;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskExecutor taskExecutor;
@@ -57,11 +58,13 @@ public class TaskDispatcherJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
-        ContextService contextService, CounterService counterService, TaskExecutor taskExecutor, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ContextService contextService, CounterService counterService, Environment environment,
+        TaskExecutor taskExecutor, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
+        this.environment = environment;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskExecutor = taskExecutor;
@@ -85,26 +88,24 @@ public class TaskDispatcherJobTestExecutor {
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
-        SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
+        AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, SpelEvaluator.create(), jobService, -1, () -> syncMessageBroker,
+            contextService, SpelEvaluator.create(), jobService, -1, () -> asyncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
-                createEventPublisher(syncMessageBroker), contextService, counterService, taskExecutionService),
+                createEventPublisher(asyncMessageBroker), contextService, counterService, taskExecutionService),
             taskExecutionService, taskExecutor, taskHandlerMapSupplier.get()::get, taskFileStorage, -1,
             workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
     }
 
-    private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker messageBroker) {
+    private static ApplicationEventPublisher createEventPublisher(AsyncMessageBroker messageBroker) {
         return event -> {
             MessageEvent<?> messageEvent = (MessageEvent<?>) event;
 
-            if (messageEvent.getMetadata(CURRENT_TENANT_ID) == null) {
-                messageEvent.putMetadata(CURRENT_TENANT_ID, TEST_TENANT_ID);
-            }
+            messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
             messageBroker.send(messageEvent.getRoute(), messageEvent);
         };
