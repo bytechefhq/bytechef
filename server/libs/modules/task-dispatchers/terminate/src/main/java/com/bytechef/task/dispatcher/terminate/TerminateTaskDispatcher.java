@@ -24,6 +24,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,6 +37,7 @@ public class TerminateTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     private final ApplicationEventPublisher eventPublisher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public TerminateTaskDispatcher(ApplicationEventPublisher eventPublisher,
         TaskExecutionService taskExecutionService) {
         this.eventPublisher = eventPublisher;
