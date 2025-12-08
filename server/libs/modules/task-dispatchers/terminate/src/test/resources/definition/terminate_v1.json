@@ -1,1 +1,33 @@
-{"description":"Stops a job execution with specified status and message.","help":null,"icon":"path:assets/terminate.svg","name":"terminate","outputDefinition":null,"properties":[{"advancedOption":null,"controlType":"TEXT","defaultValue":null,"description":"Reason for stopping the job.","displayCondition":null,"exampleValue":null,"expressionEnabled":null,"hidden":null,"label":null,"maxLength":null,"metadata":{},"minLength":null,"name":"message","options":null,"optionsLoadedDynamically":null,"placeholder":null,"regex":null,"required":null,"type":"STRING"}],"resources":null,"taskProperties":null,"title":"Stop Job","variableProperties":null,"version":1}
+{
+  "description": "Stops a job execution with specified status and message.",
+  "help": null,
+  "icon": "path:assets/terminate.svg",
+  "name": "terminate",
+  "outputDefinition": null,
+  "properties": [ {
+    "advancedOption": null,
+    "controlType": "TEXT",
+    "defaultValue": null,
+    "description": "Reason for stopping the job.",
+    "displayCondition": null,
+    "exampleValue": null,
+    "expressionEnabled": null,
+    "hidden": null,
+    "label": null,
+    "maxLength": null,
+    "metadata": { },
+    "minLength": null,
+    "name": "message",
+    "options": null,
+    "optionsLoadedDynamically": null,
+    "placeholder": null,
+    "regex": null,
+    "required": null,
+    "type": "STRING"
+  } ],
+  "resources": null,
+  "taskProperties": null,
+  "title": "Stop Job",
+  "variableProperties": null,
+  "version": 1
+}

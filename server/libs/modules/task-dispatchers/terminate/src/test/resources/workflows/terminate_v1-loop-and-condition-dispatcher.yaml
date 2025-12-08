@@ -1,0 +1,34 @@
+---
+label: "Terminate Task Dispatcher"
+tasks:
+- name: "startVar"
+  type: "var/v1/set"
+  parameters:
+    value: "start"
+- name: "loop_1"
+  type: "loop/v1"
+  parameters:
+    items: "=range(1,10)"
+    iteratee:
+    - name: "condition_1"
+      type: "condition/v1"
+      parameters:
+        conditions:
+        - - type: "number"
+            value1: "${loop_1.item}"
+            operation: "EQUALS"
+            value2: "8"
+        caseTrue:
+        - name: "terminate_1"
+          type: "terminate/v1"
+          parameters:
+            message: "Stopping job"
+        caseFalse:
+        - name: "loopCounterVar"
+          type: "var/v1/set"
+          parameters:
+            value: "${loop_1.item}"
+- name: "endVar"
+  type: "var/v1/set"
+  parameters:
+    value: "end"
