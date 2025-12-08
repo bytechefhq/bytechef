@@ -1,0 +1,16 @@
+## Connection Setup
+
+Connect Airtable to ByteChef using a Personal Access Token (PAT).
+
+### Create a Personal Access Token in Airtable
+1. Log in to your Airtable account.
+2. Open the Personal access tokens page: https://airtable.com/create/tokens
+3. Click **+Create token**.
+4. Enter a descriptive Name for your token (for example, "ByteChef Token").
+5. Add the required Scopes:
+   - `data.records:read`
+   - `data.records:write`
+   - `schema.bases:read`
+6. Set Access for the token:
+   - Choose one or more specific bases, an entire workspace, or all bases you own. For least privilege, select only the bases ByteChef needs to access.
+7. Click **Create token** and copy the token shown.
