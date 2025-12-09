@@ -1,0 +1,14 @@
+## Connection Setup
+
+Connect ClickUp to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a ClickUp OAuth app
+1. Log in to ClickUp.
+2. In the upper-right corner, click your avatar and select **Settings**.
+3. In the left sidebar, open **ClickUp API** and go to the **ClickUp API Settings** tab.
+4. Click **Create an app**.
+5. Enter a clear name (for example, `ByteChef Integration`).
+6. Add the ByteChef OAuth redirect (callback) URL(s):
+   - Cloud: `https://app.bytechef.io/callback`
+   - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
+7. Save the app and copy the generated **Client ID** and **Client Secret**.
