@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.ALBUM_ID;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.ALBUM_OUTPUT_PROPERTY;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -42,7 +42,7 @@ public class GooglePhotosGetAlbumAction {
             string(ALBUM_ID)
                 .label("Album ID")
                 .description("Identifier of the album to be requested.")
-                .options((ActionDefinition.OptionsFunction<String>) GooglePhotosUtils::getAlbumsOptions)
+                .options((OptionsFunction<String>) GooglePhotosUtils::getAlbumIdOptions)
                 .required(true))
         .output(outputSchema(ALBUM_OUTPUT_PROPERTY))
         .perform(GooglePhotosGetAlbumAction::perform);

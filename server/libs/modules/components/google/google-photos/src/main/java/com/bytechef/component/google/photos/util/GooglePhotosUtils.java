@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class GooglePhotosUtils {
 
-    public static List<Option<String>> getAlbumsOptions(
+    public static List<Option<String>> getAlbumIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
@@ -54,10 +54,7 @@ public class GooglePhotosUtils {
             if (body.get("albums") instanceof List<?> list) {
                 for (Object object : list) {
                     if (object instanceof Map<?, ?> map) {
-                        String title = (String) map.get("title");
-                        String id = (String) map.get("id");
-
-                        options.add(option(title, id));
+                        options.add(option((String) map.get("title"), (String) map.get("id")));
                     }
                 }
             }

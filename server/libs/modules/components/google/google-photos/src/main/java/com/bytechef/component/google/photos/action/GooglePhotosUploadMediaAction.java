@@ -24,12 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.ALBUM_ID;
-import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.FILE_BINARY;
-import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.FILE_NAME;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.MEDIA;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.MEDIA_OUTPUT_PROPERTY;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -38,9 +36,9 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.photos.util.GooglePhotosUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Marija Horvat
@@ -49,27 +47,30 @@ public class GooglePhotosUploadMediaAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadMedia")
         .title("Upload Media")
-        .description("Upload media items.")
+        .description("Upload media to an album in a user's Google Photos library.")
         .properties(
-            array(MEDIA)
-                .label("Media")
-                .description("Media files to upload.")
-                .items(
-                    object()
-                        .properties(
-                            fileEntry(FILE_BINARY)
-                                .label("File Binary Data")
-                                .description("File binary data to upload.")
-                                .required(true),
-                            string(FILE_NAME)
-                                .label("File Name")
-                                .description(
-                                    "File name with extension of the media item shown to the user in Google Photos.")
-                                .required(false))),
             string(ALBUM_ID)
                 .label("Album ID")
                 .description("Identifier of the album where the media items are added.")
-                .options((ActionDefinition.OptionsFunction<String>) GooglePhotosUtils::getAlbumsOptions)
+                .options((OptionsFunction<String>) GooglePhotosUtils::getAlbumIdOptions)
+                .required(true),
+            array(MEDIA)
+                .label("Media")
+                .description("Media files to upload to album. Photos and videos are supported.")
+                .items(
+                    object()
+                        .properties(
+                            fileEntry("fileEntry")
+                                .label("Photo/Video")
+                                .description("File entry of the media item to upload.")
+                                .required(true),
+                            string("fileName")
+                                .label("File Name")
+                                .description(
+                                    "File name with extension of the media item to upload. If not specified, " +
+                                        "the file name is taken from the file entry.")
+                                .required(false)))
+                .minItems(1)
                 .required(true))
         .output(outputSchema(MEDIA_OUTPUT_PROPERTY))
         .perform(GooglePhotosUploadMediaAction::perform);
@@ -78,49 +79,44 @@ public class GooglePhotosUploadMediaAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        List<Map<String, Object>> mediaItems = new ArrayList<>();
-
         List<Media> items = inputParameters.getRequiredList(MEDIA, Media.class);
 
-        for (Media item : items) {
-            getUploadToken(context, item, mediaItems);
-        }
-
-        Map<String, Object> body = Map.of(
-            ALBUM_ID, inputParameters.getRequiredString(ALBUM_ID),
-            "newMediaItems", mediaItems);
+        List<Map<String, Object>> mediaItems = items.stream()
+            .map(item -> buildMediaItem(context, item))
+            .collect(Collectors.toList());
 
         return context.http(http -> http.post("/mediaItems:batchCreate"))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(body))
+            .body(
+                Body.of(
+                    ALBUM_ID, inputParameters.getRequiredString(ALBUM_ID),
+                    "newMediaItems", mediaItems))
             .execute()
             .getBody();
     }
 
-    private static void getUploadToken(Context context, Media item, List<Map<String, Object>> mediaItems) {
-        FileEntry fileEntry = item.fileBinary();
-        String filename = item.fileName();
+    private static Map<String, Object> buildMediaItem(Context context, Media media) {
+        FileEntry fileEntry = media.fileEntry();
 
-        String uploadToken = context.http(http -> http.post("/uploads"))
+        String filename = media.fileName() == null ? fileEntry.getName() : media.fileName();
+        String uploadToken = uploadFileAndGetToken(context, fileEntry);
+
+        return Map.of("simpleMediaItem", Map.of("uploadToken", uploadToken, "fileName", filename));
+    }
+
+    private static String uploadFileAndGetToken(Context context, FileEntry fileEntry) {
+        return context.http(http -> http.post("/uploads"))
             .headers(
                 Map.of(
-                    "Content-type", List.of("application/octet-stream"),
+                    "Content-Type", List.of("application/octet-stream"),
                     "X-Goog-Upload-Content-Type", List.of(fileEntry.getMimeType()),
                     "X-Goog-Upload-Protocol", List.of("raw")))
             .body(Body.of(fileEntry))
             .configuration(responseType(ResponseType.TEXT))
             .execute()
             .getBody(new TypeReference<>() {});
-
-        Map<String, Object> mediaItem = Map.of(
-            "simpleMediaItem", Map.of(
-                "uploadToken", uploadToken,
-                "fileName", filename != null ? filename : fileEntry.getName()));
-
-        mediaItems.add(mediaItem);
     }
 
-    public record Media(String fileName, FileEntry fileBinary) {
+    public record Media(String fileName, FileEntry fileEntry) {
     }
 }
