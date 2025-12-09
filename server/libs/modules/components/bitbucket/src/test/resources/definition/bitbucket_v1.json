@@ -9405,7 +9405,7 @@
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Username",
+        "label": "Email Address",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
