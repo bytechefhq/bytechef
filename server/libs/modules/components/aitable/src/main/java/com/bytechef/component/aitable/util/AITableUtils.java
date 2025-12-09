@@ -20,9 +20,7 @@ import static com.bytechef.component.aitable.constant.AITableConstants.DATA;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.ID;
-import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.NAME;
-import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -95,29 +93,6 @@ public class AITableUtils {
         }
 
         return fields;
-    }
-
-    public static String createQuery(Parameters inputParameters) {
-        List<String> fields = inputParameters.getList(FIELDS, String.class, List.of());
-        List<String> recordIds = inputParameters.getList(RECORD_IDS, String.class, List.of());
-        Integer maxRecords = inputParameters.getInteger(MAX_RECORDS);
-
-        List<String> query = new ArrayList<>();
-
-        addToQuery(query, FIELDS, fields);
-        addToQuery(query, RECORD_IDS, recordIds);
-
-        if (maxRecords != null) {
-            query.add(MAX_RECORDS + "=" + maxRecords);
-        }
-
-        return query.isEmpty() ? "" : String.join("&", query);
-    }
-
-    private static void addToQuery(List<String> query, String key, List<String> values) {
-        if (!values.isEmpty()) {
-            query.add(key + "=" + String.join(",", values));
-        }
     }
 
     private static ModifiableValueProperty<?, ?> getPropertyType(FieldTypeInfo fieldTypeInfo) {
