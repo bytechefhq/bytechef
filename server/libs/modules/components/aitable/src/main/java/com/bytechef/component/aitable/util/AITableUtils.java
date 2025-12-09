@@ -171,33 +171,6 @@ public class AITableUtils {
         return options;
     }
 
-    public static List<Option<String>> getDatasheetRecordIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText,
-        ActionContext context) {
-
-        String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
-
-        Map<String, Object> body = context.http(http -> http.get("/datasheets/" + datasheetId + "/records"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(DATA) instanceof Map<?, ?> map && (map.get("records") instanceof List<?> list)) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> recordMap) {
-                    String recordId = (String) recordMap.get("recordId");
-
-                    options.add(option(recordId, recordId));
-                }
-            }
-        }
-
-        return options;
-    }
-
     public static List<Option<String>> getFieldNamesOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
