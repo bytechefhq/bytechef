@@ -1,5 +1,5 @@
 # docker/dockerfile:1
-FROM ghcr.io/graalvm/graalvm-community:21.0.2  AS bytechef-server-base
+FROM ghcr.io/graalvm/graalvm-community:25.0.0  AS bytechef-server-base
 
 ARG ARG_APPLICATION_HOME=/opt/bytechef
 
@@ -23,8 +23,6 @@ ENTRYPOINT exec \
      -Dserver.tomcat.basedir=/opt/bytechef/server \
      -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs \
      -Dloader.path=/opt/bytechef/external_jars \
-     -Dserver.ssl.key-store=file:/opt/bytechef/server/tls/bytechef/keystore.jks \
-     -Dserver.ssl.trust-store=file:/opt/bytechef/server/tls/trusted/truststore.jks \
      -jar server/server-app.jar
 
 FROM bytechef-server-base AS bytechef-server
