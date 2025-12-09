@@ -195,7 +195,7 @@
       "type": "ARRAY"
     }, {
       "advancedOption": null,
-      "controlType": "MULTI_SELECT",
+      "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
       "description": "The IDs of the records to find.",
       "displayCondition": null,
@@ -232,10 +232,7 @@
       "multipleValues": null,
       "name": "recordIds",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "datasheetId" ]
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
@@ -328,7 +325,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the record to update.",
       "displayCondition": null,
@@ -342,10 +339,7 @@
       "minLength": null,
       "name": "recordId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "datasheetId" ]
-      },
+      "optionsDataSource": null,
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
