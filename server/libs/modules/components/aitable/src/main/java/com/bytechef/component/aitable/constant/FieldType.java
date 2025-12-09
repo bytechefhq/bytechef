@@ -22,19 +22,41 @@ package com.bytechef.component.aitable.constant;
 public enum FieldType {
 
     SINGLE_TEXT("SingleText"),
+    TEXT("Text"),
+    SINGLE_SELECT("SingleSelect"),
+    MULTI_SELECT("MultiSelect"),
     NUMBER("Number"),
     CURRENCY("Currency"),
     PERCENT("Percent"),
     DATE_TIME("DateTime"),
+    ATTACHMENT("Attachment"),
+    MEMBER("Member"),
+    CHECKBOX("Checkbox"),
     RATING("Rating"),
     URL("URL"),
     PHONE("Phone"),
-    EMAIL("Email");
+    EMAIL("Email"),
+    WORK_DOC("WorkDoc"),
+    ONE_WAY_LINK("OneWayLink"),
+    TWO_WAY_LINK("TwoWayLink"),
+    MAGIC_LOOK_UP("MagicLookUp"),
+    FORMULA("Formula"),
+    AUTO_NUMBER("AutoNumber"),
+    CREATED_TIME("CreatedTime"),
+    LAST_MODIFIED_TIME("LastModifiedTime"),
+    CREATED_BY("CreatedBy"),
+    LAST_MODIFIED_BY("LastModifiedBy"),
+    BUTTON("Button"),
+    CASCADER("Cascader");
 
     private final String name;
 
     FieldType(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static FieldType fromString(String text) {
@@ -44,7 +66,6 @@ public enum FieldType {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("Not supported field type: " + text);
     }
-
 }

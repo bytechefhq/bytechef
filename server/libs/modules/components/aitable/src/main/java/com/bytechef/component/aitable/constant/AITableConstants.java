@@ -16,6 +16,17 @@
 
 package com.bytechef.component.aitable.constant;
 
+import static com.bytechef.component.aitable.constant.FieldType.ATTACHMENT;
+import static com.bytechef.component.aitable.constant.FieldType.AUTO_NUMBER;
+import static com.bytechef.component.aitable.constant.FieldType.BUTTON;
+import static com.bytechef.component.aitable.constant.FieldType.CASCADER;
+import static com.bytechef.component.aitable.constant.FieldType.CREATED_BY;
+import static com.bytechef.component.aitable.constant.FieldType.CREATED_TIME;
+import static com.bytechef.component.aitable.constant.FieldType.FORMULA;
+import static com.bytechef.component.aitable.constant.FieldType.LAST_MODIFIED_BY;
+import static com.bytechef.component.aitable.constant.FieldType.LAST_MODIFIED_TIME;
+import static com.bytechef.component.aitable.constant.FieldType.MAGIC_LOOK_UP;
+import static com.bytechef.component.aitable.constant.FieldType.ONE_WAY_LINK;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -23,6 +34,7 @@ import com.bytechef.component.aitable.util.AITableUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -56,6 +68,10 @@ public class AITableConstants {
         .label("Space ID")
         .options((OptionsFunction<String>) AITableUtils::getSpaceIdOptions)
         .required(false);
+
+    public static final List<FieldType> NOT_SUPPORTED_FIELD_TYPES = List.of(
+        ATTACHMENT, AUTO_NUMBER, BUTTON, CASCADER, CREATED_BY, CREATED_TIME, FORMULA, LAST_MODIFIED_TIME,
+        LAST_MODIFIED_BY, MAGIC_LOOK_UP, ONE_WAY_LINK);
 
     private AITableConstants() {
     }

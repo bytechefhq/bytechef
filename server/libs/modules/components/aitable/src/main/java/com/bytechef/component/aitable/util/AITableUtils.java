@@ -21,8 +21,11 @@ import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.NAME;
+import static com.bytechef.component.aitable.constant.AITableConstants.NOT_SUPPORTED_FIELD_TYPES;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.TYPE;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -36,13 +39,12 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Monika Domiter
@@ -63,7 +65,9 @@ public class AITableUtils {
         for (FieldTypeInfo fieldTypeInfo : datasheetFields) {
             ModifiableValueProperty<?, ?> propertyType = getPropertyType(fieldTypeInfo);
 
-            list.add(propertyType);
+            if (propertyType != null) {
+                list.add(propertyType);
+            }
         }
 
         return list;
@@ -101,49 +105,96 @@ public class AITableUtils {
 
         FieldType fieldType = FieldType.fromString(type);
 
-        return switch (Objects.requireNonNull(fieldType)) {
-            case SINGLE_TEXT, EMAIL, URL -> string(name)
-                .label(name)
-                .required(false);
-            case PHONE -> string(name)
-                .label(name)
-                .controlType(Property.ControlType.PHONE)
-                .required(false);
-            case CURRENCY -> {
-                Map<String, Object> property = fieldTypeInfo.property();
-
-                yield number(name)
+        if (!NOT_SUPPORTED_FIELD_TYPES.contains(fieldType)) {
+            return switch (fieldType) {
+                case CHECKBOX -> bool(name)
                     .label(name)
-                    .description("Currency symbol: " + property.get("symbol"))
                     .required(false);
-            }
-            case NUMBER, PERCENT -> number(name)
-                .label(name)
-                .required(false);
-            case RATING -> {
-                Map<String, Object> property = fieldTypeInfo.property();
-
-                yield integer(name)
+                case SINGLE_TEXT, EMAIL, URL -> string(name)
                     .label(name)
-                    .maxValue((Integer) property.get("max"))
                     .required(false);
-            }
-            case DATE_TIME -> {
-                Map<String, Object> property = fieldTypeInfo.property();
+                case PHONE -> string(name)
+                    .label(name)
+                    .controlType(ControlType.PHONE)
+                    .required(false);
+                case CURRENCY -> {
+                    Map<String, Object> property = fieldTypeInfo.property();
 
-                boolean includeTime = (Boolean) property.get("includeTime");
-
-                if (includeTime) {
-                    yield dateTime(name)
+                    yield number(name)
                         .label(name)
-                        .required(false);
-                } else {
-                    yield date(name)
-                        .label(name)
+                        .description("Currency symbol: " + property.get("symbol"))
                         .required(false);
                 }
+                case NUMBER, PERCENT -> number(name)
+                    .label(name)
+                    .required(false);
+                case RATING -> {
+                    Map<String, Object> property = fieldTypeInfo.property();
+
+                    yield integer(name)
+                        .label(name)
+                        .maxValue((Integer) property.get("max"))
+                        .required(false);
+                }
+                case DATE_TIME -> {
+                    Map<String, Object> property = fieldTypeInfo.property();
+
+                    boolean includeTime = (Boolean) property.get("includeTime");
+
+                    if (includeTime) {
+                        yield dateTime(name)
+                            .label(name)
+                            .required(false);
+                    } else {
+                        yield date(name)
+                            .label(name)
+                            .required(false);
+                    }
+                }
+                case TEXT -> string(name)
+                    .label(name)
+                    .controlType(ControlType.TEXT_AREA)
+                    .required(false);
+                case SINGLE_SELECT -> string(name)
+                    .label(name)
+                    .options(getOptions(fieldTypeInfo.property(), NAME))
+                    .required(false);
+                case MULTI_SELECT -> array(name)
+                    .label(name)
+                    .items(string())
+                    .options(getOptions(fieldTypeInfo.property(), NAME))
+                    .required(false);
+
+                case MEMBER -> array(name)
+                    .label(name)
+                    .options(getOptions(fieldTypeInfo.property(), ID))
+                    .items(string())
+                    .required(false);
+
+                case TWO_WAY_LINK -> array(name)
+                    .label(name)
+                    .required(false);
+                default -> null;
+            };
+        }
+
+        return null;
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> property, String optionValue) {
+        List<Option<String>> options = new ArrayList<>();
+
+        Object o = property.get("options");
+
+        if (o instanceof List<?> list) {
+            for (Object option : list) {
+                if (option instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(optionValue)));
+                }
             }
-        };
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getDatasheetIdOptions(
