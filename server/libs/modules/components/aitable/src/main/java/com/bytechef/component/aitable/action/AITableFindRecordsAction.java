@@ -57,8 +57,6 @@ public class AITableFindRecordsAction {
                 .label("Record IDs")
                 .description("The IDs of the records to find.")
                 .items(string())
-                .options((OptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
-                .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             integer(MAX_RECORDS)
                 .label("Max Records")
