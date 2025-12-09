@@ -429,3 +429,26 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Notion to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a Notion OAuth app
+1. Open the Notion developer dashboard: https://www.notion.so/my-integrations
+2. Click **+ New integration**.
+3. Enter a clear name (for example, `ByteChef Integration`), select a workspace, and set the **Integration type** to **Public**.
+4. Fill out the remaining required fields (company name, website, email, etc.).
+5. Add the ByteChef OAuth redirect (callback) URL(s):
+   - Cloud: `https://app.bytechef.io/callback`
+   - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
+6. Click **Save**, then open **Configure integration settings**.
+7. Under **Capabilities**, enable at minimum:
+   - Read content
+   - Update content
+   - Insert content
+   - User information including email addresses
+8. Click **Save changes** and copy the generated **Client ID** and **Client Secret**.

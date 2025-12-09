@@ -329,3 +329,36 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Apollo to ByteChef using either an API Key or OAuth 2.0 (Authorization Code), depending on whether you want a single server-owned key or user-consented access.
+
+### Option 1 — API Key
+Use this when you have an Apollo API key and do not require end-user OAuth consent.
+
+1. In Apollo, go to the bottom-left menu and click on **Admin Settings**.
+2. Click on **Integrations**.
+3. Find **API** and click **Connect**.
+4. Open the **API Keys** tab.
+5. Click **+ Create new key**.
+6. Enter a descriptive name and description.
+7. Choose the specific endpoints the key should access (least privilege), or enable **Set as master key** only if your use case requires broad access.
+8. Click **Create API key**. Copy the key value and store it securely.
+
+### Option 2 — OAuth 2.0 Authorization Code
+Use this when you want each user to authorize access to their own Apollo account.
+
+1. In Apollo, go to the bottom-left menu and click on **Admin Settings**.
+2. Click on **Integrations**.
+3. Find **API** and click **Connect**.
+4. Choose **OAuth registration** and provide:
+   - App name and logo
+   - Add the ByteChef OAuth callback URL to your app:
+        - `https://app.bytechef.io/callback` (Cloud)
+        - `http://127.0.0.1:5173/callback` (Local development)
+   - Scopes: select only the scopes your workflows need (principle of least privilege).
+5. Submit the registration and copy the generated **Client ID** and **Client Secret**.
