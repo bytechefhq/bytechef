@@ -77,7 +77,9 @@ public class BitbucketRepositoryPushTrigger {
             http -> http.delete("/repositories/%s/%s/hooks/%s".formatted(
                 inputParameters.getRequiredString(WORKSPACE),
                 inputParameters.getRequiredString(REPOSITORY),
-                outputParameters.get(ID))))
+                outputParameters.get(ID)
+                    .toString()
+                    .replaceAll("[{}]", ""))))
             .execute();
     }
 
