@@ -183,14 +183,14 @@ Type: OBJECT
 ### Upload Media
 Name: uploadMedia
 
-`Upload media items.`
+`Upload media to an album in a user's Google Photos library.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| media | Media | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(fileBinary), STRING\(fileName)&#125;] </details> | Media files to upload. | false |
 | albumId | Album ID | STRING | Identifier of the album where the media items are added. | true |
+| media | Media | ARRAY <details> <summary> Items </summary> [&#123;FILE_ENTRY\(fileEntry), STRING\(fileName)&#125;] </details> | Media files to upload to album. Photos and videos are supported. | true |
 
 #### Example JSON Structure
 ```json
@@ -198,16 +198,16 @@ Name: uploadMedia
   "label" : "Upload Media",
   "name" : "uploadMedia",
   "parameters" : {
+    "albumId" : "",
     "media" : [ {
-      "fileBinary" : {
+      "fileEntry" : {
         "extension" : "",
         "mimeType" : "",
         "name" : "",
         "url" : ""
       },
       "fileName" : ""
-    } ],
-    "albumId" : ""
+    } ]
   },
   "type" : "googlePhotos/v1/uploadMedia"
 }
