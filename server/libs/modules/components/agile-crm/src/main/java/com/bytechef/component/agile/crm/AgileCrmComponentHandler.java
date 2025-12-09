@@ -24,6 +24,7 @@ import com.bytechef.component.agile.crm.action.AgileCrmCreateContactAction;
 import com.bytechef.component.agile.crm.action.AgileCrmCreateDealAction;
 import com.bytechef.component.agile.crm.action.AgileCrmCreateTaskAction;
 import com.bytechef.component.agile.crm.connection.AgileCrmConnection;
+import com.bytechef.component.agile.crm.trigger.AgileCrmNewTaskTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -49,7 +50,8 @@ public class AgileCrmComponentHandler implements ComponentHandler {
         .clusterElements(
             tool(AgileCrmCreateContactAction.ACTION_DEFINITION),
             tool(AgileCrmCreateDealAction.ACTION_DEFINITION),
-            tool(AgileCrmCreateTaskAction.ACTION_DEFINITION));
+            tool(AgileCrmCreateTaskAction.ACTION_DEFINITION))
+        .triggers(AgileCrmNewTaskTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

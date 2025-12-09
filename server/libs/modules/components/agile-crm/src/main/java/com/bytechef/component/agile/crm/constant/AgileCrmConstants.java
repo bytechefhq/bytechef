@@ -25,6 +25,7 @@ public class AgileCrmConstants {
     public static final String CITY = "city";
     public static final String COMPANY = "company";
     public static final String COUNTRY = "country";
+    public static final String CREATED_TIME = "created_time";
     public static final String DESCRIPTION = "description";
     public static final String DOMAIN = "domain";
     public static final String DUE = "due";
@@ -33,6 +34,7 @@ public class AgileCrmConstants {
     public static final String FIRST_NAME = "first_name";
     public static final String ID = "id";
     public static final String LAST_NAME = "last_name";
+    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
     public static final String MILESTONE = "milestone";
     public static final String NAME = "name";
     public static final String OWNER_ID = "owner_id";
