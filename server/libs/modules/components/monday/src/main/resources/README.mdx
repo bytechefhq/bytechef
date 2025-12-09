@@ -1,0 +1,20 @@
+## Connection Setup
+
+Connect monday.com to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create an OAuth app in monday.com
+1. Open monday.com and click your profile avatar (top-right)
+2. Click on **Developers** to open the Developer Center.
+3. Click **Build app** (or open your existing app).
+4. Give the app a clear name, for example `ByteChef Integration`.
+5. In the left menu, open **OAuth**.
+6. Add the following scopes (minimum required by ByteChef):
+   - `boards:read`
+   - `boards:write`
+   - `workspaces:read`
+   - `webhooks:write`
+7. Save the scopes.
+8. Add the ByteChef OAuth redirect (callback) URL(s):
+    - Cloud: `https://app.bytechef.io/callback`
+    - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
+9. Copy your **Client ID** and **Client Secret** for later.
