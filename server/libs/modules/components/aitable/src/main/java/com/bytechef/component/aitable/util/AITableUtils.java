@@ -178,6 +178,7 @@ public class AITableUtils {
         String spaceId = inputParameters.getRequiredString(SPACE_ID);
 
         Map<String, Object> body = context.http(http -> http.get("/spaces/" + spaceId + "/nodes"))
+            .queryParameters(TYPE, "Datasheet")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -232,10 +233,10 @@ public class AITableUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof Map<?, ?> map && (map.get("fields") instanceof List<?> list)) {
+        if (body.get(DATA) instanceof Map<?, ?> map && (map.get(FIELDS) instanceof List<?> list)) {
             for (Object object : list) {
                 if (object instanceof Map<?, ?> field) {
-                    options.add(option((String) field.get(NAME), (String) field.get(TYPE)));
+                    options.add(option((String) field.get(NAME), (String) field.get(NAME)));
                 }
             }
         }
