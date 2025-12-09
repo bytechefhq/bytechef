@@ -82,7 +82,7 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
                     .title("API Key Authorization")
                     .properties(
                         string(USERNAME)
-                            .label("Username")
+                            .label("Email Address")
                             .description("Email address of your Bitbucket account.")
                             .required(true),
                         string(PASSWORD)
