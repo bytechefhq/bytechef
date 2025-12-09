@@ -24,11 +24,10 @@ import static com.bytechef.component.aitable.constant.AITableConstants.RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -50,16 +49,14 @@ public class AITableCreateRecordAction {
     private AITableCreateRecordAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.post("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
             .body(
                 Http.Body.of(
                     RECORDS, List.of(Map.of(FIELDS, inputParameters.get(FIELDS)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
