@@ -19,7 +19,6 @@ package com.bytechef.component.google.photos.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.PAGE_SIZE;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.PAGE_TOKEN;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,12 +31,12 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -46,14 +45,11 @@ import org.mockito.ArgumentCaptor;
  */
 class GooglePhotosUtilsTest {
 
-    private final ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Configuration.ConfigurationBuilder.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
         forClass(ContextFunction.class);
-    private final List<Option<String>> expectedOptions = List.of(
-        option("test1", "1"),
-        option("test2", "2"));
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
@@ -66,7 +62,7 @@ class GooglePhotosUtilsTest {
     void testGetConferenceRecordsOptions() {
         when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
-                Context.ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
 
                 return value.apply(mockedHttp);
             });
@@ -85,16 +81,16 @@ class GooglePhotosUtilsTest {
                     "nextPageToken", "t1"),
                 Map.of("albums", List.of(Map.of("title", "test2", "id", "2"))));
 
-        List<Option<String>> result = GooglePhotosUtils.getAlbumsOptions(
+        List<Option<String>> result = GooglePhotosUtils.getAlbumIdOptions(
             mockedParameters, null, null, null, mockedContext);
 
-        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(List.of(option("test1", "1"), option("test2", "2")), result);
 
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
         assertNotNull(capturedFunction);
 
-        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
         Configuration configuration = configurationBuilder.build();
 

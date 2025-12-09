@@ -17,16 +17,19 @@
 package com.bytechef.component.google.photos.action;
 
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.ALBUM_ID;
-import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.FILE_BINARY;
 import static com.bytechef.component.google.photos.constant.GooglePhotosConstants.MEDIA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
@@ -42,37 +45,50 @@ import org.mockito.ArgumentCaptor;
  */
 class GooglePhotosUploadMediaActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Object mockedObject = mock(Object.class);
-
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = forClass(Map.class);
 
     @Test
-    void testGetUploadToken() {
+    void testPerform() {
+        GooglePhotosUploadMediaAction.Media media = new GooglePhotosUploadMediaAction.Media(
+            "name123", mockedFileEntry);
 
-        GooglePhotosUploadMediaAction.Media media =
-            new GooglePhotosUploadMediaAction.Media("name123", mockedFileEntry);
-
-        when(mockedParameters.getRequiredFileEntry(FILE_BINARY))
+        when(mockedParameters.getRequiredList(MEDIA, GooglePhotosUploadMediaAction.Media.class))
+            .thenReturn(List.of(media));
+        when(mockedParameters.getRequiredFileEntry("fileEntry"))
             .thenReturn(mockedFileEntry);
         when(mockedFileEntry.getName())
             .thenReturn("name");
         when(mockedFileEntry.getMimeType())
             .thenReturn("mimeType");
         when(mockedParameters.getRequiredString(ALBUM_ID))
-            .thenReturn("album123");
-        when(mockedParameters.getRequiredList(eq(MEDIA), eq(GooglePhotosUploadMediaAction.Media.class)))
-            .thenReturn(List.of(media));
+            .thenReturn("abc");
 
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
+        when(mockedExecutor.headers(mapArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -83,23 +99,49 @@ class GooglePhotosUploadMediaActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result =
-            GooglePhotosUploadMediaAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = GooglePhotosUploadMediaAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedObject, result);
 
-        Body body = bodyArgumentCaptor.getValue();
+        List<ContextFunction<Http, Executor>> allCapturedFunctions = httpFunctionArgumentCaptor.getAllValues();
 
-        List<Map<String, Object>> mediaItems = List.of(
+        assertNotNull(allCapturedFunctions);
+        assertEquals(2, allCapturedFunctions.size());
+
+        List<ConfigurationBuilder> configurationBuilders = configurationBuilderArgumentCaptor.getAllValues();
+
+        assertEquals(2, configurationBuilders.size());
+        ConfigurationBuilder configurationBuilder = configurationBuilders.getFirst();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.TEXT, responseType.getType());
+
+        ConfigurationBuilder configurationBuilder2 = configurationBuilders.getLast();
+        Http.Configuration configuration2 = configurationBuilder2.build();
+        Http.ResponseType responseType2 = configuration2.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType2.getType());
+        assertEquals(List.of("/uploads", "/mediaItems:batchCreate"), stringArgumentCaptor.getAllValues());
+
+        assertEquals(
+            List.of(
+                Http.Body.of(mockedFileEntry),
+                Http.Body.of(
+                    Map.of(
+                        ALBUM_ID, "abc",
+                        "newMediaItems", List.of(
+                            Map.of(
+                                "simpleMediaItem",
+                                Map.of("uploadToken", "UPLOAD_TOKEN_123", "fileName", "name123")))),
+                    Http.BodyContentType.JSON)),
+            bodyArgumentCaptor.getAllValues());
+
+        assertEquals(
             Map.of(
-                "simpleMediaItem",
-                Map.of(
-                    "uploadToken", "UPLOAD_TOKEN_123",
-                    "fileName", "name123")));
-
-        assertEquals(Map.of(
-            ALBUM_ID, "album123",
-            "newMediaItems", mediaItems), body.getContent());
-
+                "Content-Type", List.of("application/octet-stream"),
+                "X-Goog-Upload-Content-Type", List.of("mimeType"),
+                "X-Goog-Upload-Protocol", List.of("raw")),
+            mapArgumentCaptor.getValue());
     }
 }
