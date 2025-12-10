@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
@@ -22,6 +21,7 @@ import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '../utils/getTask';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import styles from './NodeTypes.module.css';
 
@@ -47,9 +47,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
         const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-        const mainClusterRootTask = workflowDefinitionTasks?.find(
-            (task: WorkflowTask) => task.name === data.workflowNodeName
-        );
+        const mainClusterRootTask = data?.workflowNodeName
+            ? getTask({
+                  tasks: workflowDefinitionTasks,
+                  workflowNodeName: data.workflowNodeName,
+              })
+            : undefined;
 
         if (!mainClusterRootTask?.clusterElements) {
             return {iconsToShow: [], remainingIcons: []};

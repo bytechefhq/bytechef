@@ -38,6 +38,8 @@ import {Control, FieldValues, FormState} from 'react-hook-form';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
+import {getTask} from '../../../utils/getTask';
+
 const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',
     'DATE_TIME',
@@ -663,9 +665,12 @@ export const useProperty = ({
         if (currentNode.clusterElementType) {
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = workflowDefinitionTasks?.find(
-                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-            );
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTask({
+                      tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                  })
+                : undefined;
 
             if (mainClusterRootTask?.clusterElements) {
                 return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
