@@ -113,6 +113,7 @@ interface UsePropertyProps {
     control?: Control<FieldValues, FieldValues>;
     controlPath?: string;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
+    dynamicPropertySource?: string;
     formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
@@ -128,6 +129,7 @@ export const useProperty = ({
     control,
     controlPath = 'parameters',
     displayConditionsQuery,
+    dynamicPropertySource,
     formState,
     objectName,
     parameterValue,
@@ -766,7 +768,7 @@ export const useProperty = ({
         if (
             hidden &&
             path &&
-            objectName === undefined &&
+            (objectName === undefined || dynamicPropertySource === objectName) &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
             resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
         ) {
