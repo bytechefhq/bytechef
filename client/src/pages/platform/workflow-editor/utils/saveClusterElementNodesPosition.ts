@@ -3,6 +3,7 @@ import {ClusterElementItemType, UpdateWorkflowMutationType} from '@/shared/types
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import {getTask} from './getTask';
 import {removeClusterElementPosition} from './removeClusterElementPosition';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import updateClusterElementsPositions from './updateClusterElementsPositions';
@@ -33,9 +34,12 @@ export default function saveClusterElementNodesPosition({
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const mainClusterRootTask = workflowDefinitionTasks.find(
-        (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-    );
+    const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+        ? getTask({
+              tasks: workflowDefinitionTasks,
+              workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+          })
+        : undefined;
 
     if (!mainClusterRootTask || !mainClusterRootTask.clusterElements) {
         console.error('Main cluster root task or cluster elements not found');
