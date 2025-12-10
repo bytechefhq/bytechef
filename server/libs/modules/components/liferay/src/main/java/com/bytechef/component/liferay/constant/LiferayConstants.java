@@ -28,6 +28,7 @@ import com.bytechef.component.liferay.util.LiferayUtils;
 public class LiferayConstants {
 
     public static final String APPLICATION = "application";
+    public static final String BODY = "body";
     public static final String CONTEXT_NAME = "contextName";
     public static final String DISCOVER = "discover";
     public static final String ENDPOINT = "endpoint";

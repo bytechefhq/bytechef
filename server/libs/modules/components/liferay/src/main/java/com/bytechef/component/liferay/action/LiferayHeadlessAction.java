@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.liferay.constant.LiferayConstants.APPLICATION;
+import static com.bytechef.component.liferay.constant.LiferayConstants.BODY;
 import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
 import static com.bytechef.component.liferay.constant.LiferayConstants.PROPERTIES;
 
@@ -66,8 +67,17 @@ public class LiferayHeadlessAction {
                     (ActionDefinition.PropertiesFunction) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
+                        String endpoint = inputParameters.getRequiredString(ENDPOINT);
+
+                        if (endpoint.contains("batch")) {
+                            return List.of(string(BODY)
+                                .label("Body")
+                                .description("JSON structure of body")
+                                .required(false));
+                        }
+
                         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
-                            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
+                            inputParameters.getRequiredString(APPLICATION), endpoint,
                             context);
 
                         return propertiesContainer.properties();
@@ -88,8 +98,9 @@ public class LiferayHeadlessAction {
         String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointUrl;
 
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
+        String batchBody = (String) properties.get("body");
 
-        Map<String, ?> body = Map.of();
+        Body body = null;
         Map<String, List<String>> headers = Map.of();
         Map<String, List<String>> queryParameters = Map.of();
         Map<String, ?> pathParameters = Map.of();
@@ -98,27 +109,29 @@ public class LiferayHeadlessAction {
             inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
             context);
 
-        if (properties != null) {
-            body = propertiesContainer.bodyParameters()
+        if (batchBody != null) {
+            body = Body.of((List<?>) context.json(json -> json.read(batchBody)));
+        } else {
+            body = Body.of(propertiesContainer.bodyParameters()
                 .stream()
                 .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
-
-            headers = propertiesContainer.headerParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
-
-            queryParameters = propertiesContainer.queryParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
-
-            pathParameters = propertiesContainer.headerParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
+                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p)))));
         }
+
+        headers = propertiesContainer.headerParameters()
+            .stream()
+            .filter(properties::containsKey)
+            .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+
+        queryParameters = propertiesContainer.queryParameters()
+            .stream()
+            .filter(properties::containsKey)
+            .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+
+        pathParameters = propertiesContainer.headerParameters()
+            .stream()
+            .filter(properties::containsKey)
+            .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
@@ -133,7 +146,7 @@ public class LiferayHeadlessAction {
             .queryParameters(queryParameters)
             .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(body))
+            .body(body)
             .execute();
 
         return response.getBody();
