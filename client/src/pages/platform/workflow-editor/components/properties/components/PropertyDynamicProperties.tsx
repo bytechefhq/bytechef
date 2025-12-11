@@ -82,7 +82,7 @@ const PropertyDynamicProperties = ({
     const queryEnabled = useMemo(
         () =>
             (lookupDependsOnPaths?.length
-                ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
+                ? lookupDependsOnValues?.every((loadDependencyValue) => loadDependencyValue != null)
                 : true) && enabled,
         [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled]
     );
