@@ -21,10 +21,12 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.productboard.action.ProductboardListNotesAction;
 import com.bytechef.component.productboard.trigger.ProductboardNewNoteTrigger;
 import com.bytechef.component.productboard.trigger.ProductboardUpdatedFeatureTrigger;
 import com.google.auto.service.AutoService;
@@ -37,6 +39,11 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ProductboardComponentHandler extends AbstractProductboardComponentHandler {
+
+    @Override
+    public List<ModifiableActionDefinition> getCustomActions() {
+        return List.of(ProductboardListNotesAction.ACTION_DEFINITION);
+    }
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {

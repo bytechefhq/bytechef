@@ -71,28 +71,6 @@ paths:
                 content:
                   type: "string"
                   description: "HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out."
-    get:
-      summary: "List All Notes"
-      description: "Returns detail of all notes order by created_at desc"
-      operationId: "listNotes"
-      responses:
-        200:
-          description: "Success, the response contains valid data."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  data:
-                    type: "array"
-                    items:
-                      $ref: "#/components/schemas/ExpandedNote"
-                  pageCursor:
-                    type: "string"
-                    description: "Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor={pageCursor}"
-                  totalResults:
-                    type: "integer"
-                    description: "Total number of notes that meet the specified parameters for the query"
   "/notes/{noteId}":
     get:
       summary: "Get Note"

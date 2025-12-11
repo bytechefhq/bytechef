@@ -121,7 +121,7 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         return options;
     }
 
-    private static List<Map<?, ?>> getAllNotes(Context context) {
+    public static List<Map<?, ?>> getAllNotes(Context context) {
         List<Map<?, ?>> notes = new ArrayList<>();
         String pageCursor = null;
 
