@@ -4,8 +4,8 @@ import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
+import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
-import {getTaskDispatcherTask} from './taskDispatcherConfig';
 
 const SPACE = 4;
 
@@ -187,9 +187,9 @@ export default async function saveWorkflowDefinition({
                     ...updatedWorkflowDefinitionTasks.slice(existingTaskIndex + 1),
                 ];
             } else {
-                const nestedTask = getTaskDispatcherTask({
-                    taskDispatcherId: existingWorkflowTask.name,
+                const nestedTask = getTask({
                     tasks: workflowDefinitionTasks,
+                    workflowNodeName: existingWorkflowTask.name,
                 });
 
                 if (!nestedTask) {

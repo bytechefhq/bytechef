@@ -7,8 +7,8 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {updateClusterRootElementField, updateNestedClusterElementField} from './clusterElementsFieldChangeUtils';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import {getTask} from './getTask';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
-import {getTaskDispatcherTask} from './taskDispatcherConfig';
 
 type FieldUpdateType = {
     field: 'operation' | 'label' | 'description';
@@ -49,9 +49,9 @@ export default function saveClusterElementFieldChange({
 
     const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-    const mainClusterRootTask = getTaskDispatcherTask({
-        taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+    const mainClusterRootTask = getTask({
         tasks: workflowDefinitionTasks,
+        workflowNodeName: rootClusterElementNodeData.workflowNodeName,
     });
 
     if (!mainClusterRootTask) {

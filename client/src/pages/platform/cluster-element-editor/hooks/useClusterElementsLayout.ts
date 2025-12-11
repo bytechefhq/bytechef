@@ -14,8 +14,8 @@ import useDataPillPanelStore from '../../workflow-editor/stores/useDataPillPanel
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '../../workflow-editor/utils/getTask';
 import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
-import {getTaskDispatcherTask} from '../../workflow-editor/utils/taskDispatcherConfig';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import {isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
@@ -112,9 +112,9 @@ const useClusterElementsLayout = () => {
             return undefined;
         }
 
-        return getTaskDispatcherTask({
-            taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+        return getTask({
             tasks: workflowDefinitionTasks,
+            workflowNodeName: rootClusterElementNodeData.workflowNodeName,
         });
     }, [workflowDefinitionTasks, rootClusterElementNodeData?.workflowNodeName]);
 
