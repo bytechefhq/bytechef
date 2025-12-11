@@ -18,7 +18,6 @@ package com.bytechef.component.productboard.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionDefinition;
@@ -41,19 +40,13 @@ public class ProductboardDeleteNoteAction {
                 "path", "/notes/{noteId}"
 
             ))
-        .properties(integer("X-Version").label("X - Version")
-            .defaultValue(1)
+        .properties(string("noteId").label("Note ID")
+            .description("ID of the note")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.HEADER)),
-            string("noteId").label("Note ID")
-                .description("ID of the note")
-                .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.PATH)));
+                    "type", PropertyType.PATH)));
 
     private ProductboardDeleteNoteAction() {
     }

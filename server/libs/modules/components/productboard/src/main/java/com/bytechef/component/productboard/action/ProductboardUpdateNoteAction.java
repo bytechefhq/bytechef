@@ -19,7 +19,6 @@ package com.bytechef.component.productboard.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -47,19 +46,13 @@ public class ProductboardUpdateNoteAction {
                 "path", "/notes/{noteId}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(integer("X-Version").label("X - Version")
-            .defaultValue(1)
+        .properties(string("noteId").label("Note ID")
+            .description("ID of the note")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.HEADER)),
-            string("noteId").label("Note ID")
-                .description("ID of the note")
-                .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getNoteIdOptions)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.PATH)),
+                    "type", PropertyType.PATH)),
             object("data").properties(string("content").label("Content")
                 .description("The content of a note. This can only be updated on notes without existing snippets.")
                 .required(false),
