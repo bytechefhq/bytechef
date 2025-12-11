@@ -24,8 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.productboard.property.ProductboardFeatureProperties;
+import com.bytechef.component.productboard.util.ProductboardUtils;
 import java.util.Map;
 
 /**
@@ -35,12 +37,12 @@ import java.util.Map;
  */
 public class ProductboardGetFeatureAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getFeature")
-        .title("Get feature")
+        .title("Get Feature")
         .description("Returns detail of a specific feature.")
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/features/{id}"
+                "path", "/features/{featureId}"
 
             ))
         .properties(integer("X-Version").label("X - Version")
@@ -49,9 +51,10 @@ public class ProductboardGetFeatureAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.HEADER)),
-            string("id").label("Id")
+            string("featureId").label("Feature Id")
                 .description("ID of the feature")
                 .required(true)
+                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getFeatureIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))

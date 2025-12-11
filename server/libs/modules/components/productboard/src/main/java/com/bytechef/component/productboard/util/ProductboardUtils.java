@@ -66,6 +66,28 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         throw new ProviderException("Failed to create webhook.");
     }
 
+    public static List<Option<String>> getFeatureIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, ?> body = context.http(http -> http.get("/features"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get(DATA) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getNoteIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
