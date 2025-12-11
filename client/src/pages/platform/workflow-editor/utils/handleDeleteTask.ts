@@ -10,7 +10,8 @@ import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
-import {TASK_DISPATCHER_CONFIG, getTaskDispatcherTask} from './taskDispatcherConfig';
+import {getTask} from './getTask';
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
     rootClusterElementNodeData?: NodeDataType;
@@ -194,9 +195,9 @@ export default function handleDeleteTask({
             return parentForkJoinTask;
         }) as Array<WorkflowTaskType>;
     } else if (clusterElementsCanvasOpen && rootClusterElementNodeData) {
-        const mainRootClusterElementTask = getTaskDispatcherTask({
-            taskDispatcherId: rootClusterElementNodeData.name,
+        const mainRootClusterElementTask = getTask({
             tasks: workflowTasks,
+            workflowNodeName: rootClusterElementNodeData.name,
         });
 
         if (!mainRootClusterElementTask || !mainRootClusterElementTask.clusterElements) {

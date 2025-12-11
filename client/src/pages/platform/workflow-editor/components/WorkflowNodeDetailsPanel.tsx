@@ -447,9 +447,9 @@ const WorkflowNodeDetailsPanel = ({
             return undefined;
         }
 
-        const mainClusterRootTask = getTaskDispatcherTask({
-            taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+        const mainClusterRootTask = getTask({
             tasks: workflow.tasks || [],
+            workflowNodeName: rootClusterElementNodeData.workflowNodeName,
         });
 
         if (!mainClusterRootTask) {
@@ -1147,9 +1147,9 @@ const WorkflowNodeDetailsPanel = ({
         const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
         const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-            ? getTaskDispatcherTask({
-                  taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+            ? getTask({
                   tasks: workflowDefinitionTasks,
+                  workflowNodeName: rootClusterElementNodeData.workflowNodeName,
               })
             : undefined;
 

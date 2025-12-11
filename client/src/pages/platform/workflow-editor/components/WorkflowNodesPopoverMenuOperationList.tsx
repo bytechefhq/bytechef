@@ -29,12 +29,12 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import {getTask} from '../utils/getTask';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
 import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import {getTaskDispatcherTask} from '../utils/taskDispatcherConfig';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
     clusterElementType?: string;
@@ -196,9 +196,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = getTaskDispatcherTask({
-                taskDispatcherId: rootClusterElementNodeData.workflowNodeName,
+            const mainClusterRootTask = getTask({
                 tasks: workflowDefinitionTasks,
+                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
             });
 
             if (!mainClusterRootTask) {
