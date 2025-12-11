@@ -36,6 +36,7 @@ import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -49,12 +50,12 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         String webhookUrl, String workflowExecutionId, TriggerContext context, String eventType) {
 
         Map<String, Object> body = context.http(http -> http.post("/webhooks"))
-            .header("X-Version", "1")
-            .body(Http.Body.of(
-                DATA, Map.of(
-                    "name", "Webhook for " + workflowExecutionId,
-                    "events", List.of(Map.of("eventType", eventType)),
-                    "notification", Map.of("url", webhookUrl, "version", 1))))
+            .body(
+                Http.Body.of(
+                    DATA, Map.of(
+                        "name", "Webhook for " + workflowExecutionId,
+                        "events", List.of(Map.of("eventType", eventType)),
+                        "notification", Map.of("url", webhookUrl, "version", 1))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -73,15 +74,32 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context.http(http -> http.get("/features"))
+            .queryParameters("pageLimit", 1000)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get(DATA) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get(ID)));
-                }
+        addFeatureOption(options, body);
+
+        String nextLink = null;
+
+        if (body.get("links") instanceof Map<?, ?> links) {
+            nextLink = (String) links.get("next");
+        }
+
+        while (nextLink != null) {
+            String finalNextLink = nextLink;
+            Map<String, ?> body1 = context.http(http -> http.get(finalNextLink))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            addFeatureOption(options, body1);
+
+            nextLink = null;
+
+            if (body1.get("links") instanceof Map<?, ?> links) {
+                nextLink = (String) links.get("next");
             }
         }
 
@@ -92,27 +110,44 @@ public class ProductboardUtils extends AbstractProductboardUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context.http(http -> http.get("/notes"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(DATA) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("title"), (String) map.get(ID)));
-                }
-            }
+        List<Map<?, ?>> allData = getAllNotes(context);
+
+        for (Map<?, ?> map : allData) {
+            options.add(option((String) map.get("title"), (String) map.get(ID)));
         }
 
         return options;
     }
 
+    private static List<Map<?, ?>> getAllNotes(Context context) {
+        List<Map<?, ?>> notes = new ArrayList<>();
+        String pageCursor = null;
+
+        do {
+            Map<String, ?> body = context.http(http -> http.get("/notes"))
+                .queryParameters("pageLimit", 2000, "pageCursor", pageCursor)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get(DATA) instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+                        notes.add(map);
+                    }
+                }
+            }
+
+            pageCursor = (String) body.get("pageCursor");
+        } while (pageCursor != null);
+
+        return notes;
+    }
+
     public static void deleteSubscription(TriggerContext context, String webhookId) {
         context.http(http -> http.delete("/webhooks/%s".formatted(webhookId)))
-            .header("X-Version", "1")
             .execute();
     }
 
@@ -130,6 +165,18 @@ public class ProductboardUtils extends AbstractProductboardUtils {
 
         List<String> validationToken = map.get("validationToken");
 
-        return new WebhookValidateResponse(validationToken.getFirst(), 200);
+        String token = (validationToken == null || validationToken.isEmpty()) ? null : validationToken.getFirst();
+
+        return new WebhookValidateResponse(Objects.requireNonNullElse(token, ""), 200);
+    }
+
+    private static void addFeatureOption(List<Option<String>> options, Map<String, ?> body) {
+        if (body.get(DATA) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get(ID)));
+                }
+            }
+        }
     }
 }
