@@ -16,7 +16,6 @@
 
 package com.bytechef.component.productboard.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -44,12 +43,7 @@ public class ProductboardListNotesAction {
                 "path", "/notes"
 
             ))
-        .properties(integer("X-Version").label("X - Version")
-            .defaultValue(1)
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.HEADER)))
+        .properties()
         .output(outputSchema(object().properties(
             array("data").items(object().properties(ProductboardExpandedNoteProperties.PROPERTIES))
                 .required(false),

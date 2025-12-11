@@ -18,7 +18,6 @@ package com.bytechef.component.productboard.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -45,19 +44,13 @@ public class ProductboardGetFeatureAction {
                 "path", "/features/{featureId}"
 
             ))
-        .properties(integer("X-Version").label("X - Version")
-            .defaultValue(1)
+        .properties(string("featureId").label("Feature Id")
+            .description("ID of the feature")
             .required(true)
+            .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getFeatureIdOptions)
             .metadata(
                 Map.of(
-                    "type", PropertyType.HEADER)),
-            string("featureId").label("Feature Id")
-                .description("ID of the feature")
-                .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ProductboardUtils::getFeatureIdOptions)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.PATH)))
+                    "type", PropertyType.PATH)))
         .output(outputSchema(object().properties(object("data").properties(ProductboardFeatureProperties.PROPERTIES)
             .required(false))
             .metadata(

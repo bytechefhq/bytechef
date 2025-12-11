@@ -18,7 +18,6 @@ package com.bytechef.component.productboard.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -43,18 +42,12 @@ public class ProductboardCreateNoteAction {
                 "path", "/notes", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(integer("X-Version").label("X - Version")
-            .defaultValue(1)
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.HEADER)),
-            string("title").metadata(
-                Map.of(
-                    "type", PropertyType.BODY))
-                .label("Title")
-                .description("Title of note.")
-                .required(true),
+        .properties(string("title").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Title")
+            .description("Title of note.")
+            .required(true),
             string("content").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
