@@ -224,6 +224,19 @@ function consolidateUrlSegments(segments: string[]): string[] {
     return consolidatedSegments;
 }
 
+// Parse a segment that may contain bracket notation like "item['4broj telefona']"
+function parseSegmentWithBrackets(segment: string): {bracketNotation: string; propertyName: string} | null {
+    const bracketMatch = segment.match(/^([^[]+)(\[.+?\])$/);
+
+    if (bracketMatch) {
+        const [, propertyName, bracketNotation] = bracketMatch;
+
+        return {bracketNotation, propertyName};
+    }
+
+    return null;
+}
+
 // Transform: "user.first-name" → "user['first-name']"
 export function transformPathForObjectAccess(path: string): string {
     if (!path || !path.includes('.')) {
@@ -248,6 +261,18 @@ export function transformPathForObjectAccess(path: string): string {
     const firstSegment = consolidatedSegments[0];
 
     const formattedSegments = consolidatedSegments.slice(1).map((segment) => {
+        const segmentContainsBrackets = parseSegmentWithBrackets(segment);
+
+        if (segmentContainsBrackets) {
+            const {bracketNotation, propertyName} = segmentContainsBrackets;
+
+            const propertyNeedsBrackets = /[^a-zA-Z0-9_$]/.test(propertyName) || /^\d/.test(propertyName);
+
+            return propertyNeedsBrackets
+                ? `['${propertyName}']${bracketNotation}`
+                : `.${propertyName}${bracketNotation}`;
+        }
+
         const hasArrayNotation = /\[\d+\]$/.test(segment);
 
         if (hasArrayNotation) {
