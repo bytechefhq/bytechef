@@ -51,7 +51,8 @@ public class ProductboardConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/authorize")
-                .scopes((connection, context) -> List.of("notes:create", "notes:read", "notes:manage"))
+                .scopes((connection, context) -> List.of("notes:create", "notes:read", "notes:manage",
+                    "product_hierarchy_data:read"))
                 .tokenUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token")
                 .refreshUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token"));
 

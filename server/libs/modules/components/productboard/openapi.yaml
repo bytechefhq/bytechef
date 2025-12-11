@@ -6,9 +6,9 @@ info:
 servers:
   - url: "https://api.productboard.com"
 paths:
-  /features/{id}:
+  /features/{featureId}:
     get:
-      summary: "Get feature"
+      summary: "Get Feature"
       description: "Returns detail of a specific feature."
       operationId: "getFeature"
       parameters:
@@ -18,13 +18,14 @@ paths:
           schema:
             type: "integer"
             default: 1
-        - name: "id"
+        - name: "featureId"
           description: "ID of the feature"
           in: "path"
           required: true
           schema:
             type: "string"
             format: "uuid"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success, the response contains valid data."
@@ -445,3 +446,4 @@ components:
             notes:create: "The application will be able to create notes."
             notes:read: "The application will be able to read notes."
             notes:manage: "The application will be able to manage notes."
+            product_hierarchy_data:read: "The application will be able to read product hierarchy data."
