@@ -122,10 +122,7 @@ public class LiferayHeadlessAction {
 
         queryParameters = getParameterValueMap(propertiesContainer.queryParameters(), properties);
 
-        pathParameters = propertiesContainer.headerParameters()
-            .stream()
-            .filter(properties::containsKey)
-            .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
+        pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
