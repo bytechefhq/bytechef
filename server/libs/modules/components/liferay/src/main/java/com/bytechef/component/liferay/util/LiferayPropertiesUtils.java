@@ -23,6 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.liferay.constant.LiferayConstants.BODY;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HEADER;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HIDDEN_PROPERTIES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.PATH;
+import static com.bytechef.component.liferay.constant.LiferayConstants.QUERY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
@@ -140,10 +145,10 @@ public class LiferayPropertiesUtils {
         }
 
         switch (in) {
-            case "body" -> bodyParameters.add(name);
-            case "header" -> headerParameters.add(name);
-            case "path" -> pathParameters.add(name);
-            case "query" -> queryParameters.add(name);
+            case BODY -> bodyParameters.add(name);
+            case HEADER -> headerParameters.add(name);
+            case PATH -> pathParameters.add(name);
+            case QUERY -> queryParameters.add(name);
             default -> throw new IllegalArgumentException("Unknown parameter type: " + in);
         }
 
@@ -194,12 +199,12 @@ public class LiferayPropertiesUtils {
         List<String> queryParameters) {
 
         Map<String, Object> hiddenMap = Map.of(
-            "body", bodyParameters,
-            "header", headerParameters,
-            "path", pathParameters,
-            "query", queryParameters);
+            BODY, bodyParameters,
+            HEADER, headerParameters,
+            PATH, pathParameters,
+            QUERY, queryParameters);
 
-        return object("hiddenProperties")
+        return object(HIDDEN_PROPERTIES)
             .hidden(true)
             .defaultValue(hiddenMap);
     }
