@@ -1,11 +1,18 @@
 import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinition,
+    ComponentDefinitionApi,
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinition,
+} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {Node} from '@xyflow/react';
-import {memo, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -38,18 +45,17 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
+        const [allComponentDefinitions, setAllComponentDefinitions] = useState<Record<string, ComponentDefinition>>({});
+        const [isLoadingFullDefinitions, setIsLoadingFullDefinitions] = useState(false);
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
-
         const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
             Array<TaskDispatcherDefinition>
         >([]);
-
         const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
-
         const [filteredClusterElementComponentDefinitions, setFilteredClusterElementComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
@@ -65,6 +71,88 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         const ff_797 = useFeatureFlagsStore()('ff-797');
         const ff_1652 = useFeatureFlagsStore()('ff-1652');
 
+        const queryClient = useQueryClient();
+
+        const fetchingComponentsRef = useRef<Set<string>>(new Set());
+
+        const fetchFullComponentInfo = useCallback(
+            async (name: string, version: number): Promise<{name: string; definition: ComponentDefinition} | null> => {
+                const componentKey = `${name}@${version}`;
+
+                if (fetchingComponentsRef.current.has(componentKey)) {
+                    return null;
+                }
+
+                fetchingComponentsRef.current.add(componentKey);
+
+                try {
+                    const response = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ComponentDefinitionApi().getComponentDefinition({
+                                componentName: name,
+                                componentVersion: version,
+                            }),
+                        queryKey: ComponentDefinitionKeys.componentDefinition({
+                            componentName: name,
+                            componentVersion: version,
+                        }),
+                    });
+                    return {definition: response, name};
+                } catch (error) {   
+                    console.error(`[ERROR] Failed to fetch full component info for ${name}@v${version}:`, error);
+                    return null;
+                } finally {
+                    fetchingComponentsRef.current.delete(componentKey);
+                }
+            },
+            [queryClient]
+        );
+        useEffect(() => {
+            if (!filter || !componentDefinitions?.length) {
+                setIsLoadingFullDefinitions(false);
+                return;
+            }
+
+            const timeout = setTimeout(async () => {
+                const candidates = componentDefinitions.filter(
+                    ({actionsCount, triggersCount}) => (actionsCount ?? 0) > 0 || (triggersCount ?? 0) > 0
+                );
+
+                const fetchPromises = candidates
+                    .filter((componentDefinition) => !allComponentDefinitions[componentDefinition.name])
+                    .map((componentDefinition) =>
+                        fetchFullComponentInfo(componentDefinition.name, componentDefinition.version)
+                    );
+
+                if (fetchPromises.length > 0) {
+                    setIsLoadingFullDefinitions(true);
+                }
+
+                const results = await Promise.all(fetchPromises);
+
+                const fetchedComponents = results.filter(
+                    (result): result is {name: string; definition: ComponentDefinition} => result !== null
+                );
+
+                if (fetchedComponents.length > 0) {
+                    setAllComponentDefinitions((previousComponents) => {
+                        const newComponents = {...previousComponents};
+
+                        fetchedComponents.forEach(({definition, name}) => {
+                            if (!newComponents[name]) {
+                                newComponents[name] = definition;
+                            }
+                        });
+
+                        return newComponents;
+                    });
+                }
+
+                setIsLoadingFullDefinitions(false);
+            }, 400);
+
+            return () => clearTimeout(timeout);
+        }, [filter, componentDefinitions, allComponentDefinitions, fetchFullComponentInfo]);
         useEffect(
             () =>
                 setFilteredTaskDispatcherDefinitions(
@@ -73,48 +161,74 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
         );
 
-        useEffect(() => {
-            if (componentDefinitions) {
-                setFilteredActionComponentDefinitions(
-                    componentDefinitions
-                        .filter(
-                            ({actionsCount, name, title}) =>
-                                actionsCount &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
-                        .filter(
-                            ({name}) =>
-                                ((!ff_797 && name !== 'dataStream') || ff_797) &&
-                                ((!ff_1652 && name !== 'aiAgent') || ff_1652)
-                        )
-                );
-
-                setFilteredTriggerComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({name, title, triggersCount}) =>
-                            triggersCount &&
-                            (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                title?.toLowerCase().includes(filter.toLowerCase()))
-                    )
-                );
-
-                if (clusterElementType) {
-                    setFilteredClusterElementComponentDefinitions(
-                        componentDefinitions.filter(
-                            ({clusterElementsCount, name, title}) =>
-                                clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
-                    );
-                }
+        const matchedComponents = useMemo(() => {
+            if (!componentDefinitions?.length) {
+                return [];
             }
-        }, [componentDefinitions, filter, ff_797, ff_1652, clusterElementType]);
+
+            const normalizedFilter = filter.toLowerCase();
+
+            if (!normalizedFilter) {
+                return componentDefinitions;
+            }
+
+            return componentDefinitions.filter((componentDefinition) => {
+                const matchingComponentDefinition = allComponentDefinitions[componentDefinition.name];
+
+                const matchesComponent =
+                    componentDefinition.name?.toLowerCase().includes(normalizedFilter) ||
+                    componentDefinition.title?.toLowerCase().includes(normalizedFilter);
+
+                const matchesAction =
+                    matchingComponentDefinition?.actions?.some(
+                        (action: {name?: string; title?: string}) =>
+                            action.name?.toLowerCase().includes(normalizedFilter) ||
+                            action.title?.toLowerCase().includes(normalizedFilter)
+                    ) ?? false;
+
+                const matchesTrigger =
+                    matchingComponentDefinition?.triggers?.some(
+                        (trigger: {name?: string; title?: string}) =>
+                            trigger.name?.toLowerCase().includes(normalizedFilter) ||
+                            trigger.title?.toLowerCase().includes(normalizedFilter)
+                    ) ?? false;
+
+                return matchesComponent || matchesAction || matchesTrigger;
+            });
+        }, [componentDefinitions, filter, allComponentDefinitions]);
+
+        useEffect(() => {
+            if (!componentDefinitions) {
+                return;
+            }
+
+            const baseComponentDefinitionList = filter ? matchedComponents : componentDefinitions;
+
+            setFilteredActionComponentDefinitions(
+                baseComponentDefinitionList.filter(
+                    ({actionsCount, name}) =>
+                        actionsCount &&
+                        ((!ff_797 && name !== 'dataStream') || ff_797) &&
+                        ((!ff_1652 && name !== 'aiAgent') || ff_1652)
+                )
+            );
+
+            setFilteredTriggerComponentDefinitions(
+                baseComponentDefinitionList.filter(({triggersCount}) => triggersCount)
+            );
+
+            if (clusterElementType) {
+                const clusterKey = convertNameToSnakeCase(clusterElementType as string);
+
+                setFilteredClusterElementComponentDefinitions(
+                    baseComponentDefinitionList.filter(({clusterElementsCount}) => clusterElementsCount?.[clusterKey])
+                );
+            }
+        }, [componentDefinitions, filter, ff_797, ff_1652, clusterElementType, matchedComponents]);
 
         return (
             <div className={twMerge('rounded-lg', actionPanelOpen ? 'w-node-popover-width' : 'w-full')}>
-                <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
+                <header className="flex flex-col items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <Input
                         className="bg-white shadow-none"
                         name="workflowNodeFilter"
@@ -122,6 +236,10 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         placeholder="Filter components"
                         value={filter}
                     />
+
+                    {isLoadingFullDefinitions && (
+                        <span className="whitespace-nowrap text-xs text-gray-500">Loading...</span>
+                    )}
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">
@@ -202,8 +320,6 @@ const filterTaskDispatcherDefinitions = (
             let parentId;
 
             const currentNodeData = currentNode.data as NodeDataType;
-
-            // If using edgeId (has full data), or using sourceNodeId (has restricted data)
             if (currentNode.data.workflowNodeName) {
                 parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
             } else {
@@ -218,7 +334,6 @@ const filterTaskDispatcherDefinitions = (
 
             if (isLoopSubtask(parentNode)) {
                 hasLoopTaskDispatcher = true;
-
                 break;
             }
 
