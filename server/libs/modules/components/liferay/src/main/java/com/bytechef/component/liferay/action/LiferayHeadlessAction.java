@@ -101,9 +101,6 @@ public class LiferayHeadlessAction {
         String batchBody = (String) properties.get("body");
 
         Body body = null;
-        Map<String, List<String>> headers = Map.of();
-        Map<String, List<String>> queryParameters = Map.of();
-        Map<String, ?> pathParameters = Map.of();
 
         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
             inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
@@ -118,11 +115,11 @@ public class LiferayHeadlessAction {
                 .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p)))));
         }
 
-        headers = getParameterValueMap(propertiesContainer.headerParameters(), properties);
+        Map<String, List<String>> headers = getParameterValueMap(propertiesContainer.headerParameters(), properties);
 
-        queryParameters = getParameterValueMap(propertiesContainer.queryParameters(), properties);
+        Map<String, List<String>> queryParameters = getParameterValueMap(propertiesContainer.queryParameters(), properties);
 
-        pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
+        Map<String, ?> pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
