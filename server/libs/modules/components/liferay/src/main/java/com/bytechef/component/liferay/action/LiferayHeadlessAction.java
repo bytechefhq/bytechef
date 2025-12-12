@@ -46,6 +46,7 @@ import com.bytechef.component.liferay.util.PropertiesContainer;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -138,21 +139,24 @@ public class LiferayHeadlessAction {
 
         String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + applicationEndpoint;
 
-        if (pathParameters != null) {
-            for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
-                String key = entry.getKey();
-                Object rawValue = entry.getValue();
-
-                String value;
-                if (rawValue instanceof List<?> list && !list.isEmpty()) {
-                    value = String.valueOf(list.getFirst());
-                } else {
-                    value = String.valueOf(rawValue);
-                }
-
-                endpointUri = endpointUri.replace("{" + key + "}", value);
-            }
+        if (Objects.isNull(pathParameters) || pathParameters.isEmpty()) {
+            return endpointUri;
         }
+
+        for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
+            String key = entry.getKey();
+            Object rawValue = entry.getValue();
+
+            String value;
+            if (rawValue instanceof List<?> list && !list.isEmpty()) {
+                value = String.valueOf(list.getFirst());
+            } else {
+                value = String.valueOf(rawValue);
+            }
+
+            endpointUri = endpointUri.replace("{" + key + "}", value);
+        }
+
         return endpointUri;
     }
 
