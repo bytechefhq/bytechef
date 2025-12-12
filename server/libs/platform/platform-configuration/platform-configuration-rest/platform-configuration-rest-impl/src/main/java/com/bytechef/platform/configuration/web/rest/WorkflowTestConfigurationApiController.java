@@ -102,6 +102,19 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
+    public ResponseEntity<Void> deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String workflowConnectionKey, Long environmentId,
+        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
+
+        workflowTestConfigurationFacade.deleteWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, workflowConnectionKey,
+            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId(), environmentId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> saveWorkflowTestConfigurationInputs(
         String workflowId, Long environmentId,
         SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {
