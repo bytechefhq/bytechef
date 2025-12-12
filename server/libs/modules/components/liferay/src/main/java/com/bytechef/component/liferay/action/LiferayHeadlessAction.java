@@ -24,7 +24,11 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.liferay.constant.LiferayConstants.APPLICATION;
 import static com.bytechef.component.liferay.constant.LiferayConstants.BODY;
 import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HEADER;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HIDDEN_PROPERTIES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.PATH;
 import static com.bytechef.component.liferay.constant.LiferayConstants.PROPERTIES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.QUERY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -88,10 +92,18 @@ public class LiferayHeadlessAction {
         .perform(LiferayHeadlessAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
-            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
-            context);
+
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
+
+        if (properties == null) {
+            properties = Map.of();
+        }
+
+        Map<String, ?> hiddenProperties = (Map<String, ?>) properties.get(HIDDEN_PROPERTIES);
+
+        if (hiddenProperties == null) {
+            hiddenProperties = Map.of();
+        }
 
         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
@@ -101,19 +113,18 @@ public class LiferayHeadlessAction {
             context, endpointParts[0],
             getEndpointUri(
                 inputParameters, connectionParameters, endpointParts[1],
-                getParameterValueMap(propertiesContainer.pathParameters(), properties))
-        );
+                getParameterValueMap((List<String>) hiddenProperties.get(PATH), properties)));
 
         Response response = executor.headers(
-                getParameterValueMap(propertiesContainer.headerParameters(), properties))
+            getParameterValueMap((List<String>) hiddenProperties.get(HEADER), properties))
             .queryParameters(
-                getParameterValueMap(propertiesContainer.queryParameters(), properties))
+                getParameterValueMap((List<String>) hiddenProperties.get(QUERY), properties))
             .configuration(
                 Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(
                 responseType(ResponseType.JSON))
             .body(
-                getBody(propertiesContainer.bodyParameters(), properties, context))
+                getBody((List<String>) hiddenProperties.get(BODY), properties, context))
             .execute();
 
         return response.getBody();
@@ -127,11 +138,20 @@ public class LiferayHeadlessAction {
 
         String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + applicationEndpoint;
 
-        for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
-            String key = entry.getKey();
-            String value = String.valueOf(entry.getValue());
+        if (pathParameters != null) {
+            for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
+                String key = entry.getKey();
+                Object rawValue = entry.getValue();
 
-            endpointUri = endpointUri.replace("{" + key + "}", value);
+                String value;
+                if (rawValue instanceof List<?> list && !list.isEmpty()) {
+                    value = String.valueOf(list.getFirst());
+                } else {
+                    value = String.valueOf(rawValue);
+                }
+
+                endpointUri = endpointUri.replace("{" + key + "}", value);
+            }
         }
         return endpointUri;
     }
@@ -139,20 +159,23 @@ public class LiferayHeadlessAction {
     private static Map<String, List<String>> getParameterValueMap(
         List<String> parameterNames, Map<String, ?> properties) {
 
+        if (parameterNames == null) {
+            return Map.of();
+        }
+
         return parameterNames
             .stream()
             .filter(
-                properties::containsKey
-            ).collect(
+                properties::containsKey)
+            .collect(
                 Collectors.toMap(
-            parameterName -> parameterName,
-            parameterName -> List.of(String.valueOf(properties.get(parameterName))))
-            );
+                    parameterName -> parameterName,
+                    parameterName -> List.of(String.valueOf(properties.get(parameterName)))));
     }
 
     private static Body getBody(List<String> parameterNames, Map<String, ?> properties, Context context) {
-        if (properties.containsKey("body")) {
-            return Body.of((List<?>) context.json(json -> json.read((String)properties.get("body"))));
+        if (properties.containsKey(BODY)) {
+            return Body.of((List<?>) context.json(json -> json.read((String) properties.get(BODY))));
         }
 
         return Body.of(parameterNames
@@ -161,10 +184,8 @@ public class LiferayHeadlessAction {
                 properties::containsKey)
             .collect(
                 Collectors.toMap(
-                parameterName -> parameterName,
-                parameterName -> String.valueOf(properties.get(parameterName)))
-            )
-        );
+                    parameterName -> parameterName,
+                    parameterName -> String.valueOf(properties.get(parameterName)))));
 
     }
 
