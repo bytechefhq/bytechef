@@ -98,22 +98,10 @@ public class LiferayHeadlessAction {
         String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointUrl;
 
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
-        String batchBody = (String) properties.get("body");
-
-        Body body = null;
 
         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
             inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
             context);
-
-        if (batchBody != null) {
-            body = Body.of((List<?>) context.json(json -> json.read(batchBody)));
-        } else {
-            body = Body.of(propertiesContainer.bodyParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p)))));
-        }
 
         Map<String, ?> pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
 
@@ -135,7 +123,7 @@ public class LiferayHeadlessAction {
             .configuration(
                 responseType(ResponseType.JSON))
             .body(
-                body)
+                getBody(propertiesContainer.bodyParameters(), properties, context))
             .execute();
 
         return response.getBody();
@@ -153,6 +141,24 @@ public class LiferayHeadlessAction {
             parameterName -> parameterName,
             parameterName -> List.of(String.valueOf(properties.get(parameterName))))
             );
+    }
+
+    private static Body getBody(List<String> parameterNames, Map<String, ?> properties, Context context) {
+        if (properties.containsKey("body")) {
+            return Body.of((List<?>) context.json(json -> json.read((String)properties.get("body"))));
+        }
+
+        return Body.of(parameterNames
+            .stream()
+            .filter(
+                properties::containsKey)
+            .collect(
+                Collectors.toMap(
+                parameterName -> parameterName,
+                parameterName -> String.valueOf(properties.get(parameterName)))
+            )
+        );
+
     }
 
     private static Executor getExecutor(Context context, String method, String finalEndpointUri) {
