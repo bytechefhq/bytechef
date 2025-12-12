@@ -35,11 +35,11 @@ import org.mockito.MockitoAnnotations;
 /**
  * @author Marko Kriskovic
  */
-class ProjectWorkflowToolsTest {
+class ChatProjectWorkflowToolsTest {
     @Mock
     private TaskTools taskTools;
 
-    private ProjectWorkflowTools projectWorkflowTools;
+    private ChatProjectWorkflowTools projectWorkflowTools;
 
     @BeforeEach
     void setUp() {
