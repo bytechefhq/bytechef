@@ -88,22 +88,20 @@ public class LiferayHeadlessAction {
         .perform(LiferayHeadlessAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String baseUri = connectionParameters.getRequiredString(BASE_URI);
-        String endpoint = inputParameters.getRequiredString(ENDPOINT);
-
-        String[] endpointParts = endpoint.split(" ");
-        String method = endpointParts[0];
-        String endpointUrl = endpointParts[1];
-
-        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointUrl;
-
-        Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
-
         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
             inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
             context);
+        Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
 
         Map<String, ?> pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
+
+        String endpoint = inputParameters.getRequiredString(ENDPOINT);
+
+        String[] endpointParts = endpoint.split(" ");
+
+        String baseUri = connectionParameters.getRequiredString(BASE_URI);
+
+        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointParts[1];
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
@@ -111,6 +109,8 @@ public class LiferayHeadlessAction {
 
             endpointUri = endpointUri.replace("{" + key + "}", value);
         }
+
+        String method = endpointParts[0];
 
         Executor executor = getExecutor(context, method, endpointUri);
 
