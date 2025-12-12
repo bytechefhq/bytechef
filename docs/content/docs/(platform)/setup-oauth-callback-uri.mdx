@@ -1,0 +1,85 @@
+---
+title: "Configuring OAuth Callback URI"
+description: "Fix OAuth redirect_uri_mismatch errors by configuring the correct callback URL for Gmail and other integrations."
+---
+
+When connecting Gmail or other OAuth-based integrations in your self-hosted Bytechef instance, you may get this error:
+
+```
+Error 400: redirect_uri_mismatch
+This app has sent an invalid request.
+```
+
+This usually means the callback URI was not configured properly.
+
+In some cases, Bytechef relies on a specific callback URL for connection, and OAuth providers (like Google) require that the redirect URI is correct.
+
+In this guide, you’ll learn how to fix the issue by manually configuring the callback URI using environment variables.
+
+## Why This Happens
+
+Google could reject OAuth requests where:
+
+- The domain differs (`localhost` vs `127.0.0.1`)
+- The port differs (`8080` vs another)
+- The path differs (`/callback` vs `/auth/callback`)
+
+Bytechef expects the redirect URI to be:
+
+```
+{BYTECHEF_PUBLIC_URL}/callback
+```
+
+If this environment variable isn't correct, Bytechef might use a default value that causes a mismatch with your OAuth provider's configuration.
+
+# How to Manually Set the OAuth Callback URL
+
+### 1. Remove the existing Bytechef container
+
+```bash
+docker stop bytechef # If you're currently running Bytechef.
+docker rm -f bytechef
+```
+
+### 2. Run Bytechef with a callback URL
+
+Add the environment variable `BYTECHEF_OAUTH_CALLBACK_URL`:
+
+```bash
+docker run --name bytechef -it -p 8080:8080 \
+  --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
+  --env BYTECHEF_DATASOURCE_USERNAME=postgres \
+  --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
+  --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=<YOUR_REMEMBER_ME_KEY> \
+  --env BYTECHEF_PUBLIC_URL=http://127.0.0.1:8080 \
+  --env BYTECHEF_OAUTH_CALLBACK_URL=http://127.0.0.1:8080/callback \
+  --network bytechef_network \
+  docker.bytechef.io/bytechef/bytechef:latest
+```
+
+> Take note of the callback URL environment variable:
+> 
+> - `-env BYTECHEF_OAUTH_CALLBACK_URL=http://127.0.0.1:8080/callback`
+
+### 3. Add the same redirect URI in your Google Cloud Console
+- Go to [Google Cloud Console](https://console.cloud.google.com/)
+- Navigate to APIs & Services → Credentials
+- Find your OAuth 2.0 Client ID and click the edit icon
+- Under Authorized redirect URIs, click + ADD URI
+- Add the exact callback URL
+
+```
+http://127.0.0.1:8080/callback
+```
+
+Also add yourself as a **Test User**.
+
+## 4. Restart and Test
+
+Visit:
+
+```
+http://127.0.0.1:8080
+```
+
+Then try reconnecting Gmail; the OAuth screen should now open correctly without the `redirect_uri_mismatch` error.
