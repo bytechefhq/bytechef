@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The HTTP method.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:36.540292+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-12T13:28:34.555950792+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public enum HttpMethodModel {
   
   DELETE("DELETE"),

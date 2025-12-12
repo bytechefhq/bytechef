@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:36.540292+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-12T13:28:34.555950792+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 @Validated
 @Tag(name = "api-connector", description = "The Platform API Connector Internal API")
 public interface ApiConnectorApi {
