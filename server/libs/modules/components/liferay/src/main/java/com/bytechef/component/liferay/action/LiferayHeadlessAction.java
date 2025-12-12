@@ -126,11 +126,16 @@ public class LiferayHeadlessAction {
 
         Executor executor = getExecutor(context, method, endpointUri);
 
-        Response response = executor.headers(getParameterValueMap(propertiesContainer.headerParameters(), properties))
-            .queryParameters(getParameterValueMap(propertiesContainer.queryParameters(), properties))
-            .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
-            .configuration(responseType(ResponseType.JSON))
-            .body(body)
+        Response response = executor.headers(
+                getParameterValueMap(propertiesContainer.headerParameters(), properties))
+            .queryParameters(
+                getParameterValueMap(propertiesContainer.queryParameters(), properties))
+            .configuration(
+                Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
+            .configuration(
+                responseType(ResponseType.JSON))
+            .body(
+                body)
             .execute();
 
         return response.getBody();
