@@ -45,6 +45,9 @@ import org.w3c.dom.NodeList;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings({
+    "XXE", "XPATH_INJECTION"
+})
 public class XmlUtils {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();

@@ -25,12 +25,14 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class FilesystemGetParentFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFilePath")

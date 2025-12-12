@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.customcomponent.loader;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,6 +22,7 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ComponentHandlerLoader {
 
     public static ComponentHandler loadComponentHandler(
