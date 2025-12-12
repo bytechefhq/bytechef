@@ -21,9 +21,19 @@ import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.NAME;
-import static com.bytechef.component.aitable.constant.AITableConstants.NOT_SUPPORTED_FIELD_TYPES;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.TYPE;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.ATTACHMENT;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.AUTO_NUMBER;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.BUTTON;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.CASCADER;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.CREATED_BY;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.CREATED_TIME;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.FORMULA;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.LAST_MODIFIED_BY;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.LAST_MODIFIED_TIME;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.MAGIC_LOOK_UP;
+import static com.bytechef.component.aitable.util.AITableUtils.FieldType.ONE_WAY_LINK;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -33,7 +43,6 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.aitable.constant.FieldType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context.Http;
@@ -50,6 +59,61 @@ import java.util.Map;
  * @author Monika Domiter
  */
 public class AITableUtils {
+
+    protected enum FieldType {
+
+        SINGLE_TEXT("SingleText"),
+        TEXT("Text"),
+        SINGLE_SELECT("SingleSelect"),
+        MULTI_SELECT("MultiSelect"),
+        NUMBER("Number"),
+        CURRENCY("Currency"),
+        PERCENT("Percent"),
+        DATE_TIME("DateTime"),
+        ATTACHMENT("Attachment"),
+        MEMBER("Member"),
+        CHECKBOX("Checkbox"),
+        RATING("Rating"),
+        URL("URL"),
+        PHONE("Phone"),
+        EMAIL("Email"),
+        WORK_DOC("WorkDoc"),
+        ONE_WAY_LINK("OneWayLink"),
+        TWO_WAY_LINK("TwoWayLink"),
+        MAGIC_LOOK_UP("MagicLookUp"),
+        FORMULA("Formula"),
+        AUTO_NUMBER("AutoNumber"),
+        CREATED_TIME("CreatedTime"),
+        LAST_MODIFIED_TIME("LastModifiedTime"),
+        CREATED_BY("CreatedBy"),
+        LAST_MODIFIED_BY("LastModifiedBy"),
+        BUTTON("Button"),
+        CASCADER("Cascader");
+
+        private final String name;
+
+        FieldType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static FieldType fromString(String text) {
+            for (FieldType fieldType : values()) {
+                if (fieldType.name.equalsIgnoreCase(text)) {
+                    return fieldType;
+                }
+            }
+
+            throw new IllegalArgumentException("Not supported field type: " + text);
+        }
+    }
+
+    private static final List<FieldType> NOT_SUPPORTED_FIELD_TYPES = List.of(
+        ATTACHMENT, AUTO_NUMBER, BUTTON, CASCADER, CREATED_BY, CREATED_TIME, FORMULA, LAST_MODIFIED_TIME,
+        LAST_MODIFIED_BY, MAGIC_LOOK_UP, ONE_WAY_LINK);
 
     private AITableUtils() {
     }
