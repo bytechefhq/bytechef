@@ -115,10 +115,6 @@ public class LiferayHeadlessAction {
                 .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p)))));
         }
 
-        Map<String, List<String>> headers = getParameterValueMap(propertiesContainer.headerParameters(), properties);
-
-        Map<String, List<String>> queryParameters = getParameterValueMap(propertiesContainer.queryParameters(), properties);
-
         Map<String, ?> pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
@@ -130,8 +126,8 @@ public class LiferayHeadlessAction {
 
         Executor executor = getExecutor(context, method, endpointUri);
 
-        Response response = executor.headers(headers)
-            .queryParameters(queryParameters)
+        Response response = executor.headers(getParameterValueMap(propertiesContainer.headerParameters(), properties))
+            .queryParameters(getParameterValueMap(propertiesContainer.queryParameters(), properties))
             .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(responseType(ResponseType.JSON))
             .body(body)
