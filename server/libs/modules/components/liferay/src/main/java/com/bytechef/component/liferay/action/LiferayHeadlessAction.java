@@ -93,17 +93,16 @@ public class LiferayHeadlessAction {
             context);
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
 
-        Map<String, ?> pathParameters = getParameterValueMap(propertiesContainer.pathParameters(), properties);
-
         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
         String[] endpointParts = endpoint.split(" ");
 
-        String endpointUri = getEndpointUri(inputParameters, connectionParameters, endpointParts, pathParameters);
-
-        String method = endpointParts[0];
-
-        Executor executor = getExecutor(context, method, endpointUri);
+        Executor executor = getExecutor(
+            context, endpointParts[0],
+            getEndpointUri(
+                inputParameters, connectionParameters, endpointParts[1],
+                getParameterValueMap(propertiesContainer.pathParameters(), properties))
+        );
 
         Response response = executor.headers(
                 getParameterValueMap(propertiesContainer.headerParameters(), properties))
@@ -121,12 +120,12 @@ public class LiferayHeadlessAction {
     }
 
     private static String getEndpointUri(
-        Parameters inputParameters, Parameters connectionParameters, String[] endpointParts,
+        Parameters inputParameters, Parameters connectionParameters, String applicationEndpoint,
         Map<String, ?> pathParameters) {
 
         String baseUri = connectionParameters.getRequiredString(BASE_URI);
 
-        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointParts[1];
+        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + applicationEndpoint;
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
