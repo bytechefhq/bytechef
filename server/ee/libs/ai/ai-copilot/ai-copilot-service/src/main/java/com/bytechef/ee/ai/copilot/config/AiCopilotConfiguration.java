@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -263,7 +264,7 @@ public class AiCopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptResource))
             .state(new State())
-            .tools(List.of(taskTools, projectWorkflowTools, projectTools))
+            .tools(new ArrayList<>(List.of(projectTools, projectWorkflowTools, taskTools)))
             .workflowService(workflowService)
             .build();
     }

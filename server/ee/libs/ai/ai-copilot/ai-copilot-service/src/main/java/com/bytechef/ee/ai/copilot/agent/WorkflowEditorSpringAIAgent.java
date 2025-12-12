@@ -14,6 +14,10 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.mcp.tool.automation.ChatProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ChatProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectTools;
+import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,10 +48,12 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             """;
 
     private final WorkflowService workflowService;
+    private final List<Object> tools;
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService)
         throws AGUIException {
         super(builder);
+        this.tools = builder.tools;
 
         this.workflowService = workflowService;
     }
@@ -59,6 +65,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         Workflow workflow = workflowService.getWorkflow((String) state.get("workflowId"));
+        String mode = (String) state.get("mode");
 
         contexts.add(new Context("Current Workflow Definition", workflow.getDefinition()));
 
@@ -76,12 +83,29 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         systemMessage.setId(String.valueOf(UUID.randomUUID()));
         systemMessage.setContent(message);
 
+        if (mode.equals("CHAT")) {
+            setChatTools();
+        } else if (mode.equals("BUILD")) {
+            setAllTools();
+        }
+
         return systemMessage;
+    }
+
+    private void setChatTools() {
+        tools.set(0, (ChatProjectTools) tools.get(0));
+        tools.set(1, (ChatProjectWorkflowTools) tools.get(1));
+    }
+
+    private void setAllTools() {
+        tools.set(0, (ProjectTools) tools.get(0));
+        tools.set(1, (ProjectWorkflowTools) tools.get(1));
     }
 
     public static class Builder extends SpringAIAgent.Builder {
 
         private WorkflowService workflowService;
+        private List<Object> tools;
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
@@ -101,8 +125,10 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder tools(List<Object> tools) {
             super.tools(tools);
+            this.tools = tools;
 
             return this;
         }
@@ -172,4 +198,5 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return new WorkflowEditorSpringAIAgent(this, workflowService);
         }
     }
+
 }
