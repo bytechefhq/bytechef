@@ -31,6 +31,14 @@ import {
     WorkflowTestConfigurationConnectionToJSON,
 } from '../models/index';
 
+export interface DeleteWorkflowTestConfigurationConnectionRequest {
+    workflowId: string;
+    workflowNodeName: string;
+    workflowConnectionKey: string;
+    environmentId: number;
+    saveWorkflowTestConfigurationConnectionRequest: SaveWorkflowTestConfigurationConnectionRequest;
+}
+
 export interface GetWorkflowTestConfigurationRequest {
     workflowId: string;
     environmentId: number;
@@ -65,6 +73,81 @@ export interface SaveWorkflowTestConfigurationInputsOperationRequest {
  * 
  */
 export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
+
+    /**
+     * Delete a workflow test configuration connection.
+     * Delete a workflow test configuration connection
+     */
+    async deleteWorkflowTestConfigurationConnectionRaw(requestParameters: DeleteWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling deleteWorkflowTestConfigurationConnection().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling deleteWorkflowTestConfigurationConnection().'
+            );
+        }
+
+        if (requestParameters['workflowConnectionKey'] == null) {
+            throw new runtime.RequiredError(
+                'workflowConnectionKey',
+                'Required parameter "workflowConnectionKey" was null or undefined when calling deleteWorkflowTestConfigurationConnection().'
+            );
+        }
+
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling deleteWorkflowTestConfigurationConnection().'
+            );
+        }
+
+        if (requestParameters['saveWorkflowTestConfigurationConnectionRequest'] == null) {
+            throw new runtime.RequiredError(
+                'saveWorkflowTestConfigurationConnectionRequest',
+                'Required parameter "saveWorkflowTestConfigurationConnectionRequest" was null or undefined when calling deleteWorkflowTestConfigurationConnection().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections`;
+        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace(`{${"workflowConnectionKey"}}`, encodeURIComponent(String(requestParameters['workflowConnectionKey'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SaveWorkflowTestConfigurationConnectionRequestToJSON(requestParameters['saveWorkflowTestConfigurationConnectionRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete a workflow test configuration connection.
+     * Delete a workflow test configuration connection
+     */
+    async deleteWorkflowTestConfigurationConnection(requestParameters: DeleteWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteWorkflowTestConfigurationConnectionRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Get a workflow test configuration.

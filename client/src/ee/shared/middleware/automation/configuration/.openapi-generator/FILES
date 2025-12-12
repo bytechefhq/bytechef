@@ -1,6 +1,10 @@
 apis/ProjectGitApi.ts
 apis/WorkspaceApi.ts
 apis/index.ts
+docs/ProjectGitApi.md
+docs/ProjectGitConfiguration.md
+docs/Workspace.md
+docs/WorkspaceApi.md
 index.ts
 models/ProjectGitConfiguration.ts
 models/Workspace.ts

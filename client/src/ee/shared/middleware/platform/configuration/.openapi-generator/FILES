@@ -1,6 +1,11 @@
 apis/AiProviderApi.ts
 apis/GitConfigurationApi.ts
 apis/index.ts
+docs/AiProvider.md
+docs/AiProviderApi.md
+docs/GitConfiguration.md
+docs/GitConfigurationApi.md
+docs/UpdateAiProviderRequest.md
 index.ts
 models/AiProvider.ts
 models/GitConfiguration.ts

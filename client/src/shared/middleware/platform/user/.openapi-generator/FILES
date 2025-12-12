@@ -1,5 +1,7 @@
 apis/AuthorityApi.ts
 apis/index.ts
+docs/Authority.md
+docs/AuthorityApi.md
 index.ts
 models/Authority.ts
 models/index.ts

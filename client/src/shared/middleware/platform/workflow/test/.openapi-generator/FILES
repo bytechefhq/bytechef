@@ -1,5 +1,17 @@
 apis/WorkflowTestApi.ts
 apis/index.ts
+docs/ComponentConnection.md
+docs/ExecutionError.md
+docs/Job.md
+docs/TaskExecution.md
+docs/TestWorkflowRequest.md
+docs/TriggerExecution.md
+docs/Webhook.md
+docs/WebhookRetry.md
+docs/WorkflowTask.md
+docs/WorkflowTestApi.md
+docs/WorkflowTestExecution.md
+docs/WorkflowTrigger.md
 index.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
