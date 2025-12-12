@@ -614,6 +614,53 @@ paths:
         "204":
           description: "Successful operation."
   /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections:
+    delete:
+      description: "Delete a workflow test configuration connection."
+      summary: "Delete a workflow test configuration connection"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "deleteWorkflowTestConfigurationConnection"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowConnectionKey"
+          description: "The key of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "connectionId"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
     put:
       description: "Save a workflow test configuration connection."
       summary: "Save a workflow test configuration connection"
