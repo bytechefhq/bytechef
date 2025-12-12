@@ -118,15 +118,9 @@ public class LiferayHeadlessAction {
                 .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p)))));
         }
 
-        headers = propertiesContainer.headerParameters()
-            .stream()
-            .filter(properties::containsKey)
-            .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+        headers = getParameterValueMap(propertiesContainer.headerParameters(), properties);
 
-        queryParameters = propertiesContainer.queryParameters()
-            .stream()
-            .filter(properties::containsKey)
-            .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+        queryParameters = getParameterValueMap(propertiesContainer.queryParameters(), properties);
 
         pathParameters = propertiesContainer.headerParameters()
             .stream()
@@ -150,6 +144,20 @@ public class LiferayHeadlessAction {
             .execute();
 
         return response.getBody();
+    }
+
+    private static Map<String, List<String>> getParameterValueMap(
+        List<String> parameterNames, Map<String, ?> properties) {
+
+        return parameterNames
+            .stream()
+            .filter(
+                properties::containsKey
+            ).collect(
+                Collectors.toMap(
+            parameterName -> parameterName,
+            parameterName -> List.of(String.valueOf(properties.get(parameterName))))
+            );
     }
 
     private static Executor getExecutor(Context context, String method, String finalEndpointUri) {
