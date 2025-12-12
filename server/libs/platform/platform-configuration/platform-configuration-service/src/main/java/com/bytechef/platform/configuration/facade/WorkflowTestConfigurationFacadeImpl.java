@@ -115,6 +115,16 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value, environmentId);
     }
 
+    @Override
+    public void deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
+        long environmentId) {
+
+        // No validation is required for deletion; if it exists, remove it. Otherwise it's a no-op.
+        workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(
+            workflowId, workflowNodeName, workflowConnectionKey, environmentId);
+    }
+
     private static Map<String, String> getInputs(
         Workflow workflow, WorkflowTestConfiguration workflowTestConfiguration) {
 
