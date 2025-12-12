@@ -98,6 +98,13 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
+    public void deleteWorkflowTestConfigurationConnection(
+        String workflowId, String workflowNodeName, String key, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long connectionId, boolean workflowNodeTrigger,
         long environmentId) {
