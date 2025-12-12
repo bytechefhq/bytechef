@@ -3,6 +3,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
@@ -28,4 +29,5 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:on-error"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
+    implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 }

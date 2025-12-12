@@ -132,6 +132,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:on-error"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
+    implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
