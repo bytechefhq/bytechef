@@ -19,20 +19,22 @@ package com.bytechef.component.productboard.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.productboard.constant.ProductboardConstants.DATA;
 import static com.bytechef.component.productboard.constant.ProductboardConstants.ID;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
-import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -43,79 +45,189 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  */
-public class ProductboardUtilsTest {
+class ProductboardUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    @Test
-    void testGetNoteIdOptions() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(DATA, List.of(Map.of("title", "name", "id", "abc"))));
-
-        assertEquals(
-            List.of(option("name", "abc")),
-            ProductboardUtils.getNoteIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-    }
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testCreateSubscription() {
         String webhookUrl = "testWebhookUrl";
         String workflowExecutionId = "testWorkflowExecutionId";
 
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of(ID, "123")));
 
-        WebhookEnableOutput result =
-            ProductboardUtils.createSubscription(webhookUrl, workflowExecutionId, mockedTriggerContext, "event");
+        WebhookEnableOutput result = ProductboardUtils.createSubscription(
+            webhookUrl, workflowExecutionId, mockedTriggerContext, "event");
 
-        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
+        assertEquals(new WebhookEnableOutput(Map.of(ID, "123"), null), result);
+        assertEquals(Http.Body.of(
+            Map.of(
+                DATA, Map.of(
+                    "name", "Webhook for " + workflowExecutionId,
+                    "events", List.of(Map.of("eventType", "event")),
+                    "notification", Map.of("url", webhookUrl, "version", 1))),
+            Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
 
-        assertEquals(expectedWebhookEnableOutput, result);
-        assertEquals(List.of("X-Version", "1"), stringArgumentCaptor.getAllValues());
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        assertNotNull(capturedFunction);
 
-        assertEquals(Map.of(
-            DATA, Map.of(
-                "name", "Webhook for " + workflowExecutionId,
-                "events", List.of(Map.of("eventType", "event")),
-                "notification", Map.of("url", webhookUrl, "version", 1))),
-            body.getContent());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetNoteIdOptions() {
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of(DATA, List.of(Map.of("title", "123", "id", "abc")), "pageCursor", "pg"),
+                Map.of(DATA, List.of(Map.of("title", "234", "id", "def"))));
+
+        assertEquals(
+            List.of(option("123", "abc"), option("234", "def")),
+            ProductboardUtils.getNoteIdOptions(null, null, null, null, mockedContext));
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(List.of("/notes", "/notes"), stringArgumentCaptor.getAllValues());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(2, objectsArgumentCaptorAllValues.size());
+
+        Object[] objects1 = new Object[] {
+            "pageLimit", 2000, "pageCursor", null
+        };
+        Object[] objects2 = new Object[] {
+            "pageLimit", 2000, "pageCursor", "pg"
+        };
+
+        assertArrayEquals(objects1, objectsArgumentCaptorAllValues.getFirst());
+        assertArrayEquals(objects2, objectsArgumentCaptorAllValues.getLast());
+    }
+
+    @Test
+    void testGetFeatureIdOptions() {
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of(
+                    DATA, List.of(Map.of("name", "Feature A", ID, "fa")),
+                    "links", Map.of("next", "/features?page=2")),
+                Map.of(
+                    DATA, List.of(Map.of("name", "Feature B", ID, "fb"))));
+
+        List<Option<String>> options = ProductboardUtils.getFeatureIdOptions(
+            null, null, null, null, mockedContext);
+
+        assertEquals(List.of(option("Feature A", "fa"), option("Feature B", "fb")), options);
+
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(List.of("/features", "/features?page=2"), stringArgumentCaptor.getAllValues());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(1, objectsArgumentCaptorAllValues.size());
+
+        Object[] objects1 = new Object[] {
+            "pageLimit", 1000
+        };
+
+        assertArrayEquals(objects1, objectsArgumentCaptorAllValues.getFirst());
     }
 
     @Test
     void testDeleteSubscription() {
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
         ProductboardUtils.deleteSubscription(mockedTriggerContext, "webhookId");
 
-        assertEquals(List.of("X-Version", "1"), stringArgumentCaptor.getAllValues());
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+        assertEquals("/webhooks/webhookId", stringArgumentCaptor.getValue());
     }
 
     @Test
@@ -123,9 +235,8 @@ public class ProductboardUtilsTest {
         when(mockedHttpParameters.toMap())
             .thenReturn(Map.of("validationToken", List.of("token")));
 
-        WebhookValidateResponse webhookValidateResponse =
-            ProductboardUtils.webhookValidateOnEnable(mockedParameters, mock(HttpHeaders.class), mockedHttpParameters,
-                mock(WebhookBody.class), mock(WebhookMethod.class), mockedTriggerContext);
+        WebhookValidateResponse webhookValidateResponse = ProductboardUtils.webhookValidateOnEnable(
+            null, null, mockedHttpParameters, null, null, null);
 
         assertEquals(new WebhookValidateResponse("token", 200), webhookValidateResponse);
     }
