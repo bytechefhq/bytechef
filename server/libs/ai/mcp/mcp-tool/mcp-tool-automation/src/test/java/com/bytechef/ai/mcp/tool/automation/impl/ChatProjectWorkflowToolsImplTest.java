@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.automation.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,16 +35,16 @@ import org.mockito.MockitoAnnotations;
 /**
  * @author Marko Kriskovic
  */
-class ChatProjectWorkflowToolsTest {
+class ChatProjectWorkflowToolsImplTest {
     @Mock
     private TaskTools taskTools;
 
-    private ChatProjectWorkflowTools projectWorkflowTools;
+    private ChatProjectWorkflowToolsImpl projectWorkflowTools;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        projectWorkflowTools = new ProjectWorkflowTools(null, taskTools);
+        projectWorkflowTools = new ProjectWorkflowToolsImpl(null, taskTools);
     }
 
     @Test

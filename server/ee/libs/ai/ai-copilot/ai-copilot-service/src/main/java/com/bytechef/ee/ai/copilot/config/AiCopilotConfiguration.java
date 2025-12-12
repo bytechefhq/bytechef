@@ -9,8 +9,8 @@ package com.bytechef.ee.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
-import com.bytechef.ai.mcp.tool.automation.ProjectTools;
-import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -252,8 +252,8 @@ public class AiCopilotConfiguration {
 
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
-        ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, WorkflowService workflowService)
+        ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
+        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, WorkflowService workflowService)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
