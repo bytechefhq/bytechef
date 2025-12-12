@@ -99,16 +99,7 @@ public class LiferayHeadlessAction {
 
         String[] endpointParts = endpoint.split(" ");
 
-        String baseUri = connectionParameters.getRequiredString(BASE_URI);
-
-        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointParts[1];
-
-        for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
-            String key = entry.getKey();
-            String value = String.valueOf(entry.getValue());
-
-            endpointUri = endpointUri.replace("{" + key + "}", value);
-        }
+        String endpointUri = getEndpointUri(inputParameters, connectionParameters, endpointParts, pathParameters);
 
         String method = endpointParts[0];
 
@@ -127,6 +118,23 @@ public class LiferayHeadlessAction {
             .execute();
 
         return response.getBody();
+    }
+
+    private static String getEndpointUri(
+        Parameters inputParameters, Parameters connectionParameters, String[] endpointParts,
+        Map<String, ?> pathParameters) {
+
+        String baseUri = connectionParameters.getRequiredString(BASE_URI);
+
+        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointParts[1];
+
+        for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
+            String key = entry.getKey();
+            String value = String.valueOf(entry.getValue());
+
+            endpointUri = endpointUri.replace("{" + key + "}", value);
+        }
+        return endpointUri;
     }
 
     private static Map<String, List<String>> getParameterValueMap(
