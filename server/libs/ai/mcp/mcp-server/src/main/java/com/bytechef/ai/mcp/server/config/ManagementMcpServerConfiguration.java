@@ -17,8 +17,8 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
-import com.bytechef.ai.mcp.tool.automation.ProjectTools;
-import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -54,13 +54,13 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
 
-    private final ProjectTools projectTools;
-    private final ProjectWorkflowTools projectWorkflowTools;
+    private final ProjectToolsImpl projectTools;
+    private final ProjectWorkflowToolsImpl projectWorkflowTools;
     private final TaskTools taskTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools) {
+        ProjectToolsImpl projectTools, ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools) {
 
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;

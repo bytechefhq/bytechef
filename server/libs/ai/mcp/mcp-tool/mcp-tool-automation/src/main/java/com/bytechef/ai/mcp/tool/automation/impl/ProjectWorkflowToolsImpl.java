@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.automation.impl;
 
+import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
@@ -43,9 +44,9 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
-public class ProjectWorkflowTools {
+public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowToolsImpl.class);
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final TaskTools taskTools;
@@ -67,11 +68,171 @@ public class ProjectWorkflowTools {
         """;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowTools(ProjectWorkflowFacade projectWorkflowFacade, TaskTools taskTools) {
+    public ProjectWorkflowToolsImpl(ProjectWorkflowFacade projectWorkflowFacade, TaskTools taskTools) {
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.taskTools = taskTools;
     }
 
+    @Override
+    @Tool(
+        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
+    public ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
+
+        try {
+            ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Retrieved workflow {}", projectWorkflowDTO.getProjectWorkflowId());
+            }
+
+            return new ProjectWorkflowToolsImpl.WorkflowInfo(
+                projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
+                projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
+                projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
+                projectWorkflowDTO.getVersion(),
+                projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
+                projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+        } catch (Exception e) {
+            logger.error("Failed to get workflow {}", workflowId, e);
+
+            throw new RuntimeException("Failed to get workflow: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @SuppressFBWarnings("VA")
+    @Tool(description = "Instructions for building workflows")
+    public String getWorkflowBuildInstructions() {
+        return """
+            The workflow needs to be in JSON format similar to:
+            %s
+
+            - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
+
+            Output properties:
+            Some tasks have output properties that you get with getTaskOutputProperty() tool. Output property is a response to the task.
+            For example: the action getMail will probably have the mail parameters as an output.
+            You can reference the output property in a format similar to:
+            ${taskName.property}
+            ${taskName.arrayProperty[1]}
+            ${taskName.objectProperty.property}}
+            """
+            .formatted(DEFAULT_DEFINITION);
+    }
+
+    @Override
+    @Tool(
+        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
+    public List<WorkflowInfo> listWorkflows(
+        @ToolParam(description = "The ID of the project") long projectId) {
+
+        try {
+            List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
+
+            List<ProjectWorkflowToolsImpl.WorkflowInfo> workflowInfos = workflows.stream()
+                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(workflow.getId(),
+                    workflow.getProjectWorkflowId(),
+                    workflow.getWorkflowUuid(),
+                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
+                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} projects", workflowInfos.size());
+            }
+
+            return workflowInfos;
+        } catch (Exception e) {
+            logger.error("Failed to list project workflows", e);
+
+            throw new RuntimeException("Failed to list project workflows: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Tool(
+        description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
+    public List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(
+        @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
+        @ToolParam(required = false, description = "The ID of the project") Long projectId) {
+
+        try {
+            List<ProjectWorkflowDTO> allWorkflows =
+                projectId != null ? projectWorkflowFacade.getProjectWorkflows(projectId)
+                    : projectWorkflowFacade.getProjectWorkflows();
+
+            String lowerQuery = StringUtils.trim(query.toLowerCase());
+
+            List<ProjectWorkflowToolsImpl.WorkflowInfo> matchingWorkflow = allWorkflows.stream()
+                .filter(workflow -> {
+                    String name = workflow.getLabel();
+
+                    name = name != null ? name.toLowerCase() : "";
+
+                    String description = workflow.getDescription();
+
+                    description = description != null ? description.toLowerCase() : "";
+
+                    return name.contains(lowerQuery) || description.contains(lowerQuery);
+                })
+                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(
+                    workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
+                    workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
+                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
+                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
+                .toList();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} workflows matching query '{}'", matchingWorkflow.size(), query);
+            }
+
+            return matchingWorkflow;
+        } catch (Exception e) {
+            logger.error("Failed to search workflows with query '{}'", query, e);
+            throw new RuntimeException("Failed to search workflows: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Tool(
+        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
+    public ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(
+        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
+
+        try {
+            StringBuilder errors = new StringBuilder("[");
+            StringBuilder warnings = new StringBuilder("[");
+
+            WorkflowValidator.validateWorkflow(
+                workflow, this::getTaskProperties, this::getTaskOutputProperty, new HashMap<>(),
+                new HashMap<>(), errors, warnings);
+
+            errors.append("]");
+
+            String errorMessages = StringUtils.trim(errors.toString());
+
+            boolean isValid = errorMessages.equals("[]");
+
+            warnings.append("]");
+
+            String warningMessages = StringUtils.trim(warnings.toString());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid, errorMessages, warningMessages);
+            }
+
+            return new ProjectWorkflowToolsImpl.WorkflowValidationResult(isValid, errorMessages, warningMessages);
+        } catch (Exception e) {
+            logger.error("Failed to validate workflow", e);
+
+            throw new RuntimeException("Failed to validate workflow", e);
+        }
+    }
+
+    @Override
     @Tool(
         description = "Create a new workflow in a ByteChef project. Returns the created workflow information including id, project id, workflow id, and reference code.")
     public ProjectWorkflowInfo createProjectWorkflow(
@@ -100,6 +261,7 @@ public class ProjectWorkflowTools {
         }
     }
 
+    @Override
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId) {
@@ -122,123 +284,7 @@ public class ProjectWorkflowTools {
         }
     }
 
-    @Tool(
-        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
-    public WorkflowInfo getWorkflow(
-        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
-
-        try {
-            ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Retrieved workflow {}", projectWorkflowDTO.getProjectWorkflowId());
-            }
-
-            return new WorkflowInfo(
-                projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
-                projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
-                projectWorkflowDTO.getDescription(), projectWorkflowDTO.getDefinition(),
-                projectWorkflowDTO.getVersion(),
-                projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
-                projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
-        } catch (Exception e) {
-            logger.error("Failed to get workflow {}", workflowId, e);
-
-            throw new RuntimeException("Failed to get workflow: " + e.getMessage(), e);
-        }
-    }
-
-    @SuppressFBWarnings("VA")
-    @Tool(description = "Instructions for building workflows")
-    public String getWorkflowBuildInstructions() {
-        return """
-            The workflow needs to be in JSON format similar to:
-            %s
-
-            - Every workflow must only have one trigger, but as many actions or task dispatchers as needed
-
-            Output properties:
-            Some tasks have output properties that you get with getTaskOutputProperty() tool. Output property is a response to the task.
-            For example: the action getMail will probably have the mail parameters as an output.
-            You can reference the output property in a format similar to:
-            ${taskName.property}
-            ${taskName.arrayProperty[1]}
-            ${taskName.objectProperty.property}}
-            """
-            .formatted(DEFAULT_DEFINITION);
-    }
-
-    @Tool(
-        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
-    public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId) {
-
-        try {
-            List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
-
-            List<WorkflowInfo> workflowInfos = workflows.stream()
-                .map(workflow -> new WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
-                    workflow.getWorkflowUuid(),
-                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
-                .toList();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} projects", workflowInfos.size());
-            }
-
-            return workflowInfos;
-        } catch (Exception e) {
-            logger.error("Failed to list project workflows", e);
-
-            throw new RuntimeException("Failed to list project workflows: " + e.getMessage(), e);
-        }
-    }
-
-    @Tool(
-        description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
-    public List<WorkflowInfo> searchWorkflows(
-        @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
-        @ToolParam(required = false, description = "The ID of the project") Long projectId) {
-
-        try {
-            List<ProjectWorkflowDTO> allWorkflows =
-                projectId != null ? projectWorkflowFacade.getProjectWorkflows(projectId)
-                    : projectWorkflowFacade.getProjectWorkflows();
-
-            String lowerQuery = StringUtils.trim(query.toLowerCase());
-
-            List<WorkflowInfo> matchingWorkflow = allWorkflows.stream()
-                .filter(workflow -> {
-                    String name = workflow.getLabel();
-
-                    name = name != null ? name.toLowerCase() : "";
-
-                    String description = workflow.getDescription();
-
-                    description = description != null ? description.toLowerCase() : "";
-
-                    return name.contains(lowerQuery) || description.contains(lowerQuery);
-                })
-                .map(workflow -> new WorkflowInfo(
-                    workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
-                    workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
-                .toList();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} workflows matching query '{}'", matchingWorkflow.size(), query);
-            }
-
-            return matchingWorkflow;
-        } catch (Exception e) {
-            logger.error("Failed to search workflows with query '{}'", query, e);
-            throw new RuntimeException("Failed to search workflows: " + e.getMessage(), e);
-        }
-    }
-
+    @Override
     @Tool(
         description = "Update the workflow definition. Returns the updated workflow id, name and definition.")
     public WorkflowInfo updateWorkflow(
@@ -269,42 +315,6 @@ public class ProjectWorkflowTools {
             logger.error("Failed to update workflow {}", workflowId, e);
 
             throw new RuntimeException("Failed to update workflow: " + e.getMessage(), e);
-        }
-    }
-
-    @Tool(
-        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
-    public WorkflowValidationResult validateWorkflow(
-        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
-
-        try {
-            StringBuilder errors = new StringBuilder("[");
-            StringBuilder warnings = new StringBuilder("[");
-
-            WorkflowValidator.validateWorkflow(
-                workflow, this::getTaskProperties, this::getTaskOutputProperty, new HashMap<>(),
-                new HashMap<>(), errors, warnings);
-
-            errors.append("]");
-
-            String errorMessages = StringUtils.trim(errors.toString());
-
-            boolean isValid = errorMessages.equals("[]");
-
-            warnings.append("]");
-
-            String warningMessages = StringUtils.trim(warnings.toString());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid, errorMessages, warningMessages);
-            }
-
-            return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
-        } catch (Exception e) {
-            logger.error("Failed to validate workflow", e);
-
-            throw new RuntimeException("Failed to validate workflow", e);
         }
     }
 

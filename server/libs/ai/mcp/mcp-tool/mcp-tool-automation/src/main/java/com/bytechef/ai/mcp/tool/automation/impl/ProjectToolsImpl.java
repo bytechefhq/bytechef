@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.automation.impl;
 
+import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
@@ -45,39 +46,28 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ProjectTools {
+public class ProjectToolsImpl implements ProjectTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectTools.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectToolsImpl.class);
 
     private final ProjectService projectService;
     private final ProjectDeploymentService projectDeploymentService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTools(ProjectService projectService, ProjectDeploymentService projectDeploymentService) {
+    public ProjectToolsImpl(ProjectService projectService, ProjectDeploymentService projectDeploymentService) {
         this.projectService = projectService;
         this.projectDeploymentService = projectDeploymentService;
     }
 
+    @Override
     @Tool(
         description = "List all projects in ByteChef. Returns a list of projects with their basic information including id, name, description, and status.")
-    public List<ProjectInfo> listProjects() {
+    public List<ProjectToolsImpl.ProjectInfo> listProjects() {
         try {
             List<Project> projects = projectService.getProjects();
 
-            List<ProjectInfo> projectInfos = projects.stream()
-                .map(project -> {
-                    Instant lastPublishedDate = project.getLastPublishedDate();
-
-                    Status lastStatus = Status.PUBLISHED;
-
-                    if (lastPublishedDate == null) {
-                        lastStatus = Status.DRAFT;
-                    }
-
-                    return new ProjectInfo(
-                        project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
-                        project.getCreatedDate(), project.getLastModifiedDate());
-                })
+            List<ProjectToolsImpl.ProjectInfo> projectInfos = projects.stream()
+                .map(ProjectToolsImpl::getProjectInfo)
                 .collect(Collectors.toList());
 
             if (logger.isDebugEnabled()) {
@@ -92,9 +82,10 @@ public class ProjectTools {
         }
     }
 
+    @Override
     @Tool(
         description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
-    public ProjectDetailInfo getProject(
+    public ProjectToolsImpl.ProjectDetailInfo getProject(
         @ToolParam(description = "The ID of the project to retrieve") long projectId) {
 
         try {
@@ -105,18 +96,18 @@ public class ProjectTools {
                 logger.debug("Retrieved project {} with {} versions", projectId, projectVersions.size());
             }
 
-            Status lastStatus = project.getLastStatus();
-            List<ProjectVersionInfo> projectVersionInfos = projectVersions.stream()
+            ProjectVersion.Status lastStatus = project.getLastStatus();
+            List<ProjectToolsImpl.ProjectVersionInfo> projectVersionInfos = projectVersions.stream()
                 .map(pv -> {
-                    Status status = pv.getStatus();
+                    ProjectVersion.Status status = pv.getStatus();
 
-                    return new ProjectVersionInfo(
+                    return new ProjectToolsImpl.ProjectVersionInfo(
                         pv.getVersion(), status.name(), pv.getDescription(),
                         pv.getPublishedDate() != null ? pv.getPublishedDate() : null);
                 })
                 .collect(Collectors.toList());
 
-            return new ProjectDetailInfo(
+            return new ProjectToolsImpl.ProjectDetailInfo(
                 project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
                 project.getCategoryId(), project.getWorkspaceId(), project.getTagIds(),
                 projectVersionInfos, project.getCreatedDate(), project.getLastModifiedDate(),
@@ -128,6 +119,83 @@ public class ProjectTools {
         }
     }
 
+    @Override
+    @Tool(
+        description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
+    public List<ProjectToolsImpl.ProjectInfo> searchProjects(
+        @ToolParam(description = "The search query to match against project names and descriptions") String query) {
+
+        try {
+            List<Project> allProjects = projectService.getProjects();
+            query = query.toLowerCase();
+
+            String lowerQuery = query.trim();
+
+            List<ProjectToolsImpl.ProjectInfo> matchingProjects = allProjects.stream()
+                .filter(project -> {
+                    String name = project.getName();
+
+                    name = name != null ? name.toLowerCase() : "";
+
+                    String description = project.getDescription();
+
+                    description = description != null ? description.toLowerCase() : "";
+
+                    return name.contains(lowerQuery) || description.contains(lowerQuery);
+                })
+                .map(ProjectToolsImpl::getProjectInfo)
+                .collect(Collectors.toList());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} projects matching query '{}'", matchingProjects.size(), query);
+            }
+
+            return matchingProjects;
+        } catch (Exception e) {
+            logger.error("Failed to search projects with query '{}'", query, e);
+            throw new RuntimeException("Failed to search projects: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Tool(
+        description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
+    public ProjectToolsImpl.ProjectStatusInfo getProjectStatus(
+        @ToolParam(description = "The ID of the project to get status for") long projectId) {
+
+        try {
+            Project project = projectService.getProject(projectId);
+            List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments(projectId);
+
+            List<ProjectToolsImpl.ProjectDeploymentStatusInfo> deploymentStatuses = deployments.stream()
+                .map(deployment -> {
+                    Environment environment = deployment.getEnvironment();
+
+                    return new ProjectToolsImpl.ProjectDeploymentStatusInfo(
+                        deployment.getId(), environment.name(), deployment.isEnabled(),
+                        projectDeploymentService.isProjectDeploymentEnabled(deployment.getId()),
+                        deployment.getCreatedDate() != null ? deployment.getCreatedDate() : null,
+                        deployment.getLastModifiedDate() != null ? deployment.getLastModifiedDate() : null);
+                })
+                .collect(Collectors.toList());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Retrieved status for project {} with {} deployments", projectId,
+                    deploymentStatuses.size());
+            }
+
+            ProjectVersion.Status lastStatus = project.getLastStatus();
+            return new ProjectToolsImpl.ProjectStatusInfo(
+                project.getId(), project.getName(), lastStatus.name(), project.isPublished(),
+                project.getLastProjectVersion(),
+                project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
+        } catch (Exception e) {
+            logger.error("Failed to get status for project {}", projectId, e);
+            throw new RuntimeException("Failed to get project status: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     @Tool(
         description = "Create a new project with workflows. Returns the created project information including id, name, description, and status.")
     public ProjectInfo createProject(
@@ -180,6 +248,7 @@ public class ProjectTools {
         }
     }
 
+    @Override
     @Tool(
         description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status.")
     public ProjectInfo updateProject(
@@ -222,6 +291,7 @@ public class ProjectTools {
         }
     }
 
+    @Override
     @Tool(
         description = "Delete a project and all its workflows. Returns a confirmation message.")
     public String deleteProject(
@@ -246,91 +316,7 @@ public class ProjectTools {
         }
     }
 
-    @Tool(
-        description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
-    public List<ProjectInfo> searchProjects(
-        @ToolParam(description = "The search query to match against project names and descriptions") String query) {
-
-        try {
-            List<Project> allProjects = projectService.getProjects();
-            query = query.toLowerCase();
-
-            String lowerQuery = query.trim();
-
-            List<ProjectInfo> matchingProjects = allProjects.stream()
-                .filter(project -> {
-                    String name = project.getName();
-
-                    name = name != null ? name.toLowerCase() : "";
-
-                    String description = project.getDescription();
-
-                    description = description != null ? description.toLowerCase() : "";
-
-                    return name.contains(lowerQuery) || description.contains(lowerQuery);
-                })
-                .map(project -> {
-                    Instant lastPublishedDate = project.getLastPublishedDate();
-                    Status lastStatus = Status.PUBLISHED;
-
-                    if (lastPublishedDate == null) {
-                        lastStatus = Status.DRAFT;
-                    }
-
-                    return new ProjectInfo(
-                        project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
-                        project.getCreatedDate(), project.getLastModifiedDate());
-                })
-                .collect(Collectors.toList());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} projects matching query '{}'", matchingProjects.size(), query);
-            }
-
-            return matchingProjects;
-        } catch (Exception e) {
-            logger.error("Failed to search projects with query '{}'", query, e);
-            throw new RuntimeException("Failed to search projects: " + e.getMessage(), e);
-        }
-    }
-
-    @Tool(
-        description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
-    public ProjectStatusInfo getProjectStatus(
-        @ToolParam(description = "The ID of the project to get status for") long projectId) {
-
-        try {
-            Project project = projectService.getProject(projectId);
-            List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments(projectId);
-
-            List<ProjectDeploymentStatusInfo> deploymentStatuses = deployments.stream()
-                .map(deployment -> {
-                    Environment environment = deployment.getEnvironment();
-
-                    return new ProjectDeploymentStatusInfo(
-                        deployment.getId(), environment.name(), deployment.isEnabled(),
-                        projectDeploymentService.isProjectDeploymentEnabled(deployment.getId()),
-                        deployment.getCreatedDate() != null ? deployment.getCreatedDate() : null,
-                        deployment.getLastModifiedDate() != null ? deployment.getLastModifiedDate() : null);
-                })
-                .collect(Collectors.toList());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Retrieved status for project {} with {} deployments", projectId,
-                    deploymentStatuses.size());
-            }
-
-            Status lastStatus = project.getLastStatus();
-            return new ProjectStatusInfo(
-                project.getId(), project.getName(), lastStatus.name(), project.isPublished(),
-                project.getLastProjectVersion(),
-                project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
-        } catch (Exception e) {
-            logger.error("Failed to get status for project {}", projectId, e);
-            throw new RuntimeException("Failed to get project status: " + e.getMessage(), e);
-        }
-    }
-
+    @Override
     @Tool(
         description = "Publish a project version for deployment. Returns the published project version information.")
     public ProjectPublishInfo publishProject(
@@ -354,6 +340,20 @@ public class ProjectTools {
             logger.error("Failed to publish project {}", projectId, e);
             throw new RuntimeException("Failed to publish project: " + e.getMessage(), e);
         }
+    }
+
+    private static ProjectInfo getProjectInfo(Project project) {
+        Instant lastPublishedDate = project.getLastPublishedDate();
+
+        Status lastStatus = Status.PUBLISHED;
+
+        if (lastPublishedDate == null) {
+            lastStatus = Status.DRAFT;
+        }
+
+        return new ProjectInfo(
+            project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
+            project.getCreatedDate(), project.getLastModifiedDate());
     }
 
     /**
@@ -381,7 +381,7 @@ public class ProjectTools {
         @JsonProperty("category_id") @JsonPropertyDescription("The category ID of the project") Long categoryId,
         @JsonProperty("workspace_id") @JsonPropertyDescription("The workspace ID of the project") Long workspaceId,
         @JsonProperty("tag_ids") @JsonPropertyDescription("The tag IDs associated with the project") List<Long> tagIds,
-        @JsonProperty("versions") @JsonPropertyDescription("The versions of the project") List<ProjectVersionInfo> versions,
+        @JsonProperty("versions") @JsonPropertyDescription("The versions of the project") List<ProjectToolsImpl.ProjectVersionInfo> versions,
         @JsonProperty("created_date") @JsonPropertyDescription("When the project was created") Instant createdDate,
         @JsonProperty("last_modified_date") @JsonPropertyDescription("When the project was last modified") Instant lastModifiedDate,
         @JsonProperty("last_published_date") @JsonPropertyDescription("When the project was last published") Instant lastPublishedDate) {
@@ -409,7 +409,7 @@ public class ProjectTools {
         @JsonProperty("is_published") @JsonPropertyDescription("Whether the project is published") boolean isPublished,
         @JsonProperty("last_version") @JsonPropertyDescription("The last version number") int lastVersion,
         @JsonProperty("last_published_date") @JsonPropertyDescription("When the project was last published") Instant lastPublishedDate,
-        @JsonProperty("deployments") @JsonPropertyDescription("The deployment status information") List<ProjectDeploymentStatusInfo> deployments) {
+        @JsonProperty("deployments") @JsonPropertyDescription("The deployment status information") List<ProjectToolsImpl.ProjectDeploymentStatusInfo> deployments) {
     }
 
     /**
