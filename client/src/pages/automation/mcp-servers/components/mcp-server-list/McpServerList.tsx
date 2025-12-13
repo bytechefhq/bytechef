@@ -38,9 +38,11 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
 
     const queryClient = useQueryClient();
 
+    const sortedMcpServers = [...mcpServers].sort((a, b) => a.name.localeCompare(b.name));
+
     return (
         <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
-            {mcpServers.map((mcpServer) => {
+            {sortedMcpServers.map((mcpServer) => {
                 const handleRefresh = () => {
                     updateMcpServerUrlMutation.mutate(
                         {

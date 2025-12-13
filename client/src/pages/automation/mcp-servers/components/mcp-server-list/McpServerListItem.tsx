@@ -42,7 +42,10 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
     const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
         onSuccess: () => {
+            // Refresh all relevant caches so tags appear in the list and in the left sidebar
             queryClient.invalidateQueries({queryKey: ['mcpServers']});
+            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+            queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
         },
     });
 
