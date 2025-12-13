@@ -26,16 +26,15 @@ import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * The ProjectWorkflowTools class provides utility methods and components to facilitate the management and execution of
@@ -132,7 +131,8 @@ public class ProjectWorkflowToolsImpl implements ProjectWorkflowTools {
             List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
 
             List<ProjectWorkflowToolsImpl.WorkflowInfo> workflowInfos = workflows.stream()
-                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(workflow.getId(), workflow.getProjectWorkflowId(),
+                .map(workflow -> new ProjectWorkflowToolsImpl.WorkflowInfo(workflow.getId(),
+                    workflow.getProjectWorkflowId(),
                     workflow.getWorkflowUuid(),
                     workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
                     workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,

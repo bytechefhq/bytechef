@@ -19,13 +19,10 @@ package com.bytechef.ai.mcp.tool.automation.impl;
 import com.bytechef.ai.mcp.tool.automation.api.ChatProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * The ProjectWorkflowTools class provides utility methods and components to facilitate the management and execution of
@@ -36,9 +33,6 @@ import java.util.List;
  */
 @Component
 public class ChatProjectWorkflowToolsImpl implements ChatProjectWorkflowTools {
-
-    private static final Logger logger = LoggerFactory.getLogger(ChatProjectWorkflowToolsImpl.class);
-
     private final ProjectWorkflowTools delegate;
 
     @SuppressFBWarnings("EI")
