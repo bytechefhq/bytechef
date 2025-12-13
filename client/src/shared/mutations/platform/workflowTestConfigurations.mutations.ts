@@ -1,4 +1,5 @@
 import {
+    DeleteWorkflowTestConfigurationConnectionRequest,
     SaveWorkflowTestConfigurationConnectionOperationRequest,
     SaveWorkflowTestConfigurationInputsOperationRequest,
     SaveWorkflowTestConfigurationRequest,
@@ -6,6 +7,22 @@ import {
     WorkflowTestConfigurationApi,
 } from '@/shared/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
+
+interface DeleteWorkflowTestConfigurationConnectionRequestProps {
+    onSuccess?: (result: void, variables: DeleteWorkflowTestConfigurationConnectionRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowTestConfigurationConnectionRequest) => void;
+}
+
+export const useDeleteWorkflowTestConfigurationConnectionMutation = (
+    mutationProps?: DeleteWorkflowTestConfigurationConnectionRequestProps
+) =>
+    useMutation({
+        mutationFn: (request: DeleteWorkflowTestConfigurationConnectionRequest) => {
+            return new WorkflowTestConfigurationApi().deleteWorkflowTestConfigurationConnection(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
 
 interface SaveWorkflowTestConfigurationMutationProps {
     onSuccess?: (result: WorkflowTestConfiguration, variables: SaveWorkflowTestConfigurationRequest) => void;
