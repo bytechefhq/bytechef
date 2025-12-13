@@ -21,6 +21,8 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -45,27 +47,41 @@ public class ChatProjectWorkflowToolsImpl implements ChatProjectWorkflowTools {
     }
 
     @Override
-    public ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(String workflowId) {
+    @Tool(
+        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
+    public ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
         return delegate.getWorkflow(workflowId);
     }
 
     @Override
+    @Tool(description = "Instructions for building workflows")
     public String getWorkflowBuildInstructions() {
         return delegate.getWorkflowBuildInstructions();
     }
 
     @Override
-    public List<ProjectWorkflowToolsImpl.WorkflowInfo> listWorkflows(long projectId) {
+    @Tool(
+        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
+    public List<ProjectWorkflowToolsImpl.WorkflowInfo> listWorkflows(
+        @ToolParam(description = "The ID of the project") long projectId) {
         return delegate.listWorkflows(projectId);
     }
 
     @Override
-    public List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(String query, Long projectId) {
+    @Tool(
+        description = "Full-text search across workflows in projects. Returns a list of workflows matching the search query in name or description.")
+    public List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(
+        @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
+        @ToolParam(required = false, description = "The ID of the project") Long projectId) {
         return delegate.searchWorkflows(query, projectId);
     }
 
     @Override
-    public ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(String workflowId) {
+    @Tool(
+        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
+    public ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(
+        @ToolParam(description = "The JSON string of the workflow to validate") String workflowId) {
         return delegate.validateWorkflow(workflowId);
     }
 }

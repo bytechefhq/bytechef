@@ -7,11 +7,18 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
+import com.agui.core.agent.AgentSubscriber;
+import com.agui.core.agent.AgentSubscriberParams;
+import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
+import com.agui.core.event.BaseEvent;
 import com.agui.core.exception.AGUIException;
+import com.agui.core.message.AssistantMessage;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.SystemMessage;
+import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
+import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.mcp.tool.automation.api.ChatProjectTools;
@@ -20,18 +27,21 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.impl.ChatProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ChatProjectWorkflowToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
@@ -58,6 +68,10 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     private final ChatProjectTools chatProjectTools;
     private final ChatProjectWorkflowTools chatProjectWorkflowTools;
 
+    private final ChatClient chatClient;
+    private final ChatMemory chatMemory;
+    private final List<Advisor> advisors;
+
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService)
         throws AGUIException {
         super(builder);
@@ -69,6 +83,10 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         this.chatProjectWorkflowTools = new ChatProjectWorkflowToolsImpl(projectWorkflowTools);
 
         this.workflowService = workflowService;
+
+        this.chatMemory = builder.chatMemory;
+        this.advisors = builder.advisors;
+        this.chatClient = builder.chatClient;
     }
 
     public static Builder builder() {
@@ -78,7 +96,6 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         Workflow workflow = workflowService.getWorkflow((String) state.get("workflowId"));
-        String mode = (String) state.get("mode");
 
         contexts.add(new Context("Current Workflow Definition", workflow.getDefinition()));
 
@@ -96,30 +113,120 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         systemMessage.setId(String.valueOf(UUID.randomUUID()));
         systemMessage.setContent(message);
 
-        if (mode.equals("CHAT")) {
-            tools.set(0, chatProjectTools);
-            tools.set(1, chatProjectWorkflowTools);
-        } else if (mode.equals("BUILD")) {
-            tools.set(0, projectTools);
-            tools.set(1, projectWorkflowTools);
-        }
-
         return systemMessage;
+    }
+
+    @Override
+    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+        try {
+            String mode = (String) input.state()
+                .get("mode");
+
+            List<Object> selectedTools = new ArrayList<>(tools);
+            if (mode.equals("CHAT")) {
+                selectedTools.set(0, chatProjectTools);
+                selectedTools.set(1, chatProjectWorkflowTools);
+            } else if (mode.equals("BUILD")) {
+                selectedTools.set(0, projectTools);
+                selectedTools.set(1, projectWorkflowTools);
+            }
+
+            SystemMessage systemMessage = createSystemMessage(input.state(), input.context());
+
+            UserMessage userMessage = getLatestUserMessage(input.messages());
+            String userContent = userMessage.getContent();
+
+            String messageId = UUID.randomUUID()
+                .toString();
+            AssistantMessage assistantMessage = new AssistantMessage();
+            assistantMessage.setId(messageId);
+
+            List<BaseEvent> deferredEvents = new ArrayList<>();
+
+            emitEvent(EventFactory.runStartedEvent(input.runId(), input.threadId()), subscriber);
+            emitEvent(EventFactory.textMessageStartEvent(messageId, "assistant"), subscriber);
+
+            ChatClient.ChatClientRequestSpec chatRequest = chatClient
+                .prompt(Prompt.builder()
+                    .content(userContent)
+                    .build())
+                .system(systemMessage.getContent())
+                .tools(selectedTools.toArray(new Object[0]));
+
+            if (advisors != null && !advisors.isEmpty()) {
+                chatRequest = chatRequest.advisors(spec -> spec.param("chat_memory_conversation_id", input.threadId()));
+            }
+
+            if (Objects.nonNull(this.chatMemory)) {
+                try {
+                    chatRequest.advisors(new Advisor[] {
+                        PromptChatMemoryAdvisor.builder(this.chatMemory)
+                            .build()
+                    });
+                    chatRequest.advisors((a) -> a.param("chat_memory_conversation_id", input.threadId()));
+                } catch (RuntimeException e) {
+                    throw new AGUIException("Could not add chat memory", e);
+                }
+            }
+
+            chatRequest.stream()
+                .chatResponse()
+                .subscribe(
+                    chatResponse -> handleChatResponse(chatResponse, assistantMessage, messageId, subscriber),
+                    error -> handleError(error, subscriber),
+                    () -> handleCompletion(input, assistantMessage, messageId, deferredEvents, subscriber));
+
+        } catch (AGUIException e) {
+            emitEvent(EventFactory.runErrorEvent(e.getMessage()), subscriber);
+        }
+    }
+
+    private void handleChatResponse(
+        ChatResponse chatResponse, AssistantMessage assistantMessage,
+        String messageId, AgentSubscriber subscriber) {
+        String content = chatResponse.getResult()
+            .getOutput()
+            .getText();
+        if (content != null && !content.isEmpty()) {
+            assistantMessage.setContent(
+                (assistantMessage.getContent() != null ? assistantMessage.getContent() : "") + content);
+            emitEvent(EventFactory.textMessageContentEvent(messageId, content), subscriber);
+        }
+    }
+
+    private void handleError(Throwable error, AgentSubscriber subscriber) {
+        emitEvent(EventFactory.runErrorEvent(error.getMessage()), subscriber);
+    }
+
+    private void handleCompletion(
+        RunAgentInput input, AssistantMessage assistantMessage,
+        String messageId, List<BaseEvent> deferredEvents, AgentSubscriber subscriber) {
+        emitEvent(EventFactory.textMessageEndEvent(messageId), subscriber);
+        deferredEvents.forEach(event -> emitEvent(event, subscriber));
+        subscriber.onNewMessage(assistantMessage);
+        emitEvent(EventFactory.runFinishedEvent(input.threadId(), input.runId()), subscriber);
+        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), this.state, this, input));
     }
 
     public static class Builder extends SpringAIAgent.Builder {
 
         private WorkflowService workflowService;
         private List<Object> tools;
+        private ChatClient chatClient;
+        private ChatModel chatModel;
+        private ChatMemory chatMemory;
+        private List<Advisor> advisors;
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
+            this.chatModel = chatModel;
 
             return this;
         }
 
         public Builder advisors(List<Advisor> advisors) {
             super.advisors(advisors);
+            this.advisors = advisors;
 
             return this;
         }
@@ -130,7 +237,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-        @SuppressFBWarnings("EI_EXPOSE_REP2")
+//        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder tools(List<Object> tools) {
             super.tools(tools);
             this.tools = tools;
@@ -182,6 +289,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
         public Builder chatMemory(ChatMemory chatMemory) {
             super.chatMemory(chatMemory);
+            this.chatMemory = chatMemory;
 
             return this;
         }
@@ -200,6 +308,9 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         }
 
         public WorkflowEditorSpringAIAgent build() throws AGUIException {
+            this.chatClient = ChatClient.builder(chatModel)
+                .build();
+
             return new WorkflowEditorSpringAIAgent(this, workflowService);
         }
     }
