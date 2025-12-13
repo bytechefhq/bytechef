@@ -21,6 +21,8 @@ import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 
 import java.util.List;
 
@@ -36,22 +38,33 @@ public class ChatProjectToolsImpl implements ChatProjectTools {
 
 
     @Override
+    @Tool(
+        description = "List all projects in ByteChef. Returns a list of projects with their basic information including id, name, description, and status.")
     public List<ProjectToolsImpl.ProjectInfo> listProjects() {
         return delegate.listProjects();
     }
 
     @Override
-    public ProjectToolsImpl.ProjectDetailInfo getProject(long projectId) {
+    @Tool(
+        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
+    public ProjectToolsImpl.ProjectDetailInfo getProject(
+        @ToolParam(description = "The ID of the project to retrieve") long projectId) {
         return delegate.getProject(projectId);
     }
 
     @Override
-    public List<ProjectToolsImpl.ProjectInfo> searchProjects(String query) {
+    @Tool(
+        description = "Full-text search across all projects. Returns a list of projects matching the search query in name or description.")
+    public List<ProjectToolsImpl.ProjectInfo> searchProjects(
+        @ToolParam(description = "The search query to match against project names and descriptions") String query) {
         return delegate.searchProjects(query);
     }
 
     @Override
-    public ProjectToolsImpl.ProjectStatusInfo getProjectStatus(long projectId) {
+    @Tool(
+        description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
+    public ProjectToolsImpl.ProjectStatusInfo getProjectStatus(
+        @ToolParam(description = "The ID of the project to get status for") long projectId) {
         return delegate.getProjectStatus(projectId);
     }
 }
