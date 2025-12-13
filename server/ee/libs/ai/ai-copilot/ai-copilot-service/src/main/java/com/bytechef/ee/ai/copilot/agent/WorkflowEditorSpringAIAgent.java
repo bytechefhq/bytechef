@@ -217,6 +217,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         private ChatMemory chatMemory;
         private List<Advisor> advisors;
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
             this.chatModel = chatModel;
@@ -224,6 +225,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder advisors(List<Advisor> advisors) {
             super.advisors(advisors);
             this.advisors = advisors;
@@ -237,7 +239,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
-//        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder tools(List<Object> tools) {
             super.tools(tools);
             this.tools = tools;
@@ -287,6 +289,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder chatMemory(ChatMemory chatMemory) {
             super.chatMemory(chatMemory);
             this.chatMemory = chatMemory;

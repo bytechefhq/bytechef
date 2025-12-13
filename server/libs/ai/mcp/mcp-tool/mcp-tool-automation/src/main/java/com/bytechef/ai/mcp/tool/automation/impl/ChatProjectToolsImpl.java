@@ -19,23 +19,17 @@ package com.bytechef.ai.mcp.tool.automation.impl;
 import com.bytechef.ai.mcp.tool.automation.api.ChatProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
-import java.util.List;
-
 public class ChatProjectToolsImpl implements ChatProjectTools {
-    private static final Logger logger = LoggerFactory.getLogger(ChatProjectToolsImpl.class);
-
     private final ProjectTools delegate;
 
     @SuppressFBWarnings("EI")
     public ChatProjectToolsImpl(ProjectTools projectTools) {
         this.delegate = projectTools;
     }
-
 
     @Override
     @Tool(
