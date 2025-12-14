@@ -1,4 +1,4 @@
-query mcpServers($type: ModeType!) {
+query mcpServers($type: PlatformType!) {
     mcpServers(type: $type, orderBy: NAME_ASC) {
         id
         name

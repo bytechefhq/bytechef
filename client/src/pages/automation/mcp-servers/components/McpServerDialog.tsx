@@ -13,7 +13,12 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {McpServer, ModeType, useCreateMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
+import {
+    McpServer,
+    PlatformType,
+    useCreateMcpServerMutation,
+    useUpdateMcpServerMutation,
+} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -84,7 +89,7 @@ const McpServerDialog = ({
                         enabled: values.enabled,
                         environmentId: currentEnvironmentId!.toString(),
                         name: values.name,
-                        type: ModeType.Automation,
+                        type: PlatformType.Automation,
                         workspaceId: currentWorkspaceId + '',
                     },
                 },

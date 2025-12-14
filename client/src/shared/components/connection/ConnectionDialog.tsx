@@ -19,7 +19,7 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -104,7 +104,7 @@ const ConnectionDialog = ({
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentType = useModeTypeStore((state) => state.currentType);
+    const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const {toast} = useToast();
 
@@ -432,7 +432,7 @@ const ConnectionDialog = ({
                     {errors?.length > 0 && <Errors errors={errors} />}
 
                     <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
-                        {connection?.id && currentType === ModeType.EMBEDDED && (
+                        {connection?.id && currentType === PlatformType.EMBEDDED && (
                             <FormField
                                 control={control}
                                 name="id"

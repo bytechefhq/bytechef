@@ -1,4 +1,4 @@
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -8,7 +8,7 @@ import ModeSelectionDialog from './components/ModeSelectionDialog';
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const currentType = useModeTypeStore((state) => state.currentType);
+    const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const navigate = useNavigate();
 
@@ -24,9 +24,9 @@ const Home = () => {
         }
 
         if (currentType !== undefined) {
-            if (currentType === ModeType.AUTOMATION) {
+            if (currentType === PlatformType.AUTOMATION) {
                 navigate('/automation');
-            } else if (currentType === ModeType.EMBEDDED) {
+            } else if (currentType === PlatformType.EMBEDDED) {
                 navigate('/embedded');
             }
         }
