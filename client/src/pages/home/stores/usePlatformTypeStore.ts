@@ -1,21 +1,21 @@
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
-export const enum ModeType {
+export const enum PlatformType {
     AUTOMATION,
     EMBEDDED,
 }
 
-interface ModeTypeI {
-    currentType: ModeType | undefined;
-    setCurrentType: (currentType: ModeType) => void;
+interface PlatformTypeI {
+    currentType: PlatformType | undefined;
+    setCurrentType: (currentType: PlatformType) => void;
 }
 
-export const useModeTypeStore = create<ModeTypeI>()(
+export const usePlatformTypeStore = create<PlatformTypeI>()(
     devtools(
         persist(
             (set) => ({
-                currentType: ModeType.AUTOMATION,
+                currentType: PlatformType.AUTOMATION,
                 setCurrentType: (currentType) =>
                     set(() => ({
                         currentType,

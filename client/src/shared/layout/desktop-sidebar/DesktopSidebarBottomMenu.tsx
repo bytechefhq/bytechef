@@ -13,7 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
@@ -45,7 +45,7 @@ const DesktopSidebarBottomMenu = () => {
             logout: state.logout,
         }))
     );
-    const {currentType, setCurrentType} = useModeTypeStore(
+    const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
             setCurrentType: state.setCurrentType,
@@ -85,14 +85,14 @@ const DesktopSidebarBottomMenu = () => {
         logout();
     };
 
-    const handleModeTypeChange = (value: string) => {
+    const handlePlatformTypeChange = (value: string) => {
         const selectedType = +value;
 
         setCurrentType(selectedType);
 
-        if (selectedType === ModeType.AUTOMATION) {
+        if (selectedType === PlatformType.AUTOMATION) {
             navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
-        } else if (selectedType === ModeType.EMBEDDED) {
+        } else if (selectedType === PlatformType.EMBEDDED) {
             navigate(
                 `/embedded${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`
             );
@@ -102,9 +102,9 @@ const DesktopSidebarBottomMenu = () => {
     const handleEnvironmentValueChange = (value: string) => {
         setCurrentEnvironmentId(+value);
 
-        if (currentType === ModeType.AUTOMATION) {
+        if (currentType === PlatformType.AUTOMATION) {
             navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
-        } else if (currentType === ModeType.EMBEDDED) {
+        } else if (currentType === PlatformType.EMBEDDED) {
             navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
         }
     };
@@ -112,7 +112,7 @@ const DesktopSidebarBottomMenu = () => {
     const handleWorkspaceValueChange = (value: string) => {
         setCurrentWorkspaceId(+value);
 
-        if (currentType === ModeType.AUTOMATION) {
+        if (currentType === PlatformType.AUTOMATION) {
             navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
         }
     };
@@ -180,13 +180,13 @@ const DesktopSidebarBottomMenu = () => {
                             <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
                                 <BlendIcon className="size-5" />
 
-                                <span>{`Mode: ${currentType === ModeType.AUTOMATION ? 'Automation' : 'Embedded'}`}</span>
+                                <span>{`Mode: ${currentType === PlatformType.AUTOMATION ? 'Automation' : 'Embedded'}`}</span>
                             </DropdownMenuSubTrigger>
 
                             <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
                                     <DropdownMenuRadioGroup
-                                        onValueChange={handleModeTypeChange}
+                                        onValueChange={handlePlatformTypeChange}
                                         value={currentType?.toString()}
                                     >
                                         <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>

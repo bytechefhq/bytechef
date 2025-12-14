@@ -7,7 +7,7 @@ import {
 import {
     ApiKey,
     CreateApiKeyMutation,
-    ModeType,
+    PlatformType,
     useApiKeysQuery,
     useCreateApiKeyMutation,
     useDeleteApiKeyMutation,
@@ -31,7 +31,7 @@ const ApiKeys = () => {
                         isLoading,
                     } = useApiKeysQuery({
                         environmentId: `${environmentId}`,
-                        type: ModeType.Embedded,
+                        type: PlatformType.Embedded,
                     });
 
                     return {
@@ -56,7 +56,7 @@ const ApiKeys = () => {
                             createApiKeyMutation.mutate({
                                 ...apiKey,
                                 environmentId: environmentId,
-                                type: ModeType.Embedded,
+                                type: PlatformType.Embedded,
                             });
                         },
                     } as UseMutationResult<unknown, Error>;

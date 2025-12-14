@@ -1,6 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
-import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -135,7 +135,7 @@ function App() {
     );
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {currentType, setCurrentType} = useModeTypeStore(
+    const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
             setCurrentType: state.setCurrentType,
@@ -224,9 +224,9 @@ function App() {
         let type;
 
         if (location.pathname.includes('/automation/')) {
-            type = ModeType.AUTOMATION;
+            type = PlatformType.AUTOMATION;
         } else if (location.pathname.includes('/embedded/')) {
-            type = ModeType.EMBEDDED;
+            type = PlatformType.EMBEDDED;
         }
 
         if (type !== undefined && type !== currentType) {

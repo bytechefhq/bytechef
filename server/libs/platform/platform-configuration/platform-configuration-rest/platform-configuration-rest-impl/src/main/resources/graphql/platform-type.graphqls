@@ -1,4 +1,4 @@
-enum ModeType {
+enum PlatformType {
     AUTOMATION
     EMBEDDED
 }

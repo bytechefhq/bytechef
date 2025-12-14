@@ -7,7 +7,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
     McpServer,
-    ModeType,
+    PlatformType,
     Tag,
     useMcpServerTagsQuery,
     useWorkspaceMcpServersQuery,
@@ -44,7 +44,7 @@ const McpServers = () => {
         data: tagsData,
         error: tagsError,
         isLoading: tagsIsLoading,
-    } = useMcpServerTagsQuery({type: ModeType.Automation});
+    } = useMcpServerTagsQuery({type: PlatformType.Automation});
 
     if (!data || !data.workspaceMcpServers) {
         return <></>;

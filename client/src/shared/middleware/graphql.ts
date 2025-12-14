@@ -144,7 +144,7 @@ export type CreateWorkspaceMcpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: ModeType;
+  type: PlatformType;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -249,7 +249,7 @@ export type McpServer = {
   name: Scalars['String']['output'];
   secretKey: Scalars['String']['output'];
   tags?: Maybe<Array<Maybe<Tag>>>;
-  type: ModeType;
+  type: PlatformType;
   url: Scalars['String']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -258,7 +258,7 @@ export type McpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type: ModeType;
+  type: PlatformType;
 };
 
 export enum McpServerOrderBy {
@@ -299,7 +299,7 @@ export type McpToolInputForComponent = {
   parameters?: InputMaybe<Scalars['Map']['input']>;
 };
 
-export enum ModeType {
+export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
 }
@@ -343,7 +343,7 @@ export type Mutation = {
 export type MutationCreateApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
-  type?: InputMaybe<ModeType>;
+  type?: InputMaybe<PlatformType>;
 };
 
 
@@ -598,7 +598,7 @@ export type QueryApiKeyArgs = {
 
 export type QueryApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
-  type: ModeType;
+  type: PlatformType;
 };
 
 
@@ -669,13 +669,13 @@ export type QueryMcpServerArgs = {
 
 
 export type QueryMcpServerTagsArgs = {
-  type: ModeType;
+  type: PlatformType;
 };
 
 
 export type QueryMcpServersArgs = {
   orderBy?: InputMaybe<McpServerOrderBy>;
-  type: ModeType;
+  type: PlatformType;
 };
 
 
@@ -827,7 +827,7 @@ export type CreateMcpServerMutationVariables = Exact<{
 }>;
 
 
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean } | null };
+export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean } | null };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -995,7 +995,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
@@ -1021,7 +1021,7 @@ export type AdminApiKeysQuery = { __typename?: 'Query', adminApiKeys?: Array<{ _
 
 export type ApiKeysQueryVariables = Exact<{
   environmentId: Scalars['ID']['input'];
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
@@ -1030,7 +1030,7 @@ export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?
 export type CreateApiKeyMutationVariables = Exact<{
   name: Scalars['String']['input'];
   environmentId: Scalars['ID']['input'];
-  type?: InputMaybe<ModeType>;
+  type?: InputMaybe<PlatformType>;
 }>;
 
 
@@ -1089,18 +1089,18 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, connectionId?: string | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string } | null> | null } | null> | null };
 
 export type McpServerTagsQueryVariables = Exact<{
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
 export type McpServerTagsQuery = { __typename?: 'Query', mcpServerTags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null };
 
 export type McpServersQueryVariables = Exact<{
-  type: ModeType;
+  type: PlatformType;
 }>;
 
 
-export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: ModeType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: Scalars['ID']['input'];
@@ -1154,7 +1154,7 @@ export const useCreateMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['createMcpProject'],
@@ -1177,7 +1177,7 @@ export const useCreateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createWorkspaceApiKey'],
@@ -1202,7 +1202,7 @@ export const useCreateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['createMcpServer'],
@@ -1221,7 +1221,7 @@ export const useDeleteMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpProject'],
@@ -1240,7 +1240,7 @@ export const useDeleteSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedProject'],
@@ -1259,7 +1259,7 @@ export const useDeleteSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedWorkflow'],
@@ -1278,7 +1278,7 @@ export const useDeleteWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceApiKey'],
@@ -1297,7 +1297,7 @@ export const useDeleteWorkspaceMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceMcpServer'],
@@ -1316,7 +1316,7 @@ export const useExportSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>) => {
-    
+
     return useMutation<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedProject'],
@@ -1335,7 +1335,7 @@ export const useExportSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>) => {
-    
+
     return useMutation<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedWorkflow'],
@@ -1358,7 +1358,7 @@ export const useImportProjectTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>) => {
-    
+
     return useMutation<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importProjectTemplate'],
@@ -1381,7 +1381,7 @@ export const useImportWorkflowTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>) => {
-    
+
     return useMutation<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importWorkflowTemplate'],
@@ -1445,7 +1445,7 @@ export const useMcpProjectsByServerIdQuery = <
       variables: McpProjectsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<McpProjectsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpProjectsByServerId', variables],
@@ -1494,7 +1494,7 @@ export const usePreBuiltProjectTemplatesQuery = <
       variables?: PreBuiltProjectTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<PreBuiltProjectTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltProjectTemplates'] : ['preBuiltProjectTemplates', variables],
@@ -1536,7 +1536,7 @@ export const usePreBuiltWorkflowTemplatesQuery = <
       variables?: PreBuiltWorkflowTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<PreBuiltWorkflowTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltWorkflowTemplates'] : ['preBuiltWorkflowTemplates', variables],
@@ -1561,7 +1561,7 @@ export const useProjectByIdQuery = <
       variables: ProjectByIdQueryVariables,
       options?: Omit<UseQueryOptions<ProjectByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectByIdQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<ProjectByIdQuery, TError, TData>(
       {
     queryKey: ['projectById', variables],
@@ -1606,7 +1606,7 @@ export const useProjectTemplateQuery = <
       variables: ProjectTemplateQueryVariables,
       options?: Omit<UseQueryOptions<ProjectTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<ProjectTemplateQuery, TError, TData>(
       {
     queryKey: ['projectTemplate', variables],
@@ -1633,7 +1633,7 @@ export const useSharedProjectQuery = <
       variables: SharedProjectQueryVariables,
       options?: Omit<UseQueryOptions<SharedProjectQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedProjectQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<SharedProjectQuery, TError, TData>(
       {
     queryKey: ['sharedProject', variables],
@@ -1660,7 +1660,7 @@ export const useSharedWorkflowQuery = <
       variables: SharedWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<SharedWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<SharedWorkflowQuery, TError, TData>(
       {
     queryKey: ['sharedWorkflow', variables],
@@ -1683,7 +1683,7 @@ export const useUpdateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServer'],
@@ -1704,7 +1704,7 @@ export const useUpdateMcpServerTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerTags'],
@@ -1723,7 +1723,7 @@ export const useUpdateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateWorkspaceApiKey'],
@@ -1761,7 +1761,7 @@ export const useWorkflowTemplateQuery = <
       variables: WorkflowTemplateQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<WorkflowTemplateQuery, TError, TData>(
       {
     queryKey: ['workflowTemplate', variables],
@@ -1792,7 +1792,7 @@ export const useWorkspaceApiKeysQuery = <
       variables: WorkspaceApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<WorkspaceApiKeysQuery, TError, TData>(
       {
     queryKey: ['workspaceApiKeys', variables],
@@ -1832,7 +1832,7 @@ export const useWorkspaceMcpServersQuery = <
       variables: WorkspaceMcpServersQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<WorkspaceMcpServersQuery, TError, TData>(
       {
     queryKey: ['workspaceMcpServers', variables],
@@ -1881,7 +1881,7 @@ export const useConnectedUserProjectsQuery = <
       variables?: ConnectedUserProjectsQueryVariables,
       options?: Omit<UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<ConnectedUserProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['connectedUserProjects'] : ['connectedUserProjects', variables],
@@ -1906,7 +1906,7 @@ export const useIntegrationByIdQuery = <
       variables: IntegrationByIdQueryVariables,
       options?: Omit<UseQueryOptions<IntegrationByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationByIdQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<IntegrationByIdQuery, TError, TData>(
       {
     queryKey: ['integrationById', variables],
@@ -1937,7 +1937,7 @@ export const useAdminApiKeysQuery = <
       variables: AdminApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<AdminApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AdminApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<AdminApiKeysQuery, TError, TData>(
       {
     queryKey: ['adminApiKeys', variables],
@@ -1947,7 +1947,7 @@ export const useAdminApiKeysQuery = <
     )};
 
 export const ApiKeysDocument = `
-    query apiKeys($environmentId: ID!, $type: ModeType!) {
+    query apiKeys($environmentId: ID!, $type: PlatformType!) {
   apiKeys(environmentId: $environmentId, type: $type) {
     id
     name
@@ -1968,7 +1968,7 @@ export const useApiKeysQuery = <
       variables: ApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<ApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<ApiKeysQuery, TError, TData>(
       {
     queryKey: ['apiKeys', variables],
@@ -1978,7 +1978,7 @@ export const useApiKeysQuery = <
     )};
 
 export const CreateApiKeyDocument = `
-    mutation createApiKey($name: String!, $environmentId: ID!, $type: ModeType) {
+    mutation createApiKey($name: String!, $environmentId: ID!, $type: PlatformType) {
   createApiKey(name: $name, environmentId: $environmentId, type: $type)
 }
     `;
@@ -1987,7 +1987,7 @@ export const useCreateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createApiKey'],
@@ -2012,7 +2012,7 @@ export const useCreateMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponent'],
@@ -2042,7 +2042,7 @@ export const useCreateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponentWithTools'],
@@ -2066,7 +2066,7 @@ export const useCreateMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>) => {
-    
+
     return useMutation<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['createMcpTool'],
@@ -2085,7 +2085,7 @@ export const useDeleteApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteApiKey'],
@@ -2104,7 +2104,7 @@ export const useDeleteMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>) => {
-    
+
     return useMutation<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpComponent'],
@@ -2129,7 +2129,7 @@ export const useEnvironmentsQuery = <
       variables?: EnvironmentsQueryVariables,
       options?: Omit<UseQueryOptions<EnvironmentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentsQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<EnvironmentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['environments'] : ['environments', variables],
@@ -2151,7 +2151,7 @@ export const useManagementMcpServerUrlQuery = <
       variables?: ManagementMcpServerUrlQueryVariables,
       options?: Omit<UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<ManagementMcpServerUrlQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['managementMcpServerUrl'] : ['managementMcpServerUrl', variables],
@@ -2185,7 +2185,7 @@ export const useMcpComponentsByServerIdQuery = <
       variables: McpComponentsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<McpComponentsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpComponentsByServerId', variables],
@@ -2195,7 +2195,7 @@ export const useMcpComponentsByServerIdQuery = <
     )};
 
 export const McpServerTagsDocument = `
-    query mcpServerTags($type: ModeType!) {
+    query mcpServerTags($type: PlatformType!) {
   mcpServerTags(type: $type) {
     id
     name
@@ -2210,7 +2210,7 @@ export const useMcpServerTagsQuery = <
       variables: McpServerTagsQueryVariables,
       options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<McpServerTagsQuery, TError, TData>(
       {
     queryKey: ['mcpServerTags', variables],
@@ -2220,7 +2220,7 @@ export const useMcpServerTagsQuery = <
     )};
 
 export const McpServersDocument = `
-    query mcpServers($type: ModeType!) {
+    query mcpServers($type: PlatformType!) {
   mcpServers(type: $type, orderBy: NAME_ASC) {
     id
     name
@@ -2250,7 +2250,7 @@ export const useMcpServersQuery = <
       variables: McpServersQueryVariables,
       options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<McpServersQuery, TError, TData>(
       {
     queryKey: ['mcpServers', variables],
@@ -2277,7 +2277,7 @@ export const useMcpToolsByComponentIdQuery = <
       variables: McpToolsByComponentIdQueryVariables,
       options?: Omit<UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>['queryKey'] }
     ) => {
-    
+
     return useQuery<McpToolsByComponentIdQuery, TError, TData>(
       {
     queryKey: ['mcpToolsByComponentId', variables],
@@ -2296,7 +2296,7 @@ export const useUpdateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateApiKey'],
@@ -2315,7 +2315,7 @@ export const useUpdateManagementMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateManagementMcpServerUrl'],
@@ -2345,7 +2345,7 @@ export const useUpdateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpComponentWithTools'],
@@ -2364,7 +2364,7 @@ export const useUpdateMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>) => {
-    
+
     return useMutation<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerUrl'],
