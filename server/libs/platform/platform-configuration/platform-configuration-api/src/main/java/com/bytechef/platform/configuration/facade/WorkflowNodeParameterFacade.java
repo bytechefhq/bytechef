@@ -27,10 +27,10 @@ public interface WorkflowNodeParameterFacade {
     ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, boolean fromAiInMetadata,
-        boolean includeInMetadata, long environmentId);
+        long environmentId);
 
     ParameterResultDTO deleteWorkflowNodeParameter(
-        String workflowId, String workflowNodeName, String parameterPath, boolean includeInMetadata,
+        String workflowId, String workflowNodeName, String parameterPath,
         long environmentId);
 
     DisplayConditionResultDTO getClusterElementDisplayConditions(
