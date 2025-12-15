@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
-import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -210,12 +210,10 @@ const NotificationDialog = ({
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">Save</Button>
+                            <Button label="Save" type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>
