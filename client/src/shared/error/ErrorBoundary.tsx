@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {AlertCircle} from 'lucide-react';
 import {Component, ErrorInfo, ReactNode} from 'react';
 
@@ -54,9 +54,7 @@ class ErrorBoundary extends Component<Props, StateI> {
                             {this.state.error?.message || 'An unexpected error occurred while rendering this component'}
                         </p>
 
-                        <Button onClick={this.handleReset} variant="outline">
-                            Try again
-                        </Button>
+                        <Button label="Try again" onClick={this.handleReset} variant="outline" />
                     </div>
                 </div>
             );
