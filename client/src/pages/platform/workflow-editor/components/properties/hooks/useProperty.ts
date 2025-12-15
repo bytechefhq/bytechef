@@ -349,14 +349,13 @@ export const useProperty = ({
     const handleDeleteCustomPropertyClick = useCallback(
         (path: string) => {
             deleteProperty(
-                custom,
                 workflow.id!,
                 path!,
                 deleteWorkflowNodeParameterMutation!,
                 deleteClusterElementParameterMutation
             );
         },
-        [custom, deleteWorkflowNodeParameterMutation, deleteClusterElementParameterMutation, workflow.id]
+        [deleteWorkflowNodeParameterMutation, deleteClusterElementParameterMutation, workflow.id]
     );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
@@ -571,7 +570,6 @@ export const useProperty = ({
                     });
                 } else {
                     deleteProperty(
-                        custom,
                         workflow.id,
                         path,
                         deleteWorkflowNodeParameterMutation!,
