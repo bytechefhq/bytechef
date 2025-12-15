@@ -19,7 +19,6 @@ import com.bytechef.config.ApplicationProperties.Ai.Copilot.OpenAi;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Vectorstore;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
-import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,13 +39,11 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
@@ -139,17 +136,15 @@ public class AiCopilotConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
     AnthropicChatModel anthropicChatModel() {
-        return new SafeAnthropicChatModel(
-            anthropicApi(),
-            AnthropicChatOptions.builder()
-                .model(anthropicChatModel)
-                .temperature(anthropicChatTemperature)
-                .maxTokens(64000)
-                .build(),
-            ToolCallingManager.builder()
-                .build(),
-            RetryUtils.DEFAULT_RETRY_TEMPLATE,
-            ObservationRegistry.NOOP);
+        return AnthropicChatModel.builder()
+            .anthropicApi(anthropicApi())
+            .defaultOptions(
+                AnthropicChatOptions.builder()
+                    .model(anthropicChatModel)
+                    .temperature(anthropicChatTemperature)
+                    .maxTokens(64000)
+                    .build())
+            .build();
     }
 
     @Bean
