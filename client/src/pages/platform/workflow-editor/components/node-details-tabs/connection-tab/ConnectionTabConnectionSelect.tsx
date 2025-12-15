@@ -20,7 +20,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
@@ -46,7 +46,10 @@ const ConnectionTabConnectionSelect = ({
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
     const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
+    const connectionIdRef = useRef<number | undefined>();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
     const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -74,18 +77,14 @@ const ConnectionTabConnectionSelect = ({
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
-    if (workflowTestConfigurationConnection) {
-        if (connectionId !== workflowTestConfigurationConnection.connectionId) {
-            setConnectionId(workflowTestConfigurationConnection.connectionId);
-        }
-    }
-
     const {componentName, componentVersion, key, required} = componentConnection;
 
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({
         componentName,
         componentVersion,
     });
+
+    console.log('ConnTabConnSelect');
 
     const {data: componentConnections} = useGetConnectionsQuery!(
         {
@@ -123,6 +122,8 @@ const ConnectionTabConnectionSelect = ({
 
             setConnectionId(connectionId);
 
+            connectionIdRef.current = connectionId;
+
             if (currentNode) {
                 setCurrentNode({...currentNode, connectionId});
             }
@@ -157,11 +158,22 @@ const ConnectionTabConnectionSelect = ({
         ]
     );
 
+    // Sync connectionId from prop to state (one-way sync)
     useEffect(() => {
-        if (workflowTestConfigurationConnection && connectionId !== workflowTestConfigurationConnection.connectionId) {
-            setConnectionId(workflowTestConfigurationConnection.connectionId);
+        if (
+            workflowTestConfigurationConnection?.connectionId &&
+            connectionIdRef.current !== workflowTestConfigurationConnection.connectionId
+        ) {
+            const newConnectionId = workflowTestConfigurationConnection.connectionId;
+            setConnectionId(newConnectionId);
+            connectionIdRef.current = newConnectionId;
         }
-    }, [workflowTestConfigurationConnection, connectionId]);
+    }, [workflowTestConfigurationConnection]);
+
+    // Update connectionId ref when state changes (for the sync effect above)
+    useEffect(() => {
+        connectionIdRef.current = connectionId;
+    }, [connectionId]);
 
     useEffect(() => {
         const newComponentConnection = componentConnections?.find((connection) => connection.id === connectionId);
