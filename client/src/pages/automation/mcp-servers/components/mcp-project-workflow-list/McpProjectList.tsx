@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {McpProject, McpServer, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
@@ -65,7 +65,7 @@ const McpProjectList = ({mcpServer}: McpProjectListProps) => {
                         button={
                             <McpProjectWorkflowDialog
                                 mcpServer={mcpServer}
-                                triggerNode={<Button>Add Workflows</Button>}
+                                triggerNode={<Button label="Add Workflows" />}
                             />
                         }
                         icon={<WorkflowIcon className="size-24 text-gray-300" />}

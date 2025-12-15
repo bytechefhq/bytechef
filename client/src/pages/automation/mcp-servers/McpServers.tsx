@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
@@ -78,7 +78,9 @@ const McpServers = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<McpServerDialog mcpServer={undefined} triggerNode={<Button>New MCP Server</Button>} />}
+                        right={
+                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
+                        }
                         title={<McpServersFilterTitle filterData={filterData} tags={tags} />}
                     />
                 )
@@ -93,7 +95,7 @@ const McpServers = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button>Create MCP Server</Button>} />
+                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
                         icon={<ServerIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new MCP server."

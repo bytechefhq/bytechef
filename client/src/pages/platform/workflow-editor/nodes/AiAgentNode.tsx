@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -120,13 +120,13 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         >
             <div className="invisible absolute left-workflow-node-popover-hover pr-4 group-hover:visible">
                 <Button
-                    className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                    className="opacity-100"
+                    icon={<TrashIcon />}
                     onClick={() => handleDeleteNodeClick(data)}
+                    size="iconSm"
                     title="Delete a node"
-                    variant="outline"
-                >
-                    <TrashIcon className="size-4" />
-                </Button>
+                    variant="destructiveGhost"
+                />
             </div>
 
             <HoverCard
@@ -142,12 +142,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <HoverCardTrigger>
                     <Button
                         className={twMerge(
-                            'size-18 flex w-full flex-col items-center justify-center rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-white hover:shadow-none'
+                            'size-18 focus-visible:ring-stroke-brand-focus flex w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none active:bg-surface-neutral-primary'
                         )}
                         onClick={handleNodeClick}
                     >
-                        <span className="self-center [&_svg]:size-9">
-                            {data.icon ? data.icon : <ComponentIcon className="size-9 text-black" />}
+                        <span className="self-center text-content-neutral-primary [&_svg]:size-9">
+                            {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
                         </span>
 
                         {memoizedIconsList.iconsToShow.length > 0 && (
@@ -161,12 +161,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     <Tooltip key={index}>
                                         <TooltipTrigger asChild>
                                             <li
-                                                className="mr-2 flex items-center justify-center rounded-full border bg-background p-1 [&_svg]:size-5"
+                                                className="mr-2 flex items-center justify-center rounded-full border bg-surface-neutral-primary p-1 [&_svg]:size-5"
                                                 key={index}
                                             >
                                                 {iconUrlObject ? (
                                                     <InlineSVG
-                                                        className="size-9 flex-none text-gray-900"
+                                                        className="size-9 flex-none text-content-neutral-primary"
                                                         src={iconUrlObject.icon}
                                                     />
                                                 ) : (
@@ -176,7 +176,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                         </TooltipTrigger>
 
                                         <TooltipContent
-                                            className="text-pretty border border-gray-300 bg-white text-black"
+                                            className="text-pretty border border-stroke-neutral-tertiary bg-surface-neutral-primary text-content-neutral-primary"
                                             side="bottom"
                                         >
                                             {iconUrlObject?.label}
@@ -187,7 +187,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 {memoizedIconsList.remainingIcons.length > 0 && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-background p-1">
+                                            <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-surface-neutral-primary p-1">
                                                 <span className="self-center text-xs font-bold text-content-neutral-secondary">
                                                     +{memoizedIconsList.remainingIcons.length}
                                                 </span>
@@ -195,7 +195,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                         </TooltipTrigger>
 
                                         <TooltipContent
-                                            className="max-w-36 text-pretty border border-gray-300 bg-white text-black"
+                                            className="max-w-36 text-pretty border border-stroke-neutral-tertiary bg-surface-neutral-primary text-content-neutral-primary"
                                             side="bottom"
                                         >
                                             <ul>
@@ -241,7 +241,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                 {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
 
-                <span className="text-sm text-gray-500">{data.workflowNodeName}</span>
+                <span className="text-sm text-content-neutral-secondary">{data.workflowNodeName}</span>
             </div>
 
             <Handle
