@@ -47,10 +47,10 @@ Name: createRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | false |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
-| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
 
 #### Example JSON Structure
 ```json
@@ -103,8 +103,8 @@ Name: deleteRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | false |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
 | recordId | Records ID | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | ID of the records to delete. | true |
 
@@ -159,10 +159,10 @@ Name: getRecord
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | false |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> | ID of the record to retrieve. | true |
+| recordId | Record ID | STRING | ID of the record to retrieve. | true |
 | fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to include in the response. By default, all the fields are included in the response. | false |
 
 #### Example JSON Structure
@@ -188,6 +188,49 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Search Records
+Name: searchRecords
+
+`Searches for records in the specified table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING | ID of the workspace. | false |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
+| fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to include in the response. By default, all the fields are included in the response. | false |
+| sort | Sort By | ARRAY <details> <summary> Items </summary> [&#123;STRING\(field), STRING\(order)&#125;] </details> | Fields by which you want to sort the records in your response. | false |
+| where | Where | STRING | Specific conditions for filtering records in your response. Multiple conditions can be combined using logical operators such as 'and' and 'or'. Each condition consists of three parts: a field name, a comparison operator, and a value. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Records",
+  "name" : "searchRecords",
+  "parameters" : {
+    "workspaceId" : "",
+    "baseId" : "",
+    "tableId" : "",
+    "fields" : [ "" ],
+    "sort" : [ {
+      "field" : "",
+      "order" : ""
+    } ],
+    "where" : ""
+  },
+  "type" : "nocoDb/v1/searchRecords"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Update Records
 Name: updateRecords
 
@@ -197,10 +240,10 @@ Name: updateRecords
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | ID of the workspace. | true |
-| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | true |
+| workspaceId | Workspace ID | STRING | ID of the workspace. | false |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the base. | false |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | ID of the table. | true |
-| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | null |
 
 #### Example JSON Structure
 ```json
@@ -246,3 +289,21 @@ Items Type: OBJECT
 
 
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect NocoDB to ByteChef using an API Token.
+
+1. Log in to your NocoDB account (Cloud: https://app.nocodb.com).
+2. Click your avatar in the bottom‑left corner.
+3. Open **API Tokens**.
+4. Click **Create new token**.
+5. Enter a descriptive name (for example, `ByteChef Integration`) and click **Save**.
+6. Copy the generated token and keep it secure.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/PayrWUMJSScjPQutvCIe?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
