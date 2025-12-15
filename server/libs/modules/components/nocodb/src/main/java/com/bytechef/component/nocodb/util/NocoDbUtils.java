@@ -157,6 +157,31 @@ public class NocoDbUtils {
         return getOptions(body);
     }
 
+    public static List<Option<String>> getFieldNameOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/api/v2/meta/tables/" + inputParameters.getRequiredString(TABLE_ID)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get("columns") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    String name = (String) map.get(TITLE);
+
+                    options.add(option(name, name));
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {

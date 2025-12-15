@@ -32,9 +32,11 @@ public class NocoDbConstants {
     public static final String FIELDS = "fields";
     public static final String RECORDS = "records";
     public static final String RECORD_ID = "recordId";
+    public static final String SORT = "sort";
     public static final String TABLE_COLUMNS = "tableColumns";
     public static final String TABLE_ID = "tableId";
     public static final String TITLE = "title";
+    public static final String WHERE = "where";
     public static final String WORKSPACE_ID = "workspaceId";
 
     public static final ModifiableStringProperty BASE_ID_PROPERTY = string(BASE_ID)

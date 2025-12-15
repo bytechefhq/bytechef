@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.nocodb.action.NocoDbCreateRecords;
 import com.bytechef.component.nocodb.action.NocoDbDeleteRecords;
 import com.bytechef.component.nocodb.action.NocoDbGetRecord;
+import com.bytechef.component.nocodb.action.NocoDbSearchRecords;
 import com.bytechef.component.nocodb.action.NocoDbUpdateRecords;
 import com.bytechef.component.nocodb.connection.NocoDbConnection;
 import com.google.auto.service.AutoService;
@@ -47,11 +48,13 @@ public class NocoDbComponentHandler implements ComponentHandler {
             NocoDbCreateRecords.ACTION_DEFINITION,
             NocoDbDeleteRecords.ACTION_DEFINITION,
             NocoDbGetRecord.ACTION_DEFINITION,
+            NocoDbSearchRecords.ACTION_DEFINITION,
             NocoDbUpdateRecords.ACTION_DEFINITION)
         .clusterElements(
             tool(NocoDbCreateRecords.ACTION_DEFINITION),
             tool(NocoDbDeleteRecords.ACTION_DEFINITION),
             tool(NocoDbGetRecord.ACTION_DEFINITION),
+            tool(NocoDbSearchRecords.ACTION_DEFINITION),
             tool(NocoDbUpdateRecords.ACTION_DEFINITION));
 
     @Override
