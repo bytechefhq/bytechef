@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -193,22 +193,21 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             sourceNodeId={id}
                         >
                             <Button
-                                className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                                icon={<ArrowLeftRightIcon />}
+                                size="iconSm"
                                 title="Change trigger component"
                                 variant="outline"
-                            >
-                                <ArrowLeftRightIcon className="size-4" />
-                            </Button>
+                            />
                         </WorkflowNodesPopoverMenu>
                     ) : (
                         <Button
-                            className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                            className="opacity-100"
+                            icon={<TrashIcon />}
                             onClick={() => handleDeleteNodeClick(data)}
+                            size="iconSm"
                             title="Delete a node"
-                            variant="outline"
-                        >
-                            <TrashIcon className="size-4" />
-                        </Button>
+                            variant="destructiveGhost"
+                        />
                     )}
                 </div>
             )}
@@ -224,15 +223,15 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 >
                     <Button
                         className={twMerge(
-                            'bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm',
+                            'opacity-100',
                             !data.multipleClusterElementsNode && hasSavedClusterElementPosition && 'self-center'
                         )}
+                        icon={<TrashIcon />}
                         onClick={() => handleDeleteNodeClick(data)}
+                        size="iconSm"
                         title="Delete a node"
-                        variant="outline"
-                    >
-                        <TrashIcon className="size-4" />
-                    </Button>
+                        variant="destructiveGhost"
+                    />
 
                     <div className="flex flex-col gap-1">
                         {!data.multipleClusterElementsNode && (
@@ -246,24 +245,22 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 sourceNodeName={data.workflowNodeName}
                             >
                                 <Button
-                                    className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                                    icon={<ArrowLeftRightIcon />}
+                                    size="iconSm"
                                     title={`Change ${data.clusterElementType} component`}
                                     variant="outline"
-                                >
-                                    <ArrowLeftRightIcon className="size-4" />
-                                </Button>
+                                />
                             </WorkflowNodesPopoverMenu>
                         )}
 
                         {hasSavedClusterElementPosition && (
                             <Button
-                                className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                                icon={<PinOffIcon />}
                                 onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
+                                size="iconSm"
                                 title="Remove saved node position"
                                 variant="outline"
-                            >
-                                <PinOffIcon className="size-4" />
-                            </Button>
+                            />
                         )}
                     </div>
                 </div>
@@ -282,11 +279,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <HoverCardTrigger>
                     <Button
                         className={twMerge(
-                            'size-18 rounded-md border-2 border-gray-300 bg-white p-4 text-primary shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none [&_svg]:size-9',
+                            'size-18 focus-visible:ring-stroke-brand-focus rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none active:bg-surface-neutral-primary [&_svg]:size-9',
                             isSelected &&
                                 workflowNodeDetailsPanelOpen &&
                                 !isMainRootClusterElement &&
-                                'border-blue-300 bg-blue-100 shadow-none',
+                                'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
                             isMainRootClusterElement && 'nodrag',
                             (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px] `,
                             isClusterElement && !isMainRootClusterElement && 'rounded-full',
@@ -302,18 +299,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4'
                             )}
                         >
-                            {data.icon ? data.icon : <ComponentIcon className="size-9 text-black" />}
+                            {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
 
                             {(isMainRootClusterElement || isNestedClusterRoot) && (
                                 <div className="flex w-full min-w-max flex-col items-start">
-                                    <span className="font-semibold text-black">{data.title || data.label}</span>
+                                    <span className="font-semibold">{data.title || data.label}</span>
 
-                                    {data.operationName && (
-                                        <pre className="text-sm text-black">{data.operationName}</pre>
-                                    )}
+                                    {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
 
                                     {isNestedClusterRoot && (
-                                        <span className="text-xs text-gray-500">{data.workflowNodeName}</span>
+                                        <span className="text-xs text-content-neutral-secondary">
+                                            {data.workflowNodeName}
+                                        </span>
                                     )}
                                 </div>
                             )}
@@ -359,7 +356,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         <pre className={twMerge('text-sm', isClusterElement && 'text-xs')}>{data.operationName}</pre>
                     )}
 
-                    <span className="text-sm text-gray-500">{data.workflowNodeName}</span>
+                    <span className="text-sm text-content-neutral-secondary">{data.workflowNodeName}</span>
                 </div>
             )}
 
