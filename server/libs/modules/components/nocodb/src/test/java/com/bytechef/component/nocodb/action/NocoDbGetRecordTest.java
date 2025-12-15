@@ -17,13 +17,18 @@
 package com.bytechef.component.nocodb.action;
 
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.FIELDS;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.RECORD_ID;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -36,21 +41,33 @@ import org.mockito.ArgumentCaptor;
  */
 class NocoDbGetRecordTest {
 
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(FIELDS, List.of("firstName", "lastName")));
+    private final Http mockedHttp = mock(Http.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(TABLE_ID, "xy", RECORD_ID, "123", FIELDS, List.of("firstName", "lastName")));
     private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -61,6 +78,17 @@ class NocoDbGetRecordTest {
 
         assertEquals(mockedObject, result);
 
-        assertEquals(List.of(FIELDS, "firstName,lastName"), stringArgumentCaptor.getAllValues());
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+        Http.ResponseType responseType = configuration.getResponseType();
+
+        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(
+            List.of("/api/v2/tables/xy/records/123", FIELDS, "firstName,lastName"),
+            stringArgumentCaptor.getAllValues());
     }
 }
