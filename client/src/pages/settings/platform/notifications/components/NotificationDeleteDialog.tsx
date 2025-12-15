@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -8,7 +9,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Button} from '@/components/ui/button';
 import {Notification} from '@/shared/middleware/platform/notification';
 import {XIcon} from 'lucide-react';
 
@@ -32,11 +32,14 @@ const NotificationDeleteDialog = ({
 
                 <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
 
-                <Button className="absolute right-2 top-0" onClick={closeDeleteDialog} size="icon" variant="ghost">
-                    <XIcon />
-
-                    <span className="sr-only">Close</span>
-                </Button>
+                <Button
+                    aria-label="Close"
+                    className="absolute right-2 top-0"
+                    icon={<XIcon />}
+                    onClick={closeDeleteDialog}
+                    size="icon"
+                    variant="ghost"
+                />
             </AlertDialogHeader>
 
             <AlertDialogFooter>

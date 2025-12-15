@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Notification, NotificationEvent} from '@/shared/middleware/platform/notification';
 import {PenIcon, TrashIcon} from 'lucide-react';
 
@@ -29,22 +29,19 @@ export const ActionsCell = ({notification, openDeleteDialog, openEditDialog}: Ac
     <div className="flex space-x-1">
         <Button
             className="text-content-neutral-primary/50 hover:bg-surface-neutral-primary-hover"
+            icon={<PenIcon />}
             onClick={() => openEditDialog(notification)}
             size="icon"
             title="Edit notification"
             variant="ghost"
-        >
-            <PenIcon className="size-4 hover:cursor-pointer" />
-        </Button>
+        />
 
         <Button
-            className="text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
+            icon={<TrashIcon />}
             onClick={() => openDeleteDialog(notification)}
             size="icon"
             title="Delete notification"
-            variant="ghost"
-        >
-            <TrashIcon className="size-4 hover:cursor-pointer" />
-        </Button>
+            variant="destructiveGhost"
+        />
     </div>
 );

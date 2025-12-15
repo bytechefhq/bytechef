@@ -1,6 +1,6 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Button} from '@/components/ui/button';
 import NotificationDialog from '@/pages/settings/platform/notifications/components/NotificationDialog';
 import NotificationsTable from '@/pages/settings/platform/notifications/components/NotificationsTable';
 import Header from '@/shared/layout/Header';
@@ -34,14 +34,7 @@ const Notifications = () => {
                 <Header
                     centerTitle
                     position="main"
-                    right={
-                        <Button
-                            className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover"
-                            onClick={() => openEditDialog()}
-                        >
-                            <PlusIcon /> New Notification
-                        </Button>
-                    }
+                    right={<Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />}
                     title="Notifications"
                 />
             }
@@ -53,12 +46,7 @@ const Notifications = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <Button
-                                className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover"
-                                onClick={() => openEditDialog()}
-                            >
-                                <PlusIcon /> New Notification
-                            </Button>
+                            <Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />
                         }
                         icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any Notifications created yet."
