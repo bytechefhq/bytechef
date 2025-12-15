@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Button} from '@/components/ui/button';
 
 import useOAuth2, {CodePayloadI, TokenPayloadI} from './oauth2/useOAuth2';
 
@@ -44,15 +44,15 @@ const OAuth2Button = ({
     return (
         <Button
             disabled={loading}
+            icon={loading ? <LoadingIcon className="text-white" /> : undefined}
+            label={loading ? 'Connecting...' : 'Connect'}
             onClick={() => {
                 if (!loading) {
                     onClick(getAuth);
                 }
             }}
             type={loading ? 'button' : 'submit'}
-        >
-            {loading && <LoadingIcon className="text-white" />} {loading ? 'Connecting...' : 'Connect'}
-        </Button>
+        />
     );
 };
 
