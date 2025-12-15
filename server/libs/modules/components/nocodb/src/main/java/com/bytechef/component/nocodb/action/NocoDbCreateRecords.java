@@ -22,12 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID_PROPERTY;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_COLUMNS;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID_PROPERTY;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID_PROPERTY;
 import static com.bytechef.component.nocodb.util.NocoDbUtils.transformRecordsForInsertion;
 
@@ -52,7 +50,7 @@ public class NocoDbCreateRecords {
             BASE_ID_PROPERTY,
             TABLE_ID_PROPERTY,
             dynamicProperties(TABLE_COLUMNS)
-                .propertiesLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
+                .propertiesLookupDependsOn(TABLE_ID)
                 .properties(NocoDbUtils.createPropertiesForRecord(true)))
         .output(
             outputSchema(
