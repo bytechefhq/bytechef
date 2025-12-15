@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -275,12 +275,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button type="submit">{mcpProject?.id ? 'Update' : 'Add'}</Button>
+                            <Button label={mcpProject?.id ? 'Update' : 'Add'} type="submit" />
                         </DialogFooter>
                     </form>
                 </Form>

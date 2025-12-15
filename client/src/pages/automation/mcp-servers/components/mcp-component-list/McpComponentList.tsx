@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
 import {McpServer, useMcpComponentsByServerIdQuery} from '@/shared/middleware/graphql';
@@ -63,7 +63,7 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
                             <McpComponentDialog
                                 mcpComponent={undefined}
                                 mcpServerId={mcpServer.id}
-                                triggerNode={<Button>Add Component</Button>}
+                                triggerNode={<Button label="Add Component" />}
                             />
                         }
                         icon={<ComponentIcon className="size-24 text-gray-300" />}

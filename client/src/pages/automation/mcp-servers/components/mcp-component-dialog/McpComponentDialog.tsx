@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     Dialog,
     DialogClose,
@@ -273,20 +273,18 @@ const McpComponentDialog = ({
 
                             <div className="flex space-x-2">
                                 <DialogClose asChild>
-                                    <Button type="button" variant="outline">
-                                        Cancel
-                                    </Button>
+                                    <Button label="Cancel" type="button" variant="outline" />
                                 </DialogClose>
 
                                 {currentStep === 'tools' && !mcpComponent && (
-                                    <Button onClick={handleBack} variant="outline">
-                                        Back
-                                    </Button>
+                                    <Button label="Back" onClick={handleBack} variant="outline" />
                                 )}
 
-                                <Button disabled={selectedTools.length === 0} onClick={handleSave}>
-                                    {mcpComponent ? 'Update' : 'Save'}
-                                </Button>
+                                <Button
+                                    disabled={selectedTools.length === 0}
+                                    label={mcpComponent ? 'Update' : 'Save'}
+                                    onClick={handleSave}
+                                />
                             </div>
                         </div>
                     )}
