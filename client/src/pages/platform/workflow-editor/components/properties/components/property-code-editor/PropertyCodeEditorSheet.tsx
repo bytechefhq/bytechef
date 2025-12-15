@@ -14,6 +14,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanel';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -54,7 +55,10 @@ const PropertyCodeEditorSheet = ({
     const copilotPanelOpen = useCopilotStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
+    const currentWorkflowTask = getTask({
+        tasks: workflow.tasks || [],
+        workflowNodeName,
+    });
 
     const handleRunClick = () => {
         setScriptIsRunning(true);

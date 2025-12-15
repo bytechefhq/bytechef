@@ -38,6 +38,7 @@ interface PropertyProps {
     customClassName?: string;
     deletePropertyButton?: ReactNode;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
+    dynamicPropertySource?: string;
     formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
@@ -56,6 +57,7 @@ const Property = ({
     customClassName,
     deletePropertyButton,
     displayConditionsQuery,
+    dynamicPropertySource,
     formState,
     objectName,
     operationName,
@@ -121,6 +123,7 @@ const Property = ({
         control,
         controlPath,
         displayConditionsQuery,
+        dynamicPropertySource,
         formState,
         objectName,
         operationName,

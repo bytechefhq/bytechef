@@ -11,7 +11,13 @@ import {
 } from '@/shared/constants';
 import {describe, expect, it} from 'vitest';
 
-import {decodePath, encodeParameters, encodePath, transformPathForObjectAccess} from '../utils/encodingUtils';
+import {
+    decodePath,
+    encodeParameters,
+    encodePath,
+    transformPathForObjectAccess,
+    transformValueForObjectAccess,
+} from '../utils/encodingUtils';
 
 describe('encodingUtils', () => {
     describe('encodePath and decodePath', () => {
@@ -158,6 +164,48 @@ describe('encodingUtils', () => {
             const result = transformPathForObjectAccess(path);
 
             expect(result).toBe("['http://example.com.data.value']");
+        });
+
+        it('should handle paths with existing bracket notation', () => {
+            const path = "loop_1.item['4broj telefona']";
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("loop_1.item['4broj telefona']");
+        });
+
+        it('should handle paths with bracket notation and special property names', () => {
+            const path = "loop_1['item-name']['4broj telefona']";
+
+            const result = transformPathForObjectAccess(path);
+
+            expect(result).toBe("loop_1['item-name']['4broj telefona']");
+        });
+    });
+
+    describe('transformValueForObjectAccess', () => {
+        it('should transform template strings with paths containing bracket notation', () => {
+            const value = "${loop_1.item['4broj telefona']}";
+
+            const result = transformValueForObjectAccess(value);
+
+            expect(result).toBe("${loop_1.item['4broj telefona']}");
+        });
+
+        it('should transform template strings with simple paths', () => {
+            const value = 'Value from ${user.first-name}';
+
+            const result = transformValueForObjectAccess(value);
+
+            expect(result).toBe("Value from ${user['first-name']}");
+        });
+
+        it('should handle multiple template expressions', () => {
+            const value = "${loop_1.item['4broj telefona']} and ${user.name}";
+
+            const result = transformValueForObjectAccess(value);
+
+            expect(result).toBe("${loop_1.item['4broj telefona']} and ${user.name}");
         });
     });
 });

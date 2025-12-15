@@ -32,7 +32,7 @@ public class PostgreSQLJdbcComponentHandler implements JdbcComponentHandler {
         .title("PostgreSQL")
         .description("Query, insert and update data from PostgreSQL.")
         .icon("path:assets/postgresql.svg")
-        .databaseJdbcName("postgresql")
+        .urlTemplate("jdbc:postgresql://{host}:{port}/{database}")
         .jdbcDriverClassName("org.postgresql.Driver");
 
     @Override

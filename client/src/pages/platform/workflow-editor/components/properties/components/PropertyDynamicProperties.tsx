@@ -1,12 +1,12 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
 import {
     useGetClusterElementDynamicPropertiesQuery,
     useGetWorkflowNodeDynamicPropertiesQuery,
 } from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {PropertyAllType} from '@/shared/types';
 import {useEffect, useMemo, useState} from 'react';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
@@ -33,7 +33,7 @@ const PropertyDynamicProperties = ({
     parameterValue,
     path,
 }: PropertyDynamicPropertiesProps) => {
-    const [subProperties, setSubProperties] = useState<PropertyModel[]>([]);
+    const [subProperties, setSubProperties] = useState<PropertyAllType[]>([]);
     const [lastProcessedKey, setLastProcessedKey] = useState('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -82,7 +82,7 @@ const PropertyDynamicProperties = ({
     const queryEnabled = useMemo(
         () =>
             (lookupDependsOnPaths?.length
-                ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
+                ? lookupDependsOnValues?.every((loadDependencyValue) => loadDependencyValue != null)
                 : true) && enabled,
         [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled]
     );
@@ -144,19 +144,28 @@ const PropertyDynamicProperties = ({
 
     return (
         <ul className="space-y-4">
-            {subProperties.map((property, index) => (
-                <Property
-                    key={`${property.name}_${index}_${lastProcessedKey}_property`}
-                    objectName={name}
-                    operationName={currentOperationName}
-                    parameterValue={property.name ? (paramValueObject?.[property.name] ?? '') : ''}
-                    path={path}
-                    property={{
-                        ...property,
-                        defaultValue: property.name ? (paramValueObject?.[property.name] ?? '') : '',
-                    }}
-                />
-            ))}
+            {subProperties.map((property, index) => {
+                let defaultValue = property.defaultValue;
+
+                if (defaultValue === undefined) {
+                    defaultValue = property.name ? (paramValueObject?.[property.name] ?? '') : '';
+                }
+
+                return (
+                    <Property
+                        dynamicPropertySource={name}
+                        key={`${property.name}_${index}_${lastProcessedKey}_property`}
+                        objectName={name}
+                        operationName={currentOperationName}
+                        parameterValue={defaultValue}
+                        path={path}
+                        property={{
+                            ...property,
+                            defaultValue,
+                        }}
+                    />
+                );
+            })}
         </ul>
     );
 };

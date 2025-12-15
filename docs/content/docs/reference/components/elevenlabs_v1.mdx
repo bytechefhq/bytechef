@@ -272,6 +272,61 @@ Type: OBJECT
 ```
 
 
+### Stream Speech
+Name: streamSpeech
+
+`Converts text into speech using a voice of your choice and returns audio as an audio stream.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| voiceId | Voice | STRING | Voice you want to use for converting the text into speech. | true |
+| text | Text | STRING | Text you want to convert into speech. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Stream Speech",
+  "name" : "streamSpeech",
+  "parameters" : {
+    "voiceId" : "",
+    "text" : ""
+  },
+  "type" : "elevenLabs/v1/streamSpeech"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
 
 
 <hr />

@@ -22,19 +22,18 @@ import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
-import static com.bytechef.component.aitable.util.AITableUtils.createQuery;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -58,8 +57,6 @@ public class AITableFindRecordsAction {
                 .label("Record IDs")
                 .description("The IDs of the records to find.")
                 .items(string())
-                .options((OptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
-                .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             integer(MAX_RECORDS)
                 .label("Max Records")
@@ -71,14 +68,19 @@ public class AITableFindRecordsAction {
     private AITableFindRecordsAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<String> fields = inputParameters.getList(FIELDS, String.class, List.of());
+        List<String> recordIds = inputParameters.getList(RECORD_IDS, String.class, List.of());
+        int maxRecords = inputParameters.getInteger(MAX_RECORDS);
 
-        return actionContext
-            .http(http -> http.get("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records?"
-                + createQuery(inputParameters)))
+        return context
+            .http(http -> http.get("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
+            .queryParameters(
+                FIELDS, String.join(",", fields),
+                RECORD_IDS, String.join(",", recordIds),
+                MAX_RECORDS, maxRecords)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

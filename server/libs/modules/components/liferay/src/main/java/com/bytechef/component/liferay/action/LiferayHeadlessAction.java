@@ -22,8 +22,13 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.liferay.constant.LiferayConstants.APPLICATION;
+import static com.bytechef.component.liferay.constant.LiferayConstants.BODY;
 import static com.bytechef.component.liferay.constant.LiferayConstants.ENDPOINT;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HEADER;
+import static com.bytechef.component.liferay.constant.LiferayConstants.HIDDEN_PROPERTIES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.PATH;
 import static com.bytechef.component.liferay.constant.LiferayConstants.PROPERTIES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.QUERY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -41,6 +46,7 @@ import com.bytechef.component.liferay.util.PropertiesContainer;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +72,17 @@ public class LiferayHeadlessAction {
                     (ActionDefinition.PropertiesFunction) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
+                        String endpoint = inputParameters.getRequiredString(ENDPOINT);
+
+                        if (endpoint.contains("batch")) {
+                            return List.of(string(BODY)
+                                .label("Body")
+                                .description("JSON structure of body")
+                                .required(false));
+                        }
+
                         PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
-                            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
+                            inputParameters.getRequiredString(APPLICATION), endpoint,
                             context);
 
                         return propertiesContainer.properties();
@@ -78,65 +93,104 @@ public class LiferayHeadlessAction {
         .perform(LiferayHeadlessAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String baseUri = connectionParameters.getRequiredString(BASE_URI);
-        String endpoint = inputParameters.getRequiredString(ENDPOINT);
-
-        String[] endpointParts = endpoint.split(" ");
-        String method = endpointParts[0];
-        String endpointUrl = endpointParts[1];
-
-        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + endpointUrl;
 
         Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
 
-        Map<String, ?> body = Map.of();
-        Map<String, List<String>> headers = Map.of();
-        Map<String, List<String>> queryParameters = Map.of();
-        Map<String, ?> pathParameters = Map.of();
+        if (properties == null) {
+            properties = Map.of();
+        }
 
-        PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
-            inputParameters.getRequiredString(APPLICATION), inputParameters.getRequiredString(ENDPOINT),
-            context);
+        Map<String, ?> hiddenProperties = (Map<String, ?>) properties.get(HIDDEN_PROPERTIES);
 
-        if (properties != null) {
-            body = propertiesContainer.bodyParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
+        if (hiddenProperties == null) {
+            hiddenProperties = Map.of();
+        }
 
-            headers = propertiesContainer.headerParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+        String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
-            queryParameters = propertiesContainer.queryParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> List.of(String.valueOf(properties.get(p)))));
+        String[] endpointParts = endpoint.split(" ");
 
-            pathParameters = propertiesContainer.headerParameters()
-                .stream()
-                .filter(properties::containsKey)
-                .collect(Collectors.toMap(p -> p, p -> String.valueOf(properties.get(p))));
+        Executor executor = getExecutor(
+            context, endpointParts[0],
+            getEndpointUri(
+                inputParameters, connectionParameters, endpointParts[1],
+                getParameterValueMap((List<String>) hiddenProperties.get(PATH), properties)));
+
+        Response response = executor.headers(
+            getParameterValueMap((List<String>) hiddenProperties.get(HEADER), properties))
+            .queryParameters(
+                getParameterValueMap((List<String>) hiddenProperties.get(QUERY), properties))
+            .configuration(
+                Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
+            .configuration(
+                responseType(ResponseType.JSON))
+            .body(
+                getBody((List<String>) hiddenProperties.get(BODY), properties, context))
+            .execute();
+
+        return response.getBody();
+    }
+
+    private static String getEndpointUri(
+        Parameters inputParameters, Parameters connectionParameters, String applicationEndpoint,
+        Map<String, ?> pathParameters) {
+
+        String baseUri = connectionParameters.getRequiredString(BASE_URI);
+
+        String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + applicationEndpoint;
+
+        if (Objects.isNull(pathParameters) || pathParameters.isEmpty()) {
+            return endpointUri;
         }
 
         for (Map.Entry<String, ?> entry : pathParameters.entrySet()) {
             String key = entry.getKey();
-            String value = String.valueOf(entry.getValue());
+            Object rawValue = entry.getValue();
+
+            String value;
+            if (rawValue instanceof List<?> list && !list.isEmpty()) {
+                value = String.valueOf(list.getFirst());
+            } else {
+                value = String.valueOf(rawValue);
+            }
 
             endpointUri = endpointUri.replace("{" + key + "}", value);
         }
 
-        Executor executor = getExecutor(context, method, endpointUri);
+        return endpointUri;
+    }
 
-        Response response = executor.headers(headers)
-            .queryParameters(queryParameters)
-            .configuration(Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
-            .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(body))
-            .execute();
+    private static Map<String, List<String>> getParameterValueMap(
+        List<String> parameterNames, Map<String, ?> properties) {
 
-        return response.getBody();
+        if (parameterNames == null) {
+            return Map.of();
+        }
+
+        return parameterNames
+            .stream()
+            .filter(
+                properties::containsKey)
+            .collect(
+                Collectors.toMap(
+                    parameterName -> parameterName,
+                    parameterName -> List.of(String.valueOf(properties.get(parameterName)))));
+    }
+
+    private static Body getBody(List<String> parameterNames, Map<String, ?> properties, Context context) {
+        if (properties.containsKey(BODY)) {
+            return Body.of((List<?>) context.json(json -> json.read((String) properties.get(BODY))));
+        }
+
+        return Body.of(parameterNames
+            .stream()
+            .filter(
+                properties::containsKey)
+            .collect(
+                Collectors.toMap(
+                    parameterName -> parameterName,
+                    parameterName -> String.valueOf(properties.get(parameterName)))));
+
     }
 
     private static Executor getExecutor(Context context, String method, String finalEndpointUri) {

@@ -6,25 +6,20 @@ info:
 servers:
   - url: "https://api.productboard.com"
 paths:
-  /features/{id}:
+  /features/{featureId}:
     get:
-      summary: "Get feature"
+      summary: "Get Feature"
       description: "Returns detail of a specific feature."
       operationId: "getFeature"
       parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
-        - name: "id"
+        - name: "featureId"
           description: "ID of the feature"
           in: "path"
           required: true
           schema:
             type: "string"
             format: "uuid"
+            x-dynamic-options: true
       responses:
         200:
           description: "Success, the response contains valid data."
@@ -40,13 +35,6 @@ paths:
       summary: "Create Note"
       description: "Creates a new note."
       operationId: "createNote"
-      parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
       responses:
         201:
           description: "Note created"
@@ -83,47 +71,12 @@ paths:
                 content:
                   type: "string"
                   description: "HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out."
-    get:
-      summary: "List All Notes"
-      description: "Returns detail of all notes order by created_at desc"
-      operationId: "listNotes"
-      parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
-      responses:
-        200:
-          description: "Success, the response contains valid data."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  data:
-                    type: "array"
-                    items:
-                      $ref: "#/components/schemas/ExpandedNote"
-                  pageCursor:
-                    type: "string"
-                    description: "Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor={pageCursor}"
-                  totalResults:
-                    type: "integer"
-                    description: "Total number of notes that meet the specified parameters for the query"
   "/notes/{noteId}":
     get:
       summary: "Get Note"
       description: "Returns detail of a specific note."
       operationId: "getNote"
       parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -147,12 +100,6 @@ paths:
       description: "Updates a note."
       operationId: "updateNote"
       parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -211,12 +158,6 @@ paths:
       description: "Deletes a note."
       operationId: "deleteNote"
       parameters:
-        - name: "X-Version"
-          in: "header"
-          required: true
-          schema:
-            type: "integer"
-            default: 1
         - name: "noteId"
           description: "ID of the note"
           in: "path"
@@ -434,3 +375,15 @@ components:
     bearerAuth:
       type: "http"
       scheme: "bearer"
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://app.productboard.com/oauth2/authorize"
+          tokenUrl: "https://app.productboard.com/oauth2/token"
+          refreshUrl: "https://app.productboard.com/oauth2/token"
+          scopes:
+            notes:create: "The application will be able to create notes."
+            notes:read: "The application will be able to read notes."
+            notes:manage: "The application will be able to manage notes."
+            product_hierarchy_data:read: "The application will be able to read product hierarchy data."

@@ -23,8 +23,6 @@ ENTRYPOINT exec \
      -Dserver.tomcat.basedir=/opt/bytechef/server \
      -Dserver.tomcat.accesslog.directory=/opt/bytechef/server/logs \
      -Dloader.path=/opt/bytechef/external_jars \
-     -Dserver.ssl.key-store=file:/opt/bytechef/server/tls/bytechef/keystore.jks \
-     -Dserver.ssl.trust-store=file:/opt/bytechef/server/tls/trusted/truststore.jks \
      -jar server/server-app.jar
 
 FROM bytechef-server-base AS bytechef-server

@@ -25,10 +25,11 @@ import java.util.Optional;
 public interface JdbcComponentDefinition {
 
     /**
+     * URL template used to construct JDBC connection URL. Supported placeholders: {host}, {port}, {database}
      *
-     * @return
+     * @return JDBC URL template for the specific database
      */
-    String getDatabaseJdbcName();
+    String getUrlTemplate();
 
     /**
      *

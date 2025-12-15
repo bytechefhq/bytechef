@@ -9,6 +9,7 @@ import {
     encodePath,
     transformValueForObjectAccess,
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
@@ -140,9 +141,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             if (currentNode.clusterElementType) {
                 const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-                const mainClusterRootTask = workflowDefinitionTasks?.find(
-                    (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-                );
+                const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                    ? getTask({
+                          tasks: workflowDefinitionTasks,
+                          workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                      })
+                    : undefined;
 
                 if (mainClusterRootTask?.clusterElements) {
                     return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);

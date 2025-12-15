@@ -38,6 +38,8 @@ import {Control, FieldValues, FormState} from 'react-hook-form';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
+import {getTask} from '../../../utils/getTask';
+
 const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',
     'DATE_TIME',
@@ -113,6 +115,7 @@ interface UsePropertyProps {
     control?: Control<FieldValues, FieldValues>;
     controlPath?: string;
     displayConditionsQuery?: UseQueryResult<GetClusterElementParameterDisplayConditions200Response, Error>;
+    dynamicPropertySource?: string;
     formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
@@ -128,6 +131,7 @@ export const useProperty = ({
     control,
     controlPath = 'parameters',
     displayConditionsQuery,
+    dynamicPropertySource,
     formState,
     objectName,
     parameterValue,
@@ -661,9 +665,12 @@ export const useProperty = ({
         if (currentNode.clusterElementType) {
             const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = workflowDefinitionTasks?.find(
-                (task: {name: string}) => task.name === rootClusterElementNodeData?.workflowNodeName
-            );
+            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+                ? getTask({
+                      tasks: workflowDefinitionTasks,
+                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+                  })
+                : undefined;
 
             if (mainClusterRootTask?.clusterElements) {
                 return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
@@ -766,7 +773,7 @@ export const useProperty = ({
         if (
             hidden &&
             path &&
-            objectName === undefined &&
+            (objectName === undefined || dynamicPropertySource === objectName) &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
             resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
         ) {

@@ -3,6 +3,8 @@ import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinit
 import {UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
+import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 
 const SPACE = 4;
@@ -153,41 +155,53 @@ export default async function saveWorkflowDefinition({
                 (task) => task.name === existingWorkflowTask.name
             );
 
-            if (existingTaskIndex === undefined || existingTaskIndex === -1) {
-                return;
-            }
-
             let combinedParameters = {
                 ...existingWorkflowTask.parameters,
                 ...newTask.parameters,
             };
 
             if (existingWorkflowTask.type !== newTask.type) {
-                delete updatedWorkflowDefinitionTasks[existingTaskIndex].parameters;
-
                 combinedParameters = newTask.parameters ?? {};
             }
 
-            if (existingWorkflowTask.clusterRoot) {
-                const rootClusterElementTask: WorkflowTask = {
-                    ...newTask,
-                    clusterElements: {
-                        ...(newTask.clusterElements || {}),
-                    },
-                };
+            const taskToUpdate = existingWorkflowTask.clusterRoot
+                ? {
+                      ...newTask,
+                      clusterElements: {
+                          ...(newTask.clusterElements || {}),
+                      },
+                  }
+                : {
+                      ...newTask,
+                      parameters: combinedParameters,
+                  };
 
-                updatedWorkflowDefinitionTasks[existingTaskIndex] = rootClusterElementTask;
-            } else {
-                const combinedTask: WorkflowTask = {
-                    ...newTask,
-                    parameters: combinedParameters,
-                };
+            if (existingTaskIndex !== undefined && existingTaskIndex !== -1) {
+                if (existingWorkflowTask.type !== newTask.type) {
+                    delete updatedWorkflowDefinitionTasks[existingTaskIndex].parameters;
+                }
 
                 updatedWorkflowDefinitionTasks = [
                     ...updatedWorkflowDefinitionTasks.slice(0, existingTaskIndex),
-                    combinedTask,
+                    taskToUpdate,
                     ...updatedWorkflowDefinitionTasks.slice(existingTaskIndex + 1),
                 ];
+            } else {
+                const nestedTask = getTask({
+                    tasks: workflowDefinitionTasks,
+                    workflowNodeName: existingWorkflowTask.name,
+                });
+
+                if (!nestedTask) {
+                    console.error(`Task ${existingWorkflowTask.name} not found in workflow definition`);
+
+                    return;
+                }
+
+                updatedWorkflowDefinitionTasks = getRecursivelyUpdatedTasks(
+                    updatedWorkflowDefinitionTasks,
+                    taskToUpdate
+                );
             }
         } else {
             updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];

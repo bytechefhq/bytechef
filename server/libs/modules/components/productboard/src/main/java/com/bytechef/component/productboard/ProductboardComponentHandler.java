@@ -17,22 +17,33 @@
 package com.bytechef.component.productboard;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.productboard.action.ProductboardListNotesAction;
 import com.bytechef.component.productboard.trigger.ProductboardNewNoteTrigger;
 import com.bytechef.component.productboard.trigger.ProductboardUpdatedFeatureTrigger;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ProductboardComponentHandler extends AbstractProductboardComponentHandler {
+
+    @Override
+    public List<ModifiableActionDefinition> getCustomActions() {
+        return List.of(ProductboardListNotesAction.ACTION_DEFINITION);
+    }
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
@@ -50,13 +61,32 @@ public class ProductboardComponentHandler extends AbstractProductboardComponentH
     }
 
     @Override
-    public ComponentDsl.ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ComponentDsl.ModifiableProperty<?> modifiableProperty) {
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        if (Objects.equals(modifiableProperty.getName(), "X-Version")) {
-            modifiableProperty.hidden(true);
+        Optional<List<? extends Authorization>> optionalAuthorizations =
+            modifiableConnectionDefinition.getAuthorizations();
+
+        if (optionalAuthorizations.isPresent()) {
+            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+
+            for (Authorization authorization : authorizations) {
+                ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorization;
+
+                AuthorizationType type = modifiableAuthorization.getType();
+                if (type.equals(AuthorizationType.BEARER_TOKEN)) {
+                    modifiableAuthorization.apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                        Map.of("X-Version", List.of("1"),
+                            "Authorization", List.of("Bearer " + connectionParameters.getRequiredString("token")))));
+                } else {
+                    modifiableAuthorization.apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                        Map.of("X-Version", List.of("1"),
+                            "Authorization",
+                            List.of("Bearer " + connectionParameters.getRequiredString("access_token")))));
+                }
+            }
         }
 
-        return super.modifyProperty(actionDefinition, modifiableProperty);
+        return modifiableConnectionDefinition;
     }
 }

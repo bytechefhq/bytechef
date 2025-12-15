@@ -29,6 +29,17 @@ Version: 1
 
 
 
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
 
 
 <hr />
@@ -37,7 +48,7 @@ Version: 1
 ## Actions
 
 
-### Get feature
+### Get Feature
 Name: getFeature
 
 `Returns detail of a specific feature.`
@@ -46,17 +57,15 @@ Name: getFeature
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
-| id | Id | STRING | ID of the feature | true |
+| featureId | Feature Id | STRING | ID of the feature | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Get feature",
+  "label" : "Get Feature",
   "name" : "getFeature",
   "parameters" : {
-    "X-Version" : 1,
-    "id" : ""
+    "featureId" : ""
   },
   "type" : "productboard/v1/getFeature"
 }
@@ -120,98 +129,6 @@ Type: OBJECT
 ```
 
 
-### List All Notes
-Name: listNotes
-
-`Returns detail of all notes order by created_at desc`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "List All Notes",
-  "name" : "listNotes",
-  "parameters" : {
-    "X-Version" : 1
-  },
-  "type" : "productboard/v1/listNotes"
-}
-```
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(title), STRING\(content), STRING\(displayUrl), STRING\(externalDisplayUrl), &#123;STRING\(id)&#125;\(company), &#123;STRING\(id)&#125;\(user), &#123;STRING\(email), STRING\(name)&#125;\(owner), [&#123;STRING\(memberId), STRING\(memberName), STRING\(memberEmail), STRING\(teamId), STRING\(teamName)&#125;]\(followers), STRING\(state), &#123;STRING\(origin), STRING\(record_id)&#125;\(source), STRING\(tags), [&#123;STRING\(id), STRING\(type), INTEGER\(importance)&#125;]\(features), DATE_TIME\(createdAt), DATE_TIME\(updatedAt), &#123;STRING\(email), STRING\(name), STRING\(uuid)&#125;\(createdBy)&#125;] </details> |  |
-| pageCursor | STRING | Use this pageCursor returned by search results to get next page of results. GET /notes?pageCursor=&#123;pageCursor&#125; |
-| totalResults | INTEGER | Total number of notes that meet the specified parameters for the query |
-
-
-
-
-#### Output Example
-```json
-{
-  "data" : [ {
-    "id" : "",
-    "title" : "",
-    "content" : "",
-    "displayUrl" : "",
-    "externalDisplayUrl" : "",
-    "company" : {
-      "id" : ""
-    },
-    "user" : {
-      "id" : ""
-    },
-    "owner" : {
-      "email" : "",
-      "name" : ""
-    },
-    "followers" : [ {
-      "memberId" : "",
-      "memberName" : "",
-      "memberEmail" : "",
-      "teamId" : "",
-      "teamName" : ""
-    } ],
-    "state" : "",
-    "source" : {
-      "origin" : "",
-      "record_id" : ""
-    },
-    "tags" : "",
-    "features" : [ {
-      "id" : "",
-      "type" : "",
-      "importance" : 1
-    } ],
-    "createdAt" : "2021-01-01T00:00:00",
-    "updatedAt" : "2021-01-01T00:00:00",
-    "createdBy" : {
-      "email" : "",
-      "name" : "",
-      "uuid" : ""
-    }
-  } ],
-  "pageCursor" : "",
-  "totalResults" : 1
-}
-```
-
-
 ### Create Note
 Name: createNote
 
@@ -221,7 +138,6 @@ Name: createNote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
 | title | Title | STRING | Title of note. | true |
 | content | Content | STRING | HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out. | true |
 
@@ -231,7 +147,6 @@ Name: createNote
   "label" : "Create Note",
   "name" : "createNote",
   "parameters" : {
-    "X-Version" : 1,
     "title" : "",
     "content" : ""
   },
@@ -278,7 +193,6 @@ Name: deleteNote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
 | noteId | Note ID | STRING | ID of the note | true |
 
 #### Example JSON Structure
@@ -287,7 +201,6 @@ Name: deleteNote
   "label" : "Delete Note",
   "name" : "deleteNote",
   "parameters" : {
-    "X-Version" : 1,
     "noteId" : ""
   },
   "type" : "productboard/v1/deleteNote"
@@ -310,7 +223,6 @@ Name: getNote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
 | noteId | Note ID | STRING | ID of the note | true |
 
 #### Example JSON Structure
@@ -319,7 +231,6 @@ Name: getNote
   "label" : "Get Note",
   "name" : "getNote",
   "parameters" : {
-    "X-Version" : 1,
     "noteId" : ""
   },
   "type" : "productboard/v1/getNote"
@@ -400,7 +311,6 @@ Name: updateNote
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| X-Version | X - Version | INTEGER |  | true |
 | noteId | Note ID | STRING | ID of the note | true |
 | data | Data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(content), &#123;STRING\(email), STRING\(name)&#125;\(owner), [STRING]\(tags), STRING\(title)&#125; </details> |  | true |
 
@@ -410,7 +320,6 @@ Name: updateNote
   "label" : "Update Note",
   "name" : "updateNote",
   "parameters" : {
-    "X-Version" : 1,
     "noteId" : "",
     "data" : {
       "content" : "",
@@ -453,6 +362,101 @@ Type: OBJECT
     "id" : ""
   }
 }
+```
+
+
+### List All Notes
+Name: listNotes
+
+`Returns detail of all notes order by created_at desc`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List All Notes",
+  "name" : "listNotes",
+  "type" : "productboard/v1/listNotes"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the note. |
+| title | STRING | Title of note. |
+| content | STRING | HTML-encoded rich text supported by certain tags; unsupported tags will be stripped out. |
+| displayUrl | STRING | Note display url leading to Productboard detail page. |
+| externalDisplayUrl | STRING | URL in an external system where the note originated. |
+| company | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> |  |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> |  |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(name)&#125; </details> |  |
+| followers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(memberId), STRING\(memberName), STRING\(memberEmail), STRING\(teamId), STRING\(teamName)&#125;] </details> | The followers of the note. |
+| state | STRING | State of the note. |
+| source | OBJECT <details> <summary> Properties </summary> &#123;STRING\(origin), STRING\(record_id)&#125; </details> |  |
+| tags | STRING | Comma-separated list of tags. |
+| features | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(type), INTEGER\(importance)&#125;] </details> | All features related to a given note. |
+| createdAt | DATE_TIME | Date and time when the note was created. |
+| updatedAt | DATE_TIME | Date and time when the note was last updated. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(name), STRING\(uuid)&#125; </details> |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "title" : "",
+  "content" : "",
+  "displayUrl" : "",
+  "externalDisplayUrl" : "",
+  "company" : {
+    "id" : ""
+  },
+  "user" : {
+    "id" : ""
+  },
+  "owner" : {
+    "email" : "",
+    "name" : ""
+  },
+  "followers" : [ {
+    "memberId" : "",
+    "memberName" : "",
+    "memberEmail" : "",
+    "teamId" : "",
+    "teamName" : ""
+  } ],
+  "state" : "",
+  "source" : {
+    "origin" : "",
+    "record_id" : ""
+  },
+  "tags" : "",
+  "features" : [ {
+    "id" : "",
+    "type" : "",
+    "importance" : 1
+  } ],
+  "createdAt" : "2021-01-01T00:00:00",
+  "updatedAt" : "2021-01-01T00:00:00",
+  "createdBy" : {
+    "email" : "",
+    "name" : "",
+    "uuid" : ""
+  }
+} ]
 ```
 
 
@@ -541,3 +545,33 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Productboard to ByteChef using either a Public API Access Token (Bearer Token) or OAuth 2.0 Authorization Code.
+
+### Public API Access Token
+1. Log in to Productboard.
+2. Open **Settings** → **Integrations**.
+3. Go to the **Manage** tab.
+4. Under **Public APIs**, click **Access token**.
+5. Click **+ Add token** and follow the prompts.
+6. Copy the generated token value.
+
+### OAuth 2.0 Authorization Code
+1. In Productboard, open: https://app.productboard.com/oauth2/applications
+2. Click **New OAuth2 Application**.
+3. Enter a name, description, and any other required fields.
+4. Add the ByteChef OAuth redirect (callback) URL(s):
+   - Cloud: `https://app.bytechef.io/callback`
+   - Local development: `http://localhost:5173/callback`
+5. Select the scopes your app needs. For the ByteChef Productboard connector, enable:
+    - `notes:create`
+    - `notes:read`
+    - `notes:manage`
+    - `product_hierarchy_data:read`
+6. Click **Create Application**.
+7. Copy the generated `Client ID` and `Client Secret`.

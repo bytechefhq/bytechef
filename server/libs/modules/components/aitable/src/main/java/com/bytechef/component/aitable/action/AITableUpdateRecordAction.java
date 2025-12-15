@@ -26,13 +26,10 @@ import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.aitable.util.AITableUtils;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +47,6 @@ public class AITableUpdateRecordAction {
             string(RECORD_ID)
                 .label("Record ID")
                 .description("ID of the record to update.")
-                .optionsLookupDependsOn(DATASHEET_ID)
-                .options((OptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),
             FIELDS_DYNAMIC_PROPERTY)
         .output()
@@ -60,10 +55,8 @@ public class AITableUpdateRecordAction {
     private AITableUpdateRecordAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.patch("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
             .body(
                 Http.Body.of(
@@ -74,6 +67,6 @@ public class AITableUpdateRecordAction {
                             FIELDS, inputParameters.get(FIELDS)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

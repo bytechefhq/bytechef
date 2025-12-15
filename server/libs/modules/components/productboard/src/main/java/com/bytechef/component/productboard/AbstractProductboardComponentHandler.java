@@ -24,7 +24,6 @@ import com.bytechef.component.productboard.action.ProductboardCreateNoteAction;
 import com.bytechef.component.productboard.action.ProductboardDeleteNoteAction;
 import com.bytechef.component.productboard.action.ProductboardGetFeatureAction;
 import com.bytechef.component.productboard.action.ProductboardGetNoteAction;
-import com.bytechef.component.productboard.action.ProductboardListNotesAction;
 import com.bytechef.component.productboard.action.ProductboardUpdateNoteAction;
 import com.bytechef.component.productboard.connection.ProductboardConnection;
 
@@ -40,9 +39,8 @@ public abstract class AbstractProductboardComponentHandler implements OpenApiCom
             .description(
                 "Productboard is a product management platform that helps teams prioritize features, gather customer feedback, and align their product strategy to deliver better products."))
                     .actions(modifyActions(ProductboardGetFeatureAction.ACTION_DEFINITION,
-                        ProductboardListNotesAction.ACTION_DEFINITION, ProductboardCreateNoteAction.ACTION_DEFINITION,
-                        ProductboardDeleteNoteAction.ACTION_DEFINITION, ProductboardGetNoteAction.ACTION_DEFINITION,
-                        ProductboardUpdateNoteAction.ACTION_DEFINITION))
+                        ProductboardCreateNoteAction.ACTION_DEFINITION, ProductboardDeleteNoteAction.ACTION_DEFINITION,
+                        ProductboardGetNoteAction.ACTION_DEFINITION, ProductboardUpdateNoteAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ProductboardConnection.CONNECTION_DEFINITION))
                     .triggers(getTriggers());
 

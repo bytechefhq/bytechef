@@ -3,6 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import {
     ClusterElementDefinition,
     ComponentDefinition,
@@ -179,9 +180,14 @@ const DescriptionTab = ({invalidateWorkflowQueries, nodeDefinition, updateWorkfl
         });
     }, 600);
 
-    let workflowTaskOrTrigger = [...(workflow.tasks ?? []), ...(workflow.triggers ?? [])]?.find(
-        (task) => task.name === currentNode?.workflowNodeName
-    );
+    let workflowTaskOrTrigger =
+        workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName) ||
+        (currentNode?.workflowNodeName
+            ? getTask({
+                  tasks: workflow.tasks || [],
+                  workflowNodeName: currentNode.workflowNodeName,
+              })
+            : undefined);
 
     if (!workflowTaskOrTrigger && currentNode?.clusterElementType) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -17,12 +17,15 @@
 package com.bytechef.component.productboard.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import java.util.List;
 
 /**
  * Provides the component connection definition.
@@ -37,7 +40,21 @@ public class ProductboardConnection {
             .properties(
                 string(TOKEN)
                     .label("Token")
-                    .required(true)));
+                    .required(true)),
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/authorize")
+                .scopes((connection, context) -> List.of("notes:create", "notes:read", "notes:manage",
+                    "product_hierarchy_data:read"))
+                .tokenUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token")
+                .refreshUrl((connectionParameters, context) -> "https://app.productboard.com/oauth2/token"));
 
     private ProductboardConnection() {
     }

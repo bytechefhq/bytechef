@@ -130,18 +130,6 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         [onDeleteClick, path]
     );
 
-    const objectParameterKeys: Array<string> = useMemo(() => {
-        if (properties?.length) {
-            return properties.map((property) => property.name!);
-        }
-
-        if (parameterObject) {
-            return Object.keys(parameterObject);
-        }
-
-        return [];
-    }, [properties, parameterObject]);
-
     // render individual object items with data gathered from parameters
     useEffect(() => {
         if (
@@ -155,8 +143,47 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             return;
         }
 
-        const preexistingProperties = objectParameterKeys.map((parameterKey, index) => {
-            const matchingProperty = (properties as Array<PropertyAllType>)[index] as PropertyAllType;
+        const subPropertyKeySet = new Set<string>();
+        const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
+
+        if (path && dynamicPropertyTypes) {
+            const pathPrefix = `${path}.`;
+
+            Object.keys(dynamicPropertyTypes).forEach((dynamicKey) => {
+                if (dynamicKey.startsWith(pathPrefix)) {
+                    const subPropertyName = dynamicKey.substring(pathPrefix.length);
+
+                    if (subPropertyName && !subPropertyName.includes('.')) {
+                        subPropertyKeySet.add(subPropertyName);
+                    }
+                }
+            });
+        }
+
+        if (properties?.length) {
+            properties.forEach((property) => {
+                if (property.name) {
+                    subPropertyKeySet.add(property.name);
+                }
+            });
+        }
+
+        if (parameterObject) {
+            Object.keys(parameterObject).forEach((key) => {
+                subPropertyKeySet.add(key);
+            });
+        }
+
+        const objectParameterKeys = Array.from(subPropertyKeySet);
+
+        if (!objectParameterKeys.length) {
+            return;
+        }
+
+        const preexistingProperties = objectParameterKeys.map((parameterKey) => {
+            const matchingProperty = (properties as Array<PropertyAllType>).find(
+                (property) => property.name === parameterKey
+            ) as PropertyAllType | undefined;
 
             let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}.${parameterKey}`];
 
@@ -209,7 +236,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             setSubProperties(preexistingProperties as Array<PropertyAllType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [parameterObject, properties]);
+    }, [parameterObject, properties, path, currentComponent?.metadata?.ui?.dynamicPropertyTypes]);
 
     // set default values for subProperties when they are created
     useEffect(() => {
