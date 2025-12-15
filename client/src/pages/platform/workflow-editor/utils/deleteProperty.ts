@@ -10,7 +10,6 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function deleteProperty(
-    includeInMetadata = false,
     workflowId: string,
     path: string,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
@@ -42,7 +41,6 @@ export default function deleteProperty(
                 clusterElementType: currentNode?.clusterElementType,
                 clusterElementWorkflowNodeName: currentNode?.workflowNodeName,
                 deleteClusterElementParameterRequest: {
-                    includeInMetadata,
                     path,
                 },
                 environmentId: environmentStore.getState().currentEnvironmentId,
@@ -74,7 +72,6 @@ export default function deleteProperty(
     deleteWorkflowNodeParameterMutation.mutate(
         {
             deleteWorkflowNodeParameterRequest: {
-                includeInMetadata,
                 path,
             },
             environmentId: environmentStore.getState().currentEnvironmentId,
