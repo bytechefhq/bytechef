@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {memo} from 'react';
@@ -10,7 +10,7 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => (
     <div className="relative flex cursor-grab items-center justify-center">
         <Button
             className={twMerge(
-                'h-18 w-18 cursor-grab rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:bg-white [&_svg]:size-9'
+                'size-18 focus-visible:ring-stroke-brand-focus cursor-grab rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none active:bg-surface-neutral-primary [&_svg]:size-9'
             )}
         >
             {data.icon}
