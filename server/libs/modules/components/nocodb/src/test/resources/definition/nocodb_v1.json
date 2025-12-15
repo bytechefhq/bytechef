@@ -161,7 +161,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -186,7 +186,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -219,7 +219,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
+        "propertiesLookupDependsOn": [ "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -393,7 +393,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -418,7 +418,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -447,7 +447,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "MULTI_SELECT",
+      "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
       "description": "ID of the records to delete.",
       "displayCondition": null,
@@ -481,10 +481,7 @@
       "multipleValues": null,
       "name": "recordId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "required": true,
       "type": "ARRAY"
@@ -529,7 +526,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -554,7 +551,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -583,7 +580,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the record to retrieve.",
       "displayCondition": null,
@@ -597,10 +594,7 @@
       "minLength": null,
       "name": "recordId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
-      },
+      "optionsDataSource": null,
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -651,6 +645,263 @@
       "type": "ARRAY"
     } ],
     "title": "Get Record",
+    "workflowNodeDescription": null
+  }, {
+    "batch": null,
+    "deprecated": null,
+    "description": "Searches for records in the specified table.",
+    "help": null,
+    "metadata": null,
+    "name": "searchRecords",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the workspace.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Workspace ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "workspaceId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the base.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "baseId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "workspaceId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the table.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Table ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "tableId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": null,
+      "description": "Fields to include in the response. By default, all the fields are included in the response.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Fields",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "fields",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "tableId" ]
+      },
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Fields by which you want to sort the records in your response.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Field to sort by.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Field",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "field",
+          "options": null,
+          "optionsDataSource": {
+            "options": { },
+            "optionsLookupDependsOn": [ "tableId" ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": "asc",
+          "description": "Order in which to sort the records.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Order",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "order",
+          "options": [ {
+            "description": null,
+            "label": "Ascending",
+            "value": "asc"
+          }, {
+            "description": null,
+            "label": "Descending",
+            "value": "desc"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      } ],
+      "label": "Sort By",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "sort",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Specific conditions for filtering records in your response. Multiple conditions can be combined using logical operators such as 'and' and 'or'. Each condition consists of three parts: a field name, a comparison operator, and a value.",
+      "displayCondition": null,
+      "exampleValue": "(field1,eq,value1)~and(field2,eq,value2)",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Where",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "where",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Search Records",
     "workflowNodeDescription": null
   }, {
     "batch": null,
@@ -814,7 +1065,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -839,7 +1090,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -872,7 +1123,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
+        "propertiesLookupDependsOn": [ "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -1044,7 +1295,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1069,7 +1320,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1102,7 +1353,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
+        "propertiesLookupDependsOn": [ "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,
@@ -1280,7 +1531,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1305,7 +1556,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1334,7 +1585,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "MULTI_SELECT",
+      "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
       "description": "ID of the records to delete.",
       "displayCondition": null,
@@ -1368,10 +1619,7 @@
       "multipleValues": null,
       "name": "recordId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
-      },
+      "optionsDataSource": null,
       "placeholder": null,
       "required": true,
       "type": "ARRAY"
@@ -1420,7 +1668,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1445,7 +1693,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1474,7 +1722,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "SELECT",
+      "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the record to retrieve.",
       "displayCondition": null,
@@ -1488,10 +1736,7 @@
       "minLength": null,
       "name": "recordId",
       "options": null,
-      "optionsDataSource": {
-        "options": { },
-        "optionsLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
-      },
+      "optionsDataSource": null,
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -1542,6 +1787,267 @@
       "type": "ARRAY"
     } ],
     "title": "Get Record",
+    "type": {
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "name": "TOOLS",
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "description": "Searches for records in the specified table.",
+    "element": { },
+    "help": null,
+    "name": "searchRecords",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the workspace.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Workspace ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "workspaceId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the base.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Base ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "baseId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "workspaceId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the table.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Table ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "tableId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "baseId", "workspaceId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": null,
+      "description": "Fields to include in the response. By default, all the fields are included in the response.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Fields",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "fields",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "tableId" ]
+      },
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Fields by which you want to sort the records in your response.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "additionalProperties": null,
+        "advancedOption": null,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "metadata": { },
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Field to sort by.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Field",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "field",
+          "options": null,
+          "optionsDataSource": {
+            "options": { },
+            "optionsLookupDependsOn": [ "tableId" ]
+          },
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": null,
+          "controlType": "SELECT",
+          "defaultValue": "asc",
+          "description": "Order in which to sort the records.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": "Order",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "order",
+          "options": [ {
+            "description": null,
+            "label": "Ascending",
+            "value": "asc"
+          }, {
+            "description": null,
+            "label": "Descending",
+            "value": "desc"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        } ],
+        "required": null,
+        "type": "OBJECT"
+      } ],
+      "label": "Sort By",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "sort",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "Specific conditions for filtering records in your response. Multiple conditions can be combined using logical operators such as 'and' and 'or'. Each condition consists of three parts: a field name, a comparison operator, and a value.",
+      "displayCondition": null,
+      "exampleValue": "(field1,eq,value1)~and(field2,eq,value2)",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Where",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "where",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Search Records",
     "type": {
       "key": "tools",
       "label": "Tools",
@@ -1709,7 +2215,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1734,7 +2240,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": true,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1767,7 +2273,7 @@
       "displayCondition": null,
       "dynamicPropertiesDataSource": {
         "properties": { },
-        "propertiesLookupDependsOn": [ "tableId", "baseId", "workspaceId" ]
+        "propertiesLookupDependsOn": [ "tableId" ]
       },
       "expressionEnabled": null,
       "header": null,

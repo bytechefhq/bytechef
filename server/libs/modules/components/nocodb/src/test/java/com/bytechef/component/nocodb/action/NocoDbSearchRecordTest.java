@@ -16,8 +16,11 @@
 
 package com.bytechef.component.nocodb.action;
 
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.RECORD_ID;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.FIELDS;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.SORT;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
+import static com.bytechef.component.nocodb.constant.NocoDbConstants.WHERE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -29,6 +32,7 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.nocodb.action.NocoDbSearchRecords.SortRecord;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +42,8 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  */
-class NocoDbDeleteRecordsTest {
+class NocoDbSearchRecordTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
         forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
@@ -50,9 +53,12 @@ class NocoDbDeleteRecordsTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(TABLE_ID, "xy", RECORD_ID, List.of("123", "234")));
+        Map.of(
+            TABLE_ID, "xy", FIELDS, List.of("firstName", "lastName"),
+            SORT, List.of(new SortRecord("firstName", "asc"), new SortRecord("lastName", "desc"))));
     private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -63,9 +69,9 @@ class NocoDbDeleteRecordsTest {
 
                 return value.apply(mockedHttp);
             });
-        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -74,7 +80,7 @@ class NocoDbDeleteRecordsTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = NocoDbDeleteRecords.perform(mockedParameters, null, mockedContext);
+        Object result = NocoDbSearchRecords.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 
@@ -87,8 +93,14 @@ class NocoDbDeleteRecordsTest {
         Http.ResponseType responseType = configuration.getResponseType();
 
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/api/v2/tables/xy/records", stringArgumentCaptor.getValue());
-        assertEquals(Http.Body.of(List.of(Map.of("Id", "123"), Map.of("Id", "234")), Http.BodyContentType.JSON),
-            bodyArgumentCaptor.getValue());
+        assertEquals(List.of("/api/v2/tables/xy/records"), stringArgumentCaptor.getAllValues());
+
+        Object[] queryParameters = {
+            FIELDS, "firstName,lastName",
+            SORT, "firstName,-lastName",
+            WHERE, null
+        };
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
+
     }
 }
