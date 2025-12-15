@@ -1,5 +1,9 @@
 import ConnectionTabConnectionFieldset from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTabConnectionFieldset';
-import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentConnection,
+    ComponentDefinition,
+    WorkflowTestConfigurationConnection,
+} from '@/shared/middleware/platform/configuration';
 import {XIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -7,6 +11,7 @@ import {useConnectionNoteStore} from '../../../stores/useConnectionNoteStore';
 
 type ConnectionTabPropsType = {
     componentConnections: Array<ComponentConnection>;
+    currentComponentDefinition?: ComponentDefinition;
     workflowNodeName: string;
     workflowId: string;
     workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
@@ -14,6 +19,7 @@ type ConnectionTabPropsType = {
 
 const ConnectionTab = ({
     componentConnections,
+    currentComponentDefinition,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnections,
@@ -36,6 +42,7 @@ const ConnectionTab = ({
                     <ConnectionTabConnectionFieldset
                         componentConnection={componentConnection}
                         componentConnectionsCount={componentConnections.length}
+                        currentComponentDefinition={currentComponentDefinition}
                         key={componentConnection.key}
                         workflowId={workflowId}
                         workflowNodeName={workflowNodeName}

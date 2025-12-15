@@ -1,10 +1,15 @@
 import ConnectionTabConnectionSelect from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTabConnectionSelect';
-import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentConnection,
+    ComponentDefinition,
+    WorkflowTestConfigurationConnection,
+} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
 export interface ConnectionTabConnectionFieldsetProps {
     componentConnection: ComponentConnection;
     componentConnectionsCount: number;
+    currentComponentDefinition?: ComponentDefinition;
     workflowId: string;
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnection;
@@ -13,14 +18,21 @@ export interface ConnectionTabConnectionFieldsetProps {
 const ConnectionTabConnectionFieldset = ({
     componentConnection,
     componentConnectionsCount,
+    currentComponentDefinition,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: ConnectionTabConnectionFieldsetProps) => {
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: componentConnection.componentName,
-        componentVersion: componentConnection.componentVersion,
-    });
+    // this does remove the "1" fetch so need to check if good also need to check others
+    const {data: componentDefinitionData} = useGetComponentDefinitionQuery(
+        {
+            componentName: componentConnection.componentName,
+            componentVersion: componentConnection.componentVersion,
+        },
+        currentComponentDefinition === undefined
+    );
+
+    const componentDefinition = currentComponentDefinition ?? componentDefinitionData;
 
     if (!componentDefinition?.connection) {
         return <></>;
