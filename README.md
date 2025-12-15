@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/static/v1?label=license&message=Apache%20v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bytechef/bytechef)](https://hub.docker.com/r/bytechef/bytechef)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bytechefhq/bytechef/ci.yml?branch=main)](https://github.com/bytechefhq/bytechef/actions)
+[![Build Status](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-7389D8?logo=discord&logoColor=white)](https://discord.gg/VKvNxHjpYx)
 
 [![API integration and workflow automation platform](https://raw.githubusercontent.com/bytechefhq/bytechef/master/static/bytechef_logo.png)](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme)
@@ -12,7 +12,7 @@
 
 ByteChef is an open-source, workflow automation and low-code API integration platform that gives developers the power of code with the simplicity of visual design. With 200+ integrations, AI-native capabilities, and an Apache v2.0 license, ByteChef lets you build powerful automations and embed them into your products while maintaining full control over your data and deployments.
 
-  [Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Discord](https://discord.gg/VKvNxHjpYx) · [Live Demo](https://demo.bytechef.io) · [Connect on X](https://demo.bytechef.io)
+  [Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://demo.bytechef.io)
 
 </div>
 
