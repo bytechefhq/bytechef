@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {Button} from '@/components/ui/button';
 import {McpProjectWorkflow} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 
@@ -29,7 +29,7 @@ const McpProjectWorkflowList = ({mcpProjectWorkflows}: McpProjectWorkflowListPro
             ) : (
                 <div className="flex justify-center py-8">
                     <EmptyList
-                        button={<Button disabled>Create Workflow</Button>}
+                        button={<Button disabled label="Create Workflow" />}
                         icon={<WorkflowIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a workflow for this MCP project."
                         title="No Workflows"

@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -62,9 +62,7 @@ const McpProjectListItemDropdownMenu = ({
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="ghost">
-                        <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                    </Button>
+                    <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
