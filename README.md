@@ -10,8 +10,6 @@
 
 **Open-source, low-code, extendable API integration & workflow automation platform**
 
-ByteChef is an open-source, workflow automation and low-code API integration platform that gives developers the power of code with the simplicity of visual design. With 200+ integrations, AI-native capabilities, and an Apache v2.0 license, ByteChef lets you build powerful automations and embed them into your products while maintaining full control over your data and deployments.
-
   [Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://demo.bytechef.io)
 
 </div>
