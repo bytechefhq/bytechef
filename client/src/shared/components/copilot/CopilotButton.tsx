@@ -1,4 +1,4 @@
-import {Button} from '@/components/ui/button';
+import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -36,9 +36,13 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
         <Tooltip>
             <TooltipTrigger asChild>
                 {ai.copilot.enabled && ff_1570 && (
-                    <Button className="[&_svg]:size-5" onClick={handleClick} size="icon" variant="ghost">
-                        <SparklesIcon />
-                    </Button>
+                    <Button
+                        className="[&_svg]:size-5"
+                        icon={<SparklesIcon />}
+                        onClick={handleClick}
+                        size="icon"
+                        variant="ghost"
+                    />
                 )}
             </TooltipTrigger>
 

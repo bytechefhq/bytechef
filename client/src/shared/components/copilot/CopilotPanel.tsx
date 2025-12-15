@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import {Thread} from '@/components/assistant-ui/thread';
-import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
@@ -81,17 +81,18 @@ const CopilotPanel = () => {
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button onClick={handleCleanMessages} size="icon" variant="ghost">
-                                <MessageSquareOffIcon className="size-4" />
-                            </Button>
+                            <Button
+                                icon={<MessageSquareOffIcon />}
+                                onClick={handleCleanMessages}
+                                size="icon"
+                                variant="ghost"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent>Clean messages</TooltipContent>
                     </Tooltip>
 
-                    <Button onClick={handleCloseClick} size="icon" variant="ghost">
-                        <XIcon />
-                    </Button>
+                    <Button icon={<XIcon />} onClick={handleCloseClick} size="icon" variant="ghost" />
                 </div>
             </div>
 
