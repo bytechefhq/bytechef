@@ -42,7 +42,7 @@ public class NocoDbConstants {
         .description("ID of the base.")
         .options((OptionsFunction<String>) NocoDbUtils::getBaseIdOptions)
         .optionsLookupDependsOn(WORKSPACE_ID)
-        .required(true);
+        .required(false);
 
     public static final ModifiableStringProperty TABLE_ID_PROPERTY = string(TABLE_ID)
         .label("Table ID")
@@ -55,7 +55,7 @@ public class NocoDbConstants {
         .label("Workspace ID")
         .description("ID of the workspace.")
         .options((OptionsFunction<String>) NocoDbUtils::getWorkspaceIdOptions)
-        .required(true);
+        .required(false);
 
     private NocoDbConstants() {
     }
