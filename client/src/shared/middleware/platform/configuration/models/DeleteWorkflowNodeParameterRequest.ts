@@ -20,12 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface DeleteWorkflowNodeParameterRequest {
     /**
-     * If path and value type should be included in metadata.
-     * @type {boolean}
-     * @memberof DeleteWorkflowNodeParameterRequest
-     */
-    includeInMetadata?: boolean;
-    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof DeleteWorkflowNodeParameterRequest
@@ -51,7 +45,6 @@ export function DeleteWorkflowNodeParameterRequestFromJSONTyped(json: any, ignor
     }
     return {
         
-        'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
     };
 }
@@ -67,7 +60,6 @@ export function DeleteWorkflowNodeParameterRequestToJSONTyped(value?: DeleteWork
 
     return {
         
-        'includeInMetadata': value['includeInMetadata'],
         'path': value['path'],
     };
 }

@@ -21,12 +21,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteClusterElementParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:33.876560+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-15T09:52:48.574632+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public class DeleteClusterElementParameterRequestModel {
 
   private Boolean fromAiInMetadata = false;
-
-  private Boolean includeInMetadata = false;
 
   private String path;
 
@@ -61,26 +59,6 @@ public class DeleteClusterElementParameterRequestModel {
     this.fromAiInMetadata = fromAiInMetadata;
   }
 
-  public DeleteClusterElementParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
-    this.includeInMetadata = includeInMetadata;
-    return this;
-  }
-
-  /**
-   * If path and value type should be included in metadata.
-   * @return includeInMetadata
-   */
-  
-  @Schema(name = "includeInMetadata", description = "If path and value type should be included in metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("includeInMetadata")
-  public Boolean getIncludeInMetadata() {
-    return includeInMetadata;
-  }
-
-  public void setIncludeInMetadata(Boolean includeInMetadata) {
-    this.includeInMetadata = includeInMetadata;
-  }
-
   public DeleteClusterElementParameterRequestModel path(String path) {
     this.path = path;
     return this;
@@ -111,13 +89,12 @@ public class DeleteClusterElementParameterRequestModel {
     }
     DeleteClusterElementParameterRequestModel deleteClusterElementParameterRequest = (DeleteClusterElementParameterRequestModel) o;
     return Objects.equals(this.fromAiInMetadata, deleteClusterElementParameterRequest.fromAiInMetadata) &&
-        Objects.equals(this.includeInMetadata, deleteClusterElementParameterRequest.includeInMetadata) &&
         Objects.equals(this.path, deleteClusterElementParameterRequest.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromAiInMetadata, includeInMetadata, path);
+    return Objects.hash(fromAiInMetadata, path);
   }
 
   @Override
@@ -125,7 +102,6 @@ public class DeleteClusterElementParameterRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeleteClusterElementParameterRequestModel {\n");
     sb.append("    fromAiInMetadata: ").append(toIndentedString(fromAiInMetadata)).append("\n");
-    sb.append("    includeInMetadata: ").append(toIndentedString(includeInMetadata)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("}");
     return sb.toString();

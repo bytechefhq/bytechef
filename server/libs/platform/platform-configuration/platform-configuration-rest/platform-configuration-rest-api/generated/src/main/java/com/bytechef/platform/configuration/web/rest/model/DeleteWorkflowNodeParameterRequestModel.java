@@ -21,10 +21,8 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:33.876560+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-15T09:52:48.574632+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public class DeleteWorkflowNodeParameterRequestModel {
-
-  private Boolean includeInMetadata = false;
 
   private String path;
 
@@ -37,26 +35,6 @@ public class DeleteWorkflowNodeParameterRequestModel {
    */
   public DeleteWorkflowNodeParameterRequestModel(String path) {
     this.path = path;
-  }
-
-  public DeleteWorkflowNodeParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
-    this.includeInMetadata = includeInMetadata;
-    return this;
-  }
-
-  /**
-   * If path and value type should be included in metadata.
-   * @return includeInMetadata
-   */
-  
-  @Schema(name = "includeInMetadata", description = "If path and value type should be included in metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("includeInMetadata")
-  public Boolean getIncludeInMetadata() {
-    return includeInMetadata;
-  }
-
-  public void setIncludeInMetadata(Boolean includeInMetadata) {
-    this.includeInMetadata = includeInMetadata;
   }
 
   public DeleteWorkflowNodeParameterRequestModel path(String path) {
@@ -88,20 +66,18 @@ public class DeleteWorkflowNodeParameterRequestModel {
       return false;
     }
     DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequest = (DeleteWorkflowNodeParameterRequestModel) o;
-    return Objects.equals(this.includeInMetadata, deleteWorkflowNodeParameterRequest.includeInMetadata) &&
-        Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path);
+    return Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(includeInMetadata, path);
+    return Objects.hash(path);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeleteWorkflowNodeParameterRequestModel {\n");
-    sb.append("    includeInMetadata: ").append(toIndentedString(includeInMetadata)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("}");
     return sb.toString();
