@@ -107,7 +107,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, boolean fromAiInMetadata,
-        boolean includeInMetadata, long environmentId) {
+        long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -145,9 +145,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             fromAiPaths.remove(parameterPath);
         }
 
-        if (includeInMetadata) {
-            setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
-        }
+        setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
@@ -159,7 +157,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public ParameterResultDTO deleteWorkflowNodeParameter(
-        String workflowId, String workflowNodeName, String parameterPath, boolean includeInMetadata,
+        String workflowId, String workflowNodeName, String parameterPath,
         long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -191,9 +189,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        if (includeInMetadata) {
-            setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
-        }
+        setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());

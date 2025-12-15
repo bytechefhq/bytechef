@@ -61,7 +61,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
             id, workflowNodeName, clusterElementType.toUpperCase(), clusterElementWorkflowNodeName,
             deleteWorkflowNodeParameterRequestModel.getPath(),
             deleteWorkflowNodeParameterRequestModel.getFromAiInMetadata(),
-            deleteWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
+            environmentId);
 
         return ResponseEntity.ok(
             conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
@@ -73,8 +73,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
         DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
 
         ParameterResultDTO parameterResultDTO = workflowNodeParameterFacade.deleteWorkflowNodeParameter(
-            id, workflowNodeName, deleteWorkflowNodeParameterRequestModel.getPath(),
-            deleteWorkflowNodeParameterRequestModel.getIncludeInMetadata(), environmentId);
+            id, workflowNodeName, deleteWorkflowNodeParameterRequestModel.getPath(), environmentId);
 
         return ResponseEntity.ok(
             conversionService.convert(parameterResultDTO, DeleteClusterElementParameter200ResponseModel.class));
