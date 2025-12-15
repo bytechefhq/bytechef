@@ -33,7 +33,6 @@ import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TITLE;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -131,8 +130,6 @@ public class NocoDbUtils {
                 properties.addFirst(
                     integer("Id")
                         .description("Id of the record to update.")
-                        .options((OptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
-                        .optionsLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
                         .required(true));
             }
 
@@ -158,31 +155,6 @@ public class NocoDbUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(body);
-    }
-
-    public static List<Option<Long>> getRecordIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) {
-
-        Map<String, Object> body = context
-            .http(http -> http.get("/api/v2/tables/" + inputParameters.getRequiredString(TABLE_ID) + "/records"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<Long>> options = new ArrayList<>();
-
-        if (body.get("list") instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    long id = (Integer) map.get("Id");
-
-                    options.add(option(String.valueOf(id), id));
-                }
-            }
-        }
-
-        return options;
     }
 
     public static List<Option<String>> getTableIdOptions(
