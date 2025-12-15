@@ -1,5 +1,5 @@
+import Button from '@/components/Button/Button';
 import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/CreatableSelect';
-import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, PlusIcon, XIcon} from 'lucide-react';
@@ -27,15 +27,16 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
 
         <Tooltip>
             <TooltipTrigger asChild>
-                <button
-                    className="ml-1.5 rounded-full p-1 text-red-500 hover:bg-red-100 hover:text-red-700"
+                <Button
+                    className="ml-1.5 rounded-full opacity-100"
+                    icon={<XIcon />}
                     onClick={() => onDeleteTag(tag)}
-                >
-                    <XIcon className="size-3 cursor-pointer" />
-                </button>
+                    size="iconXxs"
+                    variant="destructiveGhost"
+                />
             </TooltipTrigger>
 
-            <TooltipContent>Remove</TooltipContent>
+            <TooltipContent>Remove tag</TooltipContent>
         </Tooltip>
     </div>
 );
@@ -69,7 +70,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
     };
 
     return (
-        <div className="mr-4 flex h-7 items-center space-x-2">
+        <div className="mr-4 flex h-7 items-center justify-center gap-2">
             <span className="text-xs text-gray-500">Tags:</span>
 
             {tags.slice(0, 3).map((tag) => (
@@ -80,13 +81,12 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                            className="mr-2 size-6"
+                            className="[&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
+                            icon={<ChevronDownIcon />}
                             onClick={() => setShowAllTags(!showAllTags)}
-                            size="icon"
+                            size="iconXs"
                             variant="ghost"
-                        >
-                            <ChevronDownIcon />
-                        </Button>
+                        />
                     </PopoverTrigger>
 
                     <PopoverContent align="end" className="w-min p-2">
@@ -130,7 +130,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                                 minHeight: '1.5rem',
                                 padding: '0',
                             }),
-                            dropdownIndicator: (styles: any) => ({...styles, padding: '0.2rem'}),
+                            dropdownIndicator: (styles: any) => ({...styles, cursor: 'pointer', padding: '0.2rem'}),
                             valueContainer: (styles: any) => ({...styles, padding: '0 0.4rem'}),
                         }}
                     />
@@ -138,35 +138,34 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                className="px-2 text-red-500 hover:bg-red-100 hover:text-red-700"
+                                className="opacity-100"
+                                icon={<XIcon />}
                                 onClick={() => setIsNewTagWindowVisible(false)}
-                                size="sm"
-                                variant="ghost"
-                            >
-                                <XIcon />
-                            </Button>
+                                size="iconSm"
+                                variant="destructiveGhost"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent>Cancel adding a new tag</TooltipContent>
                     </Tooltip>
                 </>
             ) : (
-                <div
-                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-border/50 hover:bg-gray-200"
-                    onClick={(event) => {
-                        event.preventDefault();
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={<PlusIcon />}
+                            onClick={(event) => {
+                                event.preventDefault();
 
-                        setIsNewTagWindowVisible(true);
-                    }}
-                >
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <PlusIcon className="size-3" />
-                        </TooltipTrigger>
+                                setIsNewTagWindowVisible(true);
+                            }}
+                            size="iconXs"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
 
-                        <TooltipContent>Add new tag</TooltipContent>
-                    </Tooltip>
-                </div>
+                    <TooltipContent>Add new tag</TooltipContent>
+                </Tooltip>
             )}
         </div>
     );
