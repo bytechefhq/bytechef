@@ -21,20 +21,16 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID_PROPERTY;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.RECORD_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID_PROPERTY;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID_PROPERTY;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.nocodb.util.NocoDbUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +51,6 @@ public class NocoDbDeleteRecords {
                 .label("Records ID")
                 .description("ID of the records to delete.")
                 .items(integer())
-                .options((OptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
-                .optionsLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
                 .minItems(1)
                 .required(true))
         .output(

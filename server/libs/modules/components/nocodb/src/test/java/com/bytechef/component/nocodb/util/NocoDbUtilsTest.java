@@ -169,18 +169,6 @@ class NocoDbUtilsTest {
     }
 
     @Test
-    void testGetRecordIdOptions() {
-        mockHttpParemeters();
-
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("list", List.of(Map.of("Id", 123))));
-
-        assertEquals(
-            List.of(option("123", 123)),
-            NocoDbUtils.getRecordIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
-    }
-
-    @Test
     void testGetTableIdOptions() {
         mockHttpParemeters();
 

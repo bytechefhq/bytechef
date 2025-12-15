@@ -19,21 +19,17 @@ package com.bytechef.component.nocodb.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.BASE_ID_PROPERTY;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.FIELDS;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.RECORD_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.TABLE_ID_PROPERTY;
-import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID;
 import static com.bytechef.component.nocodb.constant.NocoDbConstants.WORKSPACE_ID_PROPERTY;
 
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.nocodb.util.NocoDbUtils;
 import java.util.List;
 
 /**
@@ -51,8 +47,6 @@ public class NocoDbGetRecord {
             string(RECORD_ID)
                 .label("Record ID")
                 .description("ID of the record to retrieve.")
-                .options((OptionsFunction<Long>) NocoDbUtils::getRecordIdOptions)
-                .optionsLookupDependsOn(TABLE_ID, BASE_ID, WORKSPACE_ID)
                 .required(true),
             array(FIELDS)
                 .label("Fields")
