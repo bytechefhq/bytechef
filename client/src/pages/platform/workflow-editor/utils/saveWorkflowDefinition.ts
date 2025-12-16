@@ -275,15 +275,10 @@ function executeWorkflowMutation({
         },
         {
             onSuccess: () => {
-                console.log('saveWorkflowDefinition onSuccess');
-
                 if (onSuccess) {
                     onSuccess();
                 }
 
-                // Call invalidateWorkflowQueries if provided. The function itself is now smart enough
-                // to check if the query is already invalidated or fetching before invalidating again.
-                // This prevents duplicate invalidations when the mutation's onSuccess already handled it.
                 if (invalidateWorkflowQueries) {
                     invalidateWorkflowQueries();
                 }
