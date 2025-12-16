@@ -640,7 +640,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": null,
+      "description": "Status or Task Group ID of the group where the task will be stored.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
