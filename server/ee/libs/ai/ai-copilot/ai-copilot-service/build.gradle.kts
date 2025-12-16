@@ -9,7 +9,6 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-anthropic")
     implementation("org.springframework.ai:spring-ai-openai")
     implementation("org.springframework.data:spring-data-jdbc")
-    implementation("org.postgresql:postgresql:42.7.5")
     implementation(files("../libs/ag-ui/core-0.0.1.jar"))
     implementation(files("../libs/ag-ui/json-0.0.1.jar"))
     implementation(files("../libs/ag-ui/server-0.0.1.jar"))
