@@ -16,7 +16,7 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
-    invalidateWorkflowQueries: () => void;
+    invalidateWorkflowQueries?: () => void;
     nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
@@ -243,7 +243,7 @@ interface ExecuteWorkflowMutationProps {
         tasks?: Array<WorkflowTask>;
         triggers?: Array<WorkflowTrigger>;
     };
-    invalidateWorkflowQueries: () => void;
+    invalidateWorkflowQueries?: () => void;
     onSuccess?: () => void;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
     workflow: Workflow;
@@ -275,11 +275,18 @@ function executeWorkflowMutation({
         },
         {
             onSuccess: () => {
+                console.log('saveWorkflowDefinition onSuccess');
+
                 if (onSuccess) {
                     onSuccess();
                 }
 
-                invalidateWorkflowQueries();
+                // Call invalidateWorkflowQueries if provided. The function itself is now smart enough
+                // to check if the query is already invalidated or fetching before invalidating again.
+                // This prevents duplicate invalidations when the mutation's onSuccess already handled it.
+                if (invalidateWorkflowQueries) {
+                    invalidateWorkflowQueries();
+                }
             },
         }
     );

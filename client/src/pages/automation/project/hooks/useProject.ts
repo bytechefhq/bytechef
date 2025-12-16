@@ -172,6 +172,25 @@ export const useProject = () => {
         },
     });
 
+    const invalidateWorkflowQueries = () => {
+        const queryKey = ProjectWorkflowKeys.projectWorkflows(+projectId!);
+        const queryState = queryClient.getQueryState(queryKey);
+
+        if (queryState) {
+            const isInvalidated = queryState.isInvalidated;
+
+            const isFetching = queryState.status === 'pending' || queryState.fetchStatus === 'fetching';
+
+            if (isInvalidated || isFetching) {
+                return;
+            }
+        }
+
+        queryClient.invalidateQueries({
+            queryKey,
+        });
+    };
+
     const handleProjectClick = (projectId: number, projectWorkflowId: number) => {
         navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
     };
@@ -240,6 +259,7 @@ export const useProject = () => {
         filterData,
         handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
+        invalidateWorkflowQueries,
         projectId: parseInt(projectId!),
         projectWorkflowId: parseInt(projectWorkflowId!),
         projects,

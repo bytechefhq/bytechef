@@ -13,8 +13,6 @@ import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuratio
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useQueryClient} from '@tanstack/react-query';
 import {useShallow} from 'zustand/react/shallow';
 
 const Project = () => {
@@ -41,6 +39,7 @@ const Project = () => {
         deleteWorkflowNodeParameterMutation,
         handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
+        invalidateWorkflowQueries,
         projectId,
         projectWorkflowId,
         projects,
@@ -52,8 +51,6 @@ const Project = () => {
     } = useProject();
 
     const {runDisabled} = useRun();
-
-    const queryClient = useQueryClient();
 
     return (
         <div className="flex w-full">
@@ -89,12 +86,7 @@ const Project = () => {
                                     ConnectionKeys: ConnectionKeys,
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
-                                    invalidateWorkflowQueries: () => {
-                                        queryClient.invalidateQueries({
-                                            queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
-                                        });
-                                        // queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
-                                    },
+                                    invalidateWorkflowQueries,
                                     updateClusterElementParameterMutation,
                                     updateWorkflowMutation: updateWorkflowEditorMutation,
                                     updateWorkflowNodeParameterMutation,
