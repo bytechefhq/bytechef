@@ -47,6 +47,8 @@ public class GithubConstants {
     public static final String HEAD_REPO = "head_repo";
     public static final String BASE = "base";
     public static final String DRAFT = "draft";
+    public static final String ORGANIZATION = "organization";
+    public static final String DEFAULT_BRANCH_ONLY = "defaultBranchOnly";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
         .properties(
