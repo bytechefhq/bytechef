@@ -3,18 +3,22 @@
 Connect monday.com to ByteChef using OAuth 2.0 (Authorization Code).
 
 ### Create an OAuth app in monday.com
-1. Open monday.com and click your profile avatar (top-right)
+1. Open monday.com and click your profile avatar (top-right).
 2. Click on **Developers** to open the Developer Center.
-3. Click **Build app** (or open your existing app).
+3. Click **Create app** (or open your existing app).
 4. Give the app a clear name, for example `ByteChef Integration`.
-5. In the left menu, open **OAuth**.
+5. In the left menu, open **Build** and choose **OAuth & permissions**.
 6. Add the following scopes (minimum required by ByteChef):
    - `boards:read`
    - `boards:write`
    - `workspaces:read`
    - `webhooks:write`
 7. Save the scopes.
-8. Add the ByteChef OAuth redirect (callback) URL(s):
+8. Click on **Redirect URLs** and add the ByteChef OAuth redirect (callback) URL(s):
     - Cloud: `https://app.bytechef.io/callback`
     - Local development: `http://127.0.0.1:5173/callback` or `http://localhost:5173/callback`
-9. Copy your **Client ID** and **Client Secret** for later.
+9. Go back to **General settings** and copy your **Client ID** and **Client Secret** for later.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/z4s4DK5VY6yXHQmp3feO?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
