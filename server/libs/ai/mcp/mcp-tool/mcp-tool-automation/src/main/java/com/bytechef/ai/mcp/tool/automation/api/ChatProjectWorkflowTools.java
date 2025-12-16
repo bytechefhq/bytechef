@@ -19,7 +19,11 @@ package com.bytechef.ai.mcp.tool.automation.api;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 import java.util.List;
 
+/**
+ * @author Marko Kriskovic
+ */
 public interface ChatProjectWorkflowTools {
+
     ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(String workflowId);
 
     String getWorkflowBuildInstructions();

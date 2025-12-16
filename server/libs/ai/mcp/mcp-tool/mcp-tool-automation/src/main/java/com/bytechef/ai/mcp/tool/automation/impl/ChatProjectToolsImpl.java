@@ -23,6 +23,9 @@ import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class ChatProjectToolsImpl implements ChatProjectTools {
     private final ProjectTools delegate;
 
