@@ -23,7 +23,6 @@ const ConnectionTabConnectionFieldset = ({
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: ConnectionTabConnectionFieldsetProps) => {
-    // this does remove the "1" fetch so need to check if good also need to check others
     const {data: componentDefinitionData} = useGetComponentDefinitionQuery(
         {
             componentName: componentConnection.componentName,

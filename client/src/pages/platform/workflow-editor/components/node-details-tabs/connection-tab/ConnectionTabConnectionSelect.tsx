@@ -84,8 +84,6 @@ const ConnectionTabConnectionSelect = ({
         componentVersion,
     });
 
-    console.log('ConnTabConnSelect');
-
     const {data: componentConnections} = useGetConnectionsQuery!(
         {
             componentName: componentConnection?.componentName,
