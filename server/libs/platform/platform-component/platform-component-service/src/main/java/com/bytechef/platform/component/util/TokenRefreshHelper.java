@@ -77,7 +77,7 @@ public class TokenRefreshHelper {
         try {
             return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
-            if (componentConnection == null || componentConnection.authorizationType() == null
+            if (Objects.isNull(componentConnection) || Objects.isNull(componentConnection.authorizationType())
                 || Objects.isNull(exception.getMessage())) {
 
                 throw exception;
@@ -133,11 +133,11 @@ public class TokenRefreshHelper {
                     {
                         put(ACCESS_TOKEN, refreshTokenResponse.accessToken());
 
-                        if (refreshTokenResponse.refreshToken() != null) {
+                        if (Objects.nonNull(refreshTokenResponse.refreshToken())) {
                             put(REFRESH_TOKEN, refreshTokenResponse.refreshToken());
                         }
 
-                        if (refreshTokenResponse.expiresIn() != null) {
+                        if (Objects.nonNull(refreshTokenResponse.expiresIn())) {
                             put(EXPIRES_IN, refreshTokenResponse.expiresIn());
                         }
                     }
