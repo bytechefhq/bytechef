@@ -457,8 +457,9 @@ Follow these steps to connect Jira Cloud to ByteChef using OAuth 2.0.
 2. Sign in with your Atlassian account (create one if needed).
 3. Click **Create** and choose **OAuth 2.0 integration**.
 4. Enter the app details (e.g., App name: "ByteChef Jira Integration") and accept Atlassian's developer terms, then click **Create**.
-
-5. Configure permissions (scopes):
+5. Click on **Permissions**.
+6. Find Jira API and click **Add** and then click **Configure**.
+7. Configure permissions (scopes):
    - In the Permissions tab, add the following scopes required by ByteChef Jira component:
      - manage:jira-webhook
      - read:jira-work
@@ -466,14 +467,18 @@ Follow these steps to connect Jira Cloud to ByteChef using OAuth 2.0.
      - read:jira-user
    - You can adjust scopes later if your workflows need more/less access.
 
-6. Configure a redirect (callback) URL:
+8. Configure a redirect (callback) URL:
    - Go to the **Authorization** tab and add the Callback URL:
         - `https://app.bytechef.io/callback` (Cloud)
         - `http://127.0.0.1:5173/callback` (Local dev)
 
-7. Retrieve credentials:
+9. Retrieve credentials:
    - Open the **Settings** page of your app and copy the **Client ID** and **Client Secret**.
 
 Notes:
 
 - Jira Cloud only: This connection uses Atlassian Cloud APIs. After consent, ByteChef automatically discovers the correct Jira site base URL.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/F5ZSvN2vE0Hbv1eRg6eM?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
