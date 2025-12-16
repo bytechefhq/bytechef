@@ -576,7 +576,20 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 ![anl-c-dropbox-md](https://static.scarf.sh/a.png?x-pxid=8999e724-f122-49be-a4bb-139c6576aec3)
 ## Connection Setup
 
-[Setting up OAuth2](https://developers.dropbox.com/oauth-guide)
+Connect Dropbox to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a Dropbox OAuth app
+
+1. Open the [App Console](https://www.dropbox.com/developers/apps). Click on **Create app**.
+2. In Choose an API, select Scoped access. Choose the type of access you need and enter a name for your app. Click **Create app**.
+3. Add the ByteChef OAuth redirect (callback) URL(s):
+    - Cloud: `https://app.bytechef.io/callback`
+    - Local development: `http://localhost:5173/callback`
+4. Click on **Show**.
+5. Copy the **App key** and **Secret**.
+6. Go to **Permissions** tab.
+7. Select scopes: `files.metadata.write`, `files.content.write` and `openId`.
+8. Click **Submit**.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/756fb792-9de7-4ac9-b58a-c8c8a95fab66?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>

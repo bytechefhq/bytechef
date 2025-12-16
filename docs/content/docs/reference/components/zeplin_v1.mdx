@@ -129,3 +129,25 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+## Connection Setup
+
+Connect Zeplin to ByteChef using OAuth 2.0 (Authorization Code).
+
+### Create a Zeplin OAuth app
+
+1. Log in to the Zeplin profile page and go to the [Developer tab](https://app.zeplin.io/profile/developer).
+2. Click **Create new app**.
+3. Enter an app name (for example, `ByteChef Integration`).
+4. Add the ByteChef OAuth redirect (callback) URL(s):
+    - Cloud: `https://app.bytechef.io/callback`
+    - Local development: `http://127.0.0.1:5173/callback`
+5. Click **CREATE**.
+6. Copy **Client ID** and **Client Secret**. You will use these in ByteChef when creating the Zeplin connection.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 99999, boxSizing: 'border-box', paddingBottom: 'calc(53.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/SGg69P7XD9vjivIbNZ1n?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
