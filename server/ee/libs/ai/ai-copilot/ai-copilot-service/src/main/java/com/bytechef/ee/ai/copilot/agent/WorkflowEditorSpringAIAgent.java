@@ -74,18 +74,20 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService)
         throws AGUIException {
+
         super(builder);
+
         this.tools = builder.tools;
 
+        this.advisors = builder.advisors;
+        this.chatMemory = builder.chatMemory;
         this.projectTools = (ProjectTools) tools.get(0);
         this.projectWorkflowTools = (ProjectWorkflowTools) tools.get(1);
+
         this.chatProjectTools = new ChatProjectToolsImpl(projectTools);
         this.chatProjectWorkflowTools = new ChatProjectWorkflowToolsImpl(projectWorkflowTools);
 
         this.workflowService = workflowService;
-
-        this.chatMemory = builder.chatMemory;
-        this.advisors = builder.advisors;
         this.chatClient = builder.chatClient;
     }
 
@@ -119,10 +121,12 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     @Override
     protected void run(RunAgentInput input, AgentSubscriber subscriber) {
         try {
-            String mode = (String) input.state()
-                .get("mode");
+            State state = input.state();
+
+            String mode = (String) state.get("mode");
 
             List<Object> selectedTools = new ArrayList<>(tools);
+
             if (mode.equals("CHAT")) {
                 selectedTools.set(0, chatProjectTools);
                 selectedTools.set(1, chatProjectWorkflowTools);
@@ -131,17 +135,15 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
                 selectedTools.set(1, projectWorkflowTools);
             }
 
-            SystemMessage systemMessage = createSystemMessage(input.state(), input.context());
+            SystemMessage systemMessage = createSystemMessage(state, input.context());
 
             UserMessage userMessage = getLatestUserMessage(input.messages());
             String userContent = userMessage.getContent();
 
-            String messageId = UUID.randomUUID()
-                .toString();
             AssistantMessage assistantMessage = new AssistantMessage();
-            assistantMessage.setId(messageId);
+            String messageId = String.valueOf(UUID.randomUUID());
 
-            List<BaseEvent> deferredEvents = new ArrayList<>();
+            assistantMessage.setId(messageId);
 
             emitEvent(EventFactory.runStartedEvent(input.runId(), input.threadId()), subscriber);
             emitEvent(EventFactory.textMessageStartEvent(messageId, "assistant"), subscriber);
@@ -159,15 +161,16 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
             if (Objects.nonNull(this.chatMemory)) {
                 try {
-                    chatRequest.advisors(new Advisor[] {
+                    chatRequest.advisors(
                         PromptChatMemoryAdvisor.builder(this.chatMemory)
-                            .build()
-                    });
+                            .build());
                     chatRequest.advisors((a) -> a.param("chat_memory_conversation_id", input.threadId()));
                 } catch (RuntimeException e) {
                     throw new AGUIException("Could not add chat memory", e);
                 }
             }
+
+            List<BaseEvent> deferredEvents = new ArrayList<>();
 
             chatRequest.stream()
                 .chatResponse()
@@ -182,11 +185,12 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     }
 
     private void handleChatResponse(
-        ChatResponse chatResponse, AssistantMessage assistantMessage,
-        String messageId, AgentSubscriber subscriber) {
+        ChatResponse chatResponse, AssistantMessage assistantMessage, String messageId, AgentSubscriber subscriber) {
+
         String content = chatResponse.getResult()
             .getOutput()
             .getText();
+
         if (content != null && !content.isEmpty()) {
             assistantMessage.setContent(
                 (assistantMessage.getContent() != null ? assistantMessage.getContent() : "") + content);
@@ -194,18 +198,19 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         }
     }
 
-    private void handleError(Throwable error, AgentSubscriber subscriber) {
-        emitEvent(EventFactory.runErrorEvent(error.getMessage()), subscriber);
-    }
-
     private void handleCompletion(
-        RunAgentInput input, AssistantMessage assistantMessage,
-        String messageId, List<BaseEvent> deferredEvents, AgentSubscriber subscriber) {
+        RunAgentInput input, AssistantMessage assistantMessage, String messageId, List<BaseEvent> deferredEvents,
+        AgentSubscriber subscriber) {
+
         emitEvent(EventFactory.textMessageEndEvent(messageId), subscriber);
         deferredEvents.forEach(event -> emitEvent(event, subscriber));
         subscriber.onNewMessage(assistantMessage);
         emitEvent(EventFactory.runFinishedEvent(input.threadId(), input.runId()), subscriber);
         subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), this.state, this, input));
+    }
+
+    private void handleError(Throwable error, AgentSubscriber subscriber) {
+        emitEvent(EventFactory.runErrorEvent(error.getMessage()), subscriber);
     }
 
     public static class Builder extends SpringAIAgent.Builder {
@@ -228,6 +233,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder advisors(List<Advisor> advisors) {
             super.advisors(advisors);
+
             this.advisors = advisors;
 
             return this;
@@ -242,6 +248,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder tools(List<Object> tools) {
             super.tools(tools);
+
             this.tools = tools;
 
             return this;
@@ -292,6 +299,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder chatMemory(ChatMemory chatMemory) {
             super.chatMemory(chatMemory);
+
             this.chatMemory = chatMemory;
 
             return this;
@@ -317,5 +325,4 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return new WorkflowEditorSpringAIAgent(this, workflowService);
         }
     }
-
 }

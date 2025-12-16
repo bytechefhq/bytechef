@@ -19,7 +19,11 @@ package com.bytechef.ai.mcp.tool.automation.api;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import java.util.List;
 
+/**
+ * @author Marko Kriskovic
+ */
 public interface ChatProjectTools {
+
     List<ProjectToolsImpl.ProjectInfo> listProjects();
 
     ProjectToolsImpl.ProjectDetailInfo getProject(long projectId);

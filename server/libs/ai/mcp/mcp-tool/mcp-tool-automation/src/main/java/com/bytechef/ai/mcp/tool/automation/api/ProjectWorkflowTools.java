@@ -18,7 +18,11 @@ package com.bytechef.ai.mcp.tool.automation.api;
 
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 
+/**
+ * @author Marko Kriskovic
+ */
 public interface ProjectWorkflowTools extends ChatProjectWorkflowTools {
+
     ProjectWorkflowToolsImpl.ProjectWorkflowInfo createProjectWorkflow(long projectId, String definition);
 
     String deleteWorkflow(String workflowId);
