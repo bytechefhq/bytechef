@@ -49,6 +49,7 @@ public class NiftyCreateTaskAction {
             Map.of(
                 "type", PropertyType.BODY))
             .label("Status")
+            .description("Status or Task Group ID of the group where the task will be stored.")
             .required(true)
             .options((ActionDefinition.OptionsFunction<String>) NiftyUtils::getTaskGroupIdOptions)
             .optionsLookupDependsOn("project"),
