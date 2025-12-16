@@ -70,6 +70,7 @@ paths:
                 task_group_id:
                   title: "Status"
                   type: "string"
+                  description: "Status or Task Group ID of the group where the task will be stored."
                   x-dynamic-options: true
                   x-dynamic-options-dependency:
                     - "project"
