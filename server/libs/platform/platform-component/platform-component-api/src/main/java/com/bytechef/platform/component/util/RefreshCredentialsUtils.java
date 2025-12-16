@@ -19,6 +19,7 @@ package com.bytechef.platform.component.util;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.exception.ProviderException;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,10 @@ public class RefreshCredentialsUtils {
         }
 
         if (!matches) {
+            if (Objects.isNull(exception.getMessage())) {
+                return false;
+            }
+
             Throwable curException = exception;
 
             do {
