@@ -1286,7 +1286,7 @@ const WorkflowNodeDetailsPanel = ({
                 'absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 className
             )}
-            key={`${currentNode?.workflowNodeName}-${currentOperationName}`}
+            key={`${currentNode?.workflowNodeName}-${currentNode?.operationName}`}
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
                 <div className="flex h-full flex-col divide-y divide-muted bg-background">
@@ -1415,12 +1415,15 @@ const WorkflowNodeDetailsPanel = ({
                                     ))}
 
                                 {activeTab === 'connection' &&
-                                    currentWorkflowNodeConnections.length > 0 &&
+                                    (currentWorkflowNodeConnections.length > 0 ||
+                                        currentComponentDefinition?.connection !== undefined) &&
                                     currentNode &&
-                                    currentComponentDefinition && (
+                                    currentComponentDefinition &&
+                                    !currentNode?.clusterElementType && (
                                         <ConnectionTab
                                             componentConnections={currentWorkflowNodeConnections}
-                                            key={`${currentNode?.componentName}-${currentNode?.type}_connection`}
+                                            currentComponentDefinition={currentComponentDefinition}
+                                            key={`${currentNode?.workflowNodeName}_connection`}
                                             workflowId={workflow.id!}
                                             workflowNodeName={currentNode?.workflowNodeName}
                                             workflowTestConfigurationConnections={workflowTestConfigurationConnections}
