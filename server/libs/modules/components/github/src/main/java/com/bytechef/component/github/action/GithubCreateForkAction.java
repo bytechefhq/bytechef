@@ -67,8 +67,39 @@ public class GithubCreateForkAction {
             outputSchema(
                 object()
                     .properties(
+                        string("id")
+                            .description("The unique identifier of the fork."),
+                        string("node_id")
+                            .description("The node ID of the fork."),
+                        string("name")
+                            .description("The name of the forked repository."),
+                        string("full_name")
+                            .description("The full name of the forked repository including owner."),
+                        object("owner")
+                            .properties(
+                                string("login").description("Username of the repository owner."),
+                                string("id").description("ID of the repository owner."),
+                                string("node_id").description("Node ID of the owner."),
+                                string("url").description("URL of the owner."))
+                            .description("Owner information."),
+                        bool("private")
+                            .description("Indicates if the forked repository is private."),
+                        string("html_url")
+                            .description("HTML URL of the forked repository."),
                         string("url")
-                            .description("URL of the created fork."))))
+                            .description("API URL of the forked repository."),
+                        string("description")
+                            .description("Description of the repository."),
+                        string("fork")
+                            .description("Whether this repository is a fork."),
+                        string("created_at")
+                            .description("Creation timestamp."),
+                        string("updated_at")
+                            .description("Last update timestamp."),
+                        string("pushed_at")
+                            .description("Last push timestamp."),
+                        string("default_branch")
+                            .description("Default branch name."))))
         .perform(GithubCreateForkAction::perform);
 
     public static Map<String, Object> perform(
