@@ -26,6 +26,7 @@ import com.bytechef.component.jira.action.JiraAssignIssueAction;
 import com.bytechef.component.jira.action.JiraCreateIssueAction;
 import com.bytechef.component.jira.action.JiraCreateIssueCommentAction;
 import com.bytechef.component.jira.action.JiraGetIssueAction;
+import com.bytechef.component.jira.action.JiraListIssueCommentsAction;
 import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
 import com.bytechef.component.jira.connection.JiraConnection;
 import com.bytechef.component.jira.trigger.JiraNewIssueTrigger;
@@ -55,12 +56,14 @@ public class JiraComponentHandler implements ComponentHandler {
             JiraCreateIssueAction.ACTION_DEFINITION,
             JiraCreateIssueCommentAction.ACTION_DEFINITION,
             JiraGetIssueAction.ACTION_DEFINITION,
+            JiraListIssueCommentsAction.ACTION_DEFINITION,
             JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION)
         .clusterElements(
             tool(JiraAssignIssueAction.ACTION_DEFINITION),
             tool(JiraCreateIssueAction.ACTION_DEFINITION),
             tool(JiraCreateIssueCommentAction.ACTION_DEFINITION),
             tool(JiraGetIssueAction.ACTION_DEFINITION),
+            tool(JiraListIssueCommentsAction.ACTION_DEFINITION),
             tool(JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION))
         .triggers(
             JiraNewIssueTrigger.TRIGGER_DEFINITION,
