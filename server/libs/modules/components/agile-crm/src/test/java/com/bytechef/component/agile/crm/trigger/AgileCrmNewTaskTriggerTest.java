@@ -30,14 +30,11 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * @author Nikolina Spehar
@@ -46,48 +43,43 @@ class AgileCrmNewTaskTriggerTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final long mockedCreatedTime = LocalDateTime.of(
-        2025, 12, 8, 0, 0, 0)
-        .atZone(ZoneId.systemDefault())
-        .toEpochSecond();
-    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = ArgumentCaptor.forClass(ZoneId.class);
+    private final long mockedCreatedTime = Instant.parse("2025-01-01T05:00:00Z")
+        .getEpochSecond();
     private final List<Map<String, Object>> responseList = List.of(Map.of(CREATED_TIME, (int) mockedCreatedTime));
 
     @Test
     void poll() {
-        LocalDateTime mockedLastTimeChecked = LocalDateTime.of(
-            2025, 12, 7, 0, 0, 0);
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseList);
 
-        LocalDateTime mockedNow = LocalDateTime.of(2025, 12, 9, 0, 0, 0);
+        long mockedLastTimeChecked = Instant.parse("2025-01-01T04:00:00Z")
+            .getEpochSecond();
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked.toString()));
+        Instant mockedNow = Instant.parse("2025-01-01T07:00:00Z");
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
-            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-
-            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
+        try (MockedStatic<Instant> instantMockedStatic = mockStatic(Instant.class)) {
+            instantMockedStatic
+                .when(Instant::now)
                 .thenReturn(mockedNow);
 
-            when(mockedTriggerContext.http(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
-            when(mockedResponse.getBody(any(TypeReference.class)))
-                .thenReturn(responseList);
+            Parameters mockedParameters = MockParametersFactory.create(
+                Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked));
 
             PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(
                 mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
             PollOutput expectedPollOutput = new PollOutput(
                 List.of(Map.of(CREATED_TIME, (int) mockedCreatedTime)),
-                Map.of(LAST_TIME_CHECKED, mockedNow),
+                Map.of(LAST_TIME_CHECKED, mockedNow.getEpochSecond()),
                 false);
 
             assertEquals(expectedPollOutput, pollOutput);
-            assertEquals(ZoneId.systemDefault(), zoneIdArgumentCaptor.getValue());
         }
     }
 }
