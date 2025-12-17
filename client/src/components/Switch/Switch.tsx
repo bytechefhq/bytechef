@@ -2,8 +2,10 @@ import {Switch as SwitchPrimitives} from 'radix-ui';
 import * as React from 'react';
 import {twMerge} from 'tailwind-merge';
 
-interface BaseSwitchProps
-    extends Omit<React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>, 'checked' | 'onCheckedChange'> {
+interface BaseSwitchProps extends Omit<
+    React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
+    'checked' | 'onCheckedChange'
+> {
     variant?: VariantType;
     checked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
@@ -30,7 +32,8 @@ const baseTrackClasses =
     'peer inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors ' +
     'focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50';
 
-const baseThumbClasses = 'pointer-events-none block rounded-full ring-0 transition-transform shadow-[0_0_8px_rgba(0,0,0,0.15)]';
+const baseThumbClasses =
+    'pointer-events-none block rounded-full ring-0 transition-transform shadow-[0_0_8px_rgba(0,0,0,0.15)]';
 
 const variantConfig: Record<VariantType, {track: string; thumb: string; translate: string}> = {
     default: {
@@ -81,9 +84,7 @@ function TextBlock({
             </span>
 
             {!isSmall && description && (
-                <span className="text-sm font-normal leading-5 text-content-neutral-secondary">
-                    {description}
-                </span>
+                <span className="text-sm font-normal leading-5 text-content-neutral-secondary">{description}</span>
             )}
         </div>
     );
@@ -163,7 +164,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
             <div className={wrapperClasses} data-testid="switch-wrapper">
                 <div className={contentClasses}>
                     <TextBlock description={description} label={label} variant={variant} />
-                    
+
                     {switchElement}
                 </div>
             </div>
