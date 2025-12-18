@@ -18,7 +18,6 @@ package com.bytechef.platform.scheduler;
 
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -42,6 +41,6 @@ public interface TriggerScheduler {
     void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId);
 
     void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId);
 }

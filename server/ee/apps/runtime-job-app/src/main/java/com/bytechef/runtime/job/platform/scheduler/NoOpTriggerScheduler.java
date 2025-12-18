@@ -10,7 +10,6 @@ package com.bytechef.runtime.job.platform.scheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -49,7 +48,7 @@ public class NoOpTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
     }
 }
