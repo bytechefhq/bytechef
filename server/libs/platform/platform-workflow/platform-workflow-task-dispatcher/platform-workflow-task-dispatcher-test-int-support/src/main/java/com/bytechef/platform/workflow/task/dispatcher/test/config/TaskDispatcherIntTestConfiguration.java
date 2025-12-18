@@ -20,18 +20,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
@@ -80,35 +69,12 @@ public class TaskDispatcherIntTestConfiguration {
     }
 
     @Bean
-    ContextService contextService(CacheManager cacheManager) {
-        return new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-    }
-
-    @Bean
-    CounterService counterService(CacheManager cacheManager) {
-        return new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
-    }
-
-    @Bean
-    JobService jobService(CacheManager cacheManager, ObjectMapper objectMapper) {
-        return new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper));
-    }
-
-    @Bean
     TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor(
-        CacheManager cacheManager, Environment environment, ObjectMapper objectMapper,
-        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
+        Environment environment, ObjectMapper objectMapper, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            cacheManager, environment, objectMapper, taskExecutor, taskExecutionService, taskFileStorage,
-            workflowService);
-    }
-
-    @Bean
-    TaskExecutionService taskExecutionService(CacheManager cacheManager) {
-        return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
+            environment, objectMapper, taskExecutor, taskFileStorage, workflowService);
     }
 
     @Bean
@@ -136,8 +102,8 @@ public class TaskDispatcherIntTestConfiguration {
     }
 
     @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
-        return new InMemoryTaskExecutionRepository(cacheManager);
+    InMemoryTaskExecutionRepository taskExecutionRepository() {
+        return new InMemoryTaskExecutionRepository();
     }
 
     @Bean

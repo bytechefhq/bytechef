@@ -22,17 +22,15 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import java.util.stream.Stream;
 import org.springframework.util.comparator.Comparators;
 
 /**
@@ -42,26 +40,14 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private static final com.github.benmanes.caffeine.cache.Cache<String, ReentrantLock> LOCKS =
-        Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build();
-    private static final String TASK_EXECUTION_CACHE = InMemoryTaskExecutionRepository.class.getName() +
-        ".taskExecution";
-
-    private final CacheManager cacheManager;
-
-    public InMemoryTaskExecutionRepository(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
+    private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     @Override
     public void deleteById(long id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
-
         String storeKey = getStoreKey();
 
-        Store store = Objects.requireNonNull(cache.get(storeKey, Store::new));
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(storeKey, (key1) -> new Store()));
 
         TaskExecution existingTaskExecution = store.byId.get(id);
 
@@ -69,29 +55,41 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             return;
         }
 
+        String taskExecutionKey = getTaskExecutionLockKey(id);
         String jobKey = getJobLockKey(Objects.requireNonNull(existingTaskExecution.getJobId()));
         String parentKey = getParentLockKey(existingTaskExecution.getParentId());
 
-        // Acquire locks in deterministic order to avoid deadlocks
-        String firstKey = jobKey;
-        String secondKey = parentKey;
+        List<String> keys = new ArrayList<>();
 
-        if (secondKey != null && firstKey.compareTo(secondKey) > 0) {
-            firstKey = parentKey;
-            secondKey = jobKey;
+        keys.add(taskExecutionKey);
+
+        List<String> otherKeys = new ArrayList<>();
+
+        otherKeys.add(jobKey);
+
+        if (parentKey != null) {
+            otherKeys.add(parentKey);
         }
 
-        ReentrantLock firstLock = obtainLock(firstKey);
-        ReentrantLock secondLock = secondKey != null ? obtainLock(secondKey) : null;
+        otherKeys.sort(String::compareTo);
+
+        keys.addAll(otherKeys);
+
+        List<String> acquiredKeys = new ArrayList<>();
+
+        for (String key : keys) {
+            ReentrantLock lock = obtainLock(key);
+
+            if (!lock.isHeldByCurrentThread()) {
+                lock.lock();
+
+                acquiredKeys.add(key);
+            }
+        }
 
         try {
-            firstLock.lock();
-            if (secondLock != null) {
-                secondLock.lock();
-            }
-
             // Work with the latest store instance under locks
-            Store lockedStore = cache.get(storeKey, Store::new);
+            Store lockedStore = cache.computeIfAbsent(storeKey, (key1) -> new Store());
 
             TaskExecution removedTaskExecution = Objects.requireNonNull(lockedStore).byId.remove(id);
 
@@ -109,23 +107,31 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
                     parentTaskExecutions.removeIf(te -> Objects.equals(te.getId(), id));
                 }
-
-                cache.put(storeKey, lockedStore);
             }
         } finally {
-            if (secondLock != null) {
-                releaseLock(secondLock);
-            }
+            for (int i = acquiredKeys.size() - 1; i >= 0; i--) {
+                String key = acquiredKeys.get(i);
+                ReentrantLock lock = locks.get(key);
 
-            releaseLock(firstLock);
+                if (lock != null) {
+                    lock.unlock();
+                }
+            }
         }
     }
 
     @Override
-    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+    public List<TaskExecution> findAll() {
+        return new ArrayList<>(cache.values())
+            .stream()
+            .flatMap(store -> Stream.of(store.byId.values()))
+            .flatMap(Collection::stream)
+            .toList();
+    }
 
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+    @Override
+    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         String key = getJobLockKey(jobId);
 
@@ -138,18 +144,17 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             return new ArrayList<>(store.getJobTaskExecutions(jobId))
                 .stream()
+                .map(this::clone)
                 .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
                 .toList();
         } finally {
-            releaseLock(lock);
+            lock.unlock();
         }
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
-
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         String key = getJobLockKey(jobId);
 
@@ -159,17 +164,18 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             lock.lock();
 
             // Return in insertion order (created date order), same semantics as before
-            return new ArrayList<>(store.getJobTaskExecutions(jobId));
+            return new ArrayList<>(store.getJobTaskExecutions(jobId))
+                .stream()
+                .map(this::clone)
+                .toList();
         } finally {
-            releaseLock(lock);
+            lock.unlock();
         }
     }
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
-
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         String key = getJobLockKey(jobId);
 
@@ -180,6 +186,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             return new ArrayList<>(store.getJobTaskExecutions(jobId))
                 .stream()
+                .map(this::clone)
                 .sorted((t1, t2) -> {
                     Long id1 = Objects.requireNonNull(t1.getId());
                     Long id2 = Objects.requireNonNull(t2.getId());
@@ -188,15 +195,13 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 })
                 .toList();
         } finally {
-            releaseLock(lock);
+            lock.unlock();
         }
     }
 
     @Override
     public List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
-
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         String key = getParentLockKey(parentId);
 
@@ -209,32 +214,49 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             return new ArrayList<>(store.getParentTaskExecutions(parentId))
                 .stream()
+                .map(this::clone)
                 .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
                 .toList();
         } finally {
-            releaseLock(lock);
+            lock.unlock();
         }
     }
 
     @Override
     public Optional<TaskExecution> findById(long id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+        Store store = cache.computeIfAbsent(getStoreKey(), (key1) -> new Store());
 
-        Store store = cache.get(getStoreKey(), Store::new);
-
-        return Optional.ofNullable(Objects.requireNonNull(store).byId.get(id));
+        return Optional.ofNullable(Objects.requireNonNull(store).byId.get(id))
+            .map(this::clone);
     }
 
     @Override
     public Optional<TaskExecution> findByIdForUpdate(long id) {
+        String key = getTaskExecutionLockKey(id);
+
+        ReentrantLock lock = obtainLock(key);
+
+        if (!lock.isHeldByCurrentThread()) {
+            lock.lock();
+        }
+
         return findById(id);
     }
 
     @Override
-    public Optional<TaskExecution> findLastByJobId(long jobId) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+    public void unlockForUpdate(long id) {
+        String key = getTaskExecutionLockKey(id);
 
-        Store store = Objects.requireNonNull(cache.get(getStoreKey(), Store::new));
+        ReentrantLock lock = locks.get(key);
+
+        if (lock != null && lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public Optional<TaskExecution> findLastByJobId(long jobId) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         String key = getJobLockKey(jobId);
 
@@ -248,10 +270,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             if (taskExecutions.isEmpty()) {
                 return Optional.empty();
             } else {
-                return Optional.of(taskExecutions.getLast());
+                return Optional.of(clone(taskExecutions.getLast()));
             }
         } finally {
-            releaseLock(lock);
+            lock.unlock();
         }
     }
 
@@ -261,96 +283,113 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             taskExecution.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
         }
 
+        TaskExecution clonedTaskExecution = clone(taskExecution);
+
+        String storeKey = getStoreKey();
+
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(storeKey, (key1) -> new Store()));
+
+        String taskExecutionKey = getTaskExecutionLockKey(Objects.requireNonNull(taskExecution.getId()));
+        String jobKey = getJobLockKey(Objects.requireNonNull(taskExecution.getJobId()));
+        String parentKey = getParentLockKey(taskExecution.getParentId());
+
+        // Acquire locks in a deterministic order to avoid deadlocks
+        List<String> keys = new ArrayList<>();
+
+        keys.add(taskExecutionKey);
+
+        List<String> otherKeys = new ArrayList<>();
+
+        otherKeys.add(jobKey);
+
+        if (parentKey != null) {
+            otherKeys.add(parentKey);
+        }
+
+        otherKeys.sort(String::compareTo);
+
+        keys.addAll(otherKeys);
+
+        List<String> acquiredKeys = new ArrayList<>();
+
+        for (String key : keys) {
+            ReentrantLock lock = obtainLock(key);
+
+            if (!lock.isHeldByCurrentThread()) {
+                lock.lock();
+
+                acquiredKeys.add(key);
+            }
+        }
+
         try {
-            TaskExecution clonedTaskExecution = taskExecution.clone();
+            // by id
+            store.byId.put(Objects.requireNonNull(clonedTaskExecution.getId()), clonedTaskExecution);
 
-            Cache cache = Objects.requireNonNull(cacheManager.getCache(TASK_EXECUTION_CACHE));
+            // by job id (preserve insertion order for newly created entries; replace on update by id)
+            List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(taskExecution.getJobId());
 
-            String storeKey = getStoreKey();
+            int index = -1;
 
-            Store store = Objects.requireNonNull(cache.get(storeKey, Store::new));
+            for (int i = 0; i < jobTaskExecutions.size(); i++) {
+                TaskExecution existingTaskExecution = jobTaskExecutions.get(i);
 
-            String jobKey = getJobLockKey(Objects.requireNonNull(taskExecution.getJobId()));
-            String parentKey = getParentLockKey(taskExecution.getParentId());
+                if (Objects.equals(existingTaskExecution.getId(), clonedTaskExecution.getId())) {
+                    index = i;
 
-            // Acquire locks in a deterministic order to avoid deadlocks
-            String firstKey = jobKey;
-            String secondKey = parentKey;
-
-            if (secondKey != null && firstKey.compareTo(secondKey) > 0) {
-                firstKey = parentKey;
-                secondKey = jobKey;
+                    break;
+                }
+            }
+            if (index >= 0) {
+                jobTaskExecutions.set(index, clonedTaskExecution);
+            } else {
+                jobTaskExecutions.add(clonedTaskExecution);
             }
 
-            ReentrantLock firstLock = obtainLock(firstKey);
-            ReentrantLock secondLock = secondKey != null ? obtainLock(secondKey) : null;
+            // by parent id (same semantics)
+            if (taskExecution.getParentId() != null) {
+                List<TaskExecution> parentTaskExecutions = store.getParentTaskExecutions(
+                    taskExecution.getParentId());
 
-            try {
-                firstLock.lock();
-                if (secondLock != null) {
-                    secondLock.lock();
-                }
+                int pIndex = -1;
 
-                // by id
-                store.byId.put(Objects.requireNonNull(clonedTaskExecution.getId()), clonedTaskExecution);
-
-                // by job id (preserve insertion order for newly created entries; replace on update by id)
-                List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(taskExecution.getJobId());
-
-                int index = -1;
-
-                for (int i = 0; i < jobTaskExecutions.size(); i++) {
-                    TaskExecution existingTaskExecution = jobTaskExecutions.get(i);
+                for (int i = 0; i < parentTaskExecutions.size(); i++) {
+                    TaskExecution existingTaskExecution = parentTaskExecutions.get(i);
 
                     if (Objects.equals(existingTaskExecution.getId(), clonedTaskExecution.getId())) {
-                        index = i;
+                        pIndex = i;
 
                         break;
                     }
                 }
-                if (index >= 0) {
-                    jobTaskExecutions.set(index, clonedTaskExecution);
+
+                if (pIndex >= 0) {
+                    parentTaskExecutions.set(pIndex, clonedTaskExecution);
                 } else {
-                    jobTaskExecutions.add(clonedTaskExecution);
+                    parentTaskExecutions.add(clonedTaskExecution);
                 }
-
-                // by parent id (same semantics)
-                if (taskExecution.getParentId() != null) {
-                    List<TaskExecution> parentTaskExecutions = store.getParentTaskExecutions(
-                        taskExecution.getParentId());
-
-                    int pIndex = -1;
-
-                    for (int i = 0; i < parentTaskExecutions.size(); i++) {
-                        TaskExecution existingTaskExecution = parentTaskExecutions.get(i);
-
-                        if (Objects.equals(existingTaskExecution.getId(), clonedTaskExecution.getId())) {
-                            pIndex = i;
-
-                            break;
-                        }
-                    }
-
-                    if (pIndex >= 0) {
-                        parentTaskExecutions.set(pIndex, clonedTaskExecution);
-                    } else {
-                        parentTaskExecutions.add(clonedTaskExecution);
-                    }
-                }
-
-                cache.put(storeKey, store);
-            } finally {
-                if (secondLock != null) {
-                    releaseLock(secondLock);
-                }
-
-                releaseLock(firstLock);
             }
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
+        } finally {
+            for (int i = acquiredKeys.size() - 1; i >= 0; i--) {
+                String key = acquiredKeys.get(i);
+
+                ReentrantLock lock = locks.get(key);
+
+                if (lock != null) {
+                    lock.unlock();
+                }
+            }
         }
 
         return taskExecution;
+    }
+
+    private TaskExecution clone(TaskExecution taskExecution) {
+        try {
+            return taskExecution.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String getJobLockKey(long jobId) {
@@ -365,12 +404,12 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         return parentId == null ? null : getStoreKey() + ":parent:" + parentId;
     }
 
-    private static ReentrantLock obtainLock(String key) {
-        return LOCKS.get(key, k -> new ReentrantLock());
+    private static String getTaskExecutionLockKey(long id) {
+        return getStoreKey() + ":taskExecution:" + id;
     }
 
-    private static void releaseLock(ReentrantLock lock) {
-        lock.unlock();
+    private ReentrantLock obtainLock(String key) {
+        return locks.computeIfAbsent(key, k -> new ReentrantLock());
     }
 
     private static final class Store {

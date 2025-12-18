@@ -51,12 +51,6 @@ public class ConditionTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
@@ -165,7 +159,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(

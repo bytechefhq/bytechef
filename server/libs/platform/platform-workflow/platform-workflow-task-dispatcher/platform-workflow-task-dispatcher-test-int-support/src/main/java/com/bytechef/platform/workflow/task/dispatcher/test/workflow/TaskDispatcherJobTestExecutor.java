@@ -50,36 +50,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 
 public class TaskDispatcherJobTestExecutor {
 
-    private final CacheManager cacheManager;
     private final Environment environment;
     private final ObjectMapper objectMapper;
-    private final TaskExecutionService taskExecutionService;
     private final TaskExecutor taskExecutor;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
-        CacheManager cacheManager, Environment environment, ObjectMapper objectMapper, TaskExecutor taskExecutor,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        Environment environment, ObjectMapper objectMapper, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
-        this.cacheManager = cacheManager;
         this.environment = environment;
         this.objectMapper = objectMapper;
-        this.taskExecutionService = taskExecutionService;
         this.taskExecutor = taskExecutor;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
 
-    public Job execute(
+    public TaskDispatcherJobExecution execute(
         String workflowId, TaskCompletionHandlerFactoriesFunction taskCompletionHandlerFactoriesFunction,
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
@@ -89,33 +84,37 @@ public class TaskDispatcherJobTestExecutor {
             taskHandlerMapSupplier);
     }
 
-    public Job execute(
+    public TaskDispatcherJobExecution execute(
         String workflowId, Map<String, Object> inputs,
         TaskCompletionHandlerFactoriesFunction taskCompletionHandlerFactoriesFunction,
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
-        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
-        JobService jobService = new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository, objectMapper));
+        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, SpelEvaluator.create(), jobService, -1,
             role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
                 ? asyncMessageBroker : new AsyncMessageBroker(environment),
-            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
+            taskCompletionHandlerFactoriesFunction.apply(contextService, counterService, taskExecutionService),
+            List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 createEventPublisher(asyncMessageBroker), contextService, counterService, taskExecutionService),
             taskExecutionService, taskExecutor, taskHandlerMapSupplier.get()::get, taskFileStorage, -1,
             workflowService);
 
-        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
+        Job job = jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);
+
+        return new TaskDispatcherJobExecution(
+            job, taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())),
+            taskExecutionRepository.findAll());
     }
 
     private static ApplicationEventPublisher createEventPublisher(AsyncMessageBroker messageBroker) {
@@ -128,11 +127,30 @@ public class TaskDispatcherJobTestExecutor {
         };
     }
 
+    @SuppressFBWarnings("EI")
+    public record TaskDispatcherJobExecution(
+        Job job, List<TaskExecution> jobTaskExecutions, List<TaskExecution> taskExecutions) {
+
+        public List<ExecutionError> getExecutionErrors() {
+            return jobTaskExecutions.stream()
+                .map(TaskExecution::getError)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        }
+
+        public TaskExecution getTaskExecution(Long taskExecutionId) {
+            return taskExecutions.stream()
+                .filter(taskExecution -> Objects.equals(taskExecution.getId(), taskExecutionId))
+                .findFirst()
+                .orElseThrow();
+        }
+    }
+
     @FunctionalInterface
     public interface TaskCompletionHandlerFactoriesFunction {
 
         List<TaskCompletionHandlerFactory> apply(
-            CounterService counterService, TaskExecutionService taskExecutionService);
+            ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface
@@ -147,14 +165,5 @@ public class TaskDispatcherJobTestExecutor {
     public interface TaskHandlerMapSupplier {
 
         Map<String, TaskHandler<?>> get();
-    }
-
-    public List<ExecutionError> getExecutionErrors(long jobId) {
-        List<TaskExecution> jobTaskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
-
-        return jobTaskExecutions.stream()
-            .map(TaskExecution::getError)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
     }
 }

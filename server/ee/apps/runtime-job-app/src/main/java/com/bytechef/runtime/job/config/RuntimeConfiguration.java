@@ -18,7 +18,6 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.runtime.job.platform.scheduler.NoOpTriggerScheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,23 +36,23 @@ public class RuntimeConfiguration {
     }
 
     @Bean
-    InMemoryContextRepository contextRepository(CacheManager cacheManager) {
-        return new InMemoryContextRepository(cacheManager);
+    InMemoryContextRepository contextRepository() {
+        return new InMemoryContextRepository();
     }
 
     @Bean
-    InMemoryCounterRepository counterRepository(CacheManager cacheManager) {
-        return new InMemoryCounterRepository(cacheManager);
+    InMemoryCounterRepository counterRepository() {
+        return new InMemoryCounterRepository();
     }
 
     @Bean
-    InMemoryJobRepository jobRepository(CacheManager cacheManager, ObjectMapper objectMapper) {
-        return new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper);
+    InMemoryJobRepository jobRepository(ObjectMapper objectMapper) {
+        return new InMemoryJobRepository(taskExecutionRepository(), objectMapper);
     }
 
     @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
-        return new InMemoryTaskExecutionRepository(cacheManager);
+    InMemoryTaskExecutionRepository taskExecutionRepository() {
+        return new InMemoryTaskExecutionRepository();
     }
 
     @Bean

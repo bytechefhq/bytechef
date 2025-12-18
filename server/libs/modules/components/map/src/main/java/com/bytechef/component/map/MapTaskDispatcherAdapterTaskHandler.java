@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -58,15 +57,11 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
-    private final CacheManager cacheManager;
     private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
     private final Evaluator evaluator;
     private final TaskHandlerResolver taskHandlerResolver;
 
-    public MapTaskDispatcherAdapterTaskHandler(
-        CacheManager cacheManager, Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
-
-        this.cacheManager = cacheManager;
+    public MapTaskDispatcherAdapterTaskHandler(Evaluator evaluator, TaskHandlerResolver taskHandlerResolver) {
         this.evaluator = evaluator;
         this.taskHandlerResolver = taskHandlerResolver;
     }
@@ -98,11 +93,11 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskExecutionService taskExecutionService =
-            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository(cacheManager));
+            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
         taskExecution = taskExecutionService.create(taskExecution);
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
@@ -114,7 +109,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             taskFileStorage, List.of());
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
-            contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)), evaluator,
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository()), evaluator,
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, taskFileStorage);
