@@ -61,6 +61,16 @@ public class RemoteTaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
+        value = "/get-task-execution-for-update/{id}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<TaskExecution> getTaskExecutionForUpdate(@PathVariable long id) {
+        return ResponseEntity.ok(taskExecutionService.getTaskExecutionForUpdate(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/get-job-task-executions/{jobId}",
         produces = {
             "application/json"

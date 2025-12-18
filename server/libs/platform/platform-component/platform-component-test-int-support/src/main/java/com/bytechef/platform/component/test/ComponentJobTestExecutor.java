@@ -21,9 +21,15 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
@@ -33,6 +39,7 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +51,9 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class ComponentJobTestExecutor {
 
-    private final ContextService contextService;
     private final Environment environment;
     private final Evaluator evaluator;
-    private final JobService jobService;
-    private final TaskExecutionService taskExecutionService;
+    private final ObjectMapper objectMapper;
     private final TaskExecutor taskExecutor;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final TaskFileStorageImpl taskFileStorage;
@@ -56,16 +61,13 @@ public class ComponentJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
-        TaskExecutor taskExecutor, TaskExecutionService taskExecutionService,
+        Environment environment, Evaluator evaluator, ObjectMapper objectMapper, TaskExecutor taskExecutor,
         Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
 
-        this.contextService = contextService;
         this.environment = environment;
+        this.objectMapper = objectMapper;
         this.taskExecutor = taskExecutor;
         this.evaluator = evaluator;
-        this.jobService = jobService;
-        this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
         this.taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
         this.workflowService = workflowService;
@@ -76,6 +78,13 @@ public class ComponentJobTestExecutor {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
+
+        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
+        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, role -> new AsyncMessageBroker(environment),
             getTaskDispatcherPreSendProcessors(), taskExecutionService, taskExecutor,

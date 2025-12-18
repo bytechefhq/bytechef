@@ -33,6 +33,7 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
@@ -61,12 +62,6 @@ public class TerminateTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     protected TaskFileStorage taskFileStorage;
 
     @Autowired
@@ -79,21 +74,22 @@ public class TerminateTaskDispatcherIntTest {
 
     @Test
     public void testTerminateTaskDispatcherInSimpleFlow() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("terminate_v1-simple-flow".getBytes(StandardCharsets.UTF_8)),
             Collections.emptyMap(),
             this::getTaskCompletionHandlerFactories,
             this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
-        Assertions.assertEquals(Job.Status.STOPPED, job.getStatus());
+        Assertions.assertEquals(Job.Status.STOPPED, jobExecution.job()
+            .getStatus());
         Assertions.assertEquals("start", testVarTaskHandler.get("startVar"));
         Assertions.assertNull(testVarTaskHandler.get("endVar"));
     }
 
     @Test
     public void testTerminateTaskDispatcherInOnErrorDispatcherErrorBranch() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString(
                 "terminate_v1-on-error-dispatcher-error-branch".getBytes(StandardCharsets.UTF_8)),
             Collections.emptyMap(),
@@ -101,8 +97,10 @@ public class TerminateTaskDispatcherIntTest {
             this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
+        Job job = jobExecution.job();
+
         Assertions.assertEquals(Job.Status.STOPPED, job.getStatus());
-        assertParentTasksStopped(job);
+        assertParentTasksStopped(jobExecution);
         Assertions.assertEquals("main branch", testVarTaskHandler.get("mainBranchVar"));
         Assertions.assertEquals(
             "before terminate in error branch", testVarTaskHandler.get("beforeTerminateErrorBranchVar"));
@@ -112,7 +110,7 @@ public class TerminateTaskDispatcherIntTest {
 
     @Test
     public void testTerminateTaskDispatcherInLoopAndConditionDispatcher() {
-        Job job = taskDispatcherJobTestExecutor.execute(
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString(
                 "terminate_v1-loop-and-condition-dispatcher".getBytes(StandardCharsets.UTF_8)),
             Collections.emptyMap(),
@@ -120,16 +118,17 @@ public class TerminateTaskDispatcherIntTest {
             this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
+        Job job = jobExecution.job();
+
         Assertions.assertEquals(Job.Status.STOPPED, job.getStatus());
-        assertParentTasksStopped(job);
+        assertParentTasksStopped(jobExecution);
         Assertions.assertEquals("start", testVarTaskHandler.get("startVar"));
         Assertions.assertEquals(7, testVarTaskHandler.get("loopCounterVar"));
         Assertions.assertNull(testVarTaskHandler.get("end"));
     }
 
-    private void assertParentTasksStopped(Job job) {
-        Long jobId = Objects.requireNonNull(job.getId(), "job id");
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+    private void assertParentTasksStopped(TaskDispatcherJobExecution jobExecution) {
+        List<TaskExecution> taskExecutions = jobExecution.jobTaskExecutions();
 
         TaskExecution taskExecution =
             taskExecutions.stream()
@@ -138,7 +137,7 @@ public class TerminateTaskDispatcherIntTest {
                 .orElseThrow();
 
         while (taskExecution.getParentId() != null) {
-            taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+            taskExecution = jobExecution.getTaskExecution(taskExecution.getParentId());
 
             Assertions.assertEquals(TaskExecution.Status.CANCELLED, taskExecution.getStatus());
         }
@@ -146,7 +145,7 @@ public class TerminateTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(

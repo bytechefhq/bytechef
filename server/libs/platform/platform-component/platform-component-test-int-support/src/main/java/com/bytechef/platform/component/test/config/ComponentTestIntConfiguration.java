@@ -20,18 +20,6 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
-import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.ContextServiceImpl;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.CounterServiceImpl;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -91,12 +79,11 @@ public class ComponentTestIntConfiguration {
 
     @Bean
     ComponentJobTestExecutor componentWorkflowTestSupport(
-        ContextService contextService, Environment environment, JobService jobService,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        Environment environment, ObjectMapper objectMapper, Map<String, TaskHandler<?>> taskHandlerMap,
         TaskExecutor taskExecutor, TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
-            contextService, environment, SpelEvaluator.create(), jobService, taskExecutor, taskExecutionService,
+            environment, SpelEvaluator.create(), objectMapper, taskExecutor,
             MapUtils.concat(taskHandlerMap, taskHandlerProvider.getTaskHandlerMap()), workflowService);
     }
 
@@ -108,16 +95,6 @@ public class ComponentTestIntConfiguration {
     @Bean(name = "dataStorageService")
     DataStorage dataStorage() {
         return Mockito.mock(DataStorage.class);
-    }
-
-    @Bean
-    ContextService contextService(CacheManager cacheManager) {
-        return new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-    }
-
-    @Bean
-    CounterService counterService(CacheManager cacheManager) {
-        return new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
     }
 
     @Bean
@@ -138,22 +115,6 @@ public class ComponentTestIntConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return new JobPrincipalAccessorRegistry(List.of());
-    }
-
-    @Bean
-    JobService jobService(CacheManager cacheManager, ObjectMapper objectMapper) {
-        return new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper));
-    }
-
-    @Bean
-    TaskExecutionService taskExecutionService(CacheManager cacheManager) {
-        return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
-    }
-
-    @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
-        return new InMemoryTaskExecutionRepository(cacheManager);
     }
 
     @Bean

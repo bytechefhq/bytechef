@@ -16,8 +16,6 @@
 
 package com.bytechef.task.dispatcher.forkjoin;
 
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.evaluator.Evaluator;
@@ -45,12 +43,6 @@ public class ForkJoinTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
-
-    @Autowired
-    protected TaskExecutionService taskExecutionService;
-
-    @Autowired
     private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
@@ -66,7 +58,7 @@ public class ForkJoinTaskDispatcherIntTest {
         taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString("fork-join_v1"),
             (
-                counterService, taskExecutionService) -> List.of(
+                contextService, counterService, taskExecutionService) -> List.of(
                     (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                         contextService, counterService, EVALUATOR, taskExecutionService,
                         taskCompletionHandler, taskDispatcher, taskFileStorage)),

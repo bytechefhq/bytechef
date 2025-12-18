@@ -39,15 +39,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
  * @author Ivica Cardic
  */
 class InMemoryTaskExecutionRepositoryTest {
-
-    private static final String TASK_EXECUTION_CACHE_NAME =
-        InMemoryTaskExecutionRepository.class.getName() + ".taskExecution";
 
     private InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
 
@@ -55,9 +51,7 @@ class InMemoryTaskExecutionRepositoryTest {
     void beforeEach() {
         TenantContext.resetCurrentTenantId();
 
-        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(TASK_EXECUTION_CACHE_NAME);
-
-        inMemoryTaskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
+        inMemoryTaskExecutionRepository = new InMemoryTaskExecutionRepository();
 
         TenantContext.setCurrentTenantId("T");
     }

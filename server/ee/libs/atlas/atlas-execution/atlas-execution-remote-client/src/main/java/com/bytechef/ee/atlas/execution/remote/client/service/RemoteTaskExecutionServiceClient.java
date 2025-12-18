@@ -90,6 +90,16 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public TaskExecution getTaskExecutionForUpdate(long id) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TASK_EXECUTION_SERVICE + "/get-task-execution-for-update/{id}")
+                .build(id),
+            TaskExecution.class);
+    }
+
+    @Override
     public TaskExecution update(TaskExecution taskExecution) {
         return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder

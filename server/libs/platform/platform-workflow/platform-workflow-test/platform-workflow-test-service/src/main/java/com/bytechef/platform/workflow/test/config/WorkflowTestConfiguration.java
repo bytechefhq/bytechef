@@ -74,7 +74,6 @@ import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -85,23 +84,21 @@ import org.springframework.core.task.TaskExecutor;
  * @author Ivica Cardic
  */
 @Configuration
-public class TestExecutorConfiguration {
+public class WorkflowTestConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        CacheManager cacheManager, ComponentDefinitionService componentDefinitionService, Environment environment,
-        Evaluator evaluator, ObjectMapper objectMapper, TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        WorkflowService workflowService) {
+        ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
+        ObjectMapper objectMapper, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService, WorkflowService workflowService) {
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
-        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
-        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
-        JobService jobService = new JobServiceImpl(
-            new InMemoryJobRepository(cacheManager, taskExecutionRepository, objectMapper));
+        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -115,7 +112,7 @@ public class TestExecutorConfiguration {
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(
-                    cacheManager, evaluator),
+                    evaluator),
                 List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
@@ -163,15 +160,13 @@ public class TestExecutorConfiguration {
                 counterService, taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(
-        CacheManager cacheManager, Evaluator evaluator) {
-
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(Evaluator evaluator) {
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, evaluator, taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(evaluator, taskHandlerResolver);
                 }
 
                 @Override

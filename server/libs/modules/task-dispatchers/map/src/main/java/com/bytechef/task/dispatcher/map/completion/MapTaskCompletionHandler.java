@@ -35,8 +35,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,8 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -53,11 +49,6 @@ import org.apache.commons.lang3.Validate;
  * @since June 4, 2017
  */
 public class MapTaskCompletionHandler implements TaskCompletionHandler {
-
-    private static final Cache<Long, ReentrantLock> OUTPUT_LOCKS =
-        Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build();
 
     private final ContextService contextService;
     private final CounterService counterService;
@@ -162,44 +153,38 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(
                 iterationTaskExecutionId, Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(iterationTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
+                taskFileStorage.storeContextValue(
+                    iterationTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(iterationTaskExecution);
         } else {
+            mapTaskExecution = taskExecutionService.getTaskExecutionForUpdate(taskExecutionParentId);
+
             if (taskExecution.getOutput() != null) {
-                // Serialize updates for the same parent map task to prevent lost updates from concurrent completions
                 Long mapTaskExecutionId = Validate.notNull(mapTaskExecution.getId(), "id");
 
-                ReentrantLock lock = lockFor(mapTaskExecutionId);
+                List<Object> outputs;
 
-                lock.lock();
-
-                try {
-                    List<Object> outputs;
-
-                    if (mapTaskExecution.getOutput() != null) {
-                        outputs = new ArrayList<>(
-                            (List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
-                    } else {
-                        outputs = new ArrayList<>(iterateeWorkflowTasks.size());
-                    }
-
-                    while (outputs.size() < iterationIndex) {
-                        outputs.add(null);
-                    }
-
-                    Object value = taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
-
-                    if (outputs.size() == iterationIndex) {
-                        outputs.add(value);
-                    } else {
-                        outputs.set(iterationIndex, value);
-                    }
-
-                    mapTaskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(mapTaskExecutionId, outputs));
-                } finally {
-                    lock.unlock();
+                if (mapTaskExecution.getOutput() != null) {
+                    outputs = new ArrayList<>(
+                        (List<?>) taskFileStorage.readTaskExecutionOutput(mapTaskExecution.getOutput()));
+                } else {
+                    outputs = new ArrayList<>(iterateeWorkflowTasks.size());
                 }
+
+                while (outputs.size() < iterationIndex) {
+                    outputs.add(null);
+                }
+
+                Object value = taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                if (outputs.size() == iterationIndex) {
+                    outputs.add(value);
+                } else {
+                    outputs.set(iterationIndex, value);
+                }
+
+                mapTaskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(mapTaskExecutionId, outputs));
             }
 
             long iterationsLeft = counterService.decrement(taskExecutionParentId);
@@ -210,11 +195,9 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
                 mapTaskExecution = taskExecutionService.update(mapTaskExecution);
 
                 taskCompletionHandler.handle(mapTaskExecution);
+            } else {
+                taskExecutionService.update(mapTaskExecution);
             }
         }
-    }
-
-    private static ReentrantLock lockFor(Long id) {
-        return OUTPUT_LOCKS.get(id, k -> new ReentrantLock());
     }
 }

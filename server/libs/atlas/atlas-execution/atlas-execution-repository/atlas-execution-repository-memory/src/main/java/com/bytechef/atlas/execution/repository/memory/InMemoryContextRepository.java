@@ -25,12 +25,9 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 
 /**
  * @author Arik Cohen
@@ -38,14 +35,8 @@ import org.springframework.cache.CacheManager;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private static final String CACHE = InMemoryContextRepository.class.getName() + ".context";
-    private static final ConcurrentHashMap<String, ReentrantLock> LOCKS = new ConcurrentHashMap<>();
-
-    private final CacheManager cacheManager;
-
-    public InMemoryContextRepository(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
+    private final ConcurrentHashMap<String, Deque<FileEntry>> cache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     @Override
     public Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
@@ -67,7 +58,7 @@ public class InMemoryContextRepository implements ContextRepository {
     public Context save(Context context) {
         String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
 
-        ReentrantLock lock = LOCKS.computeIfAbsent(key, k -> new ReentrantLock());
+        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock());
 
         try {
             lock.lock();
@@ -80,14 +71,12 @@ public class InMemoryContextRepository implements ContextRepository {
 
             stack.push(context.getValue());
 
-            Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
             cache.put(key, stack);
         } finally {
             lock.unlock();
 
             if (!lock.isLocked() && !lock.hasQueuedThreads()) {
-                LOCKS.remove(key, lock);
+                locks.remove(key, lock);
             }
         }
 
@@ -99,8 +88,6 @@ public class InMemoryContextRepository implements ContextRepository {
     }
 
     private Deque<FileEntry> getStack(String key) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
-
-        return cache.get(key, LinkedList::new);
+        return cache.computeIfAbsent(key, (key1) -> new LinkedList<>());
     }
 }

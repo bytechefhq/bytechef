@@ -31,6 +31,12 @@ public interface TaskExecutionRepository {
     void deleteById(long id);
 
     /**
+     *
+     * @return
+     */
+    List<TaskExecution> findAll();
+
+    /**
      * Returns the execution steps of the given job
      *
      * @param jobId
@@ -80,4 +86,13 @@ public interface TaskExecutionRepository {
      * @param taskExecution
      */
     TaskExecution save(TaskExecution taskExecution);
+
+    /**
+     * Release the lock acquired by {@link #findByIdForUpdate(long)} for the given id, if held by the current
+     * thread/context. Implementations that rely on transactional database locks may no-op here.
+     *
+     * @param id the id of the task execution
+     */
+    default void unlockForUpdate(long id) {
+    }
 }
