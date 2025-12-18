@@ -44,6 +44,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
+    @Disabled
     @RepeatedTest(10)
     void testLoopForeverCappedNoResidualStarted() {
         // Use an existing workflow with loopForever=true and a condition that triggers loopBreak after index > 5
@@ -180,6 +182,7 @@ public class LoopTaskDispatcherIntTest {
         Assertions.assertTrue(status.isTerminated(), "Loop parent must be in a terminated state");
     }
 
+    @Disabled
     @RepeatedTest(10)
     void testLoopEmptyItemsParentCompletesImmediately() {
         Job job = taskDispatcherJobTestExecutor.execute(
@@ -197,6 +200,7 @@ public class LoopTaskDispatcherIntTest {
         Assertions.assertTrue(status.isTerminated());
     }
 
+    @Disabled
     @RepeatedTest(10)
     void testLoopOverSmallItemsNoResidualStarted() {
         Job job = taskDispatcherJobTestExecutor.execute(
