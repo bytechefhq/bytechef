@@ -75,8 +75,9 @@ public class QuartzTriggerSchedulerIntTest {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 456L, "test-workflow-456", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 100L);
-        LocalDateTime executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(100));
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMillis(100))
+            .toInstant(ZoneOffset.UTC);
 
         // When
         quartzTriggerScheduler.scheduleOneTimeTask(
@@ -108,8 +109,9 @@ public class QuartzTriggerSchedulerIntTest {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 101L, "test-workflow-delay-101", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 200L);
-        LocalDateTime executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(200));
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMillis(200))
+            .toInstant(ZoneOffset.UTC);
 
         // When
         quartzTriggerScheduler.scheduleOneTimeTask(
@@ -136,8 +138,9 @@ public class QuartzTriggerSchedulerIntTest {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 1L, "test-workflow-job-exists", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 100L);
-        LocalDateTime executeAt = LocalDateTime.now()
-            .plus(Duration.ofMillis(100));
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMillis(100))
+            .toInstant(ZoneOffset.UTC);
 
         // When
         quartzTriggerScheduler.scheduleOneTimeTask(

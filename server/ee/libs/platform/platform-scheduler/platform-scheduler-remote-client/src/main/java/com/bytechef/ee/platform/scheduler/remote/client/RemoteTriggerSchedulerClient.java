@@ -12,7 +12,6 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -102,7 +101,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(
-        LocalDateTime executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
+        Instant executeAt, Map<String, Object> output, WorkflowExecutionId workflowExecutionId,
         String taskExecutionId) {
 
         loadBalancedRestClient.post(
@@ -121,7 +120,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @SuppressFBWarnings("EI")
     private record OneTimeTaskRequest(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime executeAt, Map<String, Object> output,
+        WorkflowExecutionId workflowExecutionId, Instant executeAt, Map<String, Object> output,
         String taskExecutionId) {
     }
 

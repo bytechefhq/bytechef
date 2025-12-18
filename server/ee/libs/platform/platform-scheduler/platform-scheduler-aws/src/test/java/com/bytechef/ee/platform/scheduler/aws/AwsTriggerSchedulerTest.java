@@ -29,6 +29,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -63,6 +64,7 @@ import software.amazon.awssdk.services.scheduler.model.DeleteScheduleResponse;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("NP")
 class AwsTriggerSchedulerTest {
 
     private static final String TEST_ACCOUNT_ID = "123456789012";
@@ -169,8 +171,9 @@ class AwsTriggerSchedulerTest {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             ModeType.AUTOMATION, 789L, "test-onetime-workflow", "test-trigger");
         String taskExecutionId = "task-execution-12345678901234567890";
-        LocalDateTime executeAt = LocalDateTime.now()
-            .plusMinutes(5);
+        Instant executeAt = LocalDateTime.now()
+            .plusMinutes(5)
+            .toInstant(ZoneOffset.UTC);
         Map<String, Object> output = Map.of("delayMillis", 1000L);
 
         // When
