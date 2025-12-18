@@ -23,6 +23,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,6 +47,8 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 @ConditionalOnProperty(
     prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "quartz", matchIfMissing = true)
 public class QuartzTriggerSchedulerConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuartzTriggerSchedulerConfiguration.class);
 
     @Bean
     JobFactory jobFactory() {
@@ -89,6 +93,10 @@ public class QuartzTriggerSchedulerConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)
         public void startLater() throws SchedulerException {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Starting Quartz scheduler...");
+            }
+
             scheduler.start();
         }
     }
