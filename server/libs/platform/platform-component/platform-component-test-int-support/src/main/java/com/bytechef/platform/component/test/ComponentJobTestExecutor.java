@@ -29,13 +29,14 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.memory.SyncMessageBroker;
+import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 
 /**
@@ -44,6 +45,7 @@ import org.springframework.core.task.TaskExecutor;
 public class ComponentJobTestExecutor {
 
     private final ContextService contextService;
+    private final Environment environment;
     private final Evaluator evaluator;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
@@ -54,11 +56,12 @@ public class ComponentJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public ComponentJobTestExecutor(
-        ContextService contextService, Evaluator evaluator, JobService jobService, TaskExecutor taskExecutor,
-        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-        WorkflowService workflowService) {
+        ContextService contextService, Environment environment, Evaluator evaluator, JobService jobService,
+        TaskExecutor taskExecutor, TaskExecutionService taskExecutionService,
+        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.environment = environment;
         this.taskExecutor = taskExecutor;
         this.evaluator = evaluator;
         this.jobService = jobService;
@@ -74,8 +77,8 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, SyncMessageBroker::new, getTaskDispatcherPreSendProcessors(),
-            taskExecutionService, taskExecutor,
+            contextService, evaluator, jobService, -1, role -> new AsyncMessageBroker(environment),
+            getTaskDispatcherPreSendProcessors(), taskExecutionService, taskExecutor,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage, -1, workflowService);
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs), true);

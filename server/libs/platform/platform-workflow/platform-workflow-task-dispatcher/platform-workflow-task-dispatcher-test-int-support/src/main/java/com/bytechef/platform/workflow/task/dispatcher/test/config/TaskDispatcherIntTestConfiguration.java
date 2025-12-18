@@ -96,14 +96,14 @@ public class TaskDispatcherIntTestConfiguration {
     }
 
     @Bean
-    TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
-        ContextService contextService, CounterService counterService, Environment environment, JobService jobService,
+    TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor(
+        CacheManager cacheManager, Environment environment, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         return new TaskDispatcherJobTestExecutor(
-            contextService, counterService, environment, taskExecutor, jobService, taskExecutionService,
-            taskFileStorage, workflowService);
+            cacheManager, environment, objectMapper, taskExecutor, taskExecutionService, taskFileStorage,
+            workflowService);
     }
 
     @Bean

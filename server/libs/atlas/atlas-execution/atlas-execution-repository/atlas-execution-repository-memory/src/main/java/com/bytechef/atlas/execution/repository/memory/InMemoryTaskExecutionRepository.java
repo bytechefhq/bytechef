@@ -22,12 +22,14 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -40,7 +42,10 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private static final ConcurrentHashMap<String, ReentrantLock> LOCKS = new ConcurrentHashMap<>();
+    private static final com.github.benmanes.caffeine.cache.Cache<String, ReentrantLock> LOCKS =
+        Caffeine.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
     private static final String TASK_EXECUTION_CACHE = InMemoryTaskExecutionRepository.class.getName() +
         ".taskExecution";
 
@@ -81,7 +86,6 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
         try {
             firstLock.lock();
-
             if (secondLock != null) {
                 secondLock.lock();
             }
@@ -110,10 +114,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             }
         } finally {
             if (secondLock != null) {
-                releaseLock(secondKey, secondLock);
+                releaseLock(secondLock);
             }
 
-            releaseLock(firstKey, firstLock);
+            releaseLock(firstLock);
         }
     }
 
@@ -137,7 +141,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
                 .toList();
         } finally {
-            releaseLock(key, lock);
+            releaseLock(lock);
         }
     }
 
@@ -157,7 +161,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             // Return in insertion order (created date order), same semantics as before
             return new ArrayList<>(store.getJobTaskExecutions(jobId));
         } finally {
-            releaseLock(key, lock);
+            releaseLock(lock);
         }
     }
 
@@ -184,7 +188,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 })
                 .toList();
         } finally {
-            releaseLock(key, lock);
+            releaseLock(lock);
         }
     }
 
@@ -208,7 +212,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 .sorted((o1, o2) -> comparable.compare(o1.getTaskNumber(), o2.getTaskNumber()))
                 .toList();
         } finally {
-            releaseLock(key, lock);
+            releaseLock(lock);
         }
     }
 
@@ -247,7 +251,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 return Optional.of(taskExecutions.getLast());
             }
         } finally {
-            releaseLock(key, lock);
+            releaseLock(lock);
         }
     }
 
@@ -283,7 +287,6 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             try {
                 firstLock.lock();
-
                 if (secondLock != null) {
                     secondLock.lock();
                 }
@@ -338,10 +341,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
                 cache.put(storeKey, store);
             } finally {
                 if (secondLock != null) {
-                    releaseLock(secondKey, secondLock);
+                    releaseLock(secondLock);
                 }
 
-                releaseLock(firstKey, firstLock);
+                releaseLock(firstLock);
             }
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
@@ -363,15 +366,11 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     private static ReentrantLock obtainLock(String key) {
-        return LOCKS.computeIfAbsent(key, k -> new ReentrantLock());
+        return LOCKS.get(key, k -> new ReentrantLock());
     }
 
-    private static void releaseLock(String key, ReentrantLock lock) {
+    private static void releaseLock(ReentrantLock lock) {
         lock.unlock();
-
-        if (!lock.isLocked() && !lock.hasQueuedThreads()) {
-            LOCKS.remove(key, lock);
-        }
     }
 
     private static final class Store {

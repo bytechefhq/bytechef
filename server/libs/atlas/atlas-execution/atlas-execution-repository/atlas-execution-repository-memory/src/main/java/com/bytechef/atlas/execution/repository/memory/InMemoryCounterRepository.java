@@ -21,8 +21,11 @@ package com.bytechef.atlas.execution.repository.memory;
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -37,6 +40,11 @@ public class InMemoryCounterRepository implements CounterRepository {
 
     private final CacheManager cacheManager;
 
+    private final com.github.benmanes.caffeine.cache.Cache<Object, ReentrantLock> locks =
+        Caffeine.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
+
     public InMemoryCounterRepository(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
@@ -45,21 +53,121 @@ public class InMemoryCounterRepository implements CounterRepository {
     public void deleteById(Long id) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
-        cache.evict(TenantCacheKeyUtils.getKey(id));
+        Object key = TenantCacheKeyUtils.getKey(id);
+
+        ReentrantLock lock = lockFor(key);
+
+        boolean needAcquire = !lock.isHeldByCurrentThread();
+
+        if (needAcquire) {
+            lock.lock();
+        }
+
+        try {
+            cache.evict(key);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
     }
 
     @Override
     public Optional<Long> findValueByIdForUpdate(Long id) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+        Object key = TenantCacheKeyUtils.getKey(id);
 
-        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id), Long.class));
+        ReentrantLock lock = lockFor(key);
+        boolean acquiredHere = false;
+
+        if (!lock.isHeldByCurrentThread()) {
+            lock.lock();
+            acquiredHere = true;
+        }
+
+        Long value = cache.get(key, Long.class);
+
+        if (value == null && acquiredHere && lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+
+        return Optional.ofNullable(value);
+    }
+
+    @Override
+    public void unlockForUpdate(Long id) {
+        Object key = TenantCacheKeyUtils.getKey(id);
+
+        ReentrantLock lock = lockFor(key);
+
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public long decrementAndGet(Long id) {
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+        Object key = TenantCacheKeyUtils.getKey(id);
+
+        ReentrantLock lock = lockFor(key);
+
+        lock.lock();
+
+        try {
+            Long current = cache.get(key, Long.class);
+
+            if (current == null) {
+                throw new IllegalArgumentException("Unable to locate counter with id: %s".formatted(id));
+            }
+
+            long next = current - 1;
+
+            cache.put(key, next);
+
+            return next;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void setAtomic(Long id, long value) {
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+        Object key = TenantCacheKeyUtils.getKey(id);
+
+        ReentrantLock lock = lockFor(key);
+
+        lock.lock();
+
+        try {
+            cache.put(key, value);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public Counter save(Counter counter) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
-        cache.put(TenantCacheKeyUtils.getKey(counter.getId()), counter.getValue());
+        Object key = TenantCacheKeyUtils.getKey(counter.getId());
+
+        ReentrantLock lock = lockFor(key);
+
+        boolean needAcquire = !lock.isHeldByCurrentThread();
+
+        if (needAcquire) {
+            lock.lock();
+        }
+
+        try {
+            cache.put(key, counter.getValue());
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
 
         return counter;
     }
@@ -68,6 +176,26 @@ public class InMemoryCounterRepository implements CounterRepository {
     public void update(Long id, long value) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
 
-        cache.put(TenantCacheKeyUtils.getKey(id), value);
+        Object key = TenantCacheKeyUtils.getKey(id);
+
+        ReentrantLock lock = lockFor(key);
+
+        boolean needAcquire = !lock.isHeldByCurrentThread();
+
+        if (needAcquire) {
+            lock.lock();
+        }
+
+        try {
+            cache.put(key, value);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private ReentrantLock lockFor(Object key) {
+        return locks.get(key, k -> new ReentrantLock());
     }
 }

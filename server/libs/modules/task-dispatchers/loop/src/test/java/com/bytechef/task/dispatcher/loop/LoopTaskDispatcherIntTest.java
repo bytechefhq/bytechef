@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.Validate;
@@ -240,14 +241,48 @@ public class LoopTaskDispatcherIntTest {
     }
 
     private void assertAllTasksTerminated(Job job) {
-        Long jobId = Objects.requireNonNull(job.getId(), "job id");
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+        long jobId = Objects.requireNonNull(job.getId(), "job id");
 
-        for (TaskExecution taskExecution : taskExecutions) {
-            TaskExecution.Status status = taskExecution.getStatus();
+        long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
+        long pollDelayMillis = 50L;
+        long start = System.currentTimeMillis();
 
-            Assertions.assertTrue(status == null || status.isTerminated(),
-                () -> "TaskExecution " + taskExecution.getId() + " not terminated: " + status);
+        while (true) {
+            List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+            boolean allTerminated = true;
+
+            for (TaskExecution taskExecution : taskExecutions) {
+                TaskExecution.Status status = taskExecution.getStatus();
+
+                if (!(status == null || status.isTerminated())) {
+                    allTerminated = false;
+
+                    break;
+                }
+            }
+
+            if (allTerminated) {
+                return;
+            }
+
+            if (System.currentTimeMillis() - start > timeoutMillis) {
+                List<TaskExecution> currentExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+                String message = currentExecutions.stream()
+                    .map(te -> "TaskExecution " + te.getId() + " (" + te.getName() + ") status=" + te.getStatus())
+                    .collect(Collectors.joining(System.lineSeparator()));
+
+                Assertions.fail("Not all TaskExecutions terminated within timeout. Current statuses:\n" + message);
+            }
+
+            try {
+                Thread.sleep(pollDelayMillis);
+            } catch (InterruptedException e) {
+                Thread.currentThread()
+                    .interrupt();
+                Assertions.fail("Interrupted while waiting for task terminations");
+            }
         }
     }
 

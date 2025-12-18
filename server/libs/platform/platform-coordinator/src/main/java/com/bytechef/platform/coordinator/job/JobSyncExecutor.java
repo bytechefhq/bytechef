@@ -81,7 +81,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -113,13 +112,12 @@ public class JobSyncExecutor {
 
     public JobSyncExecutor(
         ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
-        Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
-        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        long timeout, WorkflowService workflowService) {
+        MemoryMessageFactory memoryMessageFactory, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        TaskFileStorage taskFileStorage, long timeout, WorkflowService workflowService) {
 
         this(
-            contextService, evaluator, jobService, maxTaskExecutions, memoryMessageBrokerSupplier, List.of(), List.of(),
+            contextService, evaluator, jobService, maxTaskExecutions, memoryMessageFactory, List.of(), List.of(),
             taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor, taskHandlerRegistry,
             taskFileStorage, timeout, workflowService);
     }
@@ -127,7 +125,7 @@ public class JobSyncExecutor {
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
         ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
-        Supplier<MemoryMessageBroker> memoryMessageBrokerSupplier,
+        MemoryMessageFactory memoryMessageFactory,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
@@ -137,9 +135,10 @@ public class JobSyncExecutor {
 
         this.contextService = contextService;
 
-        MemoryMessageBroker memoryMessageBroker = memoryMessageBrokerSupplier.get();
+        MemoryMessageBroker coordinatorMemoryMessageBroker =
+            memoryMessageFactory.get(MemoryMessageFactory.Role.COORDINATOR);
 
-        this.eventPublisher = createEventPublisher(memoryMessageBroker);
+        this.eventPublisher = createEventPublisher(coordinatorMemoryMessageBroker);
 
         this.jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
@@ -164,17 +163,18 @@ public class JobSyncExecutor {
             evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage,
             List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
 
-        MemoryMessageBroker coordinatorMessageBroker = memoryMessageBrokerSupplier.get();
+        MemoryMessageBroker workerMessageBroker =
+            memoryMessageFactory.get(MemoryMessageFactory.Role.WORKER);
 
         receive(
-            coordinatorMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {
+            workerMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {
                 CancelControlTaskEvent cancelControlTaskEvent = (CancelControlTaskEvent) event;
 
                 taskWorker.onCancelControlTaskEvent(cancelControlTaskEvent);
             });
 
         receive(
-            coordinatorMessageBroker, TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, event -> {
+            workerMessageBroker, TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, event -> {
                 TaskExecutionEvent taskExecutionEvent = (TaskExecutionEvent) event;
 
                 if (maxTaskExecutions != UNLIMITED_TASK_EXECUTIONS) {
@@ -205,12 +205,12 @@ public class JobSyncExecutor {
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
                 Stream.of(
                     new DefaultTaskDispatcher(
-                        createEventPublisher(coordinatorMessageBroker), taskDispatcherPreSendProcessors))));
+                        createEventPublisher(workerMessageBroker), taskDispatcherPreSendProcessors))));
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
             eventPublisher, jobService, taskDispatcherChain, taskExecutionService);
 
-        receive(memoryMessageBroker, TaskCoordinatorMessageRoute.ERROR_EVENTS,
+        receive(coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.ERROR_EVENTS,
             event -> taskExecutionErrorEventListener.onErrorEvent((ErrorEvent) event));
 
         JobExecutor jobExecutor = new JobExecutor(
@@ -234,10 +234,10 @@ public class JobSyncExecutor {
             jobService, taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
+            coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             event -> taskCoordinator.onApplicationEvent((ApplicationEvent) event));
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.APPLICATION_EVENTS, event -> {
+            coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.APPLICATION_EVENTS, event -> {
                 if (event instanceof JobStatusApplicationEvent jobStatusEvent) {
                     long jobId = jobStatusEvent.getJobId();
 
@@ -255,13 +255,13 @@ public class JobSyncExecutor {
                 }
             });
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
+            coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
             event -> taskCoordinator.onStartJobEvent((StartJobEvent) event));
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
+            coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
             event -> taskCoordinator.onStopJobEvent((StopJobEvent) event));
         receive(
-            memoryMessageBroker, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            coordinatorMemoryMessageBroker, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             event -> taskCoordinator.onTaskExecutionCompleteEvent((TaskExecutionCompleteEvent) event));
     }
 
@@ -417,6 +417,15 @@ public class JobSyncExecutor {
         } finally {
             jobCompletionLatches.remove(getKey(jobId));
         }
+    }
+
+    public interface MemoryMessageFactory {
+
+        enum Role {
+            COORDINATOR, WORKER
+        }
+
+        MemoryMessageBroker get(Role role);
     }
 
     private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction) implements JobService {

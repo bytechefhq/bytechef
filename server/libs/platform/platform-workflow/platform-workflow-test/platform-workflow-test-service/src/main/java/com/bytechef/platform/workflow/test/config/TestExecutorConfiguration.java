@@ -109,7 +109,9 @@ public class TestExecutorConfiguration {
         return new JobTestExecutor(
             componentDefinitionService, contextService, evaluator, jobService,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, 1000, () -> asyncMessageBroker,
+                contextService, evaluator, jobService, 1000,
+                role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
+                    ? asyncMessageBroker : new AsyncMessageBroker(environment),
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(

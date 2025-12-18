@@ -148,8 +148,6 @@ public class MapTaskDispatcher extends ErrorHandlingTaskDispatcher implements Ta
                     taskFileStorage.storeContextValue(taskExecutionId, i, Classname.TASK_EXECUTION, context));
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }
-
-            counterService.set(Validate.notNull(taskExecution.getId(), "id"), items.size());
         }
 
     }
