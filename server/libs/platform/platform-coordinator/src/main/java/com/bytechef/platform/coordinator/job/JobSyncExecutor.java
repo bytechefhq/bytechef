@@ -160,7 +160,7 @@ public class JobSyncExecutor {
             taskExecutor, maxTaskExecutions);
 
         TaskWorker taskWorker = new TaskWorker(
-            evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage,
+            null, evaluator, eventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain, taskFileStorage,
             List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
 
         MemoryMessageBroker workerMessageBroker =

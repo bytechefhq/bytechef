@@ -2105,10 +2105,19 @@ public class ApplicationProperties {
          */
         public static class Task {
 
+            private Long defaultTimeout;
             private Map<String, Integer> subscriptions = new HashMap<>();
+
+            public Long getDefaultTimeout() {
+                return defaultTimeout;
+            }
 
             public Map<String, Integer> getSubscriptions() {
                 return subscriptions;
+            }
+
+            public void setDefaultTimeout(Long defaultTimeout) {
+                this.defaultTimeout = defaultTimeout;
             }
 
             public void setSubscriptions(Map<String, Integer> subscriptions) {
