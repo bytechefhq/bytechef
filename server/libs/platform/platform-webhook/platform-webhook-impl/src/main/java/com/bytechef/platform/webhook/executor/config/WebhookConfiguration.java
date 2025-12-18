@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.executor.config;
 
+import static com.bytechef.platform.coordinator.job.JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -90,7 +91,9 @@ public class WebhookConfiguration {
             eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, -1, () -> asyncMessageBroker, getTaskCompletionHandlerFactories(
+                contextService, evaluator, jobService, -1,
+                role -> (role == COORDINATOR) ? asyncMessageBroker : new AsyncMessageBroker(environment),
+                getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(cacheManager, evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(

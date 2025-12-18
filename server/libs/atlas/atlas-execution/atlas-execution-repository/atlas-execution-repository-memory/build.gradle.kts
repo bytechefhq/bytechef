@@ -5,6 +5,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-core")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
 

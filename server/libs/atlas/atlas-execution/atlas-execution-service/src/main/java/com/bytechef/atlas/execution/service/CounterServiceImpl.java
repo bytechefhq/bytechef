@@ -16,10 +16,8 @@
 
 package com.bytechef.atlas.execution.service;
 
-import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -43,15 +41,7 @@ public class CounterServiceImpl implements CounterService {
      */
     @Override
     public long decrement(long id) {
-        Long value = counterRepository
-            .findValueByIdForUpdate(id)
-            .orElseThrow(() -> new IllegalArgumentException("Unable to locate counter with id: %s".formatted(id)));
-
-        value = value - 1;
-
-        counterRepository.update(id, value);
-
-        return value;
+        return counterRepository.decrementAndGet(id);
     }
 
     @Override
@@ -66,17 +56,6 @@ public class CounterServiceImpl implements CounterService {
      */
     @Override
     public void set(long id, long value) {
-        Optional<Long> selectedValue = counterRepository.findValueByIdForUpdate(id);
-
-        if (selectedValue.isEmpty()) {
-            Counter counter = new Counter();
-
-            counter.setId(id);
-            counter.setValue(value);
-
-            counterRepository.save(counter);
-        } else {
-            counterRepository.update(id, value);
-        }
+        counterRepository.setAtomic(id, value);
     }
 }

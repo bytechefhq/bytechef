@@ -25,9 +25,10 @@ import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarT
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,8 @@ public class EachTaskDispatcherIntTest {
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(
-            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+            (valueMap, name, value) -> valueMap
+                .computeIfAbsent(name, key -> Collections.synchronizedList(new ArrayList<>()))
                 .add(value));
     }
 
@@ -71,12 +73,15 @@ public class EachTaskDispatcherIntTest {
                         taskExecutionService, taskFileStorage)),
             () -> Map.of("var/v1/set", testVarTaskHandler));
 
-        Assertions.assertEquals(
-            IntStream.rangeClosed(1, 25)
-                .boxed()
-                .flatMap(item1 -> IntStream.rangeClosed(1, 25)
-                    .mapToObj(item2 -> item1 + "_" + item2))
-                .collect(Collectors.toList()),
-            testVarTaskHandler.get("var1"));
+        List<String> expected = IntStream.rangeClosed(1, 25)
+            .boxed()
+            .flatMap(item1 -> IntStream.rangeClosed(1, 25)
+                .mapToObj(item2 -> item1 + "_" + item2))
+            .toList();
+
+        List<String> actual = testVarTaskHandler.get("var1");
+
+        Assertions.assertEquals(expected.size(), actual.size());
+        Assertions.assertEquals(new HashSet<>(expected), new HashSet<>(actual));
     }
 }

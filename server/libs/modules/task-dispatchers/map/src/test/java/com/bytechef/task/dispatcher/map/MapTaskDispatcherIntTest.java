@@ -68,7 +68,9 @@ public class MapTaskDispatcherIntTest {
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(
-            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+            (valueMap, name, value) -> valueMap.computeIfAbsent(
+                name,
+                key -> java.util.Collections.synchronizedList(new ArrayList<>()))
                 .add(value));
     }
 
@@ -95,14 +97,17 @@ public class MapTaskDispatcherIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals(
-            IntStream.rangeClosed(1, 10)
-                .boxed()
-                .map(item1 -> IntStream.rangeClosed(1, item1)
-                    .mapToObj(item2 -> item1 + "_" + item2 + 1)
-                    .collect(Collectors.toList()))
-                .collect(Collectors.toList()),
-            outputs.get("map"));
+        List<?> actual = (List<?>) outputs.get("map");
+
+        List<?> expected = IntStream.rangeClosed(1, 10)
+            .boxed()
+            .map(item1 -> IntStream.rangeClosed(1, item1)
+                .mapToObj(item2 -> item1 + "_" + item2 + 1)
+                .collect(Collectors.toList()))
+            .collect(Collectors.toList());
+
+        Assertions.assertEquals(expected.size(), actual.size());
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -113,7 +118,7 @@ public class MapTaskDispatcherIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals(null, outputs.get("map"));
+        Assertions.assertNull(outputs.get("map"));
     }
 
     @SuppressWarnings("PMD")

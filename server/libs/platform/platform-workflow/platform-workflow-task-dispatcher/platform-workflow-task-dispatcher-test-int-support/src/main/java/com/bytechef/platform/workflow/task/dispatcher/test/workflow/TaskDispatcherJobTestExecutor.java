@@ -24,10 +24,18 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
+import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.error.ExecutionError;
@@ -36,21 +44,22 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.tenant.TenantContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 
 public class TaskDispatcherJobTestExecutor {
 
-    private final ContextService contextService;
-    private final CounterService counterService;
+    private final CacheManager cacheManager;
     private final Environment environment;
-    private final JobService jobService;
+    private final ObjectMapper objectMapper;
     private final TaskExecutionService taskExecutionService;
     private final TaskExecutor taskExecutor;
     private final TaskFileStorage taskFileStorage;
@@ -58,14 +67,12 @@ public class TaskDispatcherJobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public TaskDispatcherJobTestExecutor(
-        ContextService contextService, CounterService counterService, Environment environment,
-        TaskExecutor taskExecutor, JobService jobService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        CacheManager cacheManager, Environment environment, ObjectMapper objectMapper, TaskExecutor taskExecutor,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
-        this.contextService = contextService;
-        this.counterService = counterService;
+        this.cacheManager = cacheManager;
         this.environment = environment;
-        this.jobService = jobService;
+        this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskExecutor = taskExecutor;
         this.taskFileStorage = taskFileStorage;
@@ -88,10 +95,20 @@ public class TaskDispatcherJobTestExecutor {
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
+        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
+
+        JobService jobService = new JobServiceImpl(
+            new InMemoryJobRepository(cacheManager, taskExecutionRepository, objectMapper));
+        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, SpelEvaluator.create(), jobService, -1, () -> asyncMessageBroker,
+            contextService, SpelEvaluator.create(), jobService, -1,
+            role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)
+                ? asyncMessageBroker : new AsyncMessageBroker(environment),
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 createEventPublisher(asyncMessageBroker), contextService, counterService, taskExecutionService),
