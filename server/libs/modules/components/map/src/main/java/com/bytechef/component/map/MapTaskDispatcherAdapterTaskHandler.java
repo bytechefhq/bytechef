@@ -110,7 +110,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                 Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
-            evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute, taskHandlerResolver,
+            null, evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute,
+            taskHandlerResolver,
             taskFileStorage, List.of());
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(

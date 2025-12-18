@@ -157,7 +157,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         TaskWorker worker = new TaskWorker(
-            EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            null, EVALUATOR, event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             EXECUTOR_SERVICE::execute, taskHandlerResolver, taskFileStorage, List.of());
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(
