@@ -165,7 +165,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react-fast-compare": "^3.2.2",
     "sanitize-html": "^2.17.0",
-    "storybook": "^10.1.2",
+    "storybook": "^10.1.10",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
