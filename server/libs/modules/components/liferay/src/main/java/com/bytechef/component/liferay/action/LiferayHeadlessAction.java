@@ -189,7 +189,7 @@ public class LiferayHeadlessAction {
             .collect(
                 Collectors.toMap(
                     parameterName -> parameterName,
-                    parameterName -> String.valueOf(properties.get(parameterName)))));
+                    properties::get)));
 
     }
 
