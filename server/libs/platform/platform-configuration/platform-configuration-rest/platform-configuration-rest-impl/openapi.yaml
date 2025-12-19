@@ -1057,10 +1057,6 @@ paths:
               required:
                 - "path"
               properties:
-                fromAiInMetadata:
-                  description: "If fromAi should be included in metadata."
-                  type: "boolean"
-                  default: false
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
