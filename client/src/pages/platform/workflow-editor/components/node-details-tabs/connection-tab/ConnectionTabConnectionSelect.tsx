@@ -22,7 +22,7 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {PlusIcon, X} from 'lucide-react';
+import {PlusIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -170,16 +170,16 @@ const ConnectionTabConnectionSelect = ({
     const skipServerSyncRef = useRef(false);
     const clearedConnectionIdRef = useRef<number | undefined>(undefined);
 
-    const handleClear = useCallback(
+    const handleClearConnectionClick = useCallback(
         (workflowConnectionKey: string) => {
-            const prevConnectionId = connectionId ?? 0;
+            const previousConnectionId = connectionId ?? 0;
 
             skipServerSyncRef.current = true;
             clearedConnectionIdRef.current = connectionId;
 
             deleteWorkflowTestConfigurationConnectionMutation.mutate({
                 environmentId: currentEnvironmentId,
-                saveWorkflowTestConfigurationConnectionRequest: {connectionId: prevConnectionId},
+                saveWorkflowTestConfigurationConnectionRequest: {connectionId: previousConnectionId},
                 workflowConnectionKey,
                 workflowId,
                 workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
@@ -222,25 +222,25 @@ const ConnectionTabConnectionSelect = ({
 
     // Sync connectionId from prop to state (one-way sync)
     useEffect(() => {
-        const serverConnectionId = workflowTestConfigurationConnection?.connectionId;
+        const workflowConnectionId = workflowTestConfigurationConnection?.connectionId;
 
         if (
             skipServerSyncRef.current &&
-            serverConnectionId !== undefined &&
-            serverConnectionId === clearedConnectionIdRef.current
+            workflowConnectionId !== undefined &&
+            workflowConnectionId === clearedConnectionIdRef.current
         ) {
             return;
         }
 
-        if (skipServerSyncRef.current && serverConnectionId === undefined) {
+        if (skipServerSyncRef.current && workflowConnectionId === undefined) {
             skipServerSyncRef.current = false;
             clearedConnectionIdRef.current = undefined;
         }
 
-        if (serverConnectionId !== undefined && connectionId !== serverConnectionId) {
-            setConnectionId(serverConnectionId);
+        if (workflowConnectionId !== undefined && connectionId !== workflowConnectionId) {
+            setConnectionId(workflowConnectionId);
         }
-        if (serverConnectionId === undefined && connectionId !== undefined) {
+        if (workflowConnectionId === undefined && connectionId !== undefined) {
             setConnectionId(undefined);
         }
     }, [workflowTestConfigurationConnection, connectionId]);
@@ -286,8 +286,8 @@ const ConnectionTabConnectionSelect = ({
 
                         {connectionId !== undefined && (
                             <Button
-                                icon={<X />}
-                                onClick={() => handleClear(key)}
+                                icon={<XIcon />}
+                                onClick={() => handleClearConnectionClick(key)}
                                 size="icon"
                                 title="Clear connection"
                                 variant="outline"
