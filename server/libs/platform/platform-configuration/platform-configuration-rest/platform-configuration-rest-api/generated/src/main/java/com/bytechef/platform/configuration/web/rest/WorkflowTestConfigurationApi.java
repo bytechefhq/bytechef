@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-15T09:52:48.574632+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-19T14:30:20.578204370+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "The Platform Workflow Test Configuration Internal API")
 public interface WorkflowTestConfigurationApi {
@@ -44,6 +44,44 @@ public interface WorkflowTestConfigurationApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_DELETE_WORKFLOW_TEST_CONFIGURATION_CONNECTION = "/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections";
+    /**
+     * DELETE /workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections : Delete a workflow test configuration connection
+     * Delete a workflow test configuration connection.
+     *
+     * @param workflowId The id of a testing workflow. (required)
+     * @param workflowNodeName The action/trigger name defined in the workflow. (required)
+     * @param workflowConnectionKey The key of a connection. (required)
+     * @param environmentId The id of an environment. (required)
+     * @param saveWorkflowTestConfigurationConnectionRequestModel  (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "deleteWorkflowTestConfigurationConnection",
+        summary = "Delete a workflow test configuration connection",
+        description = "Delete a workflow test configuration connection.",
+        tags = { "workflow-test-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = WorkflowTestConfigurationApi.PATH_DELETE_WORKFLOW_TEST_CONFIGURATION_CONNECTION,
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Void> deleteWorkflowTestConfigurationConnection(
+        @NotNull @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @NotNull @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "workflowConnectionKey", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "SaveWorkflowTestConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_GET_WORKFLOW_TEST_CONFIGURATION = "/workflow-test-configurations/{workflowId}";
     /**
