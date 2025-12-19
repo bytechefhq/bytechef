@@ -139,11 +139,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        if (fromAiInMetadata) {
-            List<String> fromAiPaths = getFromAiPaths(metadataMap);
-
-            fromAiPaths.remove(parameterPath);
-        }
+        updateFromAiMetadataPaths(fromAiInMetadata, getFromAiPaths(metadataMap), parameterPath);
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
@@ -295,11 +291,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        if (fromAiInMetadata) {
-            List<String> fromAiPaths = getFromAiPaths(metadataMap);
-
-            fromAiPaths.add(parameterPath);
-        }
+        updateFromAiMetadataPaths(fromAiInMetadata, getFromAiPaths(metadataMap), parameterPath);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
@@ -443,6 +435,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     displayConditionMap.put(updatedDisplayCondition, String.join("_", indexesString, propertyName));
                 }
             }
+        }
+    }
+
+    private void updateFromAiMetadataPaths(boolean fromAiInMetadata, List<String> fromAiPaths, String parameterPath) {
+        if (fromAiInMetadata) {
+            fromAiPaths.add(parameterPath);
+        }
+        else {
+            fromAiPaths.remove(parameterPath);
         }
     }
 
