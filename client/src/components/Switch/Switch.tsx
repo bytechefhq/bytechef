@@ -1,9 +1,9 @@
-import {Switch as SwitchPrimitives} from 'radix-ui';
+import {Switch as ShadcnSwitch} from '@/components/ui/switch';
 import * as React from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface BaseSwitchProps extends Omit<
-    React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
+    React.ComponentPropsWithoutRef<typeof ShadcnSwitch>,
     'checked' | 'onCheckedChange'
 > {
     variant?: VariantType;
@@ -28,36 +28,26 @@ type AlignmentType = 'start' | 'end';
 
 type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
-const baseTrackClasses =
-    'peer inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors ' +
-    'focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50';
-
-const baseThumbClasses =
-    'pointer-events-none block rounded-full ring-0 transition-transform shadow-[0_0_8px_rgba(0,0,0,0.15)]';
-
-const variantConfig: Record<VariantType, {track: string; thumb: string; translate: string}> = {
+const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumb: 'w-4 h-4',
-        track: 'h-5 w-9 px-0.5',
-        translate: 'translate-x-4',
+        thumbOverrides: '[&>span]:h-4 [&>span]:w-4 [&>span]:data-[state=checked]:translate-x-4',
+        track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumb: 'w-4 h-4',
-        track: 'h-5 w-9 px-0.5',
-        translate: 'translate-x-4',
+        thumbOverrides: '[&>span]:h-4 [&>span]:w-4 [&>span]:data-[state=checked]:translate-x-4',
+        track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumb: 'w-3 h-3',
-        track: 'h-[14px] w-[26px] px-[1px]',
-        translate: '',
+        thumbOverrides: '[&>span]:h-3 [&>span]:w-3 [&>span]:data-[state=checked]:translate-x-3',
+        track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
 
 const wrapperStyles: Record<VariantType, string> = {
     default: 'flex w-[228px] items-start gap-2',
     // eslint-disable-next-line sort-keys
-    box: 'w-fit rounded-lg border border-stroke-neutral-secondary p-3',
+    box: 'flex w-fit items-start gap-2 rounded-lg border border-stroke-neutral-secondary p-3',
     small: 'flex w-[98px] items-center gap-1',
 };
 
@@ -90,42 +80,31 @@ function TextBlock({
     );
 }
 
-const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, SwitchPropsType>(
+const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPropsType>(
     ({alignment = 'start', checked = false, className, description, id, label, variant = 'default', ...props}, ref) => {
-        const config = variantConfig[variant] ?? variantConfig.default;
+        const config = variantConfig[variant];
 
-        const trackClasses = twMerge(
-            baseTrackClasses,
+        const switchClasses = twMerge(
             config.track,
-            checked ? 'bg-surface-brand-primary' : 'bg-surface-neutral-secondary',
-            'focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
-            variant === 'small' && checked ? 'justify-end' : '',
+            config.thumbOverrides,
+            'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-secondary',
+            'focus-visible:ring-2 focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
+            '[&>span]:bg-surface-neutral-primary',
+            '[&>span]:shadow-[0_0_8px_rgba(0,0,0,0.15)]',
             className
-        );
-
-        const thumbClasses = twMerge(
-            baseThumbClasses,
-            config.thumb,
-            'bg-surface-neutral-primary',
-            'my-auto',
-            variant === 'small' ? 'self-center' : '',
-            variant === 'small' ? '' : checked ? config.translate : 'translate-x-0'
         );
 
         const ariaLabel = props['aria-label'] ?? (typeof label === 'string' ? label : 'switch');
 
         const switchElement = (
-            <SwitchPrimitives.Root
+            <ShadcnSwitch
                 aria-label={ariaLabel}
                 checked={checked}
-                className={trackClasses}
+                className={switchClasses}
                 id={id}
                 ref={ref}
-                role="switch"
                 {...props}
-            >
-                <SwitchPrimitives.Thumb className={thumbClasses} />
-            </SwitchPrimitives.Root>
+            />
         );
 
         if (!label) {
@@ -141,19 +120,17 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
         if (isBoxVariant) {
             return (
                 <div className={wrapperClasses} data-testid="switch-wrapper">
-                    <div className="flex items-start gap-2">
-                        {alignment === 'start' ? (
-                            <>
-                                {switchElement}
-                                <TextBlock description={description} label={label} variant={variant} />
-                            </>
-                        ) : (
-                            <>
-                                <TextBlock description={description} label={label} variant={variant} />
-                                {switchElement}
-                            </>
-                        )}
-                    </div>
+                    {alignment === 'start' ? (
+                        <>
+                            {switchElement}
+                            <TextBlock description={description} label={label} variant={variant} />
+                        </>
+                    ) : (
+                        <>
+                            <TextBlock description={description} label={label} variant={variant} />
+                            {switchElement}
+                        </>
+                    )}
                 </div>
             );
         }
