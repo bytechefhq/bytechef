@@ -112,6 +112,7 @@ module.exports = {
                         tertiary: 'hsl(var(--stroke-branch-tertiary))',
                     },
                     brand: {
+                        focus: 'hsl(var(--stroke-brand-focus))',
                         primary: 'hsl(var(--stroke-brand-primary))',
                         'primary-hover': 'hsl(var(--stroke-brand-primary-hover))',
                         'primary-active': 'hsl(var(--stroke-brand-primary-active))',
