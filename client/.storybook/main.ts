@@ -15,6 +15,10 @@ const config: StorybookConfig = {
         options: {},
     },
 
+    typescript: {
+        reactDocgen: false,
+    },
+
     docs: {},
 };
 export default config;
