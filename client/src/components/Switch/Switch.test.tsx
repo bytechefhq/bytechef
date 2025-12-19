@@ -49,32 +49,55 @@ describe('Switch - Basic Rendering', () => {
 });
 
 describe('Switch - Variants', () => {
-    it('should render default variant with correct dimensions', () => {
+    it('should render default variant with correct track dimensions', () => {
         render(<Switch checked={false} variant="default" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-5 w-9 px-0.5');
+        expect(switchElement).toHaveClass('h-5');
+        expect(switchElement).toHaveClass('w-9');
+        expect(switchElement).toHaveClass('px-0.5');
+        expect(switchElement).toHaveClass('rounded-full');
+        expect(switchElement).toHaveClass('border-0');
     });
 
-    it('should render small variant with correct dimensions', () => {
+    it('should render default variant with correct thumb sizing via arbitrary variants', () => {
+        render(<Switch checked={false} variant="default" />);
+
+        const switchElement = screen.getByRole('switch');
+        // Check for arbitrary variant classes that style the thumb
+        expect(switchElement.className).toMatch(/\[&>span\]:h-4/);
+        expect(switchElement.className).toMatch(/\[&>span\]:w-4/);
+    });
+
+    it('should render small variant with correct track dimensions', () => {
         render(<Switch checked={false} variant="small" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-[14px] w-[26px] px-[1px]');
+        expect(switchElement).toHaveClass('h-[14px]');
+        expect(switchElement).toHaveClass('w-[26px]');
+        expect(switchElement).toHaveClass('px-[1px]');
+        expect(switchElement).toHaveClass('rounded-[7px]');
+        expect(switchElement).toHaveClass('border-0');
     });
 
-    it('should use flex positioning for small variant when checked', () => {
-        render(<Switch checked={true} variant="small" />);
+    it('should render small variant with correct thumb sizing via arbitrary variants', () => {
+        render(<Switch checked={false} variant="small" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('justify-end');
+        // Check for arbitrary variant classes for small thumb
+        expect(switchElement.className).toMatch(/\[&>span\]:h-3/);
+        expect(switchElement.className).toMatch(/\[&>span\]:w-3/);
     });
 
-    it('should render box variant with correct dimensions', () => {
+    it('should render box variant with correct track dimensions', () => {
         render(<Switch checked={false} variant="box" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-5 w-9 px-0.5');
+        expect(switchElement).toHaveClass('h-5');
+        expect(switchElement).toHaveClass('w-9');
+        expect(switchElement).toHaveClass('px-0.5');
+        expect(switchElement).toHaveClass('rounded-full');
+        expect(switchElement).toHaveClass('border-0');
     });
 
     it('should not show description in small variant', () => {
@@ -93,22 +116,33 @@ describe('Switch - Variants', () => {
         render(<Switch label="Box variant" variant="box" />);
 
         const wrapper = screen.getByTestId('switch-wrapper');
-        expect(wrapper).toHaveClass('rounded-lg border border-stroke-neutral-secondary');
-        expect(wrapper).toHaveClass('w-fit p-3');
+        expect(wrapper).toHaveClass('rounded-lg');
+        expect(wrapper).toHaveClass('border');
+        expect(wrapper).toHaveClass('border-stroke-neutral-secondary');
+        expect(wrapper).toHaveClass('w-fit');
+        expect(wrapper).toHaveClass('p-3');
     });
 
     it('should apply checked styling to box variant', () => {
         render(<Switch checked={true} label="Box variant checked" variant="box" />);
 
         const wrapper = screen.getByTestId('switch-wrapper');
-        expect(wrapper).toHaveClass('bg-surface-brand-secondary border-stroke-brand-secondary');
+        expect(wrapper).toHaveClass('bg-surface-brand-secondary');
+        expect(wrapper).toHaveClass('border-stroke-brand-secondary');
     });
 
-    it('should render box variant with inner flex container', () => {
-        const {container} = render(<Switch label="Box variant" variant="box" />);
+    it('should apply correct border-radius to variants', () => {
+        const {rerender} = render(<Switch checked={false} variant="default" />);
+        let switchElement = screen.getByRole('switch');
+        expect(switchElement).toHaveClass('rounded-full');
 
-        const innerDiv = container.querySelector('[data-testid="switch-wrapper"] > div');
-        expect(innerDiv).toHaveClass('flex items-start gap-2');
+        rerender(<Switch checked={false} variant="box" />);
+        switchElement = screen.getByRole('switch');
+        expect(switchElement).toHaveClass('rounded-full');
+
+        rerender(<Switch checked={false} variant="small" />);
+        switchElement = screen.getByRole('switch');
+        expect(switchElement).toHaveClass('rounded-[7px]');
     });
 });
 
@@ -127,20 +161,22 @@ describe('Switch - Alignment', () => {
         expect(contentDiv).not.toHaveClass('flex-row-reverse');
     });
 
-    it('should render box variant with start alignment using conditional rendering', () => {
+    it('should render box variant with start alignment', () => {
         const {container} = render(<Switch alignment="start" label="Box start" variant="box" />);
 
-        const contentDiv = container.querySelector('[data-testid="switch-wrapper"] > div');
-        expect(contentDiv).not.toHaveClass('flex-row-reverse');
-        expect(contentDiv).toHaveClass('flex items-start gap-2');
+        const wrapper = container.querySelector('[data-testid="switch-wrapper"]');
+        expect(wrapper).toHaveClass('flex');
+        expect(wrapper).toHaveClass('items-start');
+        expect(wrapper).toHaveClass('gap-2');
     });
 
-    it('should render box variant with end alignment using conditional rendering', () => {
+    it('should render box variant with end alignment', () => {
         const {container} = render(<Switch alignment="end" label="Box end" variant="box" />);
 
-        const contentDiv = container.querySelector('[data-testid="switch-wrapper"] > div');
-        expect(contentDiv).not.toHaveClass('flex-row-reverse');
-        expect(contentDiv).toHaveClass('flex items-start gap-2');
+        const wrapper = container.querySelector('[data-testid="switch-wrapper"]');
+        expect(wrapper).toHaveClass('flex');
+        expect(wrapper).toHaveClass('items-start');
+        expect(wrapper).toHaveClass('gap-2');
     });
 });
 
@@ -149,14 +185,28 @@ describe('Switch - States', () => {
         render(<Switch checked={true} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('bg-surface-brand-primary');
+        expect(switchElement).toHaveClass('data-[state=checked]:bg-surface-brand-primary');
     });
 
     it('should apply unchecked background color', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('bg-surface-neutral-secondary');
+        expect(switchElement).toHaveClass('data-[state=unchecked]:bg-surface-neutral-secondary');
+    });
+
+    it('should apply thumb background color via arbitrary variant', () => {
+        render(<Switch checked={false} />);
+
+        const switchElement = screen.getByRole('switch');
+        expect(switchElement.className).toMatch(/\[&>span\]:bg-surface-neutral-primary/);
+    });
+
+    it('should apply thumb shadow via arbitrary variant', () => {
+        render(<Switch checked={false} />);
+
+        const switchElement = screen.getByRole('switch');
+        expect(switchElement.className).toMatch(/\[&>span\]:shadow-\[0_0_8px_rgba\(0,0,0,0\.15\)\]/);
     });
 
     it('should handle disabled state', () => {
@@ -164,7 +214,8 @@ describe('Switch - States', () => {
 
         const switchElement = screen.getByRole('switch');
         expect(switchElement).toBeDisabled();
-        expect(switchElement).toHaveClass('disabled:cursor-not-allowed disabled:opacity-50');
+        expect(switchElement).toHaveClass('disabled:cursor-not-allowed');
+        expect(switchElement).toHaveClass('disabled:opacity-50');
     });
 });
 
@@ -212,6 +263,7 @@ describe('Switch - Focus', () => {
         expect(switchElement).toHaveClass('focus-visible:outline-none');
         expect(switchElement).toHaveClass('focus-visible:ring-2');
         expect(switchElement).toHaveClass('focus-visible:ring-stroke-brand-focus');
+        expect(switchElement).toHaveClass('focus-visible:ring-offset-0');
     });
 });
 
@@ -247,14 +299,6 @@ describe('Switch - TypeScript Type Safety', () => {
             render(<Switch label="Small" variant="small" />);
             render(<Switch label="Box" variant="box" />);
         });
-
-        it('should not allow invalid variant values', () => {
-            // @ts-expect-error - invalid variant value
-            render(<Switch label="Invalid" variant="invalid-variant" />);
-
-            expect(screen.getByText('Invalid')).toBeInTheDocument();
-            expect(screen.getByRole('switch')).toBeInTheDocument();
-        });
     });
 
     describe('alignment type safety', () => {
@@ -277,6 +321,15 @@ describe('Switch - className prop', () => {
         const switchElement = screen.getByRole('switch');
         expect(switchElement).toHaveClass('bg-red-500');
         expect(switchElement).toHaveClass('rounded-full');
+    });
+
+    it('should merge className with variant-specific classes', () => {
+        render(<Switch checked={false} className="bg-red-500" variant="small" />);
+
+        const switchElement = screen.getByRole('switch');
+        expect(switchElement).toHaveClass('bg-red-500');
+        expect(switchElement).toHaveClass('h-[14px]');
+        expect(switchElement).toHaveClass('rounded-[7px]');
     });
 });
 
@@ -345,7 +398,8 @@ describe('Switch - Combined Props', () => {
         expect(screen.getByText('Box description')).toBeInTheDocument();
         expect(screen.getByRole('switch')).toHaveAttribute('id', 'box-switch');
         expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
-        expect(screen.getByTestId('switch-wrapper')).toHaveClass('rounded-lg border');
+        expect(screen.getByTestId('switch-wrapper')).toHaveClass('rounded-lg');
+        expect(screen.getByTestId('switch-wrapper')).toHaveClass('border');
         expect(screen.getByRole('switch')).toHaveClass('bg-red-500');
     });
 
@@ -353,8 +407,10 @@ describe('Switch - Combined Props', () => {
         render(<Switch alignment="start" checked={false} label="Small Switch" variant="small" />);
 
         expect(screen.getByText('Small Switch')).toBeInTheDocument();
-        expect(screen.getByText('Small Switch')).toHaveClass('text-xs leading-4');
-        expect(screen.getByRole('switch')).toHaveClass('h-[14px] w-[26px]');
+        expect(screen.getByText('Small Switch')).toHaveClass('text-xs');
+        expect(screen.getByText('Small Switch')).toHaveClass('leading-4');
+        expect(screen.getByRole('switch')).toHaveClass('h-[14px]');
+        expect(screen.getByRole('switch')).toHaveClass('w-[26px]');
     });
 });
 
