@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction;
+import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -35,6 +36,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAdapater;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -42,7 +44,9 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -56,129 +60,93 @@ import org.springframework.stereotype.Service;
 public class ClusterElementDefinitionServiceImpl implements ClusterElementDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextFactory contextFactory;
+    private final TokenRefreshHelper tokenRefreshHelper;
 
-    public ClusterElementDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
+    @SuppressFBWarnings("EI")
+    public ClusterElementDefinitionServiceImpl(
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        TokenRefreshHelper tokenRefreshHelper) {
+
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextFactory = contextFactory;
+        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
     public List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ClusterElementContext context) {
+        @Nullable ComponentConnection componentConnection) {
 
-        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, true);
 
-        try {
-            com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction propertiesFunction =
-                getComponentPropertiesFunction(
-                    componentName, componentVersion, clusterElementNameName, propertyName,
-                    convertResult.inputParameters,
-                    convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
-
-            return propertiesFunction
-                .apply(
-                    convertResult.inputParameters, convertResult.connectionParameters,
-                    convertResult.lookupDependsOnPathsMap,
-                    context)
-                .stream()
-                .map(valueProperty -> (Property) Property.toProperty(valueProperty))
-                .toList();
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ConfigurationException(
-                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, clusterElementContext,
+            ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
+            (componentConnection1, clusterElementContext1) -> executeDynamicProperties(
+                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+                lookupDependsOnPaths, componentConnection1, clusterElementContext1),
+            componentConnection1 -> contextFactory.createClusterElementContext(
+                componentName, componentVersion, clusterElementName, componentConnection1, true));
     }
 
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ClusterElementContext context) {
+        @Nullable ComponentConnection componentConnection) {
 
-        try {
-            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, true);
 
-            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
-                componentName, componentVersion, clusterElementName, propertyName, convertResult.inputParameters(),
-                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
-
-            return optionsFunction
-                .apply(
-                    convertResult.inputParameters(), convertResult.connectionParameters(),
-                    convertResult.lookupDependsOnPathsMap(), searchText, context)
-                .stream()
-                .map(Option::new)
-                .toList();
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ConfigurationException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_OPTIONS);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, clusterElementContext,
+            ClusterElementDefinitionErrorType.EXECUTE_OPTIONS,
+            (componentConnection1, clusterElementContext1) -> executeOptions(
+                componentName, componentVersion, clusterElementName, propertyName, inputParameters,
+                lookupDependsOnPaths, searchText, componentConnection1, clusterElementContext1),
+            componentConnection1 -> contextFactory.createClusterElementContext(
+                componentName, componentVersion, clusterElementName, componentConnection1, true));
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
-        ClusterElementContext context) {
+        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body) {
 
-        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
-            componentDefinitionRegistry.getClusterElementDefinition(
-                componentName, componentVersion, clusterElementName);
-
-        try {
-            return clusterElementDefinition.getProcessErrorResponse()
-                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
-                    statusCode1, body1))
-                .apply(statusCode, body, context);
-        } catch (Exception e) {
-            throw new ExecutionException(e, ClusterElementDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
-        }
+        return executeProcessErrorResponse(
+            componentName, componentVersion, clusterElementName, statusCode, body,
+            contextFactory.createClusterElementContext(
+                componentName, componentVersion, clusterElementName, null, false));
     }
 
     @Override
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        SingleConnectionToolFunction toolFunction = getClusterElement(
-            componentName, componentVersion, clusterElementName);
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment);
 
-        try {
-            return toolFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory.createParameters(
-                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                context);
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ExecutionException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, clusterElementContext,
+            ClusterElementDefinitionErrorType.EXECUTE_PERFORM,
+            (componentConnection1, clusterElementContext1) -> executeTool(
+                componentName, componentVersion, clusterElementName, inputParameters, componentConnection1,
+                clusterElementContext1),
+            componentConnection1 -> contextFactory.createClusterElementContext(
+                componentName, componentVersion, clusterElementName, componentConnection1, editorEnvironment));
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        ClusterElementContext context) {
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters) {
 
-        WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
-            componentName, componentVersion, clusterElementName);
-
-        try {
-            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
-        } catch (Exception e) {
-            throw new ConfigurationException(
-                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
-        }
+        return executeWorkflowNodeDescription(
+            componentName, componentVersion, clusterElementName, inputParameters,
+            contextFactory.createClusterElementContext(
+                componentName, componentVersion, clusterElementName, null, true));
     }
 
     @Override
@@ -288,6 +256,121 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
+    private List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection componentConnection, ClusterElementContext context) {
+
+        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+        try {
+            PropertiesFunction propertiesFunction =
+                getComponentPropertiesFunction(
+                    componentName, componentVersion, clusterElementNameName, propertyName,
+                    convertResult.inputParameters,
+                    convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
+
+            return propertiesFunction
+                .apply(
+                    convertResult.inputParameters, convertResult.connectionParameters,
+                    convertResult.lookupDependsOnPathsMap,
+                    context)
+                .stream()
+                .map(valueProperty -> (Property) Property.toProperty(valueProperty))
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(
+                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+        }
+    }
+
+    private List<Option> executeOptions(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection, ClusterElementContext context) {
+
+        try {
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+                componentName, componentVersion, clusterElementName, propertyName, convertResult.inputParameters(),
+                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+
+            return optionsFunction
+                .apply(
+                    convertResult.inputParameters(), convertResult.connectionParameters(),
+                    convertResult.lookupDependsOnPathsMap(), searchText, context)
+                .stream()
+                .map(Option::new)
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_OPTIONS);
+        }
+    }
+
+    private ProviderException executeProcessErrorResponse(
+        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
+        ClusterElementContext context) {
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
+            componentDefinitionRegistry.getClusterElementDefinition(
+                componentName, componentVersion, clusterElementName);
+
+        try {
+            return clusterElementDefinition.getProcessErrorResponse()
+                .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
+                    statusCode1, body1))
+                .apply(statusCode, body, context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, ClusterElementDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+        }
+    }
+
+    private Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
+
+        SingleConnectionToolFunction toolFunction = getClusterElement(
+            componentName, componentVersion, clusterElementName);
+
+        try {
+            return toolFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory.createParameters(
+                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
+                context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ExecutionException(e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private String executeWorkflowNodeDescription(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        ClusterElementContext context) {
+
+        WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
+            componentName, componentVersion, clusterElementName);
+
+        try {
+            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                e, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
+        }
+    }
+
     private ComponentClusterElementDefinitionResult getComponentClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName) {
 
@@ -307,11 +390,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                     "Cluster element definition " + clusterElementName + " not found in component " + componentName)));
     }
 
-    private com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction
-        getComponentPropertiesFunction(
-            String componentName, int componentVersion, String clusterElementName, String propertyName,
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-            ClusterElementContext context) throws Exception {
+    private PropertiesFunction getComponentPropertiesFunction(
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ClusterElementContext context) throws Exception {
 
         DynamicPropertiesProperty dynamicPropertiesProperty = (DynamicPropertiesProperty) componentDefinitionRegistry
             .getClusterElementProperty(
@@ -328,8 +410,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                     inputParameters1, connectionParameters1, lookupDependsOnPaths1,
                     new ActionContextAdapater(context1));
         } else {
-            return (com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction) propertiesDataSource
-                .getProperties();
+            return (PropertiesFunction) propertiesDataSource.getProperties();
         }
     }
 

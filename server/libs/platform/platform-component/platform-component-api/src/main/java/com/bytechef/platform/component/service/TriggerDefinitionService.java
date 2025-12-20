@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.service;
 
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
@@ -27,6 +26,7 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
@@ -35,65 +35,59 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerDefinitionService {
+public interface TriggerDefinitionService extends OperationDefinitionService {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection,
-        TriggerContext context);
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection);
 
     WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
-        Map<String, ?> outputParameters, TriggerContext context);
+        Map<String, ?> outputParameters);
 
     String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        TriggerContext context);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters);
 
     void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, @Nullable ComponentConnection componentConnection, TriggerContext context);
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection);
 
     void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, @Nullable ComponentConnection componentConnection, TriggerContext context);
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection);
 
     List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText,
-        @Nullable ComponentConnection componentConnection, TriggerContext context);
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
+        @Nullable ComponentConnection componentConnection);
 
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, TriggerContext context);
+        @Nullable ComponentConnection componentConnection);
 
     ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        TriggerContext context);
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body);
 
     TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName,
+        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        @Nullable ComponentConnection componentConnection, TriggerContext context);
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment, ModeType type);
 
     void executeWebhookDisable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId,
-        Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection,
-        TriggerContext context);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection);
 
     WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String webhookUrl, String workflowExecutionId, @Nullable ComponentConnection componentConnection,
-        TriggerContext context);
+        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context);
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection);
 
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context);
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection);
 
     TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 

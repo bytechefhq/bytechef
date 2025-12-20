@@ -400,7 +400,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition output(OutputFunction output) {
+        public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
             this.outputDefinition = OutputDefinition.of(output);
 
             return this;

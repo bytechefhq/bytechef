@@ -44,6 +44,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -57,6 +58,8 @@ import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
@@ -79,34 +82,40 @@ import org.springframework.stereotype.Service;
 @Service("triggerDefinitionService")
 public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
-    private final ApplicationEventPublisher eventPublisher;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextFactory contextFactory;
+    private final ApplicationEventPublisher eventPublisher;
+    private final TokenRefreshHelper tokenRefreshHelper;
 
     public TriggerDefinitionServiceImpl(
-        ApplicationEventPublisher eventPublisher, @Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        ApplicationEventPublisher eventPublisher, TokenRefreshHelper tokenRefreshHelper) {
 
-        this.eventPublisher = eventPublisher;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextFactory = contextFactory;
+        this.eventPublisher = eventPublisher;
+        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection,
-        TriggerContext context) {
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection) {
 
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, componentConnection);
+            TriggerContext triggerContext = contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
 
             com.bytechef.component.definition.TriggerDefinition.PropertiesFunction propertiesFunction =
                 getComponentPropertiesFunction(
                     componentName, componentVersion, triggerName, propertyName, wrapResult.inputParameters,
-                    wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap, context);
+                    wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap, triggerContext);
 
             return CollectionUtils.map(
                 propertiesFunction.apply(
                     wrapResult.inputParameters, wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap,
-                    context),
+                    triggerContext),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ConfigurationException(
@@ -117,7 +126,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
-        Map<String, ?> outputParameters, TriggerContext context) {
+        Map<String, ?> outputParameters) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
@@ -125,13 +134,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return dynamicWebhookRefreshFunction.apply(
             ParametersFactory
                 .createParameters(componentConnection == null ? Map.of() : componentConnection.parameters()),
-            ParametersFactory.createParameters(outputParameters), context);
+            ParametersFactory.createParameters(outputParameters),
+            contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, null, null, false));
     }
 
     @Override
     public void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection componentConnection, TriggerContext context) {
+        String workflowExecutionId, ComponentConnection componentConnection) {
 
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -142,7 +153,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 ParametersFactory.createParameters(
                     componentConnection == null ? Map.of() : componentConnection.parameters()),
                 workflowExecutionId,
-                context);
+                contextFactory.createTriggerContext(
+                    componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
         } catch (Exception e) {
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.LISTENER_DISABLE_FAILED);
@@ -152,7 +164,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection componentConnection, TriggerContext context) {
+        String workflowExecutionId, ComponentConnection componentConnection) {
 
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
@@ -167,7 +179,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     new TriggerListenerEvent(
                         new TriggerListenerEvent.ListenerParameters(
                             WorkflowExecutionId.parse(workflowExecutionId), Instant.now(), output))),
-                context);
+                contextFactory.createTriggerContext(
+                    componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters,
                 TriggerDefinitionErrorType.LISTENER_ENABLE_FAILED);
@@ -176,219 +189,159 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection) {
 
-        try {
-            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, componentConnection);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
 
-            com.bytechef.component.definition.TriggerDefinition.OptionsFunction<?> optionsFunction =
-                getComponentOptionsFunction(
-                    componentName, componentVersion, triggerName, propertyName, wrapResult.inputParameters(),
-                    wrapResult.connectionParameters(), wrapResult.lookupDependsOnPathsMap(), context);
-
-            return CollectionUtils.map(
-                optionsFunction.apply(
-                    wrapResult.inputParameters(), wrapResult.connectionParameters(),
-                    wrapResult.lookupDependsOnPathsMap(), searchText, context),
-                Option::new);
-        } catch (Exception e) {
-            throw new ConfigurationException(e, inputParameters, TriggerDefinitionErrorType.OPTIONS_FAILED);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext, null,
+            (componentConnection1, triggerContext1) -> executeOptions(
+                componentName, componentVersion, triggerName, inputParameters,
+                propertyName, lookupDependsOnPaths, searchText, componentConnection1, triggerContext1),
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
     }
 
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, TriggerContext context) {
+        ComponentConnection componentConnection) {
 
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
 
-        return triggerDefinition
-            .getOutputDefinition()
-            .flatMap(OutputDefinition::getOutput)
-            .map(f -> (com.bytechef.component.definition.TriggerDefinition.OutputFunction) f)
-            .map(outputFunction -> {
-                try {
-                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
-                        ParametersFactory.createParameters(inputParameters),
-                        ParametersFactory.createParameters(
-                            componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
-                        context);
-
-                    if (outputResponse == null) {
-                        return null;
-                    }
-
-                    return SchemaUtils.toOutput(
-                        outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
-                } catch (Exception e) {
-                    if (e instanceof ProviderException) {
-                        throw (ProviderException) e;
-                    }
-
-                    throw new ConfigurationException(
-                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
-                }
-            })
-            .orElse(null);
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext, null,
+            (componentConnection1, triggerContext1) -> executeOutput(
+                componentName, componentVersion, triggerName, inputParameters, componentConnection1, triggerContext1),
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, null, null, false);
 
         try {
             return triggerDefinition.getProcessErrorResponse()
                 .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
                     statusCode1, body1))
-                .apply(statusCode, body, context);
+                .apply(statusCode, body, triggerContext);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
+        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
+        ComponentConnection componentConnection, boolean editorEnvironment, ModeType type) {
 
-        TriggerOutput triggerOutput;
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection, type,
+            editorEnvironment);
 
-        TriggerType triggerType = triggerDefinition.getType();
-
-        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
-            WebhookValidateResponse response = executeWebhookValidate(
-                triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest, context);
-
-            if (response.status() != HttpStatus.OK.getValue()) {
-                throw new IllegalStateException("Invalid trigger signature.");
-            }
-        }
-
-        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
-            triggerOutput = triggerDefinition.getWebhookRequest()
-                .map(webhookRequestFunction -> executeWebhookTrigger(
-                    triggerDefinition, inputParameters, toWebhookEnabledOutputParameters((Map<?, ?>) triggerState),
-                    webhookRequest, componentConnection, context, webhookRequestFunction))
-                .orElseThrow();
-        } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
-            triggerOutput = triggerDefinition.getPoll()
-                .map(pollFunction -> executePollingTrigger(
-                    triggerDefinition, inputParameters, componentConnection,
-                    triggerState == null ? Map.of() : (Map<String, ?>) triggerState, context, pollFunction))
-                .orElseThrow();
-        } else {
-            throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
-        }
-
-        return triggerOutput;
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext,
+            TriggerDefinitionErrorType.TRIGGER_TEST_FAILED,
+            (componentConnection1, triggerContext1) -> executeTrigger(
+                componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
+                componentConnection1, triggerContext1),
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1, type,
+                editorEnvironment));
     }
 
     @Override
     public void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection,
-        TriggerContext context) {
+        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection) {
 
-        WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
-            componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
-        if (webhookDisableConsumer == null) {
-            return;
-        }
+        tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext, null,
+            (componentConnection1, triggerContext1) -> {
+                executeWebhookDisable(
+                    componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
+                    outputParameters, componentConnection1, triggerContext1);
 
-        try {
-            webhookDisableConsumer.accept(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory
-                    .createParameters(componentConnection == null ? Map.of() : componentConnection.parameters()),
-                ParametersFactory.createParameters(outputParameters), workflowExecutionId, context);
-        } catch (Exception e) {
-            if (e instanceof ProviderException pe) {
-                throw pe;
-            }
-
-            throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_DISABLE_FAILED);
-        }
+                return null;
+            },
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
     }
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
-        ComponentConnection componentConnection, TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, String webhookUrl, ComponentConnection componentConnection) {
 
-        WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
-            componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
-        if (webhookEnableFunction == null) {
-            return null;
-        }
-
-        try {
-            return webhookEnableFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory.createParameters(
-                    componentConnection == null ? Map.of() : componentConnection.parameters()),
-                webhookUrl, workflowExecutionId, context);
-        } catch (Exception e) {
-            if (e instanceof ProviderException pe) {
-                throw pe;
-            }
-
-            throw new ExecutionException(
-                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext,
+            TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED,
+            (componentConnection1, triggerContext1) -> executeWebhookEnable(
+                componentName, componentVersion, triggerName, inputParameters,
+                webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
+            componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
+                null, null, componentConnection1, null, false));
     }
 
     @Override
     public WebhookValidateResponse executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
 
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
 
-        return executeWebhookValidate(triggerDefinition, ParametersFactory.createParameters(inputParameters),
-            webhookRequest,
-            context);
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, triggerContext, null,
+            (componentConnection1, triggerContext1) -> executeWebhookValidate(
+                componentName, componentVersion, triggerName, inputParameters, webhookRequest, triggerContext1),
+            componentConnection1 -> contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
     }
 
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection componentConnection, TriggerContext context) {
+        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidateOnEnable(
-            triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest, context);
+            triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest,
+            contextFactory.createTriggerContext(
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
 
         com.bytechef.component.definition.TriggerDefinition.WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
             getWorkflowNodeDescriptionFunction(componentName, componentVersion, triggerName);
 
         try {
-            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                contextFactory.createTriggerContext(
+                    componentName, componentVersion, triggerName, null, null, null, null, true));
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, inputParameters, TriggerDefinitionErrorType.WORKFLOW_NODE_DESCRIPTION_FAILED);
@@ -428,6 +381,66 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, actionName);
 
         return triggerDefinition.isOutputFunctionDefined();
+    }
+
+    private List<Option> executeOptions(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String propertyName, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection, TriggerContext context) {
+
+        try {
+            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, componentConnection);
+
+            com.bytechef.component.definition.TriggerDefinition.OptionsFunction<?> optionsFunction =
+                getComponentOptionsFunction(
+                    componentName, componentVersion, triggerName, propertyName, wrapResult.inputParameters(),
+                    wrapResult.connectionParameters(), wrapResult.lookupDependsOnPathsMap(), context);
+
+            return CollectionUtils.map(
+                optionsFunction.apply(
+                    wrapResult.inputParameters(), wrapResult.connectionParameters(),
+                    wrapResult.lookupDependsOnPathsMap(), searchText, context),
+                Option::new);
+        } catch (Exception e) {
+            throw new ConfigurationException(e, inputParameters, TriggerDefinitionErrorType.OPTIONS_FAILED);
+        }
+    }
+
+    private OutputResponse executeOutput(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, TriggerContext context) {
+
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return triggerDefinition
+            .getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
+            .map(f -> (com.bytechef.component.definition.TriggerDefinition.OutputFunction) f)
+            .map(outputFunction -> {
+                try {
+                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
+                        ParametersFactory.createParameters(inputParameters),
+                        ParametersFactory.createParameters(
+                            componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
+                        context);
+
+                    if (outputResponse == null) {
+                        return null;
+                    }
+
+                    return SchemaUtils.toOutput(
+                        outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                } catch (Exception e) {
+                    if (e instanceof ProviderException) {
+                        throw (ProviderException) e;
+                    }
+
+                    throw new ConfigurationException(
+                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+                }
+            })
+            .orElse(null);
     }
 
     private static TriggerOutput executePollingTrigger(
@@ -475,6 +488,113 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
 
         return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
+    }
+
+    @SuppressWarnings("unchecked")
+    private TriggerOutput executeTrigger(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
+        TriggerContext context) {
+
+        TriggerOutput triggerOutput;
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        TriggerType triggerType = triggerDefinition.getType();
+
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
+            WebhookValidateResponse response = executeWebhookValidate(
+                triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest, context);
+
+            if (response.status() != HttpStatus.OK.getValue()) {
+                throw new IllegalStateException("Invalid trigger signature.");
+            }
+        }
+
+        if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
+            triggerOutput = triggerDefinition.getWebhookRequest()
+                .map(webhookRequestFunction -> executeWebhookTrigger(
+                    triggerDefinition, inputParameters, toWebhookEnabledOutputParameters((Map<?, ?>) triggerState),
+                    webhookRequest, componentConnection, context, webhookRequestFunction))
+                .orElseThrow();
+        } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
+            triggerOutput = triggerDefinition.getPoll()
+                .map(pollFunction -> executePollingTrigger(
+                    triggerDefinition, inputParameters, componentConnection,
+                    triggerState == null ? Map.of() : (Map<String, ?>) triggerState, context, pollFunction))
+                .orElseThrow();
+        } else {
+            throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
+        }
+
+        return triggerOutput;
+    }
+
+    private void executeWebhookDisable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection,
+        TriggerContext context) {
+
+        WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
+            componentName, componentVersion, triggerName);
+
+        if (webhookDisableConsumer == null) {
+            return;
+        }
+
+        try {
+            webhookDisableConsumer.accept(
+                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory
+                    .createParameters(componentConnection == null ? Map.of() : componentConnection.parameters()),
+                ParametersFactory.createParameters(outputParameters), workflowExecutionId, context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
+            throw new ExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_DISABLE_FAILED);
+        }
+    }
+
+    private WebhookEnableOutput executeWebhookEnable(
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
+        ComponentConnection componentConnection, TriggerContext context) {
+
+        WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
+            componentName, componentVersion, triggerName);
+
+        if (webhookEnableFunction == null) {
+            return null;
+        }
+
+        try {
+            return webhookEnableFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory.createParameters(
+                    componentConnection == null ? Map.of() : componentConnection.parameters()),
+                webhookUrl, workflowExecutionId, context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException pe) {
+                throw pe;
+            }
+
+            throw new ExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.DYNAMIC_WEBHOOK_ENABLE_FAILED);
+        }
+    }
+
+    private WebhookValidateResponse executeWebhookValidate(
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext context) {
+
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        return executeWebhookValidate(triggerDefinition, ParametersFactory.createParameters(inputParameters),
+            webhookRequest, context);
     }
 
     private WebhookValidateResponse executeWebhookValidate(

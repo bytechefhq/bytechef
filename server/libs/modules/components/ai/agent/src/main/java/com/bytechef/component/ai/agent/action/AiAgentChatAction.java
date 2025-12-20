@@ -45,7 +45,6 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
-import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -72,13 +71,9 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 public class AiAgentChatAction {
 
     public final ChatActionDefinition actionDefinition;
-
-    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
-    public AiAgentChatAction(
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        ClusterElementDefinitionService clusterElementDefinitionService) {
+    public AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
 
         actionDefinition = new ChatActionDefinition(
             action(CHAT)
@@ -98,7 +93,6 @@ public class AiAgentChatAction {
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
                             inputParameters, null, context)));
 
-        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
@@ -264,7 +258,7 @@ public class AiAgentChatAction {
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
         ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        return request -> clusterElementDefinitionFacade.executeTool(
+        return request -> clusterElementDefinitionService.executeTool(
             componentName, componentVersion, clusterElementName, MapUtils.concat(request, new HashMap<>(parameters)),
             componentConnection, editorEnvironment);
     }

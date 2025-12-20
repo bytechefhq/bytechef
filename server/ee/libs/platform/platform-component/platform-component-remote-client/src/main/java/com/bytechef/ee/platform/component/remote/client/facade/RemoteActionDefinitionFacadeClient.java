@@ -7,11 +7,8 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -80,9 +77,9 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Map<String, ?> executePerform(
-        String componentName, int componentVersion, String actionName, ModeType type,
-        Long jobPrincipalId, Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
+        Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
+        Map<String, ?> extensions, boolean editorEnvironment, ModeType type) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -91,40 +88,6 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
                 componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
                 inputParameters, connectionIds),
             new ParameterizedTypeReference<>() {});
-    }
-
-    @Override
-    public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode,
-        Object body) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-workflow-node-description"),
-            new NodeDescriptionRequest(
-                componentVersion, componentName, actionName, inputParameters),
-            String.class);
-    }
-
-    private record NodeDescriptionRequest(
-        int componentVersion, String componentName, String actionName, Map<String, ?> inputParameters) {
     }
 
     private record OptionsRequest(

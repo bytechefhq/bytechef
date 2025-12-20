@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.worker.trigger.handler;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -28,6 +27,7 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.exception.TriggerExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -58,13 +58,15 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         try {
+            Optional<Long> firstConnectionId = CollectionUtils.findFirst(connectIdMap.values());
+
             return triggerDefinitionFacade.executeTrigger(
-                componentName, componentVersion, triggerName, workflowExecutionId.getType(),
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid(),
-                triggerExecution.getParameters(), triggerExecution.getState(),
+                componentName, componentVersion, triggerName, workflowExecutionId.getJobPrincipalId(),
+                workflowExecutionId.getWorkflowUuid(), triggerExecution.getParameters(), triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-                OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null),
-                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
+                firstConnectionId.orElse(null),
+                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
+                workflowExecutionId.getType());
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }

@@ -81,21 +81,6 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-workflow-node-description",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
-
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeWorkflowNodeDescription(
-                nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
-                nodeDescriptionRequest.triggerName, nodeDescriptionRequest.inputParameters));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
         value = "/execute-listener-disable",
         consumes = {
             "application/json"
@@ -171,9 +156,9 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion, triggerRequest.triggerName,
-                triggerRequest.type, triggerRequest.jobPrincipalId, triggerRequest.workflowUuid,
-                triggerRequest.inputParameters, triggerRequest.state, triggerRequest.webhookRequest,
-                triggerRequest.connectionId, false));
+                triggerRequest.jobPrincipalId, triggerRequest.workflowUuid, triggerRequest.inputParameters,
+                triggerRequest.state, triggerRequest.webhookRequest, triggerRequest.connectionId, false,
+                triggerRequest.type));
     }
 
     @RequestMapping(
@@ -248,11 +233,6 @@ public class RemoteTriggerDefinitionFacadeController {
     public record DynamicWebhookRefreshRequest(
         String componentName, int componentVersion, String triggerName,
         Map<String, Long> outputParameters, Long connectionId) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record NodeDescriptionRequest(
-        String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")

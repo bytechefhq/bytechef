@@ -24,7 +24,6 @@ public class AiAgentComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/ai-agent_v1.json",
-            new AiAgentComponentHandler(null, null).getDefinition());
+        JsonFileAssert.assertEquals("definition/ai-agent_v1.json", new AiAgentComponentHandler(null).getDefinition());
     }
 }

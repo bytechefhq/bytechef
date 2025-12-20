@@ -66,12 +66,12 @@ public class ActionDefinitionFacadeIntTest {
     @Disabled
     @Test
     public void testExecutePerform() {
-        ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(connectionService,
-            contextFactory, actionDefinitionService, tokenRefreshHelper);
+        ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(
+            connectionService, actionDefinitionService);
 
         Object result = actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), ModeType.AUTOMATION, 1000L, 1000L, 1000L,
-            "123456789", Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of(), Map.of(), false);
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, "123456789",
+            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of(), Map.of(), false, ModeType.AUTOMATION);
 
         Assertions.assertNotNull(result);
         Assertions.assertInstanceOf(List.class, result);
@@ -81,9 +81,9 @@ public class ActionDefinitionFacadeIntTest {
         Assertions.assertFalse(results.isEmpty());
 
         Http.Response response = (Http.Response) actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), ModeType.AUTOMATION, 1000L, 1000L, 1000L,
-            "123456789", Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(),
-            Map.of(), false);
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, "123456789",
+            Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(), Map.of(), false,
+            ModeType.AUTOMATION);
 
         Assertions.assertNull(response.getBody());
         Assertions.assertEquals(404, response.getStatusCode());

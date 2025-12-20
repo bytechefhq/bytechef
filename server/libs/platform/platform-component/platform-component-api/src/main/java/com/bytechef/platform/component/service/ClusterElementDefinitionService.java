@@ -16,9 +16,7 @@
 
 package com.bytechef.platform.component.service;
 
-import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -30,29 +28,24 @@ import javax.annotation.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface ClusterElementDefinitionService {
+public interface ClusterElementDefinitionService extends OperationDefinitionService {
 
     List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String clusterElementNameName, String propertyName,
+        String componentName, int componentVersion, String clusterElementName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ClusterElementContext context);
+        @Nullable ComponentConnection componentConnection);
 
     List<Option> executeOptions(
-        String componentName, int componentVersion, String clusterElementName, String propertyName,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ClusterElementContext context);
-
-    ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body,
-        ClusterElementContext context);
+        @Nullable ComponentConnection componentConnection);
 
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, ClusterElementContext context);
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 
     String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        ClusterElementContext context);
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters);
 
     <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName);
 

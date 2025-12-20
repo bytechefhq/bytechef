@@ -26,7 +26,6 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -69,9 +68,6 @@ public class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
-
-    @Autowired
-    private ConnectionDefinitionFacade connectionDefinitionFacade;
 
     @Autowired
     private ConnectionFacade connectionFacade;
@@ -168,7 +164,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+        when(connectionDefinitionService.executeBaseUri(eq("componentName"), any()))
             .thenReturn(Optional.of("baseUri"));
 
         Assertions.assertThat(connectionFacade.getConnection(connection.getId()))
@@ -193,7 +189,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        when(connectionDefinitionFacade.executeBaseUri(eq("componentName"), any()))
+        when(connectionDefinitionService.executeBaseUri(eq("componentName"), any()))
             .thenThrow(new IllegalStateException("Connection failed"));
 
         ConnectionDTO result = connectionFacade.getConnection(connection.getId());

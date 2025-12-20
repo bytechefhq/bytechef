@@ -22,7 +22,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -41,7 +40,6 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
-    private final ConnectionDefinitionService connectionDefinitionService;
     private final DataStorage dataStorage;
     private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
@@ -51,12 +49,10 @@ public class ContextFactoryImpl implements ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        ConnectionDefinitionService connectionDefinitionService, DataStorage dataStorage,
-        ApplicationEventPublisher eventPublisher, TempFileStorage tempFileStorage) {
+        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, TempFileStorage tempFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
-        this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
         this.editorTempFileStorage = new EditorTempFileStorage();
         this.eventPublisher = eventPublisher;
@@ -124,7 +120,6 @@ public class ContextFactoryImpl implements ContextFactory {
     }
 
     private HttpClientExecutor getHttpClientExecutor(boolean editorEnvironment) {
-        return new HttpClientExecutor(
-            applicationContext, connectionDefinitionService, getTempFileStorage(editorEnvironment));
+        return new HttpClientExecutor(applicationContext, getTempFileStorage(editorEnvironment));
     }
 }
