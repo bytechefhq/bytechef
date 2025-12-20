@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerState;
 import com.bytechef.platform.workflow.execution.repository.TriggerStateRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

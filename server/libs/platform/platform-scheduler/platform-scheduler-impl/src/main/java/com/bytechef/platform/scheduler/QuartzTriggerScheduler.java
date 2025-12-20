@@ -22,7 +22,7 @@ import com.bytechef.platform.scheduler.job.DelaySchedulerJob;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.ZoneId;

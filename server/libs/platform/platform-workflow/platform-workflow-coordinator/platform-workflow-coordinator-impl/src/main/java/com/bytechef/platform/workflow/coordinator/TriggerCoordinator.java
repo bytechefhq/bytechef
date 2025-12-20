@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionCompleteEvent;
@@ -37,7 +38,6 @@ import com.bytechef.platform.workflow.coordinator.event.listener.ApplicationEven
 import com.bytechef.platform.workflow.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.platform.workflow.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcher;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;

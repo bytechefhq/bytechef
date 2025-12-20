@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.util.Optional;
 
 /**

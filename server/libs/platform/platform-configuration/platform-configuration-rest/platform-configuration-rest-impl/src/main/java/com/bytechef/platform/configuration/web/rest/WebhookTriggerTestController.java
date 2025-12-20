@@ -27,7 +27,7 @@ import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;

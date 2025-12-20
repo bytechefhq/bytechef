@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.repository.converter;
 
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
