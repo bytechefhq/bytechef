@@ -26,7 +26,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.QueryExpanderComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +38,7 @@ public class QueryExpanderComponentHandler implements ComponentHandler {
 
     private final QueryExpanderComponentDefinition componentDefinition;
 
-    public QueryExpanderComponentHandler(@Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
+    public QueryExpanderComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new QueryExpanderComponentDefinitionImpl(
             component(QUERY_EXPANDER)
                 .title("Query Expander")

@@ -26,7 +26,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreDocumentRetrieverComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +39,8 @@ public class VectorStoreDocumentRetrieverComponentHandler implements ComponentHa
     private final VectorStoreDocumentRetrieverComponentDefinition componentDefinition;
 
     public VectorStoreDocumentRetrieverComponentHandler(
-        @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
         this.componentDefinition = new VectorStoreDocumentRetrieverComponentDefinitionImpl(
             component(VECTOR_STORE_DOCUMENT_RETRIEVER)
                 .title("Vector Store Document Retriever")

@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DocumentEnricherComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +39,7 @@ public class DocumentEnricherComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public DocumentEnricherComponentHandler(@Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
+    public DocumentEnricherComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.componentDefinition = new DocumentEnricherDefinitionImpl(
             component(DOCUMENT_ENRICHER)
                 .title("Document Enricher")
