@@ -123,6 +123,19 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     public Object executeTool(
+        String componentName, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, null);
+
+        return executeTool(
+            componentName, componentDefinition.getVersion(), clusterElementName, inputParameters, componentConnection,
+            editorEnvironment);
+    }
+
+    @Override
+    public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
@@ -160,11 +173,14 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     public ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName) {
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, null);
+        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
+            componentName, null, clusterElementName);
 
-        return getClusterElementDefinition(
-            componentDefinition.getName(), componentDefinition.getVersion(), clusterElementName);
+        ComponentDefinition componentDefinition = result.componentDefinition;
+
+        return new ClusterElementDefinition(
+            result.clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
+            getIcon(componentDefinition));
     }
 
     @Override
@@ -335,7 +351,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
         SingleConnectionToolFunction toolFunction = getClusterElement(
@@ -372,7 +388,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private ComponentClusterElementDefinitionResult getComponentClusterElementDefinition(
-        String componentName, int componentVersion, String clusterElementName) {
+        String componentName, Integer componentVersion, String clusterElementName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);

@@ -24,22 +24,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.trigger.TriggerOutput;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.constant.ModeType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -54,6 +60,36 @@ public class TriggerDefinitionServiceTest {
 
     @Mock
     private ComponentDefinitionRegistry componentDefinitionRegistry;
+
+    @Mock
+    private ContextFactory contextFactory;
+
+    @Mock
+    private TokenRefreshHelper tokenRefreshHelper;
+
+    @Mock
+    private TriggerContext triggerContext;
+
+    // No environment registry needed; envId is provided externally
+
+    @BeforeEach
+    void setUpMocks() {
+        when(contextFactory.createTriggerContext(
+            Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(),
+            Mockito.any(), Mockito.anyBoolean()))
+                .thenReturn(triggerContext);
+
+        Mockito.lenient()
+            .when(tokenRefreshHelper.executeSingleConnectionFunction(
+                Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any(TriggerContext.class),
+                Mockito.any(), Mockito.any(), Mockito.any()))
+            .thenAnswer(invocation -> {
+                Object componentConnection = invocation.getArgument(2);
+                TriggerContext triggerContext1 = invocation.getArgument(3);
+                BiFunction<Object, TriggerContext, Object> performFn = invocation.getArgument(5);
+                return performFn.apply(componentConnection, triggerContext1);
+            });
+    }
 
     @Test
     public void testExecutePollingTrigger() {
@@ -72,7 +108,7 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            componentDefinitionRegistry, null, eventPublisher, null);
+            componentDefinitionRegistry, contextFactory, eventPublisher, tokenRefreshHelper);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
             "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, false,
@@ -109,7 +145,7 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            componentDefinitionRegistry, null, eventPublisher, null);
+            componentDefinitionRegistry, contextFactory, eventPublisher, tokenRefreshHelper);
 
         ProviderException thrownException = assertThrows(ProviderException.class, () -> {
             triggerDefinitionService.executeTrigger(

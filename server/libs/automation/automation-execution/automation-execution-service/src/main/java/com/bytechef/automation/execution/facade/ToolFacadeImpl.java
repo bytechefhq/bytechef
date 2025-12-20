@@ -156,15 +156,8 @@ public class ToolFacadeImpl implements ToolFacade {
         return inputParameters -> {
             ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
 
-            ClusterElementDefinition clusterElementDefinition =
-                clusterElementDefinitionService.getClusterElementDefinition(
-                    result.componentName(), result.clusterElementName());
-
-            String componentName = clusterElementDefinition.getComponentName();
-
             return clusterElementDefinitionFacade.executeTool(
-                componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
-                inputParameters, connectionId);
+                result.componentName(), result.clusterElementName(), inputParameters, connectionId);
         };
     }
 

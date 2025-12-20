@@ -133,16 +133,11 @@ public class ToolFacadeImpl implements ToolFacade {
 
         ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
 
-        ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
-            result.componentName(), result.clusterElementName());
-
-        String componentName = clusterElementDefinition.getComponentName();
-
-        Long connectionId = connectionIdHelper.getConnectionId(externalUserId, componentName, instanceId, environment);
+        Long connectionId = connectionIdHelper.getConnectionId(
+            externalUserId, result.componentName(), instanceId, environment);
 
         return clusterElementDefinitionFacade.executeTool(
-            componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
-            inputParameters, connectionId);
+            result.componentName(), result.clusterElementName(), inputParameters, connectionId);
     }
 
     private static boolean filterByCategoryNames(List<String> categoryNames, ComponentDefinition componentDefinition) {
