@@ -18,7 +18,7 @@ package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import org.springframework.lang.Nullable;
 
 /**

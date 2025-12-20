@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 
 /**
  * @author Ivica Cardic

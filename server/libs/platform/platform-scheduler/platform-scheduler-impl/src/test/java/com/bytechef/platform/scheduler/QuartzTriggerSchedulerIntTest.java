@@ -19,7 +19,7 @@ package com.bytechef.platform.scheduler;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;

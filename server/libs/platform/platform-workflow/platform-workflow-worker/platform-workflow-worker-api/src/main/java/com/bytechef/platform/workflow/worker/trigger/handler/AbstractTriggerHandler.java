@@ -23,7 +23,7 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.exception.TriggerExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

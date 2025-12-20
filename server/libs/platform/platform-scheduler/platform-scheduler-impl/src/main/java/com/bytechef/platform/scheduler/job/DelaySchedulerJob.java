@@ -18,8 +18,8 @@ package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;

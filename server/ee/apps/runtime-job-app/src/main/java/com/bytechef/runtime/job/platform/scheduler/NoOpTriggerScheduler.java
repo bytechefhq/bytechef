@@ -8,7 +8,7 @@
 package com.bytechef.runtime.job.platform.scheduler;
 
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.Instant;
 import java.util.Map;
 

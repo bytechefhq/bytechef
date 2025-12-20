@@ -9,8 +9,8 @@ package com.bytechef.ee.platform.scheduler.aws.listener;
 
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_POLLING_TRIGGER_QUEUE;
 
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import org.springframework.context.ApplicationEventPublisher;
 

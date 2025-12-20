@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.util.Map;
 
 /**

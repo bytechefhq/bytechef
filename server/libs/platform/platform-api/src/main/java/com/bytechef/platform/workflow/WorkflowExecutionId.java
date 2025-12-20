@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution;
+package com.bytechef.platform.workflow;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.ModeType;
