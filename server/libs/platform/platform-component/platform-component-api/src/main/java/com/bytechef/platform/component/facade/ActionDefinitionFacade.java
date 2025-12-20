@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.component.facade;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.ModeType;
@@ -29,7 +27,7 @@ import javax.annotation.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface ActionDefinitionFacade extends OperationDefinitionFacade {
+public interface ActionDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
@@ -46,15 +44,8 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
         Map<String, Long> connectionIds);
 
     Object executePerform(
-        String componentName, int componentVersion, String actionName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
-        @Nullable String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, boolean editorEnvironment);
-
-    Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext);
-
-    String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters);
+        String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
+        @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
+        boolean editorEnvironment, @Nullable ModeType type);
 }

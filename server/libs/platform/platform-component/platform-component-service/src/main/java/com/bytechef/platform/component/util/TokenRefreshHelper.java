@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
 import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ConfigurationException;
@@ -123,11 +123,10 @@ public class TokenRefreshHelper {
             }
 
             if (componentConnection.isAuthorizationOauth2AuthorizationCode()) {
-                Authorization.RefreshTokenResponse refreshTokenResponse =
-                    connectionDefinitionService.executeRefresh(
-                        componentConnection.componentName(), componentConnection.version(),
-                        Objects.requireNonNull(componentConnection.authorizationType()),
-                        componentConnection.getParameters(), context);
+                RefreshTokenResponse refreshTokenResponse = connectionDefinitionService.executeRefresh(
+                    componentConnection.componentName(), componentConnection.version(),
+                    Objects.requireNonNull(componentConnection.authorizationType()),
+                    componentConnection.getParameters(), context);
 
                 parameters = new HashMap<>() {
                     {

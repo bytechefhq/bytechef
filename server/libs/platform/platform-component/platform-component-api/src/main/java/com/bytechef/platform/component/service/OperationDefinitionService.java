@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.facade;
+package com.bytechef.platform.component.service;
 
 import com.bytechef.component.exception.ProviderException;
 
 /**
  * @author Marko Kriskovic
  */
-public interface OperationDefinitionFacade {
+public interface OperationDefinitionService {
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String clusterElementName, int statusCode, Object body);

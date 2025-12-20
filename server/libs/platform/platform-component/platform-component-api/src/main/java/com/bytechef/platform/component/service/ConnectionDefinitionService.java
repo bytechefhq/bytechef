@@ -41,9 +41,14 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context);
 
-    AuthorizationCallbackResponse executeAuthorizationCallback(
+    default AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters, Context context, String redirectUri);
+        Map<String, ?> connectionParameters, String redirectUri) {
+
+        return null;
+    }
+
+    Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection);
 
     Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection, Context context);
 
@@ -53,7 +58,7 @@ public interface ConnectionDefinitionService {
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters, Context context);
+        Map<String, ?> connectionParameters);
 
     List<String> getAuthorizationDetectOn(
         String componentName, int connectionVersion, AuthorizationType authorizationType);

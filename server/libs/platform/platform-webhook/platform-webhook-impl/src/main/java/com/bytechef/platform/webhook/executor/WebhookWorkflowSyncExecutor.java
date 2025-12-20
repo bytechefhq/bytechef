@@ -101,12 +101,11 @@ public class WebhookWorkflowSyncExecutor {
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), workflowExecutionId.getType(),
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid(),
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            CollectionUtils.findFirstOrElse(connectionIdMap.values(), null), false);
+            CollectionUtils.findFirstOrElse(connectionIdMap.values(), null), false, workflowExecutionId.getType());
 
         triggerExecution.setBatch(triggerOutput.batch());
         triggerExecution.setOutput(

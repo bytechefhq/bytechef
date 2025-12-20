@@ -25,7 +25,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
-import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
     private final AiAgentComponentDefinition componentDefinition;
 
     public AiAgentComponentHandler(
-        @Lazy ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+
         @Lazy ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
@@ -48,9 +47,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .description("With the AI Agent, you can chat with the AI agent.")
                 .icon("path:assets/ai-agent.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(
-                    new AiAgentChatAction(
-                        clusterElementDefinitionFacade, clusterElementDefinitionService).actionDefinition));
+                .actions(new AiAgentChatAction(clusterElementDefinitionService).actionDefinition));
     }
 
     @Override

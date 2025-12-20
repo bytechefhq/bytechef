@@ -138,8 +138,7 @@ public class ToolFacadeImpl implements ToolFacade {
 
         String componentName = clusterElementDefinition.getComponentName();
 
-        Long connectionId = connectionIdHelper.getConnectionId(
-            externalUserId, componentName, instanceId, environment);
+        Long connectionId = connectionIdHelper.getConnectionId(externalUserId, componentName, instanceId, environment);
 
         return clusterElementDefinitionFacade.executeTool(
             componentName, clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),

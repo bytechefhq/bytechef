@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.Option;
@@ -118,9 +117,9 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
-        String workflowUuid, Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        Long connectionId, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
+        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest, Long connectionId,
+        boolean editorEnvironment, ModeType type) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -181,29 +180,6 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
 
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-workflow-node-description"),
-            new NodeDescriptionRequest(
-                componentName, componentVersion, triggerName, inputParameters),
-            String.class);
-    }
-
-    @Override
-    public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
-        throw new UnsupportedOperationException();
-    }
-
-    private record NodeDescriptionRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
     }
 
     private record OptionsRequest(

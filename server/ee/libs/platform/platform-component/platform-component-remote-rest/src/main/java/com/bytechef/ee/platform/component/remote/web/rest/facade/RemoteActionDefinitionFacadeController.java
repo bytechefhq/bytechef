@@ -55,20 +55,6 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-node-description",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
-
-        return ResponseEntity.ok(actionDefinitionFacade.executeWorkflowNodeDescription(
-            nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
-            nodeDescriptionRequest.actionName, nodeDescriptionRequest.inputParameters));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
         value = "/execute-options",
         consumes = {
             "application/json"
@@ -92,9 +78,9 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.type, performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId,
-                performRequest.jobId, performRequest.workflowId, performRequest.inputParameters,
-                performRequest.connectionIds, performRequest.extensions, false));
+                performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId, performRequest.jobId,
+                performRequest.workflowId, performRequest.inputParameters, performRequest.connectionIds,
+                performRequest.extensions, false, performRequest.type));
     }
 
     @RequestMapping(
@@ -110,11 +96,6 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executeOutput(
                 outputRequest.componentName, outputRequest.componentVersion, outputRequest.actionName,
                 outputRequest.inputParameters, outputRequest.connectionIds));
-    }
-
-    @SuppressFBWarnings("EI")
-    public record NodeDescriptionRequest(
-        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")

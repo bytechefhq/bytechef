@@ -16,6 +16,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -43,18 +44,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public OutputResponse executeMultipleConnectionsOutput(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> connections, Map<String, ?> extensions,
-        ActionContext context) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
+        ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -63,48 +54,47 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ActionContext context) {
+        ComponentConnection componentConnection) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public OutputResponse executeOutput(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object executePerform(
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
+        Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, boolean editorEnvironment,
+        ModeType type) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object executePerformForPolyglot(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public OutputResponse executeSingleConnectionOutput(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object executeSingleConnectionPerform(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object executeMultipleConnectionsPerform(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, Map<String, ComponentConnection> connections,
-        Map<String, ?> extensions, ActionContext context) {
+        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters) {
 
         throw new UnsupportedOperationException();
     }
@@ -133,11 +123,6 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isSingleConnectionPerform(String componentName, int componentVersion, String actionName) {
         throw new UnsupportedOperationException();
     }
 }

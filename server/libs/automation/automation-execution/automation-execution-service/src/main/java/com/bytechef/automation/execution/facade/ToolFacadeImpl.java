@@ -49,8 +49,8 @@ public class ToolFacadeImpl implements ToolFacade {
     @SuppressFBWarnings("EI")
     public ToolFacadeImpl(
         ClusterElementDefinitionService clusterElementDefinitionService,
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        McpComponentService mcpComponentService, McpToolService mcpToolService) {
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade, McpComponentService mcpComponentService,
+        McpToolService mcpToolService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;

@@ -26,7 +26,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -296,10 +296,9 @@ public class PolyglotEngine {
                     }
                 }
 
-                ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
-                    ActionDefinitionFacade.class);
+                ActionDefinitionService actionDefinitionService = getActionDefinitionService();
 
-                Object result = actionDefinitionFacade.executePerformForPolyglot(
+                Object result = actionDefinitionService.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     (Map) copyFromPolyglotContext(inputParameters), componentConnection,
                     createActionContext(
@@ -312,21 +311,6 @@ public class PolyglotEngine {
 
                 return copyToGuestValue(result, languageId);
             };
-        }
-
-        private ActionContext createActionContext(
-            String componentName, int componentVersion, String actionName, ActionContext actionContext,
-            ComponentConnection componentConnection) {
-
-            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
-
-            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
-
-            return contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
-                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(), componentConnection,
-                actionContextAware.getModeType(), true);
         }
 
         @Override
@@ -344,6 +328,25 @@ public class PolyglotEngine {
         @Override
         public void putMember(String key, Value value) {
             throw new UnsupportedOperationException();
+        }
+
+        private ActionContext createActionContext(
+            String componentName, int componentVersion, String actionName, ActionContext actionContext,
+            ComponentConnection componentConnection) {
+
+            ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
+
+            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+            return contextFactory.createActionContext(
+                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
+                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
+                actionContextAware.getWorkflowId(), componentConnection,
+                actionContextAware.getModeType(), true);
+        }
+
+        private ActionDefinitionService getActionDefinitionService() {
+            return applicationContext.getBean(ActionDefinitionService.class);
         }
 
         private Map.Entry<String, ComponentConnection> getComponentConnectionEntry(String connectionName) {

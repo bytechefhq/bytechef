@@ -58,13 +58,13 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
             return actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName,
-                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, ModeType.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_ID),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID),
                 Validate.notNull(taskExecution.getJobId(), "jobId"),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
-                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
+                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
+                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, ModeType.class));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

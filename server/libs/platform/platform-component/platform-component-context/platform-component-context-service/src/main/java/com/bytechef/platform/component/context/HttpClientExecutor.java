@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -34,10 +33,10 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.facade.OperationDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.OperationDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -87,16 +86,11 @@ class HttpClientExecutor {
     private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private final ApplicationContext applicationContext;
-    private final ConnectionDefinitionService connectionDefinitionService;
     private final TempFileStorage tempFileStorage;
 
     @SuppressFBWarnings("EI")
-    public HttpClientExecutor(
-        ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
-        TempFileStorage tempFileStorage) {
-
+    public HttpClientExecutor(ApplicationContext applicationContext, TempFileStorage tempFileStorage) {
         this.applicationContext = applicationContext;
-        this.connectionDefinitionService = connectionDefinitionService;
         this.tempFileStorage = tempFileStorage;
     }
 
@@ -303,6 +297,8 @@ class HttpClientExecutor {
             return;
         }
 
+        ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
+
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
             componentName, componentConnection.version(),
             Objects.requireNonNull(componentConnection.authorizationType()), componentConnection.getParameters(),
@@ -341,6 +337,10 @@ class HttpClientExecutor {
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
+    private ConnectionDefinitionService getConnectionDefinitionService() {
+        return applicationContext.getBean(ConnectionDefinitionService.class);
+    }
+
     private String getConnectionUrl(
         String urlString, String componentName, ComponentConnection componentConnection, Context context) {
 
@@ -348,10 +348,11 @@ class HttpClientExecutor {
             return urlString;
         }
 
-        return OptionalUtils.map(
-            connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
-            baseUri -> baseUri + urlString);
+        ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
 
+        return connectionDefinitionService.executeBaseUri(componentName, componentConnection, context)
+            .map(baseUri -> baseUri + urlString)
+            .orElseThrow(() -> new RuntimeException("Failed to get baseUri for component: " + componentName));
     }
 
     private BodyPublisher getFormDataBodyPublisher(Body body) {
@@ -425,7 +426,9 @@ class HttpClientExecutor {
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
-                OperationDefinitionFacade operationDefinitionFacade = getOperationDefinitionFacade(isAction);
+                OperationDefinitionService operationDefinitionService = getOperationDefinitionService(isAction);
+
+                ConnectionDefinitionService connectionDefinitionService = getConnectionDefinitionService();
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
                     List<String> detectOn = connectionDefinitionService.getAuthorizationDetectOn(
@@ -435,7 +438,7 @@ class HttpClientExecutor {
                         Object body = httpResponse.body();
 
                         if (body != null && RefreshCredentialsUtils.matches(body.toString(), detectOn)) {
-                            throw operationDefinitionFacade.executeProcessErrorResponse(
+                            throw operationDefinitionService.executeProcessErrorResponse(
                                 componentName, componentVersion, componentOperationName, httpResponse.statusCode(),
                                 body);
                         }
@@ -446,7 +449,7 @@ class HttpClientExecutor {
 
                 Object body = httpResponse.body();
 
-                throw operationDefinitionFacade.executeProcessErrorResponse(
+                throw operationDefinitionService.executeProcessErrorResponse(
                     componentName, componentVersion, componentOperationName, httpResponse.statusCode(), body);
             }
 
@@ -464,16 +467,16 @@ class HttpClientExecutor {
             BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
     }
 
-    private OperationDefinitionFacade getOperationDefinitionFacade(boolean isAction) {
-        OperationDefinitionFacade operationDefinitionFacade;
+    private OperationDefinitionService getOperationDefinitionService(boolean isAction) {
+        OperationDefinitionService operationDefinitionService;
 
         if (isAction) {
-            operationDefinitionFacade = applicationContext.getBean(ActionDefinitionFacade.class);
+            operationDefinitionService = applicationContext.getBean(ActionDefinitionService.class);
         } else {
-            operationDefinitionFacade = applicationContext.getBean(TriggerDefinitionFacade.class);
+            operationDefinitionService = applicationContext.getBean(TriggerDefinitionService.class);
         }
 
-        return operationDefinitionFacade;
+        return operationDefinitionService;
     }
 
     private BodyPublisher getStringBodyPublisher(Body body) {

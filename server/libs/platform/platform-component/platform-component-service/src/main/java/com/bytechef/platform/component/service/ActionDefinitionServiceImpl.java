@@ -16,13 +16,16 @@
 
 package com.bytechef.platform.component.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -36,6 +39,8 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -44,11 +49,15 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -60,201 +69,192 @@ import org.springframework.stereotype.Service;
 public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextFactory contextFactory;
+    private final TokenRefreshHelper tokenRefreshHelper;
 
-    public ActionDefinitionServiceImpl(@Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
+    public ActionDefinitionServiceImpl(
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        TokenRefreshHelper tokenRefreshHelper) {
+
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextFactory = contextFactory;
+        this.tokenRefreshHelper = tokenRefreshHelper;
     }
 
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        ComponentConnection componentConnection, ActionContext context) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
+        ComponentConnection componentConnection) {
 
-        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, true);
 
-        try {
-            PropertiesFunction propertiesFunction = getComponentPropertiesFunction(
-                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters,
-                convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
-
-            return propertiesFunction
-                .apply(
-                    convertResult.inputParameters, convertResult.connectionParameters,
-                    convertResult.lookupDependsOnPathsMap, context)
-                .stream()
-                .map(valueProperty -> (Property) Property.toProperty(valueProperty))
-                .toList();
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ConfigurationException(
-                e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
-        }
-    }
-
-    @Override
-    public OutputResponse executeMultipleConnectionsOutput(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        return actionDefinition.getOutputDefinition()
-            .flatMap(OutputDefinition::getOutput)
-            .map(f -> (MultipleConnectionsOutputFunction) f)
-            .map(multipleConnectionsOutputFunction -> {
-                try {
-                    BaseOutputDefinition.OutputResponse outputResponse = multipleConnectionsOutputFunction.apply(
-                        ParametersFactory.createParameters(inputParameters), connections,
-                        ParametersFactory.createParameters(extensions), context);
-
-                    return toOutputResponse(outputResponse);
-                } catch (Exception e) {
-                    throw new ConfigurationException(
-                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
-                }
-            })
-            .orElse(null);
-    }
-
-    @Override
-    public Object executeMultipleConnectionsPerform(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        MultipleConnectionsPerformFunction multipleConnectionsPerformFunction =
-            (MultipleConnectionsPerformFunction) OptionalUtils.get(actionDefinition.getPerform());
-
-        try {
-            return multipleConnectionsPerformFunction.apply(
-                ParametersFactory.createParameters(inputParameters), connections,
-                ParametersFactory.createParameters(extensions), context);
-        } catch (Exception e) {
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
-        }
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
+            (componentConnection1, actionContext1) -> executeDynamicProperties(
+                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+                componentConnection1, actionContext1),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection1, null,
+                true));
     }
 
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection, ActionContext context) {
+        ComponentConnection componentConnection) {
 
-        try {
-            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, true);
 
-            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
-                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
-                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_OPTIONS,
+            (componentConnection1, actionContext1) -> executeOptions(
+                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+                searchText, componentConnection1, actionContext1),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, true));
+    }
 
-            return optionsFunction
-                .apply(
-                    convertResult.inputParameters(), convertResult.connectionParameters(),
-                    convertResult.lookupDependsOnPathsMap(), searchText, context)
-                .stream()
-                .map(Option::new)
-                .toList();
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
+    @Override
+    public OutputResponse executeOutput(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections) {
 
-            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+        OutputFunction outputFunction = componentDefinitionRegistry
+            .getActionDefinition(componentName, componentVersion, actionName)
+            .getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
+            .orElse(null);
+
+        if (outputFunction == null) {
+            return null;
+        }
+
+        if (outputFunction instanceof SingleConnectionOutputFunction singleConnectionOutputFunction) {
+            ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, firstComponentConnection, null,
+                true);
+
+            return tokenRefreshHelper.executeSingleConnectionFunction(
+                componentName, componentVersion, firstComponentConnection, actionContext,
+                ActionDefinitionErrorType.EXECUTE_OUTPUT,
+                (componentConnection1, actionContext1) -> executeSingleConnectionOutput(
+                    singleConnectionOutputFunction, inputParameters, componentConnection1, actionContext1),
+                componentConnection1 -> contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null,
+                    true));
+        } else {
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, null, null, true);
+
+            return executeMultipleConnectionsOutput(
+                (MultipleConnectionsOutputFunction) outputFunction, inputParameters, componentConnections, Map.of(),
+                actionContext);
         }
     }
 
     @Override
+    public Object executePerform(
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
+        Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, boolean editorEnvironment,
+        ModeType type) {
+
+        PerformFunction performFunction = componentDefinitionRegistry
+            .getActionDefinition(componentName, componentVersion, actionName)
+            .getPerform()
+            .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+
+        if (performFunction instanceof SingleConnectionPerformFunction singleConnectionPerformFunction) {
+            ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+                firstComponentConnection, type, editorEnvironment);
+
+            return tokenRefreshHelper.executeSingleConnectionFunction(
+                componentName, componentVersion, firstComponentConnection, actionContext,
+                ActionDefinitionErrorType.EXECUTE_PERFORM,
+                (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
+                    singleConnectionPerformFunction, inputParameters, componentConnection1,
+                    actionContext1),
+                componentConnection1 -> contextFactory.createActionContext(
+                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                    workflowId, componentConnection1, type, editorEnvironment));
+        } else {
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
+                null, type, editorEnvironment);
+
+            return executeMultipleConnectionsPerform(
+                (MultipleConnectionsPerformFunction) performFunction, inputParameters, componentConnections, extensions,
+                actionContext);
+        }
+    }
+
+    @Override
+    public Object executePerformForPolyglot(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext) {
+
+        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+        SingleConnectionPerformFunction singleConnectionPerformFunction =
+            (SingleConnectionPerformFunction) componentDefinitionRegistry
+                .getActionDefinition(componentName, componentVersion, actionName)
+                .getPerform()
+                .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+
+        return tokenRefreshHelper.executeSingleConnectionFunction(
+            componentName, componentVersion, componentConnection, actionContext,
+            ActionDefinitionErrorType.EXECUTE_PERFORM,
+            (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
+                singleConnectionPerformFunction, inputParameters, componentConnection1, actionContext1),
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
+                actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
+                actionContextAware.getWorkflowId(), componentConnection1, actionContextAware.getModeType(),
+                actionContextAware.isEditorEnvironment()));
+    }
+
+    @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body,
-        ActionContext context) {
+        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, null, null, null, false);
 
         try {
             return actionDefinition.getProcessErrorResponse()
                 .orElseGet(() -> (statusCode1, body1, context1) -> ProviderException.getProviderException(
                     statusCode1, body1))
-                .apply(statusCode, body, context);
+                .apply(statusCode, body, actionContext);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
     }
 
     @Override
-    public OutputResponse executeSingleConnectionOutput(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection, ActionContext context) {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        return actionDefinition.getOutputDefinition()
-            .flatMap(OutputDefinition::getOutput)
-            .map(f -> (OutputFunction) f)
-            .map(outputFunction -> {
-                try {
-                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
-                        ParametersFactory.createParameters(inputParameters),
-                        ParametersFactory.createParameters(
-                            componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
-                        context);
-
-                    return toOutputResponse(outputResponse);
-                } catch (Exception e) {
-                    if (e instanceof ProviderException) {
-                        throw (ProviderException) e;
-                    }
-
-                    throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
-                }
-            })
-            .orElse(null);
-    }
-
-    @Override
-    public Object executeSingleConnectionPerform(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, ActionContext context) throws ExecutionException {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) OptionalUtils.get(actionDefinition.getPerform());
-
-        try {
-            return singleConnectionPerformFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                componentConnection == null
-                    ? null : ParametersFactory.createParameters(componentConnection.getConnectionParameters()),
-                context);
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
-        }
-    }
-
-    @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters) {
 
-        com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
+        WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
             getWorkflowNodeDescriptionFunction(componentName, componentVersion, actionName);
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, null, null, null, true);
 
         try {
-            return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(
+                ParametersFactory.createParameters(inputParameters), actionContext);
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
@@ -288,16 +288,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return actionDefinition.isOutputFunctionDefined();
     }
 
-    @Override
-    public boolean isSingleConnectionPerform(
-        String componentName, int componentVersion, String actionName) {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        return OptionalUtils.get(actionDefinition.getPerform()) instanceof SingleConnectionPerformFunction;
-    }
-
     private static ConvertResult convert(
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
 
@@ -306,6 +296,132 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             ParametersFactory.createParameters(
                 componentConnection == null ? Map.of() : componentConnection.parameters()),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
+    private List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection componentConnection, ActionContext context) {
+
+        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+        try {
+            PropertiesFunction propertiesFunction = getComponentPropertiesFunction(
+                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters,
+                convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
+
+            return propertiesFunction
+                .apply(
+                    convertResult.inputParameters, convertResult.connectionParameters,
+                    convertResult.lookupDependsOnPathsMap, context)
+                .stream()
+                .map(valueProperty -> (Property) Property.toProperty(valueProperty))
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(
+                e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+        }
+    }
+
+    private OutputResponse executeMultipleConnectionsOutput(
+        MultipleConnectionsOutputFunction outputFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
+                ParametersFactory.createParameters(inputParameters), connections,
+                ParametersFactory.createParameters(extensions), context);
+
+            return toOutputResponse(outputResponse);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+        }
+    }
+
+    private Object executeMultipleConnectionsPerform(
+        MultipleConnectionsPerformFunction performFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            return performFunction.apply(
+                ParametersFactory.createParameters(inputParameters), componentConnections,
+                ParametersFactory.createParameters(extensions), context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection, ActionContext context) {
+
+        try {
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, componentConnection);
+
+            OptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
+                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
+
+            return optionsFunction
+                .apply(
+                    convertResult.inputParameters(), convertResult.connectionParameters(),
+                    convertResult.lookupDependsOnPathsMap(), searchText, context)
+                .stream()
+                .map(Option::new)
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+        }
+    }
+
+    private OutputResponse executeSingleConnectionOutput(
+        SingleConnectionOutputFunction outputFunction, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext context) {
+
+        try {
+            BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory.createParameters(
+                    componentConnection == null ? Map.of() : componentConnection.getConnectionParameters()),
+                context);
+
+            return toOutputResponse(outputResponse);
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+        }
+    }
+
+    private Object executeSingleConnectionPerform(
+        SingleConnectionPerformFunction singleConnectionPerformFunction, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ActionContext context) throws ExecutionException {
+
+        try {
+            return singleConnectionPerformFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                componentConnection == null
+                    ? null : ParametersFactory.createParameters(componentConnection.getConnectionParameters()),
+                context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
     }
 
     private OptionsFunction<?> getComponentOptionsFunction(
@@ -318,7 +434,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, propertyName, inputParameters, connectionParameters,
                 lookupDependsOnPaths, context);
 
-        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
+        OptionsDataSource<?> optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
+            .orElseThrow(() -> new IllegalArgumentException("Options data source is not defined."));
 
         return (OptionsFunction<?>) optionsDataSource.getOptions();
     }
@@ -338,7 +455,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return (PropertiesFunction) propertiesDataSource.getProperties();
     }
 
-    private com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction
+    private WorkflowNodeDescriptionFunction
         getWorkflowNodeDescriptionFunction(String componentName, int componentVersion, String actionName) {
 
         if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
@@ -352,15 +469,25 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
+        Optional<String> componentDefinitionTitle = componentDefinition.getTitle();
+        Optional<String> actionDefinitionTitle = actionDefinition.getTitle();
+        Optional<String> actionDefinitionDescription = actionDefinition.getDescription();
+
         return actionDefinition.getWorkflowNodeDescription()
             .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
-                inputParameters, OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()),
-                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()),
-                OptionalUtils.orElse(actionDefinition.getDescription(), null)));
+                inputParameters, componentDefinitionTitle.orElse(componentDefinition.getName()),
+                actionDefinitionTitle.orElse(actionDefinition.getName()),
+                actionDefinitionDescription.orElse(null)));
     }
 
     private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {
         return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
+    }
+
+    ComponentConnection getFirstComponentConnection(Map<String, ComponentConnection> componentConnections) {
+        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
+
+        return !entries.isEmpty() ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null;
     }
 
     private static OutputResponse toOutputResponse(BaseOutputDefinition.OutputResponse outputResponse) {

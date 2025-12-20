@@ -23,7 +23,6 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -60,7 +59,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
-    private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -70,12 +68,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService,
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
-        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
@@ -99,7 +95,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
                 AuthorizationCallbackResponse authorizationCallbackResponse =
-                    connectionDefinitionFacade.executeAuthorizationCallback(
+                    connectionDefinitionService.executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
                         connection.getAuthorizationType(),
                         oAuth2Service.checkPredefinedParameters(
@@ -316,12 +312,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         String uri = null;
 
         try {
-            uri = connectionDefinitionFacade
-                .executeBaseUri(
-                    componentName,
-                    new ComponentConnection(
-                        componentName, connectionVersion, connection.getId(), parameters,
-                        connection.getAuthorizationType()))
+            ComponentConnection componentConnection = new ComponentConnection(
+                componentName, connectionVersion, connection.getId(), parameters,
+                connection.getAuthorizationType());
+
+            uri = connectionDefinitionService
+                .executeBaseUri(componentName, componentConnection)
                 .orElse(null);
         } catch (IllegalStateException e) {
             if (logger.isDebugEnabled()) {

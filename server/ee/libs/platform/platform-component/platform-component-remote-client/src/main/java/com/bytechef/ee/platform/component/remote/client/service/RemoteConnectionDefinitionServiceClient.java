@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
-import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
@@ -66,11 +65,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters,
-        Context context, String redirectUri) {
-
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
         throw new UnsupportedOperationException();
     }
 
@@ -84,8 +79,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public RefreshTokenResponse executeRefresh(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters,
-        Context context) {
+        Map<String, ?> connectionParameters, Context context) {
 
         throw new UnsupportedOperationException();
     }
@@ -93,15 +87,15 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
-        Map<String, ?> connectionParameters,
-        Context context) {
+        Map<String, ?> connectionParameters) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<String>
-        getAuthorizationDetectOn(String componentName, int componentVersion, AuthorizationType authorizationType) {
+    public List<String> getAuthorizationDetectOn(
+        String componentName, int componentVersion, AuthorizationType authorizationType) {
+
         throw new UnsupportedOperationException();
     }
 

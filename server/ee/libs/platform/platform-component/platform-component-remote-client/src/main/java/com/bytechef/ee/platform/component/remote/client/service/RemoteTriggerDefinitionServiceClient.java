@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.platform.component.remote.client.service;
 
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
@@ -21,6 +20,7 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -48,8 +48,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection,
-        TriggerContext context) {
+        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -57,34 +56,31 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection componentConnection,
-        TriggerContext context) {
+        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
-        ComponentConnection componentConnection, TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String webhookUrl, String workflowExecutionId, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName,
-        ComponentConnection componentConnection, Map<String, ?> outputParameters, TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
+        Map<String, ?> outputParameters) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, ComponentConnection componentConnection,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -92,34 +88,24 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection componentConnection, TriggerContext context) {
+        String workflowExecutionId, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public OutputResponse executeOutput(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection, TriggerContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
-        TriggerContext context) {
+        ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -127,7 +113,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection componentConnection, TriggerContext context) {
+        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -135,17 +121,22 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection componentConnection, TriggerContext context) {
+        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters) {
 
-        throw new UnsupportedOperationException();
+        return defaultRestClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, TRIGGER_DEFINITION_SERVICE + "/execute-workflow-node-description"),
+            new WorkflowNodeDescriptionRequest(
+                componentName, componentVersion, triggerName, inputParameters),
+            String.class);
     }
 
     @Override
@@ -191,9 +182,20 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body,
-        TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TriggerOutput executeTrigger(
+        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
+        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
+        ComponentConnection componentConnection, boolean editorEnvironment, ModeType type) {
+        return null;
+    }
+
+    private record WorkflowNodeDescriptionRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
     }
 }

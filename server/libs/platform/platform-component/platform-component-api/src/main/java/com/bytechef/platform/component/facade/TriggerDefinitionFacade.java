@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
+public interface TriggerDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
@@ -72,9 +72,9 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @Nullable Long connectionId);
 
     TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable String workflowUuid, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, Map<String, ?> inputParameters, Object triggerState,
+        WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment, @Nullable ModeType type);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
@@ -91,7 +91,4 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, @Nullable Long connectionId);
-
-    String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters);
 }

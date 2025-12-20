@@ -137,15 +137,6 @@ public interface ActionDefinition {
      */
     interface OutputFunction extends BaseOutputFunction {
 
-        /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param context
-         * @return
-         */
-        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
-
     }
 
     /**
@@ -189,6 +180,22 @@ public interface ActionDefinition {
         List<? extends Property.ValueProperty<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
             ActionContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    interface SingleConnectionOutputFunction extends OutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
+
     }
 
     /**

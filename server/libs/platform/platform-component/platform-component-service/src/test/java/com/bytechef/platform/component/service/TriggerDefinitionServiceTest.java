@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
@@ -32,6 +31,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.trigger.TriggerOutput;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,12 +72,11 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            eventPublisher, componentDefinitionRegistry);
-
-        TriggerContext mockContext = mock(TriggerContext.class);
+            componentDefinitionRegistry, null, eventPublisher, null);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", Collections.emptyMap(), null, null, null, mockContext);
+            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, false,
+            ModeType.AUTOMATION);
 
         assertNotNull(output, "TriggerOutput should not be null");
         assertNotNull(output.value(), "Output should not be null");
@@ -110,13 +109,12 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            eventPublisher, componentDefinitionRegistry);
-
-        TriggerContext mockContext = mock(TriggerContext.class);
+            componentDefinitionRegistry, null, eventPublisher, null);
 
         ProviderException thrownException = assertThrows(ProviderException.class, () -> {
             triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", Collections.emptyMap(), null, null, null, mockContext);
+                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, false,
+                ModeType.AUTOMATION);
         });
 
         assertSame(

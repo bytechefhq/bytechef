@@ -104,7 +104,7 @@ class ComponentToolsTest {
         assertEquals("result", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(triggerDefinitionFacade, never()).executeTrigger(
-            anyString(), anyInt(), anyString(), any(), any(), any(), anyMap(), any(), any(), any(), anyBoolean());
+            anyString(), anyInt(), anyString(), any(), any(), anyMap(), any(), any(), any(), anyBoolean(), any());
     }
 
     @Test
@@ -162,17 +162,19 @@ class ComponentToolsTest {
             .thenReturn(componentDefinition);
 
         TriggerOutput triggerOutput = mock(TriggerOutput.class);
-        when(triggerDefinitionFacade.executeTrigger(
-            eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), eq(true)))
-                .thenReturn(triggerOutput);
+        when(
+            triggerDefinitionFacade
+                .executeTrigger(
+                    eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(),
+                    isNull(), eq(true), isNull()))
+                        .thenReturn(triggerOutput);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version);
 
         assertNotNull(result);
         verify(triggerDefinitionFacade).executeTrigger(
             eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), eq(true));
+            eq(true), isNull());
     }
 
     @Test
@@ -195,7 +197,7 @@ class ComponentToolsTest {
 
         when(triggerDefinitionFacade.executeTrigger(
             eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            isNull(), eq(true)))
+            eq(true), isNull()))
                 .thenThrow(new RuntimeException("Connection error"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -236,8 +238,8 @@ class ComponentToolsTest {
         assertEquals("actionResult", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
-            anyString(), anyInt(), anyString(), any(), any(), any(), any(), anyString(), anyMap(),
-            anyMap(), anyMap(), anyBoolean());
+            anyString(), anyInt(), anyString(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(),
+            anyBoolean(), any());
     }
 
     @Test
@@ -307,10 +309,12 @@ class ComponentToolsTest {
             .thenReturn(List.of(connection));
 
         Map<String, Object> performResult = Map.of("data", "test");
-        when(actionDefinitionFacade.executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            anyMap(), isNull(), eq(true)))
-                .thenReturn(performResult);
+        when(
+            actionDefinitionFacade
+                .executePerform(
+                    eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
+                    anyMap(), isNull(), eq(true), isNull()))
+                        .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
 
@@ -318,8 +322,8 @@ class ComponentToolsTest {
         verify(actionDefinitionFacade).executeOutput(eq(componentName), eq(version), eq(actionName), anyMap(),
             anyMap());
         verify(actionDefinitionFacade).executePerform(
-            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            anyMap(), isNull(), eq(true));
+            eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
+            isNull(), eq(true), isNull());
     }
 
     @Test

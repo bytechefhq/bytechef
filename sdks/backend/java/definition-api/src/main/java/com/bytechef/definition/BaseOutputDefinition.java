@@ -25,7 +25,7 @@ import java.util.Optional;
  */
 public interface BaseOutputDefinition {
 
-    Optional<BaseOutputFunction> getOutput();
+    Optional<? extends BaseOutputFunction> getOutput();
 
     Optional<OutputResponse> getOutputResponse();
 
