@@ -41,6 +41,10 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         @Nullable ComponentConnection componentConnection);
 
     Object executeTool(
+        String componentName, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
+
+    Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 

@@ -43,8 +43,7 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
 
     @Override
     public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable Long connectionId) {
+        String componentName, String clusterElementName, Map<String, ?> inputParameters, @Nullable Long connectionId) {
 
         throw new UnsupportedOperationException();
     }
