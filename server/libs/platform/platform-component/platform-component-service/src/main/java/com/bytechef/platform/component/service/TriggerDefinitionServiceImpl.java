@@ -279,7 +279,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getWebhookRequest()
                 .map(webhookRequestFunction -> executeWebhookTrigger(
-                    triggerDefinition, inputParameters, toDynamicWebhookEnableOutput((Map<?, ?>) triggerState),
+                    triggerDefinition, inputParameters, toWebhookEnabledOutputParameters((Map<?, ?>) triggerState),
                     webhookRequest, componentConnection, context, webhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
@@ -503,7 +503,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static TriggerOutput executeWebhookTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, WebhookEnableOutput output, WebhookRequest webhookRequest,
+        Map<String, ?> inputParameters, Map<String, ?> webhookEnabledOutputParameters, WebhookRequest webhookRequest,
         ComponentConnection componentConnection, TriggerContext triggerContext,
         WebhookRequestFunction webhookRequestFunction) {
 
@@ -516,7 +516,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     .createParameters(componentConnection == null ? Map.of() : componentConnection.parameters()),
                 new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                output, triggerContext);
+                ParametersFactory.createParameters(webhookEnabledOutputParameters), triggerContext);
         } catch (Exception e) {
             if (e instanceof ProviderException pe) {
                 throw pe;
@@ -641,13 +641,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @SuppressWarnings("unchecked")
-    private WebhookEnableOutput toDynamicWebhookEnableOutput(Map<?, ?> triggerState) {
+    private Map<String, ?> toWebhookEnabledOutputParameters(Map<?, ?> triggerState) {
         if (triggerState == null) {
-            return null;
+            return Map.of();
         }
 
-        return new WebhookEnableOutput(
-            (Map<String, ?>) triggerState.get("parameters"), (Instant) triggerState.get("webhookExpirationDate"));
+        return (Map<String, ?>) triggerState.get("parameters");
     }
 
     private static WrapResult wrap(

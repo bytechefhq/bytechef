@@ -47,7 +47,7 @@ import org.mockito.ArgumentCaptor;
  */
 class TrelloNewCardTriggerTest {
 
-    private final WebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedDynamicWebhookEnableOutput = mock(Parameters.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);

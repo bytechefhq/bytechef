@@ -215,11 +215,12 @@ public interface TriggerDefinition {
         /**
          *
          * @param connectionParameters
-         * @param outputParameters
+         * @param webhookEnableOutputParameters
          * @param context
          * @return
          */
-        WebhookEnableOutput apply(Parameters connectionParameters, Parameters outputParameters, TriggerContext context);
+        WebhookEnableOutput
+            apply(Parameters connectionParameters, Parameters webhookEnableOutputParameters, TriggerContext context);
     }
 
     /**
@@ -372,7 +373,6 @@ public interface TriggerDefinition {
             Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
             TriggerContext context)
             throws Exception;
-
     }
 
     /**
@@ -496,11 +496,11 @@ public interface TriggerDefinition {
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param outputParameters
+         * @param webhookEnableOutputParameters
          * @param workflowExecutionId
          */
         void accept(
-            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
+            Parameters inputParameters, Parameters connectionParameters, Parameters webhookEnableOutputParameters,
             String workflowExecutionId, TriggerContext context);
 
     }
@@ -539,13 +539,13 @@ public interface TriggerDefinition {
          * @param parameters
          * @param body
          * @param method
-         * @param output
+         * @param webhookEnableOutputParameters
          * @param context
          * @return
          */
         Object apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters webhookEnableOutputParameters,
             TriggerContext context) throws Exception;
     }
 

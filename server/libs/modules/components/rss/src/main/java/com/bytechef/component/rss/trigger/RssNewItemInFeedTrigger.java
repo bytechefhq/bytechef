@@ -30,7 +30,6 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class RssNewItemInFeedTrigger {
 
     protected static Map<String, Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters webhookEnableOutput, TriggerContext context) {
 
         return body.getContent(new TypeReference<>() {});
     }

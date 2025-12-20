@@ -127,7 +127,7 @@ public class ZeplinProjectNoteTrigger {
 
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext triggerContext) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext triggerContext) {
 
         return body.getContent();
     }

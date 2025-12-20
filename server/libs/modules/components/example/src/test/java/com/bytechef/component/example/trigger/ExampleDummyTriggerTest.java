@@ -44,8 +44,7 @@ class ExampleDummyTriggerTest {
         Assertions.assertNull(
             ExampleDummyTrigger.webhookRequest(parameters, parameters, mock(TriggerDefinition.HttpHeaders.class),
                 mock(TriggerDefinition.HttpParameters.class), mock(TriggerDefinition.WebhookBody.class),
-                mock(TriggerDefinition.WebhookMethod.class), mock(TriggerDefinition.WebhookEnableOutput.class),
-                mock(TriggerContext.class)));
+                mock(TriggerDefinition.WebhookMethod.class), mock(Parameters.class), mock(TriggerContext.class)));
     }
 
 }

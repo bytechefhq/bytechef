@@ -99,7 +99,7 @@ public class TrelloNewCardTrigger {
 
     protected static Object dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         Map<String, Map<String, Object>> content = body.getContent(new TypeReference<>() {});
 

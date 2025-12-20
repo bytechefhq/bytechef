@@ -41,6 +41,7 @@ import org.mockito.MockedStatic;
 abstract class AbstractWoocommerceTriggerTest {
 
     protected final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected final Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     protected final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected final HttpParameters mockedHttpParameters = mock(HttpParameters.class);

@@ -36,7 +36,6 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class ChatNewRequestTrigger {
 
     protected static Map<String, ?> getWebhookResult(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters webhookEnableOutput, TriggerContext context) {
 
         Assert.notNull(body.getContent(), "Body content is required.");
 

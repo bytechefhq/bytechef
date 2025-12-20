@@ -48,6 +48,7 @@ class ProductboardUpdatedFeatureTriggerTest {
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
 
@@ -100,7 +101,8 @@ class ProductboardUpdatedFeatureTriggerTest {
 
             Object result = ProductboardUpdatedFeatureTrigger.webhookRequest(
                 mockedParameters, mockedParameters, mock(HttpHeaders.class), mock(HttpParameters.class),
-                mockedWebhookBody, mock(WebhookMethod.class), mockedWebhookEnableOutput, mockedTriggerContext);
+                mockedWebhookBody, mock(WebhookMethod.class), mockedWebhookEnableOutputParameters,
+                mockedTriggerContext);
 
             assertEquals(mockedObject, result);
             assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
