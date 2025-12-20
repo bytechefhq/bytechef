@@ -44,6 +44,7 @@ abstract class AbstractCalendlyTriggerTest {
 
     protected ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);

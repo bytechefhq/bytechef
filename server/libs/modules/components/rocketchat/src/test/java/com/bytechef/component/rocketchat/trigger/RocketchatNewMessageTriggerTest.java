@@ -44,7 +44,7 @@ import org.mockito.ArgumentCaptor;
  */
 class RocketchatNewMessageTriggerTest {
 
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);

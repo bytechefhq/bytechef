@@ -24,7 +24,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.jira.util.JiraUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +37,7 @@ import org.mockito.MockedStatic;
 abstract class AbstractJiraTriggerTest {
 
     protected MockedStatic<JiraUtils> jiraUtilsMockedStatic;
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);

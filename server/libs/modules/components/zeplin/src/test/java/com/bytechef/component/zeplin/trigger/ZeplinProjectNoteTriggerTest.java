@@ -54,7 +54,7 @@ class ZeplinProjectNoteTriggerTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private static final String TEST_WORKFLOW_EXECUTION_ID = "testWorkflowExecutionId";

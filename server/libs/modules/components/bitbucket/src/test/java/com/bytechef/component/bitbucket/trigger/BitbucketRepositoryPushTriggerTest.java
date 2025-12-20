@@ -60,7 +60,7 @@ class BitbucketRepositoryPushTriggerTest {
     private final Response mockedResponse = mock(Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
 
     @Test
@@ -118,7 +118,7 @@ class BitbucketRepositoryPushTriggerTest {
 
         Object result = BitbucketRepositoryPushTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutputParameters, mockedTriggerContext);
 
         assertEquals(Map.of(), result);
     }

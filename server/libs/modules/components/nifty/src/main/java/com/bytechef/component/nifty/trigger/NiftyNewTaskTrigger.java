@@ -108,7 +108,7 @@ public class NiftyNewTaskTrigger {
 
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext triggerContext) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext triggerContext) {
 
         Map<String, Object> content = body.getContent(new TypeReference<>() {});
 

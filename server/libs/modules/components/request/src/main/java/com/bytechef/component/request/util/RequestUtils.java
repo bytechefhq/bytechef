@@ -26,7 +26,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class RequestUtils {
 
     public static Map<String, ?> getRequestResult(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         Map<String, ?> headerMap = headers.toMap();
         Map<String, ?> parameterMap = parameters.toMap();

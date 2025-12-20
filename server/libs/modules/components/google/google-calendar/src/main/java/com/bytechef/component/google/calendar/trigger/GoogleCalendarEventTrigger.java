@@ -122,7 +122,7 @@ public class GoogleCalendarEventTrigger {
 
     protected static CustomEvent webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime now = LocalDateTime.now(zoneId);

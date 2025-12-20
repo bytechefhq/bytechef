@@ -86,7 +86,7 @@ public class JiraUpdatedIssueTrigger {
 
     protected static Object webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters output,
         TriggerContext context) {
 
         return body

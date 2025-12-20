@@ -132,7 +132,7 @@ public class MailchimpSubscribeTrigger {
 
     protected static Object webhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters output,
         TriggerContext context) {
 
         if (body == null) {

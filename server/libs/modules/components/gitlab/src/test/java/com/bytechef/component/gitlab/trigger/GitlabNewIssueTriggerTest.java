@@ -44,7 +44,7 @@ import org.mockito.ArgumentCaptor;
  */
 class GitlabNewIssueTriggerTest {
 
-    protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);

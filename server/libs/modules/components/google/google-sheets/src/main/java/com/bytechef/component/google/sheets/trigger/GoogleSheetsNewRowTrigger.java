@@ -129,7 +129,7 @@ public class GoogleSheetsNewRowTrigger {
 
     protected static List<Map<String, Object>> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-        HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
+        HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters output,
         TriggerContext context) {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
