@@ -62,7 +62,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {useCallback, useRef, useState} from 'react';
+import {MouseEvent, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -493,7 +493,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 <DropdownMenuItem
                                     className="dropdown-menu-item-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
+                                    onClick={(event: MouseEvent) => {
+                                        setShowDeleteDialog(true);
+
+                                        event.stopPropagation();
+                                    }}
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>
