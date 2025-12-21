@@ -8,10 +8,14 @@
     "metadata": null,
     "name": "chat",
     "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
+      "output": null,
+      "outputResponse": {
+        "outputSchema": null,
+        "placeholder": null,
+        "sampleOutput": { }
+      },
       "outputSchema": null,
-      "sampleOutput": null
+      "sampleOutput": { }
     },
     "perform": { },
     "processErrorResponse": null,

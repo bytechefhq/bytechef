@@ -5489,10 +5489,14 @@
     "listenerEnable": null,
     "name": "newEmail",
     "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
+      "output": null,
+      "outputResponse": {
+        "outputSchema": null,
+        "placeholder": null,
+        "sampleOutput": { }
+      },
       "outputSchema": null,
-      "sampleOutput": null
+      "sampleOutput": { }
     },
     "poll": { },
     "processErrorResponse": { },
