@@ -97,10 +97,14 @@
     "listenerEnable": null,
     "name": "newApiRequest",
     "outputDefinition": {
-      "output": { },
-      "outputResponse": null,
+      "output": null,
+      "outputResponse": {
+        "outputSchema": null,
+        "placeholder": null,
+        "sampleOutput": { }
+      },
       "outputSchema": null,
-      "sampleOutput": null
+      "sampleOutput": { }
     },
     "poll": null,
     "processErrorResponse": null,
