@@ -109,7 +109,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const deleteProjectMutation = useDeleteProjectMutation({
-        onSuccess: () => {
+        onSuccess: (_, projectId) => {
+            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
+
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({
                 queryKey: ProjectCategoryKeys.projectCategories,

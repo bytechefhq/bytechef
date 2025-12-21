@@ -6,10 +6,12 @@ import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import ProjectWorkflowList from '../project-workflow-list/ProjectWorkflowList';
 
 const ProjectList = ({
+    isRefetchingProjects,
     projectGitConfigurations,
     projects,
     tags,
 }: {
+    isRefetchingProjects?: boolean;
     projectGitConfigurations: ProjectGitConfiguration[];
     projects: Project[];
     tags: Tag[];
@@ -31,7 +33,7 @@ const ProjectList = ({
                         />
 
                         <CollapsibleContent>
-                            <ProjectWorkflowList project={project} />
+                            <ProjectWorkflowList project={project} queryEnabled={!isRefetchingProjects} />
                         </CollapsibleContent>
                     </Collapsible>
                 );
