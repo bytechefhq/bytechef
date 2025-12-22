@@ -5,7 +5,7 @@ All URIs are relative to */api/platform/internal*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**deleteClusterElementParameter**](WorkflowNodeParameterApi.md#deleteclusterelementparameteroperation) | **DELETE** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters | Deletes a cluster element parameter |
-| [**deleteWorkflowNodeParameter**](WorkflowNodeParameterApi.md#deleteworkflownodeparameteroperation) | **DELETE** /workflows/{id}/workflow-nodes/{workflowNodeName}/parameters | Deletes a workflow node parameter |
+| [**deleteWorkflowNodeParameter**](WorkflowNodeParameterApi.md#deleteworkflownodeparameter) | **DELETE** /workflows/{id}/workflow-nodes/{workflowNodeName}/parameters | Deletes a workflow node parameter |
 | [**getClusterElementParameterDisplayConditions**](WorkflowNodeParameterApi.md#getclusterelementparameterdisplayconditions) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/display-conditions | Get cluster element property options shown in the editor |
 | [**getWorkflowNodeParameterDisplayConditions**](WorkflowNodeParameterApi.md#getworkflownodeparameterdisplayconditions) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/display-conditions | Get action or trigger display conditions shown in the editor |
 | [**updateClusterElementParameter**](WorkflowNodeParameterApi.md#updateclusterelementparameteroperation) | **PATCH** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters | Updates a cluster element parameter |
@@ -97,7 +97,7 @@ No authorization required
 
 ## deleteWorkflowNodeParameter
 
-> DeleteClusterElementParameter200Response deleteWorkflowNodeParameter(id, workflowNodeName, environmentId, deleteWorkflowNodeParameterRequest)
+> DeleteClusterElementParameter200Response deleteWorkflowNodeParameter(id, workflowNodeName, environmentId, deleteClusterElementParameterRequest)
 
 Deletes a workflow node parameter
 
@@ -110,7 +110,7 @@ import {
   Configuration,
   WorkflowNodeParameterApi,
 } from '';
-import type { DeleteWorkflowNodeParameterOperationRequest } from '';
+import type { DeleteWorkflowNodeParameterRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -123,9 +123,9 @@ async function example() {
     workflowNodeName: workflowNodeName_example,
     // number | The id of an environment.
     environmentId: 789,
-    // DeleteWorkflowNodeParameterRequest
-    deleteWorkflowNodeParameterRequest: ...,
-  } satisfies DeleteWorkflowNodeParameterOperationRequest;
+    // DeleteClusterElementParameterRequest
+    deleteClusterElementParameterRequest: ...,
+  } satisfies DeleteWorkflowNodeParameterRequest;
 
   try {
     const data = await api.deleteWorkflowNodeParameter(body);
@@ -147,7 +147,7 @@ example().catch(console.error);
 | **id** | `string` | The workflow id | [Defaults to `undefined`] |
 | **workflowNodeName** | `string` | The name of a workflow\&#39;s action task or trigger (E.g. mailchimp_1) | [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
-| **deleteWorkflowNodeParameterRequest** | [DeleteWorkflowNodeParameterRequest](DeleteWorkflowNodeParameterRequest.md) |  | |
+| **deleteClusterElementParameterRequest** | [DeleteClusterElementParameterRequest](DeleteClusterElementParameterRequest.md) |  | |
 
 ### Return type
 

@@ -7,7 +7,6 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteClusterElementParameterRequestModel;
-import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetClusterElementParameterDisplayConditions200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateClusterElementParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
@@ -38,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-19T14:30:20.578204370+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-22T13:57:27.830042+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 @Validated
 @Tag(name = "workflow-node-parameter", description = "The Platform Workflow Node Parameter Internal API")
 public interface WorkflowNodeParameterApi {
@@ -107,7 +106,7 @@ public interface WorkflowNodeParameterApi {
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param environmentId The id of an environment. (required)
-     * @param deleteWorkflowNodeParameterRequestModel  (required)
+     * @param deleteClusterElementParameterRequestModel  (required)
      * @return The updated workflow node parameters. (status code 200)
      */
     @Operation(
@@ -131,7 +130,7 @@ public interface WorkflowNodeParameterApi {
         @NotNull @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @NotNull @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
-        @Parameter(name = "DeleteWorkflowNodeParameterRequestModel", description = "", required = true) @Valid @RequestBody DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel
+        @Parameter(name = "DeleteClusterElementParameterRequestModel", description = "", required = true) @Valid @RequestBody DeleteClusterElementParameterRequestModel deleteClusterElementParameterRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
