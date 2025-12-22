@@ -31,7 +31,9 @@ public class RefreshCredentialsUtils {
     public static boolean matches(List<Object> refreshOn, Exception exception) {
         boolean matches = false;
 
-        if (exception instanceof ProviderException providerException && providerException.getStatusCode() != null) {
+        if (exception instanceof ProviderException providerException
+            && Objects.nonNull(providerException.getStatusCode())) {
+
             matches = matches(
                 providerException.getStatusCode(),
                 CollectionUtils.map(
@@ -40,13 +42,9 @@ public class RefreshCredentialsUtils {
         }
 
         if (!matches) {
-            if (Objects.isNull(exception.getMessage())) {
-                return false;
-            }
-
             Throwable curException = exception;
 
-            do {
+            while (Objects.nonNull(curException) && Objects.nonNull(curException.getMessage())) {
                 matches = matches(
                     curException.getMessage(),
                     CollectionUtils.map(
@@ -57,7 +55,7 @@ public class RefreshCredentialsUtils {
                 }
 
                 curException = curException.getCause();
-            } while (curException != null);
+            }
         }
 
         return matches;
