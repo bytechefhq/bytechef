@@ -16,38 +16,70 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
+import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
+import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
 import java.util.Map;
 
 /**
- * Provides a list of the component actions.
- *
- * @generated
+ * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyDeleteOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
         .title("Delete Order")
         .description("Deletes an order. Orders that interact with an online gateway can't be deleted.")
-        .metadata(
-            Map.of(
-                "method", "DELETE",
-                "path", "/orders/{orderId}.json"
-
-            ))
-        .properties(integer("orderId").label("Order ID")
-            .description("ID of the order to delete.")
-            .required(true)
-            .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.PATH)));
+        .properties(
+            string(ORDER_ID)
+                .label("Order ID")
+                .description("ID of the order to delete.")
+                .required(true)
+                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("deletedId")
+                            .description("ID of the deleted order."),
+                        USER_ERRORS_PROPERTY)))
+        .perform(ShopifyDeleteOrderAction::perform);
 
     private ShopifyDeleteOrderAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = """
+            mutation OrderDelete($orderId: ID!) {
+              orderDelete(orderId: $orderId) {
+                deletedId
+                userErrors {
+                  field
+                  message
+                  code
+                }
+              }
+            }""";
+
+        Map<String, Object> variables = Map.of(ORDER_ID, inputParameters.getRequiredString(ORDER_ID));
+
+        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+
+        Object bodyContent = body.get("orderDelete");
+
+        checkForUserError(bodyContent);
+
+        return bodyContent;
     }
 }

@@ -16,12 +16,14 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.subscribeWebhook;
+import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.unsubscribeWebhook;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -30,12 +32,11 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyNewOrderTrigger {
 
@@ -43,7 +44,7 @@ public class ShopifyNewOrderTrigger {
         .title("New Order")
         .description("Triggers when new order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)))
+        .output(outputSchema(object().properties()))
         .webhookEnable(ShopifyNewOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewOrderTrigger::webhookDisable)
         .webhookRequest(ShopifyNewOrderTrigger::webhookRequest);
@@ -55,8 +56,7 @@ public class ShopifyNewOrderTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(
-            Map.of(ID, ShopifyUtils.subscribeWebhook(webhookUrl, "orders/create", context)),
+        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook(webhookUrl, "DRAFT_ORDERS_CREATE", context)),
             null);
     }
 
@@ -64,7 +64,7 @@ public class ShopifyNewOrderTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        ShopifyUtils.unsubscribeWebhook(outputParameters, context);
+        unsubscribeWebhook(outputParameters, context);
     }
 
     protected static Object webhookRequest(

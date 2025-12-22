@@ -16,23 +16,30 @@
 
 package com.bytechef.component.shopify.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.QUERY;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.VARIABLES;
+import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
+import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Context.Http.ResponseType.Type;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -40,150 +47,85 @@ import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 class ShopifyUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(Http.Configuration.ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final Http mockedHttp = mock(Http.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetOrderIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> orders = new ArrayList<>();
-        Map<String, Object> orderMap = new LinkedHashMap<>();
+    void testCheckForUserErrorProviderException() {
+        Map<String, Object> mockedContent = Map.of(
+            "userErrors", List.of(
+                Map.of("message", "Error occurred", "field", "orderId")));
 
-        orderMap.put("name", "name");
-        orderMap.put("id", 123123L);
+        ProviderException exception = assertThrows(ProviderException.class, () -> checkForUserError(mockedContent));
 
-        orders.add(orderMap);
-
-        map.put("orders", orders);
-
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
-
-        List<Option<Long>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("name", 123123L));
-
-        assertEquals(
-            expectedOptions,
-            ShopifyUtils.getOrderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        assertEquals("Error occurred", exception.getMessage());
     }
 
     @Test
-    void testProductIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> products = new ArrayList<>();
-        Map<String, Object> productMap = new LinkedHashMap<>();
+    void testCheckForUserErrorNoUserError() {
+        Map<String, Object> mockedContent = Map.of(
+            "data", "some data",
+            "status", "success");
 
-        productMap.put("title", "title");
-        productMap.put("id", 123123L);
-
-        products.add(productMap);
-
-        map.put("products", products);
-
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
-
-        List<Option<Long>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("title", 123123L));
-
-        assertEquals(
-            expectedOptions,
-            ShopifyUtils.getProductIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        assertDoesNotThrow(() -> checkForUserError(mockedContent));
     }
 
     @Test
-    void testVariantIdOptions() {
-        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
-        List<Map<String, Object>> variants = new ArrayList<>();
-        Map<String, Object> variantMap = new LinkedHashMap<>();
+    void testSendGraphQlQuery() {
+        String mockedQuery = "testQuery";
+        Map<String, Object> mockedVariables = Map.of();
+        Map<String, Object> mockedObject = Map.of("data", Map.of());
 
-        variantMap.put("title", "title");
-        variantMap.put("id", 123123L);
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
 
-        variants.add(variantMap);
-
-        map.put("variants", variants);
-
-        when(mockedActionContext.http(any()))
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
-
-        List<Option<Long>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("title", 123123L));
-
-        assertEquals(
-            expectedOptions,
-            ShopifyUtils.getVariantIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
-    }
-
-    @Test
-    void testSubscribeWebhok() {
-        when(mockedContext.http(any()))
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("webhook", Map.of(ID, 123L)));
+            .thenReturn(mockedObject);
 
-        assertEquals(123L,
-            ShopifyUtils.subscribeWebhook("webhookUrl", "topic", mockedContext));
+        Map<String, Object> result = sendGraphQlQuery(mockedQuery, mockedContext, mockedVariables);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        assertEquals(Map.of(), result);
 
-        Object content = body.getContent();
+        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        assertNotNull(capturedFunction);
 
-        assertEquals(Map.of(
-            "webhook", Map.of(
-                "topic", "topic",
-                "address", "webhookUrl",
-                "format", "json")),
-            content);
-    }
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+        ResponseType responseType = configuration.getResponseType();
 
-    @Test
-    void testUnsubscribeWebhook() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
+        Map<String, Object> expectedBody = Map.of(
+            QUERY, mockedQuery,
+            VARIABLES, mockedVariables);
 
-        ShopifyUtils.unsubscribeWebhook(mockedParameters, mockedContext);
+        Body body = bodyArgumentCaptor.getValue();
 
-        verify(mockedContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        assertEquals(expectedBody, body.getContent());
+
+        assertEquals(Type.JSON, responseType.getType());
+        assertEquals("/2025-10/graphql.json", stringArgumentCaptor.getValue());
     }
 }
