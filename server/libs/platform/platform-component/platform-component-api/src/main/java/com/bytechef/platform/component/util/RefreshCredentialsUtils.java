@@ -42,11 +42,11 @@ public class RefreshCredentialsUtils {
         }
 
         if (!matches) {
-            Throwable curException = exception;
+            Throwable throwable = exception;
 
-            while (Objects.nonNull(curException) && Objects.nonNull(curException.getMessage())) {
+            while (Objects.nonNull(throwable) && Objects.nonNull(throwable.getMessage())) {
                 matches = matches(
-                    curException.getMessage(),
+                    throwable.getMessage(),
                     CollectionUtils.map(
                         CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
 
@@ -54,7 +54,7 @@ public class RefreshCredentialsUtils {
                     break;
                 }
 
-                curException = curException.getCause();
+                throwable = throwable.getCause();
             }
         }
 
