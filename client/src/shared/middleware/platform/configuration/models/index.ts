@@ -22,7 +22,6 @@ export * from './DateProperty';
 export * from './DateTimeProperty';
 export * from './DeleteClusterElementParameter200Response';
 export * from './DeleteClusterElementParameterRequest';
-export * from './DeleteWorkflowNodeParameterRequest';
 export * from './DynamicPropertiesProperty';
 export * from './Environment';
 export * from './ExecutionError';

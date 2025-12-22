@@ -41,7 +41,6 @@ docs/DateProperty.md
 docs/DateTimeProperty.md
 docs/DeleteClusterElementParameter200Response.md
 docs/DeleteClusterElementParameterRequest.md
-docs/DeleteWorkflowNodeParameterRequest.md
 docs/DynamicPropertiesProperty.md
 docs/Environment.md
 docs/EnvironmentApi.md
@@ -126,7 +125,6 @@ models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteClusterElementParameter200Response.ts
 models/DeleteClusterElementParameterRequest.ts
-models/DeleteWorkflowNodeParameterRequest.ts
 models/DynamicPropertiesProperty.ts
 models/Environment.ts
 models/ExecutionError.ts

@@ -39,7 +39,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameter200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterElementParameterRequestModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
