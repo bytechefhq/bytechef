@@ -25,7 +25,7 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const handleClick = () => {
-        setContext({mode: MODE.CHAT, parameters, source});
+        setContext({mode: MODE.ASK, parameters, source});
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);

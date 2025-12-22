@@ -56,7 +56,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             ## Additional Rules
 
             - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - When operating in CHAT mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain.
+            - When operating in ASK mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain.
             - If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
             - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses.
             """;
@@ -127,7 +127,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
             List<Object> selectedTools = new ArrayList<>(tools);
 
-            if (mode.equals("CHAT")) {
+            if (mode.equals("ASK")) {
                 selectedTools.set(0, readProjectTools);
                 selectedTools.set(1, readProjectWorkflowTools);
             } else if (mode.equals("BUILD")) {
