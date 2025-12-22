@@ -28,7 +28,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static com.bytechef.component.jira.constant.JiraConstants.ORDER_BY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -48,21 +48,20 @@ public class JiraListIssueCommentsAction {
             string(PROJECT)
                 .label("Project ID")
                 .description("ID of the project where the issue is located.")
-                .options((ActionDefinition.OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(false),
             string(ISSUE_ID)
                 .label("Issue ID")
                 .description("ID of the issue.")
-                .options((ActionDefinition.OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .options((OptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(ORDER_BY)
                 .label("Order By")
                 .description("Order the results by a field.")
                 .options(
-                    option("Created", "created", "Order by created date."),
-                    option("+Created", "+created", "Order ascending by created date."),
-                    option("-Created", "-created", "Order descending by created date."))
+                    option("Created (Ascending)", "+created", "Order ascending by created date."),
+                    option("Created (Descending)", "-created", "Order descending by created date."))
                 .required(false),
             integer(MAX_RESULTS)
                 .label("Max Results")
@@ -70,25 +69,29 @@ public class JiraListIssueCommentsAction {
                 .required(false))
         .output(
             outputSchema(
-                object().properties(
-                    integer("maxResults"),
-                    integer("startAt"),
-                    integer("total"),
-                    array("comments")
-                        .label("Comments")
-                        .description("List of comments on the issue")
-                        .items(
-                            object().properties(
-                                string("id").label("Comment ID"),
-                                string("self").label("API URL for the comment"),
-                                object("body").properties(
-                                    array("content").items(
-                                        object().properties(
-                                            string("text")))),
-                                object("author").properties(
-                                    string("displayName")),
-                                string("created"),
-                                string("updated"))))))
+                object()
+                    .properties(
+                        integer("maxResults"),
+                        integer("startAt"),
+                        integer("total"),
+                        array("comments")
+                            .description("List of comments on the issue")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("id"),
+                                        string("self"),
+                                        object("body")
+                                            .properties(
+                                                array("content")
+                                                    .items(
+                                                        object()
+                                                            .properties(string("text")))),
+                                        object("author")
+                                            .properties(
+                                                string("displayName")),
+                                        string("created"),
+                                        string("updated"))))))
         .perform(JiraListIssueCommentsAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
