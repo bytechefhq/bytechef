@@ -287,6 +287,86 @@ Type: OBJECT
 ```
 
 
+### List Issue Comments
+Name: listIssueComments
+
+`Return all comments for an issue.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | false |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue. | true |
+| orderBy | Order By | STRING <details> <summary> Options </summary> <span title="Order ascending by created date.">+created</span>, <span title="Order descending by created date.">-created</span> </details> | Order the results by a field. | false |
+| maxResults | Max Results | INTEGER | The maximum number of items to return per page. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Issue Comments",
+  "name" : "listIssueComments",
+  "parameters" : {
+    "project" : "",
+    "issueId" : "",
+    "orderBy" : "",
+    "maxResults" : 1
+  },
+  "type" : "jira/v1/listIssueComments"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| maxResults | INTEGER | The maximum number of items that could be returned. |
+| startAt | INTEGER | The index of the first item returned. |
+| total | INTEGER | The number of items returned. |
+| comments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(self), &#123;STRING\(type), INTEGER\(version), [&#123;STRING\(text)&#125;]\(content)&#125;\(body), &#123;STRING\(accountId), STRING\(accountType), BOOLEAN\(active), STRING\(emailAddress), STRING\(displayName), STRING\(self), STRING\(timezone)&#125;\(author), STRING\(created), STRING\(updated)&#125;] </details> | List of comments on the issue |
+
+
+
+
+#### Output Example
+```json
+{
+  "maxResults" : 1,
+  "startAt" : 1,
+  "total" : 1,
+  "comments" : [ {
+    "id" : "",
+    "self" : "",
+    "body" : {
+      "type" : "",
+      "version" : 1,
+      "content" : [ {
+        "text" : ""
+      } ]
+    },
+    "author" : {
+      "accountId" : "",
+      "accountType" : "",
+      "active" : false,
+      "emailAddress" : "",
+      "displayName" : "",
+      "self" : "",
+      "timezone" : ""
+    },
+    "created" : "",
+    "updated" : ""
+  } ]
+}
+```
+
+
 ### Search Issues
 Name: searchForIssuesUsingJql
 
