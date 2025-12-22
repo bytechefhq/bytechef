@@ -65,9 +65,9 @@ const CopilotPanel = () => {
                         </SelectTrigger>
 
                         <SelectContent className="min-w-24">
-                            <SelectItem value={MODE.CHAT}>
+                            <SelectItem value={MODE.ASK}>
                                 <span className="text-muted-foreground">
-                                    {MODE.CHAT.charAt(0) + MODE.CHAT.slice(1).toLowerCase()}
+                                    {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
                                 </span>
                             </SelectItem>
 

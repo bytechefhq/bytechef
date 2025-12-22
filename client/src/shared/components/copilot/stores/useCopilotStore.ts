@@ -6,7 +6,7 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export enum MODE {
-    CHAT = 'CHAT',
+    ASK = 'ASK',
     BUILD = 'BUILD',
 }
 
@@ -54,7 +54,7 @@ export const useCopilotStore = create<CopilotStateI>()(
         },
 
         context: {
-            mode: MODE.CHAT,
+            mode: MODE.ASK,
         },
         setContext: (context) =>
             set((state) => {
