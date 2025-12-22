@@ -52,10 +52,7 @@ class JiraListIssueCommentsActionTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            ISSUE_ID, "xy",
-            ORDER_BY, "+created",
-            MAX_RESULTS, 50));
+        Map.of(ISSUE_ID, "xy", ORDER_BY, "+created", MAX_RESULTS, 50));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of("comments", "example");
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -92,7 +89,5 @@ class JiraListIssueCommentsActionTest {
         assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
 
         assertEquals("/issue/xy/comment", stringArgumentCaptor.getValue());
-
     }
-
 }
