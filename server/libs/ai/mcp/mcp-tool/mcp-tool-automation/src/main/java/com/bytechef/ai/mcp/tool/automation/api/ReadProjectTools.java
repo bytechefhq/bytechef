@@ -16,21 +16,19 @@
 
 package com.bytechef.ai.mcp.tool.automation.api;
 
-import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import java.util.List;
 
 /**
  * @author Marko Kriskovic
  */
-public interface ChatProjectWorkflowTools {
+public interface ReadProjectTools {
 
-    ProjectWorkflowToolsImpl.WorkflowInfo getWorkflow(String workflowId);
+    List<ProjectToolsImpl.ProjectInfo> listProjects();
 
-    String getWorkflowBuildInstructions();
+    ProjectToolsImpl.ProjectDetailInfo getProject(long projectId);
 
-    List<ProjectWorkflowToolsImpl.WorkflowInfo> listWorkflows(long projectId);
+    List<ProjectToolsImpl.ProjectInfo> searchProjects(String query);
 
-    List<ProjectWorkflowToolsImpl.WorkflowInfo> searchWorkflows(String query, Long projectId);
-
-    ProjectWorkflowToolsImpl.WorkflowValidationResult validateWorkflow(String workflowId);
+    ProjectToolsImpl.ProjectStatusInfo getProjectStatus(long projectId);
 }

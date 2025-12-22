@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author Marko Kriskovic
  */
-public interface ProjectTools extends ChatProjectTools {
+public interface ProjectTools extends ReadProjectTools {
 
     ProjectToolsImpl.ProjectInfo createProject(
         String name, String description, Long categoryId, Long workspaceId, List<Long> tagIds);
