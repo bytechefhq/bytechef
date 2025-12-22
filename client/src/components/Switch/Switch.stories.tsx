@@ -113,6 +113,10 @@ export const DefaultSwitch: Story = {
     render: function Render(args) {
         const [checked, setChecked] = React.useState(args.checked ?? false);
 
+        React.useEffect(() => {
+            setChecked(args.checked ?? false);
+        }, [args.checked]);
+
         return <Switch {...args} checked={checked} onCheckedChange={setChecked} />;
     },
 };
@@ -132,15 +136,9 @@ export const SwitchVariants: Story = {
 
         return (
             <div className="grid grid-cols-[140px_1fr] gap-x-6 gap-y-4 text-sm">
-                {/* Header */}
+                <span className="col-start-2 font-semibold">Example</span>
 
-                <div />
-
-                <div className="font-semibold">Example</div>
-
-                {/* Default */}
-
-                <div className="font-medium">Default</div>
+                <span className="font-medium">Default</span>
 
                 <Switch
                     checked={checked1}
@@ -149,15 +147,11 @@ export const SwitchVariants: Story = {
                     variant="default"
                 />
 
-                {/* Box */}
-
-                <div className="font-medium">Box</div>
+                <span className="font-medium">Box</span>
 
                 <Switch checked={checked2} label="Enable notifications" onCheckedChange={setChecked2} variant="box" />
 
-                {/* Small */}
-
-                <div className="font-medium">Small</div>
+                <span className="font-medium">Small</span>
 
                 <Switch checked={checked3} label="Enable" onCheckedChange={setChecked3} variant="small" />
             </div>
@@ -173,59 +167,21 @@ export const PlainSwitches: Story = {
             },
         },
     },
-    render: () => {
-        const [checked1, setChecked1] = React.useState(false);
-        const [checked2, setChecked2] = React.useState(false);
-        const [checked3, setChecked3] = React.useState(false);
-        const [checked4, setChecked4] = React.useState(true);
-        const [checked5, setChecked5] = React.useState(true);
-        const [checked6, setChecked6] = React.useState(true);
+    render: () => (
+        <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+                <Switch aria-label="Default switch" variant="default" />
 
-        return (
-            <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                    <Switch
-                        aria-label="Default switch"
-                        checked={checked1}
-                        onCheckedChange={setChecked1}
-                        variant="default"
-                    />
-
-                    <Switch aria-label="Box switch" checked={checked2} onCheckedChange={setChecked2} variant="box" />
-
-                    <Switch
-                        aria-label="Small switch"
-                        checked={checked3}
-                        onCheckedChange={setChecked3}
-                        variant="small"
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Switch
-                        aria-label="Default switch checked"
-                        checked={checked4}
-                        onCheckedChange={setChecked4}
-                        variant="default"
-                    />
-
-                    <Switch
-                        aria-label="Box switch checked"
-                        checked={checked5}
-                        onCheckedChange={setChecked5}
-                        variant="box"
-                    />
-
-                    <Switch
-                        aria-label="Small switch checked"
-                        checked={checked6}
-                        onCheckedChange={setChecked6}
-                        variant="small"
-                    />
-                </div>
+                <Switch aria-label="Small switch" variant="small" />
             </div>
-        );
-    },
+
+            <div className="flex items-center gap-4">
+                <Switch aria-label="Default switch checked" checked variant="default" />
+
+                <Switch aria-label="Small switch checked" checked variant="small" />
+            </div>
+        </div>
+    ),
 };
 
 export const SwitchAlignmentVariants: Story = {
@@ -238,71 +194,64 @@ export const SwitchAlignmentVariants: Story = {
     },
     render: () => {
         const label = 'Auto-save';
-        const [states, setStates] = React.useState([false, false, false, false, false, false]);
-
-        const toggleState = (index: number) => {
-            setStates((prev) => prev.map((state, i) => (i === index ? !state : state)));
-        };
+        const [defaultStart, setDefaultStart] = React.useState(false);
+        const [defaultEnd, setDefaultEnd] = React.useState(false);
+        const [boxStart, setBoxStart] = React.useState(false);
+        const [boxEnd, setBoxEnd] = React.useState(false);
+        const [smallStart, setSmallStart] = React.useState(false);
+        const [smallEnd, setSmallEnd] = React.useState(false);
 
         return (
             <div className="grid grid-cols-[120px_1fr_1fr] gap-4 text-sm">
-                <div />
+                <span className="col-start-2 font-semibold">Start</span>
 
-                <div className="font-semibold">Start</div>
+                <span className="font-semibold">End</span>
 
-                <div className="font-semibold">End</div>
-
-                <div className="font-medium">Default</div>
+                <span className="font-medium">Default</span>
 
                 <Switch
                     alignment="start"
-                    checked={states[0]}
+                    checked={defaultStart}
                     label={label}
-                    onCheckedChange={() => toggleState(0)}
+                    onCheckedChange={setDefaultStart}
                     variant="default"
                 />
 
                 <Switch
                     alignment="end"
-                    checked={states[1]}
+                    checked={defaultEnd}
                     label={label}
-                    onCheckedChange={() => toggleState(1)}
+                    onCheckedChange={setDefaultEnd}
                     variant="default"
                 />
 
-                <div className="font-medium">Box</div>
+                <span className="font-medium">Box</span>
 
                 <Switch
                     alignment="start"
-                    checked={states[2]}
+                    checked={boxStart}
                     label={label}
-                    onCheckedChange={() => toggleState(2)}
+                    onCheckedChange={setBoxStart}
                     variant="box"
                 />
 
-                <Switch
-                    alignment="end"
-                    checked={states[3]}
-                    label={label}
-                    onCheckedChange={() => toggleState(3)}
-                    variant="box"
-                />
+                <Switch alignment="end" checked={boxEnd} label={label} onCheckedChange={setBoxEnd} variant="box" />
 
-                <div className="font-medium">Small</div>
+                <span className="font-medium">Small</span>
 
                 <Switch
                     alignment="start"
-                    checked={states[4]}
+                    checked={smallStart}
                     label={label}
-                    onCheckedChange={() => toggleState(4)}
+                    onCheckedChange={setSmallStart}
                     variant="small"
                 />
 
                 <Switch
                     alignment="end"
-                    checked={states[5]}
+                    checked={smallEnd}
                     label={label}
-                    onCheckedChange={() => toggleState(5)}
+                    onCheckedChange={setSmallEnd}
                     variant="small"
                 />
             </div>
@@ -325,15 +274,9 @@ export const SwitchesWithDescriptions: Story = {
 
         return (
             <div className="grid grid-cols-[160px_1fr] gap-x-6 gap-y-4 text-sm">
-                {/* Header */}
+                <span className="col-start-2 font-semibold">Example</span>
 
-                <div />
-
-                <div className="font-semibold">Example</div>
-
-                {/* Default */}
-
-                <div className="font-medium">Default</div>
+                <span className="font-medium">Default</span>
 
                 <Switch
                     checked={checked1}
@@ -343,9 +286,7 @@ export const SwitchesWithDescriptions: Story = {
                     variant="default"
                 />
 
-                {/* Box */}
-
-                <div className="font-medium">Box</div>
+                <span className="font-medium">Box</span>
 
                 <Switch
                     checked={checked2}
@@ -355,9 +296,7 @@ export const SwitchesWithDescriptions: Story = {
                     variant="box"
                 />
 
-                {/* Small */}
-
-                <div className="font-medium">Small (no description)</div>
+                <span className="font-medium">Small (no description)</span>
 
                 <Switch checked={checked3} label="Enable notifications" onCheckedChange={setChecked3} variant="small" />
             </div>
@@ -373,54 +312,31 @@ export const SwitchStates: Story = {
             },
         },
     },
-    render: () => {
-        const [states, setStates] = React.useState([false, true, false, true, false, true]);
+    render: () => (
+        <div className="grid grid-cols-[140px_1fr_1fr] gap-x-6 gap-y-4 text-sm">
+            <span className="col-start-2 font-semibold">Unchecked</span>
 
-        const toggleState = (index: number) => {
-            setStates((prev) => prev.map((state, i) => (i === index ? !state : state)));
-        };
+            <span className="font-semibold">Checked</span>
 
-        return (
-            <div className="grid grid-cols-[140px_1fr_1fr] gap-x-6 gap-y-4 text-sm">
-                {/* Header */}
+            <span className="font-medium">Default</span>
 
-                <div />
+            <Switch label="Unchecked" variant="default" />
 
-                <div className="font-semibold">Unchecked</div>
+            <Switch checked label="Checked" variant="default" />
 
-                <div className="font-semibold">Checked</div>
+            <span className="font-medium">Box</span>
 
-                {/* Default */}
+            <Switch label="Unchecked" variant="box" />
 
-                <div className="font-medium">Default</div>
+            <Switch checked label="Checked" variant="box" />
 
-                <Switch
-                    checked={states[0]}
-                    label="Unchecked"
-                    onCheckedChange={() => toggleState(0)}
-                    variant="default"
-                />
+            <span className="font-medium">Small</span>
 
-                <Switch checked={states[1]} label="Checked" onCheckedChange={() => toggleState(1)} variant="default" />
+            <Switch label="Unchecked" variant="small" />
 
-                {/* Box */}
-
-                <div className="font-medium">Box</div>
-
-                <Switch checked={states[2]} label="Unchecked" onCheckedChange={() => toggleState(2)} variant="box" />
-
-                <Switch checked={states[3]} label="Checked" onCheckedChange={() => toggleState(3)} variant="box" />
-
-                {/* Small */}
-
-                <div className="font-medium">Small</div>
-
-                <Switch checked={states[4]} label="Unchecked" onCheckedChange={() => toggleState(4)} variant="small" />
-
-                <Switch checked={states[5]} label="Checked" onCheckedChange={() => toggleState(5)} variant="small" />
-            </div>
-        );
-    },
+            <Switch checked label="Checked" variant="small" />
+        </div>
+    ),
 };
 
 export const SwitchDisabledStates: Story = {
@@ -433,41 +349,29 @@ export const SwitchDisabledStates: Story = {
     },
     render: () => (
         <div className="grid grid-cols-[160px_1fr_1fr] gap-x-6 gap-y-4 text-sm">
-            {/* Header */}
+            <span className="col-start-2 font-semibold">Disabled off</span>
 
-            <div />
+            <span className="font-semibold">Disabled on</span>
 
-            <div className="font-semibold">Disabled off</div>
-
-            <div className="font-semibold">Disabled on</div>
-
-            {/* Default */}
-
-            <div className="font-medium">Default</div>
+            <span className="font-medium">Default</span>
 
             <Switch disabled label="Off" variant="default" />
 
             <Switch checked disabled label="On" variant="default" />
 
-            {/* Box */}
-
-            <div className="font-medium">Box</div>
+            <span className="font-medium">Box</span>
 
             <Switch disabled label="Off" variant="box" />
 
             <Switch checked disabled label="On" variant="box" />
 
-            {/* Small */}
-
-            <div className="font-medium">Small</div>
+            <span className="font-medium">Small</span>
 
             <Switch disabled label="Off" variant="small" />
 
             <Switch checked disabled label="On" variant="small" />
 
-            {/* Plain */}
-
-            <div className="font-medium">Plain</div>
+            <span className="font-medium">Plain</span>
 
             <Switch aria-label="Disabled off" disabled />
 
@@ -498,8 +402,6 @@ export const SwitchUseCases: Story = {
 
         return (
             <div className="grid gap-8 text-sm">
-                {/* Settings panel */}
-
                 <div>
                     <h3 className="mb-3 font-semibold">Settings panel</h3>
 
@@ -527,8 +429,6 @@ export const SwitchUseCases: Story = {
                     </div>
                 </div>
 
-                {/* Compact */}
-
                 <div>
                     <h3 className="mb-3 font-semibold">Compact settings (small variant)</h3>
 
@@ -545,8 +445,6 @@ export const SwitchUseCases: Story = {
                         <Switch checked={autoSave2} label="Auto-save" onCheckedChange={setAutoSave2} variant="small" />
                     </div>
                 </div>
-
-                {/* Feature toggles */}
 
                 <div>
                     <h3 className="mb-3 font-semibold">Feature toggles (box variant)</h3>

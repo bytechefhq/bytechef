@@ -30,16 +30,16 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
 const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumbOverrides: '[&>span]:h-4 [&>span]:w-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:h-4 [&>span]:w-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:h-3 [&>span]:w-3 [&>span]:data-[state=checked]:translate-x-3',
+        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
         track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
     },
 };
@@ -51,15 +51,13 @@ const wrapperStyles: Record<VariantType, string> = {
     small: 'flex w-[98px] items-center gap-1',
 };
 
-function TextBlock({
-    description,
-    label,
-    variant,
-}: {
+interface TextBlockProps {
     label: React.ReactNode;
     description?: React.ReactNode;
     variant: VariantType;
-}) {
+}
+
+function TextBlock({description, label, variant}: TextBlockProps) {
     const isSmall = variant === 'small';
 
     return (
@@ -81,7 +79,20 @@ function TextBlock({
 }
 
 const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPropsType>(
-    ({alignment = 'start', checked = false, className, description, id, label, variant = 'default', ...props}, ref) => {
+    (
+        {
+            alignment = 'start',
+            checked = false,
+            className,
+            description,
+            id,
+            label,
+            onCheckedChange,
+            variant = 'default',
+            ...props
+        },
+        ref
+    ) => {
         const config = variantConfig[variant];
 
         const switchClasses = twMerge(
@@ -102,6 +113,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPro
                 checked={checked}
                 className={switchClasses}
                 id={id}
+                onCheckedChange={onCheckedChange}
                 ref={ref}
                 {...props}
             />
@@ -135,7 +147,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPro
             );
         }
 
-        const contentClasses = twMerge('flex items-start gap-2', alignment === 'start' ? 'flex-row-reverse' : '');
+        const contentClasses = twMerge('flex items-start gap-2', alignment === 'start' && 'flex-row-reverse');
 
         return (
             <div className={wrapperClasses} data-testid="switch-wrapper">
