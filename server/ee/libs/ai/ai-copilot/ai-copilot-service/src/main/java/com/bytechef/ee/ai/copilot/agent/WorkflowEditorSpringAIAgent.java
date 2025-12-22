@@ -21,12 +21,12 @@ import com.agui.core.state.State;
 import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
-import com.bytechef.ai.mcp.tool.automation.api.ChatProjectTools;
-import com.bytechef.ai.mcp.tool.automation.api.ChatProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
-import com.bytechef.ai.mcp.tool.automation.impl.ChatProjectToolsImpl;
-import com.bytechef.ai.mcp.tool.automation.impl.ChatProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectToolsImpl;
+import com.bytechef.ai.mcp.tool.automation.impl.ReadProjectWorkflowToolsImpl;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -65,8 +65,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     private final List<Object> tools;
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
-    private final ChatProjectTools chatProjectTools;
-    private final ChatProjectWorkflowTools chatProjectWorkflowTools;
+    private final ReadProjectTools readProjectTools;
+    private final ReadProjectWorkflowTools readProjectWorkflowTools;
 
     private final ChatClient chatClient;
     private final ChatMemory chatMemory;
@@ -84,8 +84,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         this.projectTools = (ProjectTools) tools.get(0);
         this.projectWorkflowTools = (ProjectWorkflowTools) tools.get(1);
 
-        this.chatProjectTools = new ChatProjectToolsImpl(projectTools);
-        this.chatProjectWorkflowTools = new ChatProjectWorkflowToolsImpl(projectWorkflowTools);
+        this.readProjectTools = new ReadProjectToolsImpl(projectTools);
+        this.readProjectWorkflowTools = new ReadProjectWorkflowToolsImpl(projectWorkflowTools);
 
         this.workflowService = workflowService;
         this.chatClient = builder.chatClient;
@@ -128,8 +128,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             List<Object> selectedTools = new ArrayList<>(tools);
 
             if (mode.equals("CHAT")) {
-                selectedTools.set(0, chatProjectTools);
-                selectedTools.set(1, chatProjectWorkflowTools);
+                selectedTools.set(0, readProjectTools);
+                selectedTools.set(1, readProjectWorkflowTools);
             } else if (mode.equals("BUILD")) {
                 selectedTools.set(0, projectTools);
                 selectedTools.set(1, projectWorkflowTools);

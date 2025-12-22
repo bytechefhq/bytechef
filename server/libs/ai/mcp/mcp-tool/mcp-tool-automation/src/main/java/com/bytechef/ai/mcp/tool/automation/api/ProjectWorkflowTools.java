@@ -21,7 +21,7 @@ import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
 /**
  * @author Marko Kriskovic
  */
-public interface ProjectWorkflowTools extends ChatProjectWorkflowTools {
+public interface ProjectWorkflowTools extends ReadProjectWorkflowTools {
 
     ProjectWorkflowToolsImpl.ProjectWorkflowInfo createProjectWorkflow(long projectId, String definition);
 

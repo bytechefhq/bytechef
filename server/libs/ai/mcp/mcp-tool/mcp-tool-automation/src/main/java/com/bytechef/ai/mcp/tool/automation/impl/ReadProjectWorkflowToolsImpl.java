@@ -16,8 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.automation.impl;
 
-import com.bytechef.ai.mcp.tool.automation.api.ChatProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.api.ProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.api.ReadProjectWorkflowTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
@@ -32,11 +32,11 @@ import org.springframework.stereotype.Component;
  * @author Marko Kriskovic
  */
 @Component
-public class ChatProjectWorkflowToolsImpl implements ChatProjectWorkflowTools {
+public class ReadProjectWorkflowToolsImpl implements ReadProjectWorkflowTools {
     private final ProjectWorkflowTools delegate;
 
     @SuppressFBWarnings("EI")
-    public ChatProjectWorkflowToolsImpl(ProjectWorkflowTools projectTools) {
+    public ReadProjectWorkflowToolsImpl(ProjectWorkflowTools projectTools) {
         this.delegate = projectTools;
     }
 
