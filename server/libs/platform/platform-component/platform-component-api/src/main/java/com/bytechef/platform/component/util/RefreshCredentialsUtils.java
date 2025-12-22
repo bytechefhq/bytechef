@@ -41,21 +41,23 @@ public class RefreshCredentialsUtils {
                     item -> (Integer) item));
         }
 
-        if (!matches) {
-            Throwable throwable = exception;
+        if (matches) {
+            return matches;
+        }
 
-            while (Objects.nonNull(throwable) && Objects.nonNull(throwable.getMessage())) {
-                matches = matches(
-                    throwable.getMessage(),
-                    CollectionUtils.map(
-                        CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
+        Throwable throwable = exception;
 
-                if (matches) {
-                    break;
-                }
+        while (Objects.nonNull(throwable) && Objects.nonNull(throwable.getMessage())) {
+            matches = matches(
+                throwable.getMessage(),
+                CollectionUtils.map(
+                    CollectionUtils.filter(refreshOn, item -> item instanceof String), item -> (String) item));
 
-                throwable = throwable.getCause();
+            if (matches) {
+                return matches;
             }
+
+            throwable = throwable.getCause();
         }
 
         return matches;
