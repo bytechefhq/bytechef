@@ -167,7 +167,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, 0);
 
             // Then
             assertNotNull(result);
@@ -214,7 +214,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When/Then - This should throw a ConfigurationException due to missing cluster element
             assertThrows(ConfigurationException.class, () -> workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0));
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, 0));
         }
     }
 
@@ -288,7 +288,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
-                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, false, 0);
+                workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, path, 0);
 
             // Then
             assertNotNull(result);
@@ -2242,7 +2242,7 @@ public class WorkflowNodeParameterFacadeTest {
             // When
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName, parameterPath,
-                false, 0);
+                0);
 
             // Then
             assertNotNull(result);
@@ -2392,7 +2392,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             ParameterResultDTO result = workflowNodeParameterFacade.deleteClusterElementParameter(
                 workflowId, workflowNodeName, clusterElementTypeName, clusterElementWorkflowNodeName,
-                parameterPath, true, 0);
+                parameterPath, 0);
 
             assertNotNull(result);
 

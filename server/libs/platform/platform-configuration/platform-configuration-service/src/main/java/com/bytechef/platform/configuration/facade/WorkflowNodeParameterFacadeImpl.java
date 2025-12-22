@@ -106,8 +106,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     @Override
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
-        String clusterElementWorkflowNodeName, String parameterPath, boolean fromAiInMetadata,
-        long environmentId) {
+        String clusterElementWorkflowNodeName, String parameterPath, long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -139,7 +138,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
             true, environmentId);
 
-        updateFromAiMetadataPaths(fromAiInMetadata, getFromAiPaths(metadataMap), parameterPath);
+        updateFromAiMetadataPaths(false, getFromAiPaths(metadataMap), parameterPath);
 
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
@@ -441,8 +440,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private void updateFromAiMetadataPaths(boolean fromAiInMetadata, List<String> fromAiPaths, String parameterPath) {
         if (fromAiInMetadata) {
             fromAiPaths.add(parameterPath);
-        }
-        else {
+        } else {
             fromAiPaths.remove(parameterPath);
         }
     }
