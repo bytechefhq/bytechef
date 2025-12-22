@@ -18,6 +18,7 @@ package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -71,27 +72,61 @@ public class JiraListIssueCommentsAction {
             outputSchema(
                 object()
                     .properties(
-                        integer("maxResults"),
-                        integer("startAt"),
-                        integer("total"),
+                        integer("maxResults")
+                            .description("The maximum number of items that could be returned."),
+                        integer("startAt")
+                            .description("The index of the first item returned."),
+                        integer("total")
+                            .description("The number of items returned."),
                         array("comments")
                             .description("List of comments on the issue")
                             .items(
                                 object()
                                     .properties(
-                                        string("id"),
-                                        string("self"),
+                                        string("id")
+                                            .description("The ID of the comment."),
+                                        string("self")
+                                            .description("The URL of the comment."),
                                         object("body")
                                             .properties(
+                                                string("type")
+                                                    .description(
+                                                        "Defines the type of block node such as paragraph, table, and alike."),
+                                                integer("version")
+                                                    .description(
+                                                        "Defines the version of ADF used in this representation."),
                                                 array("content")
+                                                    .description(
+                                                        "An array containing inline and block nodes that define the content of a section of the document.")
                                                     .items(
                                                         object()
                                                             .properties(string("text")))),
                                         object("author")
                                             .properties(
-                                                string("displayName")),
-                                        string("created"),
-                                        string("updated"))))))
+                                                string("accountId")
+                                                    .description(
+                                                        "The account ID of the user, which uniquely identifies the user across all Atlassian products."),
+                                                string("accountType")
+                                                    .description(
+                                                        "The type of account represented by this user. This will be one of 'atlassian' (normal users), 'app' (application user) or 'customer' (Jira Service Desk customer user)"),
+                                                bool("active")
+                                                    .description("Whether the user is active."),
+                                                string("emailAddress")
+                                                    .description(
+                                                        "The email address of the user. Depending on the user’s privacy settings, this may be returned as null."),
+                                                string("displayName")
+                                                    .description(
+                                                        "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value."),
+                                                string("self")
+                                                    .description("The URL of the user."),
+                                                string("timezone")
+                                                    .description(
+                                                        "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.")),
+                                        string("created")
+                                            .description("The date and time at which the comment was created."),
+                                        string("updated")
+                                            .description(
+                                                "The date and time at which the comment was updated last."))))))
         .perform(JiraListIssueCommentsAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
