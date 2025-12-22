@@ -16,71 +16,59 @@
 
 package com.bytechef.component.shopify;
 
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
-import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
-import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.shopify.action.ShopifyCancelOrderAction;
+import com.bytechef.component.shopify.action.ShopifyCloseOrderAction;
+import com.bytechef.component.shopify.action.ShopifyCreateOrderAction;
+import com.bytechef.component.shopify.action.ShopifyDeleteOrderAction;
+import com.bytechef.component.shopify.action.ShopifyGetOrderAction;
+import com.bytechef.component.shopify.action.ShopifyUpdateOrderAction;
+import com.bytechef.component.shopify.connection.ShopifyConnection;
 import com.bytechef.component.shopify.trigger.ShopifyNewCancelledOrderTrigger;
 import com.bytechef.component.shopify.trigger.ShopifyNewOrderTrigger;
 import com.bytechef.component.shopify.trigger.ShopifyNewPaidOrderTrigger;
 import com.google.auto.service.AutoService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Monika Domiter
+ * @author Nikolina Spehar
  */
-@AutoService(OpenApiComponentHandler.class)
-public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
+@AutoService(ComponentHandler.class)
+public class ShopifyComponentHandler implements ComponentHandler {
 
-    @Override
-    public List<ModifiableTriggerDefinition> getTriggers() {
-        return List.of(
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("shopify")
+        .title("Shopify")
+        .description(
+            "Shopify is an e-commerce platform that allows businesses to create online stores and sell products.")
+        .icon("path:assets/shopify.svg")
+        .categories(ComponentCategory.E_COMMERCE)
+        .connection(ShopifyConnection.CONNECTION_DEFINITION)
+        .actions(
+            ShopifyCancelOrderAction.ACTION_DEFINITION,
+            ShopifyCloseOrderAction.ACTION_DEFINITION,
+            ShopifyCreateOrderAction.ACTION_DEFINITION,
+            ShopifyDeleteOrderAction.ACTION_DEFINITION,
+            ShopifyGetOrderAction.ACTION_DEFINITION,
+            ShopifyUpdateOrderAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(ShopifyCancelOrderAction.ACTION_DEFINITION),
+            tool(ShopifyCloseOrderAction.ACTION_DEFINITION),
+            tool(ShopifyCreateOrderAction.ACTION_DEFINITION),
+            tool(ShopifyDeleteOrderAction.ACTION_DEFINITION),
+            tool(ShopifyGetOrderAction.ACTION_DEFINITION),
+            tool(ShopifyUpdateOrderAction.ACTION_DEFINITION))
+        .triggers(
             ShopifyNewCancelledOrderTrigger.TRIGGER_DEFINITION,
             ShopifyNewOrderTrigger.TRIGGER_DEFINITION,
             ShopifyNewPaidOrderTrigger.TRIGGER_DEFINITION);
-    }
 
     @Override
-    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition
-            .customAction(true)
-            .icon("path:assets/shopify.svg")
-            .categories(ComponentCategory.E_COMMERCE);
-    }
-
-    @Override
-    public ModifiableConnectionDefinition modifyConnection(
-        ModifiableConnectionDefinition modifiableConnectionDefinition) {
-
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
-
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
-            ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
-
-            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
-            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
-
-            properties.addFirst(
-                string(SHOP_NAME)
-                    .label("Shop name")
-                    .required(true));
-
-            modifiableAuthorization.properties(properties);
-        }
-
-        return modifiableConnectionDefinition
-            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SHOP_NAME)
-                + ".myshopify.com/admin/api/2024-04");
+    public ComponentDefinition getDefinition() {
+        return COMPONENT_DEFINITION;
     }
 }

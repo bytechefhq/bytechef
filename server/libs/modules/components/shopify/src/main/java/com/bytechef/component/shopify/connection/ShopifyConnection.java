@@ -16,36 +16,53 @@
 
 package com.bytechef.component.shopify.connection;
 
-import static com.bytechef.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.component.definition.Authorization.KEY;
-import static com.bytechef.component.definition.Authorization.VALUE;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Provides the component connection definition.
- *
- * @generated
+ * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyConnection {
-    public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://${shopName}.myshopify.com/admin/api/2024-04")
-        .authorizations(authorization(AuthorizationType.API_KEY)
-            .title("API Key")
-            .properties(
-                string(KEY)
-                    .label("Key")
-                    .required(true)
-                    .defaultValue("X-Shopify-Access-Token")
-                    .hidden(true),
-                string(VALUE)
-                    .label("Access Token")
-                    .required(true)
 
-            ));
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://%s/admin/api"
+            .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
+        .authorizations(
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .properties(
+                    string(SHOP_NAME)
+                        .label("Shop Name")
+                        .description("Shopify shop name e.g. name.myshopify.com.")
+                        .required(true),
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .description("Client ID can be found in Dev Dashboard.")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .description("Client secret can be found in Dev Dashboard.")
+                        .required(true))
+                .authorizationUrl((connectionParameters, context) -> "https://%s/admin/oauth/authorize"
+                    .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
+                .scopes((connection, context) -> List.of("write_orders"))
+                .tokenUrl((connectionParameters, context) -> "https://%s/admin/oauth/access_token"
+                    .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
+                .refreshUrl((connectionParameters, context) -> "https://%s/admin/oauth/access_token"
+                    .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
+                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                    Map.of("X-Shopify-Access-Token", List.of(connectionParameters.getRequiredString(ACCESS_TOKEN))))));
 
     private ShopifyConnection() {
     }

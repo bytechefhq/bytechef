@@ -16,94 +16,129 @@
 
 package com.bytechef.component.shopify.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.BodyContentType;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.LINE_ITEMS;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCTS;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.QUANTITY;
+import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
+import static com.bytechef.component.shopify.util.ShopifyOptionsUtils.getLineItemsList;
+import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
+import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.shopify.property.ShopifyOrderProperties;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Provides a list of the component actions.
- *
- * @generated
+ * @author Monika Domiter
+ * @author Nikolina Spehar
  */
 public class ShopifyCreateOrderAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createOrder")
-        .title("Create Order")
-        .description("Adds an order into a Shopify store.")
-        .metadata(
-            Map.of(
-                "method", "POST",
-                "path", "/orders.json", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
-            ))
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createOrder")
+        .title("Create Order")
+        .description(
+            "Creates an order with attributes such as customer information, line items, and shipping and billing " +
+                "addresses.")
         .properties(
-            object("order")
-                .properties(
-                    array("line_items").items(object()
-                        .properties(string("fulfillment_status").label("Fulfillment Status")
-                            .description("How far along an order is in terms line items fulfilled.")
-                            .options(option("Null", "null"), option("Fulfilled", "fulfilled"), option("Partial",
-                                "partial"), option("Not_eligible", "not_eligible"))
-                            .required(false),
-                            string("grams").label("Grams")
-                                .description("The weight of the item in grams.")
-                                .required(false),
-                            number("price").label("Price")
-                                .description(
-                                    "The price of the item before discounts have been applied in the shop currency.")
-                                .required(false),
-                            integer("product_id").label("Product ID")
-                                .description("The ID of the product that the line item belongs to.")
-                                .required(false)
-                                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getProductIdOptions),
-                            integer("variant_id").label("Variant ID")
-                                .description("The ID of the product variant.")
-                                .required(false)
-                                .options((ActionDefinition.OptionsFunction<Long>) ShopifyUtils::getVariantIdOptions)
-                                .optionsLookupDependsOn("order.line_items[index].product_id"),
-                            integer("quantity").label("Quantity")
-                                .description("The number of items that were purchased.")
-                                .required(false),
-                            string("title").label("Title")
-                                .description("The title of the product.")
-                                .required(false))
-                        .description(
-                            "The list of line item objects, each containing information about an item in the order."))
-                        .placeholder("Add to Line Items")
-                        .label("Line Items")
-                        .description(
-                            "The list of line item objects, each containing information about an item in the order.")
-                        .required(false),
-                    string("total_tax").label("Total Tax")
-                        .description(
-                            "The sum of all the taxes applied to the order in the shop currency. Must be positive.")
-                        .required(false),
-                    string("currency").label("Currency")
-                        .description("The three-letter code (ISO 4217 format) for the shop currency")
-                        .required(false))
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY))
-                .label("Order")
-                .required(false))
-        .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+            array(PRODUCTS)
+                .label("Products")
+                .description("List of products you want to order.")
+                .minItems(1)
+                .required(false)
+                .items(
+                    object(PRODUCT)
+                        .label("Product")
+                        .description("Product you want to order.")
+                        .required(true)
+                        .properties(
+                            string(PRODUCT_ID)
+                                .label("Product ID")
+                                .description("ID of the product you want to order.")
+                                .options((OptionsFunction<String>) ShopifyOptionsUtils::getProductIdOptions)
+                                .required(true),
+                            integer(QUANTITY)
+                                .label("Quantity")
+                                .description("How many products you want to order")
+                                .required(true))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("order")
+                            .description("The created order.")
+                            .properties(
+                                string("id")
+                                    .description("ID of the created order."),
+                                object("lineItems")
+                                    .properties(
+                                        array("nodes")
+                                            .items(
+                                                object()
+                                                    .properties(
+                                                        string("id")
+                                                            .description("ID of the line item."),
+                                                        string("title")
+                                                            .description("Title of the line item."),
+                                                        integer("quantity")
+                                                            .description("Quantity of the line item."),
+                                                        object("variant")
+                                                            .description("The product variant.")
+                                                            .properties(
+                                                                string("id")
+                                                                    .description("ID of the product variant.")))))),
+                        USER_ERRORS_PROPERTY)))
+        .perform(ShopifyCreateOrderAction::perform);
 
     private ShopifyCreateOrderAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String query = """
+            mutation orderCreate($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {
+              orderCreate(order: $order, options: $options) {
+                userErrors {
+                  field
+                  message
+                }
+                order {
+                  id
+                  lineItems(first: 5) {
+                    nodes {
+                      id
+                      title
+                      quantity
+                      variant {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }""";
+
+        List<Object> lineItems = getLineItemsList(context, inputParameters.getList(PRODUCTS, Object.class));
+
+        Map<String, Object> variables = Map.of(ORDER, Map.of(LINE_ITEMS, lineItems));
+
+        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
+
+        Object bodyContent = body.get("orderCreate");
+
+        checkForUserError(bodyContent);
+
+        return bodyContent;
     }
 }

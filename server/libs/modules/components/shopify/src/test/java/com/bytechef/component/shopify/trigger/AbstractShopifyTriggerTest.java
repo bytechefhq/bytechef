@@ -16,18 +16,21 @@
 
 package com.bytechef.component.shopify.trigger;
 
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.shopify.util.ShopifyUtils;
+import com.bytechef.component.shopify.util.ShopifyTriggerUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -35,7 +38,7 @@ import org.mockito.MockedStatic;
  */
 public abstract class AbstractShopifyTriggerTest {
 
-    protected Parameters mockedWebhookEnableOutput = mock(Parameters.class);
+    protected ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
@@ -43,16 +46,18 @@ public abstract class AbstractShopifyTriggerTest {
     protected Object mockedObject = mock(Object.class);
     protected Parameters mockedParameters = mock(Parameters.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected MockedStatic<ShopifyUtils> shopifyUtilsMockedStatic;
+    protected MockedStatic<ShopifyTriggerUtils> shopifyTriggerUtilsMockedStatic;
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    void beforeEach() {
-        shopifyUtilsMockedStatic = mockStatic(ShopifyUtils.class);
+    public void beforeEach() {
+        shopifyTriggerUtilsMockedStatic = mockStatic(ShopifyTriggerUtils.class);
     }
 
     @AfterEach
-    void afterEach() {
-        shopifyUtilsMockedStatic.close();
+    public void afterEach() {
+        shopifyTriggerUtilsMockedStatic.close();
     }
+
 }
