@@ -146,6 +146,8 @@ public class TaskWorker {
         try {
             future.get(calculateTimeout(taskExecution), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            future.cancel(true);
+
             handleException(taskExecution, e);
         } catch (CancellationException e) {
             logger.debug("Cancelled task: {}", taskExecution.getId());
