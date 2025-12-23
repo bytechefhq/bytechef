@@ -130,7 +130,6 @@ public class JiraListIssueCommentsAction {
         .perform(JiraListIssueCommentsAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context
             .http(http -> http.get("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
