@@ -112,6 +112,7 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param inputParameters        a map containing input parameters required for processing
      * @param componentConnections   a map of component connections used for external interactions
      * @param extensions             a map of optional extensions to further control the execution
+     * @param environmentId          the environment ID
      * @param editorEnvironment      a flag indicating whether the execution is performed in an editor environment
      * @param type                   the mode type (e.g., AUTOMATION or EMBEDDED)
      * @return an object representing the result of the performed action
@@ -119,8 +120,8 @@ public interface ActionDefinitionService extends OperationDefinitionService {
     Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, boolean editorEnvironment,
-        ModeType type);
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
+        boolean editorEnvironment, ModeType type);
 
     /**
      * Executes the perform logic for a specific component and its version in the context of polyglot execution. This
@@ -132,25 +133,26 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param actionName          the name of the action to be performed
      * @param inputParameters     a map of input parameters required for processing
      * @param componentConnection an instance of {@link ComponentConnection} used for external interactions
+     * @param environmentId       the environment ID
      * @param actionContext       the context in which the action is executed
      * @return an object representing the result of the performed action
      */
     Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext);
+        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext);
 
     /**
      * Processes the error response for a given component and action and returns a ProviderException.
      *
-     * @param componentName    the name of the component where the error occurred
-     * @param componentVersion the version of the component where the error occurred
-     * @param actionName       the name of the action being executed when the error occurred
-     * @param statusCode       the HTTP status code associated with the error response
-     * @param body             the body of the error response containing additional error details
+     * @param componentName          the name of the component where the error occurred
+     * @param componentVersion       the version of the component where the error occurred
+     * @param componentOperationName the name of the action being executed when the error occurred
+     * @param statusCode             the HTTP status code associated with the error response
+     * @param body                   the body of the error response containing additional error details
      * @return a ProviderException detailing the processed error response
      */
     ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body);
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body);
 
     /**
      * Executes a workflow node description based on the specified component, version, action, and input parameters.

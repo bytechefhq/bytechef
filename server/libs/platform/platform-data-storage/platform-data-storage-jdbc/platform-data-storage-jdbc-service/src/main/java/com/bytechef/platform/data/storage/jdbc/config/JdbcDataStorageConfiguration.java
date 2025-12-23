@@ -54,33 +54,33 @@ public class JdbcDataStorageConfiguration {
         @Override
         public <T> Optional<T> fetch(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
+            return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @NonNull
         @Override
         public <T> T get(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
+            return jdbcDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @NonNull
         @Override
         public <T> Map<String, T> getAll(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, long environmentId,
             @NonNull ModeType type) {
 
-            return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
+            return jdbcDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
         public void put(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
+            @NonNull String key, @NonNull Object value, long environmentId, @NonNull ModeType type) {
 
             int size = getSizeInBytes(value);
 
@@ -89,15 +89,15 @@ public class JdbcDataStorageConfiguration {
                     "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
             }
 
-            jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
+            jdbcDataStorageService.put(componentName, scope, scopeId, key, environmentId, type, value);
         }
 
         @Override
         public void delete(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
+            jdbcDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
 
         private int getSizeInBytes(Object value) {

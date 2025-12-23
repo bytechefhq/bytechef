@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -33,15 +34,18 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
     implements TriggerDispatcherPreSendProcessor {
 
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public IntegrationTriggerDispatcherPreSendProcessor(
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationWorkflowService integrationWorkflowService) {
+        IntegrationWorkflowService integrationWorkflowService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(integrationInstanceConfigurationWorkflowService);
 
         this.integrationWorkflowService = integrationWorkflowService;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Override
@@ -57,6 +61,11 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
+
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(ModeType.EMBEDDED)
+            .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
+        triggerExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return triggerExecution;
     }

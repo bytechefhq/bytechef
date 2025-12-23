@@ -85,11 +85,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, boolean editorEnvironment, ModeType type) {
+        Map<String, ?> extensions, Long environmentId, ModeType type, boolean editorEnvironment) {
 
         return actionDefinitionService.executePerform(
             componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-            inputParameters, getComponentConnections(connectionIds), extensions, editorEnvironment, type);
+            inputParameters, getComponentConnections(connectionIds), extensions, environmentId, editorEnvironment,
+            type);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

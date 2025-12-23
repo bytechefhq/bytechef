@@ -119,14 +119,14 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest, Long connectionId,
-        boolean editorEnvironment, ModeType type) {
+        Long environmentId, ModeType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-trigger"),
             new TriggerRequest(
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-                connectionId),
+                connectionId, jobPrincipalId, workflowUuid, editorEnvironment, type, environmentId),
             TriggerOutput.class);
     }
 
@@ -224,7 +224,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     private record TriggerRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
-        WebhookRequest webhookRequest, Long connectionId) {
+        WebhookRequest webhookRequest, Long connectionId, Long jobPrincipalId, String workflowUuid,
+        boolean editorEnvironment, ModeType type, Long environmentId) {
     }
 
     private record WebhookValidateRequest(

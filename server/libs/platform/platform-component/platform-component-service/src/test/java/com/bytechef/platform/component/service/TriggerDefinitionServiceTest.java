@@ -70,13 +70,11 @@ public class TriggerDefinitionServiceTest {
     @Mock
     private TriggerContext triggerContext;
 
-    // No environment registry needed; envId is provided externally
-
     @BeforeEach
     void setUpMocks() {
         when(contextFactory.createTriggerContext(
             Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(),
-            Mockito.any(), Mockito.anyBoolean()))
+            Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
                 .thenReturn(triggerContext);
 
         Mockito.lenient()
@@ -111,8 +109,8 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher, tokenRefreshHelper);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, false,
-            ModeType.AUTOMATION);
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null,
+            ModeType.AUTOMATION, false);
 
         assertNotNull(output, "TriggerOutput should not be null");
         assertNotNull(output.value(), "Output should not be null");
@@ -149,8 +147,8 @@ public class TriggerDefinitionServiceTest {
 
         ProviderException thrownException = assertThrows(ProviderException.class, () -> {
             triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, false,
-                ModeType.AUTOMATION);
+                "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null,
+                ModeType.AUTOMATION, false);
         });
 
         assertSame(

@@ -74,6 +74,9 @@ public class DataEntry {
     @Column
     private int type;
 
+    @Column("environment")
+    private int environment;
+
     @Version
     private int version;
 
@@ -81,9 +84,11 @@ public class DataEntry {
     }
 
     public DataEntry(
-        String componentName, DataStorageScope scope, String scopeId, String key, Object value, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, Object value, int environment,
+        ModeType type) {
 
         this.componentName = componentName;
+        this.environment = environment;
         this.key = key;
         this.scope = scope.ordinal();
         this.scopeId = scopeId;
@@ -129,6 +134,10 @@ public class DataEntry {
 
     public ModeType getType() {
         return ModeType.values()[type];
+    }
+
+    public int getEnvironment() {
+        return environment;
     }
 
     public Object getValue() {

@@ -59,43 +59,43 @@ public class FileDataStorageConfiguration {
         @Override
         public <T> Optional<T> fetch(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            return fileDataStorageService.fetch(componentName, scope, scopeId, key, type);
+            return fileDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @NonNull
         @Override
         public <T> T get(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            return fileDataStorageService.get(componentName, scope, scopeId, key, type);
+            return fileDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @NonNull
         @Override
         public <T> Map<String, T> getAll(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, long environmentId,
             @NonNull ModeType type) {
 
-            return fileDataStorageService.getAll(componentName, scope, scopeId, type);
+            return fileDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
         public void put(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
+            @NonNull String key, @NonNull Object value, long environmentId, @NonNull ModeType type) {
 
-            fileDataStorageService.put(componentName, scope, scopeId, key, type, value);
+            fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
         }
 
         @Override
         public void delete(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull ModeType type) {
 
-            fileDataStorageService.delete(componentName, scope, scopeId, key, type);
+            fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
     }
 }

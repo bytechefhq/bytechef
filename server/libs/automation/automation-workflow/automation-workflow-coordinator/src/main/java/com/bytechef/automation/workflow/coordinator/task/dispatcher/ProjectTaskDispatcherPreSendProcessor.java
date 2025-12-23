@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,16 +44,18 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public ProjectTaskDispatcherPreSendProcessor(
         JobService jobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        PrincipalJobService principalJobService) {
+        PrincipalJobService principalJobService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(projectDeploymentWorkflowService);
 
         this.jobService = jobService;
         this.principalJobService = principalJobService;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Override
@@ -79,6 +82,12 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
+
+        // Derive and pass environment id for downstream components
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(ModeType.AUTOMATION)
+            .getEnvironmentId(projectDeploymentId);
+        taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return taskExecution;
     }

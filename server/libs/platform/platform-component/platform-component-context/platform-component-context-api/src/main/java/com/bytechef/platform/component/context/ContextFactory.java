@@ -32,7 +32,8 @@ public interface ContextFactory {
     ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
         @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable ModeType type, boolean editorEnvironment);
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable ModeType type,
+        boolean editorEnvironment);
 
     Context createContext(String componentName, @Nullable ComponentConnection componentConnection);
 
@@ -42,6 +43,6 @@ public interface ContextFactory {
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable ModeType type,
-        boolean editorEnvironment);
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        @Nullable ModeType type, boolean editorEnvironment);
 }

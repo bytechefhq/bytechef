@@ -79,15 +79,38 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     public Map<String, ?> executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, boolean editorEnvironment, ModeType type) {
+        Map<String, ?> extensions, Long environmentId, ModeType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
                 componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                inputParameters, connectionIds),
+                workflowId, inputParameters, connectionIds, castExtensions(extensions), environmentId),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Long> castExtensions(Map<String, ?> extensions) {
+        if (extensions == null) {
+            return null;
+        }
+        try {
+            return (Map<String, Long>) (Map<?, ?>) extensions;
+        } catch (ClassCastException e) {
+            // Fallback: convert values via toString/parseLong when possible
+            return extensions.entrySet()
+                .stream()
+                .collect(
+                    java.util.stream.Collectors.toMap(Map.Entry::getKey, e2 -> {
+                        Object v = e2.getValue();
+                        if (v == null)
+                            return null;
+                        if (v instanceof Number n)
+                            return n.longValue();
+                        return Long.parseLong(v.toString());
+                    }));
+        }
     }
 
     private record OptionsRequest(
@@ -102,7 +125,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     private record PerformRequest(
         String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, long jobId, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
     }
 
     private record PropertiesRequest(

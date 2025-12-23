@@ -88,7 +88,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, true);
+            componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, null,
+            true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -98,7 +99,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection1, null,
-                true));
+                null, true));
     }
 
     @Override
@@ -108,7 +109,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, true);
+            componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -117,7 +118,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 searchText, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, true));
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null, null,
+                true));
     }
 
     @Override
@@ -140,7 +142,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, firstComponentConnection, null,
-                true);
+                null, true);
 
             return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, firstComponentConnection, actionContext,
@@ -149,10 +151,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     singleConnectionOutputFunction, inputParameters, componentConnection1, actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null,
-                    true));
+                    null, true));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, null, true);
+                componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
 
             return executeMultipleConnectionsOutput(
                 (MultipleConnectionsOutputFunction) outputFunction, inputParameters, componentConnections, Map.of(),
@@ -164,8 +166,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, boolean editorEnvironment,
-        ModeType type) {
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
+        boolean editorEnvironment, ModeType type) {
 
         PerformFunction performFunction = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName)
@@ -177,7 +179,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-                firstComponentConnection, type, editorEnvironment);
+                firstComponentConnection, environmentId, type, editorEnvironment);
 
             return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, firstComponentConnection, actionContext,
@@ -187,11 +189,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                    workflowId, componentConnection1, type, editorEnvironment));
+                    workflowId, componentConnection1, environmentId, type, editorEnvironment));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
-                null, type, editorEnvironment);
+                null, environmentId, type, editorEnvironment);
 
             return executeMultipleConnectionsPerform(
                 (MultipleConnectionsPerformFunction) performFunction, inputParameters, componentConnections, extensions,
@@ -202,7 +204,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext) {
+        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext) {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
@@ -220,18 +222,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
-                actionContextAware.getWorkflowId(), componentConnection1, actionContextAware.getModeType(),
-                actionContextAware.isEditorEnvironment()));
+                actionContextAware.getWorkflowId(), componentConnection1, environmentId,
+                actionContextAware.getModeType(), actionContextAware.isEditorEnvironment()));
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, componentOperationName);
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, null, false);
+            componentName, componentVersion, componentOperationName, null, null, null, null, null, null, null, false);
 
         try {
             return actionDefinition.getProcessErrorResponse()
@@ -250,7 +252,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
             getWorkflowNodeDescriptionFunction(componentName, componentVersion, actionName);
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, null, true);
+            componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
 
         try {
             return workflowNodeDescriptionFunction.apply(

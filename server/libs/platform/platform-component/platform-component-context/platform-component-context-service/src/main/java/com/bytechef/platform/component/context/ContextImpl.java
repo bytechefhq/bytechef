@@ -46,9 +46,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -58,7 +58,8 @@ class ContextImpl implements Context {
     private final Convert convert;
     private final Encoder encoder;
     private final File file;
-    private final Http http;
+    @Nullable
+    private Http http;
     private final Json json;
     private final Log log;
     private final MimeType mimeType;
@@ -68,7 +69,7 @@ class ContextImpl implements Context {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, int componentVersion, String componentOperationName,
+        String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
 
@@ -76,8 +77,12 @@ class ContextImpl implements Context {
         this.editorEnvironment = editorEnvironment;
         this.encoder = new EncoderImpl();
         this.file = new FileImpl(tempFileStorage);
-        this.http = new HttpImpl(
-            componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
+
+        if (componentOperationName != null) {
+            this.http = new HttpImpl(
+                componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
+        }
+
         this.json = new JsonImpl();
         this.log = new LogImpl(componentName, componentOperationName);
         this.mimeType = new MimeTypeImpl();
@@ -173,7 +178,7 @@ class ContextImpl implements Context {
 
     private record HttpImpl(
         String componentName, int componentVersion, String componentOperationName,
-        ComponentConnection componentConnection, Context context, HttpClientExecutor httpClientExecutor)
+        @Nullable ComponentConnection componentConnection, Context context, HttpClientExecutor httpClientExecutor)
 
         implements Http {
 
@@ -226,11 +231,13 @@ class ContextImpl implements Context {
 
         private static class ExecutorImpl implements Executor {
 
+            @Nullable
             private Body body;
             private final String componentName;
             private final int componentVersion;
             private final String componentOperationName;
             private Configuration configuration = new Configuration();
+            @Nullable
             private final ComponentConnection componentConnection;
             private final Context context;
             private final HttpClientExecutor httpClientExecutor;
@@ -241,7 +248,7 @@ class ContextImpl implements Context {
 
             private ExecutorImpl(
                 String url, RequestMethod requestMethod, String componentName, int componentVersion,
-                String componentOperationName, ComponentConnection componentConnection,
+                String componentOperationName, @Nullable ComponentConnection componentConnection,
                 HttpClientExecutor httpClientExecutor, Context context) {
 
                 this.componentName = componentName;
@@ -609,7 +616,7 @@ class ContextImpl implements Context {
 
         private final org.slf4j.Logger logger;
 
-        public LogImpl(String componentName, String componentOperationName) {
+        public LogImpl(String componentName, @Nullable String componentOperationName) {
             logger = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }

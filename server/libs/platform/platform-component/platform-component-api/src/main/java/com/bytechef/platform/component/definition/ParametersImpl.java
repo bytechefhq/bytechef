@@ -40,8 +40,9 @@ public final class ParametersImpl implements Parameters {
 
     private final Map<String, Object> map;
 
+    @SuppressWarnings("unchecked")
     public ParametersImpl(Map<String, ?> map) {
-        this.map = Collections.unmodifiableMap(map);
+        this.map = map == null ? Collections.emptyMap() : (Map<String, Object>) Collections.unmodifiableMap(map);
     }
 
     @Override

@@ -105,7 +105,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, componentConnection);
             TriggerContext triggerContext = contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
 
             com.bytechef.component.definition.TriggerDefinition.PropertiesFunction propertiesFunction =
                 getComponentPropertiesFunction(
@@ -136,7 +136,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 .createParameters(componentConnection == null ? Map.of() : componentConnection.parameters()),
             ParametersFactory.createParameters(outputParameters),
             contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, null, null, false));
+                componentName, componentVersion, triggerName, null, null, null, null, null, false));
     }
 
     @Override
@@ -154,7 +154,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     componentConnection == null ? Map.of() : componentConnection.parameters()),
                 workflowExecutionId,
                 contextFactory.createTriggerContext(
-                    componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
+                    componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false));
         } catch (Exception e) {
             throw new ExecutionException(
                 e, inputParameters, TriggerDefinitionErrorType.LISTENER_DISABLE_FAILED);
@@ -180,7 +180,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                         new TriggerListenerEvent.ListenerParameters(
                             WorkflowExecutionId.parse(workflowExecutionId), Instant.now(), output))),
                 contextFactory.createTriggerContext(
-                    componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
+                    componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false));
         } catch (Exception e) {
             throw new ExecutionException(e, inputParameters,
                 TriggerDefinitionErrorType.LISTENER_ENABLE_FAILED);
@@ -194,7 +194,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
@@ -202,7 +202,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 componentName, componentVersion, triggerName, inputParameters,
                 propertyName, lookupDependsOnPaths, searchText, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, true));
     }
 
     @Override
@@ -211,24 +211,24 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, true);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
             (componentConnection1, triggerContext1) -> executeOutput(
                 componentName, componentVersion, triggerName, inputParameters, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, true));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, true));
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body) {
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, componentOperationName);
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, null, null, false);
+            componentName, componentVersion, componentOperationName, null, null, null, null, null, false);
 
         try {
             return triggerDefinition.getProcessErrorResponse()
@@ -244,10 +244,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, boolean editorEnvironment, ModeType type) {
+        ComponentConnection componentConnection, Long environmentId, ModeType type, boolean editorEnvironment) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection, type,
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
+            environmentId, type,
             editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
@@ -257,7 +258,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
                 componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1, type,
+                componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection1,
+                environmentId, type,
                 editorEnvironment));
     }
 
@@ -267,7 +269,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
         tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
@@ -279,7 +281,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 return null;
             },
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, false));
     }
 
     @Override
@@ -288,7 +290,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String workflowExecutionId, String webhookUrl, ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext,
@@ -297,7 +299,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 componentName, componentVersion, triggerName, inputParameters,
                 webhookUrl, workflowExecutionId, componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(componentName, componentVersion, triggerName,
-                null, null, componentConnection1, null, false));
+                null, null, componentConnection1, null, null, false));
     }
 
     @Override
@@ -306,14 +308,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         WebhookRequest webhookRequest, ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, false);
+            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, triggerContext, null,
             (componentConnection1, triggerContext1) -> executeWebhookValidate(
                 componentName, componentVersion, triggerName, inputParameters, webhookRequest, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection1, null, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection1, null, null, false));
     }
 
     @Override
@@ -327,7 +329,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return executeWebhookValidateOnEnable(
             triggerDefinition, ParametersFactory.createParameters(inputParameters), webhookRequest,
             contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection, null, false));
+                componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false));
     }
 
     @Override
@@ -341,7 +343,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return workflowNodeDescriptionFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
                 contextFactory.createTriggerContext(
-                    componentName, componentVersion, triggerName, null, null, null, null, true));
+                    componentName, componentVersion, triggerName, null, null, null, null, null, true));
         } catch (Exception e) {
             throw new ConfigurationException(
                 e, inputParameters, TriggerDefinitionErrorType.WORKFLOW_NODE_DESCRIPTION_FAILED);
