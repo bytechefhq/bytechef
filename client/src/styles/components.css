@@ -60,6 +60,7 @@
         --stroke-branch-primary: 239 84% 67%;
         --stroke-branch-secondary: 243 75% 59%;
         --stroke-branch-tertiary: 245 58% 51%;
+        --stroke-brand-focus: 217 61% 60%;
         --stroke-brand-primary: 217 91% 40%;
         --stroke-brand-primary-hover: 217 91% 36%;
         --stroke-brand-primary-active: 217 92% 28%;
@@ -198,6 +199,7 @@
         --stroke-branch-primary: 0 0% 100%;
         --stroke-branch-secondary: 0 0% 100%;
         --stroke-branch-tertiary: 0 0% 100%;
+        --stroke-brand-focus: 217 61% 60%;
         --stroke-brand-primary: 217 91% 40%;
         --stroke-brand-primary-hover: 217 92% 28%;
         --stroke-brand-primary-active: 217 91% 17%;
