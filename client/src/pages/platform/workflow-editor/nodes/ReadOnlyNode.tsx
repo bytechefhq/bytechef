@@ -10,7 +10,7 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => (
     <div className="relative flex cursor-grab items-center justify-center">
         <Button
             className={twMerge(
-                'size-18 focus-visible:ring-stroke-brand-focus cursor-grab rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none active:bg-surface-neutral-primary [&_svg]:size-9'
+                'size-18 cursor-grab rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9'
             )}
         >
             {data.icon}
