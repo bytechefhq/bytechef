@@ -30,9 +30,10 @@ public class PineconeConstants {
     public static final String HOST = "host";
     public static final String PINECONE = "pinecone";
 
+    private static final Pattern PATTERN = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
+
     public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
-        Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
-        Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(HOST));
+        Matcher matcher = PATTERN.matcher(connectionParameters.getRequiredString(HOST));
 
         if (matcher.find()) {
             return PineconeVectorStore.builder(embeddingModel)
