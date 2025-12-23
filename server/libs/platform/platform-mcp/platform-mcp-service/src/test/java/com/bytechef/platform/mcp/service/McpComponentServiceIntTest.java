@@ -22,7 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -68,7 +68,7 @@ public class McpComponentServiceIntTest {
     @BeforeEach
     public void beforeEach() {
         mcpServer = mcpServerRepository.save(
-            new McpServer("test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
     }
 
     @AfterEach
@@ -153,7 +153,7 @@ public class McpComponentServiceIntTest {
         component2 = mcpComponentRepository.save(component2);
 
         McpServer anotherServer = mcpServerRepository.save(
-            new McpServer("another-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("another-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         McpComponent anotherComponent = new McpComponent("another-component", 1, anotherServer.getId(), null);
 

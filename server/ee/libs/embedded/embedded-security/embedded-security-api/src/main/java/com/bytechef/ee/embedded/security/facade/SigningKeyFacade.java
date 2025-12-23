@@ -17,12 +17,12 @@
 package com.bytechef.ee.embedded.security.facade;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 
 /**
  * @author Ivica Cardic
  */
 public interface SigningKeyFacade {
 
-    String create(SigningKey signingKey, ModeType type);
+    String create(SigningKey signingKey, PlatformType type);
 }

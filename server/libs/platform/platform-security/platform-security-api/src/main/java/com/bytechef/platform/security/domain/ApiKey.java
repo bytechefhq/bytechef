@@ -17,7 +17,7 @@
 package com.bytechef.platform.security.domain;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import java.time.Instant;
 import java.util.Objects;
@@ -126,12 +126,12 @@ public class ApiKey {
         return secretKey;
     }
 
-    public ModeType getType() {
+    public PlatformType getType() {
         if (type == null) {
             return null;
         }
 
-        return ModeType.values()[type];
+        return PlatformType.values()[type];
     }
 
     public Environment getEnvironment() {
@@ -158,7 +158,7 @@ public class ApiKey {
         this.secretKey = secretKey;
     }
 
-    public void setType(ModeType type) {
+    public void setType(PlatformType type) {
         if (type != null) {
             this.type = type.ordinal();
         }

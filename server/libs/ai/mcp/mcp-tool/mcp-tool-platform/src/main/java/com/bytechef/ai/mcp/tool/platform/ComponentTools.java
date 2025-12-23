@@ -27,7 +27,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -544,7 +544,8 @@ public class ComponentTools {
                             } catch (Exception e) {
                                 try {
                                     List<Connection> connections =
-                                        connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
+                                        connectionService.getConnections(componentName, version,
+                                            PlatformType.AUTOMATION);
 
                                     Connection connection = connections.getFirst();
 

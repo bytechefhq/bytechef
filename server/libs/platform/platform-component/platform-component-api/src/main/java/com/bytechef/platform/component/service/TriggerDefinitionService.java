@@ -26,7 +26,7 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ModeType type,
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, PlatformType type,
         boolean editorEnvironment);
 
     void executeWebhookDisable(

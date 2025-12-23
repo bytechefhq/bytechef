@@ -22,7 +22,7 @@ import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -55,7 +55,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Nullable
     private final Long jobId;
     @Nullable
-    private final ModeType modeType;
+    private final PlatformType type;
     @Nullable
     private final String workflowId;
     @Nullable
@@ -68,7 +68,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         @Nullable ComponentConnection componentConnection, @Nullable String publicUrl, CacheManager cacheManager,
         ContextFactory contextFactory, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage, @Nullable Long environmentId,
-        @Nullable ModeType type, boolean editorEnvironment) {
+        @Nullable PlatformType type, boolean editorEnvironment) {
 
         super(
             componentName, componentVersion, actionName, componentConnection, editorEnvironment, httpClientExecutor,
@@ -88,7 +88,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.jobPrincipalId = jobPrincipalId;
         this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
         this.jobId = jobId;
-        this.modeType = type;
+        this.type = type;
         this.workflowId = workflowId;
         this.environmentId = environmentId;
     }
@@ -150,8 +150,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @Override
     @Nullable
-    public ModeType getModeType() {
-        return modeType;
+    public PlatformType getPlatformType() {
+        return type;
     }
 
     @Override
@@ -195,13 +195,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         @Nullable
         private final Long jobId;
         @Nullable
-        private final ModeType type;
+        private final PlatformType type;
 
         private DataImpl(
             DataStorage dataStorage, String componentName, Integer componentVersion, String actionName,
             @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
             @Nullable String workflowId, CacheManager cacheManager, @Nullable Long environmentId,
-            @Nullable ModeType type, boolean editorEnvironment) {
+            @Nullable PlatformType type, boolean editorEnvironment) {
 
             this.actionName = actionName;
             this.componentName = componentName;
@@ -331,7 +331,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
 
         @Nullable
-        public ModeType type() {
+        public PlatformType type() {
             return type;
         }
 

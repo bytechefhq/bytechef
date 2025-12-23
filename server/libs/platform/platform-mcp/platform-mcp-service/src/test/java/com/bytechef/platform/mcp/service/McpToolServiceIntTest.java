@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -68,7 +68,7 @@ public class McpToolServiceIntTest {
     @BeforeEach
     public void beforeEach() {
         McpServer mcpServer = mcpServerRepository.save(
-            new McpServer("test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         mcpComponent = mcpComponentRepository.save(new McpComponent("test-component", 1, mcpServer.getId(), null));
     }

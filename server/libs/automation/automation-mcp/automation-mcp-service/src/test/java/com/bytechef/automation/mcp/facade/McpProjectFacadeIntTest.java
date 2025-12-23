@@ -35,7 +35,7 @@ import com.bytechef.automation.mcp.repository.McpProjectWorkflowRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -89,7 +89,7 @@ public class McpProjectFacadeIntTest {
     @BeforeEach
     public void beforeEach() {
         mcpServer = mcpServerRepository.save(
-            new McpServer("test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         Category category = categoryRepository.save(new Category("test-category"));
         Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));

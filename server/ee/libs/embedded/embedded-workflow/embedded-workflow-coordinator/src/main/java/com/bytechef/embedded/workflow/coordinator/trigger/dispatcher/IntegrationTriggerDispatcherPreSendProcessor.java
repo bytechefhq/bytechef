@@ -13,7 +13,7 @@ import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProce
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -63,7 +63,7 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
         }
 
         int environmentId = (int) jobPrincipalAccessorRegistry
-            .getJobPrincipalAccessor(ModeType.EMBEDDED)
+            .getJobPrincipalAccessor(PlatformType.EMBEDDED)
             .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
         triggerExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
@@ -74,6 +74,6 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
     public boolean canProcess(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        return workflowExecutionId.getType() == ModeType.EMBEDDED;
+        return workflowExecutionId.getType() == PlatformType.EMBEDDED;
     }
 }

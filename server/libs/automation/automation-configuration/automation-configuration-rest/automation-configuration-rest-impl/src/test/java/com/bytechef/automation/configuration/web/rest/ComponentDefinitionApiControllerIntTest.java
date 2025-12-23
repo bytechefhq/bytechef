@@ -20,7 +20,7 @@ import com.bytechef.automation.configuration.web.rest.config.AutomationConfigura
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +60,8 @@ public class ComponentDefinitionApiControllerIntTest {
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionService.getComponentDefinitions(null, null, null, null, ModeType.AUTOMATION))
+        Mockito
+            .when(componentDefinitionService.getComponentDefinitions(null, null, null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(new ComponentDefinition("component1"), new ComponentDefinition("component2")));
 
         try {

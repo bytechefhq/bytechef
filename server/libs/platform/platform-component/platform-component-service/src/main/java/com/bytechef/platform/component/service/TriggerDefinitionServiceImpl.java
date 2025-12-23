@@ -59,7 +59,7 @@ import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.util.TokenRefreshHelper;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
@@ -244,7 +244,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, Long environmentId, ModeType type, boolean editorEnvironment) {
+        ComponentConnection componentConnection, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,

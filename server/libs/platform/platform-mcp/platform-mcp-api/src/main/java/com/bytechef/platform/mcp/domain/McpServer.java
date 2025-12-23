@@ -18,7 +18,7 @@ package com.bytechef.platform.mcp.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.tenant.domain.TenantKey;
 import java.time.Instant;
@@ -87,7 +87,7 @@ public final class McpServer {
     public McpServer() {
     }
 
-    public McpServer(String name, ModeType type, Environment environment) {
+    public McpServer(String name, PlatformType type, Environment environment) {
         this.enabled = true;
         this.environment = environment.ordinal();
         this.name = name;
@@ -95,7 +95,7 @@ public final class McpServer {
         this.type = type.ordinal();
     }
 
-    public McpServer(String name, ModeType type, Environment environment, boolean enabled) {
+    public McpServer(String name, PlatformType type, Environment environment, boolean enabled) {
         this.enabled = enabled;
         this.environment = environment.ordinal();
         this.name = name;
@@ -147,8 +147,8 @@ public final class McpServer {
         return name;
     }
 
-    public ModeType getType() {
-        return ModeType.values()[type];
+    public PlatformType getType() {
+        return PlatformType.values()[type];
     }
 
     public Environment getEnvironment() {
@@ -186,7 +186,7 @@ public final class McpServer {
         this.name = name;
     }
 
-    public void setType(ModeType type) {
+    public void setType(PlatformType type) {
         this.type = type.ordinal();
     }
 

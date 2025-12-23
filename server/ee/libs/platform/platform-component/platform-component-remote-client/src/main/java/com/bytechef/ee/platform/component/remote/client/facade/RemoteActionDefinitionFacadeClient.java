@@ -12,7 +12,7 @@ import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -79,7 +79,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     public Map<String, ?> executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, Long environmentId, ModeType type, boolean editorEnvironment) {
+        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -124,7 +124,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
     }

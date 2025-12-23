@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.accessor;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobPrincipalAccessorRegistry {
 
-    private final Map<ModeType, JobPrincipalAccessor> joPrincipalAccessorMap;
+    private final Map<PlatformType, JobPrincipalAccessor> joPrincipalAccessorMap;
 
     public JobPrincipalAccessorRegistry(List<JobPrincipalAccessor> jobPrincipalAccessors) {
         this.joPrincipalAccessorMap = jobPrincipalAccessors.stream()
@@ -37,7 +37,7 @@ public class JobPrincipalAccessorRegistry {
                 Collectors.toMap(JobPrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public JobPrincipalAccessor getJobPrincipalAccessor(ModeType type) {
+    public JobPrincipalAccessor getJobPrincipalAccessor(PlatformType type) {
         return Validate.notNull(joPrincipalAccessorMap.get(type), "joPrincipalAccessor");
     }
 }

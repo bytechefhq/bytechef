@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.file.storage.service;
 
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.File;
@@ -58,17 +58,18 @@ public class FileDataStorageServiceTest {
     @Test
     public void testDelete() {
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
         String value1 = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1);
 
-        FILE_DATA_STORAGE_SERVICE.delete("test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+        FILE_DATA_STORAGE_SERVICE.delete("test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0,
+            PlatformType.AUTOMATION);
 
         Optional<String> value1Optional = FILE_DATA_STORAGE_SERVICE.fetch(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Optional.empty(), value1Optional);
     }
@@ -76,10 +77,10 @@ public class FileDataStorageServiceTest {
     @Test
     public void testFetch() {
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
         Optional<String> value1Optional = FILE_DATA_STORAGE_SERVICE.fetch(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1Optional.get());
     }
@@ -87,10 +88,10 @@ public class FileDataStorageServiceTest {
     @Test
     public void testGet() {
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
         String value1 = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1);
     }
@@ -98,12 +99,12 @@ public class FileDataStorageServiceTest {
     @Test
     public void testGetAll() {
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key2", "value2", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key2", "value2", 0, PlatformType.AUTOMATION);
 
         Map<String, String> values = FILE_DATA_STORAGE_SERVICE.getAll(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(values.size(), 2);
         Assertions.assertEquals("value1", values.get("key1"));
@@ -113,50 +114,51 @@ public class FileDataStorageServiceTest {
     @Test
     public void testPut() {
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
         Object value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value);
 
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value2", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value2", 0, PlatformType.AUTOMATION);
 
         value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value2", value);
 
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 34, 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 34, 0, PlatformType.AUTOMATION);
 
         value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(34, value);
 
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 44L, 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 44L, 0, PlatformType.AUTOMATION);
 
         value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(44L, value);
 
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", "value1"), 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", "value1"), 0,
+            PlatformType.AUTOMATION);
 
         value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("key1", "value1"), value);
 
         FILE_DATA_STORAGE_SERVICE.put(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", 23), 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", 23), 0, PlatformType.AUTOMATION);
 
         value = FILE_DATA_STORAGE_SERVICE.get(
-            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, ModeType.AUTOMATION);
+            "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("key1", 23), value);
     }

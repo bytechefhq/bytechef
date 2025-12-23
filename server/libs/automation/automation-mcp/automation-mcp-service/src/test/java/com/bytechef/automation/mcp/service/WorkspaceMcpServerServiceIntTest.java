@@ -27,7 +27,7 @@ import com.bytechef.automation.mcp.config.McpProjectIntTestConfigurationSharedMo
 import com.bytechef.automation.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -80,8 +80,10 @@ public class WorkspaceMcpServerServiceIntTest {
 
         // Create test data
         testWorkspaceId = Workspace.DEFAULT_WORKSPACE_ID;
-        testMcpServer1 = mcpServerService.create("Test Server 1", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
-        testMcpServer2 = mcpServerService.create("Test Server 2", ModeType.AUTOMATION, Environment.DEVELOPMENT, true);
+        testMcpServer1 =
+            mcpServerService.create("Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+        testMcpServer2 =
+            mcpServerService.create("Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
     }
 
     @AfterEach

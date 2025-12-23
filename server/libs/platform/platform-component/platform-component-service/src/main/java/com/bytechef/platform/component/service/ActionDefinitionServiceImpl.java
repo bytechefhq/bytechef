@@ -50,7 +50,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.util.TokenRefreshHelper;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
@@ -167,7 +167,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
-        boolean editorEnvironment, ModeType type) {
+        boolean editorEnvironment, PlatformType type) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName);
@@ -225,7 +225,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
                 actionContextAware.getWorkflowId(), componentConnection1, environmentId,
-                actionContextAware.getModeType(), actionContextAware.isEditorEnvironment()));
+                actionContextAware.getPlatformType(), actionContextAware.isEditorEnvironment()));
     }
 
     @Override

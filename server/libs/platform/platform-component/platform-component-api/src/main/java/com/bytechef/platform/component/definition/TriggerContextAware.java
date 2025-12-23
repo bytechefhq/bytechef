@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import org.springframework.lang.Nullable;
 
 /**
@@ -30,7 +30,7 @@ public interface TriggerContextAware extends TriggerContext {
 
     String getTriggerName();
 
-    ModeType getType();
+    PlatformType getType();
 
     String getWorkflowUuid();
 }

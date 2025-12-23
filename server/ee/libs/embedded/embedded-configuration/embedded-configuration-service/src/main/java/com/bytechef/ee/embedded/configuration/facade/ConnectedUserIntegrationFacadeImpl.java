@@ -31,7 +31,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -103,7 +103,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         Connection connection = connectionService.create(
             integrationInstanceConfiguration.getAuthorizationType(), integration.getComponentName(),
             connectionDefinition.getVersion(), environment.ordinal(),
-            integrationInstanceConfiguration.getName(), connectionParameters, ModeType.EMBEDDED);
+            integrationInstanceConfiguration.getName(), connectionParameters, PlatformType.EMBEDDED);
 
         return integrationInstanceService.create(
             connectedUser.getId(), connection.getId(), integrationInstanceConfiguration.getId());

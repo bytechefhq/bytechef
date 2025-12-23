@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.connection.remote.client.fasade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
-    public long create(ConnectionDTO connectionDTO, ModeType type) {
+    public long create(ConnectionDTO connectionDTO, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
@@ -38,20 +38,20 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
-    public List<ConnectionDTO> getConnections(List<Long> connectionIds, ModeType type) {
+    public List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<ConnectionDTO> getConnections(
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
-        ModeType type) {
+        PlatformType type) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Tag> getConnectionTags(ModeType type) {
+    public List<Tag> getConnectionTags(PlatformType type) {
         throw new UnsupportedOperationException();
     }
 

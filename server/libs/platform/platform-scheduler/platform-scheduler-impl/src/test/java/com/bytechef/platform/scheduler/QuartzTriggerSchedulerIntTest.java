@@ -17,7 +17,7 @@
 package com.bytechef.platform.scheduler;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -73,7 +73,7 @@ public class QuartzTriggerSchedulerIntTest {
         // Given
         String taskExecutionId = "test-task-123";
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 456L, "test-workflow-456", "testTrigger");
+            PlatformType.AUTOMATION, 456L, "test-workflow-456", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 100L);
         Instant executeAt = LocalDateTime.now()
             .plus(Duration.ofMillis(100))
@@ -107,7 +107,7 @@ public class QuartzTriggerSchedulerIntTest {
         // Given
         String taskExecutionId = "test-task-delay-789";
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 101L, "test-workflow-delay-101", "testTrigger");
+            PlatformType.AUTOMATION, 101L, "test-workflow-delay-101", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 200L);
         Instant executeAt = LocalDateTime.now()
             .plus(Duration.ofMillis(200))
@@ -136,7 +136,7 @@ public class QuartzTriggerSchedulerIntTest {
         // Given
         String taskExecutionId = "test-task-job-exists";
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 1L, "test-workflow-job-exists", "testTrigger");
+            PlatformType.AUTOMATION, 1L, "test-workflow-job-exists", "testTrigger");
         Map<String, Object> output = Map.of("delayMillis", 100L);
         Instant executeAt = LocalDateTime.now()
             .plus(Duration.ofMillis(100))
@@ -169,7 +169,7 @@ public class QuartzTriggerSchedulerIntTest {
     public void testScheduleDynamicWebhookTriggerRefresh() throws Exception {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 123L, "test-webhook-workflow", "testTrigger");
+            PlatformType.AUTOMATION, 123L, "test-webhook-workflow", "testTrigger");
         Instant webhookExpirationDate = LocalDateTime.now()
             .plus(Duration.ofSeconds(2))
             .toInstant(ZoneOffset.UTC);
@@ -212,7 +212,7 @@ public class QuartzTriggerSchedulerIntTest {
     public void testScheduleScheduleTrigger() throws Exception {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 789L, "test-schedule-workflow", "testTrigger");
+            PlatformType.AUTOMATION, 789L, "test-schedule-workflow", "testTrigger");
         String cronPattern = "0/5 * * * * ?"; // Every 5 seconds
         String zoneId = ZoneId.systemDefault()
             .getId();
@@ -251,7 +251,7 @@ public class QuartzTriggerSchedulerIntTest {
     public void testCancelDynamicWebhookTriggerRefresh() throws Exception {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 111L, "test-cancel-webhook", "testTrigger");
+            PlatformType.AUTOMATION, 111L, "test-cancel-webhook", "testTrigger");
         Instant webhookExpirationDate = LocalDateTime.now()
             .plus(Duration.ofMinutes(5))
             .toInstant(ZoneOffset.UTC);
@@ -284,7 +284,7 @@ public class QuartzTriggerSchedulerIntTest {
     public void testCancelScheduleTrigger() throws Exception {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 222L, "test-cancel-schedule", "testTrigger");
+            PlatformType.AUTOMATION, 222L, "test-cancel-schedule", "testTrigger");
         String cronPattern = "0 0 12 * * ?"; // Daily at noon
         Map<String, Object> output = Map.of("test", "data");
 

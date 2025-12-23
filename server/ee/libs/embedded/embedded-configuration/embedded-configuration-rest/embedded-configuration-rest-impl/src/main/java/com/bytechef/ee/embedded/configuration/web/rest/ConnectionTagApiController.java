@@ -12,7 +12,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -44,7 +44,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(ModeType.EMBEDDED)
+            connectionFacade.getConnectionTags(PlatformType.EMBEDDED)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());

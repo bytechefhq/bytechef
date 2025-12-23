@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.data.storage.jdbc.service;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.DataEntry;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
@@ -42,7 +42,8 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     public void delete(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
 
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
@@ -55,7 +56,8 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
 
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
@@ -67,7 +69,8 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
 
         return (T) fetch(componentName, scope, scopeId, key, environmentId, type)
             .orElseThrow();
@@ -77,7 +80,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
 
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndEnvironmentAndType(
@@ -89,7 +92,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     public void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type,
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
         Object value) {
 
         dataStorageRepository

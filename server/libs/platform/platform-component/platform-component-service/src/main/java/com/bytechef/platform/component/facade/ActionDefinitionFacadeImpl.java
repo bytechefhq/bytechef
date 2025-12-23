@@ -22,7 +22,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -85,7 +85,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, Long environmentId, ModeType type, boolean editorEnvironment) {
+        Map<String, ?> extensions, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         return actionDefinitionService.executePerform(
             componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,

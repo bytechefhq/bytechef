@@ -18,7 +18,7 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
@@ -47,5 +47,5 @@ public interface ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
         @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
         Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
-        @Nullable Long environmentId, @Nullable ModeType type, boolean editorEnvironment);
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment);
 }

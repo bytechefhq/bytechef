@@ -17,7 +17,7 @@
 package com.bytechef.ee.embedded.security.service;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.security.PublicKey;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public interface SigningKeyService {
 
     SigningKey getSigningKey(long id);
 
-    List<SigningKey> getSigningKeys(ModeType type, long environmentId);
+    List<SigningKey> getSigningKeys(PlatformType type, long environmentId);
 
     SigningKey update(SigningKey signingKey);
 }

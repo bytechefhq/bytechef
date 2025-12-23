@@ -17,7 +17,7 @@
 package com.bytechef.ee.embedded.security.domain;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import java.time.Instant;
 import java.util.Objects;
@@ -133,8 +133,8 @@ public class SigningKey {
         return publicKey;
     }
 
-    public ModeType getType() {
-        return ModeType.values()[type];
+    public PlatformType getType() {
+        return PlatformType.values()[type];
     }
 
     public Environment getEnvironment() {
@@ -169,7 +169,7 @@ public class SigningKey {
         this.publicKey = publicKey;
     }
 
-    public void setType(ModeType type) {
+    public void setType(PlatformType type) {
         this.type = type.ordinal();
     }
 

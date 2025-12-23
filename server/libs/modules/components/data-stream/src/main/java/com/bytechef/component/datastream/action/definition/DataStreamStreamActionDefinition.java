@@ -135,10 +135,10 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                         MetadataConstants.EDITOR_ENVIRONMENT,
                         new JobParameter<>(actionContextAware.isEditorEnvironment(), Boolean.class));
 
-                    if (actionContextAware.getModeType() != null) {
+                    if (actionContextAware.getPlatformType() != null) {
                         put(
                             MODE_TYPE,
-                            new JobParameter<>(String.valueOf(actionContextAware.getModeType()), String.class));
+                            new JobParameter<>(String.valueOf(actionContextAware.getPlatformType()), String.class));
                     }
                 }
             });

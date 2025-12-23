@@ -51,7 +51,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
@@ -217,7 +217,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         return principalJobFacade.createJob(
             new JobParametersDTO(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id,
-            ModeType.EMBEDDED);
+            PlatformType.EMBEDDED);
     }
 
     @Override
@@ -232,12 +232,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(id);
 
-        List<Long> jobIds = principalJobService.getJobIds(id, ModeType.EMBEDDED);
+        List<Long> jobIds = principalJobService.getJobIds(id, PlatformType.EMBEDDED);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            principalJobService.deletePrincipalJobs(jobId, ModeType.EMBEDDED);
+            principalJobService.deletePrincipalJobs(jobId, PlatformType.EMBEDDED);
 
             jobFacade.deleteJob(jobId);
         }

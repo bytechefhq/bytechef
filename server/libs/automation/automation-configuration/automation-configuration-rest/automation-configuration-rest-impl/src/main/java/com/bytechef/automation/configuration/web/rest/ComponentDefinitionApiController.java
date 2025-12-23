@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +51,7 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
         return ResponseEntity.ok(
             componentDefinitionService
                 .getComponentDefinitions(
-                    actionDefinitions, connectionDefinitions, triggerDefinitions, include, ModeType.AUTOMATION)
+                    actionDefinitions, connectionDefinitions, triggerDefinitions, include, PlatformType.AUTOMATION)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

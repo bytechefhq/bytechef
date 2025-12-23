@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -64,7 +64,7 @@ public class ContextFactoryImpl implements ContextFactory {
     public ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,
         @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId, @Nullable String workflowId,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable ModeType type,
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, @Nullable PlatformType type,
         boolean editorEnvironment) {
 
         return new ActionContextImpl(
@@ -95,7 +95,7 @@ public class ContextFactoryImpl implements ContextFactory {
     public TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
-        @Nullable ModeType type, boolean editorEnvironment) {
+        @Nullable PlatformType type, boolean editorEnvironment) {
 
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,

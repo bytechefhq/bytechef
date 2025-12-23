@@ -26,7 +26,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
@@ -184,7 +184,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, "trigger_1");
+                PlatformType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, "trigger_1");
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });

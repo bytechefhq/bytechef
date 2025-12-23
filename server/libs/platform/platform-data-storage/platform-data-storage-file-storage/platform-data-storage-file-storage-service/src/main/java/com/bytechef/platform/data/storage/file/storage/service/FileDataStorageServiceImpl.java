@@ -18,7 +18,7 @@ package com.bytechef.platform.data.storage.file.storage.service;
 
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,7 +43,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     @Override
     public void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-        ModeType type) {
+        PlatformType type) {
         String directoryPath = getDirectoryPath(type, environmentId);
 
         fileStorageService.deleteFile(
@@ -54,7 +54,8 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
 
         String directoryPath = getDirectoryPath(type, environmentId);
 
@@ -73,7 +74,8 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     @Override
     public <T> T get(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
         Optional<T> optional = fetch(componentName, scope, scopeId, key, environmentId, type);
 
         return optional.orElseThrow(() -> new IllegalArgumentException(
@@ -86,7 +88,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     @Override
     public <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId, long environmentId, ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
         return fileStorageService.getFileEntries(getDirectoryPath(type, environmentId))
             .stream()
             .collect(
@@ -99,7 +101,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     @Override
     public void put(
         String componentName, DataStorageScope scope, String scopeId, String key, Object value, long environmentId,
-        ModeType type) {
+        PlatformType type) {
 
         ValueWrapper valueWrapper = new ValueWrapper(value);
 
@@ -108,7 +110,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
             CompressionUtils.compress(valueWrapper.write()), false);
     }
 
-    private static String getDirectoryPath(ModeType type, long environmentId) {
+    private static String getDirectoryPath(PlatformType type, long environmentId) {
         return DATA_ENTRIES_ROOT_DIR + type.ordinal() + "/" + environmentId;
     }
 

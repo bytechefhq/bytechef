@@ -13,7 +13,7 @@ import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions,
-        Boolean triggerDefinitions, List<String> include, ModeType modeType) {
+        Boolean triggerDefinitions, List<String> include, PlatformType platformType) {
 
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),

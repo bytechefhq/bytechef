@@ -47,7 +47,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -148,7 +148,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = connectionService.getConnections(ModeType.EMBEDDED);
+        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
         Map<String, ?> workflowMap = JsonUtils.readMap(definition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -456,7 +456,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
         return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
+            principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION), this::getJobEndDate,
+            null);
     }
 
     private Instant getWorkflowLastExecutionDate(String workflowId) {

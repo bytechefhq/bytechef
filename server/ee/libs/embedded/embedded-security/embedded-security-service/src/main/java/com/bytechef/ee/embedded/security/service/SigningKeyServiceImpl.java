@@ -18,7 +18,7 @@ package com.bytechef.ee.embedded.security.service;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.repository.SigningKeyRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyFactory;
@@ -109,7 +109,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SigningKey> getSigningKeys(ModeType type, long environmentId) {
+    public List<SigningKey> getSigningKeys(PlatformType type, long environmentId) {
         return signingKeyRepository.findAllByTypeAndEnvironment(type.ordinal(), (int) environmentId);
     }
 

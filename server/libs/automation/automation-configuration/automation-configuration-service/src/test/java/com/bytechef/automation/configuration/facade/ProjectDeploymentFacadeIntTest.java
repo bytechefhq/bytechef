@@ -38,7 +38,7 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -267,7 +267,7 @@ public class ProjectDeploymentFacadeIntTest {
 
         when(
             principalJobService.getJobIds(
-                eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(deploymentId)), eq(ModeType.AUTOMATION),
+                eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(deploymentId)), eq(PlatformType.AUTOMATION),
                 eq(List.of(workflowId)), eq(0)))
                     .thenReturn(new PageImpl<>(runningJobIds, PageRequest.of(0, 20), runningJobIds.size()));
 

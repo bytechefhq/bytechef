@@ -10,7 +10,7 @@ package com.bytechef.runtime.job.platform.connection.service;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(
         AuthorizationType authorizationType, String componentName, int connectionVersion, int environmentId,
-        String name, Map<String, Object> parameters, ModeType type) {
+        String name, Map<String, Object> parameters, PlatformType type) {
 
         throw new UnsupportedOperationException();
     }
@@ -53,18 +53,18 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(ModeType type) {
+    public List<Connection> getConnections(PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version, ModeType type) {
+    public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Long environmentId, ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Long environmentId, PlatformType type) {
 
         throw new UnsupportedOperationException();
     }

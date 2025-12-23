@@ -16,7 +16,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -72,7 +72,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
-        boolean editorEnvironment, ModeType type) {
+        boolean editorEnvironment, PlatformType type) {
 
         throw new UnsupportedOperationException();
     }

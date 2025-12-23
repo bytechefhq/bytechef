@@ -17,7 +17,7 @@
 package com.bytechef.platform.mcp.service;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.Comparator;
@@ -63,7 +63,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    public McpServer create(String name, ModeType type, Environment environment, Boolean enabled) {
+    public McpServer create(String name, PlatformType type, Environment environment, Boolean enabled) {
         McpServer mcpServer;
 
         if (enabled != null) {
@@ -77,13 +77,13 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers(ModeType type) {
+    public List<McpServer> getMcpServers(PlatformType type) {
         return getMcpServers(type, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<McpServer> getMcpServers(ModeType type, McpServerOrderBy orderBy) {
+    public List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy) {
         List<McpServer> servers = mcpServerRepository.findAll()
             .stream()
             .filter(server -> server.getType() == type)

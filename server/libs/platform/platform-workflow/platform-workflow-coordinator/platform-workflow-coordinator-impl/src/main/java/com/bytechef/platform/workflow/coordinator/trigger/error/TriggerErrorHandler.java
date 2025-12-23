@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -82,7 +82,7 @@ public class TriggerErrorHandler {
     }
 
     private long createFailedJob(
-        String workflowId, Map<String, ?> inputMap, long jobPrincipalId, Map<String, ?> metadataMap, ModeType type,
+        String workflowId, Map<String, ?> inputMap, long jobPrincipalId, Map<String, ?> metadataMap, PlatformType type,
         Instant startDate, Instant endDate) {
 
         Job job = principalJobFacade.createSyncJob(

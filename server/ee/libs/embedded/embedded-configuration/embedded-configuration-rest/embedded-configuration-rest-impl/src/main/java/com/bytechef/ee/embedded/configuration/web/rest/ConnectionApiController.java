@@ -16,7 +16,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionReq
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -57,7 +57,7 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             connectionFacade.create(
-                conversionService.convert(connectionModel, ConnectionDTO.class), ModeType.EMBEDDED));
+                conversionService.convert(connectionModel, ConnectionDTO.class), PlatformType.EMBEDDED));
     }
 
     @Override
@@ -100,7 +100,8 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectionFacade
-                .getConnections(componentName, connectionVersion, List.of(), tagId, environmentId, ModeType.EMBEDDED)
+                .getConnections(componentName, connectionVersion, List.of(), tagId, environmentId,
+                    PlatformType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

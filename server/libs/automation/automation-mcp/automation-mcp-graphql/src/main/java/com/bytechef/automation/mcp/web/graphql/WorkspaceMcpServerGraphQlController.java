@@ -19,7 +19,7 @@ package com.bytechef.automation.mcp.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -67,6 +67,6 @@ public class WorkspaceMcpServerGraphQlController {
     }
 
     public record CreateWorkspaceMcpServerInput(
-        String name, ModeType type, long environmentId, Boolean enabled, Long workspaceId) {
+        String name, PlatformType type, long environmentId, Boolean enabled, Long workspaceId) {
     }
 }

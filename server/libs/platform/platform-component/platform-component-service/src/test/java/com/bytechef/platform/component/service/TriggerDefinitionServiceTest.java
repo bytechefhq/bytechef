@@ -34,7 +34,7 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.util.TokenRefreshHelper;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -109,8 +109,8 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher, tokenRefreshHelper);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null,
-            ModeType.AUTOMATION, false);
+            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            PlatformType.AUTOMATION, false);
 
         assertNotNull(output, "TriggerOutput should not be null");
         assertNotNull(output.value(), "Output should not be null");
@@ -147,8 +147,8 @@ public class TriggerDefinitionServiceTest {
 
         ProviderException thrownException = assertThrows(ProviderException.class, () -> {
             triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null,
-                ModeType.AUTOMATION, false);
+                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+                PlatformType.AUTOMATION, false);
         });
 
         assertSame(

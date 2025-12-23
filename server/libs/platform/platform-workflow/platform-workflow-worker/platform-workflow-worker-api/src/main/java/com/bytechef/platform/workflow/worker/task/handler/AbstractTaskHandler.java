@@ -23,7 +23,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -64,7 +64,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
-                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, ModeType.class),
+                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
                 MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);

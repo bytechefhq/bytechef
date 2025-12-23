@@ -21,7 +21,7 @@ import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -75,12 +75,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
-        ModeType modeType) {
+        PlatformType platformType) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(modeType))
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
 
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
