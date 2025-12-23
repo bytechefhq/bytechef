@@ -156,7 +156,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -277,7 +277,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -329,7 +329,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -395,7 +395,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -440,7 +440,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -487,7 +487,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1088,7 +1088,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1144,7 +1144,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1207,7 +1207,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1277,7 +1277,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1345,7 +1345,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1520,7 +1520,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1596,7 +1596,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1659,7 +1659,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1720,7 +1720,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1775,7 +1775,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -1982,7 +1982,7 @@ public class WorkflowNodeParameterFacadeTest {
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -2051,7 +2051,7 @@ public class WorkflowNodeParameterFacadeTest {
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -2224,7 +2224,7 @@ public class WorkflowNodeParameterFacadeTest {
         try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -2289,7 +2289,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);
@@ -2377,7 +2377,7 @@ public class WorkflowNodeParameterFacadeTest {
 
             mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
                 .thenReturn(definitionMap);
-            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any(), any(Boolean.class)))
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
                 .thenReturn("{}");
 
             Workflow workflow = mock(Workflow.class);

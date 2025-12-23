@@ -16,7 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -336,49 +335,12 @@ public class JsonUtils {
         }
     }
 
-    public static String write(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = objectMapper;
-
-        if (includeNulls) {
-            currentObjectMapper = currentObjectMapper.copy()
-                .setSerializationInclusion(JsonInclude.Include.ALWAYS);
-        } else {
-            currentObjectMapper = currentObjectMapper.copy()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        }
-
-        try {
-            return currentObjectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static String writeWithDefaultPrettyPrinter(Object object) {
         try {
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
                 .withObjectIndenter(new DefaultIndenter("    ", "\n"));
 
             return objectMapper.writer(printer)
-                .writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String writeWithDefaultPrettyPrinter(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = objectMapper;
-
-        if (includeNulls) {
-            currentObjectMapper = currentObjectMapper.copy()
-                .setSerializationInclusion(JsonInclude.Include.ALWAYS);
-        }
-
-        try {
-            DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
-                .withObjectIndenter(new DefaultIndenter("    ", "\n"));
-
-            return currentObjectMapper.writer(printer)
                 .writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);

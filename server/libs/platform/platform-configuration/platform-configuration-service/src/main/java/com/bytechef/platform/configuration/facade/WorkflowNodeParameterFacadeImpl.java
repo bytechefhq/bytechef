@@ -143,7 +143,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -187,7 +187,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         setDynamicPropertyTypeItem(parameterPath, null, metadataMap);
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -297,7 +297,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -343,7 +343,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
