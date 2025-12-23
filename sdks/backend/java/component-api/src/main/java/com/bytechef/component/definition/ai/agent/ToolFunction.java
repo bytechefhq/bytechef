@@ -16,12 +16,22 @@
 
 package com.bytechef.component.definition.ai.agent;
 
-import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.ClusterElementContext;
+import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
  */
-public interface ToolFunction {
+@FunctionalInterface
+public interface ToolFunction extends BaseToolFunction {
 
-    ClusterElementType TOOLS = new ClusterElementType("TOOLS", "tools", "Tools", true, false);
+    /**
+     *
+     * @param inputParameters
+     * @param connectionParameters
+     * @param context
+     * @return
+     */
+    Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
+        throws Exception;
 }

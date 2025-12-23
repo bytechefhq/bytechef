@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition.ai.agent;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @FunctionalInterface
-public interface MultipleConnectionsToolFunction extends ToolFunction {
+public interface MultipleConnectionsToolFunction extends BaseToolFunction {
 
     /**
      * @param inputParameters

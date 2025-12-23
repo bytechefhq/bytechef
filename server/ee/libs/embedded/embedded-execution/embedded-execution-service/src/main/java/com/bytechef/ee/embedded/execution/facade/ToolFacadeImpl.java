@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -74,7 +74,7 @@ public class ToolFacadeImpl implements ToolFacade {
 
     @Override
     public List<ToolDTO> getTools() {
-        return clusterElementDefinitionService.getClusterElementDefinitions(ToolFunction.TOOLS)
+        return clusterElementDefinitionService.getClusterElementDefinitions(BaseToolFunction.TOOLS)
             .stream()
             .map(clusterElementDefinition -> new ToolDTO(
                 getToolName(
@@ -111,7 +111,7 @@ public class ToolFacadeImpl implements ToolFacade {
             .filter(componentDefinition -> filterByCategoryNames(categoryNames, componentDefinition))
             .flatMap(componentDefinition -> CollectionUtils.stream(
                 clusterElementDefinitionService.getClusterElementDefinitions(
-                    componentDefinition.getName(), componentDefinition.getVersion(), ToolFunction.TOOLS)))
+                    componentDefinition.getName(), componentDefinition.getVersion(), BaseToolFunction.TOOLS)))
             .filter(clusterElementDefinition -> filterByClusterElementNames(
                 clusterElementNames, clusterElementDefinition))
             .collect(

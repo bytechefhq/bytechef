@@ -16,7 +16,7 @@
 
 package com.bytechef.component.definition;
 
-import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -24,7 +24,7 @@ import com.bytechef.component.definition.OptionsDataSource.BaseOptionsFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
-import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
+import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
@@ -241,7 +241,7 @@ public final class ComponentDsl {
         return new ModifiableTimeProperty(name);
     }
 
-    public static ModifiableClusterElementDefinition<SingleConnectionToolFunction> tool(
+    public static ModifiableClusterElementDefinition<ToolFunction> tool(
         ActionDefinition actionDefinition) {
 
         Optional<String> title = actionDefinition.getTitle();
@@ -252,7 +252,7 @@ public final class ComponentDsl {
             .map(f -> (PerformFunction) f)
             .orElse((inputParameters, connectionParameters, context) -> null);
 
-        return ComponentDsl.<SingleConnectionToolFunction>clusterElement(actionDefinition.getName())
+        return ComponentDsl.<ToolFunction>clusterElement(actionDefinition.getName())
             .title(title.orElse(null))
             .description(description.orElse(null))
             .type(TOOLS)
