@@ -118,8 +118,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(1111L);
+        taskExecution.setJobId(1111L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
@@ -148,8 +148,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(2222L);
+        taskExecution.setJobId(2222L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
@@ -200,8 +200,8 @@ public class TaskWorkerTest {
                                 PARAMETERS, Map.of("value", "done"))))))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(3333L);
+        taskExecution.setJobId(3333L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
@@ -262,8 +262,8 @@ public class TaskWorkerTest {
                                 PARAMETERS, Map.of("path", tempDir))))))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(4444L);
+        taskExecution.setJobId(4444L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
@@ -326,8 +326,8 @@ public class TaskWorkerTest {
                                 PARAMETERS, Map.of("path", tempDir))))))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(5555L);
+        taskExecution.setJobId(5555L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
@@ -357,8 +357,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution.setId(1234L);
-        taskExecution.setJobId(4567L);
+        taskExecution.setId(6666L);
+        taskExecution.setJobId(6666L);
 
         // execute the task
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
@@ -403,8 +403,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution1.setId(1111L);
-        taskExecution1.setJobId(2222L);
+        taskExecution1.setId(7777L);
+        taskExecution1.setJobId(7777L);
 
         // execute the task
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
@@ -413,8 +413,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution2.setId(3333L);
-        taskExecution2.setJobId(4444L);
+        taskExecution2.setId(77777L);
+        taskExecution2.setJobId(77777L);
 
         // execute the task
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
@@ -459,8 +459,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution1.setId(1111L);
-        taskExecution1.setJobId(2222L);
+        taskExecution1.setId(8888L);
+        taskExecution1.setJobId(8888L);
 
         // execute the task
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
@@ -469,8 +469,8 @@ public class TaskWorkerTest {
             .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
-        taskExecution2.setId(3333L);
-        taskExecution2.setJobId(2222L);
+        taskExecution2.setId(88888L);
+        taskExecution2.setJobId(8888L);
         taskExecution2.setParentId(taskExecution1.getId());
 
         // execute the task
