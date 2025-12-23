@@ -1,6 +1,6 @@
-import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
+import { AlbumIcon, Heart, LayoutTemplate } from 'lucide-react';
 import Image from 'next/image';
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import type { BaseLayoutProps, LinkItemType } from 'fumadocs-ui/layouts/shared';
 import { LogoIcon } from '@/app/layout.client';
 import Logo from '@/public/logo.svg';
 
@@ -24,27 +24,23 @@ export const logo = (
       alt="ByteChef"
       src={Logo}
       sizes="100px"
-      className="hidden w-20 md:w-24 [.uwu_&]:block"
+      className="hidden w-22 in-[.uwu]:block"
       aria-label="ByteChef"
     />
 
-    <LogoIcon className="size-5 [.uwu_&]:hidden" />
+    <LogoIcon className="size-5 in-[.uwu]:hidden" />
   </>
 );
 
 export function baseOptions(): BaseLayoutProps {
   return {
-    githubUrl: 'https://github.com/bytechefhq/bytechef',
     nav: {
       title: (
         <>
           {logo}
-          <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
-            ByteChef
-          </span>
+          <span className="font-medium in-[.uwu]:hidden">ByteChef</span>
         </>
       ),
-      transparentMode: 'top',
     },
   };
 }

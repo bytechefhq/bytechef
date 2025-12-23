@@ -1,6 +1,5 @@
 'use client';
 
-import { OramaClient } from '@oramacloud/client';
 import {
   SearchDialog,
   SearchDialogClose,
@@ -27,11 +26,7 @@ import { cn } from '@/lib/cn';
 import { useTreeContext } from 'fumadocs-ui/contexts/tree';
 import type { Item, Node } from 'fumadocs-core/page-tree';
 import { useRouter } from 'next/navigation';
-
-const client = new OramaClient({
-  endpoint: 'https://cloud.orama.run/v1/indexes/docs-fk97oe',
-  api_key: '',
-});
+import { orama } from '@/lib/orama/client';
 
 const items = [
   {
@@ -39,6 +34,26 @@ const items = [
     description: '',
     value: undefined,
   },
+  // {
+  //   name: 'Framework',
+  //   description: 'Only results about Fumadocs UI & guides',
+  //   value: 'ui',
+  // },
+  // {
+  //   name: 'Core',
+  //   description: 'Only results about headless features',
+  //   value: 'headless',
+  // },
+  // {
+  //   name: 'MDX',
+  //   description: 'Only results about Fumadocs MDX',
+  //   value: 'mdx',
+  // },
+  // {
+  //   name: 'CLI',
+  //   description: 'Only results about Fumadocs CLI',
+  //   value: 'cli',
+  // },
 ];
 
 export default function CustomSearchDialog(props: SharedProps) {
@@ -46,7 +61,7 @@ export default function CustomSearchDialog(props: SharedProps) {
   const [tag, setTag] = useState<string | undefined>();
   const { search, setSearch, query } = useDocsSearch({
     type: 'orama-cloud',
-    client,
+    client: orama,
     tag,
   });
   const { full } = useTreeContext();

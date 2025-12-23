@@ -2,7 +2,7 @@
 
 import { RootProvider } from 'fumadocs-ui/provider/base';
 import dynamic from 'next/dynamic';
-import {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import {PostHogProvider} from "@/lib/posthog";
 
@@ -28,19 +28,19 @@ if (item === 'true') {
 export function Provider({ children }: { children: ReactNode }) {
   return (
     <PostHogProvider>
-        <RootProvider
-          // search={{
-          //   SearchDialog,
-          // }}
-        >
-          <TooltipProvider>
-            <script
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: inject }}
-            />
-            {children}
-          </TooltipProvider>
-        </RootProvider>
+      <RootProvider
+        // search={{
+        //   SearchDialog,
+        // }}
+      >
+        <TooltipProvider>
+          <script
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: inject }}
+          />
+          {children}
+        </TooltipProvider>
+      </RootProvider>
     </PostHogProvider>
   );
 }
