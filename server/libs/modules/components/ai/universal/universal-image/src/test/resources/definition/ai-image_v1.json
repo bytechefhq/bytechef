@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI generate an image that you prompt.",
     "help": null,
@@ -370,6 +373,8 @@
       "required": null,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Generate Image",
     "workflowNodeDescription": null
   } ],

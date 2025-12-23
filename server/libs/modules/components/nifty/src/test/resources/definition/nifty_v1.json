@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new project.",
     "help": null,
@@ -325,10 +328,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Project",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new task",
     "help": null,
@@ -731,10 +739,15 @@
       "required": false,
       "type": "DATE_TIME"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Task",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets task details.",
     "help": null,
@@ -1009,10 +1022,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Task",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates new status",
     "help": null,
@@ -1479,10 +1497,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Status",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Gets tracked time report information.",
     "help": null,
@@ -2105,6 +2128,8 @@
       "required": false,
       "type": "DATE_TIME"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Tracked Time Report",
     "workflowNodeDescription": null
   } ],

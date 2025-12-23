@@ -47,13 +47,11 @@ public class ComponentDefinitionTest {
         ActionDefinition action = ComponentDsl.action("name")
             .title("title")
             .description("description")
-            .perform(
-                (ActionDefinition.SingleConnectionPerformFunction) (
-                    inputParameters, connectionParameters, context) -> null);
+            .perform((ActionDefinition.PerformFunction) (inputParameters, connectionParameters, context) -> null);
 
         jsonAssertEquals(
             """
-                {"batch":null,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputDefinition":null,"properties":null,"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"perform":{}}
+                {"batch":null,"beforeResume":null,"beforeSuspend":null,"beforeTimeoutResume":null,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputDefinition":null,"properties":null,"title":"title","processErrorResponse":null,"workflowNodeDescription":null,"resumePerform":null,"suspendPerform":null,"perform":{}}
                 """,
             action);
     }

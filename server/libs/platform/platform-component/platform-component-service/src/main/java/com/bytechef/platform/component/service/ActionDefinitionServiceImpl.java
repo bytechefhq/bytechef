@@ -19,12 +19,12 @@ package com.bytechef.platform.component.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BaseOutputFunction;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionDefinition.WorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -127,17 +127,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections) {
 
-        OutputFunction outputFunction = componentDefinitionRegistry
+        BaseOutputFunction baseOutputFunction = componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName)
             .getOutputDefinition()
             .flatMap(OutputDefinition::getOutput)
             .orElse(null);
 
-        if (outputFunction == null) {
+        if (baseOutputFunction == null) {
             return null;
         }
 
-        if (outputFunction instanceof SingleConnectionOutputFunction singleConnectionOutputFunction) {
+        if (baseOutputFunction instanceof OutputFunction outputFunction) {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
             ActionContext actionContext = contextFactory.createActionContext(
@@ -148,7 +148,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, firstComponentConnection, actionContext,
                 ActionDefinitionErrorType.EXECUTE_OUTPUT,
                 (componentConnection1, actionContext1) -> executeSingleConnectionOutput(
-                    singleConnectionOutputFunction, inputParameters, componentConnection1, actionContext1),
+                    outputFunction, inputParameters, componentConnection1, actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, null, null, null, null, componentConnection1, null,
                     null, true));
@@ -157,7 +157,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, null, null, null, null, null, null, null, true);
 
             return executeMultipleConnectionsOutput(
-                (MultipleConnectionsOutputFunction) outputFunction, inputParameters, componentConnections, Map.of(),
+                (MultipleConnectionsOutputFunction) baseOutputFunction, inputParameters, componentConnections, Map.of(),
                 actionContext);
         }
     }
@@ -169,12 +169,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
         boolean editorEnvironment, ModeType type) {
 
-        PerformFunction performFunction = componentDefinitionRegistry
-            .getActionDefinition(componentName, componentVersion, actionName)
+        com.bytechef.component.definition.ActionDefinition actionDefinition = componentDefinitionRegistry
+            .getActionDefinition(componentName, componentVersion, actionName);
+
+        BasePerformFunction basePerformFunction = actionDefinition
             .getPerform()
             .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
-        if (performFunction instanceof SingleConnectionPerformFunction singleConnectionPerformFunction) {
+        if (basePerformFunction instanceof PerformFunction performFunction) {
             ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
             ActionContext actionContext = contextFactory.createActionContext(
@@ -185,7 +187,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, firstComponentConnection, actionContext,
                 ActionDefinitionErrorType.EXECUTE_PERFORM,
                 (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
-                    singleConnectionPerformFunction, inputParameters, componentConnection1,
+                    performFunction, inputParameters, componentConnection1,
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
@@ -196,8 +198,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 null, environmentId, type, editorEnvironment);
 
             return executeMultipleConnectionsPerform(
-                (MultipleConnectionsPerformFunction) performFunction, inputParameters, componentConnections, extensions,
-                actionContext);
+                (MultipleConnectionsPerformFunction) basePerformFunction, inputParameters, componentConnections,
+                extensions, actionContext);
         }
     }
 
@@ -208,8 +210,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) componentDefinitionRegistry
+        PerformFunction performFunction =
+            (PerformFunction) componentDefinitionRegistry
                 .getActionDefinition(componentName, componentVersion, actionName)
                 .getPerform()
                 .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
@@ -218,7 +220,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_PERFORM,
             (componentConnection1, actionContext1) -> executeSingleConnectionPerform(
-                singleConnectionPerformFunction, inputParameters, componentConnection1, actionContext1),
+                performFunction, inputParameters, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
@@ -387,7 +389,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private OutputResponse executeSingleConnectionOutput(
-        SingleConnectionOutputFunction outputFunction, Map<String, ?> inputParameters,
+        OutputFunction outputFunction, Map<String, ?> inputParameters,
         ComponentConnection componentConnection, ActionContext context) {
 
         try {
@@ -408,11 +410,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private Object executeSingleConnectionPerform(
-        SingleConnectionPerformFunction singleConnectionPerformFunction, Map<String, ?> inputParameters,
+        PerformFunction performFunction, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ActionContext context) throws ExecutionException {
 
         try {
-            return singleConnectionPerformFunction.apply(
+            return performFunction.apply(
                 ParametersFactory.createParameters(inputParameters),
                 componentConnection == null
                     ? null : ParametersFactory.createParameters(componentConnection.getConnectionParameters()),

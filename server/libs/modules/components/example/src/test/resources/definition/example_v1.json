@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Description",
     "help": null,
@@ -63,6 +66,8 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": [ ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Title",
     "workflowNodeDescription": null
   } ],

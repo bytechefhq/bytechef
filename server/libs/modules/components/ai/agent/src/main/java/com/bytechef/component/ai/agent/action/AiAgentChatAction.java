@@ -103,7 +103,7 @@ public class AiAgentChatAction {
         }
 
         @Override
-        public Optional<PerformFunction> getPerform() {
+        public Optional<BasePerformFunction> getPerform() {
             return Optional.of((MultipleConnectionsPerformFunction) this::perform);
         }
 

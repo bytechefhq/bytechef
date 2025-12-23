@@ -18,7 +18,7 @@ package com.bytechef.component.definition;
 
 import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
 
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.OptionsDataSource.BaseOptionsFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
@@ -248,8 +248,9 @@ public final class ComponentDsl {
         Optional<String> description = actionDefinition.getDescription();
         Optional<List<? extends Property>> properties = actionDefinition.getProperties();
         Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
-        SingleConnectionPerformFunction perform = (SingleConnectionPerformFunction) actionDefinition.getPerform()
-            .orElse((SingleConnectionPerformFunction) (inputParameters, connectionParameters, context) -> null);
+        PerformFunction perform = (PerformFunction) actionDefinition.getPerform()
+            .map(f -> (PerformFunction) f)
+            .orElse((inputParameters, connectionParameters, context) -> null);
 
         return ComponentDsl.<SingleConnectionToolFunction>clusterElement(actionDefinition.getName())
             .title(title.orElse(null))
@@ -272,15 +273,20 @@ public final class ComponentDsl {
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
+        private BeforeSuspendConsumer beforeSuspendConsumer;
+        private BeforeResumeFunction beforeResumeFunction;
+        private BeforeTimeoutResumeFunction beforeTimeoutResumeFunction;
         private Boolean deprecated;
         private String description;
-        private ProcessErrorResponseFunction processErrorResponseFunction;
-        private PerformFunction performFunction;
         private Help help;
         private Map<String, Object> metadata;
         private String name;
         private OutputDefinition outputDefinition;
+        private BasePerformFunction performFunction;
+        private ProcessErrorResponseFunction processErrorResponseFunction;
         private List<? extends Property> properties;
+        private ResumePerformFunction resumePerformFunction;
+        private SuspendPerformFunction suspendPerformFunction;
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -297,6 +303,24 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableActionDefinition beforeSuspend(BeforeSuspendConsumer beforeSuspend) {
+            this.beforeSuspendConsumer = beforeSuspend;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition beforeResume(BeforeResumeFunction beforeResume) {
+            this.beforeResumeFunction = beforeResume;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition beforeTimeoutResume(BeforeTimeoutResumeFunction beforeTimeoutResume) {
+            this.beforeTimeoutResumeFunction = beforeTimeoutResume;
+
+            return this;
+        }
+
         public ModifiableActionDefinition deprecated(Boolean deprecated) {
             this.deprecated = deprecated;
 
@@ -305,30 +329,6 @@ public final class ComponentDsl {
 
         public ModifiableActionDefinition description(String description) {
             this.description = description;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
-            this.processErrorResponseFunction = processErrorResponse;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition perform(PerformFunction perform) {
-            this.performFunction = perform;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition perform(SingleConnectionPerformFunction perform) {
-            this.performFunction = perform;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition perform(WebhookResponsePerformFunction perform) {
-            this.performFunction = perform;
 
             return this;
         }
@@ -400,8 +400,32 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
+        public ModifiableActionDefinition output(OutputFunction output) {
             this.outputDefinition = OutputDefinition.of(output);
+
+            return this;
+        }
+
+        public ModifiableActionDefinition perform(BasePerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition perform(PerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition perform(WebhookResponsePerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition processErrorResponse(ProcessErrorResponseFunction processErrorResponse) {
+            this.processErrorResponseFunction = processErrorResponse;
 
             return this;
         }
@@ -419,6 +443,18 @@ public final class ComponentDsl {
             if (properties != null) {
                 this.properties = Collections.unmodifiableList(properties);
             }
+
+            return this;
+        }
+
+        public ModifiableActionDefinition resumPerform(ResumePerformFunction resumePerform) {
+            this.resumePerformFunction = resumePerform;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition suspendPerform(SuspendPerformFunction suspendPerform) {
+            this.suspendPerformFunction = suspendPerform;
 
             return this;
         }
@@ -468,6 +504,21 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<BeforeSuspendConsumer> getBeforeSuspend() {
+            return Optional.ofNullable(beforeSuspendConsumer);
+        }
+
+        @Override
+        public Optional<BeforeResumeFunction> getBeforeResume() {
+            return Optional.ofNullable(beforeResumeFunction);
+        }
+
+        @Override
+        public Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume() {
+            return Optional.ofNullable(beforeTimeoutResumeFunction);
+        }
+
+        @Override
         public Optional<Boolean> getDeprecated() {
             return Optional.ofNullable(deprecated);
         }
@@ -475,16 +526,6 @@ public final class ComponentDsl {
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
-        }
-
-        @Override
-        public Optional<PerformFunction> getPerform() {
-            return Optional.ofNullable(performFunction);
-        }
-
-        @Override
-        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
-            return Optional.ofNullable(processErrorResponseFunction);
         }
 
         @Override
@@ -508,8 +549,28 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<? extends BasePerformFunction> getPerform() {
+            return Optional.ofNullable(performFunction);
+        }
+
+        @Override
+        public Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+            return Optional.ofNullable(processErrorResponseFunction);
+        }
+
+        @Override
         public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
+        }
+
+        @Override
+        public Optional<ResumePerformFunction> getResumePerform() {
+            return Optional.ofNullable(resumePerformFunction);
+        }
+
+        @Override
+        public Optional<SuspendPerformFunction> getSuspendPerform() {
+            return Optional.ofNullable(suspendPerformFunction);
         }
 
         @Override

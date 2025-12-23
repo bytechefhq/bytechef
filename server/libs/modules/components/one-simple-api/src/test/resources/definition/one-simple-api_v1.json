@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Convert currency from one to another.",
     "help": null,
@@ -1625,10 +1628,15 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Currency Converter",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Shorten your desired URL",
     "help": null,
@@ -1929,10 +1937,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "URL Shortener",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get information about a certain webpage",
     "help": null,
@@ -2617,6 +2630,8 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Web Page Information",
     "workflowNodeDescription": null
   } ],

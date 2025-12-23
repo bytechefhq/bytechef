@@ -16,8 +16,8 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.definition.ActionDefinition.BaseOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition;
 import java.util.Objects;
@@ -28,13 +28,13 @@ import java.util.Optional;
  */
 public final class OutputDefinition implements BaseOutputDefinition {
 
-    private OutputFunction output;
+    private BaseOutputFunction output;
     private OutputResponse outputResponse;
 
     private OutputDefinition() {
     }
 
-    private OutputDefinition(OutputFunction output) {
+    private OutputDefinition(BaseOutputFunction output) {
         this.output = output;
     }
 
@@ -69,20 +69,20 @@ public final class OutputDefinition implements BaseOutputDefinition {
         return new OutputDefinition(outputSchema, sampleOutput, placeholder);
     }
 
+    public static OutputDefinition of(BaseOutputFunction output) {
+        Objects.requireNonNull(output, "'output' mut not be null");
+
+        return new OutputDefinition(output);
+    }
+
     public static OutputDefinition of(OutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
         return new OutputDefinition(output);
     }
 
-    public static OutputDefinition of(SingleConnectionOutputFunction output) {
-        Objects.requireNonNull(output, "'output' mut not be null");
-
-        return new OutputDefinition(output);
-    }
-
     @Override
-    public Optional<OutputFunction> getOutput() {
+    public Optional<? extends BaseOutputFunction> getOutput() {
         return Optional.ofNullable(output);
     }
 

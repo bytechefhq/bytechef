@@ -66,7 +66,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<BasePerformFunction> getPerform() {
         return Optional.of((MultipleConnectionsPerformFunction) this::perform);
     }
 

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add a new employee.",
     "help": null,
@@ -305,10 +308,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee, based on employee ID.",
     "help": null,
@@ -479,10 +487,15 @@
       "required": false,
       "type": "DATE"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get employee data, based on employee ID.",
     "help": null,
@@ -568,10 +581,15 @@
       "required": true,
       "type": "ARRAY"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Employee",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update an employee file.",
     "help": null,
@@ -699,6 +717,8 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Update Employee File",
     "workflowNodeDescription": null
   } ],

@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
     "help": null,
@@ -538,6 +541,8 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Image",
     "workflowNodeDescription": null
   } ],

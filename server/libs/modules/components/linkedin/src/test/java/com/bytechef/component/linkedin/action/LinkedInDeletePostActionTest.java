@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -58,12 +58,12 @@ class LinkedInDeletePostActionTest {
 
     @Test
     void testPerform() throws Exception {
-        Optional<PerformFunction> performFunction = LinkedInDeletePostAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = LinkedInDeletePostAction.ACTION_DEFINITION
+            .getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.encoder(encoderFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> encoderFunctionArgumentCaptor.getValue()
@@ -79,7 +79,7 @@ class LinkedInDeletePostActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertNull(result);
         assertEquals(List.of("123", "/rest/posts/urn"), stringArgumentCaptor.getAllValues());

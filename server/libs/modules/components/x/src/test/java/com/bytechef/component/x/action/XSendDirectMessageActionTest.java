@@ -29,8 +29,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
@@ -71,12 +71,12 @@ class XSendDirectMessageActionTest {
                 .when(() -> XUtils.getUserIdByUsername(contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn("abc");
 
-            Optional<PerformFunction> performFunction = XSendDirectMessageAction.ACTION_DEFINITION.getPerform();
+            Optional<? extends BasePerformFunction> basePerformFunction = XSendDirectMessageAction.ACTION_DEFINITION
+                .getPerform();
 
-            assertTrue(performFunction.isPresent());
+            assertTrue(basePerformFunction.isPresent());
 
-            SingleConnectionPerformFunction singleConnectionPerformFunction =
-                (SingleConnectionPerformFunction) performFunction.get();
+            PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
             when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> {
@@ -95,7 +95,7 @@ class XSendDirectMessageActionTest {
             when(mockedResponse.getBody())
                 .thenReturn(mockedObject);
 
-            Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+            Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
             assertEquals(mockedObject, result);
 

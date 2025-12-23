@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -56,12 +56,12 @@ class XDeletePostActionTest {
 
     @Test
     void testPerform() throws Exception {
-        Optional<PerformFunction> performFunction = XDeletePostAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = XDeletePostAction.ACTION_DEFINITION
+            .getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
@@ -78,7 +78,7 @@ class XDeletePostActionTest {
         when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
-        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertEquals(mockedObject, result);
         ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();

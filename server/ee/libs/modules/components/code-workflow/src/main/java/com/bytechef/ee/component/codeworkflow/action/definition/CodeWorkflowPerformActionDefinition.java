@@ -37,7 +37,7 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<BasePerformFunction> getPerform() {
         return Optional.of((MultipleConnectionsPerformFunction) this::perform);
     }
 

@@ -30,8 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
@@ -68,12 +68,12 @@ class GoogleTasksUpdateTaskActionTest {
     @Test
     @SuppressWarnings("unchecked")
     void testPerform() throws Exception {
-        Optional<PerformFunction> performFunction = GoogleTasksUpdateTaskAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = GoogleTasksUpdateTaskAction.ACTION_DEFINITION
+            .getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> {
@@ -92,7 +92,7 @@ class GoogleTasksUpdateTaskActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
         assertEquals(responseMap, result);
 

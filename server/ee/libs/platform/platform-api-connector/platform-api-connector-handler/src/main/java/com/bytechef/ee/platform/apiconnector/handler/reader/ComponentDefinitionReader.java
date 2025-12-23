@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class ComponentDefinitionReader {
 
-    private static final Function<ActionDefinition, ActionDefinition.SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
+    private static final Function<ActionDefinition, ActionDefinition.PerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
             OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null),

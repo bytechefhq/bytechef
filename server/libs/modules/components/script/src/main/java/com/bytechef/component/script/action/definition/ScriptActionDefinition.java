@@ -39,8 +39,8 @@ public class ScriptActionDefinition extends AbstractActionDefinitionWrapper {
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
-        return Optional.of((MultipleConnectionsPerformFunction) this::perform);
+    public Optional<MultipleConnectionsPerformFunction> getPerform() {
+        return Optional.of(this::perform);
     }
 
     protected Object perform(
