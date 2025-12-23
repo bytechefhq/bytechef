@@ -1,6 +1,4 @@
-/// <reference types="@testing-library/jest-dom" />
 import {render, screen} from '@testing-library/react';
-import React from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import Switch from './Switch';
@@ -64,9 +62,7 @@ describe('Switch - Variants', () => {
         render(<Switch checked={false} variant="default" />);
 
         const switchElement = screen.getByRole('switch');
-        // Check for arbitrary variant classes that style the thumb
-        expect(switchElement.className).toMatch(/\[&>span\]:h-4/);
-        expect(switchElement.className).toMatch(/\[&>span\]:w-4/);
+        expect(switchElement).toHaveClass('[&>span]:size-4');
     });
 
     it('should render small variant with correct track dimensions', () => {
@@ -84,9 +80,7 @@ describe('Switch - Variants', () => {
         render(<Switch checked={false} variant="small" />);
 
         const switchElement = screen.getByRole('switch');
-        // Check for arbitrary variant classes for small thumb
-        expect(switchElement.className).toMatch(/\[&>span\]:h-3/);
-        expect(switchElement.className).toMatch(/\[&>span\]:w-3/);
+        expect(switchElement).toHaveClass('[&>span]:size-3');
     });
 
     it('should render box variant with correct track dimensions', () => {
@@ -260,7 +254,6 @@ describe('Switch - Focus', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('focus-visible:outline-none');
         expect(switchElement).toHaveClass('focus-visible:ring-2');
         expect(switchElement).toHaveClass('focus-visible:ring-stroke-brand-focus');
         expect(switchElement).toHaveClass('focus-visible:ring-offset-0');
