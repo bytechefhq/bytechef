@@ -4,7 +4,7 @@ import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
-import { createMetadata } from '@/lib/metadata';
+import { createMetadata, getPageImage } from '@/lib/metadata';
 import { source } from '@/lib/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/mdx/mermaid';
@@ -16,21 +16,21 @@ import {
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
 import Link from 'fumadocs-core/link';
-import { AutoTypeTable } from 'fumadocs-typescript/ui';
-import { createGenerator } from 'fumadocs-typescript';
 import { getPageTreePeers } from 'fumadocs-core/page-tree';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { getMDXComponents } from '@/mdx-components';
-import { APIPage } from 'fumadocs-openapi/ui';
 import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
-import * as path from 'node:path';
 import { Banner } from 'fumadocs-ui/components/banner';
-import { openapi } from '@/lib/openapi';
 import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
-import { DocsPage } from 'fumadocs-ui/page';
+import {
+  DocsBody,
+  DocsPage,
+  PageLastUpdate,
+} from 'fumadocs-ui/layouts/docs/page';
 import { NotFound } from '@/components/not-found';
 // import { getSuggestions } from '@/app/(docs)/[...slug]/suggestions';
+import { PathUtils } from 'fumadocs-core/source';
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
@@ -40,8 +40,6 @@ function PreviewRenderer({ preview }: { preview: string }): ReactNode {
 
   return null;
 }
-
-const generator = createGenerator();
 
 export const revalidate = false;
 
@@ -55,22 +53,33 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
       <NotFound getSuggestions={() => Promise.resolve([])} />
     );
 
-  const preview = page.data.preview;
-  const { body: Mdx, toc, lastModified } = page.data;
+  if (page.data.type === 'openapi') {
+    const { APIPage } = await import('@/components/api-page');
+    return (
+      <DocsPage full>
+        <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
+
+        <DocsBody>
+          <APIPage {...page.data.getAPIPageProps()} />
+        </DocsBody>
+      </DocsPage>
+    );
+  }
+
+  const { body: Mdx, toc, lastModified } = await page.data.load();
 
   return (
     <DocsPage
       toc={toc}
-      lastUpdate={lastModified ? new Date(lastModified) : undefined}
       tableOfContent={{
         style: 'clerk',
       }}
     >
       <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
-      <p className="text-lg text-fd-muted-foreground">
+      <p className="text-lg text-fd-muted-foreground mb-2">
         {page.data.description}
       </p>
-      <div className="flex flex-row gap-2 items-center border-b pt-2 pb-6">
+      <div className="flex flex-row flex-wrap gap-2 items-center border-b pb-6">
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions
           markdownUrl={`${page.url}.mdx`}
@@ -78,28 +87,28 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
         />
       </div>
       <div className="prose flex-1 text-fd-foreground/90">
-        {preview ? <PreviewRenderer preview={preview} /> : null}
+        {page.data.preview && <PreviewRenderer preview={page.data.preview} />}
         <Mdx
           components={getMDXComponents({
             ...Twoslash,
             a: ({ href, ...props }) => {
               const found = source.getPageByHref(href ?? '', {
-                dir: path.dirname(page.path),
+                dir: PathUtils.dirname(page.path),
               });
 
               if (!found) return <Link href={href} {...props} />;
 
               return (
                 <HoverCard>
-                  <HoverCardTrigger asChild>
-                    <Link
-                      href={
-                        found.hash
-                          ? `${found.page.url}#${found.hash}`
-                          : found.page.url
-                      }
-                      {...props}
-                    />
+                  <HoverCardTrigger
+                    href={
+                      found.hash
+                        ? `${found.page.url}#${found.hash}`
+                        : found.page.url
+                    }
+                    {...props}
+                  >
+                    {props.children}
                   </HoverCardTrigger>
                   <HoverCardContent className="text-sm">
                     <p className="font-medium">{found.page.data.title}</p>
@@ -113,12 +122,8 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
             Banner,
             Mermaid,
             TypeTable,
-            AutoTypeTable: (props) => (
-              <AutoTypeTable generator={generator} {...props} />
-            ),
             Wrapper,
             blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
-            APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
             DocsCategory: ({ url }) => {
               return <DocsCategory url={url ?? page.url} />;
             },
@@ -129,6 +134,7 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
         {page.data.index ? <DocsCategory url={page.url} /> : null}
       </div>
       <Feedback onRateAction={onRateAction} />
+      {lastModified && <PageLastUpdate date={lastModified} />}
     </DocsPage>
   );
 }
@@ -159,7 +165,7 @@ export async function generateMetadata(
     page.data.description ?? 'The platform for building ai-driven automations';
 
   const image = {
-    url: ['/og', ...slug, 'image.webp'].join('/'),
+    url: getPageImage(page).url,
     width: 1200,
     height: 630,
   };

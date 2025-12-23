@@ -2,6 +2,7 @@ import { source } from '@/lib/source';
 import { notFound } from 'next/navigation';
 import { generate as MetadataImage, getImageResponseOptions } from './generate';
 import { ImageResponse } from '@takumi-rs/image-response';
+import { getPageImage } from '@/lib/metadata';
 
 export const revalidate = false;
 
@@ -14,12 +15,10 @@ export async function GET(
   if (!page) notFound();
 
   return new ImageResponse(
-    (
-      <MetadataImage
-        title={page.data.title}
-        description={page.data.description}
-      />
-    ),
+    <MetadataImage
+      title={page.data.title}
+      description={page.data.description}
+    />,
     await getImageResponseOptions(),
   );
 }
@@ -27,8 +26,7 @@ export async function GET(
 export function generateStaticParams(): {
   slug: string[];
 }[] {
-  return source.generateParams().map((page) => ({
-    ...page,
-    slug: [...page.slug, 'image.webp'],
+  return source.getPages().map((page) => ({
+    slug: getPageImage(page).segments,
   }));
 }
