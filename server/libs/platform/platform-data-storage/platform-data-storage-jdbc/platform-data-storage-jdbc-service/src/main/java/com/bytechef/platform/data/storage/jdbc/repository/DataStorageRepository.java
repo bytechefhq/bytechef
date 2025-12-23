@@ -33,10 +33,10 @@ public interface DataStorageRepository
     extends ListPagingAndSortingRepository<DataEntry, Long>, ListCrudRepository<DataEntry, Long> {
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
-    Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndType(
-        String componentName, int scope, String scopeId, String key, int type);
+    Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
+        String componentName, int scope, String scopeId, String key, int environment, int type);
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
-    Optional<List<DataEntry>> findByComponentNameAndScopeAndScopeIdAndType(
-        String componentName, int scope, String scopeId, int type);
+    List<DataEntry> findByComponentNameAndScopeAndScopeIdAndEnvironmentAndType(
+        String componentName, int scope, String scopeId, int environment, int type);
 }

@@ -122,13 +122,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest, Long connectionId,
-        boolean editorEnvironment, ModeType type) {
+        Long environmentId, ModeType type, boolean editorEnvironment) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeTrigger(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, inputParameters, triggerState,
-            webhookRequest, componentConnection, editorEnvironment, type);
+            webhookRequest, componentConnection, environmentId, type, editorEnvironment);
     }
 
     @Override

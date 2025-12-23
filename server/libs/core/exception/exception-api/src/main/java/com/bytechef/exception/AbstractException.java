@@ -44,11 +44,12 @@ public abstract class AbstractException extends RuntimeException {
     }
 
     public AbstractException(
-        String message, Map<String, ?> inputParameters, ErrorType errorType) {
+        String message, @Nullable Map<String, ?> inputParameters, ErrorType errorType) {
 
         this(message, errorType);
 
-        this.inputParameters = Collections.unmodifiableMap(inputParameters);
+        this.inputParameters =
+            inputParameters == null ? Collections.emptyMap() : Collections.unmodifiableMap(inputParameters);
     }
 
     public AbstractException(String message, ErrorType errorType, List<?> errorMessageArguments) {
@@ -67,11 +68,12 @@ public abstract class AbstractException extends RuntimeException {
     }
 
     public AbstractException(
-        Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
+        Throwable cause, @Nullable Map<String, ?> inputParameters, ErrorType errorType) {
 
         this(cause, errorType);
 
-        this.inputParameters = Collections.unmodifiableMap(inputParameters);
+        this.inputParameters =
+            inputParameters == null ? Collections.emptyMap() : Collections.unmodifiableMap(inputParameters);
     }
 
     public AbstractException(String message, Throwable cause, ErrorType errorType) {
@@ -82,11 +84,12 @@ public abstract class AbstractException extends RuntimeException {
     }
 
     public AbstractException(
-        String message, Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
+        String message, Throwable cause, @Nullable Map<String, ?> inputParameters, ErrorType errorType) {
 
         this(message, cause, errorType);
 
-        this.inputParameters = Collections.unmodifiableMap(inputParameters);
+        this.inputParameters =
+            inputParameters == null ? Collections.emptyMap() : Collections.unmodifiableMap(inputParameters);
     }
 
     public AbstractException(

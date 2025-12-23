@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -38,15 +39,18 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
     implements TriggerDispatcherPreSendProcessor {
 
     private final ProjectWorkflowService projectWorkflowService;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ProjectWorkflowService projectWorkflowService) {
+        ProjectWorkflowService projectWorkflowService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
         super(projectDeploymentWorkflowService);
 
         this.projectWorkflowService = projectWorkflowService;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
     }
 
     @Override
@@ -62,6 +66,12 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
+
+        // Add environment id for downstream processing
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(ModeType.AUTOMATION)
+            .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
+        triggerExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return triggerExecution;
     }

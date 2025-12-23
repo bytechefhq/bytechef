@@ -76,6 +76,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -95,10 +96,10 @@ class HttpClientExecutor {
     }
 
     public Response execute(
-        String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod, String componentName, int componentVersion,
-        String componentOperationName, ComponentConnection componentConnection, Context context)
-        throws Exception {
+        String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
+        @Nullable Body body, Configuration configuration, RequestMethod requestMethod, String componentName,
+        int componentVersion, String componentOperationName, @Nullable ComponentConnection componentConnection,
+        Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
@@ -121,7 +122,7 @@ class HttpClientExecutor {
         }
     }
 
-    BodyPublisher createBodyPublisher(Body body) {
+    BodyPublisher createBodyPublisher(@Nullable Body body) {
         BodyPublisher bodyPublisher;
 
         if (body == null) {
@@ -150,7 +151,7 @@ class HttpClientExecutor {
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
         String componentName, int componentVersion, String componentOperationName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder();
 
@@ -212,8 +213,8 @@ class HttpClientExecutor {
 
     HttpRequest createHttpRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Body body, String componentName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable Map<String, List<String>> queryParameters, @Nullable Body body, String componentName,
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .method(requestMethod.name(), createBodyPublisher(body));
@@ -291,7 +292,7 @@ class HttpClientExecutor {
 
     private void applyAuthorization(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, String componentName,
-        ComponentConnection componentConnection, Context context) {
+        @Nullable ComponentConnection componentConnection, Context context) {
 
         if (componentConnection == null) {
             return;
@@ -342,7 +343,7 @@ class HttpClientExecutor {
     }
 
     private String getConnectionUrl(
-        String urlString, String componentName, ComponentConnection componentConnection, Context context) {
+        String urlString, String componentName, @Nullable ComponentConnection componentConnection, Context context) {
 
         if (urlString.contains("://") || (componentConnection == null)) {
             return urlString;
@@ -491,7 +492,7 @@ class HttpClientExecutor {
             BodyPublishers.ofString(XmlUtils.write(body.getContent())), MediaType.APPLICATION_XML);
     }
 
-    private boolean isEmpty(final Object object) {
+    private boolean isEmpty(@Nullable Object object) {
         if (object == null) {
             return true;
         }
@@ -534,10 +535,11 @@ class HttpClientExecutor {
     private static class ResponseImpl implements Response {
 
         private final Map<String, List<String>> headers;
+        @Nullable
         private final Object body;
         private final int statusCode;
 
-        private ResponseImpl(Map<String, List<String>> headers, Object body, int statusCode) {
+        private ResponseImpl(Map<String, List<String>> headers, @Nullable Object body, int statusCode) {
             this.headers = headers;
             this.body = body;
             this.statusCode = statusCode;
@@ -589,6 +591,7 @@ class HttpClientExecutor {
 
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
+        @Nullable
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }

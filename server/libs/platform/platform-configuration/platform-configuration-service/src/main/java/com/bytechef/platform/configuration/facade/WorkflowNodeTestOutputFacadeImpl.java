@@ -186,7 +186,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
             triggerWorkflowNodeType.operation(), null, workflowExecutionId.getWorkflowUuid(), triggerParameters,
-            Map.of(), webhookRequest, connectionId, true, workflowExecutionId.getType());
+            Map.of(), webhookRequest, connectionId, environmentId, workflowExecutionId.getType(), true);
 
         if (triggerOutput != null && triggerOutput.value() != null) {
             saveWorkflowNodeSampleOutput(
@@ -216,7 +216,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Object value = actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            inputParameters, connectionIds, extensions, true, null);
+            inputParameters, connectionIds, extensions, environmentId, null, true);
 
         if (value == null) {
             return null;
@@ -244,9 +244,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowId, environmentId);
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), null, null, workflowTrigger.evaluateParameters(inputs, evaluator), null, null,
-            connectionId, true, null);
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null,
+            workflowTrigger.evaluateParameters(inputs, evaluator), null, null, connectionId, environmentId, null, true);
 
         Object value = triggerOutput.value();
 

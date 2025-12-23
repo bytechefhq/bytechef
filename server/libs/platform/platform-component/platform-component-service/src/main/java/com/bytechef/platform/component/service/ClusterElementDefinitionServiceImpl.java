@@ -113,12 +113,12 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String clusterElementName, int statusCode, Object body) {
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
 
         return executeProcessErrorResponse(
-            componentName, componentVersion, clusterElementName, statusCode, body,
+            componentName, componentVersion, componentOperationName, statusCode, body,
             contextFactory.createClusterElementContext(
-                componentName, componentVersion, clusterElementName, null, false));
+                componentName, componentVersion, componentOperationName, null, false));
     }
 
     @Override

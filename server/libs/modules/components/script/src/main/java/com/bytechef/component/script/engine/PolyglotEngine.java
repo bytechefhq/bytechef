@@ -298,12 +298,16 @@ public class PolyglotEngine {
 
                 ActionDefinitionService actionDefinitionService = getActionDefinitionService();
 
+                ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+                ActionContext newActionContext = createActionContext(
+                    componentDefinition.getName(), componentDefinition.getVersion(), actionName, actionContextAware,
+                    componentConnection);
+
                 Object result = actionDefinitionService.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     (Map) copyFromPolyglotContext(inputParameters), componentConnection,
-                    createActionContext(
-                        componentDefinition.getName(), componentDefinition.getVersion(),
-                        actionName, actionContext, componentConnection));
+                    actionContextAware.getEnvironmentId(), newActionContext);
 
                 if (result == null) {
                     return null;
@@ -331,18 +335,16 @@ public class PolyglotEngine {
         }
 
         private ActionContext createActionContext(
-            String componentName, int componentVersion, String actionName, ActionContext actionContext,
+            String componentName, int componentVersion, String actionName, ActionContextAware actionContextAware,
             ComponentConnection componentConnection) {
 
             ContextFactory contextFactory = applicationContext.getBean(ContextFactory.class);
-
-            ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
             return contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
                 actionContextAware.getWorkflowId(), componentConnection,
-                actionContextAware.getModeType(), true);
+                actionContextAware.getEnvironmentId(), actionContextAware.getModeType(), true);
         }
 
         private ActionDefinitionService getActionDefinitionService() {

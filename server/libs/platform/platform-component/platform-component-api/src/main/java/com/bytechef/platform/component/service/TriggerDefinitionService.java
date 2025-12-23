@@ -66,12 +66,13 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         @Nullable ComponentConnection componentConnection);
 
     ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String triggerName, int statusCode, Object body);
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body);
 
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        @Nullable ComponentConnection componentConnection, boolean editorEnvironment, ModeType type);
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, ModeType type,
+        boolean editorEnvironment);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

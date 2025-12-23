@@ -33,13 +33,21 @@ public interface ActionContextAware extends ActionContext {
 
     String getActionName();
 
+    @Nullable
+    Long getEnvironmentId();
+
+    @Nullable
     Long getJobPrincipalId();
 
+    @Nullable
     Long getJobPrincipalWorkflowId();
 
+    @Nullable
     Long getJobId();
 
+    @Nullable
     ModeType getModeType();
 
+    @Nullable
     String getWorkflowId();
 }

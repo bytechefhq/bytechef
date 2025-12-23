@@ -104,7 +104,8 @@ class ComponentToolsTest {
         assertEquals("result", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(triggerDefinitionFacade, never()).executeTrigger(
-            anyString(), anyInt(), anyString(), any(), any(), anyMap(), any(), any(), any(), anyBoolean(), any());
+            anyString(), anyInt(), anyString(), any(), any(), anyMap(), any(), any(), any(), any(), any(),
+            anyBoolean());
     }
 
     @Test
@@ -166,7 +167,7 @@ class ComponentToolsTest {
             triggerDefinitionFacade
                 .executeTrigger(
                     eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    isNull(), eq(true), isNull()))
+                    isNull(), isNull(), isNull(), eq(true)))
                         .thenReturn(triggerOutput);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, triggerName, version);
@@ -174,7 +175,7 @@ class ComponentToolsTest {
         assertNotNull(result);
         verify(triggerDefinitionFacade).executeTrigger(
             eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            eq(true), isNull());
+            isNull(), isNull(), eq(true));
     }
 
     @Test
@@ -197,7 +198,7 @@ class ComponentToolsTest {
 
         when(triggerDefinitionFacade.executeTrigger(
             eq(componentName), eq(version), eq(triggerName), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-            eq(true), isNull()))
+            isNull(), isNull(), eq(true)))
                 .thenThrow(new RuntimeException("Connection error"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -238,8 +239,8 @@ class ComponentToolsTest {
         assertEquals("actionResult", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(actionDefinitionFacade, never()).executePerform(
-            anyString(), anyInt(), anyString(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(),
-            anyBoolean(), any());
+            anyString(), anyInt(), anyString(), any(), any(), any(), anyString(), anyMap(), anyMap(), anyMap(), any(),
+            any(), anyBoolean());
     }
 
     @Test
@@ -313,7 +314,7 @@ class ComponentToolsTest {
             actionDefinitionFacade
                 .executePerform(
                     eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(),
-                    anyMap(), isNull(), eq(true), isNull()))
+                    anyMap(), isNull(), isNull(), isNull(), eq(true)))
                         .thenReturn(performResult);
 
         PropertyInfo result = componentTools.getOutputProperty(componentName, actionName, version);
@@ -323,7 +324,7 @@ class ComponentToolsTest {
             anyMap());
         verify(actionDefinitionFacade).executePerform(
             eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
-            isNull(), eq(true), isNull());
+            isNull(), isNull(), isNull(), eq(true));
     }
 
     @Test

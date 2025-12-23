@@ -18,12 +18,14 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.constant.ModeType;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface TriggerContextAware extends TriggerContext {
 
+    @Nullable
     Long getJobPrincipalId();
 
     String getTriggerName();

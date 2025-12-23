@@ -38,17 +38,18 @@ public interface TriggerDefinitionFacade {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
 
     /**
-     * Renews webhook subscription definition at provider side.
-     *
+     * Renews webhook subscription definition at provider side. <br>
      * This lambda function is invoked when your webhook subscription is set to have an expiry time, defined in the
      * output of webhook_subscribe. It allows you to refresh as webhook subscriptions so your trigger can continue to
      * receive events.
      *
-     * @param componentName
-     * @param componentVersion
-     * @param triggerName
-     * @param outputParameters
-     * @return
+     * @param componentName    The name of the component for which the webhook refresh is being executed.
+     * @param componentVersion The version of the component for which the webhook refresh is being executed.
+     * @param triggerName      The name of the trigger associated with the webhook.
+     * @param outputParameters A map containing key-value pairs of output parameters that influence the refresh logic.
+     * @param connectionId     An optional ID representing the connection context for the execution.
+     * @return A {@code TriggerDefinition.WebhookEnableOutput} object containing the result of the webhook refresh
+     *         execution.
      */
     TriggerDefinition.WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
@@ -74,7 +75,8 @@ public interface TriggerDefinitionFacade {
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, Map<String, ?> inputParameters, Object triggerState,
-        WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment, @Nullable ModeType type);
+        WebhookRequest webhookRequest, @Nullable Long connectionId, @Nullable Long environmentId,
+        @Nullable ModeType type, boolean editorEnvironment);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

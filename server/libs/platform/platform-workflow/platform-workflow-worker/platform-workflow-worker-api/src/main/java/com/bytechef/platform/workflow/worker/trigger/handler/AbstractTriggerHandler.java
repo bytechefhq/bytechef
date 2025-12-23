@@ -65,8 +65,9 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
                 workflowExecutionId.getWorkflowUuid(), triggerExecution.getParameters(), triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 firstConnectionId.orElse(null),
-                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
-                workflowExecutionId.getType());
+                MapUtils.getLong(triggerExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
+                workflowExecutionId.getType(),
+                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }

@@ -71,8 +71,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public Object executePerform(
         String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
         Long jobId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, boolean editorEnvironment,
-        ModeType type) {
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, Long environmentId,
+        boolean editorEnvironment, ModeType type) {
 
         throw new UnsupportedOperationException();
     }
@@ -80,14 +80,14 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Object executePerformForPolyglot(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext actionContext) {
+        ComponentConnection componentConnection, Long environmentId, ActionContext actionContext) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
+        String componentName, int componentVersion, String componentOperationName, int statusCode, Object body) {
 
         throw new UnsupportedOperationException();
     }
