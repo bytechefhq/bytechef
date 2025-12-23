@@ -76,7 +76,11 @@ const ProjectsLeftSidebar = ({
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const {data: projects, refetch: refetchProjects} = useGetWorkspaceProjectsQuery({
+    const {
+        data: projects,
+        isLoading: projectsLoading,
+        refetch: refetchProjects,
+    } = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
     });
 
@@ -107,8 +111,8 @@ const ProjectsLeftSidebar = ({
     });
 
     useEffect(() => {
-        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading);
-    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading]);
+        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading || projectsLoading);
+    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading, projectsLoading]);
 
     useEffect(() => {
         if (selectedProjectId === 0) {
