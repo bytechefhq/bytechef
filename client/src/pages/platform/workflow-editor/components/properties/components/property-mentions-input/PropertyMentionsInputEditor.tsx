@@ -442,7 +442,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
-                    if ((event.key === '=' && isEditorEmpty) || isFormulaMode) {
+                    if (event.key === '=' && isEditorEmpty) {
+                        event.preventDefault();
+
+                        if (setIsFormulaMode) {
+                            setIsFormulaMode(true);
+                        }
+
+                        return;
+                    }
+
+                    if (isFormulaMode) {
                         return;
                     }
 
