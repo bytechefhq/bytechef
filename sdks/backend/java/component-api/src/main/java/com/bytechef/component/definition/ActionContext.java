@@ -46,6 +46,7 @@ public interface ActionContext extends Context {
     /**
      *
      */
+    @Deprecated
     interface Approval {
         /**
          */

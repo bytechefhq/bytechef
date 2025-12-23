@@ -28,8 +28,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -66,12 +66,12 @@ class XRepostPostActionTest {
             xUtilsMockedStatic.when(() -> XUtils.getAuthenticatedUserId(contextArgumentCaptor.capture()))
                 .thenReturn("user123");
 
-            Optional<PerformFunction> performFunction = XRepostPostAction.ACTION_DEFINITION.getPerform();
+            Optional<? extends BasePerformFunction> basePerformFunction = XRepostPostAction.ACTION_DEFINITION
+                .getPerform();
 
-            assertTrue(performFunction.isPresent());
+            assertTrue(basePerformFunction.isPresent());
 
-            SingleConnectionPerformFunction singleConnectionPerformFunction =
-                (SingleConnectionPerformFunction) performFunction.get();
+            PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
             when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> {
@@ -90,7 +90,7 @@ class XRepostPostActionTest {
             when(mockedResponse.getBody())
                 .thenReturn(mockedObject);
 
-            Object result = singleConnectionPerformFunction.apply(mockedParameters, null, mockedActionContext);
+            Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
 
             assertEquals(mockedObject, result);
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());

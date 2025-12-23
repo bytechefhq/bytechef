@@ -73,7 +73,7 @@ public class ActionDefinition {
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
         this.singleConnection = OptionalUtils.mapOrElse(
             actionDefinition.getPerform(),
-            perform -> perform instanceof com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction,
+            perform -> perform instanceof com.bytechef.component.definition.ActionDefinition.PerformFunction,
             false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(

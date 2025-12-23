@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @FunctionalInterface
-public interface MultipleConnectionsPerformFunction extends ActionDefinition.PerformFunction {
+public interface MultipleConnectionsPerformFunction extends ActionDefinition.BasePerformFunction {
 
     /**
      *

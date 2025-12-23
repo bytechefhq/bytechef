@@ -5,6 +5,9 @@
   },
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Loads data into the vector store using LLM embeddings.",
     "help": null,
@@ -14,10 +17,15 @@
     "perform": { },
     "processErrorResponse": null,
     "properties": [ ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Load Data",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Query data from the vector store using LLM embeddings.",
     "help": null,
@@ -54,6 +62,8 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Data",
     "workflowNodeDescription": null
   } ],

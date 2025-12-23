@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Add two numbers.",
     "help": null,
@@ -107,10 +110,15 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Addition",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Divide two numbers.",
     "help": null,
@@ -217,10 +225,15 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Division",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get the remainder of the division of two numbers.",
     "help": null,
@@ -327,10 +340,15 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Modulo",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Multiply two numbers.",
     "help": null,
@@ -437,10 +455,15 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Multiplication",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Subtract two numbers.",
     "help": null,
@@ -547,6 +570,8 @@
       "required": true,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Subtraction",
     "workflowNodeDescription": null
   } ],

@@ -209,7 +209,7 @@ public class HttpClientActionUtils {
         }
     }
 
-    public static ActionDefinition.SingleConnectionPerformFunction getPerform(RequestMethod requestMethod) {
+    public static ActionDefinition.PerformFunction getPerform(RequestMethod requestMethod) {
         return (inputParameters, connectionParameters, context) -> execute(
             inputParameters, requestMethod, context);
     }

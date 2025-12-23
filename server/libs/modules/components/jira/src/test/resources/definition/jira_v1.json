@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Assigns an existing issue to a specific user.",
     "help": null,
@@ -85,10 +88,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Assign Issue",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new issue.",
     "help": null,
@@ -448,10 +456,15 @@
       "required": false,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Issue",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a comment to an issue.",
     "help": null,
@@ -1414,10 +1427,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Create Issue Comment",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get issue details in selected project.",
     "help": null,
@@ -2254,10 +2272,15 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Get Issue",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Return all comments for an issue.",
     "help": null,
@@ -3387,10 +3410,15 @@
       "required": false,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "List Issue Comments",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search for issues using JQL.",
     "help": null,
@@ -3557,14 +3585,16 @@
       "required": true,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Search Issues",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "assignIssue",
     "description": "Assigns an existing issue to a specific user.",
     "element": { },
     "help": null,
-    "name": "assignIssue",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -3645,18 +3675,18 @@
     } ],
     "title": "Assign Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createIssue",
     "description": "Creates a new issue.",
     "element": { },
     "help": null,
-    "name": "createIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4012,18 +4042,18 @@
     } ],
     "title": "Create Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createIssueComment",
     "description": "Adds a comment to an issue.",
     "element": { },
     "help": null,
-    "name": "createIssueComment",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4982,18 +5012,18 @@
     } ],
     "title": "Create Issue Comment",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getIssue",
     "description": "Get issue details in selected project.",
     "element": { },
     "help": null,
-    "name": "getIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5826,18 +5856,18 @@
     } ],
     "title": "Get Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listIssueComments",
     "description": "Return all comments for an issue.",
     "element": { },
     "help": null,
-    "name": "listIssueComments",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6963,18 +6993,18 @@
     } ],
     "title": "List Issue Comments",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchForIssuesUsingJql",
     "description": "Search for issues using JQL.",
     "element": { },
     "help": null,
-    "name": "searchForIssuesUsingJql",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7137,17 +7167,17 @@
     } ],
     "title": "Search Issues",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

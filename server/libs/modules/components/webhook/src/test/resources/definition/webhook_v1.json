@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts the response to the webhook request.",
     "help": null,
@@ -286,6 +289,8 @@
       "required": null,
       "type": "INTEGER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Response to Webhook Request",
     "workflowNodeDescription": null
   } ],
@@ -319,10 +324,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
+          "body": { },
           "headers": { },
           "method": "POST",
-          "parameters": { },
-          "body": { }
+          "parameters": { }
         },
         "sampleOutput": null
       },
@@ -357,10 +362,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
+          "body": { },
           "headers": { },
           "method": "POST",
-          "parameters": { },
-          "body": { }
+          "parameters": { }
         },
         "sampleOutput": null
       },
@@ -417,10 +422,10 @@
       "outputResponse": {
         "outputSchema": null,
         "placeholder": {
+          "body": { },
           "headers": { },
           "method": "POST",
-          "parameters": { },
-          "body": { }
+          "parameters": { }
         },
         "sampleOutput": null
       },

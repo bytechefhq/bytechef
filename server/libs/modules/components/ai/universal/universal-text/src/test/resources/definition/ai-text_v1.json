@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI reads, analyzes and classifies your text into one of defined categories.",
     "help": null,
@@ -305,10 +308,15 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Classify Text",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "The sentiment of the text is typically categorized as POSITIVE, NEGATIVE, or NEUTRAL.",
     "help": null,
@@ -528,10 +536,15 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Sentiment Analysis",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Scores the text based on several criteria",
     "help": null,
@@ -834,10 +847,15 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Score",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI reads, analyzes and summarizes your text into a shorter format.",
     "help": null,
@@ -1121,10 +1139,15 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Summarize Text",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Search through a large text and find the parts that are the most relevant. Returns a JSON list.",
     "help": null,
@@ -1356,10 +1379,15 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Similarity Search",
     "workflowNodeDescription": null
   }, {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI generates text based on the given prompt.",
     "help": null,
@@ -1579,6 +1607,8 @@
       "required": null,
       "type": "NUMBER"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Text Generation",
     "workflowNodeDescription": null
   } ],

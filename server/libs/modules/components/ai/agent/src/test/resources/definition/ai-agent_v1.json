@@ -2,20 +2,19 @@
   "actionClusterElementTypes": { },
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Chat with the AI agent.",
     "help": null,
     "metadata": null,
     "name": "chat",
     "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": null,
-        "placeholder": null,
-        "sampleOutput": { }
-      },
+      "output": { },
+      "outputResponse": null,
       "outputSchema": null,
-      "sampleOutput": { }
+      "sampleOutput": null
     },
     "perform": { },
     "processErrorResponse": null,
@@ -535,6 +534,8 @@
       "required": null,
       "type": "STRING"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Chat",
     "workflowNodeDescription": null
   } ],

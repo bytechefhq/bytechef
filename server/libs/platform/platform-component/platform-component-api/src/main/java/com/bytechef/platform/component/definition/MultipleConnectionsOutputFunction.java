@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.OutputFunction;
+import com.bytechef.component.definition.ActionDefinition.BaseOutputFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.ComponentConnection;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @FunctionalInterface
-public interface MultipleConnectionsOutputFunction extends OutputFunction {
+public interface MultipleConnectionsOutputFunction extends BaseOutputFunction {
 
     /**
      *

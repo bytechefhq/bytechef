@@ -89,8 +89,8 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
-        return Optional.of((SingleConnectionPerformFunction) this::perform);
+    public Optional<BasePerformFunction> getPerform() {
+        return Optional.of((PerformFunction) this::perform);
     }
 
     protected Object perform(Parameters inputParameters, Parameters connectionParameter, ActionContext context) {

@@ -32,6 +32,9 @@ import java.util.Optional;
 public abstract class AbstractActionDefinitionWrapper implements ActionDefinition {
 
     protected final Boolean batch;
+    protected final BeforeResumeFunction beforeResumeFunction;
+    protected final BeforeSuspendConsumer beforeSuspendConsumer;
+    protected final BeforeTimeoutResumeFunction beforeTimeoutResumeFunction;
     protected final Boolean deprecated;
     protected final String description;
     protected final ProcessErrorResponseFunction processErrorResponseFunction;
@@ -39,13 +42,21 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final Map<String, Object> metadata;
     protected final String name;
     protected final OutputDefinition outputSchemaFunction;
-    protected final PerformFunction performFunction;
+    protected final BasePerformFunction performFunction;
     protected final List<? extends Property> properties;
+    protected final ResumePerformFunction resumePerformFunction;
+    protected final SuspendPerformFunction suspendPerformFunction;
     protected final String title;
     protected final WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
     public AbstractActionDefinitionWrapper(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
+        this.beforeResumeFunction = actionDefinition.getBeforeResume()
+            .orElse(null);
+        this.beforeSuspendConsumer = actionDefinition.getBeforeSuspend()
+            .orElse(null);
+        this.beforeTimeoutResumeFunction = actionDefinition.getBeforeTimeoutResume()
+            .orElse(null);
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.processErrorResponseFunction = OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null);
@@ -55,6 +66,10 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
         this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null);
         this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
+        this.resumePerformFunction = actionDefinition.getResumePerform()
+            .orElse(null);
+        this.suspendPerformFunction = actionDefinition.getSuspendPerform()
+            .orElse(null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
         this.workflowNodeDescriptionFunction =
             OptionalUtils.orElse(actionDefinition.getWorkflowNodeDescription(), null);
@@ -63,6 +78,21 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     @Override
     public Optional<Boolean> getBatch() {
         return Optional.ofNullable(batch);
+    }
+
+    @Override
+    public Optional<BeforeSuspendConsumer> getBeforeSuspend() {
+        return Optional.ofNullable(beforeSuspendConsumer);
+    }
+
+    @Override
+    public Optional<BeforeResumeFunction> getBeforeResume() {
+        return Optional.ofNullable(beforeResumeFunction);
+    }
+
+    @Override
+    public Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume() {
+        return Optional.ofNullable(beforeTimeoutResumeFunction);
     }
 
     @Override
@@ -101,13 +131,23 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<PerformFunction> getPerform() {
+    public Optional<? extends BasePerformFunction> getPerform() {
         return Optional.ofNullable(performFunction);
     }
 
     @Override
     public Optional<List<? extends Property>> getProperties() {
         return Optional.ofNullable(properties);
+    }
+
+    @Override
+    public Optional<ResumePerformFunction> getResumePerform() {
+        return Optional.ofNullable(resumePerformFunction);
+    }
+
+    @Override
+    public Optional<SuspendPerformFunction> getSuspendPerform() {
+        return Optional.ofNullable(suspendPerformFunction);
     }
 
     @Override

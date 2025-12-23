@@ -33,8 +33,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
@@ -98,12 +98,12 @@ class LinkedInCreatePostActionTest {
                     stringArgumentCaptor.capture()))
                 .thenReturn("imageId");
 
-            Optional<PerformFunction> performFunction = LinkedInCreatePostAction.ACTION_DEFINITION.getPerform();
+            Optional<? extends BasePerformFunction> basePerformFunction = LinkedInCreatePostAction.ACTION_DEFINITION
+                .getPerform();
 
-            assertTrue(performFunction.isPresent());
+            assertTrue(basePerformFunction.isPresent());
 
-            SingleConnectionPerformFunction singleConnectionPerformFunction =
-                (SingleConnectionPerformFunction) performFunction.get();
+            PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
             byte[] bytes = {
                 1, 2, 3
@@ -133,7 +133,7 @@ class LinkedInCreatePostActionTest {
             when(mockedResponse.getFirstHeader(stringArgumentCaptor.capture()))
                 .thenReturn("abc");
 
-            Object result = singleConnectionPerformFunction.apply(
+            Object result = performFunction.apply(
                 mockedParameters, mockedConnectionParameters, mockedActionContext);
 
             assertEquals("abc", result);

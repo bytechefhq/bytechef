@@ -24,7 +24,8 @@ import static com.bytechef.component.definition.ActionDefinition.WebhookResponse
 
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.definition.BaseOutputFunction;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,37 @@ public interface ActionDefinition {
      * @return
      */
     Optional<Boolean> getBatch();
+
+    /**
+     * Retrieves an optional {@link BeforeResumeFunction}, which represents a custom operation to be executed before
+     * resuming an action in a workflow or process. This function can be utilized for validations, data transformations,
+     * or other pre-processing tasks related to the continuation of the action.
+     *
+     * @return an {@code Optional} containing the {@link BeforeResumeFunction} if defined, or an empty {@code Optional}
+     *         if not present
+     */
+    Optional<BeforeResumeFunction> getBeforeResume();
+
+    /**
+     * Retrieves an optional {@link BeforeSuspendConsumer} that represents a custom operation to be executed before
+     * suspending an action in a workflow or process. This consumer can be utilized for tasks such as preparing
+     * suspension parameters or executing custom pre-suspension logic specific to the action.
+     *
+     * @return an {@code Optional} containing the {@link BeforeSuspendConsumer} if defined, or an empty {@code Optional}
+     *         if not present
+     */
+    Optional<BeforeSuspendConsumer> getBeforeSuspend();
+
+    /**
+     * Retrieves an optional {@link BeforeTimeoutResumeFunction}, which represents a custom operation to be executed
+     * before a timeout occurs and allows for resumption of processing with specific parameters. This function serves as
+     * a mechanism to handle timeout scenarios by potentially modifying processing parameters or performing other
+     * context-specific actions.
+     *
+     * @return an {@code Optional} containing the {@link BeforeTimeoutResumeFunction} if defined, or an empty
+     *         {@code Optional} if not present
+     */
+    Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume();
 
     /**
      * TODO
@@ -85,7 +117,7 @@ public interface ActionDefinition {
      *
      * @return an optional execute function implementation
      */
-    Optional<PerformFunction> getPerform();
+    Optional<? extends BasePerformFunction> getPerform();
 
     /**
      *
@@ -99,6 +131,10 @@ public interface ActionDefinition {
      */
     Optional<List<? extends Property>> getProperties();
 
+    Optional<ResumePerformFunction> getResumePerform();
+
+    Optional<SuspendPerformFunction> getSuspendPerform();
+
     /**
      *
      * @return
@@ -110,6 +146,95 @@ public interface ActionDefinition {
      * @return
      */
     Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
+
+    /**
+     *
+     */
+    interface BaseOutputFunction extends com.bytechef.definition.BaseOutputFunction {
+
+    }
+
+    /**
+     *
+     */
+    interface BasePerformFunction {
+
+    }
+
+    /**
+     * Functional interface representing a consumer to be invoked prior to suspending an action execution. This
+     * interface is designed to provide custom actions that can be executed before a suspension event occurs. It
+     * provides parameters related to the current context, suspension details, and options to perform further actions.
+     */
+    @FunctionalInterface
+    interface BeforeSuspendConsumer {
+
+        /**
+         * Applies a specific action during the execution flow, handling suspension details and resumption parameters.
+         * This method is invoked with the current action context, allowing for custom logic to be executed before the
+         * action is suspended for resumption.
+         *
+         * @param resumeUrl          The URL to be used for resuming the action after suspension.
+         * @param expiresAt          The expiration time indicating how long the suspension is valid.
+         * @param continueParameters The parameters passed for continuation, containing key-value data for resumption.
+         * @param context            The current action context containing execution data.
+         * @throws Exception If an error occurs during execution.
+         */
+        void apply(String resumeUrl, Instant expiresAt, Parameters continueParameters, ActionContext context)
+            throws Exception;
+    }
+
+    /**
+     * Represents a functional interface for defining a custom operation that is executed before an action resumes in a
+     * specific workflow or process. The operation takes input data, input parameters, continuation parameters, and an
+     * action context as arguments, and produces an output encapsulated in a continue {@link Map} instance. This
+     * functional interface can be leveraged to integrate pre-resume processing logic, such as validations,
+     * transformations, or enrichments, as part of the action workflow.
+     */
+    @FunctionalInterface
+    interface BeforeResumeFunction {
+
+        /**
+         * Applies a custom operation before an action resumes in a workflow or process. This method processes the
+         * provided input data, input parameters, continue parameters, and action context to produce an optional
+         * continue {@link Map} object. It can be used for operations like validation, data enrichment, or preparation
+         * before resuming the workflow.
+         *
+         * @param data               the input data passed to the method for processing
+         * @param inputParameters    the parameters related to the initial invocation of the action
+         * @param continueParameters the parameters related to the continuation of the action
+         * @param context            the contextual information about the current workflow or process
+         * @return an optional continue {@link Map} instance containing processed continuation parameters
+         * @throws Exception if any error occurs during the processing of the operation
+         */
+        Optional<Map<String, ?>> apply(
+            Object data, Parameters inputParameters, Parameters continueParameters, ActionContext context)
+            throws Exception;
+    }
+
+    /**
+     * Functional interface representing a function that is executed before a timeout occurs and allows for resumption
+     * of processing with specific parameters.
+     */
+    @FunctionalInterface
+    interface BeforeTimeoutResumeFunction {
+
+        /**
+         * Applies the function using the provided input parameters, continuation parameters, and action context. The
+         * function may modify the processing based on the inputs and may return specific parameters for further
+         * processing.
+         *
+         * @param inputParameters    the parameters provided as input to the function
+         * @param continueParameters the parameters used for continuation of processing
+         * @param context            the action context which provides additional contextual information for the
+         *                           function execution
+         * @return an {@link Optional} containing continue {@link Map} instance to be used for further actions, or an
+         *         empty {@link Optional} if no result is to be returned
+         * @throws Exception if an error occurs during function execution
+         */
+        Optional<Map<String, ?>> apply(Parameters inputParameters, Parameters continueParameters, ActionContext context)
+            throws Exception;
+    }
 
     /**
      *
@@ -133,17 +258,50 @@ public interface ActionDefinition {
     }
 
     /**
-     *
+     * Represents a specialized output function interface that processes input and connection parameters along with
+     * additional context to produce a standardized output response. <br>
+     * This interface extends the {@code BaseOutputFunction} to define a specific method for generating an
+     * {@code OutputResponse}. <br>
+     * Implementations of this interface are responsible for handling the logic required to process various inputs and
+     * contexts, returning a meaningful and structured output.
      */
     interface OutputFunction extends BaseOutputFunction {
+
+        /**
+         * Processes the given input parameters, connection parameters, and context to generate an output response.
+         *
+         * @param inputParameters      the parameters specific to the input data being processed
+         * @param connectionParameters the parameters required for connection or external resource access
+         * @param context              additional context about the execution environment or process
+         * @return an {@code OutputResponse} representing the result of the operation, including schema, sample output,
+         *         and optional placeholder
+         * @throws Exception if an error occurs during the processing
+         */
+        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
 
     }
 
     /**
-     *
+     * Functional interface defining the contract for executing a specific action with given input parameters,
+     * connection parameters, and action context, and returning a result upon completion. <br>
+     * The primary purpose of this interface is to provide a flexible mechanism for implementing custom business logic
+     * that can be executed dynamically within workflows or processes.
      */
-    interface PerformFunction {
+    @FunctionalInterface
+    interface PerformFunction extends BasePerformFunction {
 
+        /**
+         * Applies the specified action using the given input parameters, connection parameters, and action context.
+         *
+         * @param inputParameters      the input parameters for the action
+         * @param connectionParameters the parameters related to the connection or configuration
+         * @param context              the context in which the action is executed
+         * @return the result of the action execution as an Object
+         * @throws Exception if an error occurs during the execution of the action
+         */
+        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
     }
 
     /**
@@ -183,35 +341,56 @@ public interface ActionDefinition {
     }
 
     /**
-     *
+     * Represents a functional interface intended for performing a continuation or resume operation with a single
+     * connection within a workflow or procedural execution context. This interface extends {@code PerformFunction},
+     * adding support for actions that require input parameters, connection-related parameters, continuation parameters,
+     * and an action context. <br>
+     * Implementations of this interface are designed to handle operations that resume from a specific state or context
+     * during workflow execution.
      */
-    interface SingleConnectionOutputFunction extends OutputFunction {
+    @FunctionalInterface
+    interface ResumePerformFunction {
 
         /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Executes an action using the provided parameters and context. This method is designed for continuation or
+         * resuming action in a workflow or procedural execution.
+         *
+         * @param inputParameters      the parameters specific to the operation or input data
+         * @param connectionParameters the parameters related to the connection or external resource required for
+         *                             execution
+         * @param continueParameters   the parameters associated with the continuation process or resume state
+         * @param context              the action context providing access to auxiliary data, event functions, or state
+         *                             management facilities
+         * @return the result of the action execution, which can be any object as per the operation's requirements
+         * @throws Exception if an error occurs during execution or processing of the action
          */
-        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
+        Object apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
+            ActionContext context)
 
+            throws Exception;
     }
 
     /**
-     *
+     * Represents a specialized functional interface within the ActionDefinition framework, used for defining
+     * suspendable action implementations. This interface extends {@link BasePerformFunction} and provides a mechanism
+     * for suspending actions during their execution.
      */
     @FunctionalInterface
-    interface SingleConnectionPerformFunction extends PerformFunction {
+    interface SuspendPerformFunction {
 
         /**
+         * Applies the specified input parameters, connection parameters, and action context to perform an operation
+         * that results in a suspendable state.
          *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param context
-         * @return
+         * @param inputParameters      the parameters provided as input for the operation
+         * @param connectionParameters the parameters required to establish a connection or interaction
+         * @param context              the context in which the action is executed, providing runtime information
+         * @return a {@link Suspend} object representing the suspendable state, including continuation parameters and
+         *         expiration details
+         * @throws Exception if an error occurs during the execution of the operation
          */
-        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        Suspend apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
@@ -248,6 +427,17 @@ public interface ActionDefinition {
          * @return
          */
         String apply(Parameters inputParameters, ActionContext context) throws Exception;
+    }
+
+    /**
+     * Represents a suspend state as part of an action definition. It indicates a temporary suspension with accompanying
+     * parameters and expiration details.
+     *
+     * @param continueParameters a map containing parameters required to continue the suspended action
+     * @param expiresAt          the timestamp indicating when the suspension expires
+     */
+    @SuppressFBWarnings("EI")
+    record Suspend(Map<String, ?> continueParameters, Instant expiresAt) {
     }
 
     /**

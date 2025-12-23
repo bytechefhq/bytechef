@@ -22,8 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
@@ -49,12 +49,12 @@ abstract class AbstractGithubActionTest {
     protected Object executePerformFunction(
         ModifiableActionDefinition modifiableActionDefinition, Parameters mockedParameters) throws Exception {
 
-        Optional<PerformFunction> performFunction = modifiableActionDefinition.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction = modifiableActionDefinition.getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction singleConnectionPerformFunction =
+            (PerformFunction) basePerformFunction.get();
 
         when(mockedActionContext.http(contextFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()

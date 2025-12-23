@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
     "help": null,
@@ -252,6 +255,8 @@
       "required": true,
       "type": "TIME"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Set Value",
     "workflowNodeDescription": null
   } ],

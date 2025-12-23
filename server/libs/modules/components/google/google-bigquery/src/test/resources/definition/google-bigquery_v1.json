@@ -1,6 +1,9 @@
 {
   "actions": [ {
     "batch": null,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.",
     "help": null,
@@ -2566,6 +2569,8 @@
       "required": false,
       "type": "BOOLEAN"
     } ],
+    "resumePerform": null,
+    "suspendPerform": null,
     "title": "Query",
     "workflowNodeDescription": null
   } ],

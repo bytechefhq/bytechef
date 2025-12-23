@@ -125,6 +125,21 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
+        public Optional<BeforeResumeFunction> getBeforeResume() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<BeforeSuspendConsumer> getBeforeSuspend() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<BeforeTimeoutResumeFunction> getBeforeTimeoutResume() {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<Boolean> getDeprecated() {
             return Optional.empty();
         }
@@ -135,9 +150,9 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<PerformFunction> getPerform() {
+        public Optional<BasePerformFunction> getPerform() {
             return Optional.of(
-                (SingleConnectionPerformFunction) (inputParameters, connectionParameters, context) -> executePerform(
+                (PerformFunction) (inputParameters, connectionParameters, context) -> executePerform(
                     name, inputParameters, connectionParameters, context, languageId, script));
         }
 
@@ -168,6 +183,16 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<List<? extends Property>> getProperties() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ResumePerformFunction> getResumePerform() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<SuspendPerformFunction> getSuspendPerform() {
             return Optional.empty();
         }
 

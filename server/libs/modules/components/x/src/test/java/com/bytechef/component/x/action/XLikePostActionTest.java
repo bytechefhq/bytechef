@@ -28,8 +28,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -66,12 +66,11 @@ class XLikePostActionTest {
             xUtilsMockedStatic.when(() -> XUtils.getAuthenticatedUserId(contextArgumentCaptor.capture()))
                 .thenReturn("user123");
 
-            Optional<PerformFunction> performFunction = XLikePostAction.ACTION_DEFINITION.getPerform();
+            Optional<? extends BasePerformFunction> performFunction = XLikePostAction.ACTION_DEFINITION.getPerform();
 
             assertTrue(performFunction.isPresent());
 
-            SingleConnectionPerformFunction singleConnectionPerformFunction =
-                (SingleConnectionPerformFunction) performFunction.get();
+            PerformFunction singleConnectionPerformFunction = (PerformFunction) performFunction.get();
 
             when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> {
