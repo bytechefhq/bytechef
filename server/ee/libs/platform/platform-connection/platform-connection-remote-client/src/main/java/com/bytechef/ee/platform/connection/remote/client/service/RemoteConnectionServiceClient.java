@@ -11,7 +11,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     @Override
     public Connection create(
         AuthorizationType authorizationType, String componentName, int connectionVersion, int environmentId,
-        String name, Map<String, Object> parameters, ModeType type) {
+        String name, Map<String, Object> parameters, PlatformType type) {
 
         throw new UnsupportedOperationException();
     }
@@ -62,7 +62,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(ModeType type) {
+    public List<Connection> getConnections(PlatformType type) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
@@ -72,13 +72,13 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version, ModeType type) {
+    public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long typeId, Long environmentId, ModeType type) {
+        String componentName, Integer connectionVersion, Long typeId, Long environmentId, PlatformType type) {
 
         throw new UnsupportedOperationException();
     }

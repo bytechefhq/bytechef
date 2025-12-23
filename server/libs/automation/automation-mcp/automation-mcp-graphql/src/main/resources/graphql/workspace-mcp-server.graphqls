@@ -9,7 +9,7 @@ extend type Mutation {
 
 input CreateWorkspaceMcpServerInput {
     name: String!
-    type: ModeType!
+    type: PlatformType!
     environmentId: ID!
     enabled: Boolean
     workspaceId: ID!

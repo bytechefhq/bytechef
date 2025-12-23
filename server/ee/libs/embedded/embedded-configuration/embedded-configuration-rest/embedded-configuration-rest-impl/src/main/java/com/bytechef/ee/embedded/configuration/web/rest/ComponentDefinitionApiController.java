@@ -11,7 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +46,7 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
         return ResponseEntity.ok(
             componentDefinitionService
                 .getComponentDefinitions(
-                    actionDefinitions, connectionDefinitions, triggerDefinitions, include, ModeType.EMBEDDED)
+                    actionDefinitions, connectionDefinitions, triggerDefinitions, include, PlatformType.EMBEDDED)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

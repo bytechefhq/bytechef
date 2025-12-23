@@ -22,7 +22,7 @@ import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDi
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -70,7 +70,7 @@ public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
         }
 
         int environmentId = (int) jobPrincipalAccessorRegistry
-            .getJobPrincipalAccessor(ModeType.AUTOMATION)
+            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
             .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
         triggerExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
@@ -81,6 +81,6 @@ public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
     public boolean canProcess(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        return workflowExecutionId.getType() == ModeType.AUTOMATION;
+        return workflowExecutionId.getType() == PlatformType.AUTOMATION;
     }
 }

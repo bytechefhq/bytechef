@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -112,7 +112,7 @@ class AwsTriggerSchedulerTest {
     void testScheduleScheduleTrigger() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 123L, "test-workflow", "test-trigger");
         String pattern = "0 0 12 * * ?"; // Daily at noon
         String zoneId = "UTC";
         Map<String, Object> output = Map.of("key", "value");
@@ -142,7 +142,7 @@ class AwsTriggerSchedulerTest {
     void testSchedulePollingTrigger() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 456L, "test-polling-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 456L, "test-polling-workflow", "test-trigger");
 
         // When
         assertDoesNotThrow(() -> awsTriggerScheduler.schedulePollingTrigger(workflowExecutionId));
@@ -169,7 +169,7 @@ class AwsTriggerSchedulerTest {
     void testScheduleOneTimeTask() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 789L, "test-onetime-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 789L, "test-onetime-workflow", "test-trigger");
         String taskExecutionId = "task-execution-12345678901234567890";
         Instant executeAt = LocalDateTime.now()
             .plusMinutes(5)
@@ -204,7 +204,7 @@ class AwsTriggerSchedulerTest {
     void testScheduleDynamicWebhookTriggerRefresh() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 101L, "test-webhook-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 101L, "test-webhook-workflow", "test-trigger");
         Instant webhookExpirationDate = LocalDateTime.now()
             .plusHours(1)
             .toInstant(ZoneOffset.UTC);
@@ -240,7 +240,7 @@ class AwsTriggerSchedulerTest {
     void testCancelScheduleTrigger() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 202L, "test-cancel-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 202L, "test-cancel-workflow", "test-trigger");
 
         // When
         assertDoesNotThrow(() -> awsTriggerScheduler.cancelScheduleTrigger(workflowExecutionId.toString()));
@@ -266,7 +266,7 @@ class AwsTriggerSchedulerTest {
     void testCancelPollingTrigger() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 303L, "test-cancel-polling-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 303L, "test-cancel-polling-workflow", "test-trigger");
 
         // When
         assertDoesNotThrow(() -> awsTriggerScheduler.cancelPollingTrigger(workflowExecutionId.toString()));
@@ -290,7 +290,7 @@ class AwsTriggerSchedulerTest {
     void testCancelDynamicWebhookTriggerRefresh() {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 404L, "test-cancel-webhook-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 404L, "test-cancel-webhook-workflow", "test-trigger");
 
         // When & Then - should not throw exception (exceptions are caught and logged)
         assertDoesNotThrow(
@@ -333,7 +333,7 @@ class AwsTriggerSchedulerTest {
 
         // Test that the ARNs are constructed correctly by triggering a schedule operation
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 123L, "test-workflow", "test-trigger");
+            PlatformType.AUTOMATION, 123L, "test-workflow", "test-trigger");
 
         assertDoesNotThrow(() -> scheduler.schedulePollingTrigger(workflowExecutionId));
 

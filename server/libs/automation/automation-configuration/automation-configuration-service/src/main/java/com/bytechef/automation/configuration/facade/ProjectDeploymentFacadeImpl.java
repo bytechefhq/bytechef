@@ -50,7 +50,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -199,7 +199,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             new JobParametersDTO(
                 workflowId, projectDeploymentWorkflow.getInputs(),
                 Map.of("projectVersion", projectDeployment.getProjectVersion())),
-            id, ModeType.AUTOMATION);
+            id, PlatformType.AUTOMATION);
     }
 
     @Override
@@ -213,12 +213,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflows(id);
 
-        List<Long> jobIds = principalJobService.getJobIds(id, ModeType.AUTOMATION);
+        List<Long> jobIds = principalJobService.getJobIds(id, PlatformType.AUTOMATION);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            principalJobService.deletePrincipalJobs(jobId, ModeType.AUTOMATION);
+            principalJobService.deletePrincipalJobs(jobId, PlatformType.AUTOMATION);
 
             jobFacade.deleteJob(jobId);
         }
@@ -578,7 +578,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -659,7 +659,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             }
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -678,7 +678,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         while (true) {
             org.springframework.data.domain.Page<Long> page = principalJobService.getJobIds(
-                Job.Status.STARTED, null, null, principalIds, ModeType.AUTOMATION, workflowIds, pageNumber);
+                Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, pageNumber);
 
             List<Long> jobIds = page.getContent();
 
@@ -744,7 +744,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
         return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(projectDeploymentId, ModeType.AUTOMATION), this::getJobEndDate, null);
+            principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION), this::getJobEndDate,
+            null);
     }
 
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {
@@ -775,7 +776,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        ModeType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
+                        PlatformType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
                         workflowTrigger.getName()));
             }
         }

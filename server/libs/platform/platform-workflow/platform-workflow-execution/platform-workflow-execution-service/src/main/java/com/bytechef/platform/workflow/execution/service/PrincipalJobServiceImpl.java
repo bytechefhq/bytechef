@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.repository.PrincipalJobRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,44 +45,44 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     }
 
     @Override
-    public PrincipalJob create(long jobId, long principalId, ModeType type) {
+    public PrincipalJob create(long jobId, long principalId, PlatformType type) {
         return principalJobRepository.save(new PrincipalJob(principalId, jobId, type));
     }
 
     @Override
-    public void deletePrincipalJobs(long jobId, ModeType type) {
+    public void deletePrincipalJobs(long jobId, PlatformType type) {
         principalJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .ifPresent(instanceJob -> principalJobRepository.deleteById(Validate.notNull(instanceJob.getId(), "id")));
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long principalId, ModeType type) {
+    public Optional<Long> fetchLastJobId(long principalId, PlatformType type) {
         return principalJobRepository
             .findTop1ByPrincipalIdAndTypeOrderByJobIdDesc(principalId, type.ordinal())
             .map(PrincipalJob::getJobId);
     }
 
     @Override
-    public Optional<Long> fetchJobPrincipalId(long jobId, ModeType type) {
+    public Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type) {
         return principalJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(PrincipalJob::getPrincipalId);
     }
 
     @Override
-    public long getJobPrincipalId(long jobId, ModeType type) {
+    public long getJobPrincipalId(long jobId, PlatformType type) {
         return principalJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(PrincipalJob::getPrincipalId)
             .orElseThrow();
     }
 
     @Override
-    public List<Long> getJobIds(long principalId, ModeType type) {
+    public List<Long> getJobIds(long principalId, PlatformType type) {
         return principalJobRepository.findallJobIds(principalId, type.ordinal());
     }
 
     @Override
     public Page<Long> getJobIds(
-        Status status, Instant startDate, Instant endDate, List<Long> principalIds, ModeType type,
+        Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, PrincipalJobRepository.DEFAULT_PAGE_SIZE);

@@ -30,7 +30,7 @@ import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestMod
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -125,7 +125,7 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(ModeType.AUTOMATION))
+        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
@@ -153,7 +153,7 @@ public class ConnectionApiControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections(null, null, List.of(), null, null, ModeType.AUTOMATION))
+        when(connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -168,7 +168,7 @@ public class ConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", null, List.of(), null, null, ModeType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", null, List.of(), null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -181,7 +181,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, 1, List.of(), null, null, ModeType.AUTOMATION))
+        when(connectionFacade.getConnections(null, 1, List.of(), null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -194,7 +194,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", 1, List.of(), null, null, ModeType.AUTOMATION))
+        when(connectionFacade.getConnections("component1", 1, List.of(), null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -213,7 +213,7 @@ public class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any(), ModeType.AUTOMATION))
+        when(connectionFacade.create(any(), PlatformType.AUTOMATION))
             .thenReturn(getConnection().id());
 
         try {
@@ -234,7 +234,7 @@ public class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionFacade).create(connectionArgumentCaptor.capture(), ModeType.AUTOMATION);
+        verify(connectionFacade).create(connectionArgumentCaptor.capture(), PlatformType.AUTOMATION);
 
         assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")

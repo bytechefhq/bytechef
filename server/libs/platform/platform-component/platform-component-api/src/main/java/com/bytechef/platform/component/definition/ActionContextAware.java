@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import javax.annotation.Nullable;
 
 /**
@@ -46,7 +46,7 @@ public interface ActionContextAware extends ActionContext {
     Long getJobId();
 
     @Nullable
-    ModeType getModeType();
+    PlatformType getPlatformType();
 
     @Nullable
     String getWorkflowId();

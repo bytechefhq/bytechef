@@ -20,7 +20,7 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -191,7 +191,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, Long environmentId, ModeType type, boolean editorEnvironment) {
+        ComponentConnection componentConnection, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         throw new UnsupportedOperationException();
     }

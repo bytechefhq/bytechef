@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -64,7 +64,7 @@ public class McpServerServiceIntTest {
 
         assertThat(mcpServer)
             .hasFieldOrPropertyWithValue("name", "test-server")
-            .hasFieldOrPropertyWithValue("type", ModeType.AUTOMATION)
+            .hasFieldOrPropertyWithValue("type", PlatformType.AUTOMATION)
             .hasFieldOrPropertyWithValue("environment", Environment.DEVELOPMENT)
             .hasFieldOrPropertyWithValue("enabled", true);
         assertThat(mcpServer.getId()).isNotNull();
@@ -73,11 +73,11 @@ public class McpServerServiceIntTest {
     @Test
     public void testCreateWithParameters() {
         McpServer mcpServer = mcpServerService.create(
-            "test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT, false);
+            "test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
 
         assertThat(mcpServer)
             .hasFieldOrPropertyWithValue("name", "test-server")
-            .hasFieldOrPropertyWithValue("type", ModeType.AUTOMATION)
+            .hasFieldOrPropertyWithValue("type", PlatformType.AUTOMATION)
             .hasFieldOrPropertyWithValue("environment", Environment.DEVELOPMENT)
             .hasFieldOrPropertyWithValue("enabled", false);
         assertThat(mcpServer.getId()).isNotNull();
@@ -131,10 +131,10 @@ public class McpServerServiceIntTest {
     public void testGetMcpServersByType() {
         McpServer automationServer = mcpServerRepository.save(getMcpServer());
         McpServer embeddedServer =
-            mcpServerRepository.save(new McpServer("embedded-server", ModeType.EMBEDDED, Environment.DEVELOPMENT));
+            mcpServerRepository.save(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
-        List<McpServer> automationServers = mcpServerService.getMcpServers(ModeType.AUTOMATION);
-        List<McpServer> embeddedServers = mcpServerService.getMcpServers(ModeType.EMBEDDED);
+        List<McpServer> automationServers = mcpServerService.getMcpServers(PlatformType.AUTOMATION);
+        List<McpServer> embeddedServers = mcpServerService.getMcpServers(PlatformType.EMBEDDED);
 
         assertThat(automationServers).hasSize(1)
             .contains(automationServer);
@@ -145,14 +145,14 @@ public class McpServerServiceIntTest {
     @Test
     public void testGetMcpServersByTypeWithOrderBy() {
         McpServer server1 = mcpServerRepository.save(
-            new McpServer("a-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("a-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
         McpServer server2 = mcpServerRepository.save(
-            new McpServer("z-server", ModeType.AUTOMATION, Environment.DEVELOPMENT));
+            new McpServer("z-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
         List<McpServer> serversAsc =
-            mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
+            mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC);
         List<McpServer> serversDesc =
-            mcpServerService.getMcpServers(ModeType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_DESC);
+            mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_DESC);
 
         assertThat(serversAsc).hasSize(2);
         assertThat(serversAsc.get(0)).isEqualTo(server1);
@@ -164,6 +164,6 @@ public class McpServerServiceIntTest {
     }
 
     private McpServer getMcpServer() {
-        return new McpServer("test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT);
+        return new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
     }
 }

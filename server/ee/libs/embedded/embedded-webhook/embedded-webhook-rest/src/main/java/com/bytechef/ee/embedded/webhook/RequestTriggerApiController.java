@@ -26,7 +26,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -101,7 +101,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.EMBEDDED, integrationInstance.getId(), workflowUuid, findRequestTriggerName(workflow));
+            PlatformType.EMBEDDED, integrationInstance.getId(), workflowUuid, findRequestTriggerName(workflow));
 
         ResponseEntity<Object> responseEntity;
 

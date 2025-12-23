@@ -31,7 +31,7 @@ import com.bytechef.automation.mcp.repository.McpProjectRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -82,13 +82,13 @@ public class McpProjectServiceIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        McpServer mcpServer1 = new McpServer("test-server", ModeType.AUTOMATION, Environment.DEVELOPMENT);
+        McpServer mcpServer1 = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
         mcpServer1 = mcpServerRepository.save(mcpServer1);
 
         mcpServerId = mcpServer1.getId();
 
-        McpServer mcpServer2 = new McpServer("test-server-2", ModeType.AUTOMATION, Environment.DEVELOPMENT);
+        McpServer mcpServer2 = new McpServer("test-server-2", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
 
         mcpServer2 = mcpServerRepository.save(mcpServer2);
 

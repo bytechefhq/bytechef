@@ -16,7 +16,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.ProjectHandler;
 import com.bytechef.workflow.definition.ProjectDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -75,7 +75,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerFacade.create(
             projectDefinition.getName(), projectDefinition.getVersion(), projectDefinition.getWorkflows(),
-            language, bytes, ModeType.AUTOMATION);
+            language, bytes, PlatformType.AUTOMATION);
 
         projectCodeWorkflowService.create(codeWorkflowContainer, project);
 

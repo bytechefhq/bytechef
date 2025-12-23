@@ -37,7 +37,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -101,7 +101,7 @@ public class ComponentJobTestExecutor {
 
         @Override
         public TaskExecution process(TaskExecution taskExecution) {
-            taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
+            taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION);
 
             return taskExecution;
         }

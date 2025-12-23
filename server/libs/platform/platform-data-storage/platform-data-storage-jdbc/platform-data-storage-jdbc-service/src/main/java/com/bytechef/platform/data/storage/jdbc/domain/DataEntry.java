@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.data.storage.jdbc.domain;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import java.time.Instant;
@@ -85,7 +85,7 @@ public class DataEntry {
 
     public DataEntry(
         String componentName, DataStorageScope scope, String scopeId, String key, Object value, int environment,
-        ModeType type) {
+        PlatformType type) {
 
         this.componentName = componentName;
         this.environment = environment;
@@ -132,8 +132,8 @@ public class DataEntry {
         return scopeId;
     }
 
-    public ModeType getType() {
-        return ModeType.values()[type];
+    public PlatformType getType() {
+        return PlatformType.values()[type];
     }
 
     public int getEnvironment() {

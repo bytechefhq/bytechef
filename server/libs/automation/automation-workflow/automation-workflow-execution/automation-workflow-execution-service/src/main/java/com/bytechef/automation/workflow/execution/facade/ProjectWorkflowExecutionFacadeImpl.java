@@ -42,7 +42,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -129,7 +129,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 : taskFileStorage.readJobOutputs(job.getOutputs()),
             getJobTaskExecutions(id));
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
-            Validate.notNull(job.getId(), ""), ModeType.AUTOMATION);
+            Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
 
         return new WorkflowExecutionDTO(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
@@ -185,7 +185,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             } else {
                 Page<Job> jobsPage = principalJobService
                     .getJobIds(
-                        jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, ModeType.AUTOMATION, workflowIds,
+                        jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
                         pageNumber)
                     .map(jobService::getJob);
 
@@ -207,7 +207,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                         project -> CollectionUtils.contains(
                             projectWorkflowService.getProjectWorkflowIds(project.getId()), job.getWorkflowId())),
                     OptionalUtils.map(
-                        principalJobService.fetchJobPrincipalId(job.getId(), ModeType.AUTOMATION),
+                        principalJobService.fetchJobPrincipalId(job.getId(), PlatformType.AUTOMATION),
                         projectDeploymentService::getProjectDeployment),
                     new JobDTO(job),
                     CollectionUtils.getFirst(workflows,

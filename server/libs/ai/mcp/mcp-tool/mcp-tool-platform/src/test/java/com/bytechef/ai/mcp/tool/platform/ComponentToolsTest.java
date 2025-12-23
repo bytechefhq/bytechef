@@ -41,7 +41,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
@@ -306,7 +306,7 @@ class ComponentToolsTest {
 
         Connection connection = mock(Connection.class);
         when(connection.getId()).thenReturn(123L);
-        when(connectionService.getConnections(componentName, version, ModeType.AUTOMATION))
+        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
             .thenReturn(List.of(connection));
 
         Map<String, Object> performResult = Map.of("data", "test");
@@ -351,7 +351,7 @@ class ComponentToolsTest {
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        when(connectionService.getConnections(componentName, version, ModeType.AUTOMATION))
+        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
             .thenThrow(new RuntimeException("Connection required"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,

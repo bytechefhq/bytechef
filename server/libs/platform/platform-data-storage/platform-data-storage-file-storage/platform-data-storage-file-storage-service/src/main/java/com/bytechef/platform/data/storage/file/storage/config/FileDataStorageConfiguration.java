@@ -19,7 +19,7 @@ package com.bytechef.platform.data.storage.file.storage.config;
 import static com.bytechef.config.ApplicationProperties.DataStorage.Provider;
 
 import com.bytechef.file.storage.FileStorageServiceRegistry;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
@@ -59,7 +59,7 @@ public class FileDataStorageConfiguration {
         @Override
         public <T> Optional<T> fetch(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull PlatformType type) {
 
             return fileDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
@@ -68,7 +68,7 @@ public class FileDataStorageConfiguration {
         @Override
         public <T> T get(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull PlatformType type) {
 
             return fileDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
         }
@@ -77,7 +77,7 @@ public class FileDataStorageConfiguration {
         @Override
         public <T> Map<String, T> getAll(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, long environmentId,
-            @NonNull ModeType type) {
+            @NonNull PlatformType type) {
 
             return fileDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
         }
@@ -85,7 +85,7 @@ public class FileDataStorageConfiguration {
         @Override
         public void put(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull Object value, long environmentId, @NonNull ModeType type) {
+            @NonNull String key, @NonNull Object value, long environmentId, @NonNull PlatformType type) {
 
             fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
         }
@@ -93,7 +93,7 @@ public class FileDataStorageConfiguration {
         @Override
         public void delete(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull ModeType type) {
+            @NonNull String key, long environmentId, @NonNull PlatformType type) {
 
             fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }

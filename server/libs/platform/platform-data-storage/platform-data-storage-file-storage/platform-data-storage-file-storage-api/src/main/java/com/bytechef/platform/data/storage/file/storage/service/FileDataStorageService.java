@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.data.storage.file.storage.service;
 
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.util.Map;
 import java.util.Optional;
@@ -28,19 +28,20 @@ public interface FileDataStorageService {
 
     void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-        ModeType type);
+        PlatformType type);
 
     <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type);
 
     <T> T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-        ModeType type);
+        PlatformType type);
 
     <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId, long environmentId, ModeType type);
+        String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type);
 
     void put(
         String componentName, DataStorageScope scope, String scopeId, String key, Object value, long environmentId,
-        ModeType type);
+        PlatformType type);
 }

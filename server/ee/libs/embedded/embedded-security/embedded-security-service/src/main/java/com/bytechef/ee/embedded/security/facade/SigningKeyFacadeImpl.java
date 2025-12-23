@@ -18,7 +18,7 @@ package com.bytechef.ee.embedded.security.facade;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,7 +42,7 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
-    public String create(SigningKey signingKey, ModeType type) {
+    public String create(SigningKey signingKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
         signingKey.setType(type);

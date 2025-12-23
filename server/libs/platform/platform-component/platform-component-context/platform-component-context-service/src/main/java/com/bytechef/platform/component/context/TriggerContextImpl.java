@@ -19,7 +19,7 @@ package com.bytechef.platform.component.context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.TriggerContextAware;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -40,7 +40,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     private final Long jobPrincipalId;
     private final String triggerName;
     @Nullable
-    private final ModeType type;
+    private final PlatformType type;
     @Nullable
     private final String workflowUuid;
 
@@ -49,7 +49,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, CacheManager cacheManager,
         DataStorage dataStorage, TempFileStorage tempFileStorage, HttpClientExecutor httpClientExecutor,
-        @Nullable Long environmentId, @Nullable ModeType type, boolean editorEnvironment) {
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment) {
 
         super(
             componentName, componentVersion, triggerName, componentConnection, editorEnvironment, httpClientExecutor,
@@ -86,7 +86,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
     @Override
     @Nullable
-    public ModeType getType() {
+    public PlatformType getType() {
         return type;
     }
 
@@ -107,14 +107,14 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private final InMemoryDataStorage inMemoryDataStorage;
         private final String triggerName;
         @Nullable
-        private final ModeType type;
+        private final PlatformType type;
         @Nullable
         private final String workflowUuid;
 
         private DataImpl(
             DataStorage dataStorage, String componentName, Integer componentVersion, String triggerName,
             @Nullable String workflowUuid, CacheManager cacheManager, @Nullable Long environmentId,
-            @Nullable ModeType type, boolean editorEnvironment) {
+            @Nullable PlatformType type, boolean editorEnvironment) {
 
             this.componentName = componentName;
             this.componentVersion = componentVersion;
@@ -217,7 +217,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         }
 
         @Nullable
-        public ModeType type() {
+        public PlatformType type() {
             return type;
         }
 

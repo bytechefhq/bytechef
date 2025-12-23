@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.workflow.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,17 +38,17 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
-    public PrincipalJob create(long jobId, long principalId, ModeType type) {
+    public PrincipalJob create(long jobId, long principalId, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deletePrincipalJobs(long jobId, ModeType type) {
+    public void deletePrincipalJobs(long jobId, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long principalId, ModeType type) {
+    public Optional<Long> fetchLastJobId(long principalId, PlatformType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
@@ -59,7 +59,7 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
-    public Optional<Long> fetchJobPrincipalId(long jobId, ModeType type) {
+    public Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
@@ -70,18 +70,18 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
-    public long getJobPrincipalId(long jobId, ModeType type) {
+    public long getJobPrincipalId(long jobId, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Long> getJobIds(long principalId, ModeType type) {
+    public List<Long> getJobIds(long principalId, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<Long> getJobIds(
-        Status status, Instant startDate, Instant endDate, List<Long> principalIds, ModeType type,
+        Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -106,7 +106,7 @@ public class ConnectionRepositoryIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
-            .type(ModeType.AUTOMATION)
+            .type(PlatformType.AUTOMATION)
             .build();
     }
 }

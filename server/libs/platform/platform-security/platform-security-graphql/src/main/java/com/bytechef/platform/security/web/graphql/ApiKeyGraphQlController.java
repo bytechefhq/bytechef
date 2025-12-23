@@ -19,7 +19,7 @@ package com.bytechef.platform.security.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -54,7 +54,7 @@ public class ApiKeyGraphQlController {
     }
 
     @QueryMapping(name = "apiKeys")
-    public List<ApiKey> apiKeys(@Argument Long environmentId, @Argument ModeType type) {
+    public List<ApiKey> apiKeys(@Argument Long environmentId, @Argument PlatformType type) {
         return apiKeyFacade.getApiKeys(environmentId, type);
     }
 
@@ -64,7 +64,7 @@ public class ApiKeyGraphQlController {
     }
 
     @MutationMapping(name = "createApiKey")
-    public String createApiKey(@Argument String name, @Argument long environmentId, @Argument ModeType type) {
+    public String createApiKey(@Argument String name, @Argument long environmentId, @Argument PlatformType type) {
         ApiKey apiKey = new ApiKey();
 
         apiKey.setEnvironment(environmentService.getEnvironment(environmentId));

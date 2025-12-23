@@ -16,7 +16,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -119,7 +119,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     public TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
         Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest, Long connectionId,
-        Long environmentId, ModeType type, boolean editorEnvironment) {
+        Long environmentId, PlatformType type, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -225,7 +225,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     private record TriggerRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
         WebhookRequest webhookRequest, Long connectionId, Long jobPrincipalId, String workflowUuid,
-        boolean editorEnvironment, ModeType type, Long environmentId) {
+        boolean editorEnvironment, PlatformType type, Long environmentId) {
     }
 
     private record WebhookValidateRequest(

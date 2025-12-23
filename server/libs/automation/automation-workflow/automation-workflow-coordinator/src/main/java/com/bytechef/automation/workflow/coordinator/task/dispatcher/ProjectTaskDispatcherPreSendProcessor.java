@@ -26,7 +26,7 @@ import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendPro
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectDeploymentId = principalJobService.getJobPrincipalId(
-            Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION);
+            Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);
 
@@ -80,12 +80,12 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID, projectDeploymentWorkflow.getId());
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
+        taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         // Derive and pass environment id for downstream components
         int environmentId = (int) jobPrincipalAccessorRegistry
-            .getJobPrincipalAccessor(ModeType.AUTOMATION)
+            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
             .getEnvironmentId(projectDeploymentId);
         taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
@@ -97,7 +97,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectDeploymentId = OptionalUtils.orElse(
-            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
+            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION),
             null);
 
         return projectDeploymentId != null;

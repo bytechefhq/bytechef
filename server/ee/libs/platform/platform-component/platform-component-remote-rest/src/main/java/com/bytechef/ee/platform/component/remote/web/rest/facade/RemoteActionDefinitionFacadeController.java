@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.component.remote.web.rest.facade;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -118,7 +118,7 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, Long> extensions, Long environmentId) {
     }

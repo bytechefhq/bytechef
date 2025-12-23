@@ -20,7 +20,7 @@ import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -51,7 +51,7 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
 
     @Override
     public String create(long workspaceId, ApiKey apiKey) {
-        apiKey = apiKeyFacade.create(apiKey, ModeType.AUTOMATION);
+        apiKey = apiKeyFacade.create(apiKey, PlatformType.AUTOMATION);
 
         workspaceApiKeyService.create(apiKey.getId(), workspaceId);
 

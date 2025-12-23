@@ -16,7 +16,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,7 +59,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     @Override
     public CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
-        byte[] bytes, ModeType type) {
+        byte[] bytes, PlatformType type) {
 
         try {
             UUID codeWorkflowContainerId = UUID.randomUUID();
@@ -92,7 +92,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
     private ArrayNode toArrayNode(
         String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, List<? extends TaskDefinition> tasks,
-        ModeType type) {
+        PlatformType type) {
 
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
@@ -117,7 +117,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     private String getDefinition(
-        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, ModeType type) {
+        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, PlatformType type) {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
 

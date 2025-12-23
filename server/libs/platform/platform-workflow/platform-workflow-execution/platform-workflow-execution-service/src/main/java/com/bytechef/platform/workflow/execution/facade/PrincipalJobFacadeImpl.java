@@ -21,7 +21,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
@@ -52,7 +52,7 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     // TODO @Transactional
-    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
+    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         long jobId = jobFacade.createJob(jobParametersDTO);
 
         principalJobService.create(jobId, jobPrincipalId, type);
@@ -62,7 +62,7 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         principalJobService.create(Validate.notNull(job.getId(), "id"), jobPrincipalId, type);

@@ -27,7 +27,7 @@ import com.bytechef.automation.mcp.config.McpProjectIntTestConfigurationSharedMo
 import com.bytechef.automation.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -94,9 +94,9 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testGetWorkspaceMcpServers() {
         // Given - Create and assign servers to workspace
         McpServer createdServer1 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 1", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
         McpServer createdServer2 = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         // When
         List<McpServer> result = workspaceMcpServerFacade.getWorkspaceMcpServers(testWorkspaceId);
@@ -116,7 +116,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testCreateWorkspaceMcpServer() {
         // Given
         String name = "Test Server";
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         Environment environment = Environment.DEVELOPMENT;
         Boolean enabled = true;
 
@@ -144,7 +144,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testCreateWorkspaceMcpServerWithNullEnabled() {
         // Given
         String name = "Test Server";
-        ModeType type = ModeType.AUTOMATION;
+        PlatformType type = PlatformType.AUTOMATION;
         Environment environment = Environment.DEVELOPMENT;
         Boolean enabled = null; // Should default to enabled
 
@@ -170,7 +170,7 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServer() {
         // Given - Create server and assign to workspace
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         // Verify server exists
         assertEquals(1, workspaceMcpServerRepository.findAllByWorkspaceId(testWorkspaceId)
@@ -190,11 +190,11 @@ public class WorkspaceMcpServerFacadeIntTest {
     void testDeleteWorkspaceMcpServerButKeepIfUsedByOtherWorkspaces() {
         // Given - Create server and assign to two workspaces
         McpServer createdServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
+            "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, testWorkspaceId);
 
         Long otherWorkspaceId = 1050L;
         workspaceMcpServerFacade.createWorkspaceMcpServer(
-            "Test Server 2", ModeType.AUTOMATION, Environment.DEVELOPMENT, true, otherWorkspaceId);
+            "Test Server 2", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, otherWorkspaceId);
 
         // Manually assign the first server to the second workspace to simulate shared usage
         WorkspaceMcpServer additionalAssignment = new WorkspaceMcpServer(createdServer.getId(), otherWorkspaceId);

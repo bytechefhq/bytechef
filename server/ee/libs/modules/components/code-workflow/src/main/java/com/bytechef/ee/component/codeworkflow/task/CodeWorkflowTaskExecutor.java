@@ -13,7 +13,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.ProjectHandler;
 import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
@@ -47,7 +47,7 @@ public class CodeWorkflowTaskExecutor {
     }
 
     public Object executePerform(
-        String codeWorkflowContainerUuid, String workflowName, String taskName, ModeType type) {
+        String codeWorkflowContainerUuid, String workflowName, String taskName, PlatformType type) {
 
         CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
             codeWorkflowContainerUuid);
@@ -71,11 +71,11 @@ public class CodeWorkflowTaskExecutor {
     }
 
     private List<WorkflowDefinition> getWorkflowDefinitions(
-        CodeWorkflowContainer codeWorkflowContainer, ModeType type) {
+        CodeWorkflowContainer codeWorkflowContainer, PlatformType type) {
 
         List<WorkflowDefinition> workflows = List.of();
 
-        if (ModeType.AUTOMATION.equals(type)) {
+        if (PlatformType.AUTOMATION.equals(type)) {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
                 codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflows()),
                 codeWorkflowContainer.getLanguage(),

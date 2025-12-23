@@ -22,7 +22,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public long createConnectedUserProjectWorkflowConnection(
         long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO) {
 
-        long connectionId = connectionFacade.create(connectionDTO, ModeType.EMBEDDED);
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserConnectedUserProject(
             connectedUserId);
@@ -108,7 +108,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
                 .toList());
 
         List<ConnectionDTO> connectionDTOs = new ArrayList<>(
-            connectionFacade.getConnections(allConnectionIds, ModeType.EMBEDDED));
+            connectionFacade.getConnections(allConnectionIds, PlatformType.EMBEDDED));
 
         connectionDTOs.addAll(
             connectionIds.stream()

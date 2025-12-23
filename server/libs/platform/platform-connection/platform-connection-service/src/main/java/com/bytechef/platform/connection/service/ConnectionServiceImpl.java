@@ -23,7 +23,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(
         @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
-        int environmentId, String name, Map<String, Object> parameters, ModeType type) {
+        int environmentId, String name, Map<String, Object> parameters, PlatformType type) {
 
         Assert.hasText(componentName, "'componentName' must not be empty");
         Assert.hasText(name, "'name' must not be empty");
@@ -102,14 +102,14 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(ModeType type) {
+    public List<Connection> getConnections(PlatformType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, int version, ModeType type) {
+    public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
             componentName, version, type.ordinal());
     }
@@ -117,7 +117,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Long environmentId, ModeType type) {
+        String componentName, Integer connectionVersion, Long tagId, Long environmentId, PlatformType type) {
 
         List<Connection> connections;
 

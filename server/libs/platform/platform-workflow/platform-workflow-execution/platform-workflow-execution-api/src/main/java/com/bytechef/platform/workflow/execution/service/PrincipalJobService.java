@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import java.time.Instant;
 import java.util.List;
@@ -29,19 +29,19 @@ import org.springframework.data.domain.Page;
  */
 public interface PrincipalJobService {
 
-    PrincipalJob create(long jobId, long principalId, ModeType type);
+    PrincipalJob create(long jobId, long principalId, PlatformType type);
 
-    void deletePrincipalJobs(long jobId, ModeType type);
+    void deletePrincipalJobs(long jobId, PlatformType type);
 
-    Optional<Long> fetchLastJobId(long principalId, ModeType type);
+    Optional<Long> fetchLastJobId(long principalId, PlatformType type);
 
-    Optional<Long> fetchJobPrincipalId(long jobId, ModeType type);
+    Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type);
 
-    long getJobPrincipalId(long jobId, ModeType type);
+    long getJobPrincipalId(long jobId, PlatformType type);
 
-    List<Long> getJobIds(long principalId, ModeType type);
+    List<Long> getJobIds(long principalId, PlatformType type);
 
     Page<Long> getJobIds(
-        Status status, Instant startDate, Instant endDate, List<Long> principalIds, ModeType type,
+        Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
         List<String> workflowIds, int pageNumber);
 }

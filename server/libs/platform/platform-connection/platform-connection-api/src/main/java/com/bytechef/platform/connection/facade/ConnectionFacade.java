@@ -17,7 +17,7 @@
 package com.bytechef.platform.connection.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
@@ -26,19 +26,19 @@ import java.util.List;
  */
 public interface ConnectionFacade {
 
-    long create(ConnectionDTO connectionDTO, ModeType type);
+    long create(ConnectionDTO connectionDTO, PlatformType type);
 
     void delete(Long id);
 
     ConnectionDTO getConnection(Long id);
 
-    List<ConnectionDTO> getConnections(List<Long> connectionIds, ModeType type);
+    List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type);
 
     List<ConnectionDTO> getConnections(
         String componentName, Integer connectionVersion, List<Long> connectionIds, Long tagId, Long environmentId,
-        ModeType type);
+        PlatformType type);
 
-    List<Tag> getConnectionTags(ModeType type);
+    List<Tag> getConnectionTags(PlatformType type);
 
     void update(long id, List<Tag> tags);
 

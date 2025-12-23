@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
@@ -32,7 +32,7 @@ public class WorkflowExecutionId implements Serializable {
     private long jobPrincipalId;
 
     @Nullable
-    private ModeType type;
+    private PlatformType type;
 
     @Nullable
     private String workflowUuid;
@@ -48,7 +48,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     private WorkflowExecutionId(
-        String tenantId, ModeType type, long jobPrincipalId, String workflowUuid, String triggerName) {
+        String tenantId, PlatformType type, long jobPrincipalId, String workflowUuid, String triggerName) {
 
         this.jobPrincipalId = jobPrincipalId;
         this.tenantId = tenantId;
@@ -58,7 +58,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId of(
-        ModeType type, long jobPrincipalId, String workflowUuid, String triggerName) {
+        PlatformType type, long jobPrincipalId, String workflowUuid, String triggerName) {
 
         Assert.hasText(workflowUuid, "'workflowUuid' must not be blank");
         Assert.hasText(triggerName, "'triggerName' must not be blank");
@@ -73,14 +73,14 @@ public class WorkflowExecutionId implements Serializable {
         String[] items = id.split(":");
 
         return new WorkflowExecutionId(
-            items[0], ModeType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
+            items[0], PlatformType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
     }
 
     public long getJobPrincipalId() {
         return jobPrincipalId;
     }
 
-    public ModeType getType() {
+    public PlatformType getType() {
         return Objects.requireNonNull(type);
     }
 
@@ -98,7 +98,7 @@ public class WorkflowExecutionId implements Serializable {
 
     @Override
     public String toString() {
-        ModeType type1 = Objects.requireNonNull(type);
+        PlatformType type1 = Objects.requireNonNull(type);
 
         return EncodingUtils.base64EncodeToString(
             tenantId +

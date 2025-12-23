@@ -17,7 +17,7 @@
 package com.bytechef.platform.scheduler;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzJdbcTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -90,7 +90,7 @@ public class QuartzIntTest {
     public void testPollingTriggerJobDataMapLoaded() throws Exception {
         // Given: A workflow execution ID with job data
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 1059L, "50849def-93e2-44eb-aa05-797ebf849954", "trigger_1");
+            PlatformType.AUTOMATION, 1059L, "50849def-93e2-44eb-aa05-797ebf849954", "trigger_1");
 
         // When: Schedule the polling trigger (stores in PostgreSQL)
         quartzTriggerScheduler.schedulePollingTrigger(workflowExecutionId);
@@ -121,7 +121,7 @@ public class QuartzIntTest {
     public void testScheduleTriggerWithJobDataMap() throws Exception {
         // Given: A cron schedule with output data in JobDataMap
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 789L, "test-schedule-workflow", "testTrigger");
+            PlatformType.AUTOMATION, 789L, "test-schedule-workflow", "testTrigger");
         String cronPattern = "0/5 * * * * ?"; // Every 5 seconds
         Map<String, Object> output = Map.of("key", "value", "number", 42);
 
@@ -162,7 +162,7 @@ public class QuartzIntTest {
     public void testDynamicWebhookTriggerJobDataMap() throws Exception {
         // Given: A webhook refresh trigger with connection data
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 123L, "test-webhook-workflow", "testTrigger");
+            PlatformType.AUTOMATION, 123L, "test-webhook-workflow", "testTrigger");
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -211,7 +211,7 @@ public class QuartzIntTest {
     public void testSchedulerStartStopWithPostgreSQL() throws Exception {
         // Given: A polling trigger stored in PostgreSQL
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            ModeType.AUTOMATION, 2000L, "test-restart-workflow", "trigger_restart");
+            PlatformType.AUTOMATION, 2000L, "test-restart-workflow", "trigger_restart");
 
         quartzTriggerScheduler.schedulePollingTrigger(workflowExecutionId);
 

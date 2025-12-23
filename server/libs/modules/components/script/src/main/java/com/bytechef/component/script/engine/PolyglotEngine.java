@@ -344,7 +344,7 @@ public class PolyglotEngine {
                 componentName, componentVersion, actionName, actionContextAware.getJobPrincipalId(),
                 actionContextAware.getJobPrincipalWorkflowId(), actionContextAware.getJobId(),
                 actionContextAware.getWorkflowId(), componentConnection,
-                actionContextAware.getEnvironmentId(), actionContextAware.getModeType(), true);
+                actionContextAware.getEnvironmentId(), actionContextAware.getPlatformType(), true);
         }
 
         private ActionDefinitionService getActionDefinitionService() {
