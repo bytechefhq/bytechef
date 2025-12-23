@@ -538,7 +538,6 @@ public class ComponentTools {
                             outputResponse = actionDefinition.getOutputResponse();
                         } else if (actionDefinition.isOutputFunctionDefined()) {
                             try {
-
                                 outputResponse = actionDefinitionFacade.executeOutput(
                                     componentDefinition.getName(), componentDefinition.getVersion(),
                                     actionDefinition.getName(), Map.of(), Map.of());
@@ -546,8 +545,10 @@ public class ComponentTools {
                                 try {
                                     List<Connection> connections =
                                         connectionService.getConnections(componentName, version, ModeType.AUTOMATION);
-                                    Map<String, Long> connectionIds = Map.of(operationName, connections.get(0)
-                                        .getId());
+
+                                    Connection connection = connections.getFirst();
+
+                                    Map<String, Long> connectionIds = Map.of(operationName, connection.getId());
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
