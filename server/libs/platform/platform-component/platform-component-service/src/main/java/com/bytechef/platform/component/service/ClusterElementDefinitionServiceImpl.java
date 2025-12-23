@@ -30,7 +30,7 @@ import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
+import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
@@ -354,7 +354,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         String componentName, Integer componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ClusterElementContext context) {
 
-        SingleConnectionToolFunction toolFunction = getClusterElement(
+        ToolFunction toolFunction = getClusterElement(
             componentName, componentVersion, clusterElementName);
 
         try {
