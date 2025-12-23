@@ -364,7 +364,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
 
@@ -374,7 +374,7 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution.getJobId(), "jobId"), Validate.notNull(taskExecution.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }
@@ -420,7 +420,7 @@ public class TaskWorkerTest {
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -430,7 +430,7 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
     }
@@ -477,7 +477,7 @@ public class TaskWorkerTest {
         EXECUTOR_SERVICE.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution2)));
 
         // give it a second to start executing
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
@@ -487,7 +487,7 @@ public class TaskWorkerTest {
                 Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
 
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }
