@@ -13,7 +13,7 @@ import {Connections} from '@/pages/automation/connections/Connections';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
-import {AUTHORITIES} from '@/shared/constants';
+import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
@@ -429,6 +429,15 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
+                                    loader: async () => {
+                                        const currentEnvironmentId = environmentStore.getState().currentEnvironmentId;
+
+                                        if (currentEnvironmentId != DEVELOPMENT_ENVIRONMENT) {
+                                            return redirect('/automation/deployments');
+                                        }
+
+                                        return null;
+                                    },
                                     path: 'projects',
                                 },
                                 {
