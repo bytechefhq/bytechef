@@ -30,8 +30,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,15 +56,14 @@ public class AgileCrmNewTaskTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        ZoneId zoneId = ZoneId.systemDefault();
+        Instant now = Instant.now();
 
-        LocalDateTime now = LocalDateTime.now(zoneId);
-
-        LocalDateTime lastTimeChecked = closureParameters.getLocalDateTime(
-            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment() ? now.minusHours(3) : now);
-
-        long lastTimeCheckedEpoch = lastTimeChecked.atZone(zoneId)
-            .toEpochSecond();
+        long lastTimeCheckedEpoch = closureParameters.getLong(
+            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment()
+                ? Instant.now()
+                    .minus(3, ChronoUnit.HOURS)
+                    .getEpochSecond()
+                : now.getEpochSecond());
 
         List<Map<String, Object>> tasks = triggerContext.http(http -> http.get("/tasks/based"))
             .configuration(responseType(ResponseType.JSON))
@@ -79,6 +78,6 @@ public class AgileCrmNewTaskTrigger {
             }
         }
 
-        return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now), false);
+        return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now.getEpochSecond()), false);
     }
 }
