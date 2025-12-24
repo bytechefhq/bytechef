@@ -42,7 +42,10 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
     const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
         onSuccess: () => {
+            // Refresh all relevant caches so tags appear in the list and in the left sidebar
             queryClient.invalidateQueries({queryKey: ['mcpServers']});
+            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+            queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
         },
     });
 
@@ -87,25 +90,13 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
-                            <div className="flex w-full items-center gap-2">
-                                {mcpServer.name ? (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <div className="flex items-center">
-                                                <span className="text-base font-semibold">{mcpServer.name}</span>
-                                            </div>
-                                        </TooltipTrigger>
+                            <CollapsibleTrigger className="text-base font-semibold">
+                                <div className="flex items-center">
+                                    <ServerIcon className="mr-2 size-4 text-gray-500" />
 
-                                        <TooltipContent>MCP Server</TooltipContent>
-                                    </Tooltip>
-                                ) : (
-                                    <div className="flex items-center">
-                                        <ServerIcon className="mr-2 size-4 text-gray-500" />
-
-                                        <span className="text-base font-semibold">{mcpServer.name}</span>
-                                    </div>
-                                )}
-                            </div>
+                                    <span className="text-base font-semibold">{mcpServer.name}</span>
+                                </div>
+                            </CollapsibleTrigger>
                         </div>
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
