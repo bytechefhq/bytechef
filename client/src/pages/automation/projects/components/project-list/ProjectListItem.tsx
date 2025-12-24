@@ -62,7 +62,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {useCallback, useRef, useState} from 'react';
+import {MouseEvent, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -109,7 +109,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
 
     const deleteProjectMutation = useDeleteProjectMutation({
-        onSuccess: () => {
+        onSuccess: (_, projectId) => {
+            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
+
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({
                 queryKey: ProjectCategoryKeys.projectCategories,
@@ -490,7 +493,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 <DropdownMenuItem
                                     className="dropdown-menu-item-destructive"
-                                    onClick={() => setShowDeleteDialog(true)}
+                                    onClick={(event: MouseEvent) => {
+                                        setShowDeleteDialog(true);
+
+                                        event.stopPropagation();
+                                    }}
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>

@@ -36,8 +36,11 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     const queryClient = useQueryClient();
 
     const deleteProjectMutation = useDeleteProjectMutation({
-        onSuccess: () => {
+        onSuccess: (_, projectId) => {
             navigate('/automation/projects');
+
+            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({

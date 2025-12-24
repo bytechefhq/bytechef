@@ -12,7 +12,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -35,6 +35,8 @@ const Projects = () => {
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
     const ff_1041 = useFeatureFlagsStore()('ff-1041');
@@ -66,9 +68,9 @@ const Projects = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
+    const isRefetchingProjects = queryClient.isFetching({queryKey: ProjectKeys.projects}) > 0;
 
-    const queryClient = useQueryClient();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
     return (
         <LayoutContainer
@@ -128,6 +130,7 @@ const Projects = () => {
             >
                 {projects && projects?.length > 0 && tags ? (
                     <ProjectList
+                        isRefetchingProjects={isRefetchingProjects}
                         projectGitConfigurations={projectGitConfigurations ?? []}
                         projects={projects}
                         tags={tags}
