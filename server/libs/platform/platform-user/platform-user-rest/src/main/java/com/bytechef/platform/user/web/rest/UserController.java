@@ -84,6 +84,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
+@SuppressFBWarnings("CRLF_INJECTION_LOGS")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);

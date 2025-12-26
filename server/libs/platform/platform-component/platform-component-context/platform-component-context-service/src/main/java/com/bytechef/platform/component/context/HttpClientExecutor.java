@@ -589,6 +589,7 @@ class HttpClientExecutor {
         }
     }
 
+    @SuppressFBWarnings("WEAK_TRUST_MANAGER")
     private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
         @Nullable
