@@ -1,0 +1,54 @@
+"""
+TriggerDefinition represents a trigger exposed by a component.
+"""
+type TriggerDefinition {
+    componentName: String!
+    componentVersion: Int!
+    description: String!
+    help: Help
+    name: String!
+    outputDefined: Boolean!
+    outputFunctionDefined: Boolean!
+    outputSchemaDefined: Boolean!
+    properties: [Property!]!
+    title: String!
+    type: TriggerType!
+    workflowNodeDescriptionDefined: Boolean!
+}
+
+"""
+Minimal Help type if not already defined elsewhere in the schema set.
+"""
+type Help {
+    description: String
+    documentationUrl: String
+}
+
+"""
+Minimal Property type if not already defined elsewhere in the schema set.
+Only core fields required by UI; backend will populate nested structure.
+"""
+type Property {
+    name: String
+    type: String
+    label: String
+    description: String
+    required: Boolean
+    defaultValue: String
+    items: [Property!]
+    properties: [Property!]
+}
+
+"""
+Trigger type enumeration.
+"""
+enum TriggerType {
+    DYNAMIC_WEBHOOK
+    POLLING
+    REAL_TIME
+    STATIC_WEBHOOK
+}
+
+extend type Query {
+    triggerDefinition(componentName: String!, componentVersion: Int!, triggerName: String!): TriggerDefinition!
+}
