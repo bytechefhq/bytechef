@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
