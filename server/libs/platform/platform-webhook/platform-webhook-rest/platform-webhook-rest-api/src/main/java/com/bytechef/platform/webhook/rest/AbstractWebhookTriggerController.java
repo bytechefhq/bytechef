@@ -228,7 +228,7 @@ public abstract class AbstractWebhookTriggerController {
             }
 
             body = new WebhookBodyImpl(
-                multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
+                parseMap(multipartFormDataMap), ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
             parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
         } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
             Map<String, String[]> parameterMap = new HashMap<>(httpServletRequest.getParameterMap());
@@ -242,8 +242,7 @@ public abstract class AbstractWebhookTriggerController {
             }
 
             body = new WebhookBodyImpl(
-                parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
-                httpServletRequest.getContentType(), null);
+                parseMap(parameterMap), ContentType.FORM_URL_ENCODED, httpServletRequest.getContentType(), null);
             parameters = new HashMap<>(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
@@ -346,15 +345,15 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, ?> parseFormUrlencodedParams(Map<String, String[]> parameterMap) {
+    private Map<String, ?> parseMap(Map<String, ?> map) {
         Map<String, Object> multiMap = new HashMap<>();
 
-        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
-            String[] values = entry.getValue();
+            Object value = entry.getValue();
 
-            // Split the key on [
-            String[] keys = key.split("\\[");
+            // Split the key on [ or .
+            String[] keys = key.split("\\[|\\.");
 
             Map<String, Object> currentMap = multiMap;
 
@@ -369,15 +368,25 @@ public abstract class AbstractWebhookTriggerController {
                 if (i == keys.length - 1) {
                     // If we're at the last key, add the value
 
-                    List<Object> convertedValues = Arrays.stream(values)
-                        .map(string -> (string == null || string.isBlank()) ? null : ConvertUtils.convertString(string))
-                        .toList();
+                    List<Object> values;
+
+                    if (value instanceof Object[] objects) {
+                        values = Arrays.stream(objects)
+                            .map(this::convertValue)
+                            .toList();
+                    } else if (value instanceof List<?> list) {
+                        values = list.stream()
+                            .map(this::convertValue)
+                            .toList();
+                    } else {
+                        values = List.of(convertValue(value));
+                    }
 
                     currentMap.put(
                         currentKey,
-                        convertedValues.isEmpty()
+                        values.isEmpty()
                             ? null
-                            : convertedValues.size() == 1 ? convertedValues.getFirst() : convertedValues);
+                            : values.size() == 1 ? values.getFirst() : values);
                 } else {
                     // Otherwise, add a new map if one doesn't already exist
                     currentMap.putIfAbsent(currentKey, new HashMap<String, Object>());
@@ -388,6 +397,14 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         return multiMap;
+    }
+
+    private Object convertValue(Object value) {
+        if (value instanceof String string) {
+            return (string.isBlank()) ? null : ConvertUtils.convertString(string);
+        }
+
+        return value;
     }
 
     private ResponseEntity<Object> processWebhookResponse(
