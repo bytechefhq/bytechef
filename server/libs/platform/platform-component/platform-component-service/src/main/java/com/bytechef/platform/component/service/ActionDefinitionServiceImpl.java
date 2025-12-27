@@ -127,7 +127,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections) {
 
-        BaseOutputFunction baseOutputFunction = componentDefinitionRegistry
+        BaseOutputFunction baseOutputFunction = (BaseOutputFunction) componentDefinitionRegistry
             .getActionDefinition(componentName, componentVersion, actionName)
             .getOutputDefinition()
             .flatMap(OutputDefinition::getOutput)
