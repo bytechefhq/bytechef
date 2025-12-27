@@ -92,24 +92,19 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    private static Object checkFileEntry(Object item) {
-        if (item instanceof Map map) {
-            return new FileEntryImpl(
-                MapUtils.getRequiredString(map, "name"), MapUtils.getRequiredString(map, "extension"),
-                MapUtils.getRequiredString(map, MIME_TYPE), MapUtils.getRequiredString(map, "url"));
-        } else {
-            return item;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     private static Object checkValue(Map.Entry<String, ?> entry) {
-        if (entry.getValue() instanceof String) {
-            return entry.getValue();
-        } else if (entry.getValue() instanceof List<?> list) {
-            return CollectionUtils.map(list, WebhookRequestDeserializer::checkFileEntry);
+        if (entry.getValue() instanceof Map map) {
+            if (FileEntry.isFileEntryMap(map)) {
+                return new FileEntryImpl(
+                    MapUtils.getRequiredString(map, "name"), MapUtils.getString(map, "extension"),
+                    MapUtils.getString(map, MIME_TYPE), MapUtils.getRequiredString(map, "url"));
+            } else {
+                return MapUtils.toMap(map, Map.Entry::getKey, WebhookRequestDeserializer::checkValue);
+            }
+        } else if (entry.getValue() instanceof List list) {
+            return CollectionUtils.map(list, WebhookRequestDeserializer::checkValue);
         } else {
-            return new FileEntry((Map<String, ?>) entry.getValue());
+            return entry.getValue();
         }
     }
 
