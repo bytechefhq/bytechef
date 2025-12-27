@@ -45,6 +45,8 @@ export const CONDITION_CASE_TRUE = 'caseTrue';
 export const CONDITION_CASE_FALSE = 'caseFalse';
 
 export const DEVELOPMENT_ENVIRONMENT = 0;
+export const STAGING_ENVIRONMENT = 1;
+export const PRODUCTION_ENVIRONMENT = 2;
 
 export const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 

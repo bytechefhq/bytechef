@@ -11,6 +11,7 @@ import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
 import {Connections} from '@/pages/automation/connections/Connections';
 import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
+import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -338,6 +339,14 @@ export const getRouter = (queryClient: QueryClient) =>
                 </AccessControl>
             ),
             path: '/verify-email',
+        },
+        {
+            element: <TriggerForm />,
+            path: 'form/:workflowExecutionId',
+        },
+        {
+            element: <TriggerForm />,
+            path: 'form/:environment/:workflowExecutionId',
         },
         {
             element: <WorkflowChat />,
