@@ -30,7 +30,7 @@ import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 /**
  * Configuration class for registering the Map scalar type with GraphQL.
  *
- * @author Junie
+ * @author Ivica Cardic
  */
 @Configuration
 class MapScalarConfiguration {
@@ -45,11 +45,13 @@ class MapScalarConfiguration {
             .name("Map")
             .description("A map scalar that represents a JSON object")
             .coercing(new Coercing<Map<String, Object>, Map<String, Object>>() {
+
                 @Override
                 public Map<String, Object> serialize(Object dataFetcherResult) throws CoercingSerializeException {
                     if (dataFetcherResult instanceof Map) {
                         return (Map<String, Object>) dataFetcherResult;
                     }
+
                     throw new CoercingSerializeException("Expected a Map object");
                 }
 
@@ -58,6 +60,7 @@ class MapScalarConfiguration {
                     if (input instanceof Map) {
                         return (Map<String, Object>) input;
                     }
+
                     throw new CoercingParseValueException("Expected a Map object");
                 }
 
@@ -66,6 +69,7 @@ class MapScalarConfiguration {
                     if (input instanceof StringValue) {
                         return parseValue(((StringValue) input).getValue());
                     }
+
                     throw new CoercingParseLiteralException("Expected a StringValue");
                 }
             })
