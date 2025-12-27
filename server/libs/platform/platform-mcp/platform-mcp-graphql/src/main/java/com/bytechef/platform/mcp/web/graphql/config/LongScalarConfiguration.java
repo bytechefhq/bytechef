@@ -23,6 +23,7 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.math.BigInteger;
 import java.time.Instant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,17 +47,21 @@ class LongScalarConfiguration {
             .name("Long")
             .description("A Long scalar that represents a 64-bit signed integer")
             .coercing(new Coercing<Long, Long>() {
+
                 @Override
                 public Long serialize(Object dataFetcherResult) throws CoercingSerializeException {
                     if (dataFetcherResult instanceof Long) {
                         return (Long) dataFetcherResult;
                     }
+
                     if (dataFetcherResult instanceof Number) {
                         return ((Number) dataFetcherResult).longValue();
                     }
+
                     if (dataFetcherResult instanceof Instant) {
                         return ((Instant) dataFetcherResult).toEpochMilli();
                     }
+
                     if (dataFetcherResult instanceof String) {
                         try {
                             return Long.parseLong((String) dataFetcherResult);
@@ -93,8 +98,9 @@ class LongScalarConfiguration {
                 @Override
                 public Long parseLiteral(Object input) throws CoercingParseLiteralException {
                     if (input instanceof IntValue) {
-                        return ((IntValue) input).getValue()
-                            .longValue();
+                        BigInteger bigInteger = ((IntValue) input).getValue();
+
+                        return bigInteger.longValue();
                     }
 
                     if (input instanceof StringValue) {
