@@ -432,7 +432,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     loader: async () => {
                                         const currentEnvironmentId = environmentStore.getState().currentEnvironmentId;
 
-                                        if (currentEnvironmentId != DEVELOPMENT_ENVIRONMENT) {
+                                        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
                                             return redirect('/automation/deployments');
                                         }
 
