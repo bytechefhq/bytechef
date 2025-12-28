@@ -16,9 +16,12 @@ import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/compo
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
+import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
-import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {Suspense, lazy, useState} from 'react';
 
@@ -34,8 +37,6 @@ interface WorkflowCodeEditorSheetProps {
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-const workflowTestApi = new WorkflowTestApi();
-
 const WorkflowCodeEditorSheet = ({
     invalidateWorkflowQueries,
     onSheetOpenClose,
@@ -47,13 +48,25 @@ const WorkflowCodeEditorSheet = ({
 }: WorkflowCodeEditorSheetProps) => {
     const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
-    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
-    const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
     const [showCloseAlertDialog, setShowCloseAlertDialog] = useState(false);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
+    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
+    const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
+    const {persistJobId} = usePersistJobId(workflow.id, currentEnvironmentId);
+    const {close, setStreamRequest} = useWorkflowTestStream(
+        workflow.id!,
+        (execution) => {
+            setWorkflowTestExecution(execution);
+            setWorkflowIsRunning(false);
+        },
+        () => {
+            setWorkflowTestExecution(undefined);
+            setWorkflowIsRunning(false);
+        }
+    );
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     const handleRunClick = () => {
@@ -61,19 +74,12 @@ const WorkflowCodeEditorSheet = ({
         setWorkflowIsRunning(true);
 
         if (workflow?.id) {
-            workflowTestApi
-                .testWorkflow({
-                    environmentId: currentEnvironmentId,
-                    id: workflow?.id,
-                })
-                .then((workflowTestExecution) => {
-                    setWorkflowTestExecution(workflowTestExecution);
-                    setWorkflowIsRunning(false);
-                })
-                .catch(() => {
-                    setWorkflowIsRunning(false);
-                    setWorkflowTestExecution(undefined);
-                });
+            const request = getTestWorkflowStreamPostRequest({
+                environmentId: currentEnvironmentId,
+                id: workflow.id,
+            });
+
+            setStreamRequest(request);
         }
     };
 
@@ -181,7 +187,10 @@ const WorkflowCodeEditorSheet = ({
                             <Button
                                 icon={<SquareIcon />}
                                 onClick={() => {
-                                    console.error('Implement cancel workflow execution');
+                                    setWorkflowIsRunning(false);
+                                    setStreamRequest(null);
+                                    persistJobId(null);
+                                    close();
                                 }}
                                 size="icon"
                                 variant="destructive"
