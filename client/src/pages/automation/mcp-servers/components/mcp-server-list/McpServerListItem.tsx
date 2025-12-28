@@ -94,7 +94,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                                 <div className="flex items-center">
                                     <ServerIcon className="mr-2 size-4 text-gray-500" />
 
-                                    <span className="text-base font-semibold">{mcpServer.name}</span>
+                                    <span>{mcpServer.name}</span>
                                 </div>
                             </CollapsibleTrigger>
                         </div>
