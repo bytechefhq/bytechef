@@ -104,7 +104,7 @@ public class WorkflowTestConfiguration {
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
         return new JobTestExecutor(
-            componentDefinitionService, contextService, evaluator, jobService,
+            componentDefinitionService, contextService, evaluator,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, 1000,
                 role -> (role == JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR)

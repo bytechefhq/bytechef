@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -34,7 +34,11 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
+import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
+import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
+import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
+import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
+import java.util.function.Consumer;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,8 +56,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
-
-    private static final Random RANDOM = new Random();
 
     private final ComponentDefinitionService componentDefinitionService;
     private final JobTestExecutor jobTestExecutor;
@@ -74,8 +76,61 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
-    @SuppressWarnings("unchecked")
     public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs, long environmentId) {
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+
+        return new WorkflowTestExecutionDTO(
+            jobTestExecutor.execute(workflowTestParameters.jobParametersDTO()),
+            workflowTestParameters.triggerExecutionDTO());
+    }
+
+    @Override
+    public long startTestWorkflow(String workflowId, Map<String, Object> inputs, long environmentId) {
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+
+        return jobTestExecutor.start(workflowTestParameters.jobParametersDTO());
+    }
+
+    private record WorkflowTestParameters(
+        JobParametersDTO jobParametersDTO, TriggerExecutionDTO triggerExecutionDTO) {
+    }
+
+    @Override
+    public WorkflowTestExecutionDTO awaitTestResult(long jobId) {
+        JobDTO jobDTO = jobTestExecutor.await(jobId);
+
+        return new WorkflowTestExecutionDTO(jobDTO, null);
+    }
+
+    @Override
+    public void stopTest(long jobId) {
+        jobTestExecutor.stop(jobId);
+    }
+
+    @Override
+    public AutoCloseable addJobStatusListener(long jobId, Consumer<JobStatusEventDTO> listener) {
+        return jobTestExecutor.addJobStatusListener(jobId, listener);
+    }
+
+    @Override
+    public AutoCloseable addTaskStartedListener(long jobId, Consumer<TaskStatusEventDTO> listener) {
+        return jobTestExecutor.addTaskStartedListener(jobId, listener);
+    }
+
+    @Override
+    public AutoCloseable addTaskExecutionCompleteListener(long jobId, Consumer<TaskStatusEventDTO> listener) {
+        return jobTestExecutor.addTaskExecutionCompleteListener(jobId, listener);
+    }
+
+    @Override
+    public AutoCloseable addErrorListener(long jobId, Consumer<ExecutionErrorEventDTO> listener) {
+        return jobTestExecutor.addErrorListener(jobId, listener);
+    }
+
+    @SuppressWarnings("unchecked")
+    private WorkflowTestParameters getWorkflowTestParameters(
+        String workflowId, Map<String, Object> inputs, long environmentId) {
+
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
             workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId);
 
@@ -100,8 +155,9 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         if (workflowTriggers.isEmpty()) {
-            Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
-                workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
+            Map<String, ?> workflowTestConfigurationInputs = workflowTestConfigurationOptional
+                .map(WorkflowTestConfiguration::getInputs)
+                .orElse(Map.of());
 
             inputs = MapUtils.concat(inputs, (Map<String, Object>) workflowTestConfigurationInputs);
         } else {
@@ -112,31 +168,32 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
                 workflowId, workflowTrigger.getName(), environmentId);
 
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .id(-RandomUtils.nextLong())
+                .startDate(Instant.now())
+                .endDate(Instant.now())
+                .status(Status.COMPLETED)
+                .workflowTrigger(workflowTrigger)
+                .build();
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+
+            Map<String, ?> workflowTestConfigurationInputs = workflowTestConfigurationOptional
+                .map(WorkflowTestConfiguration::getInputs)
+                .orElse(Map.of());
+
+            Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
+
+            if (sampleOutput == null) {
+                sampleOutput = Map.of();
+            }
+
+            triggerExecutionDTO = new TriggerExecutionDTO(
+                triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(),
+                workflowTestConfigurationInputs, sampleOutput);
+
             if (inputs.isEmpty()) {
-                TriggerExecution triggerExecution = TriggerExecution.builder()
-                    .id(-RANDOM.nextLong())
-                    .startDate(Instant.now())
-                    .endDate(Instant.now())
-                    .status(Status.COMPLETED)
-                    .workflowTrigger(workflowTrigger)
-                    .build();
-
-                ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                    workflowNodeType.name(), workflowNodeType.version());
-
-                Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
-                    workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
-
-                Object sampleOutput = workflowNodeOutputDTO.getSampleOutput();
-
-                if (sampleOutput == null) {
-                    sampleOutput = Map.of();
-                }
-
-                triggerExecutionDTO = new TriggerExecutionDTO(
-                    triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(),
-                    workflowTestConfigurationInputs, sampleOutput);
-
                 WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
@@ -156,9 +213,8 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             }
         }
 
-        return new WorkflowTestExecutionDTO(
-            jobTestExecutor.execute(
-                new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap))),
+        return new WorkflowTestParameters(
+            new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap)),
             triggerExecutionDTO);
     }
 }
