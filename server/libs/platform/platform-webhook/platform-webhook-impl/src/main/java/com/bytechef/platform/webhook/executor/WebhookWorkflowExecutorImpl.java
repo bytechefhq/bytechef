@@ -31,6 +31,7 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +51,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
+    @SuppressFBWarnings("EI")
     public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,

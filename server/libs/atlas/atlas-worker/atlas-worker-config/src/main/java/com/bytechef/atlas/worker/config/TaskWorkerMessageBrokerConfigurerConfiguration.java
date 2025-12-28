@@ -58,8 +58,8 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
                 .getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TaskWorkerMessageRoute.ofTaskMessageRoute(routeName),
-                concurrency, taskWorkerDelegate, "onTaskExecutionEvent"));
+                listenerEndpointRegistrar, TaskWorkerMessageRoute.ofTaskMessageRoute(routeName), concurrency,
+                taskWorkerDelegate, "onTaskExecutionEvent"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskWorkerMessageRoute.CONTROL_EVENTS, 1, taskWorkerDelegate,
