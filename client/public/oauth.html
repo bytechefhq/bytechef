@@ -94,7 +94,7 @@
                 window.opener.postMessage({
                     error: 'OAuth error: State mismatch.',
                     type: OAUTH_RESPONSE,
-                });
+                }, '*');
             }
 
             // Auto-close window after successful authentication (optional)
