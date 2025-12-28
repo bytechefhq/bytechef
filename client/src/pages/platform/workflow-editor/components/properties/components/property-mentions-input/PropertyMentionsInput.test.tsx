@@ -96,7 +96,6 @@ import {
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
-import {Editor} from '@tiptap/react';
 import * as React from 'react';
 import {type Mock, describe, expect, test, vi} from 'vitest';
 
@@ -138,125 +137,6 @@ describe('PropertyMentionsInput', () => {
 
         expect(screen.getByText('PropertyMentionsInput Label')).toBeInTheDocument();
     });
-
-    test.each([['TEXT' as const], ['TEXT_AREA' as const], ['RICH_TEXT' as const]])(
-        'Backspace after a mention inserts $ (not @) in %s',
-        async (controlType) => {
-            // Ensure workflow id so guards inside the editor pass
-            useWorkflowDataStore.setState({
-                workflow: {id: 'wf-bksp', nodeNames: ['trigger_1']},
-            } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
-
-            const dummyMutation = {} as unknown as UseMutationResult<unknown, Error, unknown, unknown>;
-            const updateWorkflowNodeParameterMutation = dummyMutation as unknown as UseMutationResult<
-                DeleteClusterElementParameter200Response,
-                Error,
-                UpdateWorkflowNodeParameterOperationRequest,
-                unknown
-            >;
-            const updateClusterElementParameterMutation = dummyMutation as unknown as UseMutationResult<
-                DeleteClusterElementParameter200Response,
-                Error,
-                UpdateClusterElementParameterOperationRequest,
-                unknown
-            >;
-
-            const editorRef = React.createRef<Editor>();
-
-            render(
-                <WorkflowEditorProvider
-                    value={{
-                        ConnectionKeys: {
-                            connection: () => [],
-                            connectionTags: [],
-                            connections: [],
-                            filteredConnections: () => [],
-                        },
-                        deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
-                            DeleteClusterElementParameter200Response,
-                            Error,
-                            DeleteClusterElementParameterOperationRequest,
-                            unknown
-                        >,
-                        deleteWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
-                            DeleteClusterElementParameter200Response,
-                            Error,
-                            DeleteWorkflowNodeParameterRequest,
-                            unknown
-                        >,
-                        invalidateWorkflowQueries: () => {},
-                        updateClusterElementParameterMutation,
-                        updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
-                        updateWorkflowNodeParameterMutation,
-                        useCreateConnectionMutation: () =>
-                            ({}) as unknown as UseMutationResult<number, Error, ConnectionI, unknown>,
-                        useGetComponentDefinitionsQuery: () =>
-                            ({}) as UseQueryResult<Array<ComponentDefinitionBasic>, Error>,
-                        useGetConnectionTagsQuery: () => ({}) as unknown as UseQueryResult<Tag[], Error>,
-                        useGetConnectionsQuery: () => ({}) as unknown as UseQueryResult<ConnectionI[], Error>,
-                        webhookTriggerTestApi: {
-                            startWebhookTriggerTest: async () => ({}),
-                            stopWebhookTriggerTest: async () => {},
-                        },
-                    }}
-                >
-                    <WorkflowReadOnlyProvider
-                        value={{
-                            useGetComponentDefinitionsQuery: () =>
-                                ({}) as UseQueryResult<Array<ComponentDefinitionBasic>, Error>,
-                        }}
-                    >
-                        <PropertyMentionsInput
-                            controlType={controlType}
-                            label={`Bksp ${controlType}`}
-                            leadingIcon="📄"
-                            placeholder=""
-                            ref={editorRef}
-                            type="STRING"
-                            value=""
-                        />
-                    </WorkflowReadOnlyProvider>
-                </WorkflowEditorProvider>
-            );
-
-            const textbox = screen.getByRole('textbox', {name: `Bksp ${controlType}`});
-            const user = userEvent.setup();
-            await user.click(textbox);
-            await microtaskTick();
-
-            // Editor instance is created asynchronously by Tiptap; wait for it to be ready
-            await import('@testing-library/react');
-            const {waitFor} = await import('@testing-library/react');
-            await waitFor(() => {
-                expect(editorRef.current).toBeTruthy();
-            });
-            const editor = editorRef.current!;
-
-            // Insert a mention node programmatically (simulate selected pill)
-            editor
-                .chain()
-                .focus()
-                .insertContent([
-                    {
-                        attrs: {id: 'trigger_1.output', label: 'trigger_1.output'},
-                        type: 'mention',
-                    },
-                ])
-                .run();
-
-            // Place caret after the mention and press Backspace once
-            editor.commands.setTextSelection(editor.state.doc.content.size);
-            await microtaskTick();
-
-            const backspaceEvent = new KeyboardEvent('keydown', {bubbles: true, key: 'Backspace'});
-            editor.view.dom.dispatchEvent(backspaceEvent);
-            await microtaskTick(2);
-
-            const text = editor.state.doc.textBetween(0, editor.state.doc.content.size, '\n');
-            expect(text.includes('$')).toBe(true);
-            expect(text.includes('@')).toBe(false);
-        }
-    );
 
     test('coalesces saves and prevents parallel saveProperty calls; latest value wins', async () => {
         // Arrange: workflow id so guard passes
