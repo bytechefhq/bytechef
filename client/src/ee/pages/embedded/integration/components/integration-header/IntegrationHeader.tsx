@@ -29,12 +29,14 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
+import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {RefObject, useState} from 'react';
+import {RefObject, useCallback, useEffect, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -54,6 +56,7 @@ const IntegrationHeader = ({
     runDisabled: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
+    const [jobId, setJobId] = useState<string | null>(null);
     const [showDeleteIntegrationAlertDialog, setShowDeleteIntegrationAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditIntegrationDialog, setShowEditIntegrationDialog] = useState(false);
@@ -82,6 +85,8 @@ const IntegrationHeader = ({
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowTested} = useAnalytics();
 
+    const queryClient = useQueryClient();
+
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
@@ -92,7 +97,18 @@ const IntegrationHeader = ({
         !showDeleteIntegrationAlertDialog
     );
 
-    const queryClient = useQueryClient();
+    const {close, error, getPersistedJobId, persistJobId, setStreamRequest} = useWorkflowTestStream(
+        workflow.id!,
+        () => {
+            if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
+                bottomResizablePanelRef.current.resize(35);
+            }
+
+            setJobId(null);
+        },
+        () => setJobId(null),
+        (jobId) => setJobId(jobId)
+    );
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (integrationWorkflowId) => {
@@ -173,13 +189,12 @@ const IntegrationHeader = ({
         setCurrentNode(undefined);
 
         navigate(
-            `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
+            `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams.toString()}`
         );
     };
 
-    const handleRunClick = () => {
+    const handleRunClick = useCallback(() => {
         setShowBottomPanelOpen(true);
-        setWorkflowIsRunning(true);
         setWorkflowTestExecution(undefined);
 
         if (bottomResizablePanelRef.current) {
@@ -189,25 +204,65 @@ const IntegrationHeader = ({
         if (workflow.id) {
             captureIntegrationWorkflowTested();
 
-            workflowTestApi
-                .testWorkflow({
-                    environmentId: currentEnvironmentId,
-                    id: workflow.id,
-                })
-                .then((workflowTestExecution) => {
-                    setWorkflowTestExecution(workflowTestExecution);
-                    setWorkflowIsRunning(false);
+            setWorkflowIsRunning(true);
+            setJobId(null);
+            persistJobId(null);
 
-                    if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
-                        bottomResizablePanelRef.current.resize(35);
-                    }
-                })
-                .catch(() => {
-                    setWorkflowIsRunning(false);
-                    setWorkflowTestExecution(undefined);
-                });
+            const req = getTestWorkflowStreamPostRequest({
+                environmentId: currentEnvironmentId,
+                id: workflow.id,
+            });
+            setStreamRequest(req);
         }
-    };
+    }, [
+        captureIntegrationWorkflowTested,
+        currentEnvironmentId,
+        bottomResizablePanelRef,
+        persistJobId,
+        setShowBottomPanelOpen,
+        setStreamRequest,
+        setWorkflowIsRunning,
+        setWorkflowTestExecution,
+        workflow.id,
+    ]);
+
+    const handleStopClick = useCallback(() => {
+        setWorkflowIsRunning(false);
+        close();
+        setStreamRequest(null);
+
+        if (jobId) {
+            workflowTestApi.stopWorkflowTest({jobId}).finally(() => {
+                persistJobId(null);
+                setJobId(null);
+            });
+        }
+    }, [close, jobId, persistJobId, setStreamRequest, setWorkflowIsRunning]);
+
+    useEffect(() => {
+        if (!workflow.id || currentEnvironmentId === undefined) return;
+
+        const jobId = getPersistedJobId();
+
+        if (!jobId) {
+            return;
+        }
+
+        setWorkflowIsRunning(true);
+        setJobId(jobId);
+
+        setStreamRequest(getTestWorkflowAttachRequest({jobId}));
+    }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
+
+    // On transport error (e.g., 4xx/5xx), make sure to reset running state and clear the request to prevent retries
+    useEffect(() => {
+        if (error) {
+            setWorkflowIsRunning(false);
+            setStreamRequest(null);
+            persistJobId(null);
+            setJobId(null);
+        }
+    }, [error, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
     return (
         <header className="flex items-center px-3 py-2.5">
@@ -246,7 +301,7 @@ const IntegrationHeader = ({
                     )}
 
                     {workflowIsRunning ? (
-                        <IntegrationHeaderStopButton />
+                        <IntegrationHeaderStopButton onClick={handleStopClick} />
                     ) : (
                         <IntegrationHeaderRunButton onRunClick={handleRunClick} runDisabled={runDisabled} />
                     )}
