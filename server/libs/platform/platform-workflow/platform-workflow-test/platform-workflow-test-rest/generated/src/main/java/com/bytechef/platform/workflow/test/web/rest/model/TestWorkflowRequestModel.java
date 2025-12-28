@@ -23,30 +23,17 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("testWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:35.138751+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-12-01T08:02:58.568220+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
 public class TestWorkflowRequestModel {
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
-  public TestWorkflowRequestModel inputs(Map<String, Object> inputs) {
-    this.inputs = inputs;
-    return this;
-  }
-
-  public TestWorkflowRequestModel putInputsItem(String key, Object inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new HashMap<>();
-    }
-    this.inputs.put(key, inputsItem);
-    return this;
-  }
-
   /**
    * The input parameters used as workflow input values.
    * @return inputs
    */
-  
+
   @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public Map<String, Object> getInputs() {
