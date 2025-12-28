@@ -186,6 +186,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     HTMLAttributes: {
                         class: 'property-mention',
                     },
+                    deleteTriggerWithBackspace: true,
                     renderHTML({node, options}) {
                         const svg = getComponentIcon(node.attrs.label ?? node.attrs.id);
 
