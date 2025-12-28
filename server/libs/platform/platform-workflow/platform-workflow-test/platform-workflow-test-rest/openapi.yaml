@@ -9,45 +9,92 @@ tags:
   - name: "workflow-test"
     description: "The Platform Workflow Test Internal API"
 paths:
-  /workflows/{id}/tests:
+#  /workflow-tests/{id}:
+#    post:
+#      description: "Start and stream execution of a workflow for testing purposes via Server-Sent Events (SSE). Clients must request 'Accept: text/event-stream'. Emits events: start (runId), log (progress), result (final WorkflowTestExecution JSON), and error."
+#      summary: "Start and stream workflow test run (POST SSE)"
+#      tags:
+#        - "workflow-test"
+#      operationId: "startWorkflowTest"
+#      parameters:
+#        - name: "id"
+#          description: "Id of the workflow to execute."
+#          in: "path"
+#          schema:
+#            type: "string"
+#          required: true
+#        - name: "environmentId"
+#          description: "The id of an environment."
+#          required: true
+#          in: "query"
+#          schema:
+#            type: "integer"
+#            format: "int64"
+#      requestBody:
+#        content:
+#          application/json:
+#            schema:
+#              type: "object"
+#              properties:
+#                inputs:
+#                  description: "The input parameters used as workflow input values."
+#                  type: "object"
+#                  additionalProperties:
+#                    type: "object"
+#      responses:
+#        "200":
+#          description: "SSE stream with execution updates and final result."
+#          content:
+#            text/event-stream:
+#              schema:
+#                # Model SSE as a stream of events where each item is an event payload
+#                # OpenAPI convention for SSE: array + format: event-stream
+#                type: array
+#                format: event-stream
+#                items:
+#                  $ref: '#/components/schemas/WorkflowTestExecution'
+  /workflow-tests/{jobId}/stop:
     post:
-      description: "Execute a workflow synchronously for testing purposes."
-      summary: "Execute a workflow synchronously for testing purpose"
+      description: "Abort an in-progress workflow test run identified by jobId. Sends an 'error' event with 'Aborted' and closes the SSE stream."
+      summary: "Stop workflow test run"
       tags:
         - "workflow-test"
-      operationId: "testWorkflow"
+      operationId: "stopWorkflowTest"
       parameters:
-        - name: "id"
-          description: "Id of the workflow to execute."
+        - name: "jobId"
+          description: "The job identifier obtained from the start endpoint."
+          required: true
           in: "path"
           schema:
             type: "string"
-          required: true
-        - name: "environmentId"
-          description: "The id of an environment."
-          required: true
-          in: "query"
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                inputs:
-                  description: "The input parameters used as workflow input values."
-                  type: "object"
-                  additionalProperties:
-                    type: "object"
       responses:
         "200":
-          description: "The output expected by the workflow."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkflowTestExecution"
+          description: "Run aborted"
+#  /workflow-tests/{jobId}/attach:
+#    get:
+#      description: "Attach to an in-progress workflow test run by jobId and continue streaming events via SSE. Emits 'start' with jobId, optional 'log', and final 'result' or 'error'."
+#      summary: "Attach to workflow test run (GET SSE)"
+#      tags:
+#        - "workflow-test"
+#      operationId: "attachWorkflowTest"
+#      parameters:
+#        - name: "jobId"
+#          description: "The job identifier returned by the start endpoint."
+#          required: true
+#          in: "path"
+#          schema:
+#            type: "integer"
+#            format: "int64"
+#      responses:
+#        "200":
+#          description: "SSE stream with execution updates and final result."
+#          content:
+#            text/event-stream:
+#              schema:
+#                type: array
+#                format: event-stream
+#                items:
+#                  $ref: '#/components/schemas/WorkflowTestExecution'
 components:
   schemas:
     WorkflowTestExecution:
