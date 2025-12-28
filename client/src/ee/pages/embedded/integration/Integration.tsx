@@ -16,26 +16,32 @@ import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEdito
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
+import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const Integration = () => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {leftSidebarOpen} = useIntegrationsLeftSidebarStore(
         useShallow((state) => ({
             leftSidebarOpen: state.leftSidebarOpen,
         }))
     );
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
+    const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
-            workflowIsRunning: state.workflowIsRunning,
-            workflowTestExecution: state.workflowTestExecution,
+            workflow: state.workflow,
         }))
     );
+
+    const {cancelLeave, confirmLeave, showLeaveDialog, workflowIsRunning, workflowTestExecution} =
+        useWorkflowTestRunGuard(workflow.id, currentEnvironmentId);
 
     const {integrationId, integrationWorkflowId} = useParams();
 
@@ -59,6 +65,7 @@ const Integration = () => {
 
     return (
         <>
+            <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
             <LayoutContainer
                 className="bg-muted/50"
                 leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
