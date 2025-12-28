@@ -8,6 +8,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-web")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
