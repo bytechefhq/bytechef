@@ -25,7 +25,7 @@ import {Mention} from '@tiptap/extension-mention';
 import {Paragraph} from '@tiptap/extension-paragraph';
 import {Placeholder} from '@tiptap/extension-placeholder';
 import {Text} from '@tiptap/extension-text';
-import {Plugin, TextSelection} from '@tiptap/pm/state';
+import {TextSelection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
@@ -157,38 +157,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
-                Extension.create({
-                    addProseMirrorPlugins() {
-                        return [
-                            new Plugin({
-                                appendTransaction: (_trs, _oldState, newState) => {
-                                    const sel = newState.selection;
-
-                                    if (!sel.empty) {
-                                        return null;
-                                    }
-
-                                    const $pos = sel.$from;
-                                    const before = $pos.nodeBefore;
-
-                                    if (
-                                        before &&
-                                        before.isText &&
-                                        typeof before.text === 'string' &&
-                                        before.text.endsWith('@')
-                                    ) {
-                                        const from = $pos.pos - 1;
-                                        const to = $pos.pos;
-
-                                        return newState.tr.insertText('$', from, to);
-                                    }
-                                    return null;
-                                },
-                            }),
-                        ];
-                    },
-                    name: 'MentionBackspaceFix',
-                }),
                 FormulaMode.configure({
                     saveNullValue: () => {
                         if (
@@ -500,17 +468,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return getContent(editorValue);
         }, [editorValue, getContent]);
 
-        // Forward editor instance to parent ref when it becomes available
-        useEffect(() => {
-            if (!ref) {
-                return;
-            }
-            if (typeof ref === 'function') {
-                ref(editor);
-            } else {
-                (ref as MutableRefObject<Editor | null>).current = editor;
-            }
-        }, [editor, ref]);
+        if (ref) {
+            (ref as MutableRefObject<Editor | null>).current = editor;
+        }
 
         useEffect(() => {
             if (editor) {
