@@ -39,9 +39,9 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.11.50",
     "@ag-ui/client": "^0.0.42",
     "@ag-ui/core": "^0.0.42",
+    "@assistant-ui/react": "^0.11.50",
     "@assistant-ui/react-markdown": "^0.11.8",
     "@hookform/resolvers": "^5.2.2",
     "@lingui/core": "^5.6.1",
