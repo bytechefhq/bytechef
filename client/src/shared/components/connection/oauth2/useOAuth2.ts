@@ -162,7 +162,7 @@ const useOAuth2 = (props: Oauth2Props) => {
                 return;
             }
 
-            curStateRef.current = message?.data?.payload.state;
+            curStateRef.current = message?.data?.payload?.state;
 
             try {
                 const error = message?.data?.error;
