@@ -12,7 +12,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,8 +26,7 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String clusterElementName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        @Nullable Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId) {
 
         throw new UnsupportedOperationException();
     }

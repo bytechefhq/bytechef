@@ -60,6 +60,6 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
 }

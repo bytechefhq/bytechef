@@ -35,11 +35,9 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +45,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import tools.jackson.databind.ObjectMapper;
 
 @ComponentScan(
     basePackages = {
@@ -120,9 +119,7 @@ public class ComponentRegistryConfiguration {
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public ConnectionIntTestJdbcConfiguration(
-            Encryption encryption, @Qualifier("objectMapper") ObjectMapper objectMapper) {
-
+        public ConnectionIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
             this.encryption = encryption;
             this.objectMapper = objectMapper;
         }

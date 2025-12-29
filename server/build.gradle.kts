@@ -32,4 +32,12 @@ subprojects {
         implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${rootProject.libs.versions.spring.cloud.aws.get()}"))
         implementation(platform("org.springframework.ai:spring-ai-bom:${rootProject.libs.versions.spring.ai.get()}"))
     }
+
+    dependencyManagement {
+        dependencies {
+            dependency("org.testcontainers:junit-jupiter:${rootProject.libs.versions.testcontainers.get()}")
+            dependency("org.testcontainers:localstack:${rootProject.libs.versions.testcontainers.get()}")
+            dependency("org.testcontainers:postgresql:${rootProject.libs.versions.testcontainers.get()}")
+        }
+    }
 }

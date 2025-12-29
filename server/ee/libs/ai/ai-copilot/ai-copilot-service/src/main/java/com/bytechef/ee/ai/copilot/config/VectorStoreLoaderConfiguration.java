@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
@@ -468,10 +469,13 @@ public class VectorStoreLoaderConfiguration {
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
 
             @Override
-            @SuppressFBWarnings("NP")
             public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
-                if (StringUtils.endsWith(filePath.toString(), suffix)) {
+                if (Strings.CS.endsWith(filePath.toString(), suffix)) {
                     Path fileNamePath = filePath.getFileName();
+
+                    if (fileNamePath == null) {
+                        return FileVisitResult.CONTINUE;
+                    }
 
                     String fileName = fileNamePath.toString();
 

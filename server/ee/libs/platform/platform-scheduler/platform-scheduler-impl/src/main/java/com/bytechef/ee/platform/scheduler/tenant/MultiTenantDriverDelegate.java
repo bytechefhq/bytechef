@@ -281,7 +281,7 @@ public class MultiTenantDriverDelegate extends StdJDBCDelegate {
 
     @Override
     public JobDetail selectJobForTrigger(Connection conn, ClassLoadHelper loadHelper, TriggerKey triggerKey)
-        throws ClassNotFoundException, SQLException {
+        throws SQLException {
         return execute(conn, (connection) -> {
             try {
                 return delegate.selectJobForTrigger(connection, loadHelper, triggerKey);

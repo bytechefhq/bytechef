@@ -1,7 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-api"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))

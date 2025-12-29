@@ -52,11 +52,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.lang.Nullable;
 
 /**
  * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.TaskCoordinator}.
@@ -78,8 +78,7 @@ public class TaskWorker {
 
     public static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    @Nullable
-    private final Long defaultTimeout;
+    private final @Nullable Long defaultTimeout;
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final AsyncTaskExecutor taskExecutor;

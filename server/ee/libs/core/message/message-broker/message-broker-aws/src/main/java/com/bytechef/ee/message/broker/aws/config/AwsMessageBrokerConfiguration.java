@@ -9,10 +9,7 @@ package com.bytechef.ee.message.broker.aws.config;
 
 import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAws;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import org.slf4j.Logger;
@@ -21,11 +18,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.converter.JacksonJsonMessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -50,8 +48,8 @@ public class AwsMessageBrokerConfiguration {
     }
 
     @Bean
-    MessageConverter jacksonMessageConverter(ObjectMapper objectMapper) {
-        MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter() {
+    MessageConverter jacksonMessageConverter(JsonMapper objectMapper) {
+        return new JacksonJsonMessageConverter(objectMapper) {
 
             @Override
             protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
@@ -67,45 +65,38 @@ public class AwsMessageBrokerConfiguration {
                     }
                 }
 
-                JavaType javaType = getObjectMapper().constructType(targetClass);
+                JavaType javaType = objectMapper.constructType(targetClass);
                 Object payload = message.getPayload();
                 Class<?> view = getSerializationView(conversionHint);
 
                 // Note: in the view case, calling withType instead of forType for
                 // compatibility with Jackson <2.5
-                try {
-                    if (payload instanceof byte[]) {
-                        if (view != null) {
-                            return getObjectMapper()
-                                .readerWithView(view)
-                                .forType(javaType)
-                                .readValue((byte[]) payload);
-                        } else {
-                            return getObjectMapper().readValue((byte[]) payload, javaType);
-                        }
-                    } else {
-                        if (view != null) {
-                            return getObjectMapper()
-                                .readerWithView(view)
-                                .forType(javaType)
-                                .readValue(payload.toString());
-                        } else {
-                            Writer writer = new StringWriter(1024);
-                            getObjectMapper().writeValue(writer, payload);
-                            String payloadJSONString = writer.toString();
 
-                            return getObjectMapper().readValue(payloadJSONString, javaType);
-                        }
+                if (payload instanceof byte[]) {
+                    if (view != null) {
+                        return objectMapper.readerWithView(view)
+                            .forType(javaType)
+                            .readValue((byte[]) payload);
+                    } else {
+                        return objectMapper.readValue((byte[]) payload, javaType);
                     }
-                } catch (IOException ex) {
-                    throw new MessageConversionException(message, "Could not read JSON: " + ex.getMessage(), ex);
+                } else {
+                    if (view != null) {
+                        return objectMapper.readerWithView(view)
+                            .forType(javaType)
+                            .readValue(payload.toString());
+                    } else {
+                        Writer writer = new StringWriter(1024);
+
+                        objectMapper.writeValue(writer, payload);
+
+                        String payloadJSONString = writer.toString();
+
+                        return objectMapper.readValue(payloadJSONString, javaType);
+                    }
                 }
             }
         };
-
-        mappingJackson2MessageConverter.setObjectMapper(objectMapper);
-
-        return mappingJackson2MessageConverter;
     }
 
     @Bean

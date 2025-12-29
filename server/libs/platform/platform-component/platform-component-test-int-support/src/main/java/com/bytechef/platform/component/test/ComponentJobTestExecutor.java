@@ -39,12 +39,12 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

@@ -19,17 +19,17 @@ package com.bytechef.message.broker.amqp.config;
 import com.bytechef.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAmqp;
 import com.bytechef.message.route.SystemMessageRoute;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -61,8 +61,8 @@ public class AmqpMessageBrokerConfiguration {
     }
 
     @Bean
-    MessageConverter jacksonAmqpMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
+    MessageConverter jacksonAmqpMessageConverter(JsonMapper objectMapper) {
+        return new JacksonJsonMessageConverter(objectMapper);
     }
 
     @Bean

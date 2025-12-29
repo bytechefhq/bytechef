@@ -17,8 +17,8 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
-import com.fasterxml.jackson.databind.JsonNode;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Handles type validation for workflow properties.

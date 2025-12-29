@@ -17,11 +17,11 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Builder pattern for managing validation context and parameters. Reduces parameter passing complexity and improves

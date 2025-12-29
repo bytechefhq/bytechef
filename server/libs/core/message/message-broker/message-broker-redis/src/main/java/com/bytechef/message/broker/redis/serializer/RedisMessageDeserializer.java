@@ -16,10 +16,10 @@
 
 package com.bytechef.message.broker.redis.serializer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

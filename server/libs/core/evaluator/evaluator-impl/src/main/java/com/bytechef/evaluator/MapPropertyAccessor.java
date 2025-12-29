@@ -19,12 +19,12 @@
 package com.bytechef.evaluator;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
-import org.springframework.lang.Nullable;
 
 /**
  * Simple {@link PropertyAccessor} that can access {@link Map} properties.

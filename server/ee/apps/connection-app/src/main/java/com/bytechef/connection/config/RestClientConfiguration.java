@@ -12,7 +12,6 @@ import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -21,7 +20,6 @@ import org.springframework.web.client.RestClient;
  * @author Ivica Cardic
  */
 @Configuration
-@EnableRetry
 @LoadBalancerClients({
     @LoadBalancerClient("configuration-app")
 })

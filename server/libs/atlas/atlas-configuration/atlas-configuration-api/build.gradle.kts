@@ -4,7 +4,7 @@ dependencies {
     api(project(":server:libs:core:exception:exception-api"))
 
     implementation("org.apache.commons:commons-lang3")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("org.springframework.data:spring-data-relational")
+    implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
     implementation(project(":server:libs:core:commons:commons-util"))
 }

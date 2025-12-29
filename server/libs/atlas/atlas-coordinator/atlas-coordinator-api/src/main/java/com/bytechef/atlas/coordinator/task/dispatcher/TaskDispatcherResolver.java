@@ -19,7 +19,7 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.configuration.domain.Task;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The strategy interface used for resolving the apprpriate {@link TaskDispatcher} instance for a given {@link Task}.

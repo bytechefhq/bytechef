@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentSplitterFunction;
+import java.util.List;
 import org.springframework.ai.document.DocumentTransformer;
 
 /**
@@ -79,7 +80,7 @@ public class TokenTextSplitter {
 
         return new org.springframework.ai.transformer.splitter.TokenTextSplitter(
             textSplitter.defaultChunkSize(), textSplitter.minChunkSizeChars(), textSplitter.minChunkLengthToEmbed(),
-            textSplitter.maxNumChunks(), textSplitter.keepSeparator());
+            textSplitter.maxNumChunks(), textSplitter.keepSeparator(), List.of('.', '?', '!', '\n'));
     }
 
     record TextSplitter(

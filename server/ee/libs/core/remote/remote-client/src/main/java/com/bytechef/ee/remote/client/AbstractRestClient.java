@@ -12,7 +12,7 @@ import com.bytechef.tenant.constant.TenantConstants;
 import java.net.URI;
 import java.util.function.Function;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 

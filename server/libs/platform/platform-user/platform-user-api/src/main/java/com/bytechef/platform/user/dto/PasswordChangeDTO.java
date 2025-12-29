@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * @author Ivica Cardic
  */
@@ -24,6 +26,7 @@ public class PasswordChangeDTO {
     private String currentPassword;
     private String newPassword;
 
+    @JsonCreator
     public PasswordChangeDTO() {
         // Empty constructor needed for Jackson.
     }

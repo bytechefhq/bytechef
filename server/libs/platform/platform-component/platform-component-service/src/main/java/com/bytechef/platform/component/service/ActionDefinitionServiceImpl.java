@@ -58,8 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -85,7 +85,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
-        ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, workflowId, componentConnection, null, null,
@@ -106,7 +106,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection) {
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, null, componentConnection, null, null, true);
@@ -123,7 +123,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public OutputResponse executeOutput(
+    public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections) {
 
@@ -293,7 +293,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private static ConvertResult convert(
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection) {
 
         return new ConvertResult(
             ParametersFactory.createParameters(inputParameters),
@@ -331,7 +332,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
-    private OutputResponse executeMultipleConnectionsOutput(
+    private @Nullable OutputResponse executeMultipleConnectionsOutput(
         MultipleConnectionsOutputFunction outputFunction, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
 
@@ -388,9 +389,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
     }
 
-    private OutputResponse executeSingleConnectionOutput(
+    private @Nullable OutputResponse executeSingleConnectionOutput(
         OutputFunction outputFunction, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, ActionContext context) {
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         try {
             BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
@@ -488,13 +489,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
-    ComponentConnection getFirstComponentConnection(Map<String, ComponentConnection> componentConnections) {
+    private @Nullable ComponentConnection
+        getFirstComponentConnection(Map<String, ComponentConnection> componentConnections) {
         Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
 
         return !entries.isEmpty() ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null;
     }
 
-    private static OutputResponse toOutputResponse(BaseOutputDefinition.OutputResponse outputResponse) {
+    private static @Nullable OutputResponse toOutputResponse(
+        BaseOutputDefinition.@Nullable OutputResponse outputResponse) {
+
         if (outputResponse == null) {
             return null;
         }

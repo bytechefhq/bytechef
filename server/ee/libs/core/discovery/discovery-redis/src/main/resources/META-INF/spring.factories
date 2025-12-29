@@ -4,5 +4,5 @@ com.bytechef.ee.discovery.redis.config.RedisRegistryAutoConfiguration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 com.bytechef.ee.discovery.redis.config.RedisDiscoveryClientBootstrapConfiguration
 
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
 com.bytechef.ee.discovery.redis.env.RedisDiscoveryServiceProviderEnvironmentPostProcessor

@@ -345,7 +345,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -756,7 +755,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .toList());
     }
 
-    @SuppressFBWarnings("NP")
     private List<String> getWorkflowIds(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
         return integrationInstanceConfiguration.getIntegrationVersion() == null
             ? List.of()

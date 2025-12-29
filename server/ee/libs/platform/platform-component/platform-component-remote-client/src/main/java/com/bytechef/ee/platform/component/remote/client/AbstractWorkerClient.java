@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.component.remote.client;
 
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.remote.client.DefaultRestClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Map;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.util.UriBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee

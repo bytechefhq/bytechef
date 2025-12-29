@@ -38,7 +38,6 @@ import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import java.time.Instant;
 import java.util.Collections;
@@ -51,9 +50,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,19 +60,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link AccountController} REST controller.
  *
  * @author Ivica Cardic
  */
+@AutoConfigureMockMvc
 @SpringBootTest(
     classes = {
         UserIntTestConfiguration.class, MultiTenantAccountControllerConfiguration.class
     }, properties = {
         "bytechef.tenant.mode=multi", "bytechef.edition=EE", "spring.main.allow-bean-definition-overriding=true"
     })
-@AutoConfigureMockMvc
 @UserIntTestConfigurationSharedMocks
 class MultiTenantAccountControllerIntTest {
 

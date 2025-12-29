@@ -27,8 +27,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -36,13 +36,10 @@ import org.springframework.lang.Nullable;
 class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerContextAware {
 
     private final Data data;
-    @Nullable
-    private final Long jobPrincipalId;
+    private final @Nullable Long jobPrincipalId;
     private final String triggerName;
-    @Nullable
-    private final PlatformType type;
-    @Nullable
-    private final String workflowUuid;
+    private final @Nullable PlatformType type;
+    private final @Nullable String workflowUuid;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
@@ -74,8 +71,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     }
 
     @Override
-    @Nullable
-    public Long getJobPrincipalId() {
+    public @Nullable Long getJobPrincipalId() {
         return jobPrincipalId;
     }
 
@@ -85,14 +81,12 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     }
 
     @Override
-    @Nullable
-    public PlatformType getType() {
+    public @Nullable PlatformType getType() {
         return type;
     }
 
     @Override
-    @Nullable
-    public String getWorkflowUuid() {
+    public @Nullable String getWorkflowUuid() {
         return workflowUuid;
     }
 
@@ -102,14 +96,11 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private final String componentName;
         private final Integer componentVersion;
         private final boolean editorEnvironment;
-        @Nullable
-        private final Long environmentId;
+        private final @Nullable Long environmentId;
         private final InMemoryDataStorage inMemoryDataStorage;
         private final String triggerName;
-        @Nullable
-        private final PlatformType type;
-        @Nullable
-        private final String workflowUuid;
+        private final @Nullable PlatformType type;
+        private final @Nullable String workflowUuid;
 
         private DataImpl(
             DataStorage dataStorage, String componentName, Integer componentVersion, String triggerName,
@@ -206,18 +197,15 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
             return triggerName;
         }
 
-        @Nullable
-        public String workflowUuid() {
+        public @Nullable String workflowUuid() {
             return workflowUuid;
         }
 
-        @Nullable
-        public Long environmentId() {
+        public @Nullable Long environmentId() {
             return environmentId;
         }
 
-        @Nullable
-        public PlatformType type() {
+        public @Nullable PlatformType type() {
             return type;
         }
 

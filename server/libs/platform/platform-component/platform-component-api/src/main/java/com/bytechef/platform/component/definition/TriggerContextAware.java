@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.constant.PlatformType;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

@@ -9,7 +9,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
 
-    testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("tools.jackson.core:jackson-databind")
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))

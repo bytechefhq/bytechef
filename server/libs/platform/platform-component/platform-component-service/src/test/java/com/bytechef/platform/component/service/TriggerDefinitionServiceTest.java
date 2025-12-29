@@ -121,8 +121,8 @@ public class TriggerDefinitionServiceTest {
         assertTrue(records.contains("Test Record"), "Output should contain the test record");
 
         assertNotNull(output.state(), "Closure parameters should not be null");
-        assertTrue(((Map<?, ?>) output.state()).containsKey(
-            "lastPolledAt"), "Closure parameters should contain lastPolledAt");
+        assertTrue(
+            ((Map<?, ?>) output.state()).containsKey("lastPolledAt"), "Closure parameters should contain lastPolledAt");
     }
 
     @Test

@@ -36,8 +36,6 @@ import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -47,21 +45,22 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link UserController} REST controller.
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
+@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @WithMockUser(authorities = AuthorityConstants.ADMIN)
 @UserIntTestConfigurationSharedMocks
 class UserControllerIntTest {
@@ -70,6 +69,8 @@ class UserControllerIntTest {
     private static final String UPDATED_LOGIN = "bytechef";
 
     private static final Long DEFAULT_ID = 1L;
+
+    private static final String DEFAULT_ID_STR = "1";
 
     private static final String DEFAULT_EMAIL = "johndoe@localhost.com";
     private static final String UPDATED_EMAIL = "bytechef@localhost.com";
@@ -104,7 +105,6 @@ class UserControllerIntTest {
     private UserMapper userMapper;
 
     @BeforeEach
-    @SuppressFBWarnings("NP")
     public void beforeEach() {
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)
             .clear();
@@ -144,7 +144,7 @@ class UserControllerIntTest {
         assertPersistedUsers(users -> {
             assertThat(users).hasSize(databaseSizeBeforeCreate + 1);
 
-            User testUser = users.getLast();
+            User testUser = users.get(users.size() - 1);
 
             assertThat(testUser.getLogin()).isEqualTo(DEFAULT_LOGIN);
             assertThat(testUser.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
@@ -271,7 +271,6 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    @SuppressFBWarnings("NP")
     void testGetUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
@@ -285,6 +284,7 @@ class UserControllerIntTest {
             .perform(get("/api/platform/internal/users/{login}", user.getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.id").value(user.getId()))
             .andExpect(jsonPath("$.login").value(user.getLogin()))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRSTNAME))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LASTNAME))
@@ -509,7 +509,6 @@ class UserControllerIntTest {
 
     @Test
     @Transactional
-    @SuppressFBWarnings("NP")
     void testDeleteUser() throws Exception {
         // Initialize the database
         userRepository.save(user);

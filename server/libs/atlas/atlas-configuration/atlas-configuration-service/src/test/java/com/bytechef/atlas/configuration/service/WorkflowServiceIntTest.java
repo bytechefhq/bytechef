@@ -27,10 +27,12 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -53,10 +55,21 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class WorkflowServiceIntTest {
 
     @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
     private WorkflowCrudRepository workflowCrudRepository;
 
     @Autowired
     private WorkflowService workflowService;
+
+    @BeforeEach
+    public void beforeEach() {
+        Cache cache = org.mockito.Mockito.mock(Cache.class);
+
+        org.mockito.Mockito.when(cacheManager.getCache(org.mockito.ArgumentMatchers.anyString()))
+            .thenReturn(cache);
+    }
 
     @Test
     public void testCreate() {
@@ -110,6 +123,11 @@ public class WorkflowServiceIntTest {
     @EnableAutoConfiguration
     @Configuration
     public static class WorkflowConfigurationIntTestConfiguration {
+
+        @Bean
+        CacheManager cacheManager() {
+            return org.mockito.Mockito.mock(CacheManager.class);
+        }
 
         @Bean
         WorkflowService workflowService(

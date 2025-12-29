@@ -47,8 +47,8 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -58,8 +58,7 @@ class ContextImpl implements Context {
     private final Convert convert;
     private final Encoder encoder;
     private final File file;
-    @Nullable
-    private Http http;
+    private @Nullable Http http;
     private final Json json;
     private final Log log;
     private final MimeType mimeType;
@@ -231,14 +230,12 @@ class ContextImpl implements Context {
 
         private static class ExecutorImpl implements Executor {
 
-            @Nullable
-            private Body body;
+            private @Nullable Body body;
             private final String componentName;
             private final int componentVersion;
             private final String componentOperationName;
             private Configuration configuration = new Configuration();
-            @Nullable
-            private final ComponentConnection componentConnection;
+            private final @Nullable ComponentConnection componentConnection;
             private final Context context;
             private final HttpClientExecutor httpClientExecutor;
             private Map<String, List<String>> headers = new HashMap<>();
@@ -350,11 +347,6 @@ class ContextImpl implements Context {
         @Override
         public <T> T value(Object fromValue, Class<T> toValueType) {
             return ConvertUtils.convertValue(fromValue, toValueType);
-        }
-
-        @Override
-        public <T> T value(Object fromValue, Class<T> toValueType, boolean includeNulls) {
-            return ConvertUtils.convertValue(fromValue, toValueType, includeNulls);
         }
 
         @Override

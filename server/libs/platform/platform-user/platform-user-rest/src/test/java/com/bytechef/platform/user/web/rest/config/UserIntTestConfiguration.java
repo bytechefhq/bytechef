@@ -18,6 +18,7 @@ package com.bytechef.platform.user.web.rest.config;
 
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.security.config.SecurityConfiguration;
@@ -41,8 +42,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
-    AuditingJdbcConfiguration.class, CacheConfiguration.class, LiquibaseConfiguration.class,
-    PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
+    AuditingJdbcConfiguration.class, CacheConfiguration.class, JacksonConfiguration.class,
+    LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
 })
 @Configuration
 public class UserIntTestConfiguration {

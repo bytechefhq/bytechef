@@ -21,7 +21,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzJdbcTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -65,7 +64,6 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 @Import({
     PostgreSQLContainerConfiguration.class, QuartzIntTest.QuartzJdbcConfiguration.class
 })
-@SuppressFBWarnings("NP")
 public class QuartzIntTest {
 
     @Autowired

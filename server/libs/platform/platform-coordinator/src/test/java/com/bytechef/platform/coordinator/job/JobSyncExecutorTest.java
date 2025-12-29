@@ -42,12 +42,6 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +54,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -68,9 +64,7 @@ class JobSyncExecutorTest {
 
     private static final String TENANT = "t1";
 
-    @SuppressFBWarnings("NP")
     private MemoryMessageBroker memoryMessageBroker;
-    @SuppressFBWarnings("NP")
     private JobSyncExecutor jobSyncExecutor;
     private final JobService jobService = Mockito.mock(JobService.class);
     private final TaskExecutionService taskExecutionService = Mockito.mock(TaskExecutionService.class);
@@ -78,9 +72,6 @@ class JobSyncExecutorTest {
     @BeforeEach
     void beforeEach() {
         ObjectMapper objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .build();
 
         ConvertUtils.setObjectMapper(objectMapper);

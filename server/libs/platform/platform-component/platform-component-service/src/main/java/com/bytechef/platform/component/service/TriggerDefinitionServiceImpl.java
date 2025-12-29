@@ -71,9 +71,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -125,8 +125,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
-        Map<String, ?> outputParameters) {
+        String componentName, int componentVersion, String triggerName,
+        @Nullable ComponentConnection componentConnection, Map<String, ?> outputParameters) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
@@ -142,7 +142,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection componentConnection) {
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection) {
 
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -164,7 +164,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection componentConnection) {
+        String workflowExecutionId, @Nullable ComponentConnection componentConnection) {
 
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
@@ -190,8 +190,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
+        @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
@@ -206,9 +206,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public OutputResponse executeOutput(
+    public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
@@ -242,9 +242,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
-        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, Long environmentId, PlatformType type, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid,
+        Map<String, ?> inputParameters, @Nullable Object triggerState, @Nullable WebhookRequest webhookRequest,
+        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, PlatformType type,
+        boolean editorEnvironment) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
@@ -266,7 +268,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection) {
+        String workflowExecutionId, Map<String, ?> outputParameters,
+        @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
@@ -285,9 +288,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public WebhookEnableOutput executeWebhookEnable(
+    public @Nullable WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, String webhookUrl, ComponentConnection componentConnection) {
+        String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
@@ -305,7 +308,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
@@ -321,7 +324,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection componentConnection) {
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -387,7 +390,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, String searchText,
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable String searchText,
         ComponentConnection componentConnection, TriggerContext context) {
 
         try {
@@ -408,9 +411,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private OutputResponse executeOutput(
+    private @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, TriggerContext context) {
+        @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -447,8 +450,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static TriggerOutput executePollingTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection, Map<String, ?> closureParameters,
-        TriggerContext triggerContext, PollFunction pollFunction) {
+        Map<String, ?> inputParameters, @Nullable ComponentConnection componentConnection,
+        Map<String, ?> closureParameters, TriggerContext triggerContext, PollFunction pollFunction) {
 
         PollOutput pollOutput;
 
@@ -495,7 +498,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @SuppressWarnings("unchecked")
     private TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
+        @Nullable Object triggerState, WebhookRequest webhookRequest, ComponentConnection componentConnection,
         TriggerContext context) {
 
         TriggerOutput triggerOutput;
@@ -534,7 +537,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection componentConnection,
+        String workflowExecutionId, Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection,
         TriggerContext context) {
 
         WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
@@ -560,10 +563,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
     }
 
-    private WebhookEnableOutput executeWebhookEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
-        ComponentConnection componentConnection, TriggerContext context) {
+    private @Nullable WebhookEnableOutput executeWebhookEnable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String webhookUrl, String workflowExecutionId, @Nullable ComponentConnection componentConnection,
+        TriggerContext context) {
 
         WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
             componentName, componentVersion, triggerName);
@@ -626,7 +629,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private static TriggerOutput executeWebhookTrigger(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, Map<String, ?> webhookEnabledOutputParameters, WebhookRequest webhookRequest,
-        ComponentConnection componentConnection, TriggerContext triggerContext,
+        @Nullable ComponentConnection componentConnection, TriggerContext triggerContext,
         WebhookRequestFunction webhookRequestFunction) {
 
         Object webhookOutput;
@@ -699,7 +702,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
-    private WebhookDisableConsumer getWebhookDisableConsumer(
+    private @Nullable WebhookDisableConsumer getWebhookDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
@@ -709,7 +712,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(null);
     }
 
-    private WebhookEnableFunction getWebhookEnableFunction(
+    private @Nullable WebhookEnableFunction getWebhookEnableFunction(
         String componentName, int componentVersion, String triggerName) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
@@ -763,7 +766,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, ?> toWebhookEnabledOutputParameters(Map<?, ?> triggerState) {
+    private Map<String, ?> toWebhookEnabledOutputParameters(@Nullable Map<?, ?> triggerState) {
         if (triggerState == null) {
             return Map.of();
         }
@@ -772,7 +775,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static WrapResult wrap(
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection) {
 
         return new WrapResult(
             ParametersFactory.createParameters(inputParameters),

@@ -18,10 +18,10 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @param workflowNodeName action task/trigger name used in the workflow

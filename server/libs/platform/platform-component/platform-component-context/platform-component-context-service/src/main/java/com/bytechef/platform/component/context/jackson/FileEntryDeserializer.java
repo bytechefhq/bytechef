@@ -18,25 +18,21 @@ package com.bytechef.platform.component.context.jackson;
 
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.platform.component.context.FileEntryImpl;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import java.io.IOException;
-import org.springframework.boot.jackson.JsonComponent;
+import org.springframework.boot.jackson.JacksonComponent;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
  * @author Ivica Cardic
  */
-@JsonComponent
-public class FileEntryDeserializer extends JsonDeserializer<FileEntry> {
+@JacksonComponent
+public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
 
     @Override
-    public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        ObjectCodec objectCodec = jp.getCodec();
-
-        JsonNode jsonNode = objectCodec.readTree(jp);
+    public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) {
+        JsonNode jsonNode = ctxt.readTree(jp);
 
         return new FileEntryImpl(
             asText("extension", jsonNode), asText("mimeType", jsonNode), asText("name", jsonNode),

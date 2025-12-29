@@ -22,18 +22,17 @@ import com.bytechef.component.definition.datastream.ItemProcessor;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.core.step.StepExecution;
 
 /**
  * @author Ivica Cardic
  */
 public class ItemStreamProcessorDelegate extends AbstractItemStreamDelegate
-    implements org.springframework.batch.item.ItemProcessor<Map<String, Object>, Map<String, Object>> {
+    implements org.springframework.batch.infrastructure.item.ItemProcessor<Map<String, Object>, Map<String, Object>> {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    @Nullable
-    private ItemProcessor<Object, Object> itemProcessor;
+    private @Nullable ItemProcessor<Object, Object> itemProcessor;
 
     public ItemStreamProcessorDelegate(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {

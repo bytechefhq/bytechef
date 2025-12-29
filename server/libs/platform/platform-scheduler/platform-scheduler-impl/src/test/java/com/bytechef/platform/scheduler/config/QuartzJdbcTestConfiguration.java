@@ -17,10 +17,9 @@
 package com.bytechef.platform.scheduler.config;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Test configuration for Quartz JDBC integration tests with PostgreSQL. Unlike QuartzTriggerSchedulerTestConfiguration,
@@ -29,12 +28,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
  * @author Ivica Cardic
  */
 @SpringBootConfiguration
-@EnableAutoConfiguration(exclude = {
-    HibernateJpaAutoConfiguration.class
-})
+@EnableAutoConfiguration
 public class QuartzJdbcTestConfiguration {
 
     public QuartzJdbcTestConfiguration() {
-        JsonUtils.setObjectMapper(new ObjectMapper());
+        JsonUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 }

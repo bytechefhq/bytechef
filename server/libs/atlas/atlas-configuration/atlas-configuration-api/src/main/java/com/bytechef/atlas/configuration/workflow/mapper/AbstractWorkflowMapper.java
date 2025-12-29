@@ -20,9 +20,6 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
 import com.bytechef.commons.util.CollectionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Matija Petanjek
@@ -94,7 +93,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> parse(String workflow) throws JsonProcessingException {
+    private Map<String, Object> parse(String workflow) {
         Map<String, Object> workflowMap = objectMapper.readValue(workflow, new TypeReference<>() {});
 
         validate(workflowMap);

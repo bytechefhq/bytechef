@@ -19,7 +19,7 @@ package com.bytechef.component.definition.datastream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Object representing a context for an {@link ItemStream}. It is a thin wrapper for a map that allows optionally for

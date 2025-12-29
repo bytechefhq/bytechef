@@ -139,7 +139,6 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
             .build();
     }
 
-    @SuppressFBWarnings("NP")
     private IntegrationInstanceConfigurationModel toIntegrationInstanceConfigurationModel(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 

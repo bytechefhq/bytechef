@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.definition;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

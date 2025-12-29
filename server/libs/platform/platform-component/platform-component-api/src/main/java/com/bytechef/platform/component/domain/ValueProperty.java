@@ -19,7 +19,7 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property.ControlType;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

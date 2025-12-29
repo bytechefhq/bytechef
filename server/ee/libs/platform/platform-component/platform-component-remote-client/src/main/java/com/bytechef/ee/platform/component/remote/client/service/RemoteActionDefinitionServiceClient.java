@@ -18,12 +18,13 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -45,7 +46,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
-        ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }
@@ -54,7 +55,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection) {
 
         throw new UnsupportedOperationException();
     }

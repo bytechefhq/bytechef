@@ -18,9 +18,9 @@ package com.bytechef.commons.data.jdbc.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.encryption.Encryption;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

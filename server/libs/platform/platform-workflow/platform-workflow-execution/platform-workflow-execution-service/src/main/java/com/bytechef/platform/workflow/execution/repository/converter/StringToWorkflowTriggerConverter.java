@@ -17,11 +17,10 @@
 package com.bytechef.platform.workflow.execution.repository.converter;
 
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -42,10 +41,6 @@ public class StringToWorkflowTriggerConverter implements Converter<String, Workf
     }
 
     private WorkflowTrigger read(ObjectMapper objectMapper, String json) {
-        try {
-            return objectMapper.readValue(json, WorkflowTrigger.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(json, WorkflowTrigger.class);
     }
 }

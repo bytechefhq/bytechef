@@ -26,7 +26,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -93,6 +93,7 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param componentConnections a map of component connections used for external interactions
      * @return the result of the output execution as an OutputResponse object
      */
+    @Nullable
     OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections);

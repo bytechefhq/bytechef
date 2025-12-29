@@ -49,6 +49,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class ScriptComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     private final TaskHandler<Object> taskHandler = taskExecution -> {
         Map<String, ?> parameters = taskExecution.getParameters();
 

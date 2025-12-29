@@ -10,7 +10,6 @@ package com.bytechef.ee.discovery.util;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.client.ServiceInstance;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee

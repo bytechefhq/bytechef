@@ -56,7 +56,6 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,6 +77,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Arik Cohen
@@ -90,7 +90,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import({
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
-@SuppressFBWarnings("NP")
 public class TaskCoordinatorIntTest {
 
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());

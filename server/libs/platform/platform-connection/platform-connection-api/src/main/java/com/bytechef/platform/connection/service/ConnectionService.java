@@ -21,7 +21,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

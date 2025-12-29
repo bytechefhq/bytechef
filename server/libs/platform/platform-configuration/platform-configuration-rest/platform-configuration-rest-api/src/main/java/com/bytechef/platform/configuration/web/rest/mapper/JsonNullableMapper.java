@@ -27,6 +27,6 @@ import org.openapitools.jackson.nullable.JsonNullable;
 public interface JsonNullableMapper {
 
     default JsonNullable<Object> mapToJsonNullable(Object value) {
-        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+        return JsonNullable.of(value);
     }
 }

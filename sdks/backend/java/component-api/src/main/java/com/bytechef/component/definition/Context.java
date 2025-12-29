@@ -155,15 +155,6 @@ public interface Context {
         /**
          *
          * @param fromValue
-         * @param toValueType
-         * @param includeNulls
-         * @return
-         */
-        <T> T value(Object fromValue, Class<T> toValueType, boolean includeNulls);
-
-        /**
-         *
-         * @param fromValue
          * @param toValueTypeRef
          * @return
          */

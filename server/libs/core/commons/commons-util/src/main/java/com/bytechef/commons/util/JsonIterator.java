@@ -16,14 +16,14 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -37,16 +37,14 @@ final class JsonIterator implements Iterator<Map<String, ?>> {
 
     public JsonIterator(JsonParser jsonParser, ObjectMapper objectMapper) {
         this.jsonParser = jsonParser;
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.rebuild()
+            .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+            .build();
 
-        try {
-            lastJsonToken = jsonParser.nextToken();
+        lastJsonToken = jsonParser.nextToken();
 
-            if (lastJsonToken != JsonToken.START_ARRAY) {
-                throw new IllegalArgumentException("Provided stream is not a JSON array");
-            }
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
+        if (lastJsonToken != JsonToken.START_ARRAY) {
+            throw new IllegalArgumentException("Provided stream is not a JSON array");
         }
     }
 

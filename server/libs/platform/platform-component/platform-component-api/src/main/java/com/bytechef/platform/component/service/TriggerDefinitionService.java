@@ -30,7 +30,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +42,8 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection);
 
     WebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, ComponentConnection componentConnection,
-        Map<String, ?> outputParameters);
+        String componentName, int componentVersion, String triggerName,
+        @Nullable ComponentConnection componentConnection, Map<String, ?> outputParameters);
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters);
@@ -61,6 +61,7 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
         @Nullable ComponentConnection componentConnection);
 
+    @Nullable
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection);
@@ -69,15 +70,16 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         String componentName, int componentVersion, String componentOperationName, int statusCode, Object body);
 
     TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Long jobPrincipalId, String workflowUuid,
-        Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        @Nullable ComponentConnection componentConnection, @Nullable Long environmentId, PlatformType type,
-        boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, Map<String, ?> inputParameters, @Nullable Object triggerState,
+        @Nullable WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, PlatformType type, boolean editorEnvironment);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Map<String, ?> outputParameters, @Nullable ComponentConnection componentConnection);
 
+    @Nullable
     WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection);

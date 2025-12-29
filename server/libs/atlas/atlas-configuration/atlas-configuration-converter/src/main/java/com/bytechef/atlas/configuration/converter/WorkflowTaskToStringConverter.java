@@ -17,10 +17,10 @@
 package com.bytechef.atlas.configuration.converter;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

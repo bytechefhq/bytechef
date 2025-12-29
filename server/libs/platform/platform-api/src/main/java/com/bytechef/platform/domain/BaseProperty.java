@@ -18,7 +18,7 @@ package com.bytechef.platform.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BaseProperty {
 

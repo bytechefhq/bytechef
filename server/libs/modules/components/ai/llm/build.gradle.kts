@@ -5,6 +5,7 @@ dependencies {
     api("org.springframework.boot:spring-boot")
 
     implementation("org.springframework.ai:spring-ai-retry")
+    implementation("org.springframework.boot:spring-boot-http-client")
 }
 
 subprojects {

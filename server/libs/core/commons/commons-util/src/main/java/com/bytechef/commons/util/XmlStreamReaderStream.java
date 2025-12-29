@@ -16,7 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -46,6 +45,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic

@@ -21,14 +21,13 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -116,15 +115,11 @@ public class InMemoryJobRepository implements JobRepository {
             job.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
         }
 
-        try {
-            // Emulate identical behaviour when storing in db by serialization and deserialization
+        // Emulate identical behaviour when storing in db by serialization and deserialization
 
-            cache.put(
-                TenantCacheKeyUtils.getKey(job.getId()),
-                objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        cache.put(
+            TenantCacheKeyUtils.getKey(job.getId()),
+            objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
 
         return job;
     }

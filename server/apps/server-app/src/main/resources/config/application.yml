@@ -103,6 +103,9 @@ management:
     sampling:
       probability: 1.0
   otlp:
+    metrics:
+      export:
+        enabled: ${bytechef.observability.enabled}
     tracing:
       endpoint: ${bytechef.tracing.otlp.endpoint}
 

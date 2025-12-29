@@ -19,11 +19,11 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Handles validation of array properties.
@@ -39,8 +39,8 @@ class ArrayPropertyValidator {
      * Validates array property using PropertyInfo.
      */
     static void validateFromPropertyInfo(
-        JsonNode valueJsonNode, PropertyInfo propertyInfo, String propertyPath,
-        StringBuilder errors, StringBuilder warnings) {
+        JsonNode valueJsonNode, PropertyInfo propertyInfo, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
 
         if (valueJsonNode.isNull()) {
             return;
@@ -172,7 +172,8 @@ class ArrayPropertyValidator {
         JsonNode elementJsonNode, List<PropertyInfo> elementProperties,
         String propertyPath, int index, JsonNode rootParametersJsonNode, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = elementJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = elementJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             PropertyInfo matchingProperty = elementProperties.stream()

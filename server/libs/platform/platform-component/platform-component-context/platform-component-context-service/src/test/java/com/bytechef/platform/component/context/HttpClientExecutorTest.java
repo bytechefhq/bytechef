@@ -29,11 +29,8 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -56,11 +53,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationContext;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -75,13 +76,14 @@ public class HttpClientExecutorTest {
         new HttpClientExecutor(Mockito.mock(ApplicationContext.class), Mockito.mock(TempFileStorage.class));
 
     static {
-        JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());
-
-        ObjectMapper objectMapper = jacksonConfiguration.objectMapper();
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .build();
 
         ConvertUtils.setObjectMapper(objectMapper);
         JsonUtils.setObjectMapper(objectMapper);
-        XmlUtils.setXmlMapper(jacksonConfiguration.xmlMapper());
+        XmlUtils.setXmlMapper(
+            XmlMapper.builder()
+                .build());
     }
 
     @Test
@@ -605,7 +607,7 @@ public class HttpClientExecutorTest {
 
         private final Object body;
         private final int statusCode;
-        private final HttpHeaders httpHeaders;
+        private final @Nullable HttpHeaders httpHeaders;
 
         private TestHttpResponse(Object body) {
             this(body, 200);

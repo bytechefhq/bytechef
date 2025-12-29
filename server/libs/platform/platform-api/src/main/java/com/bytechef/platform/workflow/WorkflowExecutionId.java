@@ -21,7 +21,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -30,17 +29,9 @@ import org.springframework.util.Assert;
 public class WorkflowExecutionId implements Serializable {
 
     private long jobPrincipalId;
-
-    @Nullable
     private PlatformType type;
-
-    @Nullable
     private String workflowUuid;
-
-    @Nullable
     private String tenantId;
-
-    @Nullable
     private String triggerName;
 
     private WorkflowExecutionId() {
