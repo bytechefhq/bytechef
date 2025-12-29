@@ -1,0 +1,23 @@
+{
+  "title": "Self-Hosting",
+  "description": "Deploy ByteChef on your own infrastructure",
+  "icon": "Server",
+  "root": true,
+  "pages": [
+    "---Install ByteChef---",
+    "index",
+    "architecture",
+    "deployment/local-docker",
+    "deployment/docker",
+    "deployment/kubernetes",
+    "deployment/aws-ec2",
+    "deployment/aws-ec3",
+    "deployment/azures",
+    "deployment/google-cloud",
+    "deployment/digitalocean",
+    "---Manage Insatance---",
+    "configuration/configure-instance",
+    "configuration/environment-variables",
+    "configuration/manage-instance"
+  ]
+}

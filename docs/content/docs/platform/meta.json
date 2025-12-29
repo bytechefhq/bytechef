@@ -1,0 +1,9 @@
+{
+  "title": "Platform",
+  "description": "The platform guide",
+  "icon": "Layers",
+  "root": true,
+  "pages": [
+    "overview"
+  ]
+}
