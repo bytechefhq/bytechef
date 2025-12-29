@@ -483,8 +483,8 @@ public class JobSyncExecutor {
         try {
             notifyErrorListeners(event);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
             }
         }
 
@@ -640,8 +640,8 @@ public class JobSyncExecutor {
                 jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
             }
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
             }
         }
 
@@ -658,8 +658,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -676,8 +676,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (logger.isDebugEnabled()) {
+                logger.debug(exception.getMessage(), exception);
             }
         }
 
@@ -695,8 +695,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -713,8 +713,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -731,8 +731,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(exception.getMessage(), exception);
                 }
             }
         }
