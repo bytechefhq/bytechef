@@ -24,7 +24,6 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.SE
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXTS;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;

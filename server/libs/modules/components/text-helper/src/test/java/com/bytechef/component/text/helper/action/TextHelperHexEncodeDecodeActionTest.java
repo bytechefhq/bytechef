@@ -16,30 +16,37 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.OPERATION;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.text.helper.constant.OperationType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperMarkdownToHTMLActionTest {
-
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(MARKDOWN, "# Hello World"));
+class TextHelperHexEncodeDecodeActionTest {
 
     @Test
     void testPerform() {
-        String result = TextHelperMarkdownToHTMLAction.perform(
-            mockedParameters, mockedParameters, mock(Context.class));
+        String text = "testing";
 
-        String expected = "<h1><a href=\"#hello-world\" id=\"hello-world\">Hello World</a></h1>\n";
+        Parameters encodeMockedParameters = MockParametersFactory.create(
+            Map.of(TEXT, text, OPERATION, OperationType.ENCODE.name()));
 
-        assertEquals(expected, result);
+        String encodedString = TextHelperHexEncodeDecodeAction.perform(
+            encodeMockedParameters, null, null);
+
+        Parameters decodeMockedParameters = MockParametersFactory.create(
+            Map.of(TEXT, encodedString, OPERATION, OperationType.DECODE.name()));
+
+        String decodedString = TextHelperHexEncodeDecodeAction.perform(
+            decodeMockedParameters, null, null);
+
+        assertEquals(text, decodedString);
     }
 }

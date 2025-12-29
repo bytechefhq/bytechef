@@ -19,17 +19,52 @@ package com.bytechef.component.text.helper.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.exception.ProviderException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
+ * @author Nikolina Špehar
  */
 public class TextHelperUtils {
 
     private TextHelperUtils() {
+    }
+
+    public static int getPatternEndIndex(String pattern, String text, int matchNumber) {
+        int index;
+        int fromIndex = 0;
+
+        for (int i = 0; i < matchNumber; i++) {
+            index = text.indexOf(pattern, fromIndex);
+
+            if (index == -1) {
+                throw new ProviderException("No pattern was found in text or match number is too large.");
+            }
+
+            fromIndex = index + pattern.length();
+        }
+
+        return fromIndex;
+    }
+
+    public static List<String> extractByRegEx(String text, String regularExpression) {
+        Pattern pattern = Pattern.compile(regularExpression);
+        Matcher matcher = pattern.matcher(text);
+
+        List<String> extractedStrings = new ArrayList<>();
+
+        while (matcher.find()) {
+            extractedStrings.add(matcher.group());
+        }
+
+        return extractedStrings;
     }
 
     public static List<Option<String>> getCurrencyOptions() {

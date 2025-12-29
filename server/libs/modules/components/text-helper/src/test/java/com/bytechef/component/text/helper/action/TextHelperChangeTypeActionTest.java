@@ -16,8 +16,9 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.Context;
@@ -27,19 +28,27 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperMarkdownToHTMLActionTest {
-
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(MARKDOWN, "# Hello World"));
+class TextHelperChangeTypeActionTest {
 
     @Test
-    void testPerform() {
-        String result = TextHelperMarkdownToHTMLAction.perform(
-            mockedParameters, mockedParameters, mock(Context.class));
+    void testPerformValidNumber() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
+        Context mockedContext = mock(Context.class);
 
-        String expected = "<h1><a href=\"#hello-world\" id=\"hello-world\">Hello World</a></h1>\n";
+        double result = TextHelperChangeTypeAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(expected, result);
+        assertEquals(42.0, result);
+    }
+
+    @Test
+    void testPerformInvalidNumber() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
+        Context mockedContext = mock(Context.class);
+
+        assertThrows(NumberFormatException.class,
+            () -> TextHelperChangeTypeAction.perform(mockedParameters, mockedParameters, mockedContext));
     }
 }

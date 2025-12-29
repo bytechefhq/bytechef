@@ -17,46 +17,45 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.DELIMITER;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.REGULAR_EXPRESSION;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
+import static com.bytechef.component.text.helper.util.TextHelperUtils.extractByRegEx;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperSplitAction {
+public class TextHelperExtractRegExAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("split")
-        .title("Split")
-        .description("Split the text by delimiter.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractRegEx")
+        .title("Extract by Regular Expression")
+        .description("Extract first string that match a given pattern.")
         .properties(
-            TEXT_PROPERTY,
-            string(DELIMITER)
-                .label("Delimiter")
-                .description("Delimiter used for splitting the text.")
+            string(TEXT)
+                .label("Text")
+                .description("The text on which regular expression will be used on.")
+                .required(true),
+            string(REGULAR_EXPRESSION)
+                .label("Regular Expression")
+                .description("Regular expression that will be used for extracting strings.")
                 .required(true))
-        .output(
-            outputSchema(
-                array()
-                    .description("List of elements.")
-                    .items(string())))
-        .perform(TextHelperSplitAction::perform);
+        .output(outputSchema(string().description("String that matches the regular expression.")))
+        .perform(TextHelperExtractRegExAction::perform);
 
-    private TextHelperSplitAction() {
+    private TextHelperExtractRegExAction() {
     }
 
-    public static String[] perform(
+    public static String perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        String text = inputParameters.getRequiredString(TEXT);
-
-        return text.split(inputParameters.getRequiredString(DELIMITER));
+        return extractByRegEx(
+            inputParameters.getRequiredString(TEXT),
+            inputParameters.getRequiredString(REGULAR_EXPRESSION))
+                .getFirst();
     }
 }

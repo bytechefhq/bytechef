@@ -25,7 +25,6 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.QU
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_ARRAY;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
