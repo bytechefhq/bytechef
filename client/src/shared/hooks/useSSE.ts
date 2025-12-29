@@ -1,6 +1,9 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 
-type EventHandlersType = Record<string, (data: string) => void>;
+type EventHandlersType = Record<string, (data: unknown) => void>;
+
+const EVENT_PREFIX = 'event:';
+const DATA_PREFIX = 'data:';
 
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
@@ -20,7 +23,7 @@ export type UseSSEResultType<T = unknown> = {
 
 function parseAndDispatchSSE(
     chunk: string,
-    onDefaultMessage: (data: string) => void,
+    onDefaultMessage: (data: unknown) => void,
     customHandlers?: EventHandlersType
 ) {
     // SSE events are separated by blank lines. Lines can be: event:, data:, id:, retry:
@@ -36,26 +39,22 @@ function parseAndDispatchSSE(
         const lines = event.split(/\n/);
 
         for (const line of lines) {
-            if (line.startsWith('event:')) {
-                eventType = line.slice(6).trim();
-            } else if (line.startsWith('data:')) {
-                const dataLine = line.slice(5);
+            if (line.startsWith(EVENT_PREFIX)) {
+                eventType = line.slice(EVENT_PREFIX.length).trim();
+            } else if (line.startsWith(DATA_PREFIX)) {
+                const dataLine = line.slice(DATA_PREFIX.length);
 
                 dataLines.push(dataLine);
             }
         }
 
-        let data = dataLines.join('\n');
+        let data: unknown = dataLines.join('\n');
 
-        if (data.startsWith(' ')) {
-            const trimmedData = data.slice(1);
-
+        if (typeof data === 'string') {
             try {
-                JSON.parse(trimmedData);
-
-                data = trimmedData;
+                data = JSON.parse(data);
             } catch {
-                // ignore
+                // ignored
             }
         }
 
@@ -74,16 +73,10 @@ function parseAndDispatchSSE(
 export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOptionsType = {}): UseSSEResultType<T> => {
     const [data, setData] = useState<T | string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [connectionState, setConnectionState] = useState<'CONNECTING' | 'CONNECTED' | 'ERROR' | 'CLOSED'>(
-        'CONNECTING'
-    );
+    const [connectionState, setConnectionState] = useState<'CONNECTING' | 'CONNECTED' | 'ERROR' | 'CLOSED'>('CLOSED');
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const handlersRef = useRef<EventHandlersType | undefined>(options.eventHandlers);
-
-    useEffect(() => {
-        handlersRef.current = options.eventHandlers;
-    }, [options.eventHandlers]);
 
     const stableRequest = useMemo(() => {
         if (request == null) {
@@ -92,6 +85,17 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
         return {init: request.init, url: request.url};
     }, [request]);
+
+    const close = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            setConnectionState('CLOSED');
+        }
+    };
+
+    useEffect(() => {
+        handlersRef.current = options.eventHandlers;
+    }, [options.eventHandlers]);
 
     useEffect(() => {
         if (!stableRequest) {
@@ -151,13 +155,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     for (const part of parts) {
                         parseAndDispatchSSE(
                             part,
-                            (dataStr) => {
-                                try {
-                                    const parsed = JSON.parse(dataStr);
-                                    setData(parsed as T);
-                                } catch {
-                                    setData(dataStr);
-                                }
+                            (data) => {
+                                setData(data as T);
                             },
                             handlersRef.current
                         );
@@ -168,14 +167,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 if (buffer.trim()) {
                     parseAndDispatchSSE(
                         buffer,
-                        (dataStr) => {
-                            try {
-                                const parsed = JSON.parse(dataStr);
-
-                                setData(parsed as T);
-                            } catch {
-                                setData(dataStr);
-                            }
+                        (data) => {
+                            setData(data as T);
                         },
                         handlersRef.current
                     );
@@ -195,13 +188,6 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
             setConnectionState('CLOSED');
         };
     }, [stableRequest]);
-
-    const close = () => {
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-            setConnectionState('CLOSED');
-        }
-    };
 
     return {close, connectionState, data, error};
 };

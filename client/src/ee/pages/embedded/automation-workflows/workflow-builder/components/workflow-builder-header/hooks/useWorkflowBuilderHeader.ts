@@ -101,18 +101,24 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         );
     };
 
-    const {close, error, getPersistedJobId, persistJobId, setStreamRequest} = useWorkflowTestStream(
-        workflow.id!,
-        () => {
+    const {
+        close: closeWorkflowTestStream,
+        error: workflowTestStreamError,
+        getPersistedJobId,
+        persistJobId,
+        setStreamRequest,
+    } = useWorkflowTestStream({
+        onError: () => setJobId(null),
+        onResult: () => {
             if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
                 bottomResizablePanelRef.current.resize(35);
             }
 
             setJobId(null);
         },
-        () => setJobId(null),
-        (jobId) => setJobId(jobId)
-    );
+        onStart: (jobId) => setJobId(jobId),
+        workflowId: workflow.id!,
+    });
 
     const handleRunClick = useCallback(() => {
         setShowBottomPanelOpen(true);
@@ -170,7 +176,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
 
     const handleStopClick = useCallback(() => {
         setWorkflowIsRunning(false);
-        close();
+        closeWorkflowTestStream();
         setStreamRequest(null);
 
         if (jobId) {
@@ -190,7 +196,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
     }, [
         bottomResizablePanelRef,
         chatTrigger,
-        close,
+        closeWorkflowTestStream,
         jobId,
         persistJobId,
         setStreamRequest,
@@ -201,7 +207,9 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
     // On mount: try to restore an ongoing run using jobId persisted in localStorage.
     // Attach-first approach: immediately call attach with the exact jobId string.
     useEffect(() => {
-        if (!workflow.id || currentEnvironmentId === undefined) return;
+        if (!workflow.id || currentEnvironmentId === undefined) {
+            return;
+        }
 
         const jobId = getPersistedJobId();
 
@@ -215,23 +223,23 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         setStreamRequest(getTestWorkflowAttachRequest({jobId}));
     }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
 
+    // Stop the workflow execution when:
+    // - The node details panel is opened (this always cancels runs, regardless of chat mode), or
+    // - We are in chat mode (`chatTrigger` is true) and the chat panel is not open (`!workflowTestChatPanelOpen`)
     useEffect(() => {
-        // Stop only when:
-        // - The node details panel is opened (always cancels runs), or
-        // - We are in chat mode and the chat panel is not open
         if (workflowNodeDetailsPanelOpen || (chatTrigger && !workflowTestChatPanelOpen)) {
             handleStopClick();
         }
     }, [chatTrigger, handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
     useEffect(() => {
-        if (error) {
+        if (workflowTestStreamError) {
             setWorkflowIsRunning(false);
             setStreamRequest(null);
             persistJobId(null);
             setJobId(null);
         }
-    }, [error, persistJobId, setWorkflowIsRunning, setStreamRequest]);
+    }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
     return {
         handleProjectWorkflowValueChange,

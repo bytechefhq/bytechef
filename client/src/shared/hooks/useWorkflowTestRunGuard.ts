@@ -1,7 +1,7 @@
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useBlocker} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -25,113 +25,19 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     const navConfirmedRef = useRef(false);
     const suppressBeforeUnloadPromptRef = useRef(false);
 
-    useEffect(() => {
-        latestRunningRef.current = workflowIsRunning;
-    }, [workflowIsRunning]);
-
-    useEffect(() => {
-        // Intercept keyboard reload to show the custom dialog
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (!latestRunningRef.current) {
-                return;
-            }
-
-            const key = event.key.toLowerCase();
-
-            const isReload = key === 'f5' || ((event.ctrlKey || event.metaKey) && key === 'r');
-
-            if (isReload) {
-                event.preventDefault();
-                event.stopPropagation();
-                setPendingAction('reload');
-                setShowLeaveDialog(true);
-            }
-        };
-
-        const stopBestEffort = async () => {
-            const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
-
-            if (!jobId) {
-                return;
-            }
-
-            await workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
-        };
-
-        const onBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (!latestRunningRef.current) {
-                return;
-            }
-
-            if (suppressBeforeUnloadPromptRef.current) {
-                return;
-            }
-
-            // Trigger the native confirmation dialog to prevent closing the page while a job is running
-            e.preventDefault();
-
-            // Setting returnValue is required by some browsers to show the prompt
-            e.returnValue = '';
-        };
-
-        const onPageHide = () => {
-            isUnloadingRef.current = true;
-
-            stopBestEffort();
-        };
-
-        const onVisibilityChange = () => {
-            if (document.visibilityState === 'hidden') {
-                isUnloadingRef.current = true;
-
-                stopBestEffort();
-            }
-        };
-
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('beforeunload', onBeforeUnload);
-        window.addEventListener('pagehide', onPageHide);
-        document.addEventListener('visibilitychange', onVisibilityChange);
-
-        return () => {
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('beforeunload', onBeforeUnload);
-            window.removeEventListener('pagehide', onPageHide);
-            document.removeEventListener('visibilitychange', onVisibilityChange);
-
-            // Only stop when leaving via SPA navigation (component unmount) – but skip if the page is unloading
-            if (isUnloadingRef.current) {
-                return;
-            }
-
-            // If we already confirmed a navigation and stopped explicitly, skip here to avoid double-stop
-            if (navConfirmedRef.current) {
-                return;
-            }
-
-            if (!latestRunningRef.current) {
-                return;
-            }
-
-            const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
-
-            if (jobId) {
-                workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
-            }
-        };
-    }, [getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
-
-    // Block SPA navigation when a run is active and show the same leave dialog
     const blocker = useBlocker(workflowIsRunning);
 
-    useEffect(() => {
-        if (blocker && blocker.state === 'blocked' && latestRunningRef.current) {
-            setPendingAction('nav');
-            setShowLeaveDialog(true);
-        }
-    }, [blocker, blocker?.state]);
+    // Block SPA navigation when a workflow execution is active and show the same leave dialog
+    const cancelLeave = useCallback(() => {
+        setPendingAction(null);
+        setShowLeaveDialog(false);
 
-    const confirmLeave = async () => {
+        if (blocker && blocker.state === 'blocked' && typeof blocker.reset === 'function') {
+            blocker.reset();
+        }
+    }, [blocker]);
+
+    const confirmLeave = useCallback(async () => {
         const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
 
         setShowLeaveDialog(false);
@@ -155,17 +61,114 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         }
 
         setPendingAction(null);
-    };
+    }, [blocker, getPersistedJobId, pendingAction, persistJobId, workflowTestExecution?.job?.id]);
 
-    const cancelLeave = () => {
-        setPendingAction(null);
-        setShowLeaveDialog(false);
-
-        // Cancel the blocked navigation if any
-        if (blocker && blocker.state === 'blocked' && typeof blocker.reset === 'function') {
-            blocker.reset();
+    const onBeforeUnload = useCallback((event: BeforeUnloadEvent) => {
+        if (!latestRunningRef.current) {
+            return;
         }
-    };
+
+        if (suppressBeforeUnloadPromptRef.current) {
+            return;
+        }
+
+        event.preventDefault();
+        event.returnValue = '';
+    }, []);
+
+    const onKeyDown = useCallback((event: KeyboardEvent) => {
+        if (!latestRunningRef.current) {
+            return;
+        }
+
+        const key = event.key.toLowerCase();
+
+        const isReloadKey = key === 'f5' || ((event.ctrlKey || event.metaKey) && key === 'r');
+
+        if (isReloadKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            setPendingAction('reload');
+            setShowLeaveDialog(true);
+        }
+    }, []);
+
+    const stopBestEffort = useCallback(async () => {
+        const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
+
+        if (!jobId) {
+            return;
+        }
+
+        await workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
+    }, [getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
+
+    const onPageHide = useCallback(async () => {
+        isUnloadingRef.current = true;
+
+        await stopBestEffort();
+    }, [stopBestEffort]);
+
+    const onVisibilityChange = useCallback(async () => {
+        if (document.visibilityState === 'hidden') {
+            isUnloadingRef.current = true;
+
+            await stopBestEffort();
+        }
+    }, [stopBestEffort]);
+
+    useEffect(() => {
+        latestRunningRef.current = workflowIsRunning;
+    }, [workflowIsRunning]);
+
+    // Intercept keyboard reload to show the custom dialog
+    useEffect(() => {
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('beforeunload', onBeforeUnload);
+        window.addEventListener('pagehide', onPageHide);
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('beforeunload', onBeforeUnload);
+            window.removeEventListener('pagehide', onPageHide);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+
+            if (isUnloadingRef.current) {
+                return;
+            }
+
+            // If we already confirmed a navigation and stopped explicitly, skip here to avoid double-stop
+            if (navConfirmedRef.current) {
+                return;
+            }
+
+            if (!latestRunningRef.current) {
+                return;
+            }
+
+            const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
+
+            if (jobId) {
+                workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
+            }
+        };
+    }, [
+        onBeforeUnload,
+        onKeyDown,
+        onPageHide,
+        onVisibilityChange,
+        getPersistedJobId,
+        persistJobId,
+        workflowTestExecution?.job?.id,
+    ]);
+
+    useEffect(() => {
+        if (blocker && blocker.state === 'blocked' && latestRunningRef.current) {
+            setPendingAction('nav');
+            setShowLeaveDialog(true);
+        }
+    }, [blocker, blocker?.state]);
 
     return {
         cancelLeave,

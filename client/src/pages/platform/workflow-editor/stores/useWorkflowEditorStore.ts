@@ -5,7 +5,7 @@ import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/t
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface WorkflowEditorI {
+export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
 

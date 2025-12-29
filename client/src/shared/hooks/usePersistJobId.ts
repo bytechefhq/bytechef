@@ -32,8 +32,8 @@ export const usePersistJobId = (workflowId?: string, environmentId?: number) => 
             if (jobId) {
                 try {
                     localStorage.setItem(key, jobId);
-                } catch {
-                    // ignore
+                } catch (error) {
+                    console.error('Failed to persist job ID:', error);
                 }
             } else {
                 try {

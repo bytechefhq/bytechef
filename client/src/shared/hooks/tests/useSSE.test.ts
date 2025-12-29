@@ -56,9 +56,9 @@ describe('useSSE', () => {
             rs.close();
         });
 
-        // handlers called with raw data strings (async) — expect trimmed data
-        await waitFor(() => expect(onStart).toHaveBeenCalledWith('{"jobId":"123"}'));
-        await waitFor(() => expect(onResult).toHaveBeenCalledWith('{"ok":true}'));
+        // handlers called with objects (async)
+        await waitFor(() => expect(onStart).toHaveBeenCalledWith({jobId: '123'}));
+        await waitFor(() => expect(onResult).toHaveBeenCalledWith({ok: true}));
 
         // stream closed
         await waitFor(() => expect(result.current.connectionState).toBe('CLOSED'));
@@ -132,7 +132,57 @@ describe('useSSE', () => {
         });
 
         expect(h1.start).not.toHaveBeenCalled();
-        await waitFor(() => expect(h2.start).toHaveBeenCalledWith('{"jobId":"99"}'));
+        await waitFor(() => expect(h2.start).toHaveBeenCalledWith({jobId: '99'}));
         expect(fetchSpy).toHaveBeenCalledTimes(1); // no reconnect
+    });
+
+    it('preserves spaces between words in streamed data', async () => {
+        const rs = makeStream();
+        const fetchSpy = vi
+            .fn<typeof fetch>()
+            .mockImplementation(() =>
+                Promise.resolve(new Response(rs.stream, {headers: {'Content-Type': 'text/event-stream'}, status: 200}))
+            );
+
+        global.fetch = fetchSpy;
+
+        const onStream = vi.fn();
+
+        const req: SSERequestType = {init: {method: 'GET'}, url: '/sse'};
+        renderHook(() => useSSE(req, {eventHandlers: {stream: onStream}}));
+
+        // Push events with leading spaces
+        act(() => {
+            // Typical SSE data line has a space after "data:"
+            // Specification says: "If line starts with 'data:', then: Let value be the subset of line from the first character after the colon to the end of the line. If value starts with a U+0020 SPACE character, remove it from value."
+
+            // Case 1: "data:Hello" -> should result in "Hello"
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data:Hello\n\n');
+
+            // Case 2: "data: Hello" (one space) -> should result in " Hello"
+            // Current code: "data: Hello" -> slice(5) -> " Hello" -> slice(1) -> "Hello" (BUG)
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data: Hello\n\n');
+
+            // Case 3: Leading space in content
+            // If payload is " how", SseEmitter might send "data:  how"
+            // Current code: "data:  how" -> slice(5) -> " how" -> slice(1) -> "how" (BAD)
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data:  how\n\n');
+
+            // Case 3: "data: " followed by "data: world" -> should result in "\nworld" or just " world" if joined?
+            // Actually SSE joins multiple data lines with \n
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data: \n');
+            rs.enqueue('data: world\n\n');
+
+            rs.close();
+        });
+
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith('Hello'));
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith(' Hello'));
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith('  how'));
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith(' \n world'));
     });
 });

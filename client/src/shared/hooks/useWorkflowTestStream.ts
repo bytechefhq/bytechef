@@ -7,12 +7,27 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
-export function useWorkflowTestStream(
-    workflowId: string,
-    onResult?: (execution: WorkflowTestExecution) => void,
-    onError?: () => void,
-    onStart?: (jobId: string) => void
-) {
+export interface UseWorkflowTestStreamProps {
+    workflowId: string;
+    onResult?: (execution: WorkflowTestExecution) => void;
+    onError?: () => void;
+    onStart?: (jobId: string) => void;
+}
+
+export interface UseWorkflowTestStreamResultI {
+    close: () => void;
+    error: string | null;
+    getPersistedJobId: () => string | null;
+    persistJobId: (jobId: string | null) => void;
+    setStreamRequest: (request: SSERequestType) => void;
+}
+
+export function useWorkflowTestStream({
+    onError,
+    onResult,
+    onStart,
+    workflowId,
+}: UseWorkflowTestStreamProps): UseWorkflowTestStreamResultI {
     const [streamRequest, setStreamRequest] = useState<SSERequestType>(null);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -39,7 +54,9 @@ export function useWorkflowTestStream(
             },
             result: (data) => {
                 try {
-                    const workflowTestExecution = WorkflowTestExecutionFromJSON(JSON.parse(data));
+                    const resultData = typeof data === 'string' ? JSON.parse(data) : data;
+
+                    const workflowTestExecution = WorkflowTestExecutionFromJSON(resultData);
 
                     setWorkflowTestExecution(workflowTestExecution);
 
@@ -55,9 +72,9 @@ export function useWorkflowTestStream(
                 }
             },
             start: (data) => {
-                const parsed = JSON.parse(data);
+                const startData = typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number});
 
-                const jobId = String((parsed as {jobId: string | number}).jobId);
+                const jobId = String(startData.jobId);
 
                 persistJobId(jobId);
 

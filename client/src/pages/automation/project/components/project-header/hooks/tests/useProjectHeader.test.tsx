@@ -222,11 +222,11 @@ describe('useProjectHeader', () => {
         });
 
         // Simulate start -> persist jobId
-        act(() => latest.handlers?.start?.(JSON.stringify({jobId})));
+        act(() => latest.handlers?.start?.({jobId}));
         expect(localStorage.getItem(storageKey)).toBe(jobId);
 
         // Simulate result -> stop running, set execution, clear jobId and resize panel if closed
-        act(() => latest.handlers?.result?.(JSON.stringify({ok: true})));
+        act(() => latest.handlers?.result?.({ok: true}));
         await waitFor(() => expect(hoisted.editorSpies.setWorkflowIsRunning).toHaveBeenCalledWith(false));
         expect(hoisted.editorSpies.setWorkflowTestExecution).toHaveBeenCalled();
         expect(panelRef.current.resize).toHaveBeenCalledWith(35);
@@ -245,7 +245,7 @@ describe('useProjectHeader', () => {
         const {result} = renderHook(() =>
             useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
         );
-        act(() => latest.handlers?.start?.(JSON.stringify({jobId})));
+        act(() => latest.handlers?.start?.({jobId}));
         localStorage.setItem(storageKey, jobId);
 
         // Mock fetch and cookie
