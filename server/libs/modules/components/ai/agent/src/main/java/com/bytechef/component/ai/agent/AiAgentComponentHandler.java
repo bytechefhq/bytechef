@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.action.AiAgentChatAction;
+import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -37,13 +38,16 @@ public class AiAgentComponentHandler implements ComponentHandler {
     private final AiAgentComponentDefinition componentDefinition;
 
     public AiAgentComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+        final AiAgentChatAction aiAgentChatAction = new AiAgentChatAction(clusterElementDefinitionService);
+
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
                 .title("AI Agent")
                 .description("With the AI Agent, you can chat with the AI agent.")
                 .icon("path:assets/ai-agent.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(new AiAgentChatAction(clusterElementDefinitionService).actionDefinition));
+                .actions(aiAgentChatAction.actionDefinition)
+                .clusterElements(new AiAgentChatTool(aiAgentChatAction).clusterElementDefinition));
     }
 
     @Override
