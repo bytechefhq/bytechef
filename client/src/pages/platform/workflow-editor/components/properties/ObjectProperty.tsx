@@ -16,6 +16,22 @@ import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 import SubPropertyPopover from './components/SubPropertyPopover';
 
+interface BuildOrderedPropertyKeysProps {
+    dynamicPropertyTypes: Record<string, string> | undefined;
+    parameterObject: {[key: string]: object[] | undefined};
+    path: string;
+    properties: Array<PropertyAllType> | undefined;
+}
+
+interface BuildPropertyFromParameterKeyProps {
+    baseProperty: PropertyAllType;
+    dynamicPropertyTypes: Record<string, string> | undefined;
+    parameterKey: string;
+    parameterObject: {[key: string]: unknown};
+    path: string;
+    properties: Array<PropertyAllType>;
+}
+
 interface ObjectPropertyProps {
     operationName?: string;
     arrayIndex?: number;
@@ -130,64 +146,69 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         [onDeleteClick, path]
     );
 
-    // render individual object items with data gathered from parameters
-    useEffect(() => {
-        if (
-            !name ||
-            !path ||
-            !currentComponent?.parameters ||
-            !properties ||
-            !parameterObject ||
-            !isObject(parameterObject)
-        ) {
-            return;
-        }
+    const buildOrderedPropertyKeys = useCallback(
+        ({dynamicPropertyTypes, parameterObject, path, properties}: BuildOrderedPropertyKeysProps): string[] => {
+            const subPropertyKeySet = new Set<string>();
+            const orderedKeys: string[] = [];
 
-        const subPropertyKeySet = new Set<string>();
-        const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
+            if (properties?.length) {
+                properties.forEach((property) => {
+                    if (property.name) {
+                        orderedKeys.push(property.name);
 
-        if (path && dynamicPropertyTypes) {
-            const pathPrefix = `${path}.`;
-
-            Object.keys(dynamicPropertyTypes).forEach((dynamicKey) => {
-                if (dynamicKey.startsWith(pathPrefix)) {
-                    const subPropertyName = dynamicKey.substring(pathPrefix.length);
-
-                    if (subPropertyName && !subPropertyName.includes('.')) {
-                        subPropertyKeySet.add(subPropertyName);
+                        subPropertyKeySet.add(property.name);
                     }
-                }
-            });
-        }
+                });
+            }
 
-        if (properties?.length) {
-            properties.forEach((property) => {
-                if (property.name) {
-                    subPropertyKeySet.add(property.name);
-                }
-            });
-        }
+            if (path && dynamicPropertyTypes) {
+                const pathPrefix = `${path}.`;
 
-        if (parameterObject) {
-            Object.keys(parameterObject).forEach((key) => {
-                subPropertyKeySet.add(key);
-            });
-        }
+                Object.keys(dynamicPropertyTypes).forEach((dynamicKey) => {
+                    if (dynamicKey.startsWith(pathPrefix)) {
+                        const subPropertyName = dynamicKey.substring(pathPrefix.length);
 
-        const objectParameterKeys = Array.from(subPropertyKeySet);
+                        if (subPropertyName && !subPropertyName.includes('.')) {
+                            if (!subPropertyKeySet.has(subPropertyName)) {
+                                orderedKeys.push(subPropertyName);
 
-        if (!objectParameterKeys.length) {
-            return;
-        }
+                                subPropertyKeySet.add(subPropertyName);
+                            }
+                        }
+                    }
+                });
+            }
 
-        const preexistingProperties = objectParameterKeys.map((parameterKey) => {
-            const matchingProperty = (properties as Array<PropertyAllType>).find(
-                (property) => property.name === parameterKey
-            ) as PropertyAllType | undefined;
+            if (parameterObject) {
+                Object.keys(parameterObject).forEach((key) => {
+                    if (!subPropertyKeySet.has(key)) {
+                        orderedKeys.push(key);
 
-            let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}.${parameterKey}`];
+                        subPropertyKeySet.add(key);
+                    }
+                });
+            }
 
-            const parameterKeyValue = parameterObject[parameterKey!];
+            return orderedKeys;
+        },
+        []
+    );
+
+    const buildPropertyFromParameterKey = useCallback(
+        ({
+            baseProperty,
+            dynamicPropertyTypes,
+            parameterKey,
+            parameterObject,
+            path,
+            properties,
+        }: BuildPropertyFromParameterKeyProps): PropertyAllType => {
+            const matchingProperty = properties.find((property) => property.name === parameterKey) as
+                | PropertyAllType
+                | undefined;
+
+            let parameterItemType = dynamicPropertyTypes?.[`${path}.${parameterKey}`];
+            const parameterKeyValue = parameterObject[parameterKey];
 
             if (Array.isArray(parameterKeyValue) && !parameterItemType) {
                 parameterItemType = 'ARRAY';
@@ -215,10 +236,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     controlType: matchingPropertyControlType,
                     defaultValue: parameterKeyValue,
                     type: matchingPropertyType,
-                };
+                } as PropertyAllType;
             } else {
                 return {
-                    ...property,
+                    ...baseProperty,
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlType,
@@ -228,15 +249,61 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     label: parameterKey,
                     name: parameterKey,
                     type: parameterItemType as PropertyType,
-                };
+                } as PropertyAllType;
             }
+        },
+        []
+    );
+
+    // render individual object items with data gathered from parameters
+    useEffect(() => {
+        if (
+            !name ||
+            !path ||
+            !currentComponent?.parameters ||
+            !properties ||
+            !parameterObject ||
+            !isObject(parameterObject)
+        ) {
+            return;
+        }
+
+        const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
+
+        const objectParameterKeys = buildOrderedPropertyKeys({
+            dynamicPropertyTypes,
+            parameterObject,
+            path,
+            properties: properties as Array<PropertyAllType>,
         });
+
+        if (!objectParameterKeys.length) {
+            return;
+        }
+
+        const preexistingProperties = objectParameterKeys.map((parameterKey) =>
+            buildPropertyFromParameterKey({
+                baseProperty: property,
+                dynamicPropertyTypes,
+                parameterKey,
+                parameterObject,
+                path,
+                properties: properties as Array<PropertyAllType>,
+            })
+        );
 
         if (preexistingProperties.length) {
             setSubProperties(preexistingProperties as Array<PropertyAllType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [parameterObject, properties, path, currentComponent?.metadata?.ui?.dynamicPropertyTypes]);
+    }, [
+        parameterObject,
+        properties,
+        path,
+        currentComponent?.metadata?.ui?.dynamicPropertyTypes,
+        buildOrderedPropertyKeys,
+        buildPropertyFromParameterKey,
+    ]);
 
     // set default values for subProperties when they are created
     useEffect(() => {
