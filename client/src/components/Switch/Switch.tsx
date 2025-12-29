@@ -1,19 +1,16 @@
 import {Switch as ShadcnSwitch} from '@/components/ui/switch';
-import * as React from 'react';
+import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-interface BaseSwitchProps extends Omit<
-    React.ComponentPropsWithoutRef<typeof ShadcnSwitch>,
-    'checked' | 'onCheckedChange'
-> {
+interface BaseSwitchProps extends Omit<ComponentPropsWithoutRef<typeof ShadcnSwitch>, 'checked' | 'onCheckedChange'> {
     variant?: VariantType;
     checked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
 }
 
 interface LabeledSwitchProps extends BaseSwitchProps {
-    label: React.ReactNode;
-    description?: React.ReactNode;
+    label: ReactNode;
+    description?: ReactNode;
     alignment?: AlignmentType;
 }
 
@@ -52,8 +49,8 @@ const wrapperStyles: Record<VariantType, string> = {
 };
 
 interface TextBlockProps {
-    label: React.ReactNode;
-    description?: React.ReactNode;
+    label: ReactNode;
+    description?: ReactNode;
     variant: VariantType;
 }
 
@@ -78,7 +75,7 @@ function TextBlock({description, label, variant}: TextBlockProps) {
     );
 }
 
-const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPropsType>(
+const Switch = forwardRef<ElementRef<typeof ShadcnSwitch>, SwitchPropsType>(
     (
         {
             alignment = 'start',
@@ -124,6 +121,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof ShadcnSwitch>, SwitchPro
         }
 
         const isBoxVariant = variant === 'box';
+
         const wrapperClasses = twMerge(
             wrapperStyles[variant],
             isBoxVariant && checked ? 'bg-surface-brand-secondary border-stroke-brand-secondary' : ''
