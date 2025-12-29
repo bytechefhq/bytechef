@@ -1,11 +1,16 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowExecutionsTaskAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTaskAccordionItem';
 import WorkflowExecutionsTriggerAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsTriggerAccordionItem';
-import {getInitialSelectedItem, getTasksTree} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import {
+    getErrorItem,
+    getInitialSelectedItem,
+    getTasksTree,
+} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ChevronDownIcon, RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
@@ -28,6 +33,8 @@ const WorkflowExecutionsTestOutput = ({
         getInitialSelectedItem(workflowTestExecution)
     );
 
+    const setWorkflowExecutionError = useCopilotStore((state) => state.setWorkflowExecutionError);
+
     const job = workflowTestExecution?.job;
     const triggerExecution = workflowTestExecution?.triggerExecution;
 
@@ -35,6 +42,19 @@ const WorkflowExecutionsTestOutput = ({
         setSelectedItem(getInitialSelectedItem(workflowTestExecution));
         setActiveTab('input');
     }, [workflowTestExecution]);
+
+    // Set workflow execution error in copilot store when an error exists
+    useEffect(() => {
+        const errorItem = getErrorItem(workflowTestExecution);
+
+        if (errorItem?.error) {
+            setWorkflowExecutionError({
+                errorMessage: errorItem.error.message,
+                stackTrace: errorItem.error.stackTrace,
+                title: errorItem.title,
+            });
+        }
+    }, [workflowTestExecution, setWorkflowExecutionError]);
 
     const tasksTree = useMemo(() => (job ? getTasksTree(job) : []), [job]);
 
