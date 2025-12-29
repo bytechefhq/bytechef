@@ -20,6 +20,11 @@ export type ContextType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
     mode: MODE;
+    workflowExecutionError?: {
+        errorMessage?: string;
+        stackTrace?: string[];
+        title?: string;
+    };
 };
 
 interface CopilotStateI {
@@ -28,6 +33,11 @@ interface CopilotStateI {
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
+    setWorkflowExecutionError: (workflowExecutionError: {
+        errorMessage?: string;
+        stackTrace?: string[];
+        title?: string;
+    }) => void;
 
     copilotPanelOpen: boolean;
     setCopilotPanelOpen: (showCopilot: boolean) => void;
@@ -55,12 +65,23 @@ export const useCopilotStore = create<CopilotStateI>()(
 
         context: {
             mode: MODE.ASK,
+            workflowExecutionError: undefined,
         },
         setContext: (context) =>
             set((state) => {
                 return {
                     ...state,
                     context,
+                };
+            }),
+        setWorkflowExecutionError: (error) =>
+            set((state) => {
+                return {
+                    ...state,
+                    context: {
+                        ...state.context,
+                        workflowExecutionError: error,
+                    },
                 };
             }),
 
