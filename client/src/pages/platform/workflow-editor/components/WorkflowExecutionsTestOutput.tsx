@@ -53,6 +53,9 @@ const WorkflowExecutionsTestOutput = ({
                 stackTrace: errorItem.error.stackTrace,
                 title: errorItem.title,
             });
+        } else {
+            // Clear error when workflow succeeds
+            setWorkflowExecutionError(undefined);
         }
     }, [workflowTestExecution, setWorkflowExecutionError]);
 
