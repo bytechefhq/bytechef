@@ -35,7 +35,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -49,7 +49,6 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +56,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -74,7 +74,6 @@ public class AiAgentChatAction {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
     public AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
-
         actionDefinition = new ChatActionDefinition(
             action(CHAT)
                 .title("Chat")
@@ -104,12 +103,18 @@ public class AiAgentChatAction {
 
         @Override
         public Optional<BasePerformFunction> getPerform() {
-            return Optional.of((MultipleConnectionsPerformFunction) this::perform);
+            return Optional.of(
+                (MultipleConnectionsPerformFunction) (
+                    inputParameters, connectionParameters, extensions,
+                    actionContext) -> perform(
+                        inputParameters, connectionParameters, extensions, actionContext,
+                        clusterElementDefinitionService));
         }
 
         protected Object perform(
             Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
-            Parameters extensions, ActionContext actionContext) throws Exception {
+            Parameters extensions, ActionContext actionContext,
+            ClusterElementDefinitionService clusterElementDefinitionService) throws Exception {
 
             ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
@@ -135,7 +140,7 @@ public class AiAgentChatAction {
                 .messages(ModelUtils.getMessages(inputParameters, actionContext))
                 .toolCallbacks(
                     getToolCallbacks(
-                        clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
+                        clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
                         actionContext.isEditorEnvironment()))
                 .call();
 
@@ -220,7 +225,6 @@ public class AiAgentChatAction {
         }
     }
 
-    @SuppressFBWarnings("NP")
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
         boolean editorEnvironment) {
@@ -244,8 +248,19 @@ public class AiAgentChatAction {
                 .inputType(Map.class)
                 .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
 
-            if (clusterElementDefinition.getDescription() != null) {
-                builder.description(clusterElementDefinition.getDescription());
+            // Prefer the per-tool description provided as a PROPERTY (cluster element parameter), then fall back to the
+            // extension-based description for backward compatibility, otherwise use the cluster element definition
+            // description.
+            String toolDescription = getToolDescription(clusterElement);
+
+            if (toolDescription != null) {
+                builder.description(toolDescription);
+            } else {
+                String description = clusterElementDefinition.getDescription();
+
+                if (description != null) {
+                    builder.description(description);
+                }
             }
 
             toolCallbacks.add(builder.build());
@@ -261,5 +276,31 @@ public class AiAgentChatAction {
         return request -> clusterElementDefinitionService.executeTool(
             componentName, componentVersion, clusterElementName, MapUtils.concat(request, new HashMap<>(parameters)),
             componentConnection, editorEnvironment);
+    }
+
+    private static @Nullable String getToolDescription(ClusterElement clusterElement) {
+        String toolDescription = null;
+        Map<String, ?> params = clusterElement.getParameters();
+
+        if (params != null) {
+            Object desc = params.get("description");
+
+            if (desc instanceof String s && !s.isBlank()) {
+                toolDescription = s;
+            }
+        }
+
+        if (toolDescription == null) {
+            Map<String, ?> extensions = clusterElement.getExtensions();
+
+            if (extensions != null) {
+                Object desc = extensions.get("description");
+
+                if (desc instanceof String s && !s.isBlank()) {
+                    toolDescription = s;
+                }
+            }
+        }
+        return toolDescription;
     }
 }
