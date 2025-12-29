@@ -21,15 +21,13 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
+import static com.bytechef.component.text.helper.util.TextHelperUtils.extractByRegEx;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Monika Kušter
@@ -56,15 +54,6 @@ public class TextHelperExtractUrlsAction {
         String regexStr =
             "\\b((?:https?|ftp|file)://[a-zA-Z0-9+&@#/%?=~_|!:,.;]*[a-zA-Z0-9+&@#/%=~_|]|www\\.[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}(?:/[\\w+&@#/%?=~_|!:,.;]*)?)";
 
-        Pattern pattern = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(inputParameters.getRequiredString(TEXT));
-
-        List<String> urls = new ArrayList<>();
-
-        while (matcher.find()) {
-            urls.add(matcher.group());
-        }
-
-        return urls;
+        return extractByRegEx(inputParameters.getRequiredString(TEXT), regexStr);
     }
 }

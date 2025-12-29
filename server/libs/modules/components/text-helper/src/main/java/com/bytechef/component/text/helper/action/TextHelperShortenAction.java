@@ -17,41 +17,43 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.EXPRESSION;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.LENGTH;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperContainsAction {
+public class TextHelperShortenAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("contains")
-        .title("Contains")
-        .description("Check if text contains the specified sequence of characters.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("shorten")
+        .title("Shorten")
+        .description("Shorten string to a max allowed length.")
         .properties(
-            TEXT_PROPERTY,
-            string(EXPRESSION)
-                .label("Expression")
-                .description("Text to search for.")
+            string(TEXT)
+                .label("Text")
+                .description("The text that will be shortened.")
+                .required(true),
+            integer(LENGTH)
+                .label("Length")
+                .description("Maximum allowed length of the string.")
                 .required(true))
-        .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
-        .perform(TextHelperContainsAction::perform);
+        .output(outputSchema(string().description("Shortened string.")))
+        .perform(TextHelperShortenAction::perform);
 
-    private TextHelperContainsAction() {
+    private TextHelperShortenAction() {
     }
 
-    public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String text = inputParameters.getRequiredString(TEXT);
+        int maxLength = inputParameters.getRequiredInteger(LENGTH);
 
-        return text.contains(inputParameters.getRequiredString(EXPRESSION));
+        return text.substring(0, maxLength);
     }
 }

@@ -16,7 +16,8 @@
 
 package com.bytechef.component.text.helper.action;
 
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.LENGTH;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -27,19 +28,19 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Spehar
  */
-class TextHelperMarkdownToHTMLActionTest {
-
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(MARKDOWN, "# Hello World"));
+class TextHelperShortenActionTest {
 
     @Test
     void testPerform() {
-        String result = TextHelperMarkdownToHTMLAction.perform(
-            mockedParameters, mockedParameters, mock(Context.class));
+        Context mockedContext = mock(Context.class);
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "123456789", LENGTH, 4));
 
-        String expected = "<h1><a href=\"#hello-world\" id=\"hello-world\">Hello World</a></h1>\n";
+        String result = TextHelperShortenAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(expected, result);
+        assertEquals(4, result.length());
+        assertEquals("1234", result);
     }
 }
