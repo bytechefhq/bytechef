@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.text.helper.constant.OperationType;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperUrlEncodeDecodeActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
 
     @Test
     void testPerformEncode() {
@@ -41,7 +42,7 @@ class TextHelperUrlEncodeDecodeActionTest {
             Map.of(TEXT, "Hello+World%21", OPERATION, OperationType.DECODE.name()));
 
         Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("Hello World!", result);
     }
@@ -52,7 +53,7 @@ class TextHelperUrlEncodeDecodeActionTest {
             Map.of(TEXT, "Hello World!", OPERATION, OperationType.ENCODE.name()));
 
         Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("Hello+World%21", result);
     }
@@ -63,7 +64,7 @@ class TextHelperUrlEncodeDecodeActionTest {
             Map.of(TEXT, "", OPERATION, OperationType.DECODE.name()));
 
         Object result =
-            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperUrlEncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("", result);
     }

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.text.helper.constant.OperationType;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperBase64EncodeDecodeActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
 
     @Test
     void testPerformEncode() {
@@ -41,7 +42,7 @@ class TextHelperBase64EncodeDecodeActionTest {
             Map.of(TEXT, "SGVsbG8gd29ybGQ=", OPERATION, OperationType.DECODE.name()));
 
         Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("Hello world", result);
     }
@@ -52,7 +53,7 @@ class TextHelperBase64EncodeDecodeActionTest {
             Map.of(TEXT, "Hello world", OPERATION, OperationType.ENCODE.name()));
 
         Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("SGVsbG8gd29ybGQ=", result);
     }
@@ -63,7 +64,7 @@ class TextHelperBase64EncodeDecodeActionTest {
             Map.of(TEXT, "", OPERATION, OperationType.DECODE.name()));
 
         Object result =
-            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            TextHelperBase64EncodeDecodeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals("", result);
     }
