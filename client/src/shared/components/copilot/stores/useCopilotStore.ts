@@ -33,11 +33,15 @@ interface CopilotStateI {
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
-    setWorkflowExecutionError: (workflowExecutionError: {
-        errorMessage?: string;
-        stackTrace?: string[];
-        title?: string;
-    }) => void;
+    setWorkflowExecutionError: (
+        workflowExecutionError:
+            | {
+                  errorMessage?: string;
+                  stackTrace?: string[];
+                  title?: string;
+              }
+            | undefined
+    ) => void;
 
     copilotPanelOpen: boolean;
     setCopilotPanelOpen: (showCopilot: boolean) => void;
