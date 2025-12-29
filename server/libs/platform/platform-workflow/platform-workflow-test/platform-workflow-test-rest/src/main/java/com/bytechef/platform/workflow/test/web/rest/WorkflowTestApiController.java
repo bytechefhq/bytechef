@@ -18,12 +18,10 @@ package com.bytechef.platform.workflow.test.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
-import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
-import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.bytechef.tenant.TenantContext;
@@ -118,18 +116,30 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         if (future == null) {
             List<SseEmitter.SseEventBuilder> bufferedEvents = pendingEvents.getIfPresent(key);
 
-            if (bufferedEvents != null) {
-                pendingEvents.invalidate(key);
-            }
-
             if (bufferedEvents != null && !bufferedEvents.isEmpty()) {
+                pendingEvents.invalidate(key);
+
                 try {
                     for (SseEmitter.SseEventBuilder eventBuilder : bufferedEvents) {
                         try {
                             emitter.send(eventBuilder);
                         } catch (IOException exception) {
                             if (logger.isTraceEnabled()) {
-                                logger.trace(exception.getMessage(), exception);
+                                logger.trace(
+                                    "Failed to send buffered SSE event for job {}: {}", jobId, exception.getMessage(),
+                                    exception);
+                            }
+
+                            try {
+                                emitter.send(createEvent("error", "Failed to deliver buffered events"));
+                            } catch (IOException ioException) {
+                                if (logger.isTraceEnabled()) {
+                                    logger.trace(
+                                        "Failed to send SSE error event for job {}: {}", jobId,
+                                        ioException.getMessage(), ioException);
+                                }
+
+                                break;
                             }
                         }
                     }
@@ -137,6 +147,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                     emitter.complete();
                 }
             } else {
+                if (bufferedEvents != null) {
+                    pendingEvents.invalidate(key);
+                }
+
                 try {
                     emitter.send(createEvent("error", "Not running"));
                 } catch (Exception exception) {
@@ -185,6 +199,11 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     @Override
     @PostMapping(value = "/workflow-tests/{jobId}/stop")
     public ResponseEntity<Void> stopWorkflowTest(@PathVariable String jobId) {
+        if (!jobId.matches("\\d+")) {
+            return ResponseEntity.badRequest()
+                .build();
+        }
+
         final String key = TenantCacheKeyUtils.getKey(jobId);
 
         CompletableFuture<WorkflowTestExecutionModel> future = runs.getIfPresent(key);
@@ -291,23 +310,19 @@ public class WorkflowTestApiController implements WorkflowTestApi {
             List<AutoCloseable> handles = new ArrayList<>();
 
             handles.add(workflowTestFacade.addJobStatusListener(
-                jobId, (JobStatusEventDTO event) -> sendToEmitter(key, createEvent("job", String.valueOf(event)))));
+                jobId, (event) -> sendToEmitter(key, createEvent("job", JsonUtils.write(event)))));
 
             handles.add(
                 workflowTestFacade.addTaskStartedListener(
-                    jobId,
-                    (TaskStatusEventDTO event) -> sendToEmitter(key, createEvent("task", String.valueOf(event)))));
+                    jobId, (event) -> sendToEmitter(key, createEvent("task", JsonUtils.write(event)))));
 
             handles.add(
                 workflowTestFacade.addTaskExecutionCompleteListener(
-                    jobId,
-                    (TaskStatusEventDTO event) -> sendToEmitter(key, createEvent("task", String.valueOf(event)))));
+                    jobId, (event) -> sendToEmitter(key, createEvent("task", JsonUtils.write(event)))));
 
             handles.add(
                 workflowTestFacade.addErrorListener(
-                    jobId,
-                    (ExecutionErrorEventDTO event) -> sendToEmitter(
-                        key, createEvent("error", String.valueOf(event)))));
+                    jobId, (event) -> sendToEmitter(key, createEvent("error", JsonUtils.write(event)))));
 
             return handles;
         });
@@ -318,9 +333,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         if (emitter != null) {
             this.emitter.invalidate(key);
-        }
 
-        if (emitter != null) {
             try {
                 emitter.complete();
             } catch (Exception exception) {
@@ -384,9 +397,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         if (bufferedEvents != null) {
             pendingEvents.invalidate(key);
-        }
 
-        if (bufferedEvents != null) {
             for (SseEmitter.SseEventBuilder eventBuilder : bufferedEvents) {
                 sendToEmitter(key, eventBuilder);
             }
@@ -427,9 +438,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         if (handles != null) {
             listenerHandles.invalidate(key);
-        }
 
-        if (handles != null) {
             for (AutoCloseable handle : handles) {
                 try {
                     handle.close();

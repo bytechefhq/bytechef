@@ -63,7 +63,13 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
 
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
+        if (receivers == null || receivers.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No listeners subscribed for: " + messageRoute);
+            }
+
+            return;
+        }
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
             executor.execute(() -> receiver.receive(

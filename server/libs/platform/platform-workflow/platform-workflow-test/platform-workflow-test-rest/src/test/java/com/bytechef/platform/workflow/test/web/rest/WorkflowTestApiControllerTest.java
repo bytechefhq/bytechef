@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
@@ -39,6 +40,10 @@ import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -52,6 +57,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -84,6 +90,16 @@ class WorkflowTestApiControllerTest {
 
     @Autowired
     private WorkflowTestApiController controller;
+
+    @BeforeEach
+    public void beforeEach() {
+        JsonUtils.setObjectMapper(
+            JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .addModules(new JavaTimeModule())
+                .build());
+    }
 
     @Test
     void testStartStreamEmitsStartAndResult() throws Exception {
@@ -190,6 +206,13 @@ class WorkflowTestApiControllerTest {
     }
 
     @Test
+    void testStopWorkflowTestWithUndefinedJobId() throws Exception {
+        mockMvc.perform(
+            post("/internal/workflow-tests/{jobId}/stop", "undefined"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void testAttachWhenNotRunningEmitsErrorNotRunning() throws Exception {
         // No runs have been started in this test -> attach should report not running
         var mvcResult = mockMvc.perform(get("/internal/workflow-tests/{jobId}/attach", 999L)
@@ -279,23 +302,23 @@ class WorkflowTestApiControllerTest {
             Thread.sleep(50);
         }
 
-        Consumer<JobStatusEventDTO> jobStatusEventDTOConsumer = jobListener.get();
-        Consumer<TaskStatusEventDTO> taskStatusEventDTOConsumerStarted = taskStartedListener.get();
-        Consumer<TaskStatusEventDTO> taskStatusEventDTOConsumerCompleted = taskCompletedListener.get();
-        Consumer<ExecutionErrorEventDTO> executionErrorEventDTOConsumer = errorListener.get();
+        Consumer<JobStatusEventDTO> jobStatusEventConsumer = jobListener.get();
+        Consumer<TaskStatusEventDTO> taskStatusEventStartedConsumer = taskStartedListener.get();
+        Consumer<TaskStatusEventDTO> taskStatusEventCompletedConsumer = taskCompletedListener.get();
+        Consumer<ExecutionErrorEventDTO> executionErrorEventConsumer = errorListener.get();
 
-        assertThat(jobStatusEventDTOConsumer).isNotNull();
-        assertThat(taskStatusEventDTOConsumerStarted).isNotNull();
-        assertThat(taskStatusEventDTOConsumerCompleted).isNotNull();
-        assertThat(executionErrorEventDTOConsumer).isNotNull();
+        assertThat(jobStatusEventConsumer).isNotNull();
+        assertThat(taskStatusEventStartedConsumer).isNotNull();
+        assertThat(taskStatusEventCompletedConsumer).isNotNull();
+        assertThat(executionErrorEventConsumer).isNotNull();
 
         // Fire synthetic events
-        jobStatusEventDTOConsumer.accept(new JobStatusEventDTO(jobId, "STARTED", Instant.now()));
-        taskStatusEventDTOConsumerStarted.accept(
+        jobStatusEventConsumer.accept(new JobStatusEventDTO(jobId, "STARTED", Instant.now()));
+        taskStatusEventStartedConsumer.accept(
             new TaskStatusEventDTO(jobId, 1L, STARTED, null, null, Instant.now(), null));
-        taskStatusEventDTOConsumerCompleted.accept(
+        taskStatusEventCompletedConsumer.accept(
             new TaskStatusEventDTO(jobId, 1L, COMPLETED, "t", "type", null, Instant.now()));
-        executionErrorEventDTOConsumer.accept(new ExecutionErrorEventDTO(jobId, "Oops"));
+        executionErrorEventConsumer.accept(new ExecutionErrorEventDTO(jobId, "Oops"));
 
         // Allow a brief moment for SSE forwarding to flush before finishing
         Duration duration = Duration.ofMillis(50);
@@ -363,21 +386,19 @@ class WorkflowTestApiControllerTest {
         // Obtain the key from the controller's 'runs' map (wait briefly if needed)
         String key = waitForRunKey();
 
-        // Remove emitters to force buffering
-        Object emitters = ReflectionTestUtils.getField(controller, "emitter");
+        // Remove emitter to force buffering
+        Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
-        assert emitters != null;
+        assert emitter != null;
 
-        if (emitters instanceof Cache<?, ?> cache) {
+        if (emitter instanceof Cache<?, ?> cache) {
             @SuppressWarnings("unchecked")
-            Cache<String, CopyOnWriteArrayList<SseEmitter>> emitterCache =
-                (Cache<String, CopyOnWriteArrayList<SseEmitter>>) cache;
+            Cache<String, SseEmitter> emitterCache = (Cache<String, SseEmitter>) cache;
 
             emitterCache.invalidate(key);
-        } else if (emitters instanceof ConcurrentMap<?, ?>) {
+        } else if (emitter instanceof ConcurrentMap<?, ?>) {
             @SuppressWarnings("unchecked")
-            ConcurrentMap<String, CopyOnWriteArrayList<SseEmitter>> emitterMap =
-                (ConcurrentMap<String, CopyOnWriteArrayList<SseEmitter>>) emitters;
+            ConcurrentMap<String, SseEmitter> emitterMap = (ConcurrentMap<String, SseEmitter>) emitter;
 
             emitterMap.remove(key);
         }
@@ -476,14 +497,12 @@ class WorkflowTestApiControllerTest {
 
         if (emitter instanceof Cache<?, ?> cache) {
             @SuppressWarnings("unchecked")
-            Cache<String, CopyOnWriteArrayList<SseEmitter>> emitterCache =
-                (Cache<String, CopyOnWriteArrayList<SseEmitter>>) cache;
+            Cache<String, SseEmitter> emitterCache = (Cache<String, SseEmitter>) cache;
 
             emitterCache.invalidate(key);
         } else if (emitter instanceof ConcurrentMap<?, ?>) {
             @SuppressWarnings("unchecked")
-            ConcurrentMap<String, CopyOnWriteArrayList<SseEmitter>> emitterMap =
-                (ConcurrentMap<String, CopyOnWriteArrayList<SseEmitter>>) emitter;
+            ConcurrentMap<String, SseEmitter> emitterMap = (ConcurrentMap<String, SseEmitter>) emitter;
 
             emitterMap.remove(key);
         }
@@ -546,11 +565,18 @@ class WorkflowTestApiControllerTest {
     }
 
     private static String normalizeSse(String body) {
-        // Normalize potential double-space after 'event:' introduced by different SSE encoders
-        String normalized = body.replace("event:  ", "event: ");
+        if (body == null || body.isEmpty()) {
+            return body;
+        }
 
-        // Also collapse any accidental triple spaces just in case
-        return normalized.replace("event:   ", "event: ");
+        // Normalize whitespace after 'event:' at the beginning of SSE lines, regardless of encoder quirks.
+        // This collapses any sequence of whitespace after 'event:' to a single space.
+        // Example:
+        // event: started
+        // event:\tcompleted
+        // becomes:
+        // event: started
+        return body.replaceAll("(?m)^(event:)(\\s*)", "$1 ");
     }
 
     @Configuration
