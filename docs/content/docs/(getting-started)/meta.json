@@ -1,0 +1,13 @@
+{
+  "title": "Getting Started",
+  "description": "Get started with ByteChef",
+  "icon": "Rocket",
+  "pages": [
+    "---Getting Started---",
+    "introduction",
+    "what-is-bytechef",
+    "quickstart",
+    "architecture",
+    "glossary"
+  ]
+}
