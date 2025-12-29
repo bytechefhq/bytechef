@@ -150,15 +150,11 @@ public class UserController {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
      */
-    @PutMapping({
-        "/users", "/users/{login}"
-    })
+    @PutMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public ResponseEntity<AdminUserDTO> updateUser(
-        @PathVariable(name = "login", required = false) @Pattern(regexp = UserConstants.LOGIN_REGEX) String login,
-        @Valid @RequestBody AdminUserDTO userDTO) {
-
+    public ResponseEntity<AdminUserDTO> updateUser(@Valid @RequestBody AdminUserDTO userDTO) {
         logger.debug("REST request to update User : {}", userDTO);
+
         Optional<User> existingUser = userService.fetchUserByEmail(userDTO.getEmail());
 
         if (existingUser.isPresent() && (!existingUser.orElseThrow()
@@ -168,7 +164,7 @@ public class UserController {
             throw new EmailAlreadyUsedException();
         }
 
-        login = userDTO.getLogin();
+        String login = userDTO.getLogin();
 
         existingUser = userService.fetchUserByLogin(login.toLowerCase());
 

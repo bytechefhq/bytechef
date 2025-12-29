@@ -50,7 +50,6 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<CreateApiClient200ResponseModel> createApiClient(ApiClientModel apiClientModel) {
         return ResponseEntity.ok(
             new CreateApiClient200ResponseModel().secretKey(
@@ -66,7 +65,6 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiClientModel> getApiClient(Long id) {
         ApiClientModel apiClientModel = conversionService.convert(
             apiClientService.getApiClient(id), ApiClientModel.class);
@@ -84,7 +82,6 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateApiClient(Long id, ApiClientModel apiClientModel) {
         apiClientService.update(conversionService.convert(apiClientModel.id(id), ApiClient.class));
 

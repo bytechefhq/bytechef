@@ -21,15 +21,17 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskDispatcherDefinitionService {
 
+    @Nullable
     OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters);
 
+    @Nullable
     OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters);
 
     String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters);

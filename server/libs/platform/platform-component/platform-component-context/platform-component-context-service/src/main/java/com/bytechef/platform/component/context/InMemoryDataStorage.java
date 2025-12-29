@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic

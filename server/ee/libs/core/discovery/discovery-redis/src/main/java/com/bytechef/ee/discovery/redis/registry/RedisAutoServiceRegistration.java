@@ -11,6 +11,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @version ee
@@ -23,10 +24,10 @@ public class RedisAutoServiceRegistration extends AbstractAutoServiceRegistratio
 
     @SuppressFBWarnings("EI2")
     public RedisAutoServiceRegistration(
-        ServiceRegistry<RedisRegistration> serviceRegistry, AutoServiceRegistrationProperties properties,
-        RedisRegistration redisRegistration) {
+        ApplicationContext applicationContext, ServiceRegistry<RedisRegistration> serviceRegistry,
+        AutoServiceRegistrationProperties properties, RedisRegistration redisRegistration) {
 
-        super(serviceRegistry, properties);
+        super(applicationContext, serviceRegistry, properties);
 
         this.redisRegistration = redisRegistration;
     }

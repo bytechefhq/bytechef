@@ -8,7 +8,7 @@ springBoot {
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -37,6 +37,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

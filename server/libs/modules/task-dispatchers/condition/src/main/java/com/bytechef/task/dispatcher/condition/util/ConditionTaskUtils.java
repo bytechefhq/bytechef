@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Matija Petanjek

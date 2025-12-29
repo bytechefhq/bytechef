@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@SpringBootTest(classes = ConfigurationApplication.class)
 @Import({
     PostgreSQLContainerConfiguration.class,
 })

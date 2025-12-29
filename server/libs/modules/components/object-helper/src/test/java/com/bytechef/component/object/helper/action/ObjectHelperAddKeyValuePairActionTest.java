@@ -23,18 +23,17 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class ObjectHelperAddKeyValuePairActionTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void testPerform() throws JsonProcessingException {
+    void testPerform() {
         testWith("{\"a\":1}", "[{\"key\":\"b\", \"value\":2}]", "{\"a\":1,\"b\":2}");
         testWith("{\"a\":1}", "[{\"key\":\"a\", \"value\":2}]", "{\"a\":2}");
         testWith("{\"a\":1}", "[{\"key\":\"a\", \"value\":2}, {\"key\":\"c\", \"value\":3}]", "{\"a\":2,\"c\":3}");
@@ -42,7 +41,7 @@ class ObjectHelperAddKeyValuePairActionTest {
             "{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}}");
     }
 
-    private void testWith(String sourceJson, String valueJson, String expectedJson) throws JsonProcessingException {
+    private void testWith(String sourceJson, String valueJson, String expectedJson) {
         Object sourceObject = objectMapper.readValue(sourceJson, Object.class);
         Object valueObject = objectMapper.readValue(valueJson, Object.class);
         Object expectedObject = objectMapper.readValue(expectedJson, Object.class);

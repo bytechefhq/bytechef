@@ -22,10 +22,10 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic

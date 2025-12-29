@@ -39,7 +39,6 @@ import com.bytechef.platform.component.service.OperationDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -73,11 +72,13 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -416,7 +417,7 @@ class HttpClientExecutor {
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction) {
+        @Nullable AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction) {
 
         return new Methanol.Interceptor() {
             @Override
@@ -508,8 +509,8 @@ class HttpClientExecutor {
         Optional<String> contentTypeOptional = httpHeaders.firstValue("content-type");
 
         return contentTypeOptional
-            .map(contentType -> StringUtils.equalsIgnoreCase(contentType, responseType.getContentType()) ||
-                StringUtils.containsIgnoreCase(contentType, String.valueOf(responseType.getType())))
+            .map(contentType -> Strings.CI.equals(contentType, responseType.getContentType()) ||
+                Strings.CI.equals(contentType, String.valueOf(responseType.getType())))
             .orElse(true);
 
     }

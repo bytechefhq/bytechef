@@ -14,12 +14,12 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee

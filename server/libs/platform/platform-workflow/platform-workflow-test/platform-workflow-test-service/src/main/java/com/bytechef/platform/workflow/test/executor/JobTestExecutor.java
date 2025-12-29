@@ -48,12 +48,12 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
 import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic

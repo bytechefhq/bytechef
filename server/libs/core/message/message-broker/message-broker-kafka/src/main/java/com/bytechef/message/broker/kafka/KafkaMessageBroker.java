@@ -37,7 +37,7 @@ public class KafkaMessageBroker implements MessageBroker {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBroker.class);
 
-    private KafkaTemplate<Integer, Object> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
@@ -66,7 +66,7 @@ public class KafkaMessageBroker implements MessageBroker {
     }
 
     @SuppressFBWarnings("EI")
-    public void setKafkaTemplate(KafkaTemplate<Integer, Object> kafkaTemplate) {
+    public void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 }

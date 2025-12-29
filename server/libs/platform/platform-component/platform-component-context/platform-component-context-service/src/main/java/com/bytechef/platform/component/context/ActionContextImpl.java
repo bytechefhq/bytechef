@@ -33,9 +33,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -43,23 +43,16 @@ import org.springframework.lang.Nullable;
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
 
     private final String actionName;
-    @Nullable
-    private Approval approval;
+    private @Nullable Approval approval;
     private final ContextFactory contextFactory;
     private final Data data;
     private final Event event;
-    @Nullable
-    private final Long jobPrincipalId;
-    @Nullable
-    private final Long jobPrincipalWorkflowId;
-    @Nullable
-    private final Long jobId;
-    @Nullable
-    private final PlatformType type;
-    @Nullable
-    private final String workflowId;
-    @Nullable
-    private final Long environmentId;
+    private final @Nullable Long jobPrincipalId;
+    private final @Nullable Long jobPrincipalWorkflowId;
+    private final @Nullable Long jobId;
+    private final @Nullable PlatformType type;
+    private final @Nullable String workflowId;
+    private final @Nullable Long environmentId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
@@ -185,17 +178,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private final Integer componentVersion;
         private final DataStorage dataStorage;
         private final boolean editorEnvironment;
-        @Nullable
-        private final Long environmentId;
+        private final @Nullable Long environmentId;
         private final InMemoryDataStorage inMemoryDataStorage;
-        @Nullable
-        private final Long jobPrincipalId;
-        @Nullable
-        private final Long jobPrincipalWorkflowId;
-        @Nullable
-        private final Long jobId;
-        @Nullable
-        private final PlatformType type;
+        private final @Nullable Long jobPrincipalId;
+        private final @Nullable Long jobPrincipalWorkflowId;
+        private final @Nullable Long jobId;
+        private final @Nullable PlatformType type;
 
         private DataImpl(
             DataStorage dataStorage, String componentName, Integer componentVersion, String actionName,
@@ -310,28 +298,23 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return actionName;
         }
 
-        @Nullable
-        public Long jobPrincipalId() {
+        public @Nullable Long jobPrincipalId() {
             return jobPrincipalId;
         }
 
-        @Nullable
-        public Long jobPrincipalWorkflowId() {
+        public @Nullable Long jobPrincipalWorkflowId() {
             return jobPrincipalWorkflowId;
         }
 
-        @Nullable
-        public Long jobId() {
+        public @Nullable Long jobId() {
             return jobId;
         }
 
-        @Nullable
-        public Long environmentId() {
+        public @Nullable Long environmentId() {
             return environmentId;
         }
 
-        @Nullable
-        public PlatformType type() {
+        public @Nullable PlatformType type() {
             return type;
         }
 

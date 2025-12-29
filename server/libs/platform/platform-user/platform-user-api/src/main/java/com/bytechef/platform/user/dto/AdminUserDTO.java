@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -62,8 +63,6 @@ public class AdminUserDTO {
     @Size(min = 2, max = 10)
     private String langKey;
 
-    private String uuid;
-
     private String createdBy;
 
     private Instant createdDate;
@@ -74,13 +73,13 @@ public class AdminUserDTO {
 
     private Set<String> authorities;
 
+    @JsonCreator
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
 
     public AdminUserDTO(User user, List<Authority> authorities) {
         this.id = user.getId();
-        this.uuid = user.getUuidAsString();
         this.login = user.getLogin();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
@@ -102,10 +101,6 @@ public class AdminUserDTO {
 
     public Long getId() {
         return id;
-    }
-
-    public String getUuidAsString() {
-        return uuid;
     }
 
     public String getLogin() {
@@ -219,7 +214,6 @@ public class AdminUserDTO {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
-            ", uuid='" + uuid + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

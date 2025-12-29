@@ -53,7 +53,7 @@ import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.core.retry.RetryTemplate;
 
 /**
  * @author Monika Domiter

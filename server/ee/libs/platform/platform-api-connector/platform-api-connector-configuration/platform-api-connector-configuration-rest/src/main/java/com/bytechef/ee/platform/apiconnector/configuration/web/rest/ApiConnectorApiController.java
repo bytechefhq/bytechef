@@ -48,7 +48,6 @@ public class ApiConnectorApiController implements ApiConnectorApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiConnectorModel> createApiConnector(ApiConnectorModel apiConnectorModel) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -99,7 +98,6 @@ public class ApiConnectorApiController implements ApiConnectorApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiConnectorModel> updateApiConnector(
         Long id, ApiConnectorModel apiConnectorModel) {
 

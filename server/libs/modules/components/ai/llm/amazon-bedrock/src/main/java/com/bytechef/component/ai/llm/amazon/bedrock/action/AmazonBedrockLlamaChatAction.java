@@ -37,7 +37,6 @@ import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.llama.BedrockLlamaChatModel;
 import org.springframework.ai.bedrock.llama.BedrockLlamaChatOptions;
 import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;

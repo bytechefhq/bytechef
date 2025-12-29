@@ -18,12 +18,12 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Utility class for orchestrating property-level validation. Handles recursive property validation, extra property
@@ -125,8 +125,8 @@ class PropertyValidator {
     }
 
     private static void handleMalformedDisplayCondition(
-        JsonNode taskParametersJsonNode, String fieldName, String propertyPath,
-        String malformedMessage, StringBuilder warnings) {
+        JsonNode taskParametersJsonNode, String fieldName, String propertyPath, @Nullable String malformedMessage,
+        StringBuilder warnings) {
 
         if (taskParametersJsonNode.has(fieldName)) {
             StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(propertyPath), warnings);
@@ -144,7 +144,8 @@ class PropertyValidator {
     private static void checkForUndefinedProperties(
         JsonNode taskParametersJsonNode, Set<String> validatedProperties, String path, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = taskParametersJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = taskParametersJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             if (!validatedProperties.contains(fieldName)) {
@@ -163,7 +164,8 @@ class PropertyValidator {
     private static void checkExtraProperties(
         JsonNode taskParametersJsonNode, JsonNode definitionJsonNode, String path, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = taskParametersJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = taskParametersJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             if (!definitionJsonNode.has(fieldName)) {
@@ -184,7 +186,8 @@ class PropertyValidator {
         @Nullable String originalTaskDefinitionForArrays, String originalCurrentParameters, StringBuilder errors,
         StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = definitionJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = definitionJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             JsonNode curDefinitionJsonNode = definitionJsonNode.get(fieldName);
@@ -240,7 +243,8 @@ class PropertyValidator {
     private static void generateWarningsForUndefinedNestedProperties(
         JsonNode valueJsonNode, String propertyPath, StringBuilder warnings) {
 
-        Iterator<String> fieldNamesIterator = valueJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = valueJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(curFieldName -> {
             String fieldPath = PropertyUtils.buildPropertyPath(propertyPath, curFieldName);
@@ -386,7 +390,8 @@ class PropertyValidator {
     private static void validateObjectProperties(
         JsonNode jsonNode, JsonNode objectDefinitionJsonNode, String elementPath, StringBuilder errors) {
 
-        Iterator<String> fieldNamesIterator = objectDefinitionJsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = objectDefinitionJsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             JsonNode fieldDefinitionJsonNode = objectDefinitionJsonNode.get(fieldName);
@@ -444,7 +449,8 @@ class PropertyValidator {
      * Generates warnings for all properties recursively.
      */
     private static void generateWarningsForAllProperties(JsonNode jsonNode, String path, StringBuilder warnings) {
-        Iterator<String> fieldNamesIterator = jsonNode.fieldNames();
+        Iterator<String> fieldNamesIterator = jsonNode.propertyNames()
+            .iterator();
 
         fieldNamesIterator.forEachRemaining(fieldName -> {
             String propertyPath = PropertyUtils.buildPropertyPath(path, fieldName);

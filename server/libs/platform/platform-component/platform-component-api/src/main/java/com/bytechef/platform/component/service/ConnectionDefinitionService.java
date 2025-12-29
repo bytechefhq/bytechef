@@ -27,6 +27,7 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +42,7 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context);
 
-    default AuthorizationCallbackResponse executeAuthorizationCallback(
+    default @Nullable AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, String redirectUri) {
 
@@ -71,7 +72,7 @@ public interface ConnectionDefinitionService {
 
     ConnectionDefinition getConnectionConnectionDefinition(String componentName, int connectionVersion);
 
-    ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion);
+    ConnectionDefinition getConnectionDefinition(String componentName, @Nullable Integer componentVersion);
 
     List<ConnectionDefinition> getConnectionDefinitions();
 

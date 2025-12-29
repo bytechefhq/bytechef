@@ -21,17 +21,17 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class ItemStreamExecutionContext implements ExecutionContext {
 
-    private final org.springframework.batch.item.ExecutionContext executionContext;
+    private final org.springframework.batch.infrastructure.item.ExecutionContext executionContext;
 
     @SuppressFBWarnings("EI")
-    public ItemStreamExecutionContext(org.springframework.batch.item.ExecutionContext executionContext) {
+    public ItemStreamExecutionContext(org.springframework.batch.infrastructure.item.ExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 

@@ -55,7 +55,6 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.URI;
@@ -73,6 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -622,7 +622,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             (curConnectionParameters, context1) -> getDefaultScopes(curConnectionParameters));
         OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction =
             OptionalUtils.orElse(
-                authorization.getOAuth2AuthorizationExtraQueryParameters(),
+                authorization.getOauth2AuthorizationExtraQueryParameters(),
                 (curConnectionParameters, context1) -> Map.of());
 
         Parameters parameters = ParametersFactory.createParameters(connectionParameters);

@@ -23,23 +23,20 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.boot.jackson.JsonComponent;
+import org.springframework.boot.jackson.JacksonComponent;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
 /**
  * @author Ivica Cardic
  */
-@JsonComponent
-public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest> {
+@JacksonComponent
+public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest> {
 
     private static final String BODY = "body";
     private static final String CONTENT = "content";
@@ -48,18 +45,16 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
 
     @Override
     @SuppressWarnings("unchecked")
-    public WebhookRequest deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public WebhookRequest deserialize(JsonParser jp, DeserializationContext ctxt) {
         WebhookBodyImpl webhookBody = null;
 
-        ObjectCodec objectCodec = jp.getCodec();
-
-        JsonNode jsonNode = objectCodec.readTree(jp);
+        JsonNode jsonNode = ctxt.readTree(jp);
 
         JsonNode bodyJsonNode = jsonNode.get(BODY);
 
-        if (bodyJsonNode != null && bodyJsonNode.getNodeType() != JsonNodeType.NULL) {
+        if (bodyJsonNode != null && !bodyJsonNode.isNull()) {
             Object content;
-            Map<String, ?> bodyMap = objectCodec.treeToValue(bodyJsonNode, Map.class);
+            Map<String, ?> bodyMap = ctxt.readTreeAsValue(bodyJsonNode, Map.class);
 
             ContentType contentType = ContentType.valueOf(MapUtils.getString(bodyMap, "contentType"));
 
@@ -85,8 +80,8 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
         }
 
         return new WebhookRequest(
-            objectCodec.treeToValue(jsonNode.get("headers"), Map.class),
-            objectCodec.treeToValue(jsonNode.get("parameters"), Map.class), webhookBody,
+            ctxt.readTreeAsValue(jsonNode.get("headers"), Map.class),
+            ctxt.readTreeAsValue(jsonNode.get("parameters"), Map.class), webhookBody,
             WebhookMethod.valueOf(getMethod(jsonNode)));
     }
 
@@ -121,7 +116,7 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
     private static String getMethod(JsonNode jsonNode) {
         JsonNode fieldJsonNode = jsonNode.get("method");
 
-        return fieldJsonNode.asText();
+        return fieldJsonNode.asString();
     }
 
     private static class FileEntryImpl implements com.bytechef.component.definition.FileEntry {

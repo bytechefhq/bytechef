@@ -17,12 +17,11 @@
 package com.bytechef.atlas.execution.repository.jdbc.converter;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -43,10 +42,6 @@ public class StringToWebhooksConverter implements Converter<String, Job.Webhooks
     }
 
     private Job.Webhooks read(ObjectMapper objectMapper, String json) {
-        try {
-            return objectMapper.readValue(json, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(json, new TypeReference<>() {});
     }
 }

@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:config:jackson-config"))

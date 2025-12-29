@@ -104,7 +104,6 @@ public class ConnectionApiController implements ConnectionApi {
             .build();
     }
 
-    @SuppressFBWarnings("NP")
     private ConnectionModel toConnectionModel(ConnectionDTO connection) {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 

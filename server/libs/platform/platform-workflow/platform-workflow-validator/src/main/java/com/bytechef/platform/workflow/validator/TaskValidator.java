@@ -18,12 +18,12 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Template Method pattern for task validation. Defines the skeleton of a task validation algorithm while letting

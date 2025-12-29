@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

@@ -21,11 +21,11 @@ import static com.bytechef.component.definition.Authorization.AuthorizationType.
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
@@ -61,13 +61,11 @@ public record ComponentConnection(
         return parameters;
     }
 
-    @Nullable
-    public <T> T getParameter(String key) {
+    public <T> @Nullable T getParameter(String key) {
         return MapUtils.get(parameters, key, new TypeReference<>() {});
     }
 
-    @Nullable
-    public AuthorizationType getAuthorizationType() {
+    public @Nullable AuthorizationType getAuthorizationType() {
         return authorizationType;
     }
 

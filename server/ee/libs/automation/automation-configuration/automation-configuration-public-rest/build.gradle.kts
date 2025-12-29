@@ -53,6 +53,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
 }

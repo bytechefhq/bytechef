@@ -29,7 +29,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -64,7 +63,6 @@ import software.amazon.awssdk.services.scheduler.model.DeleteScheduleResponse;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NP")
 class AwsTriggerSchedulerTest {
 
     private static final String TEST_ACCOUNT_ID = "123456789012";

@@ -14,8 +14,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Properties;
 import org.quartz.spi.JobFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
-import org.springframework.boot.autoconfigure.quartz.SchedulerFactoryBeanCustomizer;
+import org.springframework.boot.quartz.autoconfigure.QuartzProperties;
+import org.springframework.boot.quartz.autoconfigure.SchedulerFactoryBeanCustomizer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 

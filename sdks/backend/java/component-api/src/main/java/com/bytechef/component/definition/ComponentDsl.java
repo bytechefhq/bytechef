@@ -1073,7 +1073,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOAuth2AuthorizationExtraQueryParameters() {
+        public Optional<OAuth2AuthorizationExtraQueryParametersFunction> getOauth2AuthorizationExtraQueryParameters() {
             return Optional.ofNullable(oAuth2AuthorizationExtraQueryParametersFunction);
         }
 

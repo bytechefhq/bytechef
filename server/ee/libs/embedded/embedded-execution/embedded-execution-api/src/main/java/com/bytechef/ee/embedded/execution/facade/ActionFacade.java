@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.Map;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -20,6 +20,5 @@ public interface ActionFacade {
 
     Object executeAction(
         String externalUserId, String componentName, Integer componentVersion, String actionName,
-        Map<String, Object> inputParameters,
-        @Nullable Long instanceId, Environment environment);
+        Map<String, Object> inputParameters, @Nullable Long instanceId, Environment environment);
 }

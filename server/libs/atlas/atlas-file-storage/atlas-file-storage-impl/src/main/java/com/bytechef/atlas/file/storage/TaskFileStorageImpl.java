@@ -21,9 +21,9 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic

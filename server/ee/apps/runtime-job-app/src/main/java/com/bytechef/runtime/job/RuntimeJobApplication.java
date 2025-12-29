@@ -17,7 +17,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 /**
  * @version ee
@@ -25,9 +24,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @author Ivica Cardic
  */
 
-@SpringBootApplication(scanBasePackages = "com.bytechef", exclude = {
-    DataSourceAutoConfiguration.class
-})
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 public class RuntimeJobApplication implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RuntimeJobApplication.class);

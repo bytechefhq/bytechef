@@ -20,7 +20,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -51,8 +51,10 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = QuartzTriggerSchedulerTestConfiguration.class, properties = "spring.profiles.active=test")
-@Import(QuartzTriggerSchedulerIntTest.QuartzTriggerSchedulerIntTestConfiguration.class)
-@SuppressFBWarnings("NP")
+@Import({
+    PostgreSQLContainerConfiguration.class,
+    QuartzTriggerSchedulerIntTest.QuartzTriggerSchedulerIntTestConfiguration.class
+})
 public class QuartzTriggerSchedulerIntTest {
 
     @Autowired

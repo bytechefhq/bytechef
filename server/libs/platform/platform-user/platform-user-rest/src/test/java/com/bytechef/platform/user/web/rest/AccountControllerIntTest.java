@@ -43,7 +43,6 @@ import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -57,22 +56,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the {@link AccountController} REST controller.
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
+@SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @UserIntTestConfigurationSharedMocks
 class AccountControllerIntTest {
 

@@ -1,8 +1,8 @@
 dependencies {
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.mockito:mockito-core")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-cache")
+    implementation("org.springframework.boot:spring-boot-jdbc")
     implementation("org.springframework.boot:spring-boot-test")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))

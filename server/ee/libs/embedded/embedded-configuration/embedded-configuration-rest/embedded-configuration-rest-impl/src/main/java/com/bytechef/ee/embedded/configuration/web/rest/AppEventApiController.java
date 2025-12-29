@@ -41,7 +41,6 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Long> createAppEvent(AppEventModel appEventModel) {
         AppEvent appEvent = appEventService.create(conversionService.convert(appEventModel, AppEvent.class));
 
@@ -69,7 +68,6 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateAppEvent(Long id, AppEventModel appEventModel) {
         appEventService.update(conversionService.convert(appEventModel, AppEvent.class));
 

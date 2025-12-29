@@ -36,14 +36,14 @@ import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
  * @author Ivica Cardic
@@ -65,26 +65,23 @@ public class ComponentDefinitionReader {
     @SuppressFBWarnings("EI")
     public ComponentDefinitionReader(ApiConnectorFileStorage apiConnectorFileStorage, ObjectMapper objectMapper) {
         this.apiConnectorFileStorage = apiConnectorFileStorage;
-        this.objectMapper = objectMapper.copy()
+        this.objectMapper = objectMapper.rebuild()
             .addMixIn(Property.class, PropertyMixIn.class)
-            .addMixIn(BaseProperty.BaseValueProperty.class, PropertyMixIn.class);
-
-        registerAbstractTypeMapping(ActionDefinition.class, ModifiableActionDefinition.class);
-        registerAbstractTypeMapping(ConnectionDefinition.class, ModifiableConnectionDefinition.class);
-        registerAbstractTypeMapping(ClusterElementDefinition.class, ModifiableClusterElementDefinition.class);
-        registerAbstractTypeMapping(TriggerDefinition.class, ModifiableTriggerDefinition.class);
+            .addMixIn(BaseProperty.BaseValueProperty.class, PropertyMixIn.class)
+            .addModules(
+                createModule(ActionDefinition.class, ModifiableActionDefinition.class),
+                createModule(ConnectionDefinition.class, ModifiableConnectionDefinition.class),
+                createModule(ClusterElementDefinition.class, ModifiableClusterElementDefinition.class),
+                createModule(TriggerDefinition.class, ModifiableTriggerDefinition.class))
+            .build();
     }
 
     public ComponentDefinitionWrapper readComponentDefinition(ApiConnector apiConnector) {
         ComponentDsl.ModifiableComponentDefinition componentDefinition;
 
-        try {
-            componentDefinition = objectMapper.readValue(
-                apiConnectorFileStorage.readApiConnectorDefinition(apiConnector.getDefinition()),
-                ComponentDsl.ModifiableComponentDefinition.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
-        }
+        componentDefinition = objectMapper.readValue(
+            apiConnectorFileStorage.readApiConnectorDefinition(apiConnector.getDefinition()),
+            ComponentDsl.ModifiableComponentDefinition.class);
 
         return new ComponentDefinitionWrapper(
             componentDefinition,
@@ -96,12 +93,12 @@ public class ComponentDefinitionReader {
                 .orElse(List.of()));
     }
 
-    private <T> void registerAbstractTypeMapping(Class<T> abstractType, Class<? extends T> concreteType) {
+    private <T> JacksonModule createModule(Class<T> abstractType, Class<? extends T> concreteType) {
         SimpleModule simpleModule = new SimpleModule();
 
         simpleModule.addAbstractTypeMapping(abstractType, concreteType);
 
-        objectMapper.registerModule(simpleModule);
+        return simpleModule;
     }
 
     @JsonTypeInfo(

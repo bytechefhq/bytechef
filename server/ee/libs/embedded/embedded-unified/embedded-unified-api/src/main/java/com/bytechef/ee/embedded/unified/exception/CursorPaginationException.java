@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.unified.exception;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An exception indicating that a cursor pagination operation failed.

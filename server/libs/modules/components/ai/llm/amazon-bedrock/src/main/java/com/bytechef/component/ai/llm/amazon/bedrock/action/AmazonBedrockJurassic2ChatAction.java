@@ -52,7 +52,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatModel;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatOptions;
 import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi;

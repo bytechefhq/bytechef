@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.email.EmailProtocol;
 import com.bytechef.component.email.constant.EmailConstants;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.bytechef.jackson.config.JacksonConfiguration;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.server.AbstractServer;
@@ -38,7 +37,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Igor Beslic
@@ -46,7 +45,9 @@ import org.springframework.boot.jackson.JsonComponentModule;
 public class EmailActionIntTest {
 
     static {
-        JsonUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+        JsonUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 
     @RegisterExtension

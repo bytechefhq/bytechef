@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -74,8 +74,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
-        PlatformType platformType) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        @Nullable List<String> include, PlatformType platformType) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
             .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
@@ -138,7 +138,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     private static Predicate<ComponentDefinition> filter(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+        @Nullable Boolean actionDefinitions, @Nullable Boolean connectionDefinitions,
+        @Nullable Boolean triggerDefinitions, @Nullable List<String> include) {
 
         return componentDefinition -> {
             if (include == null || include.contains(componentDefinition.getName())) {

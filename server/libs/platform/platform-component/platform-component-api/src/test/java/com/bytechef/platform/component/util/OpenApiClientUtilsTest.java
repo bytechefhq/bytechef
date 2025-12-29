@@ -38,13 +38,13 @@ import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ExecutionException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Monika Kušter

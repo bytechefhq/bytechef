@@ -7,15 +7,15 @@ jacoco = "0.8.13"
 java = "25"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
-org-springdoc = "2.8.14"
+org-springdoc = "3.0.0"
 pmd = "7.19.0"
-quartz = "2.5.2"
 spotbugs = "4.9.8"
-spring-ai = "1.1.1"
-spring-boot = "3.5.8"
-spring-cloud-aws = "3.4.1"
-spring-cloud-dependencies = "2025.0.0"
-spring-shell = "3.4.1"
+spring-ai = "2.0.0-M1"
+spring-boot = "4.0.1"
+spring-cloud-aws = "4.0.0-M1"
+spring-cloud-dependencies = "2025.1.0"
+spring-shell = "4.0.0-RC1"
+testcontainers = "1.21.3"
 
 [libraries]
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.7.0"
@@ -42,7 +42,6 @@ org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.m
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.8"
-org-quartz-scheduler-quartz = { module = "org.quartz-scheduler:quartz", version.ref = "quartz" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"

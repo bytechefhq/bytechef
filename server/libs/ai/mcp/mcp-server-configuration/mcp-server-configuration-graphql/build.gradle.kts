@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
 
     testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
-    testImplementation("org.springframework.graphql:spring-graphql-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
     testImplementation(project(":server:libs:test:test-int-support"))
 }

@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.thread.Threading;
+import org.springframework.boot.thread.Threading;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 

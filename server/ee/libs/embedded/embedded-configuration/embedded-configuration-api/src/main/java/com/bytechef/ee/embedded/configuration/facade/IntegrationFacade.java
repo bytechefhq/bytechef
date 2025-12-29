@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee

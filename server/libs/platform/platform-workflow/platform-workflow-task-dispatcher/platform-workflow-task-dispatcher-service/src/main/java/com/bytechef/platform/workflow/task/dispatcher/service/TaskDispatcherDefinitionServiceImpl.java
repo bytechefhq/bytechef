@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -45,7 +45,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
+    public @Nullable OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
@@ -66,7 +66,8 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
+    public @Nullable OutputResponse
+        executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 

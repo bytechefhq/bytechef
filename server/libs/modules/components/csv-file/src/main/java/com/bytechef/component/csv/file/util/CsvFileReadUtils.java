@@ -26,7 +26,6 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,10 +34,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * @author Ivica Cardic
@@ -100,9 +99,8 @@ public class CsvFileReadUtils {
         return map;
     }
 
-    @SuppressFBWarnings("NP")
-    public static Iterator<CSVRecord> getIterator(
-        BufferedReader bufferedReader, ReadConfiguration configuration) throws IOException {
+    public static Iterator<CSVRecord> getIterator(BufferedReader bufferedReader, ReadConfiguration configuration)
+        throws IOException {
 
         String delimiter = configuration.delimiter();
         String[] headerRow = null;
@@ -112,7 +110,9 @@ public class CsvFileReadUtils {
         if (configuration.headerRow()) {
             String headerLine = bufferedReader.readLine();
 
-            Objects.requireNonNull(headerLine, "Invalid file content. Text is expected in the first line.");
+            if (headerLine == null) {
+                throw new IllegalArgumentException("Invalid file content. Text is expected in the first line.");
+            }
 
             headerRow = CSVHeaderBuilder.asArray(headerLine, delimiter, quoteCharacter);
         }
@@ -184,7 +184,7 @@ public class CsvFileReadUtils {
 
         valueString = StringUtils.removeStart(valueString, enclosingCharacter);
 
-        return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
+        return Strings.CS.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 
     private static class CSVHeaderBuilder {

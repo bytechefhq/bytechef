@@ -20,7 +20,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +34,8 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include,
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        @Nullable List<String> include,
         PlatformType platformType);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);

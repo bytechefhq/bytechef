@@ -19,16 +19,15 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @version ee
@@ -134,10 +133,6 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             workflowDefinition.getTasks(),
             tasks -> objectNode.set("tasks", toArrayNode(codeWorkflowContainerUuid, workflowDefinition, tasks, type)));
 
-        try {
-            return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.writeValueAsString(objectNode);
     }
 }

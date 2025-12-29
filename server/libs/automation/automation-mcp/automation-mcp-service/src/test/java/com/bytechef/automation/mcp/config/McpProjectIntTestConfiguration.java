@@ -33,7 +33,6 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Utility class for validating individual fields and their properties. Contains validation logic for required fields,

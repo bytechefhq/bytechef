@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.domain.Option;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

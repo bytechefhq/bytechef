@@ -28,7 +28,6 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -80,7 +79,6 @@ public class AwsS3ListObjectsAction {
             return s3Object.key();
         }
 
-        @SuppressFBWarnings("NP")
         public String getSuffix() {
             Path path = Paths.get(getKey());
 

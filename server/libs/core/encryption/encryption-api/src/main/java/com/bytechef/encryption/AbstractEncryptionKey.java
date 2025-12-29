@@ -21,15 +21,14 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public abstract class AbstractEncryptionKey implements EncryptionKey {
 
-    @Nullable
-    private String key;
+    private @Nullable String key;
 
     @Override
     public String getKey() {

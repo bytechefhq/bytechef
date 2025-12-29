@@ -19,6 +19,7 @@ package com.bytechef.platform.mcp.domain;
 import com.bytechef.platform.connection.domain.Connection;
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -28,7 +29,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
 /**
  * Domain class representing an MCP component.

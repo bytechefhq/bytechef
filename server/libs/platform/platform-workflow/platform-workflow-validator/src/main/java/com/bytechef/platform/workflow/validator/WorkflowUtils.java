@@ -18,11 +18,11 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Ivica Cardic

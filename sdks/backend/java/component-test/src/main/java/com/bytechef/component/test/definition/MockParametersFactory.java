@@ -18,9 +18,8 @@ package com.bytechef.component.test.definition;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.jackson.config.JacksonConfiguration;
 import java.util.Map;
-import org.springframework.boot.jackson.JsonComponentModule;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Igor Beslic
@@ -28,7 +27,9 @@ import org.springframework.boot.jackson.JsonComponentModule;
 public class MockParametersFactory {
 
     static {
-        MapUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+        MapUtils.setObjectMapper(
+            JsonMapper.builder()
+                .build());
     }
 
     public static Parameters create(Map<String, Object> map) {

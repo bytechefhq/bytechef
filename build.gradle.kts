@@ -20,7 +20,7 @@ dependencyManagement {
 
 versionCatalogUpdate {
     keep {
-        versions.addAll("checkstyle", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell")
+        versions.addAll("checkstyle", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
     }
 }
 
@@ -32,24 +32,18 @@ subprojects {
     dependencyManagement {
         dependencies {
             dependency("com.github.spotbugs:spotbugs-annotations:[4.9.3,)")
-            dependency("org.quartz-scheduler:quartz:${rootProject.libs.versions.quartz.get()}")
         }
     }
 
     dependencies {
         compileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
 
+        implementation("org.jspecify:jspecify")
         implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
 
         testCompileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
-    }
-
-    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
-        imports {
-            mavenBom("org.springframework.shell:spring-shell-dependencies:${rootProject.libs.versions.spring.shell.get()}")
-        }
     }
 }
 

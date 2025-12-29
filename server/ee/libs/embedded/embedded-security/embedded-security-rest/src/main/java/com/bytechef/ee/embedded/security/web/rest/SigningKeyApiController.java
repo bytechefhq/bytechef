@@ -48,7 +48,6 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
             new CreateSigningKey200ResponseModel().privateKey(
@@ -77,7 +76,6 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
         signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
 

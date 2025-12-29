@@ -22,17 +22,15 @@ import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.batch.core.step.StepExecution;
+import org.springframework.batch.infrastructure.item.ExecutionContext;
+import org.springframework.batch.infrastructure.item.ItemStreamException;
+import org.springframework.batch.infrastructure.item.ItemStreamReader;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NP")
 public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
     implements ItemStreamReader<Map<String, Object>> {
 

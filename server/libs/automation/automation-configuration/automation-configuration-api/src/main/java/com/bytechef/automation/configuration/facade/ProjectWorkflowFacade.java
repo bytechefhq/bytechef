@@ -21,7 +21,7 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

@@ -16,11 +16,7 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
@@ -41,6 +37,9 @@ import org.apache.commons.lang3.Validate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.type.TypeFactory;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -56,12 +55,8 @@ public class XmlUtils {
     public static Map<String, ?> read(InputStream inputStream) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
-        try {
-            return xmlMapper.readValue(
-                inputStream, typeFactory.constructMapType(Map.class, String.class, Object.class));
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
-        }
+        return xmlMapper.readValue(
+            inputStream, typeFactory.constructMapType(Map.class, String.class, Object.class));
     }
 
     public static <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {

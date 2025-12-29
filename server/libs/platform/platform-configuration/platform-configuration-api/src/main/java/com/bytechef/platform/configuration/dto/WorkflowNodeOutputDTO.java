@@ -21,7 +21,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

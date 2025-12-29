@@ -21,13 +21,13 @@ import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerRedis;
 import com.bytechef.message.broker.redis.RedisMessageBroker;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic

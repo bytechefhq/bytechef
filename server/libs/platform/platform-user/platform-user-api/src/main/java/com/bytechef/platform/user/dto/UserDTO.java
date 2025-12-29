@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.dto;
 
 import com.bytechef.platform.user.domain.User;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * @author Ivica Cardic
@@ -27,6 +28,7 @@ public class UserDTO {
 
     private String login;
 
+    @JsonCreator
     public UserDTO() {
         // Empty constructor needed for Jackson.
     }

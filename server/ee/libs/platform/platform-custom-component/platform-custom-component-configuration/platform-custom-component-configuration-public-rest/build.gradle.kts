@@ -59,6 +59,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
 }

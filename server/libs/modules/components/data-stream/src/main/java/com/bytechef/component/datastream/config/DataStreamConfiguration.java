@@ -24,28 +24,28 @@ import com.bytechef.component.datastream.item.ItemStreamWriterDelegate;
 import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
+import org.springframework.batch.core.configuration.support.JdbcDefaultBatchConfiguration;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.job.parameters.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-public class DataStreamConfiguration extends DefaultBatchConfiguration {
+public class DataStreamConfiguration extends JdbcDefaultBatchConfiguration {
 
     private final ObjectMapper objectMapper;
 
@@ -66,7 +66,7 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
     }
 
     @Bean
-    public Job dataStreamJob(JobRepository jobRepository, Step step1, DataStreamJobExecutionListener listener) {
+    Job dataStreamJob(JobRepository jobRepository, Step step1, DataStreamJobExecutionListener listener) {
         return new JobBuilder("dataStreamJob", jobRepository)
             .listener(listener)
             .incrementer(new RunIdIncrementer())
@@ -76,7 +76,7 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
 
     @Bean
     @JobScope
-    public Step step1(
+    Step step1(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory,
         JobRepository jobRepository, DataSourceTransactionManager transactionManager) {
 

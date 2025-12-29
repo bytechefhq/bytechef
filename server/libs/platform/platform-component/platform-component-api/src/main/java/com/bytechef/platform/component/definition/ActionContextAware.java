@@ -20,7 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic

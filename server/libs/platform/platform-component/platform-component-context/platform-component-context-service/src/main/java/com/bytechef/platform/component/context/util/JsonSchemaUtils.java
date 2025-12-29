@@ -19,11 +19,10 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @version ee
@@ -142,11 +141,7 @@ public class JsonSchemaUtils {
             return;
         }
 
-        Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
-
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> field = fields.next();
-
+        for (Map.Entry<String, JsonNode> field : jsonNode.properties()) {
             String propertyName = field.getKey();
             JsonNode propertyJsonNode = field.getValue();
 

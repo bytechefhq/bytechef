@@ -43,12 +43,12 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -57,11 +57,10 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.content.Media;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
-import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.lang.Nullable;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestClient;
 
@@ -74,17 +73,13 @@ public class ModelUtils {
     private ModelUtils() {
     }
 
-    @SuppressFBWarnings("NP")
-    @Nullable
-    public static Object getChatResponse(
+    public static @Nullable Object getChatResponse(
         CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
 
         return getChatResponse(callResponseSpec, parameters, true, context);
     }
 
-    @SuppressFBWarnings("NP")
-    @Nullable
-    public static Object getChatResponse(
+    public static @Nullable Object getChatResponse(
         CallResponseSpec callResponseSpec, Parameters parameters, boolean responseFormatRequired, Context context) {
 
         Object response = null;
@@ -172,7 +167,7 @@ public class ModelUtils {
     }
 
     public static RestClient.Builder getRestClientBuilder() {
-        ClientHttpRequestFactorySettings requestFactorySettings = new ClientHttpRequestFactorySettings(
+        HttpClientSettings requestFactorySettings = new HttpClientSettings(
             null, Duration.of(1, ChronoUnit.MINUTES), Duration.of(5, ChronoUnit.MINUTES), SslBundle.of(null));
 
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.jdk()

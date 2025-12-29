@@ -91,7 +91,7 @@ public class RedisRegistration implements Registration {
 
     @Override
     public URI getUri() {
-        return DefaultServiceInstance.getUri(this);
+        return new DefaultServiceInstance(instanceId, serviceId, host, port, false).getUri();
     }
 
     @Override

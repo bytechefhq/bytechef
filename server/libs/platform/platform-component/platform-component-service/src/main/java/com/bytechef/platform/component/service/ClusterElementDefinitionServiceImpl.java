@@ -49,7 +49,7 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -263,7 +263,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private static ConvertResult convert(
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable ComponentConnection componentConnection) {
 
         return new ConvertResult(
             ParametersFactory.createParameters(inputParameters),
@@ -388,7 +389,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private ComponentClusterElementDefinitionResult getComponentClusterElementDefinition(
-        String componentName, Integer componentVersion, String clusterElementName) {
+        String componentName, @Nullable Integer componentVersion, String clusterElementName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -459,7 +460,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         }
     }
 
-    private static String getIcon(ComponentDefinition componentDefinition) {
+    private static @Nullable String getIcon(ComponentDefinition componentDefinition) {
         return componentDefinition.getIcon()
             .orElse(null);
     }

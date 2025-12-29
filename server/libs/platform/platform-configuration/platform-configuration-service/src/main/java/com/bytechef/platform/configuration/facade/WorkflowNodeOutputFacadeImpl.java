@@ -48,7 +48,6 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +58,7 @@ import java.util.stream.Collectors;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Ivica Cardic
