@@ -16,9 +16,16 @@
 
 package com.bytechef.component.date.helper.util;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DAY;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.HOUR;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.MINUTE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.MONTH;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.SECOND;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.UNIX_TIMESTAMP;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.YEAR;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.date.helper.constants.DateHelperComparisonEnum;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -28,6 +35,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -36,10 +44,40 @@ import java.util.stream.Collectors;
 
 /**
  * @author Monika Kušter
+ * @author Nikolina Spehar
  */
 public class DateHelperUtils {
 
     private DateHelperUtils() {
+    }
+
+    public static LocalDateTime applyResolution(String resolution, LocalDateTime date) {
+        return switch (resolution) {
+            case SECOND -> date.truncatedTo(ChronoUnit.SECONDS);
+            case MINUTE -> date.truncatedTo(ChronoUnit.MINUTES);
+            case HOUR -> date.truncatedTo(ChronoUnit.HOURS);
+            case DAY -> date.truncatedTo(ChronoUnit.DAYS);
+            case MONTH -> date.withDayOfMonth(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+            case YEAR -> date.withMonth(1)
+                .withDayOfMonth(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+            default -> throw new IllegalArgumentException("Unknown resolution type: " + resolution);
+        };
+
+    }
+
+    public static List<Option<String>> getComparisonOptions() {
+        return Arrays.stream(DateHelperComparisonEnum.values())
+            .map(dateHelperComparisonEnum -> option(
+                dateHelperComparisonEnum.getName(), dateHelperComparisonEnum.getName()))
+            .collect(Collectors.toList());
     }
 
     public static List<Option<Long>> getDayOfWeekOptions() {
@@ -69,5 +107,62 @@ public class DateHelperUtils {
             .stream()
             .map(s -> option(s, s))
             .collect(Collectors.toList());
+    }
+
+    public static LocalDateTime normalizeToTimeOnly(LocalDateTime date) {
+        return date.withYear(2025)
+            .withMonth(1)
+            .withDayOfMonth(1);
+    }
+
+    public static String formatDuration(long totalSeconds) {
+        if (totalSeconds == 0)
+            return "0 seconds";
+
+        totalSeconds = Math.abs(totalSeconds);
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Unit unit : UNITS) {
+            long quantity = totalSeconds / unit.seconds;
+            if (quantity > 0) {
+                if (!stringBuilder.isEmpty()) {
+                    stringBuilder.append(", ");
+                }
+
+                stringBuilder.append(quantity)
+                    .append(" ")
+                    .append(unit.plural(quantity));
+                totalSeconds %= unit.seconds;
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static ChronoUnit getChronoUnit(String unit) {
+        return switch (unit) {
+            case SECOND -> ChronoUnit.SECONDS;
+            case MINUTE -> ChronoUnit.MINUTES;
+            case HOUR -> ChronoUnit.HOURS;
+            case DAY -> ChronoUnit.DAYS;
+            case MONTH -> ChronoUnit.MONTHS;
+            case YEAR -> ChronoUnit.YEARS;
+            default -> throw new IllegalArgumentException("Unsupported unit: " + unit);
+        };
+    }
+
+    private static final List<Unit> UNITS = List.of(
+        new Unit(YEAR, 31536000),
+        new Unit(MONTH, 2592000),
+        new Unit(DAY, 86400),
+        new Unit(HOUR, 3600),
+        new Unit(MINUTE, 60),
+        new Unit(SECOND, 1));
+
+    private record Unit(String name, long seconds) {
+        String plural(long quantity) {
+            return quantity == 1 ? name : name + "s";
+        }
     }
 }
