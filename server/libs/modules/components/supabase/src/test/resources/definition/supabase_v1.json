@@ -307,10 +307,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "uploadFile",
     "description": "Upload file to Supabase Bucket.",
     "element": { },
     "help": null,
-    "name": "uploadFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -604,17 +604,17 @@
     } ],
     "title": "Upload File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,

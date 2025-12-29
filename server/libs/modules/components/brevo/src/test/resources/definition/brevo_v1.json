@@ -629,10 +629,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Creates new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -791,18 +791,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateContact",
     "description": "Updates existing contact.",
     "element": { },
     "help": null,
-    "name": "updateContact",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -877,18 +877,18 @@
     } ],
     "title": "Update Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendTransactionalEmail",
     "description": "Sends and email from your Brevo account.",
     "element": { },
     "help": null,
-    "name": "sendTransactionalEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1246,17 +1246,17 @@
     } ],
     "title": "Send Transactional Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

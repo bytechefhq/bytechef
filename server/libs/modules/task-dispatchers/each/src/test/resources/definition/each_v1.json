@@ -27,6 +27,7 @@
   } ],
   "resources": null,
   "taskProperties": [ {
+    "name": "iteratee",
     "advancedOption": null,
     "controlType": null,
     "defaultValue": null,
@@ -37,7 +38,6 @@
     "hidden": null,
     "label": null,
     "metadata": { },
-    "name": "iteratee",
     "placeholder": null,
     "required": null,
     "type": "TASK"

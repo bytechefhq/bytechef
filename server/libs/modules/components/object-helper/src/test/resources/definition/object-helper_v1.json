@@ -220,6 +220,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "value",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -230,7 +231,6 @@
       "hidden": null,
       "label": "Value",
       "metadata": { },
-      "name": "value",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -460,6 +460,7 @@
         "required": null,
         "type": "NUMBER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -470,7 +471,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -761,6 +761,7 @@
           "required": true,
           "type": "INTEGER"
         }, {
+          "name": "value",
           "advancedOption": null,
           "controlType": "NULL",
           "defaultValue": null,
@@ -771,7 +772,6 @@
           "hidden": null,
           "label": "Value",
           "metadata": { },
-          "name": "value",
           "placeholder": null,
           "required": true,
           "type": "NULL"
@@ -1239,8 +1239,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

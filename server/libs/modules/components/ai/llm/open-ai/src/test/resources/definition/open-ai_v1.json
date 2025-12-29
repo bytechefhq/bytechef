@@ -2233,10 +2233,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "embedding",
     "description": "OpenAI embedding.",
     "element": { },
     "help": null,
-    "name": "embedding",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2276,18 +2276,18 @@
     } ],
     "title": "OpenAI Embedding",
     "type": {
+      "name": "EMBEDDING",
       "key": "embedding",
       "label": "Embedding",
       "multipleElements": false,
-      "name": "EMBEDDING",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "model",
     "description": "OpenAI model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2652,17 +2652,17 @@
     } ],
     "title": "OpenAI Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

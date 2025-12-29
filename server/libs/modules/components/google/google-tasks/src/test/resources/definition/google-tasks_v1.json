@@ -1044,10 +1044,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createTask",
     "description": "Creates a new task on the specified task list.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1377,18 +1377,18 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listTasks",
     "description": "Returns all tasks in the specified task list.",
     "element": { },
     "help": null,
-    "name": "listTasks",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1710,18 +1710,18 @@
     } ],
     "title": "List Tasks",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateTask",
     "description": "Updates a specific task on the specified task list.",
     "element": { },
     "help": null,
-    "name": "updateTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2076,17 +2076,17 @@
     } ],
     "title": "Update Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

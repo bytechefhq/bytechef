@@ -990,8 +990,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Accounting",
-    "name": "accounting"
+    "name": "accounting",
+    "label": "Accounting"
   } ],
   "connection": {
     "authorizationRequired": null,

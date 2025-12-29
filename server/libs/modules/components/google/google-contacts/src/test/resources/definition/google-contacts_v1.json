@@ -2815,10 +2815,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Creates a new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3663,18 +3663,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createGroup",
     "description": "Creates a new group.",
     "element": { },
     "help": null,
-    "name": "createGroup",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3795,18 +3795,18 @@
     } ],
     "title": "Create Group",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateContact",
     "description": "Modifies an existing contact.",
     "element": { },
     "help": null,
-    "name": "updateContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4673,18 +4673,18 @@
     } ],
     "title": "Update Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchContacts",
     "description": "Searches the contacts in Google Contacts account.",
     "element": { },
     "help": null,
-    "name": "searchContacts",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5617,17 +5617,17 @@
     } ],
     "title": "Search Contacts",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

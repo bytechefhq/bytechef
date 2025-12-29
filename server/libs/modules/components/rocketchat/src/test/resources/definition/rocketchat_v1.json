@@ -3020,10 +3020,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendDirectMessage",
     "description": "Send messages to users on your workspace.",
     "element": { },
     "help": null,
-    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4037,18 +4037,18 @@
     } ],
     "title": "Send Direct Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendChannelMessage",
     "description": "Send messages to channel on your workspace.",
     "element": { },
     "help": null,
-    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5062,18 +5062,18 @@
     } ],
     "title": "Send Channel Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createChannel",
     "description": "Create a public channel.",
     "element": { },
     "help": null,
-    "name": "createChannel",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6028,17 +6028,17 @@
     } ],
     "title": "Create Channel",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

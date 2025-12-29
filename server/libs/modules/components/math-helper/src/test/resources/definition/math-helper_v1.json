@@ -576,10 +576,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addition",
     "description": "Add two numbers.",
     "element": { },
     "help": null,
-    "name": "addition",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -682,18 +682,18 @@
     } ],
     "title": "Addition",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "division",
     "description": "Divide two numbers.",
     "element": { },
     "help": null,
-    "name": "division",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -796,18 +796,18 @@
     } ],
     "title": "Division",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "modulo",
     "description": "Get the remainder of the division of two numbers.",
     "element": { },
     "help": null,
-    "name": "modulo",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -910,18 +910,18 @@
     } ],
     "title": "Modulo",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "multiplication",
     "description": "Multiply two numbers.",
     "element": { },
     "help": null,
-    "name": "multiplication",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1024,18 +1024,18 @@
     } ],
     "title": "Multiplication",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "subtraction",
     "description": "Subtract two numbers.",
     "element": { },
     "help": null,
-    "name": "subtraction",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1138,17 +1138,17 @@
     } ],
     "title": "Subtraction",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

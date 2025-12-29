@@ -3,17 +3,17 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "VECTOR_STORE",
     "key": "vectorStore",
     "label": "Vector Store",
     "multipleElements": false,
-    "name": "VECTOR_STORE",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "rag",
     "description": "Context for the question is retrieved from a Vector Store and added to the prompt's user text.",
     "element": { },
     "help": null,
-    "name": "rag",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -82,17 +82,17 @@
     } ],
     "title": "Question Answer RAG",
     "type": {
+      "name": "RAG",
       "key": "rag",
       "label": "RAG",
       "multipleElements": false,
-      "name": "RAG",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

@@ -182,8 +182,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Payment Processing",
-    "name": "payment-processing"
+    "name": "payment-processing",
+    "label": "Payment Processing"
   } ],
   "connection": null,
   "customAction": null,

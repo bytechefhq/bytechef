@@ -3,17 +3,17 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "MODEL",
     "key": "model",
     "label": "Model",
     "multipleElements": false,
-    "name": "MODEL",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "keywordMetadataEnricher",
     "description": "Keyword extractor that uses generative to extract 'excerpt_keywords' metadata field.",
     "element": { },
     "help": null,
-    "name": "keywordMetadataEnricher",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -58,18 +58,18 @@
     } ],
     "title": "Keyword Metadata Enricher",
     "type": {
+      "name": "DOCUMENT_TRANSFORMER",
       "key": "documentTransformer",
       "label": "Document Transformer",
       "multipleElements": true,
-      "name": "DOCUMENT_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "summaryMetadataEnricher",
     "description": "Title extractor with adjacent sharing that uses generative to extract 'section_summary', 'prev_section_summary', 'next_section_summary' metadata fields.",
     "element": { },
     "help": null,
-    "name": "summaryMetadataEnricher",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -150,17 +150,17 @@
     } ],
     "title": "Summary Metadata Enricher",
     "type": {
+      "name": "DOCUMENT_TRANSFORMER",
       "key": "documentTransformer",
       "label": "Document Transformer",
       "multipleElements": true,
-      "name": "DOCUMENT_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

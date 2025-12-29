@@ -68,6 +68,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -79,7 +80,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -359,6 +359,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -370,7 +371,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -381,8 +381,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

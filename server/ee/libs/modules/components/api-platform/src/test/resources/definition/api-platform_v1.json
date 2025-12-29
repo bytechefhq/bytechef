@@ -56,6 +56,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "response",
       "advancedOption": null,
       "description": "The properties of the response.",
       "displayCondition": null,
@@ -67,7 +68,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "response",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -78,8 +78,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,
@@ -102,14 +102,10 @@
     "listenerEnable": null,
     "name": "newApiRequest",
     "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": null,
-        "placeholder": null,
-        "sampleOutput": { }
-      },
+      "output": { },
+      "outputResponse": null,
       "outputSchema": null,
-      "sampleOutput": { }
+      "sampleOutput": null
     },
     "poll": null,
     "processErrorResponse": null,

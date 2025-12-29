@@ -1,10 +1,10 @@
 {
   "actions": null,
   "clusterElements": [ {
+    "name": "tokenTextSplitter",
     "description": "Splitter that splits text into chunks of a target size in tokens.",
     "element": { },
     "help": null,
-    "name": "tokenTextSplitter",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -130,17 +130,17 @@
     } ],
     "title": "Token Text Splitter",
     "type": {
+      "name": "DOCUMENT_TRANSFORMER",
       "key": "documentTransformer",
       "label": "Document Transformer",
       "multipleElements": true,
-      "name": "DOCUMENT_TRANSFORMER",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

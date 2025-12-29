@@ -233,6 +233,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "value",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -243,7 +244,6 @@
       "hidden": null,
       "label": "Value",
       "metadata": { },
-      "name": "value",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -740,6 +740,7 @@
       "required": false,
       "type": "INTEGER"
     }, {
+      "name": "defaultValue",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -750,7 +751,6 @@
       "hidden": null,
       "label": "Default Value",
       "metadata": { },
-      "name": "defaultValue",
       "placeholder": null,
       "required": false,
       "type": "NULL"
@@ -1334,6 +1334,7 @@
       "required": null,
       "type": "INTEGER"
     }, {
+      "name": "defaultValue",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -1344,7 +1345,6 @@
       "hidden": null,
       "label": "Default Value",
       "metadata": { },
-      "name": "defaultValue",
       "placeholder": null,
       "required": null,
       "type": "NULL"
@@ -1673,6 +1673,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "value",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -1683,7 +1684,6 @@
       "hidden": null,
       "label": "Value",
       "metadata": { },
-      "name": "value",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -2026,6 +2026,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "value",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -2036,7 +2037,6 @@
       "hidden": null,
       "label": "Value",
       "metadata": { },
-      "name": "value",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -2129,8 +2129,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

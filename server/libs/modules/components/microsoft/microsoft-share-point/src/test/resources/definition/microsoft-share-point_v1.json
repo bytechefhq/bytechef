@@ -1975,6 +1975,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "columns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1986,7 +1987,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "columns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -3092,11 +3092,11 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   }, {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

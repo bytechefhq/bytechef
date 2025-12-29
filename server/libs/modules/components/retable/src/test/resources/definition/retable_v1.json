@@ -1211,6 +1211,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "row_ids",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1222,7 +1223,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row_ids",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1467,6 +1467,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "row_ids",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1478,7 +1479,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row_ids",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1488,10 +1488,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "deleteRow",
     "description": "Delete a row.",
     "element": { },
     "help": null,
-    "name": "deleteRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1739,18 +1739,18 @@
     } ],
     "title": "Delete Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "insertRow",
     "description": "Insert a row.",
     "element": { },
     "help": null,
-    "name": "insertRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2692,6 +2692,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "row_ids",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -2703,24 +2704,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row_ids",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Insert Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Update a row.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2947,6 +2947,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "row_ids",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -2958,23 +2959,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row_ids",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -312,10 +312,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "trackEvents",
     "description": "Send batches of events from your servers to Mixpanel.",
     "element": { },
     "help": null,
-    "name": "trackEvents",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -614,17 +614,17 @@
     } ],
     "title": "Track Events",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

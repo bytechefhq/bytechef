@@ -1190,10 +1190,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createCustomer",
     "description": "Creates a new customer.",
     "element": { },
     "help": null,
-    "name": "createCustomer",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2032,18 +2032,18 @@
     } ],
     "title": "Create Customer",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createInvoice",
     "description": "Creates a new invoice.",
     "element": { },
     "help": null,
-    "name": "createInvoice",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2359,17 +2359,17 @@
     } ],
     "title": "Create Invoice",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Payment Processing",
-    "name": "payment-processing"
+    "name": "payment-processing",
+    "label": "Payment Processing"
   } ],
   "connection": {
     "authorizationRequired": null,

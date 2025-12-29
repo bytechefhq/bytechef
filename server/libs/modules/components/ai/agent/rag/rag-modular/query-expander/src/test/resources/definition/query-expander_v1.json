@@ -3,17 +3,17 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "MODEL",
     "key": "model",
     "label": "Model",
     "multipleElements": false,
-    "name": "MODEL",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "multiQueryExpander",
     "description": "Uses a large language model to expand a query into multiple semantically diverse\nvariations to capture different perspectives, useful for retrieving additional\ncontextual information and increasing the chances of finding relevant results.\n",
     "element": { },
     "help": null,
-    "name": "multiQueryExpander",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -62,17 +62,17 @@
     } ],
     "title": "Multi Query Expander",
     "type": {
+      "name": "QUERY_EXPANDER",
       "key": "queryExpander",
       "label": "Query Expander",
       "multipleElements": false,
-      "name": "QUERY_EXPANDER",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

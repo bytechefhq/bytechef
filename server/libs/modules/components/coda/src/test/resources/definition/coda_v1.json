@@ -3887,6 +3887,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "rowValues",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -3898,7 +3899,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "rowValues",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -3908,10 +3908,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "listDocs",
     "description": "Returns a list of docs accessible by the user, and which they have opened at least once.",
     "element": { },
     "help": null,
-    "name": "listDocs",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5699,18 +5699,18 @@
     } ],
     "title": "List Docs",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "copyDoc",
     "description": "Copies an existing doc.",
     "element": { },
     "help": null,
-    "name": "copyDoc",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7174,18 +7174,18 @@
     } ],
     "title": "Copy Doc",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Updates the specified row in the table.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7529,18 +7529,18 @@
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "insertRow",
     "description": "Inserts row into a table.",
     "element": { },
     "help": null,
-    "name": "insertRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7773,6 +7773,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "rowValues",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -7784,23 +7785,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "rowValues",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Insert Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

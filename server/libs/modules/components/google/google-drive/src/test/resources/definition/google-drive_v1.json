@@ -2539,10 +2539,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "copyFile",
     "description": "Copy a selected file to a different location within Google Drive.",
     "element": { },
     "help": null,
-    "name": "copyFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2845,18 +2845,18 @@
     } ],
     "title": "Copy File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createNewFolder",
     "description": "Creates a new empty folder in Google Drive.",
     "element": { },
     "help": null,
-    "name": "createNewFolder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3142,18 +3142,18 @@
     } ],
     "title": "Create New Folder",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createNewTextFile",
     "description": "Creates a new text file in Google Drive.",
     "element": { },
     "help": null,
-    "name": "createNewTextFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3495,18 +3495,18 @@
     } ],
     "title": "Create New Text File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteFile",
     "description": "Delete a selected file from Google Drive.",
     "element": { },
     "help": null,
-    "name": "deleteFile",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -3537,18 +3537,18 @@
     } ],
     "title": "Delete File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "downloadFile",
     "description": "Download selected file from Google Drive.",
     "element": { },
     "help": null,
-    "name": "downloadFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3796,18 +3796,18 @@
     } ],
     "title": "Download File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFile",
     "description": "Retrieve a specified file from your Google Drive.",
     "element": { },
     "help": null,
-    "name": "getFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4063,18 +4063,18 @@
     } ],
     "title": "Get File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listFiles",
     "description": "List files in a Google Drive folder.",
     "element": { },
     "help": null,
-    "name": "listFiles",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4372,18 +4372,18 @@
     } ],
     "title": "List Files",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listFolders",
     "description": "List folders in a Google Drive folder.",
     "element": { },
     "help": null,
-    "name": "listFolders",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4681,18 +4681,18 @@
     } ],
     "title": "List Folders",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "uploadFile",
     "description": "Uploads a file in your Google Drive.",
     "element": { },
     "help": null,
-    "name": "uploadFile",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5060,17 +5060,17 @@
     } ],
     "title": "Upload File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

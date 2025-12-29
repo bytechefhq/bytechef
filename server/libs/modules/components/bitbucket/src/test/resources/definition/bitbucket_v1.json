@@ -6132,10 +6132,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "listProjects",
     "description": "Returns list of projects from workspace.",
     "element": { },
     "help": null,
-    "name": "listProjects",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7021,18 +7021,18 @@
     } ],
     "title": "List Projects",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listRepositories",
     "description": "Returns list of repositories from workspace.",
     "element": { },
     "help": null,
-    "name": "listRepositories",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9390,17 +9390,17 @@
     } ],
     "title": "List Repositories",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

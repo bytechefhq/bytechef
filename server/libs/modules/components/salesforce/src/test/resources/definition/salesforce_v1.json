@@ -131,6 +131,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -142,7 +143,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -434,6 +434,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -445,7 +446,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -562,10 +562,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createRecord",
     "description": "Creates a new record of a specified Salesforce object.",
     "element": { },
     "help": null,
-    "name": "createRecord",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -687,6 +687,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -698,7 +699,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -811,18 +811,18 @@
     } ],
     "title": "Create Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteRecord",
     "description": "Deletes an existing record of a specified Salesforce object.",
     "element": { },
     "help": null,
-    "name": "deleteRecord",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -878,18 +878,18 @@
     } ],
     "title": "Delete Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "soqlQuery",
     "description": "Executes a raw SOQL query to  extract data from Salesforce.",
     "element": { },
     "help": null,
-    "name": "soqlQuery",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -922,18 +922,18 @@
     } ],
     "title": "SOQL Query",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRecord",
     "description": "Updates an existing record for a specified Salesforce object.",
     "element": { },
     "help": null,
-    "name": "updateRecord",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -987,6 +987,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -998,7 +999,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -1111,17 +1111,17 @@
     } ],
     "title": "Update Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

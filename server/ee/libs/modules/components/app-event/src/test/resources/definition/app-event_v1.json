@@ -2,8 +2,8 @@
   "actions": [ ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,
@@ -26,14 +26,10 @@
     "listenerEnable": null,
     "name": "newEvent",
     "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": null,
-        "placeholder": null,
-        "sampleOutput": { }
-      },
+      "output": { },
+      "outputResponse": null,
       "outputSchema": null,
-      "sampleOutput": { }
+      "sampleOutput": null
     },
     "poll": null,
     "processErrorResponse": null,

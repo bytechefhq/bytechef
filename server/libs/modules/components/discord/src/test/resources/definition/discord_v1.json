@@ -3978,10 +3978,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendChannelMessage",
     "description": "Post a new message to a specific #channel you choose.",
     "element": { },
     "help": null,
-    "name": "sendChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5522,18 +5522,18 @@
     } ],
     "title": "Send Channel Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createChannel",
     "description": "Create a new channel",
     "element": { },
     "help": null,
-    "name": "createChannel",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6398,18 +6398,18 @@
     } ],
     "title": "Create Channel",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendDirectMessage",
     "description": "Send direct message guild member.",
     "element": { },
     "help": null,
-    "name": "sendDirectMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7934,17 +7934,17 @@
     } ],
     "title": "Send Direct Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

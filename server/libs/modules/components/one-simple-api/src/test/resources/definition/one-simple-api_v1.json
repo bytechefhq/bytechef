@@ -2637,8 +2637,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,

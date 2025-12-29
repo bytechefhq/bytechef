@@ -6041,10 +6041,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "commentTicket",
     "description": "Adds a comment to an existing ticket.",
     "element": { },
     "help": null,
-    "name": "commentTicket",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8557,18 +8557,18 @@
     } ],
     "title": "Add Comment to Ticket",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createOrganization",
     "description": "Creates an organization.",
     "element": { },
     "help": null,
-    "name": "createOrganization",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9424,18 +9424,18 @@
     } ],
     "title": "Create Organization",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTicket",
     "description": "Creates a ticket.",
     "element": { },
     "help": null,
-    "name": "createTicket",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12070,17 +12070,17 @@
     } ],
     "title": "Create Ticket",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Surveys and Feedback",
-    "name": "surveys-and-feedback"
+    "name": "surveys-and-feedback",
+    "label": "Surveys and Feedback"
   } ],
   "connection": {
     "authorizationRequired": null,

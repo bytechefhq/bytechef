@@ -2588,10 +2588,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendMessage",
     "description": "Send message to a channel.",
     "element": { },
     "help": null,
-    "name": "sendMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5161,17 +5161,17 @@
     } ],
     "title": "Send message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

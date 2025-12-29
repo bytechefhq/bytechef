@@ -92,6 +92,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -103,7 +104,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -542,6 +542,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -553,7 +554,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -563,10 +563,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "appendRow",
     "description": "Append a row of values to an existing worksheet.",
     "element": { },
     "help": null,
-    "name": "appendRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -649,6 +649,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -660,24 +661,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Append Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "clearWorksheet",
     "description": "Clear a worksheet of all values.",
     "element": { },
     "help": null,
-    "name": "clearWorksheet",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -757,18 +757,18 @@
     } ],
     "title": "Clear Worksheet",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteRow",
     "description": "Delete row on an existing sheet.",
     "element": { },
     "help": null,
-    "name": "deleteRow",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -843,18 +843,18 @@
     } ],
     "title": "Delete Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "findRowByNum",
     "description": "Get row values from the worksheet by the row number.",
     "element": { },
     "help": null,
-    "name": "findRowByNum",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -958,18 +958,18 @@
     } ],
     "title": "Find Row by Number",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Update a row in a worksheet.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -1095,6 +1095,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1106,23 +1107,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

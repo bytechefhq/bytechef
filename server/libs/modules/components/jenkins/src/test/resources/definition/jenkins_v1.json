@@ -63,10 +63,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createJob",
     "description": "Creates a new job.",
     "element": { },
     "help": null,
-    "name": "createJob",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -116,17 +116,17 @@
     } ],
     "title": "Create Job",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,
