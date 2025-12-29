@@ -5,7 +5,7 @@ export interface TestWorkflowRequestProps {
 }
 
 export interface GetTestWorkflowAttachRequestProps {
-    jobId: string | number;
+    jobId: string;
 }
 
 const getCookie = (name: string): string | undefined => {

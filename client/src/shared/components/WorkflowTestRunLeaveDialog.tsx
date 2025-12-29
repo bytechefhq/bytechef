@@ -22,14 +22,15 @@ const WorkflowTestRunLeaveDialog = ({onCancel, onConfirm, open}: WorkflowTestRun
                 <AlertDialogTitle>Workflow is running</AlertDialogTitle>
 
                 <AlertDialogDescription>
-                    A test run is currently in progress. Do you really want to leave this page? The run will be stopped.
+                    A test run is currently in progress. Do you really want to leave this page? The workflow execution
+                    will be stopped.
                 </AlertDialogDescription>
             </AlertDialogHeader>
 
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
+                <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

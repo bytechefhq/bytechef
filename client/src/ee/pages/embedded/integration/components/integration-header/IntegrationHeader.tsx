@@ -97,18 +97,24 @@ const IntegrationHeader = ({
         !showDeleteIntegrationAlertDialog
     );
 
-    const {close, error, getPersistedJobId, persistJobId, setStreamRequest} = useWorkflowTestStream(
-        workflow.id!,
-        () => {
+    const {
+        close: closeWorkflowTestStream,
+        error: workflowTestStreamError,
+        getPersistedJobId,
+        persistJobId,
+        setStreamRequest,
+    } = useWorkflowTestStream({
+        onError: () => setJobId(null),
+        onResult: () => {
             if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
                 bottomResizablePanelRef.current.resize(35);
             }
 
             setJobId(null);
         },
-        () => setJobId(null),
-        (jobId) => setJobId(jobId)
-    );
+        onStart: (jobId) => setJobId(jobId),
+        workflowId: workflow.id!,
+    });
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (integrationWorkflowId) => {
@@ -208,11 +214,11 @@ const IntegrationHeader = ({
             setJobId(null);
             persistJobId(null);
 
-            const req = getTestWorkflowStreamPostRequest({
+            const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id,
             });
-            setStreamRequest(req);
+            setStreamRequest(request);
         }
     }, [
         captureIntegrationWorkflowTested,
@@ -228,7 +234,7 @@ const IntegrationHeader = ({
 
     const handleStopClick = useCallback(() => {
         setWorkflowIsRunning(false);
-        close();
+        closeWorkflowTestStream();
         setStreamRequest(null);
 
         if (jobId) {
@@ -237,7 +243,7 @@ const IntegrationHeader = ({
                 setJobId(null);
             });
         }
-    }, [close, jobId, persistJobId, setStreamRequest, setWorkflowIsRunning]);
+    }, [closeWorkflowTestStream, jobId, persistJobId, setStreamRequest, setWorkflowIsRunning]);
 
     useEffect(() => {
         if (!workflow.id || currentEnvironmentId === undefined) return;
@@ -254,15 +260,15 @@ const IntegrationHeader = ({
         setStreamRequest(getTestWorkflowAttachRequest({jobId}));
     }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
 
-    // On transport error (e.g., 4xx/5xx), make sure to reset running state and clear the request to prevent retries
+    // On transport error (e.g., 4xx/5xx), make sure to reset the running state and clear the request to prevent retries
     useEffect(() => {
-        if (error) {
+        if (workflowTestStreamError) {
             setWorkflowIsRunning(false);
             setStreamRequest(null);
             persistJobId(null);
             setJobId(null);
         }
-    }, [error, persistJobId, setWorkflowIsRunning, setStreamRequest]);
+    }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
     return (
         <header className="flex items-center px-3 py-2.5">

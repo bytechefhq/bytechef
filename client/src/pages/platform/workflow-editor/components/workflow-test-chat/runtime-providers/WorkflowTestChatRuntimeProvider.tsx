@@ -42,13 +42,11 @@ export function WorkflowTestChatRuntimeProvider({
         }))
     );
 
-    const {setStreamRequest} = useWorkflowTestStream(
-        workflow.id!,
-        () => {
-            setIsRunning(false);
-        },
-        () => setIsRunning(false)
-    );
+    const {setStreamRequest} = useWorkflowTestStream({
+        onError: () => setIsRunning(false),
+        onResult: () => setIsRunning(false),
+        workflowId: workflow.id!,
+    });
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
