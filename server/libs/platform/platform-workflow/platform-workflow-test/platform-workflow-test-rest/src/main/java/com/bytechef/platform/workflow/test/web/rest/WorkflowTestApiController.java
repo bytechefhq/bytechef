@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -157,7 +158,9 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         future.whenComplete((result, throwable) -> {
             try {
-                if (throwable != null) {
+                if (throwable instanceof CancellationException) {
+                    sendToEmitter(key, createEvent("error", "Aborted"));
+                } else if (throwable != null) {
                     sendToEmitter(
                         key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
                 } else {
@@ -184,23 +187,21 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     public ResponseEntity<Void> stopWorkflowTest(@PathVariable String jobId) {
         final String key = TenantCacheKeyUtils.getKey(jobId);
 
-        workflowTestFacade.stopTest(Long.parseLong(jobId));
-
         CompletableFuture<WorkflowTestExecutionModel> future = runs.getIfPresent(key);
-        if (future != null) {
-            runs.invalidate(key);
-        }
-
-        try {
-            sendToEmitter(key, createEvent("error", "Aborted"));
-        } finally {
-            pendingEvents.invalidate(key);
-            completeAndClearEmitter(key);
-            unregisterListeners(key);
-        }
 
         if (future != null && !future.isDone()) {
             future.cancel(true);
+        } else {
+            workflowTestFacade.stopTest(Long.parseLong(jobId));
+
+            try {
+                sendToEmitter(key, createEvent("error", "Aborted"));
+            } finally {
+                runs.invalidate(key);
+                pendingEvents.invalidate(key);
+                completeAndClearEmitter(key);
+                unregisterListeners(key);
+            }
         }
 
         return ResponseEntity.ok()
@@ -259,7 +260,11 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         future.whenComplete((result, throwable) -> {
             try {
-                if (throwable != null) {
+                if (throwable instanceof CancellationException) {
+                    workflowTestFacade.stopTest(jobId);
+
+                    sendToEmitter(key, createEvent("error", "Aborted"));
+                } else if (throwable != null) {
                     sendToEmitter(
                         key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
                 } else {
