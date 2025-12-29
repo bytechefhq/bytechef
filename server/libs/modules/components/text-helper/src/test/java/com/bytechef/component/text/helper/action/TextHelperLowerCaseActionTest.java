@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -35,7 +36,7 @@ class TextHelperLowerCaseActionTest {
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXT, "HELLO WORLD! This Is A Sample Text."));
 
-        String result = TextHelperLowerCaseAction.perform(parameters, parameters, mock(ActionContext.class));
+        String result = TextHelperLowerCaseAction.perform(parameters, parameters, mock(Context.class));
 
         assertEquals("hello world! this is a sample text.", result);
     }

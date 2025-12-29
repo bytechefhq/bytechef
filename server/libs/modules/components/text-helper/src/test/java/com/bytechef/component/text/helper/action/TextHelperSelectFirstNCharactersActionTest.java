@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -38,7 +39,7 @@ class TextHelperSelectFirstNCharactersActionTest {
             Map.of(TEXT, "The quick brown fox jumps over the lazy dog.", NUMBER_OF_CHARACTERS, 10));
 
         String result =
-            TextHelperSelectFirstNCharactersAction.perform(parameters, parameters, mock(ActionContext.class));
+            TextHelperSelectFirstNCharactersAction.perform(parameters, parameters, mock(Context.class));
 
         assertEquals("The quick ", result);
     }

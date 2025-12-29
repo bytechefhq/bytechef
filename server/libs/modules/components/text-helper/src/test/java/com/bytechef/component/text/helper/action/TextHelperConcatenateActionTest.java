@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -38,7 +39,7 @@ class TextHelperConcatenateActionTest {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXTS, List.of("apple", "banana", "orange"), SEPARATOR, ", "));
 
-        String result = TextHelperConcatenateAction.perform(parameters, parameters, mock(ActionContext.class));
+        String result = TextHelperConcatenateAction.perform(parameters, parameters, mock(Context.class));
 
         String expected = "apple, banana, orange";
 
@@ -49,7 +50,7 @@ class TextHelperConcatenateActionTest {
     void testPerformWithoutSeparator() {
         Parameters parameters = MockParametersFactory.create(Map.of(TEXTS, List.of("apple", "banana", "orange")));
 
-        String result = TextHelperConcatenateAction.perform(parameters, parameters, mock(ActionContext.class));
+        String result = TextHelperConcatenateAction.perform(parameters, parameters, mock(Context.class));
 
         String expected = "applebananaorange";
 

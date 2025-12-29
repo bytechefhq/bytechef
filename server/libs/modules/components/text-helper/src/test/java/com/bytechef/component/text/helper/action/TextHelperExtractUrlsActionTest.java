@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -39,7 +40,7 @@ class TextHelperExtractUrlsActionTest {
             Map.of(TEXT,
                 "Check out these websites: https://www.example.com and http://blog.example.org. For more information, visit https://docs.example.net/guide or www.example.io."));
 
-        List<String> result = TextHelperExtractUrlsAction.perform(parameters, parameters, mock(ActionContext.class));
+        List<String> result = TextHelperExtractUrlsAction.perform(parameters, parameters, mock(Context.class));
 
         assertEquals(
             List.of(
@@ -52,7 +53,7 @@ class TextHelperExtractUrlsActionTest {
     public void testPerformWithNoUrls() {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "\"No URLs here!\""));
 
-        List<String> result = TextHelperExtractUrlsAction.perform(mockedParameters, null, mock(ActionContext.class));
+        List<String> result = TextHelperExtractUrlsAction.perform(mockedParameters, null, mock(Context.class));
 
         assertTrue(result.isEmpty());
     }

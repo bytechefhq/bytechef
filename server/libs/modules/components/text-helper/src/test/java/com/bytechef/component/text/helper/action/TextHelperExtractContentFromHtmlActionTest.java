@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -37,7 +38,7 @@ import org.junit.jupiter.api.Test;
  */
 class TextHelperExtractContentFromHtmlActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
 
     @Test
     void testPerformExtractText() {
@@ -46,7 +47,7 @@ class TextHelperExtractContentFromHtmlActionTest {
                 CONTENT, "<div><p>Hello World</p><p>Goodbye World</p></div>", QUERY_SELECTOR, "p",
                 RETURN_VALUE, ReturnValue.TEXT, RETURN_ARRAY, false));
 
-        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedActionContext);
+        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedContext);
 
         assertEquals("Hello World Goodbye World", result);
     }
@@ -58,7 +59,7 @@ class TextHelperExtractContentFromHtmlActionTest {
                 CONTENT, "<div><p>Hello World</p><p>Goodbye World</p></div>", QUERY_SELECTOR, "p",
                 RETURN_VALUE, ReturnValue.HTML, RETURN_ARRAY, true));
 
-        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedActionContext);
+        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedContext);
 
         assertEquals(List.of("Hello World", "Goodbye World"), result);
     }
@@ -70,7 +71,7 @@ class TextHelperExtractContentFromHtmlActionTest {
                 CONTENT, "<div><p class='greeting'>Hello World</p><p class='farewell'>Goodbye World</p></div>",
                 QUERY_SELECTOR, "p", RETURN_VALUE, ReturnValue.ATTRIBUTE, ATTRIBUTE, "class", RETURN_ARRAY, true));
 
-        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedActionContext);
+        Object result = TextHelperExtractContentFromHtmlAction.perform(parameters, parameters, mockedContext);
 
         assertEquals(List.of("greeting", "farewell"), result);
     }

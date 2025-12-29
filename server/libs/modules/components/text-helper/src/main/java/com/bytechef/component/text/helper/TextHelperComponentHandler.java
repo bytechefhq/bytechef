@@ -17,6 +17,7 @@
 package com.bytechef.component.text.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -66,7 +67,24 @@ public class TextHelperComponentHandler implements ComponentHandler {
             TextHelperSplitAction.ACTION_DEFINITION,
             TextHelperTrimWhitespaceAction.ACTION_DEFINITION,
             TextHelperUpperCaseAction.ACTION_DEFINITION,
-            TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION);
+            TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(TextHelperBase64EncodeDecodeAction.ACTION_DEFINITION),
+            tool(TextHelperConcatenateAction.ACTION_DEFINITION),
+            tool(TextHelperContainsAction.ACTION_DEFINITION),
+            tool(TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION),
+            tool(TextHelperExtractUrlsAction.ACTION_DEFINITION),
+            tool(TextHelperFormatCurrencyAction.ACTION_DEFINITION),
+            tool(TextHelperHTMLToMarkdownAction.ACTION_DEFINITION),
+            tool(TextHelperLowerCaseAction.ACTION_DEFINITION),
+            tool(TextHelperMarkdownToHTMLAction.ACTION_DEFINITION),
+            tool(TextHelperReplaceAction.ACTION_DEFINITION),
+            tool(TextHelperSelectFirstNCharactersAction.ACTION_DEFINITION),
+            tool(TextHelperSelectLastNCharactersAction.ACTION_DEFINITION),
+            tool(TextHelperSplitAction.ACTION_DEFINITION),
+            tool(TextHelperTrimWhitespaceAction.ACTION_DEFINITION),
+            tool(TextHelperUpperCaseAction.ACTION_DEFINITION),
+            tool(TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

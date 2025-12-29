@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -38,7 +39,7 @@ class TextHelperSelectLastNCharactersActionTest {
             Map.of(TEXT, "Hello, World!", NUMBER_OF_CHARACTERS, 5));
 
         String result =
-            TextHelperSelectLastNCharactersAction.perform(parameters, parameters, mock(ActionContext.class));
+            TextHelperSelectLastNCharactersAction.perform(parameters, parameters, mock(Context.class));
 
         assertEquals("orld!", result);
     }

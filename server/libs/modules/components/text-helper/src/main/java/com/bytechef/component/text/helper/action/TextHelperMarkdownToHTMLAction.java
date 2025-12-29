@@ -23,6 +23,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.MA
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.vladsch.flexmark.html.HtmlRenderer;
@@ -52,8 +53,8 @@ public class TextHelperMarkdownToHTMLAction {
     private TextHelperMarkdownToHTMLAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         DataHolder dataHolder = PegdownOptionsAdapter.flexmarkOptions(true, Extensions.ALL);
 
