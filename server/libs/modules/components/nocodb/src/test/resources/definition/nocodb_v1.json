@@ -217,6 +217,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "tableColumns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -228,7 +229,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "tableColumns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1141,6 +1141,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "tableColumns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1152,7 +1153,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "tableColumns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1162,10 +1162,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createRecords",
     "description": "Creates a new records in the specified table.",
     "element": { },
     "help": null,
-    "name": "createRecords",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1373,6 +1373,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "tableColumns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1384,24 +1385,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "tableColumns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Create Records",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteRecords",
     "description": "Deletes existing records in the specified table.",
     "element": { },
     "help": null,
-    "name": "deleteRecords",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1651,18 +1651,18 @@
     } ],
     "title": "Delete Records",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getRecord",
     "description": "Gets a record from the specified table.",
     "element": { },
     "help": null,
-    "name": "getRecord",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -1813,18 +1813,18 @@
     } ],
     "title": "Get Record",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchRecords",
     "description": "Searches for records in the specified table.",
     "element": { },
     "help": null,
-    "name": "searchRecords",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -2074,18 +2074,18 @@
     } ],
     "title": "Search Records",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRecords",
     "description": "Updates existing records in the specified table.",
     "element": { },
     "help": null,
-    "name": "updateRecords",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2293,6 +2293,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "tableColumns",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -2304,23 +2305,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "tableColumns",
       "required": null,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Records",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

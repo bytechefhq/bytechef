@@ -141,10 +141,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getShortAnswer",
     "description": "Returns a short answer for your query.",
     "element": { },
     "help": null,
-    "name": "getShortAnswer",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -269,17 +269,17 @@
     } ],
     "title": "Get Short Answer",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,

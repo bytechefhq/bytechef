@@ -1061,8 +1061,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -3,17 +3,17 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "VECTOR_STORE",
     "key": "vectorStore",
     "label": "Vector Store",
     "multipleElements": false,
-    "name": "VECTOR_STORE",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "chatMemory",
     "description": "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
     "element": { },
     "help": null,
-    "name": "chatMemory",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -38,17 +38,17 @@
     } ],
     "title": "Vector Store Chat Memory",
     "type": {
+      "name": "CHAT_MEMORY",
       "key": "chatMemory",
       "label": "Memory",
       "multipleElements": false,
-      "name": "CHAT_MEMORY",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

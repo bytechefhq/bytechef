@@ -600,10 +600,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "read",
     "description": "Reads data from a JSON file.",
     "element": { },
     "help": null,
-    "name": "read",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -832,18 +832,18 @@
     } ],
     "title": "Read from File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "write",
     "description": "Writes the data to a JSON file.",
     "element": { },
     "help": null,
-    "name": "write",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1189,17 +1189,17 @@
     } ],
     "title": "Write to File",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

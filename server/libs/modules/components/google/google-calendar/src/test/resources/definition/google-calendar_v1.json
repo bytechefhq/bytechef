@@ -9601,10 +9601,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addAttendeesToEvent",
     "description": "Invites one or more person to an existing event.",
     "element": { },
     "help": null,
-    "name": "addAttendeesToEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -11302,18 +11302,18 @@
     } ],
     "title": "Add Attendees to Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createEvent",
     "description": "Creates a new event in Google Calendar.",
     "element": { },
     "help": null,
-    "name": "createEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -13489,18 +13489,18 @@
     } ],
     "title": "Create Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createQuickEvent",
     "description": "Creates a quick event in Google Calendar.",
     "element": { },
     "help": null,
-    "name": "createQuickEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -15186,18 +15186,18 @@
     } ],
     "title": "Create Quick Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteEvent",
     "description": "Deletes an event from Google Calendar.",
     "element": { },
     "help": null,
-    "name": "deleteEvent",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -15253,18 +15253,18 @@
     } ],
     "title": "Delete Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getEvents",
     "description": "List events from the specified Google Calendar.",
     "element": { },
     "help": null,
-    "name": "getEvents",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -17086,18 +17086,18 @@
     } ],
     "title": "Get Events",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFreeTimeSlots",
     "description": "Get free time slots from Google Calendar.",
     "element": { },
     "help": null,
-    "name": "getFreeTimeSlots",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -17341,18 +17341,18 @@
     } ],
     "title": "Get Free Time Slots",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateEvent",
     "description": "Updates event in Google Calendar.",
     "element": { },
     "help": null,
-    "name": "updateEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -19186,17 +19186,17 @@
     } ],
     "title": "Update Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Calendars and Scheduling",
-    "name": "calendars-and-scheduling"
+    "name": "calendars-and-scheduling",
+    "label": "Calendars and Scheduling"
   } ],
   "connection": {
     "authorizationRequired": null,

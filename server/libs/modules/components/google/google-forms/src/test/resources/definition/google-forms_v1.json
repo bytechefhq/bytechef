@@ -171,8 +171,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Surveys and Feedback",
-    "name": "surveys-and-feedback"
+    "name": "surveys-and-feedback",
+    "label": "Surveys and Feedback"
   } ],
   "connection": {
     "authorizationRequired": null,

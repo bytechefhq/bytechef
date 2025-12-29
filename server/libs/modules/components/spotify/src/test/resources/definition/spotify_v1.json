@@ -1178,10 +1178,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "startResumePlayback",
     "description": "Start or resume current playback on an active device.",
     "element": { },
     "help": null,
-    "name": "startResumePlayback",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1303,18 +1303,18 @@
     } ],
     "title": "Play/Resume Playback",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addItemsToPlaylist",
     "description": "Adds one or more items to your playlist.",
     "element": { },
     "help": null,
-    "name": "addItemsToPlaylist",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1516,18 +1516,18 @@
     } ],
     "title": "Add Items to a Playlist",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPlaylist",
     "description": "Creates a new playlist",
     "element": { },
     "help": null,
-    "name": "createPlaylist",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2334,10 +2334,10 @@
     } ],
     "title": "Create Playlist",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null

@@ -1,7 +1,7 @@
 {
   "actionClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -71,45 +71,45 @@
     "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
+    "name": "DOCUMENT_READER",
     "key": "documentReader",
     "label": "Document Reader",
     "multipleElements": false,
-    "name": "DOCUMENT_READER",
     "required": true
   }, {
+    "name": "DOCUMENT_TRANSFORMER",
     "key": "documentTransformer",
     "label": "Document Transformer",
     "multipleElements": true,
-    "name": "DOCUMENT_TRANSFORMER",
     "required": false
   }, {
+    "name": "EMBEDDING",
     "key": "embedding",
     "label": "Embedding",
     "multipleElements": false,
-    "name": "EMBEDDING",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "vectorStore",
     "description": "Typesense VectorStore.",
     "element": { },
     "help": null,
-    "name": "vectorStore",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "Typesense VectorStore",
     "type": {
+      "name": "VECTOR_STORE",
       "key": "vectorStore",
       "label": "Vector Store",
       "multipleElements": false,
-      "name": "VECTOR_STORE",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

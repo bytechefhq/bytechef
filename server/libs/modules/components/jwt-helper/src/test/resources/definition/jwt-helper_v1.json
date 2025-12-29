@@ -246,10 +246,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sign",
     "description": "Creates JWT token.",
     "element": { },
     "help": null,
-    "name": "sign",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -415,18 +415,18 @@
     } ],
     "title": "Sign",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "verify",
     "description": "Verify JWT token.",
     "element": { },
     "help": null,
-    "name": "verify",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -481,17 +481,17 @@
     } ],
     "title": "Verify",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

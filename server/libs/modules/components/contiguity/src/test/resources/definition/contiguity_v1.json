@@ -1019,10 +1019,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendSms",
     "description": "Send SMS.",
     "element": { },
     "help": null,
-    "name": "sendSms",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1469,18 +1469,18 @@
     } ],
     "title": "Send SMS",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendEmail",
     "description": "Send email.",
     "element": { },
     "help": null,
-    "name": "sendEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2017,17 +2017,17 @@
     } ],
     "title": "Send Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

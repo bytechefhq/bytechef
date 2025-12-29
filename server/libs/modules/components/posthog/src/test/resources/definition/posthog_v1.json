@@ -2876,10 +2876,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createEvent",
     "description": "Create a new event.",
     "element": { },
     "help": null,
-    "name": "createEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3044,18 +3044,18 @@
     } ],
     "title": "Create Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createProject",
     "description": "Create a new Project.",
     "element": { },
     "help": null,
-    "name": "createProject",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5741,17 +5741,17 @@
     } ],
     "title": "Create Project",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Analytics",
-    "name": "analytics"
+    "name": "analytics",
+    "label": "Analytics"
   } ],
   "connection": {
     "authorizationRequired": null,

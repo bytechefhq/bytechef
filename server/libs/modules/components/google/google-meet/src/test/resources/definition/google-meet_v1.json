@@ -1021,10 +1021,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createMeetingSpace",
     "description": "Creates a meeting space.",
     "element": { },
     "help": null,
-    "name": "createMeetingSpace",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1377,18 +1377,18 @@
     } ],
     "title": "Create Meeting Space",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getMeetingSpace",
     "description": "Gets details about a meeting space.",
     "element": { },
     "help": null,
-    "name": "getMeetingSpace",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1725,18 +1725,18 @@
     } ],
     "title": "Get Meeting Space",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listParticipants",
     "description": "Lists the participants in a conference record. By default, ordered by join time and in descending order.",
     "element": { },
     "help": null,
-    "name": "listParticipants",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2030,17 +2030,17 @@
     } ],
     "title": "List Participants",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

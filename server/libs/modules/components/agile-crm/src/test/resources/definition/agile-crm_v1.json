@@ -6320,10 +6320,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Creates a new contact.",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8971,18 +8971,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "crateDeal",
     "description": "Creates a new deal.",
     "element": { },
     "help": null,
-    "name": "crateDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -11125,18 +11125,18 @@
     } ],
     "title": "Create Deal",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTask",
     "description": "Creates a new task.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12628,17 +12628,17 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "CRM",
-    "name": "crm"
+    "name": "crm",
+    "label": "CRM"
   } ],
   "connection": {
     "authorizationRequired": null,

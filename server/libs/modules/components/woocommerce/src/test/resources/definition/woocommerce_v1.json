@@ -16294,10 +16294,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createCoupon",
     "description": "Create a new coupon.",
     "element": { },
     "help": null,
-    "name": "createCoupon",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -18458,18 +18458,18 @@
     } ],
     "title": "Create Coupon",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createCustomer",
     "description": "Create a new customer.",
     "element": { },
     "help": null,
-    "name": "createCustomer",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -21100,18 +21100,18 @@
     } ],
     "title": "Create Customer",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createOrder",
     "description": "Create a new order.",
     "element": { },
     "help": null,
-    "name": "createOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -27159,18 +27159,18 @@
     } ],
     "title": "Create Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createProduct",
     "description": "Create a new product.",
     "element": { },
     "help": null,
-    "name": "createProduct",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -32575,17 +32575,17 @@
     } ],
     "title": "Create Product",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "E-commerce",
-    "name": "e-commerce"
+    "name": "e-commerce",
+    "label": "E-commerce"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -2159,10 +2159,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createSoundEffect",
     "description": "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound effects model in the world.",
     "element": { },
     "help": null,
-    "name": "createSoundEffect",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2407,18 +2407,18 @@
     } ],
     "title": "Create Sound Effect",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSpeech",
     "description": "Converts text into speech using a voice of your choice and returns audio.",
     "element": { },
     "help": null,
-    "name": "createSpeech",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2688,18 +2688,18 @@
     } ],
     "title": "Create Speech",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSpeechWithTiming",
     "description": "Generate speech from text with precise character-level timing information for audio-text synchronization.",
     "element": { },
     "help": null,
-    "name": "createSpeechWithTiming",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3441,18 +3441,18 @@
     } ],
     "title": "Create Speech With Timing",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTranscript",
     "description": "Transcribe an audio or video file.",
     "element": { },
     "help": null,
-    "name": "createTranscript",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4023,18 +4023,18 @@
     } ],
     "title": "Create Transcript",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "streamSpeech",
     "description": "Converts text into speech using a voice of your choice and returns audio as an audio stream.",
     "element": { },
     "help": null,
-    "name": "streamSpeech",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4304,17 +4304,17 @@
     } ],
     "title": "Stream Speech",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

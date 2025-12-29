@@ -1404,10 +1404,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "uploadVideo",
     "description": "Uploads video to Youtube.",
     "element": { },
     "help": null,
-    "name": "uploadVideo",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2798,17 +2798,17 @@
     } ],
     "title": "Upload Video",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,

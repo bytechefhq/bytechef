@@ -43,6 +43,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -54,7 +55,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -4494,6 +4494,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -4505,7 +4506,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -4515,10 +4515,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createDatabaseItem",
     "description": "Creates a new item in Notion database.",
     "element": { },
     "help": null,
-    "name": "createDatabaseItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4552,6 +4552,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -4563,7 +4564,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     }, {
@@ -4591,18 +4591,18 @@
     } ],
     "title": "Create Database Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPage",
     "description": "Creates a new page that is a child of an existing page.",
     "element": { },
     "help": null,
-    "name": "createPage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6194,18 +6194,18 @@
     } ],
     "title": "Create Page",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getDatabase",
     "description": "Retrieve database information by database ID.",
     "element": { },
     "help": null,
-    "name": "getDatabase",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7351,18 +7351,18 @@
     } ],
     "title": "Get Database",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getPage",
     "description": "Retrieve page properties using page ID. Response does not contain page content.",
     "element": { },
     "help": null,
-    "name": "getPage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8932,18 +8932,18 @@
     } ],
     "title": "Get Page",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateDatabaseItem",
     "description": "Update specific fields in a Notion database item.",
     "element": { },
     "help": null,
-    "name": "updateDatabaseItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -8999,6 +8999,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "fields",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -9010,23 +9011,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "fields",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Database Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -946,11 +946,11 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   }, {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

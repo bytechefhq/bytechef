@@ -1130,10 +1130,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "reader",
     "description": "Reads a single row from a CSV file.",
     "element": { },
     "help": null,
-    "name": "reader",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1397,18 +1397,18 @@
     } ],
     "title": "Read CSV file row",
     "type": {
+      "name": "SOURCE",
       "key": "source",
       "label": "Source",
       "multipleElements": false,
-      "name": "SOURCE",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "writer",
     "description": "Writes a list of rows to a CSV file.",
     "element": { },
     "help": null,
-    "name": "writer",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1518,17 +1518,17 @@
     } ],
     "title": "Write CSV file rows",
     "type": {
+      "name": "DESTINATION",
       "key": "destination",
       "label": "Destination",
       "multipleElements": false,
-      "name": "DESTINATION",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

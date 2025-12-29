@@ -1266,10 +1266,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createContact",
     "description": "Create new contact",
     "element": { },
     "help": null,
-    "name": "createContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1706,18 +1706,18 @@
     } ],
     "title": "Create Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getContact",
     "description": "Get a single Contact",
     "element": { },
     "help": null,
-    "name": "getContact",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2061,18 +2061,18 @@
     } ],
     "title": "Get Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendMessage",
     "description": "Send a new message",
     "element": { },
     "help": null,
-    "name": "sendMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2520,17 +2520,17 @@
     } ],
     "title": "Send Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Customer Support",
-    "name": "customer-support"
+    "name": "customer-support",
+    "label": "Customer Support"
   } ],
   "connection": {
     "authorizationRequired": null,

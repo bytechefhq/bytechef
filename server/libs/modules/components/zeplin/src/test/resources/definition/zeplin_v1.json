@@ -100,8 +100,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

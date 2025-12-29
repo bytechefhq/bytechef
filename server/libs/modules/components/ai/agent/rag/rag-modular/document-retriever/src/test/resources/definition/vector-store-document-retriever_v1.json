@@ -3,17 +3,17 @@
   "actions": [ ],
   "clusterElementClusterElementTypes": { },
   "clusterElementTypes": [ {
+    "name": "VECTOR_STORE",
     "key": "vectorStore",
     "label": "Vector Store",
     "multipleElements": false,
-    "name": "VECTOR_STORE",
     "required": true
   } ],
   "clusterElements": [ {
+    "name": "documentRetriever",
     "description": "Memory is retrieved added into the prompt's system text.",
     "element": { },
     "help": null,
-    "name": "documentRetriever",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -82,17 +82,17 @@
     } ],
     "title": "Document Retriever",
     "type": {
+      "name": "DOCUMENT_RETRIEVER",
       "key": "documentRetriever",
       "label": "Document Retriever",
       "multipleElements": false,
-      "name": "DOCUMENT_RETRIEVER",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

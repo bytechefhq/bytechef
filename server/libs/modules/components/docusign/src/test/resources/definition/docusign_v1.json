@@ -992,10 +992,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createEnvelope",
     "description": "Creates a new envelope.",
     "element": { },
     "help": null,
-    "name": "createEnvelope",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1672,18 +1672,18 @@
     } ],
     "title": "Create Envelope",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "downloadEnvelopeDocument",
     "description": "Downloads a single document or all documents from an envelope.",
     "element": { },
     "help": null,
-    "name": "downloadEnvelopeDocument",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1973,17 +1973,17 @@
     } ],
     "title": "Download Envelope Document",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

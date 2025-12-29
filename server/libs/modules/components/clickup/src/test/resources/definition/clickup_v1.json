@@ -1650,10 +1650,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createList",
     "description": "Creates a new List in specified Folder.",
     "element": { },
     "help": null,
-    "name": "createList",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2163,18 +2163,18 @@
     } ],
     "title": "Create List",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTask",
     "description": "Create a new task in a ClickUp workspace and list.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2905,18 +2905,18 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createFolder",
     "description": "Creates a new folder in a ClickUp workspace.",
     "element": { },
     "help": null,
-    "name": "createFolder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3273,17 +3273,17 @@
     } ],
     "title": "Create Folder",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

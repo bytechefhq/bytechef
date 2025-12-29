@@ -2711,10 +2711,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createEvent",
     "description": "Creates an event in the specified calendar.",
     "element": { },
     "help": null,
-    "name": "createEvent",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3420,18 +3420,18 @@
     } ],
     "title": "Create Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteEvent",
     "description": "Deletes an event from the specified calendar.",
     "element": { },
     "help": null,
-    "name": "deleteEvent",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -3487,18 +3487,18 @@
     } ],
     "title": "Delete Event",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getEvents",
     "description": "Gets a list of events in specified calendar.",
     "element": { },
     "help": null,
-    "name": "getEvents",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4100,18 +4100,18 @@
     } ],
     "title": "Get Events",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getFreeTimeSlots",
     "description": "Get free time slots from the Microsoft Outlook 365 calendar.",
     "element": { },
     "help": null,
-    "name": "getFreeTimeSlots",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4355,18 +4355,18 @@
     } ],
     "title": "Get Free Time Slots",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getMail",
     "description": "Get a specific message",
     "element": { },
     "help": null,
-    "name": "getMail",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -4432,18 +4432,18 @@
     } ],
     "title": "Get Mail",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "moveEmail",
     "description": "Moves a email to another folder within the user's mailbox. ",
     "element": { },
     "help": null,
-    "name": "moveEmail",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4504,18 +4504,18 @@
     } ],
     "title": "Move Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replyToEmail",
     "description": "Creates a new reply to email.",
     "element": { },
     "help": null,
-    "name": "replyToEmail",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -4831,18 +4831,18 @@
     } ],
     "title": "Reply to Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "searchEmail",
     "description": "Get the messages in the signed-in user's mailbox",
     "element": { },
     "help": null,
-    "name": "searchEmail",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
@@ -4974,18 +4974,18 @@
     } ],
     "title": "Search Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendEmail",
     "description": "Send the message.",
     "element": { },
     "help": null,
-    "name": "sendEmail",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -5404,20 +5404,20 @@
     } ],
     "title": "Send Email",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   }, {
-    "label": "Calendars and Scheduling",
-    "name": "calendars-and-scheduling"
+    "name": "calendars-and-scheduling",
+    "label": "Calendars and Scheduling"
   } ],
   "connection": {
     "authorizationRequired": null,
@@ -5534,14 +5534,10 @@
     "listenerEnable": null,
     "name": "newEmail",
     "outputDefinition": {
-      "output": null,
-      "outputResponse": {
-        "outputSchema": null,
-        "placeholder": null,
-        "sampleOutput": { }
-      },
+      "output": { },
+      "outputResponse": null,
       "outputSchema": null,
-      "sampleOutput": { }
+      "sampleOutput": null
     },
     "poll": { },
     "processErrorResponse": { },

@@ -2135,11 +2135,11 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   }, {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

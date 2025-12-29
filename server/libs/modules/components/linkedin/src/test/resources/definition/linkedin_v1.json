@@ -671,10 +671,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createPost",
     "description": "Create a post on LinkedIn.",
     "element": { },
     "help": null,
-    "name": "createPost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1292,18 +1292,18 @@
     } ],
     "title": "Create Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deletePost",
     "description": "Delete a post from LinkedIn.",
     "element": { },
     "help": null,
-    "name": "deletePost",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1331,20 +1331,20 @@
     } ],
     "title": "Delete Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   }, {
-    "label": "Social Media",
-    "name": "social-media"
+    "name": "social-media",
+    "label": "Social Media"
   } ],
   "connection": {
     "authorizationRequired": null,

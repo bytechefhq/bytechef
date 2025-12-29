@@ -1,10 +1,10 @@
 {
   "actions": null,
   "clusterElements": [ {
+    "name": "json",
     "description": "Reads JSON documents and converts them into a list of Document objects.",
     "element": { },
     "help": null,
-    "name": "json",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -157,18 +157,18 @@
     } ],
     "title": "JSON Document Reader",
     "type": {
+      "name": "DOCUMENT_READER",
       "key": "documentReader",
       "label": "Document Reader",
       "multipleElements": false,
-      "name": "DOCUMENT_READER",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "markdown",
     "description": "Reads the given Markdown resource and groups headers, paragraphs, or text divided by horizontal lines into documents.",
     "element": { },
     "help": null,
-    "name": "markdown",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -278,18 +278,18 @@
     } ],
     "title": "Markdown Document Reader",
     "type": {
+      "name": "DOCUMENT_READER",
       "key": "documentReader",
       "label": "Document Reader",
       "multipleElements": false,
-      "name": "DOCUMENT_READER",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "pagePdf",
     "description": "Groups the parsed PDF pages into Documents.",
     "element": { },
     "help": null,
-    "name": "pagePdf",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -399,18 +399,18 @@
     } ],
     "title": "Page PDF Document Reader",
     "type": {
+      "name": "DOCUMENT_READER",
       "key": "documentReader",
       "label": "Document Reader",
       "multipleElements": false,
-      "name": "DOCUMENT_READER",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "tika",
     "description": "A document reader that leverages Apache Tika to extract text from a variety of document\nformats, such as PDF, DOC/DOCX, PPT/PPTX, and HTML. For a comprehensive list of\nsupported formats, refer to: https://tika.apache.org/3.0.0/formats.html.\nThis reader directly provides the extracted text without any additional formatting. All\nextracted texts are encapsulated within a Document object.\n",
     "element": { },
     "help": null,
-    "name": "tika",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -520,18 +520,18 @@
     } ],
     "title": "Tika Document Reader",
     "type": {
+      "name": "DOCUMENT_READER",
       "key": "documentReader",
       "label": "Document Reader",
       "multipleElements": false,
-      "name": "DOCUMENT_READER",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "txt",
     "description": "Reads text.",
     "element": { },
     "help": null,
-    "name": "txt",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -641,17 +641,17 @@
     } ],
     "title": "TXT Document Reader",
     "type": {
+      "name": "DOCUMENT_READER",
       "key": "documentReader",
       "label": "Document Reader",
       "multipleElements": false,
-      "name": "DOCUMENT_READER",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

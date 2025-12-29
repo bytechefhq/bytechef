@@ -1374,6 +1374,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "rows",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1385,7 +1386,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "rows",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1516,6 +1516,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1527,7 +1528,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1979,6 +1979,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1990,7 +1991,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -2000,10 +2000,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "clearSheet",
     "description": "Clear a sheet of all values while preserving formats.",
     "element": { },
     "help": null,
-    "name": "clearSheet",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2080,18 +2080,18 @@
     } ],
     "title": "Clear Sheet",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createColumn",
     "description": "Append a new column to the end of the sheet.",
     "element": { },
     "help": null,
-    "name": "createColumn",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2392,18 +2392,18 @@
     } ],
     "title": "Create Column",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSheet",
     "description": "Create a blank sheet with title. Optionally, provide headers.",
     "element": { },
     "help": null,
-    "name": "createSheet",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2722,18 +2722,18 @@
     } ],
     "title": "Create Sheet",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSpreadsheet",
     "description": "Create a new spreadsheet in a specified folder.",
     "element": { },
     "help": null,
-    "name": "createSpreadsheet",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -2791,18 +2791,18 @@
     } ],
     "title": "Create Spreadsheet",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteColumn",
     "description": "Delete column on an existing sheet.",
     "element": { },
     "help": null,
-    "name": "deleteColumn",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2877,18 +2877,18 @@
     } ],
     "title": "Delete Column",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteRow",
     "description": "Delete row on an existing sheet.",
     "element": { },
     "help": null,
-    "name": "deleteRow",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2960,18 +2960,18 @@
     } ],
     "title": "Delete Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteSheet",
     "description": "Delete a specified sheet from a spreadsheet.",
     "element": { },
     "help": null,
-    "name": "deleteSheet",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -3024,18 +3024,18 @@
     } ],
     "title": "Delete Sheet",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "findRowByNum",
     "description": "Get a row in a Google Sheet by row number.",
     "element": { },
     "help": null,
-    "name": "findRowByNum",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3139,18 +3139,18 @@
     } ],
     "title": "Find Row by Number",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getRows",
     "description": "Get all rows from a Google Sheet.",
     "element": { },
     "help": null,
-    "name": "getRows",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3235,18 +3235,18 @@
     } ],
     "title": "Get Rows",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "insertMultipleRows",
     "description": "Append rows to the end of the spreadsheet.",
     "element": { },
     "help": null,
-    "name": "insertMultipleRows",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3359,6 +3359,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "rows",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -3370,24 +3371,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "rows",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Insert Multiple Rows",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "insertRow",
     "description": "Append a row of values to an existing sheet.",
     "element": { },
     "help": null,
-    "name": "insertRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3500,6 +3500,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -3511,24 +3512,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Insert Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listSheets",
     "description": "Get all sheets from the spreadsheet.",
     "element": { },
     "help": null,
-    "name": "listSheets",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -3824,18 +3824,18 @@
     } ],
     "title": "List Sheets",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateRow",
     "description": "Overwrite values in an existing row.",
     "element": { },
     "help": null,
-    "name": "updateRow",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3961,6 +3961,7 @@
       "required": true,
       "type": "BOOLEAN"
     }, {
+      "name": "row",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -3972,23 +3973,22 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "row",
       "required": true,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Update Row",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

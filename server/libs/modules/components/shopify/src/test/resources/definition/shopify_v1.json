@@ -3522,10 +3522,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createOrder",
     "description": "Adds an order into a Shopify store.",
     "element": { },
     "help": null,
-    "name": "createOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4538,18 +4538,18 @@
     } ],
     "title": "Create Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteOrder",
     "description": "Deletes an order. Orders that interact with an online gateway can't be deleted.",
     "element": { },
     "help": null,
-    "name": "deleteOrder",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -4579,18 +4579,18 @@
     } ],
     "title": "Delete Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "cancelOrder",
     "description": "Cancels an order. Orders that are paid and have fulfillments can't be canceled.",
     "element": { },
     "help": null,
-    "name": "cancelOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5353,18 +5353,18 @@
     } ],
     "title": "Cancel an order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateOrder",
     "description": "Update an existing order.",
     "element": { },
     "help": null,
-    "name": "updateOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6237,18 +6237,18 @@
     } ],
     "title": "Update Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "closeOrder",
     "description": "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.",
     "element": { },
     "help": null,
-    "name": "closeOrder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -7011,17 +7011,17 @@
     } ],
     "title": "Close Order",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "E-commerce",
-    "name": "e-commerce"
+    "name": "e-commerce",
+    "label": "E-commerce"
   } ],
   "connection": {
     "authorizationRequired": null,

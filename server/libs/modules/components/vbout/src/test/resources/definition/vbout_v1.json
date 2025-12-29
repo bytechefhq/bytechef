@@ -946,10 +946,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addContactToList",
     "description": "Adds a contact to a selected email list.",
     "element": { },
     "help": null,
-    "name": "addContactToList",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1029,18 +1029,18 @@
     } ],
     "title": "Add Contact To List",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateContact",
     "description": "Updates a contact in a selected email list.",
     "element": { },
     "help": null,
-    "name": "updateContact",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1148,18 +1148,18 @@
     } ],
     "title": "Update Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createEmailMarketingCampaign",
     "description": "Creates a new email campaign for specific list.",
     "element": { },
     "help": null,
-    "name": "createEmailMarketingCampaign",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1438,18 +1438,18 @@
     } ],
     "title": "Create Email Marketing Campaign",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addTagToContact",
     "description": "Adds the tag to the contact.",
     "element": { },
     "help": null,
-    "name": "addTagToContact",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1520,18 +1520,18 @@
     } ],
     "title": "Add Tag To Contact",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createEmailList",
     "description": "Creates a new email list.",
     "element": { },
     "help": null,
-    "name": "createEmailList",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1779,18 +1779,18 @@
     } ],
     "title": "Create Email List",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createSocialMediaMessage",
     "description": "Post a message to one of your social media channel.",
     "element": { },
     "help": null,
-    "name": "createSocialMediaMessage",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -1877,17 +1877,17 @@
     } ],
     "title": "Create Social Media Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Marketing Automation",
-    "name": "marketing-automation"
+    "name": "marketing-automation",
+    "label": "Marketing Automation"
   } ],
   "connection": {
     "authorizationRequired": null,

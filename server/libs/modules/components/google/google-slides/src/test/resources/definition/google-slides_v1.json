@@ -138,10 +138,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createPresentationBasedOnTemplate",
     "description": "Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.",
     "element": { },
     "help": null,
-    "name": "createPresentationBasedOnTemplate",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -266,17 +266,17 @@
     } ],
     "title": "Create Presentation Based on Template",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

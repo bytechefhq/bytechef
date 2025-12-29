@@ -2031,6 +2031,7 @@
         "required": null,
         "type": "INTEGER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -2041,7 +2042,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -2283,6 +2283,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "defaultValue",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -2293,7 +2294,6 @@
       "hidden": null,
       "label": "Default Value",
       "metadata": { },
-      "name": "defaultValue",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -3112,10 +3112,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "mapObjectsToArray",
     "description": "Transform an object or array of objects into an array of key-value pairs.",
     "element": { },
     "help": null,
-    "name": "mapObjectsToArray",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3261,18 +3261,18 @@
     } ],
     "title": "Map Objects to Array",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "mapObjectsToObject",
     "description": "Creates a new object with the chosen input properties. You can also rename the property keys.",
     "element": { },
     "help": null,
-    "name": "mapObjectsToObject",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3555,18 +3555,18 @@
     } ],
     "title": "Map Objects to Object",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "mergeAndPivotPropertiesByKey",
     "description": "Creates a new object out of all objects that have the same key as the specified field kay and an object as value. That value of the new object contains values of all properties that share the specified field key as keys and the they all have the specified field value as a value.",
     "element": { },
     "help": null,
-    "name": "mergeAndPivotPropertiesByKey",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3662,18 +3662,18 @@
     } ],
     "title": "Merge and Pivot Properties by Key",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "renameKeys",
     "description": "The action renames keys of an input object defined by mappings.",
     "element": { },
     "help": null,
-    "name": "renameKeys",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -3789,18 +3789,18 @@
     } ],
     "title": "Rename Keys",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replaceAllSpecifiedValues",
     "description": "Goes through all object parameters and replaces all specified input parameter values.",
     "element": { },
     "help": null,
-    "name": "replaceAllSpecifiedValues",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4687,18 +4687,18 @@
     } ],
     "title": "Replace All Specified Values",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replaceMultipleValuesByKey",
     "description": "Replaces all values specified by the keys in the input object with the values specified by keys in the output object.",
     "element": { },
     "help": null,
-    "name": "replaceMultipleValuesByKey",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -4834,18 +4834,18 @@
     } ],
     "title": "Replace Multiple Values by Key",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "replaceValue",
     "description": "Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null. You can also change a string value with regex.",
     "element": { },
     "help": null,
-    "name": "replaceValue",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -5131,6 +5131,7 @@
         "required": null,
         "type": "INTEGER"
       }, {
+        "name": null,
         "advancedOption": null,
         "controlType": "NULL",
         "defaultValue": null,
@@ -5141,7 +5142,6 @@
         "hidden": null,
         "label": null,
         "metadata": { },
-        "name": null,
         "placeholder": null,
         "required": null,
         "type": "NULL"
@@ -5383,6 +5383,7 @@
       "required": true,
       "type": "INTEGER"
     }, {
+      "name": "defaultValue",
       "advancedOption": null,
       "controlType": "NULL",
       "defaultValue": null,
@@ -5393,7 +5394,6 @@
       "hidden": null,
       "label": "Default Value",
       "metadata": { },
-      "name": "defaultValue",
       "placeholder": null,
       "required": true,
       "type": "NULL"
@@ -6208,17 +6208,17 @@
     } ],
     "title": "Replace Value",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": null,
   "customAction": null,

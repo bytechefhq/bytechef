@@ -710,10 +710,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "getFullResult",
     "description": "Returns a full result of your query.",
     "element": { },
     "help": null,
-    "name": "getFullResult",
     "outputDefinition": {
       "output": null,
       "outputResponse": null,
@@ -1403,17 +1403,17 @@
     } ],
     "title": "Get Full Result",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Helpers",
-    "name": "helpers"
+    "name": "helpers",
+    "label": "Helpers"
   } ],
   "connection": {
     "authorizationRequired": null,

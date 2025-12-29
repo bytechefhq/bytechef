@@ -8883,10 +8883,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createIncident",
     "description": "Create an incident synchronously without a corresponding event from a monitoring service.",
     "element": { },
     "help": null,
-    "name": "createIncident",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12897,18 +12897,18 @@
     } ],
     "title": "Create Incident",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createIncidentNote",
     "description": "Create a new note for the specified incident.",
     "element": { },
     "help": null,
-    "name": "createIncidentNote",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -13724,18 +13724,18 @@
     } ],
     "title": "Create Incident Note",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "updateIncident",
     "description": "Update selected incident.",
     "element": { },
     "help": null,
-    "name": "updateIncident",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -17754,17 +17754,17 @@
     } ],
     "title": "Update Incident",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

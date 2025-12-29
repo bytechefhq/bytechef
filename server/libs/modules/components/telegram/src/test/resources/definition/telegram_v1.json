@@ -6295,10 +6295,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendMedia",
     "description": "Sends a media message through a Telegram bot.",
     "element": { },
     "help": null,
-    "name": "sendMedia",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9595,18 +9595,18 @@
     } ],
     "title": "Send Media",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "sendMessage",
     "description": "Sends a message through a Telegram bot.",
     "element": { },
     "help": null,
-    "name": "sendMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12579,17 +12579,17 @@
     } ],
     "title": "Send Message",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

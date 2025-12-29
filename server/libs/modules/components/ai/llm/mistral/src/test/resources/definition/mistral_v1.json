@@ -2352,10 +2352,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "embedding",
     "description": "Mistral embedding.",
     "element": { },
     "help": null,
-    "name": "embedding",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2391,18 +2391,18 @@
     } ],
     "title": "Mistral Embedding",
     "type": {
+      "name": "EMBEDDING",
       "key": "embedding",
       "label": "Embedding",
       "multipleElements": false,
-      "name": "EMBEDDING",
       "required": true
     },
     "workflowNodeDescription": null
   }, {
+    "name": "model",
     "description": "MistralAI model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2627,17 +2627,17 @@
     } ],
     "title": "MistralAI Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

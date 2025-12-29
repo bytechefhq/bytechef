@@ -1413,10 +1413,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "search",
     "description": "Execute a search query.",
     "element": { },
     "help": null,
-    "name": "search",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2154,18 +2154,18 @@
     } ],
     "title": "Search",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "extract",
     "description": "Extract web page content from one or more specified URLs.",
     "element": { },
     "help": null,
-    "name": "extract",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2805,17 +2805,17 @@
     } ],
     "title": "Extract",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

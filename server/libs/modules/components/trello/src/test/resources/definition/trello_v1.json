@@ -781,10 +781,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createBoard",
     "description": "Creates a new board.",
     "element": { },
     "help": null,
-    "name": "createBoard",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -834,18 +834,18 @@
     } ],
     "title": "Create Board",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createCard",
     "description": "Creates a new card.",
     "element": { },
     "help": null,
-    "name": "createCard",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1214,18 +1214,18 @@
     } ],
     "title": "Create Card",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getCard",
     "description": "Gets a card details.",
     "element": { },
     "help": null,
-    "name": "getCard",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1550,17 +1550,17 @@
     } ],
     "title": "Get Card",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Productivity and Collaboration",
-    "name": "productivity-and-collaboration"
+    "name": "productivity-and-collaboration",
+    "label": "Productivity and Collaboration"
   } ],
   "connection": {
     "authorizationRequired": null,

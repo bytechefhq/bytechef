@@ -422,10 +422,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "sendNotification",
     "description": "Sends a notification.",
     "element": { },
     "help": null,
-    "name": "sendNotification",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -834,17 +834,17 @@
     } ],
     "title": "Send Notification",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Communication",
-    "name": "communication"
+    "name": "communication",
+    "label": "Communication"
   } ],
   "connection": {
     "authorizationRequired": null,

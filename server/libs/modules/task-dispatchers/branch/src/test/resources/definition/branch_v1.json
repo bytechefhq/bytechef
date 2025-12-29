@@ -81,6 +81,7 @@
         "expressionEnabled": null,
         "hidden": null,
         "items": [ {
+          "name": null,
           "advancedOption": null,
           "controlType": null,
           "defaultValue": null,
@@ -91,7 +92,6 @@
           "hidden": null,
           "label": null,
           "metadata": { },
-          "name": null,
           "placeholder": null,
           "required": null,
           "type": "TASK"
@@ -130,6 +130,7 @@
     "expressionEnabled": null,
     "hidden": null,
     "items": [ {
+      "name": null,
       "advancedOption": null,
       "controlType": null,
       "defaultValue": null,
@@ -140,7 +141,6 @@
       "hidden": null,
       "label": null,
       "metadata": { },
-      "name": null,
       "placeholder": null,
       "required": null,
       "type": "TASK"

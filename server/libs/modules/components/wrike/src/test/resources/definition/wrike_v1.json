@@ -5262,10 +5262,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createComment",
     "description": "Create a comment in a folder or in a task.",
     "element": { },
     "help": null,
-    "name": "createComment",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5853,18 +5853,18 @@
     } ],
     "title": "Create Comment",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createFolder",
     "description": "Create a folder.",
     "element": { },
     "help": null,
-    "name": "createFolder",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -6964,18 +6964,18 @@
     } ],
     "title": "Create Folder",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createProject",
     "description": "Create a project.",
     "element": { },
     "help": null,
-    "name": "createProject",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8572,18 +8572,18 @@
     } ],
     "title": "Create Project",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createTask",
     "description": "Create a task.",
     "element": { },
     "help": null,
-    "name": "createTask",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -10511,17 +10511,17 @@
     } ],
     "title": "Create Task",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Project Management",
-    "name": "project-management"
+    "name": "project-management",
+    "label": "Project Management"
   } ],
   "connection": {
     "authorizationRequired": null,

@@ -7708,10 +7708,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "addAssigneesToIssue",
     "description": "Adds an assignees to the specified issue.",
     "element": { },
     "help": null,
-    "name": "addAssigneesToIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -8636,18 +8636,18 @@
     } ],
     "title": "Add Assignee to Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "addLabelsToIssue",
     "description": "Adds labels to the specified issue.",
     "element": { },
     "help": null,
-    "name": "addLabelsToIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9016,18 +9016,18 @@
     } ],
     "title": "Add Labels to Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createCommentOnIssue",
     "description": "Adds a comment to the specified issue.",
     "element": { },
     "help": null,
-    "name": "createCommentOnIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -9947,18 +9947,18 @@
     } ],
     "title": "Create Comment on Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createIssue",
     "description": "Create Issue in GitHub Repository",
     "element": { },
     "help": null,
-    "name": "createIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -10875,18 +10875,18 @@
     } ],
     "title": "Create Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPullRequest",
     "description": "Creates a new pull request.",
     "element": { },
     "help": null,
-    "name": "createPullRequest",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -12540,18 +12540,18 @@
     } ],
     "title": "Create Pull Request",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "getIssue",
     "description": "Get information from a specific issue",
     "element": { },
     "help": null,
-    "name": "getIssue",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -13449,18 +13449,18 @@
     } ],
     "title": "Get Issue",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listIssues",
     "description": "Retrieve issues assigned to the authenticated user across all accessible repositories.",
     "element": { },
     "help": null,
-    "name": "listIssues",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -14411,18 +14411,18 @@
     } ],
     "title": "List Issues",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "listRepositoryIssues",
     "description": "Lists issues in a repository. Only open issues will be listed.",
     "element": { },
     "help": null,
-    "name": "listRepositoryIssues",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -15337,18 +15337,18 @@
     } ],
     "title": "List Repository Issues",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "starRepository",
     "description": "Stars a repository for the authenticated user.",
     "element": { },
     "help": null,
-    "name": "starRepository",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -15398,17 +15398,17 @@
     } ],
     "title": "Star Repository",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Developer Tools",
-    "name": "developer-tools"
+    "name": "developer-tools",
+    "label": "Developer Tools"
   } ],
   "connection": {
     "authorizationRequired": null,

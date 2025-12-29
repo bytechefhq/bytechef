@@ -1,26 +1,26 @@
 {
   "actions": null,
   "clusterElements": [ {
+    "name": "contextualQueryAugmenter",
     "description": "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
     "element": { },
     "help": null,
-    "name": "contextualQueryAugmenter",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": null,
     "title": "Contextual Query Augmenter",
     "type": {
+      "name": "QUERY_AUGMENTER",
       "key": "queryAugmenter",
       "label": "Query Augmenter",
       "multipleElements": false,
-      "name": "QUERY_AUGMENTER",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": null,
   "customAction": null,

@@ -712,10 +712,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "model",
     "description": "Antropic model.",
     "element": { },
     "help": null,
-    "name": "model",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -916,17 +916,17 @@
     } ],
     "title": "Antropic Model",
     "type": {
+      "name": "MODEL",
       "key": "model",
       "label": "Model",
       "multipleElements": false,
-      "name": "MODEL",
       "required": true
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Artificial Intelligence",
-    "name": "artificial-intelligence"
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
   } ],
   "connection": {
     "authorizationRequired": null,

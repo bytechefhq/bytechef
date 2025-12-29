@@ -1272,6 +1272,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "columnValues",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1283,7 +1284,6 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "columnValues",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1386,10 +1386,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createBoard",
     "description": "Create a new board.",
     "element": { },
     "help": null,
-    "name": "createBoard",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1650,18 +1650,18 @@
     } ],
     "title": "Create Board",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createColumn",
     "description": "Create a new column in board.",
     "element": { },
     "help": null,
-    "name": "createColumn",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2094,18 +2094,18 @@
     } ],
     "title": "Create Column",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createGroup",
     "description": "Creates a new group in board.",
     "element": { },
     "help": null,
-    "name": "createGroup",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2360,18 +2360,18 @@
     } ],
     "title": "Create Group",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createItem",
     "description": "Create a new item in a board.",
     "element": { },
     "help": null,
-    "name": "createItem",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -2649,6 +2649,7 @@
       "required": true,
       "type": "STRING"
     }, {
+      "name": "columnValues",
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -2660,24 +2661,23 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "name": "columnValues",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Create Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "deleteItem",
     "description": "Deletes an item from a board.",
     "element": { },
     "help": null,
-    "name": "deleteItem",
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ {
@@ -2758,10 +2758,10 @@
     } ],
     "title": "Delete Item",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null

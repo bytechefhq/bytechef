@@ -1287,8 +1287,8 @@
   } ],
   "clusterElements": null,
   "componentCategories": [ {
-    "label": "File Storage",
-    "name": "file-storage"
+    "name": "file-storage",
+    "label": "File Storage"
   } ],
   "connection": {
     "authorizationRequired": null,

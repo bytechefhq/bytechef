@@ -477,10 +477,10 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "createComment",
     "description": "Creates comment on a Reddit post or replies to a comment.",
     "element": { },
     "help": null,
-    "name": "createComment",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -669,18 +669,18 @@
     } ],
     "title": "Create Comment",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   }, {
+    "name": "createPost",
     "description": "Creates a new reddit post.",
     "element": { },
     "help": null,
-    "name": "createPost",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -943,17 +943,17 @@
     } ],
     "title": "Create Post",
     "type": {
+      "name": "TOOLS",
       "key": "tools",
       "label": "Tools",
       "multipleElements": true,
-      "name": "TOOLS",
       "required": false
     },
     "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
-    "label": "Social Media",
-    "name": "social-media"
+    "name": "social-media",
+    "label": "Social Media"
   } ],
   "connection": {
     "authorizationRequired": null,
