@@ -59,7 +59,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             - When operating in ASK mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain.
             - If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
             - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses.
-            - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
+            - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
             """;
 
     private final WorkflowService workflowService;

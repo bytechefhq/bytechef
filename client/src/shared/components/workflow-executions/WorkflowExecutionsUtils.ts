@@ -78,13 +78,13 @@ export const getErrorItem = (
     if (!workflowTestExecution) return undefined;
 
     if (workflowTestExecution.triggerExecution && workflowTestExecution.triggerExecution.error) {
-        return workflowTestExecution.triggerExecution as TriggerExecution;
+        return workflowTestExecution.triggerExecution;
     }
 
     const failedTask = workflowTestExecution.job?.taskExecutions?.find((task) => task.error && 'workflowTask' in task);
 
     if (failedTask) {
-        return failedTask as TaskExecution;
+        return failedTask;
     }
 
     return undefined;

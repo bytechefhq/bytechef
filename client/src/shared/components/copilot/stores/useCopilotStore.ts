@@ -20,7 +20,7 @@ export type ContextType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
     mode: MODE;
-    workflowExecutionError?: {
+    taskExecutionError?: {
         errorMessage?: string;
         stackTrace?: string[];
         title?: string;
@@ -68,6 +68,8 @@ export const useCopilotStore = create<CopilotStateI>()(
         },
 
         context: {
+            source: Source.WORKFLOW_EDITOR,
+            parameters: {},
             mode: MODE.ASK,
             workflowExecutionError: undefined,
         },
@@ -84,7 +86,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                     ...state,
                     context: {
                         ...state.context,
-                        workflowExecutionError: error,
+                        taskExecutionError: error,
                     },
                 };
             }),
