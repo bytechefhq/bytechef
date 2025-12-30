@@ -32,7 +32,6 @@ public class FormConstants {
     public static final String FIELD_TYPE = "fieldType";
     public static final String FORM = "form";
     public static final String FORM_DESCRIPTION = "formDescription";
-//    public static final String FORM_PATH = "formPath";
     public static final String FORM_TITLE = "formTitle";
     public static final String IGNORE_BOTS = "ignoreBots";
     public static final String INPUTS = "inputs";
@@ -68,8 +67,8 @@ public class FormConstants {
             return value;
         }
 
-        public static FieldType valueOf(int value) {
-            for (FieldType fieldType : FieldType.values()) {
+        public static FieldType fromValue(int value) {
+            for (FieldType fieldType : values()) {
                 if (fieldType.value == value) {
                     return fieldType;
                 }
