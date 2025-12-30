@@ -4,11 +4,11 @@ import {fireEvent, render, screen, waitFor} from '../../../shared/util/test-util
 import TriggerForm from './TriggerForm';
 
 const mockWorkflowExecutionId = 'test-id';
-const mockEnvironment = 'test';
+const mockEnvironmentId = '0';
 
 vi.mock('react-router-dom', () => ({
     useParams: () => ({
-        environment: mockEnvironment,
+        environmentId: mockEnvironmentId,
         workflowExecutionId: mockWorkflowExecutionId,
     }),
 }));

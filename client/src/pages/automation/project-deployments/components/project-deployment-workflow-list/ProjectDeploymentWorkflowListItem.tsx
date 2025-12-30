@@ -7,7 +7,6 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
-import {PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
@@ -25,15 +24,9 @@ const getTriggerUrl = (type: 'form' | 'chat', environmentId?: number, staticWebh
         return '';
     }
 
-    const environmentPrefix =
-        environmentId === PRODUCTION_ENVIRONMENT
-            ? ''
-            : environmentId === STAGING_ENVIRONMENT
-              ? 'staging/'
-              : 'development/';
     const webhookId = staticWebhookUrl.substring(staticWebhookUrl.lastIndexOf('/webhooks/') + '/webhooks/'.length);
 
-    return `/${type}/${environmentPrefix}${webhookId}`;
+    return `/${type}/${environmentId}/${webhookId}`;
 };
 
 const ProjectDeploymentWorkflowListItem = ({
@@ -237,7 +230,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     />
                                 </TooltipTrigger>
 
-                                <TooltipContent>Click to open a chat</TooltipContent>
+                                <TooltipContent>Open hosted chat (URL is not copied)</TooltipContent>
                             </Tooltip>
                         )}
                     </div>

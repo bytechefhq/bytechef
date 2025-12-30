@@ -346,7 +346,7 @@ export const getRouter = (queryClient: QueryClient) =>
         },
         {
             element: <TriggerForm />,
-            path: 'form/:environment/:workflowExecutionId',
+            path: 'form/:environmentId/:workflowExecutionId',
         },
         {
             element: <WorkflowChat />,
@@ -354,7 +354,7 @@ export const getRouter = (queryClient: QueryClient) =>
         },
         {
             element: <WorkflowChat />,
-            path: 'chat/:environment/:workflowExecutionId',
+            path: 'chat/:environmentId/:workflowExecutionId',
         },
         {
             children: [
