@@ -42,6 +42,7 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.fasterxml.jackson.core.type.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,6 +76,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("UNVALIDATED_REDIRECT")
 public abstract class AbstractWebhookTriggerController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);

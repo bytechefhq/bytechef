@@ -29,10 +29,12 @@ import static com.bytechef.component.random.helper.constant.RandomHelperConstant
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Nikolina Spehar
  */
+@SuppressFBWarnings("PREDICTABLE_RANDOM")
 public class RandomHelperRandomStringAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomString")

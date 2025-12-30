@@ -20,6 +20,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.PAT
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PATH_TRAVERSAL_IN")
 class FilesystemMkdirActionTest {
 
     @Test

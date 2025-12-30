@@ -17,6 +17,7 @@
 package com.bytechef.cli.command.component;
 
 import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenApiGenerator;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
@@ -57,6 +58,7 @@ public class ComponentCommand {
         }
     }
 
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private void generateOpenApiComponent(
         String basePackageName, boolean internalComponent, String name, String openApiPath, String outputPath,
         int version) throws Exception {

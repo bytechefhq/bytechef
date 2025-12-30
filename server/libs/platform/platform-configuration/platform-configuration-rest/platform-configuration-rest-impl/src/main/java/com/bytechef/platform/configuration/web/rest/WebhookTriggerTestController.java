@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorage
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
+@SuppressFBWarnings("SPRING_CSRF_UNRESTRICTED_REQUEST_MAPPING")
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebhookTriggerTestController.class);

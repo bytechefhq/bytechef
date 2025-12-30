@@ -16,11 +16,13 @@
 
 package com.bytechef.component.random.helper.constant;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("PREDICTABLE_RANDOM")
 public class RandomHelperConstants {
 
     public static final String ALPHANUMERIC_CHARACTERS =
