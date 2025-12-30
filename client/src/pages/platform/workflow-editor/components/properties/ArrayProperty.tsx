@@ -82,6 +82,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         setArrayItems([...arrayItems, newItem]);
 
         if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
+            if (newItemType === 'OBJECT') {
+                return;
+            }
+
             saveProperty({
                 includeInMetadata: true,
                 path: newItemPath,
