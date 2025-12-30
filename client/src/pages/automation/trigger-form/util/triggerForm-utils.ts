@@ -18,7 +18,6 @@ export type FormInputType = {
     defaultValue?: string;
     fieldDescription?: string;
     fieldLabel?: string;
-    formLabel?: string;
     fieldName: string;
     fieldOptions?: {
         label: string;
@@ -48,6 +47,10 @@ export async function fetchTriggerFormDefinition(
     workflowExecutionId: string,
     signal?: AbortSignal
 ): Promise<TriggerFormType> {
+    if (workflowExecutionId.trim() === '') {
+        throw new Error('Invalid workflowExecutionId: value must be a non-empty string.');
+    }
+
     const res = await fetch(`/api/trigger-form/${workflowExecutionId}`, {
         headers: {
             'Content-Type': 'application/json',

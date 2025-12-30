@@ -1,22 +1,23 @@
-import DatePicker from '@/components/DatePicker/DatePicker';
-import DateTimePicker from '@/components/DateTimePicker/DateTimePicker';
 import {Button} from '@/components/ui/button';
-import {Checkbox} from '@/components/ui/checkbox';
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Textarea} from '@/components/ui/textarea';
+import {Form} from '@/components/ui/form';
+import {PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
 import React, {useEffect, useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import {useParams} from 'react-router-dom';
-import sanitize from 'sanitize-html';
 
+import {CheckboxFieldRenderer} from './components/CheckboxFieldRenderer';
+import {CustomHTMLFieldRenderer} from './components/CustomHTMLFieldRenderer';
+import {DateTimeFieldRenderer} from './components/DateTimeFieldRenderer';
+import {FileInputFieldRenderer} from './components/FileInputFieldRenderer';
+import {HiddenFieldRenderer} from './components/HiddenFieldRenderer';
+import {InputFieldRenderer} from './components/InputFieldRenderer';
+import {RadioFieldRenderer} from './components/RadioFieldRenderer';
+import {SelectFieldRenderer} from './components/SelectFieldRenderer';
+import {TextAreaFieldRenderer} from './components/TextAreaFieldRenderer';
 import {FieldType, FormInputType, TriggerFormType, fetchTriggerFormDefinition} from './util/triggerForm-utils';
 
 export default function TriggerForm() {
-    const {environment, workflowExecutionId} = useParams<{environment: string; workflowExecutionId: string}>();
+    const {environmentId, workflowExecutionId} = useParams<{environmentId: string; workflowExecutionId: string}>();
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -29,80 +30,7 @@ export default function TriggerForm() {
         mode: 'onSubmit',
     });
 
-    useEffect(() => {
-        if (!workflowExecutionId) {
-            return;
-        }
-
-        const controller = new AbortController();
-
-        const fetchDefinition = async () => {
-            setError(null);
-
-            try {
-                const triggerFormDefinition = await fetchTriggerFormDefinition(workflowExecutionId, controller.signal);
-
-                if (controller.signal.aborted) {
-                    return;
-                }
-
-                setDefinition(triggerFormDefinition);
-
-                if (triggerFormDefinition.inputs) {
-                    const defaultValues: Record<string, unknown> = {};
-
-                    triggerFormDefinition.inputs.forEach((input) => {
-                        if (input.fieldType === FieldType.CUSTOM_HTML) {
-                            return;
-                        }
-
-                        if (input.defaultValue !== undefined) {
-                            if (input.fieldType === FieldType.CHECKBOX) {
-                                defaultValues[input.fieldName] = !!input.defaultValue;
-                            } else {
-                                defaultValues[input.fieldName] = input.defaultValue;
-                            }
-                        }
-                    });
-
-                    form.reset(defaultValues);
-                }
-            } catch (e: unknown) {
-                if (e instanceof Error && e.name === 'AbortError') {
-                    return;
-                }
-
-                setError(e instanceof Error ? e.message : 'Failed to load trigger definition');
-            } finally {
-                if (!controller.signal.aborted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchDefinition();
-
-        return () => {
-            controller.abort();
-        };
-    }, [form, workflowExecutionId]);
-
-    const ui = useMemo(() => {
-        if (!definition) {
-            return null;
-        }
-
-        const {appendAttribution, buttonLabel, customFormStyling, formDescription, formTitle, inputs} = definition;
-
-        return {
-            appendAttribution: appendAttribution ?? true,
-            buttonLabel: buttonLabel || 'Submit',
-            customFormStyling: customFormStyling || '',
-            inputs: inputs || [],
-            subtitle: formDescription || '',
-            title: formTitle || 'Form',
-        };
-    }, [definition]);
+    const environmentName = toEnvironmentName(environmentId ? +environmentId : PRODUCTION_ENVIRONMENT);
 
     const handleSubmit = async (values: Record<string, unknown>) => {
         if (!workflowExecutionId) return;
@@ -172,6 +100,81 @@ export default function TriggerForm() {
         }
     };
 
+    const ui = useMemo(() => {
+        if (!definition) {
+            return null;
+        }
+
+        const {appendAttribution, buttonLabel, customFormStyling, formDescription, formTitle, inputs} = definition;
+
+        return {
+            appendAttribution: appendAttribution ?? true,
+            buttonLabel: buttonLabel || 'Submit',
+            customFormStyling: customFormStyling,
+            inputs: inputs || [],
+            subtitle: formDescription || '',
+            title: formTitle || 'Form',
+        };
+    }, [definition]);
+
+    useEffect(() => {
+        if (!workflowExecutionId) {
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const fetchDefinition = async () => {
+            setError(null);
+
+            try {
+                const triggerFormDefinition = await fetchTriggerFormDefinition(workflowExecutionId, controller.signal);
+
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setDefinition(triggerFormDefinition);
+
+                if (triggerFormDefinition.inputs) {
+                    const defaultValues: Record<string, unknown> = {};
+
+                    triggerFormDefinition.inputs.forEach((input) => {
+                        if (input.fieldType === FieldType.CUSTOM_HTML) {
+                            return;
+                        }
+
+                        if (input.defaultValue !== undefined) {
+                            if (input.fieldType === FieldType.CHECKBOX) {
+                                defaultValues[input.fieldName] = !!input.defaultValue;
+                            } else {
+                                defaultValues[input.fieldName] = input.defaultValue;
+                            }
+                        }
+                    });
+
+                    form.reset(defaultValues);
+                }
+            } catch (e: unknown) {
+                if (e instanceof Error && e.name === 'AbortError') {
+                    return;
+                }
+
+                setError(e instanceof Error ? e.message : 'Failed to load trigger definition');
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchDefinition();
+
+        return () => {
+            controller.abort();
+        };
+    }, [form, workflowExecutionId]);
+
     if (loading) {
         return (
             <div className="h-full overflow-auto">
@@ -215,385 +218,44 @@ export default function TriggerForm() {
     }
 
     const renderField = (name: string, formInput: Partial<FormInputType>) => {
-        const {
-            defaultValue,
-            fieldDescription,
-            fieldLabel,
-            fieldName,
-            fieldOptions,
-            fieldType,
-            formLabel,
-            maxSelection,
-            minSelection,
-            multipleChoice,
-            placeholder,
-            required,
-        } = formInput;
-
-        if (fieldType === FieldType.HIDDEN_FIELD) {
-            return <input name={name} readOnly type="hidden" value={defaultValue?.toString() ?? ''} />;
-        }
-
-        const label = formLabel || fieldLabel || fieldName || name;
+        const {fieldType} = formInput;
 
         switch (fieldType) {
+            case FieldType.HIDDEN_FIELD:
+                return <HiddenFieldRenderer form={form} formInput={formInput} name={name} />;
             case FieldType.INPUT:
             case FieldType.EMAIL_INPUT:
             case FieldType.NUMBER_INPUT:
-            case FieldType.PASSWORD_INPUT: {
-                const type =
-                    fieldType === FieldType.EMAIL_INPUT
-                        ? 'email'
-                        : fieldType === FieldType.NUMBER_INPUT
-                          ? 'number'
-                          : fieldType === FieldType.PASSWORD_INPUT
-                            ? 'password'
-                            : 'text';
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <FormControl>
-                                    <Input
-                                        placeholder={placeholder}
-                                        type={type}
-                                        {...field}
-                                        value={
-                                            typeof field.value === 'string' || typeof field.value === 'number'
-                                                ? field.value
-                                                : ''
-                                        }
-                                    />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.TEXTAREA: {
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <FormControl>
-                                    <Textarea
-                                        placeholder={placeholder}
-                                        {...field}
-                                        value={typeof field.value === 'string' ? field.value : ''}
-                                    />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.SELECT: {
-                const options = fieldOptions || [];
-
-                if (multipleChoice) {
-                    return (
-                        <FormField
-                            control={form.control}
-                            name={name}
-                            render={({field}) => (
-                                <FormItem className="space-y-2">
-                                    <FormLabel>{label}</FormLabel>
-
-                                    {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                    <div className="flex flex-col gap-2">
-                                        {options.map((opt) => (
-                                            <label className="flex items-center gap-2 text-sm" key={opt.value}>
-                                                <Checkbox
-                                                    checked={
-                                                        Array.isArray(field.value)
-                                                            ? field.value.includes(opt.value)
-                                                            : false
-                                                    }
-                                                    onCheckedChange={(checked) => {
-                                                        const current: string[] = Array.isArray(field.value)
-                                                            ? field.value
-                                                            : [];
-                                                        if (checked) {
-                                                            if (
-                                                                maxSelection &&
-                                                                maxSelection > 0 &&
-                                                                current.length >= maxSelection
-                                                            ) {
-                                                                return;
-                                                            }
-                                                            field.onChange([...current, opt.value]);
-                                                        } else {
-                                                            field.onChange(current.filter((v) => v !== opt.value));
-                                                        }
-                                                    }}
-                                                />
-
-                                                <span>{opt.label}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{
-                                required: required ? 'Required' : false,
-                                validate: (value: unknown) => {
-                                    if (!Array.isArray(value)) {
-                                        return true;
-                                    }
-
-                                    if (minSelection && minSelection > 0 && value.length < minSelection) {
-                                        return `Select at least ${minSelection} option${minSelection > 1 ? 's' : ''}`;
-                                    }
-
-                                    if (maxSelection && maxSelection > 0 && value.length > maxSelection) {
-                                        return `Select at most ${maxSelection} option${maxSelection > 1 ? 's' : ''}`;
-                                    }
-
-                                    return true;
-                                },
-                            }}
-                        />
-                    );
-                }
-
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <Select
-                                    onValueChange={field.onChange}
-                                    value={typeof field.value === 'string' ? field.value : undefined}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={placeholder || 'Select...'} />
-                                        </SelectTrigger>
-                                    </FormControl>
-
-                                    <SelectContent>
-                                        {options.map((opt) => (
-                                            <SelectItem key={opt.value} value={opt.value}>
-                                                {opt.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.RADIO: {
-                const options = fieldOptions || [];
-
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <div className="flex flex-col gap-2">
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        value={typeof field.value === 'string' ? field.value : undefined}
-                                    >
-                                        <div className="flex items-center space-x-2">
-                                            {options.map((opt) => (
-                                                <div className="flex items-center space-x-2" key={opt.value}>
-                                                    <RadioGroupItem id={`${name}-${opt.value}`} value={opt.value} />
-
-                                                    <Label htmlFor={`${name}-${opt.value}`}>{opt.label}</Label>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </RadioGroup>
-                                </div>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.CHECKBOX: {
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <div className="flex items-center space-x-2">
-                                    <FormControl>
-                                        <Checkbox checked={!!field.value} onCheckedChange={field.onChange} />
-                                    </FormControl>
-
-                                    <FormLabel className="font-normal">{placeholder || label}</FormLabel>
-                                </div>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
+            case FieldType.PASSWORD_INPUT:
+                return <InputFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.TEXTAREA:
+                return <TextAreaFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.SELECT:
+                return <SelectFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.RADIO:
+                return <RadioFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.CHECKBOX:
+                return <CheckboxFieldRenderer form={form} formInput={formInput} name={name} />;
             case FieldType.DATE_PICKER:
-            case FieldType.DATETIME_PICKER: {
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <FormControl>
-                                    {fieldType === FieldType.DATE_PICKER ? (
-                                        <DatePicker
-                                            onChange={(date) => field.onChange(date?.toISOString())}
-                                            value={field.value ? new Date(field.value as string) : undefined}
-                                        />
-                                    ) : (
-                                        <DateTimePicker
-                                            onChange={(date) => field.onChange(date?.toISOString())}
-                                            value={field.value ? new Date(field.value as string) : undefined}
-                                        />
-                                    )}
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.FILE_INPUT: {
-                return (
-                    <Controller
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <FormControl>
-                                    <div>
-                                        <input
-                                            onChange={(e) => field.onChange(e.target.files?.[0] || null)}
-                                            type="file"
-                                        />
-                                    </div>
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required}}
-                    />
-                );
-            }
-            case FieldType.CUSTOM_HTML: {
-                return (
-                    <div className="space-y-2">
-                        {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                        <div
-                            className="prose max-w-none"
-                            dangerouslySetInnerHTML={{
-                                __html: sanitize(defaultValue ?? '', {
-                                    allowedAttributes: {
-                                        div: ['class'],
-                                        table: ['class'],
-                                        td: ['class'],
-                                        tr: ['class'],
-                                    },
-                                }),
-                            }}
-                        />
-                    </div>
-                );
-            }
+            case FieldType.DATETIME_PICKER:
+                return <DateTimeFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.FILE_INPUT:
+                return <FileInputFieldRenderer form={form} formInput={formInput} name={name} />;
+            case FieldType.CUSTOM_HTML:
+                return <CustomHTMLFieldRenderer formInput={formInput} />;
             default:
-                return (
-                    <FormField
-                        control={form.control}
-                        name={name}
-                        render={({field}) => (
-                            <FormItem className="space-y-2">
-                                <FormLabel>{label}</FormLabel>
-
-                                {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
-
-                                <FormControl>
-                                    <Input
-                                        placeholder={placeholder}
-                                        {...field}
-                                        value={
-                                            typeof field.value === 'string' || typeof field.value === 'number'
-                                                ? field.value
-                                                : ''
-                                        }
-                                    />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                );
+                return <InputFieldRenderer form={form} formInput={formInput} name={name} />;
         }
     };
 
     return (
         <div className="h-full overflow-auto">
             <div className="mx-auto w-full max-w-2xl p-6">
-                {environment !== 'production' && (
+                {+(environmentId ?? PRODUCTION_ENVIRONMENT) !== PRODUCTION_ENVIRONMENT && (
                     <div className="mb-4 space-x-1 uppercase">
                         <span>Environment:</span>
 
-                        <span className="font-semibold">{environment}</span>
+                        <span className="font-semibold">{environmentName}</span>
                     </div>
                 )}
 
