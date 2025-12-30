@@ -213,6 +213,7 @@ export default [
             'right-data-pill-panel-placement',
             'right-minimap-placement',
             'rounded-xs',
+            'size-18',
             'sm:max-w-workflow-inputs-sheet-width',
             'stroke-destructive',
             'text-accent-foreground',
