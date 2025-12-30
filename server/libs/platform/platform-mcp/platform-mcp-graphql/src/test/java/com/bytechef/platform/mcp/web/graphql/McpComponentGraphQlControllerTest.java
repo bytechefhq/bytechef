@@ -37,7 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * Integration test for {@link McpComponentGraphQlController}. This test focuses on testing the GraphQL layer with
  * mocked service dependencies.
  *
- * @author ByteChef
+ * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
 public class McpComponentGraphQlControllerTest {

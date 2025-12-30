@@ -1,6 +1,6 @@
 /**
  * @fileoverview Bytechef ESLint plugin
- * @author Bytechef
+ * @author Ivica Cardic
  */
 'use strict';
 

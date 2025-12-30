@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
  * GraphQL controller for managing MCP Server configuration. Provides read/write access to platform-level property
  * "mcp.server.key".
  *
- * @author ByteChef
+ * @author Ivica Cardic
  */
 @Controller
 class ManagementMcpServerGraphQlController {
