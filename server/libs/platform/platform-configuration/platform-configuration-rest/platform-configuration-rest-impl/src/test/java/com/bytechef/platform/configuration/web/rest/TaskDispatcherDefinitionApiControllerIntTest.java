@@ -16,6 +16,11 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -23,13 +28,13 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -37,7 +42,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = PlatformConfigurationRestTestConfiguration.class)
 @WebMvcTest(TaskDispatcherDefinitionApiController.class)
 @WorkflowConfigurationRestTestConfigurationSharedMocks
@@ -51,15 +55,23 @@ public class TaskDispatcherDefinitionApiControllerIntTest {
 
     private WebTestClient webTestClient;
 
+    @MockitoBean
+    private JobPrincipalAccessor jobPrincipalAccessor;
+
+    @MockitoBean
+    private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+
     @BeforeEach
     public void beforeEach() {
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
+
         this.webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
     }
 
     @Test
     public void testGetTaskDispatcherDefinitions() {
-        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
             .thenReturn(
                 List.of(
                     new TaskDispatcherDefinition("task-dispatcher1"),
@@ -68,7 +80,7 @@ public class TaskDispatcherDefinitionApiControllerIntTest {
         try {
             webTestClient
                 .get()
-                .uri("/internal/core/task-dispatcher-definitions")
+                .uri("/internal/task-dispatcher-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
