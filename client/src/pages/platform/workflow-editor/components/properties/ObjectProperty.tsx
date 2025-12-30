@@ -168,7 +168,9 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     if (dynamicKey.startsWith(pathPrefix)) {
                         const subPropertyName = dynamicKey.substring(pathPrefix.length);
 
-                        if (subPropertyName && !subPropertyName.includes('.')) {
+                        const isArrayIndexPattern = /\[\d+\]/.test(subPropertyName);
+
+                        if (subPropertyName && !subPropertyName.includes('.') && !isArrayIndexPattern) {
                             if (!subPropertyKeySet.has(subPropertyName)) {
                                 orderedKeys.push(subPropertyName);
 
