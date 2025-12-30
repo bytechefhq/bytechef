@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.ConvertUtils;
@@ -25,11 +26,14 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.TriggerFormDTO;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Ivica Cardic
@@ -50,9 +54,14 @@ public class TriggerFormApiController {
     }
 
     @GetMapping("/api/trigger-form/{id}")
-    @SuppressWarnings("unchecked")
     public ResponseEntity<TriggerFormDTO> getTriggerForm(@PathVariable String id) {
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+        WorkflowExecutionId workflowExecutionId;
+
+        try {
+            workflowExecutionId = WorkflowExecutionId.parse(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, e);
+        }
 
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
             workflowExecutionId.getType());
@@ -60,12 +69,41 @@ public class TriggerFormApiController {
         String workflowId = jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
 
-        WorkflowTrigger workflowTrigger = WorkflowTrigger
-            .of(workflowService.getWorkflow(workflowId))
-            .getFirst();
+        Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        Map<String, Object> parameters = (Map<String, Object>) workflowTrigger.getParameters();
+        if (workflow == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow not found: " + workflowId);
+        }
+
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+        Map<String, Object> parameters = getParameters(workflowExecutionId, workflowId, workflowTriggers);
 
         return ResponseEntity.ok(ConvertUtils.convertValue(parameters, TriggerFormDTO.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> getParameters(
+        WorkflowExecutionId workflowExecutionId, String workflowId, List<WorkflowTrigger> workflowTriggers) {
+
+        String triggerName = workflowExecutionId.getTriggerName();
+
+        WorkflowTrigger workflowTrigger = null;
+
+        for (WorkflowTrigger curWorkflowTrigger : workflowTriggers) {
+            if (triggerName != null && triggerName.equals(curWorkflowTrigger.getName())) {
+                workflowTrigger = curWorkflowTrigger;
+
+                break;
+            }
+        }
+
+        if (workflowTrigger == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Workflow does not contain trigger: " + triggerName + " for workflowId: " + workflowId);
+        }
+
+        return (Map<String, Object>) workflowTrigger.getParameters();
     }
 }

@@ -28,9 +28,9 @@ public record TriggerFormDTO(
     boolean appendAttribution, boolean ignoreBots, boolean useWorkflowTimezone, List<TriggerFormInputDTO> inputs) {
 
     public record TriggerFormInputDTO(
-        String defaultValue, String fieldDescription, String fieldName, List<FieldOptionDTO> fieldOptions,
-        Integer fieldType, Integer maxSelection, Integer minSelection, Boolean multipleChoice, String placeholder,
-        boolean required) {
+        String defaultValue, String fieldDescription, String fieldLabel, String fieldName,
+        List<FieldOptionDTO> fieldOptions, Integer fieldType, Integer maxSelection, Integer minSelection,
+        Boolean multipleChoice, String placeholder, boolean required) {
     }
 
     public record FieldOptionDTO(String label, String value) {

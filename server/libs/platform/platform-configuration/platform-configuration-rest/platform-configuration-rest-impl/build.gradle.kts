@@ -32,6 +32,7 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework:spring-web")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
@@ -53,4 +54,5 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

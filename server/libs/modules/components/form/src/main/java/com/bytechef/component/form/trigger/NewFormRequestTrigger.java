@@ -39,9 +39,20 @@ import static com.bytechef.component.form.constant.FormConstants.FIELD_OPTIONS;
 import static com.bytechef.component.form.constant.FormConstants.FIELD_TYPE;
 import static com.bytechef.component.form.constant.FormConstants.FORM_DESCRIPTION;
 import static com.bytechef.component.form.constant.FormConstants.FORM_TITLE;
-import static com.bytechef.component.form.constant.FormConstants.FieldType.*;
 import static com.bytechef.component.form.constant.FormConstants.FieldType.CHECKBOX;
 import static com.bytechef.component.form.constant.FormConstants.FieldType.CUSTOM_HTML;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.DATETIME_PICKER;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.DATE_PICKER;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.EMAIL_INPUT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.FILE_INPUT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.HIDDEN_FIELD;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.INPUT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.NUMBER_INPUT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.PASSWORD_INPUT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.RADIO;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.SELECT;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.TEXTAREA;
+import static com.bytechef.component.form.constant.FormConstants.FieldType.fromValue;
 import static com.bytechef.component.form.constant.FormConstants.IGNORE_BOTS;
 import static com.bytechef.component.form.constant.FormConstants.INPUTS;
 import static com.bytechef.component.form.constant.FormConstants.MAX_SELECTION;
@@ -91,10 +102,6 @@ public class NewFormRequestTrigger {
                 .label("Form Description")
                 .description("A subtitle shown under the form title. Use \n or <br> for line breaks.")
                 .required(false),
-//            string(FORM_PATH)
-//                .label("Form Path")
-//                .description("Custom slug for the form URL path.")
-//                .required(false),
             string(BUTTON_LABEL)
                 .label("Button Label")
                 .description("Label for the submit button.")
@@ -159,7 +166,8 @@ public class NewFormRequestTrigger {
                                 .description("The placeholder text.")
                                 .required(false)
                                 .displayCondition("contains({%s,%s,%s,%s,%s}, fieldType)".formatted(
-                                    EMAIL_INPUT, INPUT, NUMBER_INPUT, PASSWORD_INPUT, TEXTAREA)),
+                                    EMAIL_INPUT.getValue(), INPUT.getValue(), NUMBER_INPUT.getValue(),
+                                    PASSWORD_INPUT.getValue(), TEXTAREA.getValue())),
                             string(DEFAULT_VALUE)
                                 .label("Default value")
                                 .description("Pre-filled or pre-selected value for compatible fields.")
@@ -185,14 +193,14 @@ public class NewFormRequestTrigger {
                                                 .required(true)))
                                 .required(false)
                                 .displayCondition(
-                                    "contains({%s,%s}, provider)".formatted(RADIO.getValue(), SELECT.getValue())),
+                                    "contains({%s,%s}, fieldType)".formatted(RADIO.getValue(), SELECT.getValue())),
                             bool(MULTIPLE_CHOICE)
                                 .label("Multiple Choice")
                                 .description("Allow multiple selections.")
                                 .defaultValue(false)
                                 .required(false)
                                 .displayCondition(
-                                    "fieldType == %s and multipleChoice == true".formatted(SELECT.getValue())),
+                                    "fieldType == %s".formatted(SELECT.getValue())),
                             integer(MIN_SELECTION)
                                 .label("Min selection")
                                 .description("Minimum selections required.")
@@ -203,7 +211,8 @@ public class NewFormRequestTrigger {
                                 .label("Max selection")
                                 .description("Maximum selections allowed.")
                                 .required(false)
-                                .displayCondition("fieldType == %s".formatted(CHECKBOX.getValue())),
+                                .displayCondition(
+                                    "fieldType == %s and multipleChoice == true".formatted(SELECT.getValue())),
                             bool(REQUIRED)
                                 .label("Required")
                                 .description("Whether this field is required")
@@ -230,7 +239,8 @@ public class NewFormRequestTrigger {
             }
 
             Integer fieldTypeInt = (Integer) input.get(FIELD_TYPE);
-            FieldType fieldType = valueOf(fieldTypeInt);
+
+            FieldType fieldType = fieldTypeInt != null ? fromValue(fieldTypeInt) : INPUT;
 
             ModifiableValueProperty<?, ?> property = switch (fieldType) {
                 case CHECKBOX -> bool(fieldName);
@@ -253,7 +263,7 @@ public class NewFormRequestTrigger {
         return OutputResponse.of(
             object()
                 .properties(
-                    number("submittedAt"),
+                    string("submittedAt"),
                     object("body")
                         .properties(properties.toArray(new ModifiableValueProperty[0]))));
     }
@@ -279,14 +289,14 @@ public class NewFormRequestTrigger {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> bodyContent = new HashMap<>((Map<String, Object>) body.getContent());
+        Map<String, Object> content = new HashMap<>((Map<String, Object>) body.getContent());
 
         boolean useWorkflowTimezone = inputParameters.getBoolean(USE_WORKFLOW_TIMEZONE, false);
 
         if (!useWorkflowTimezone) {
-            bodyContent.put("submittedAt", String.valueOf(Instant.now(Clock.systemUTC())));
+            content.put("submittedAt", String.valueOf(Instant.now(Clock.systemUTC())));
         }
 
-        return bodyContent;
+        return content;
     }
 }

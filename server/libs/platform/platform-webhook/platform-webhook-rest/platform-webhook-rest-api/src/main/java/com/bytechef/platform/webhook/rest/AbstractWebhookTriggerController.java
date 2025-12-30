@@ -401,7 +401,11 @@ public abstract class AbstractWebhookTriggerController {
 
     private Object convertValue(Object value) {
         if (value instanceof String string) {
-            return (string.isBlank()) ? null : ConvertUtils.convertString(string);
+            if (string.isBlank()) {
+                return string;
+            }
+
+            return ConvertUtils.convertString(string);
         }
 
         return value;

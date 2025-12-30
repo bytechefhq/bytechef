@@ -26,6 +26,7 @@ import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.jackson.JacksonComponent;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -44,7 +45,6 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
     private static final String RAW_CONTENT = "rawContent";
 
     @Override
-    @SuppressWarnings("unchecked")
     public WebhookRequest deserialize(JsonParser jp, DeserializationContext ctxt) {
         WebhookBodyImpl webhookBody = null;
 
@@ -54,6 +54,7 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
 
         if (bodyJsonNode != null && !bodyJsonNode.isNull()) {
             Object content;
+            @SuppressWarnings("unchecked")
             Map<String, ?> bodyMap = ctxt.readTreeAsValue(bodyJsonNode, Map.class);
 
             ContentType contentType = ContentType.valueOf(MapUtils.getString(bodyMap, "contentType"));
@@ -79,32 +80,49 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
                 content, contentType, MapUtils.getString(bodyMap, MIME_TYPE), MapUtils.getString(bodyMap, RAW_CONTENT));
         }
 
-        return new WebhookRequest(
-            ctxt.readTreeAsValue(jsonNode.get("headers"), Map.class),
-            ctxt.readTreeAsValue(jsonNode.get("parameters"), Map.class), webhookBody,
-            WebhookMethod.valueOf(getMethod(jsonNode)));
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> headers = ctxt.readTreeAsValue(jsonNode.get("headers"), Map.class);
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> parameters = ctxt.readTreeAsValue(jsonNode.get("parameters"), Map.class);
+
+        return new WebhookRequest(headers, parameters, webhookBody, WebhookMethod.valueOf(getMethod(jsonNode)));
     }
 
     private static Map<String, Object> checkFormDataWebhookBodyContent(Map<String, ?> content) {
         return MapUtils.toMap(content, Map.Entry::getKey, WebhookRequestDeserializer::checkValue);
     }
 
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    private static Object checkValue(Map.Entry<String, ?> entry) {
-        if (entry.getValue() instanceof Map map) {
-            if (FileEntry.isFileEntryMap(map)) {
-                return new FileEntryImpl(
-                    MapUtils.getRequiredString(map, "name"), MapUtils.getString(map, "extension"),
-                    MapUtils.getString(map, MIME_TYPE), MapUtils.getRequiredString(map, "url"));
-            } else {
-                return MapUtils.toMap(map, Map.Entry::getKey, WebhookRequestDeserializer::checkValue);
-            }
-        } else if (entry.getValue() instanceof List list) {
-            return CollectionUtils.map(list, WebhookRequestDeserializer::checkValue);
+    private static Object checkListItem(Object item) {
+        if (item instanceof Map<?, ?> map) {
+            return checkValue(map);
+        } else if (item instanceof List<?> list) {
+            return CollectionUtils.map(list, WebhookRequestDeserializer::checkListItem);
+        } else {
+            return item;
+        }
+    }
+
+    private static Object checkValue(Map.Entry<?, ?> entry) {
+        if (entry.getValue() instanceof Map<?, ?> map) {
+            return checkValue(map);
+        } else if (entry.getValue() instanceof List<?> list) {
+            return CollectionUtils.map(list, WebhookRequestDeserializer::checkListItem);
         } else {
             return entry.getValue();
+        }
+    }
+
+    @NonNull
+    private static Object checkValue(Map<?, ?> map) {
+        if (FileEntry.isFileEntryMap(map)) {
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> objectMap = (Map<Object, Object>) map;
+
+            return new FileEntryImpl(
+                MapUtils.getRequiredString(objectMap, "name"), MapUtils.getString(objectMap, "extension"),
+                MapUtils.getString(objectMap, MIME_TYPE), MapUtils.getRequiredString(objectMap, "url"));
+        } else {
+            return MapUtils.toMap(map, Map.Entry::getKey, WebhookRequestDeserializer::checkValue);
         }
     }
 
