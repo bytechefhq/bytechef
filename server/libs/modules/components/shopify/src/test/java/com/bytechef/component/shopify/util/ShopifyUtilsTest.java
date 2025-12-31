@@ -18,7 +18,6 @@ package com.bytechef.component.shopify.util;
 
 import static com.bytechef.component.shopify.constant.ShopifyConstants.QUERY;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.VARIABLES;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
 import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -52,36 +53,16 @@ import org.mockito.ArgumentCaptor;
 class ShopifyUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(Http.Configuration.ConfigurationBuilder.class);
+        forClass(ConfigurationBuilder.class);
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
         forClass(ContextFunction.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Http mockedHttp = mock(Http.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-
-    @Test
-    void testCheckForUserErrorProviderException() {
-        Map<String, Object> mockedContent = Map.of(
-            "userErrors", List.of(
-                Map.of("message", "Error occurred", "field", "orderId")));
-
-        ProviderException exception = assertThrows(ProviderException.class, () -> checkForUserError(mockedContent));
-
-        assertEquals("Error occurred", exception.getMessage());
-    }
-
-    @Test
-    void testCheckForUserErrorNoUserError() {
-        Map<String, Object> mockedContent = Map.of(
-            "data", "some data",
-            "status", "success");
-
-        assertDoesNotThrow(() -> checkForUserError(mockedContent));
-    }
 
     @Test
     void testSendGraphQlQuery() {
@@ -106,7 +87,8 @@ class ShopifyUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Map<String, Object> result = sendGraphQlQuery(mockedQuery, mockedContext, mockedVariables);
+        Map<String, Object> result =
+            assertDoesNotThrow(() -> sendGraphQlQuery(mockedQuery, mockedContext, mockedVariables));
 
         assertEquals(Map.of(), result);
 
@@ -127,5 +109,69 @@ class ShopifyUtilsTest {
 
         assertEquals(Type.JSON, responseType.getType());
         assertEquals("/2025-10/graphql.json", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testSendGraphQlQueryThrowsProviderException() {
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Executor> value = httpFunctionArgumentCaptor.getValue();
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("errors", List.of(Map.of("message", "Top-level error"))));
+
+        ProviderException ex = assertThrows(
+            ProviderException.class,
+            () -> sendGraphQlQuery("queryWithErrors", mockedContext, Map.of()));
+
+        assertEquals("Top-level error", ex.getMessage());
+    }
+
+    @Test
+    void testExecuteGraphQlOperationReturnsContent() {
+        String query = "mutation { doSomething }";
+        Map<String, Object> variables = Map.of("key", "value");
+        String dataKey = "operationResult";
+
+        Map<String, Object> expectedContent = Map.of("id", 123, "status", "OK");
+
+        try (MockedStatic<ShopifyUtils> utils = Mockito.mockStatic(ShopifyUtils.class, Mockito.CALLS_REAL_METHODS)) {
+            utils.when(() -> sendGraphQlQuery(query, mockedContext, variables))
+                .thenReturn(Map.of(dataKey, expectedContent));
+
+            Object result = ShopifyUtils.executeGraphQlOperation(query, mockedContext, variables, dataKey);
+
+            assertEquals(expectedContent, result);
+        }
+    }
+
+    @Test
+    void testExecuteGraphQlOperationThrowsOnUserErrors() {
+        String query = "mutation { doSomething }";
+        Map<String, Object> variables = Map.of();
+        String dataKey = "operationResult";
+
+        Map<String, Object> contentWithErrors = Map.of(
+            "userErrors", List.of(Map.of("message", "User-level error")));
+
+        try (MockedStatic<ShopifyUtils> utils = Mockito.mockStatic(ShopifyUtils.class, Mockito.CALLS_REAL_METHODS)) {
+            utils.when(() -> sendGraphQlQuery(query, mockedContext, variables))
+                .thenReturn(Map.of(dataKey, contentWithErrors));
+
+            ProviderException ex = assertThrows(
+                ProviderException.class,
+                () -> ShopifyUtils.executeGraphQlOperation(query, mockedContext, variables, dataKey));
+
+            assertEquals("User-level error", ex.getMessage());
+        }
     }
 }

@@ -27,8 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
 import com.bytechef.component.shopify.util.ShopifyUtils;
@@ -44,32 +44,32 @@ import org.junit.jupiter.api.Test;
 class ShopifyCreateOrderActionTest extends AbstractShopifyActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Object mockedObject = Map.of("orderCreate", Map.of());
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(PRODUCTS, List.of(Map.of(PRODUCT_ID, "productId", QUANTITY, 2))));
 
     @Test
     void testPerform() throws Exception {
         shopifyUtilsMockedStatic
-            .when(() -> ShopifyUtils.sendGraphQlQuery(
+            .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
                 actionContextArgumentCaptor.capture(),
-                (Map<String, Object>) objectArgumentCaptor.capture()))
-            .thenReturn(mockedObject);
+                mapArgumentCaptor.capture(),
+                stringArgumentCaptor.capture()))
+            .thenReturn(Map.of());
 
         shopifyOptionsUtilsMockedStatic.when(
             () -> ShopifyOptionsUtils.getLineItemsList(
-                actionContextArgumentCaptor.capture(), (List<Object>) objectArgumentCaptor.capture()))
+                actionContextArgumentCaptor.capture(), listArgumentCaptor.capture()))
             .thenReturn(List.of(Map.of(VARIANT_ID, "variantId", QUANTITY, 2)));
 
-        Optional<PerformFunction> performFunction = ShopifyCreateOrderAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> basePerformFunction =
+            ShopifyCreateOrderAction.ACTION_DEFINITION.getPerform();
 
-        assertTrue(performFunction.isPresent());
+        assertTrue(basePerformFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
 
-        Object result = singleConnectionPerformFunction.apply(
+        Object result = performFunction.apply(
             mockedParameters, null, mockedActionContext);
 
         assertEquals(Map.of(), result);
@@ -102,8 +102,9 @@ class ShopifyCreateOrderActionTest extends AbstractShopifyActionTest {
         Map<String, Object> expectedVariables = Map.of(
             ORDER, Map.of(LINE_ITEMS, List.of(Map.of(VARIANT_ID, "variantId", QUANTITY, 2))));
 
-        assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-        assertEquals(List.of(expectedList, expectedVariables), objectArgumentCaptor.getAllValues());
+        assertEquals(List.of(expectedQuery, "orderCreate"), stringArgumentCaptor.getAllValues());
+        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
+        assertEquals(expectedList, listArgumentCaptor.getValue());
         assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
     }
 }

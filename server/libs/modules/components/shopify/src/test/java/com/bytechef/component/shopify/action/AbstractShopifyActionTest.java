@@ -23,6 +23,8 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.shopify.util.ShopifyOptionsUtils;
 import com.bytechef.component.shopify.util.ShopifyUtils;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
@@ -31,23 +33,26 @@ import org.mockito.MockedStatic;
 /**
  * @author Nikolina Spehar
  */
-public abstract class AbstractShopifyActionTest {
+abstract class AbstractShopifyActionTest {
 
     protected final ArgumentCaptor<ActionContext> actionContextArgumentCaptor = forClass(ActionContext.class);
     protected final ActionContext mockedActionContext = mock(ActionContext.class);
-    protected final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
+    @SuppressWarnings("unchecked")
+    protected final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = forClass(Map.class);
+    @SuppressWarnings("unchecked")
+    protected final ArgumentCaptor<List<Object>> listArgumentCaptor = forClass(List.class);
     protected MockedStatic<ShopifyUtils> shopifyUtilsMockedStatic;
     protected MockedStatic<ShopifyOptionsUtils> shopifyOptionsUtilsMockedStatic;
     protected final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         shopifyUtilsMockedStatic = mockStatic(ShopifyUtils.class);
         shopifyOptionsUtilsMockedStatic = mockStatic(ShopifyOptionsUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         shopifyUtilsMockedStatic.close();
         shopifyOptionsUtilsMockedStatic.close();
     }
