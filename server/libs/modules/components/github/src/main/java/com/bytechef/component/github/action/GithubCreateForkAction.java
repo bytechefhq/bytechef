@@ -60,9 +60,10 @@ public class GithubCreateForkAction {
                 .description("The organization name if forking into an organization.")
                 .required(false),
             bool(DEFAULT_BRANCH_ONLY)
-                .label("Default branch only")
+                .label("Default Branch Only")
                 .description("When forking from an existing repository, fork with only the default branch.")
-                .defaultValue(true))
+                .defaultValue(true)
+                .required(false))
         .output(
             outputSchema(
                 object()
@@ -77,10 +78,14 @@ public class GithubCreateForkAction {
                             .description("The full name of the forked repository including owner."),
                         object("owner")
                             .properties(
-                                string("login").description("Username of the repository owner."),
-                                string("id").description("ID of the repository owner."),
-                                string("node_id").description("Node ID of the owner."),
-                                string("url").description("URL of the owner."))
+                                string("login")
+                                    .description("Username of the repository owner."),
+                                string("id")
+                                    .description("ID of the repository owner."),
+                                string("node_id")
+                                    .description("Node ID of the owner."),
+                                string("url")
+                                    .description("URL of the owner."))
                             .description("Owner information."),
                         bool("private")
                             .description("Indicates if the forked repository is private."),
@@ -105,14 +110,14 @@ public class GithubCreateForkAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.post(
-                "/repos/" + inputParameters.getRequiredString(OWNER) + "/"
-                    + inputParameters.getRequiredString(REPOSITORY) + "/forks"))
-            .body(Http.Body.of(
-                NAME, inputParameters.getString(NAME),
-                ORGANIZATION, inputParameters.getString(ORGANIZATION),
-                DEFAULT_BRANCH_ONLY, inputParameters.getBoolean(DEFAULT_BRANCH_ONLY)))
+        return context.http(
+            http -> http.post("/repos/%s/%s/forks".formatted(
+                inputParameters.getRequiredString(OWNER), inputParameters.getRequiredString(REPOSITORY))))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    ORGANIZATION, inputParameters.getString(ORGANIZATION),
+                    DEFAULT_BRANCH_ONLY, inputParameters.getBoolean(DEFAULT_BRANCH_ONLY)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

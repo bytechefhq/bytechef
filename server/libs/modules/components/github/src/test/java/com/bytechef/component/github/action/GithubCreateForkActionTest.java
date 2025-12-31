@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -52,11 +52,10 @@ class GithubCreateForkActionTest extends AbstractGithubActionTest {
 
         assertEquals(Map.of(), result);
         assertEquals("/repos/testOwner/testRepo/forks", stringArgumentCaptor.getValue());
-
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(NAME, "name", ORGANIZATION, "testOrganization",
-            DEFAULT_BRANCH_ONLY, true), body.getContent());
+        assertEquals(
+            Http.Body.of(
+                Map.of(NAME, "name", ORGANIZATION, "testOrganization", DEFAULT_BRANCH_ONLY, true),
+                Http.BodyContentType.JSON),
+            bodyArgumentCaptor.getValue());
     }
-
 }
