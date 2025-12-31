@@ -18,8 +18,6 @@ package com.bytechef.component.agile.crm.trigger;
 
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.CREATED_TIME;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.LAST_TIME_CHECKED;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -40,13 +38,12 @@ import java.util.Map;
  * @author Nikolina Spehar
  */
 public class AgileCrmNewTaskTrigger {
+
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newTask")
         .title("New Task")
         .description("Triggers when a new task is added.")
         .type(TriggerType.POLLING)
-        .properties()
-        .output(
-            outputSchema(object()))
+        .output()
         .poll(AgileCrmNewTaskTrigger::poll);
 
     private AgileCrmNewTaskTrigger() {
@@ -58,12 +55,10 @@ public class AgileCrmNewTaskTrigger {
 
         Instant now = Instant.now();
 
-        long lastTimeCheckedEpoch = closureParameters.getLong(
-            LAST_TIME_CHECKED, triggerContext.isEditorEnvironment()
-                ? Instant.now()
-                    .minus(3, ChronoUnit.HOURS)
-                    .getEpochSecond()
-                : now.getEpochSecond());
+        Instant lastTimeCheckedEpoch = closureParameters.get(
+            LAST_TIME_CHECKED,
+            Instant.class,
+            triggerContext.isEditorEnvironment() ? now.minus(3, ChronoUnit.HOURS) : now);
 
         List<Map<String, Object>> tasks = triggerContext.http(http -> http.get("/tasks/based"))
             .configuration(responseType(ResponseType.JSON))
@@ -73,11 +68,11 @@ public class AgileCrmNewTaskTrigger {
         List<Map<String, Object>> newTasks = new ArrayList<>();
 
         for (Map<String, Object> task : tasks) {
-            if ((Integer) task.get(CREATED_TIME) >= lastTimeCheckedEpoch) {
+            if ((Integer) task.get(CREATED_TIME) >= lastTimeCheckedEpoch.getEpochSecond()) {
                 newTasks.add(task);
             }
         }
 
-        return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now.getEpochSecond()), false);
+        return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }
