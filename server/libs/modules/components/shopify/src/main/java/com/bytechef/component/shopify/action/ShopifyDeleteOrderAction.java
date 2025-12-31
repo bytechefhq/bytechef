@@ -22,10 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -46,7 +45,7 @@ public class ShopifyDeleteOrderAction {
                 .label("Order ID")
                 .description("ID of the order to delete.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
         .output(
             outputSchema(
                 object()
@@ -74,12 +73,6 @@ public class ShopifyDeleteOrderAction {
 
         Map<String, Object> variables = Map.of(ORDER_ID, inputParameters.getRequiredString(ORDER_ID));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        Object bodyContent = body.get("orderDelete");
-
-        checkForUserError(bodyContent);
-
-        return bodyContent;
+        return executeGraphQlOperation(query, context, variables, "orderDelete");
     }
 }

@@ -41,6 +41,7 @@ public class ShopifyConnection {
             .formatted(connectionParameters.getRequiredString(SHOP_NAME)))
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
                 .properties(
                     string(SHOP_NAME)
                         .label("Shop Name")

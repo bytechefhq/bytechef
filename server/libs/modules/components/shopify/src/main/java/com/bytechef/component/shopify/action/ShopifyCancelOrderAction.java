@@ -30,10 +30,9 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.REFUND_ME
 import static com.bytechef.component.shopify.constant.ShopifyConstants.RESTOCK;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.STAFF_NOTE;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -47,7 +46,7 @@ import java.util.Map;
 public class ShopifyCancelOrderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("cancelOrder")
-        .title("Cancel an order")
+        .title("Cancel Order")
         .description(
             "Cancels an order, with options for refunding, restocking inventory, and customer notification." +
                 "Order cancellation is irreversible.")
@@ -56,7 +55,7 @@ public class ShopifyCancelOrderAction {
                 .label("Order ID")
                 .description("ID of the order to cancel.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions),
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions),
             string(REASON)
                 .label("Reason")
                 .description("The reason for canceling the order.")
@@ -109,9 +108,7 @@ public class ShopifyCancelOrderAction {
     private ShopifyCancelOrderAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String query = """
             mutation OrderCancel(
               $orderId: ID!
@@ -150,18 +147,10 @@ public class ShopifyCancelOrderAction {
             ORDER_ID, inputParameters.getRequiredString(ORDER_ID),
             REASON, inputParameters.getRequiredString(REASON),
             REFUND_METHOD,
-            Map.of(
-                ORIGINAL_PAYMENT_METHODS_REFUND,
-                inputParameters.getBoolean(ORIGINAL_PAYMENT_METHODS_REFUND)),
+            Map.of(ORIGINAL_PAYMENT_METHODS_REFUND, inputParameters.getBoolean(ORIGINAL_PAYMENT_METHODS_REFUND)),
             RESTOCK, inputParameters.getRequiredBoolean(RESTOCK),
             STAFF_NOTE, inputParameters.getString(STAFF_NOTE, ""));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        Object bodyContent = body.get("orderCancel");
-
-        checkForUserError(bodyContent);
-
-        return bodyContent;
+        return executeGraphQlOperation(query, context, variables, "orderCancel");
     }
 }

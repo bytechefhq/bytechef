@@ -27,10 +27,9 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.INPUT;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -53,7 +52,7 @@ public class ShopifyCloseOrderAction {
                 .label("Order ID")
                 .description("ID of the order to close.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions))
         .output(
             outputSchema(
                 object()
@@ -109,12 +108,6 @@ public class ShopifyCloseOrderAction {
 
         Map<String, Object> variables = Map.of(INPUT, Map.of(ID, inputParameters.getRequiredString(ORDER_ID)));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        Object bodyContent = body.get("orderClose");
-
-        checkForUserError(bodyContent);
-
-        return bodyContent;
+        return executeGraphQlOperation(query, context, variables, "orderClose");
     }
 }

@@ -37,39 +37,52 @@ public class ShopifyUtils {
     private ShopifyUtils() {
     }
 
-    public static void checkForUserError(Object content) {
-        if (content instanceof Map<?, ?> contentMap
-            && contentMap.get("userErrors") instanceof List<?> userErrors
-            && userErrors.getFirst() instanceof Map<?, ?> userError) {
+    public static Object executeGraphQlOperation(
+        String query, Context context, Map<String, Object> variables, String dataKey) {
 
-            throw new ProviderException((String) userError.get("message"));
-        }
+        Map<String, Object> data = sendGraphQlQuery(query, context, variables);
+
+        Object content = data.get(dataKey);
+
+        checkForUserError(content);
+
+        return content;
     }
 
     public static Map<String, Object> sendGraphQlQuery(
         String query, Context context, Map<String, Object> variables) {
 
-        Map<String, Object> body = context
+        Map<String, Map<String, Object>> body = context
             .http(http -> http.post("/2025-10/graphql.json"))
             .configuration(Http.responseType(ResponseType.JSON))
-            .body(
-                Body.of(
-                    Map.of(
-                        QUERY, query,
-                        VARIABLES, variables)))
+            .body(Body.of(QUERY, query, VARIABLES, variables))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        checkIfErrorResponse(body);
+        checkForErrors(body.get("errors"));
 
-        return (Map<String, Object>) body.get("data");
+        return body.get("data");
     }
 
-    private static void checkIfErrorResponse(Map<String, Object> response) {
-        if (response.get("errors") instanceof List<?> errors
-            && errors.getFirst() instanceof Map<?, ?> error) {
+    private static void checkForUserError(Object content) {
+        if (content instanceof Map<?, ?> contentMap) {
+            Object userErrorsObj = contentMap.get("userErrors");
 
-            throw new ProviderException((String) error.get("message"));
+            checkForErrors(userErrorsObj);
+        }
+    }
+
+    private static void checkForErrors(Object userErrorsObj) {
+        if (userErrorsObj instanceof List<?> userErrors && !userErrors.isEmpty()) {
+            Object first = userErrors.getFirst();
+
+            if (first instanceof Map<?, ?> userError) {
+                Object message = userError.get("message");
+
+                if (message instanceof String msg && !msg.isBlank()) {
+                    throw new ProviderException(msg);
+                }
+            }
         }
     }
 }

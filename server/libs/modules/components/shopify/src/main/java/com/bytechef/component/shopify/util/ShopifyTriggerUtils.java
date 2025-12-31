@@ -32,7 +32,6 @@ public class ShopifyTriggerUtils {
     }
 
     public static String subscribeWebhook(String webhookUrl, String topic, Context context) {
-
         String query = """
             mutation WebhookSubscriptionCreate(
               $topic: WebhookSubscriptionTopic!
@@ -57,14 +56,13 @@ public class ShopifyTriggerUtils {
             """;
 
         Map<String, Object> variables = Map.of(
-            "topic", topic,
-            "webhookSubscription", Map.of(
-                "uri", webhookUrl));
+            "topic", topic, "webhookSubscription", Map.of("uri", webhookUrl));
 
         Map<String, Object> body = sendGraphQlQuery(query, context, variables);
 
-        if (body.get("webhookSubscriptionCreate") instanceof Map<?, ?> webhookSubscriptionCreate
-            && webhookSubscriptionCreate.get("webhookSubscription") instanceof Map<?, ?> webhookSubscription) {
+        if (body.get("webhookSubscriptionCreate") instanceof Map<?, ?> webhookSubscriptionCreate &&
+            webhookSubscriptionCreate.get("webhookSubscription") instanceof Map<?, ?> webhookSubscription) {
+
             return (String) webhookSubscription.get(ID);
         }
 
