@@ -30,8 +30,7 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_I
 import static com.bytechef.component.shopify.constant.ShopifyConstants.QUANTITY;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
 import static com.bytechef.component.shopify.util.ShopifyOptionsUtils.getLineItemsList;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -133,12 +132,6 @@ public class ShopifyCreateOrderAction {
 
         Map<String, Object> variables = Map.of(ORDER, Map.of(LINE_ITEMS, lineItems));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        Object bodyContent = body.get("orderCreate");
-
-        checkForUserError(bodyContent);
-
-        return bodyContent;
+        return executeGraphQlOperation(query, context, variables, "orderCreate");
     }
 }

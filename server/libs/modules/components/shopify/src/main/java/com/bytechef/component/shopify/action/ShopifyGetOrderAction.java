@@ -23,9 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -44,7 +44,7 @@ public class ShopifyGetOrderAction {
             string(ORDER_ID)
                 .label("Order ID")
                 .description("ID of the order you want to fetch.")
-                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions)
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions)
                 .required(true))
         .output(
             outputSchema(
@@ -89,9 +89,7 @@ public class ShopifyGetOrderAction {
     private ShopifyGetOrderAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String query = """
             query GetOrder($id: ID!) {
               order(id: $id) {
@@ -119,8 +117,6 @@ public class ShopifyGetOrderAction {
 
         Map<String, Object> variables = Map.of(ID, inputParameters.getRequiredString(ORDER_ID));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        return body.get("order");
+        return executeGraphQlOperation(query, context, variables, "order");
     }
 }

@@ -44,6 +44,8 @@ public class ShopifyOptionsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
+        List<Option<String>> options = new ArrayList<>();
+
         String query = """
             query GetOrders($first: Int!, $after: String) {
               orders(first: $first, after: $after) {
@@ -69,12 +71,10 @@ public class ShopifyOptionsUtils {
 
         Map<String, Object> body = sendGraphQlQuery(query, context, variables);
 
-        Map<String, Object> orders = Map.of();
+        Map<?, ?> orders = Map.of();
         if (body.get("orders") instanceof Map<?, ?> ordersMap) {
-            orders = (Map<String, Object>) ordersMap;
+            orders = ordersMap;
         }
-
-        List<Option<String>> options = new ArrayList<>();
 
         getOrderOptionsFromEdges(options, orders.get("edges"));
 
@@ -86,7 +86,7 @@ public class ShopifyOptionsUtils {
             body = sendGraphQlQuery(query, context, variables);
 
             if (body.get("orders") instanceof Map<?, ?> ordersMap) {
-                orders = (Map<String, Object>) ordersMap;
+                orders = ordersMap;
             }
 
             getOrderOptionsFromEdges(options, orders.get("edges"));
@@ -124,21 +124,14 @@ public class ShopifyOptionsUtils {
 
                 Map<String, Object> body = sendGraphQlQuery(query, context, variables);
 
-                String variantId = "";
+                if (body.get(PRODUCT) instanceof Map<?, ?> variant &&
+                    variant.get("variants") instanceof Map<?, ?> variants &&
+                    variants.get("edges") instanceof List<?> edges &&
+                    edges.getFirst() instanceof Map<?, ?> edgeMap &&
+                    edgeMap.get("node") instanceof Map<?, ?> node) {
 
-                if (body.get(PRODUCT) instanceof Map<?, ?> variant
-                    && variant.get("variants") instanceof Map<?, ?> variants
-                    && variants.get("edges") instanceof List<?> edges
-                    && edges.getFirst() instanceof Map<?, ?> edgeMap
-                    && edgeMap.get("node") instanceof Map<?, ?> node) {
-
-                    variantId = (String) node.get(ID);
+                    lineItemsList.add(Map.of("variantId", node.get(ID), QUANTITY, product.get(QUANTITY)));
                 }
-
-                lineItemsList.add(
-                    Map.of(
-                        "variantId", variantId,
-                        QUANTITY, product.get(QUANTITY)));
             }
         }
 
@@ -148,9 +141,7 @@ public class ShopifyOptionsUtils {
     private static String getNextPageEndCursor(Object pageInfoObject) {
         String endCursor = "";
 
-        if (pageInfoObject instanceof Map<?, ?> pageInfoMap
-            && (Boolean) pageInfoMap.get("hasNextPage")) {
-
+        if (pageInfoObject instanceof Map<?, ?> pageInfoMap && (Boolean) pageInfoMap.get("hasNextPage")) {
             endCursor = (String) pageInfoMap.get("endCursor");
         }
 
@@ -160,9 +151,7 @@ public class ShopifyOptionsUtils {
     private static void getOrderOptionsFromEdges(List<Option<String>> options, Object edgesObject) {
         if (edgesObject instanceof List<?> edgesList) {
             for (Object edgeObject : edgesList) {
-                if (edgeObject instanceof Map<?, ?> edgeMap
-                    && edgeMap.get("node") instanceof Map<?, ?> node) {
-
+                if (edgeObject instanceof Map<?, ?> edgeMap && edgeMap.get("node") instanceof Map<?, ?> node) {
                     options.add(option((String) node.get("name"), (String) node.get("id")));
                 }
             }
@@ -172,6 +161,8 @@ public class ShopifyOptionsUtils {
     public static List<Option<String>> getProductIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
 
         String query = """
             query GetProducts($first: Int!) {
@@ -188,20 +179,14 @@ public class ShopifyOptionsUtils {
 
         Map<String, Object> body = sendGraphQlQuery(query, context, variables);
 
-        Map<String, Object> products = Map.of();
-        if (body.get(PRODUCTS) instanceof Map<?, ?> productsMap) {
-            products = (Map<String, Object>) productsMap;
-        }
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (products.get("nodes") instanceof List<?> nodes) {
+        if (body.get(PRODUCTS) instanceof Map<?, ?> productsMap && productsMap.get("nodes") instanceof List<?> nodes) {
             for (Object node : nodes) {
                 if (node instanceof Map<?, ?> nodeMap) {
                     options.add(option((String) nodeMap.get("title"), (String) nodeMap.get(ID)));
                 }
             }
         }
+
         return options;
     }
 }

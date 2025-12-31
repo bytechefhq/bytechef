@@ -16,8 +16,6 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.subscribeWebhook;
@@ -44,7 +42,7 @@ public class ShopifyNewPaidOrderTrigger {
         .title("New Paid Order")
         .description("Triggers when paid order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(object().properties()))
+        .output()
         .webhookEnable(ShopifyNewPaidOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewPaidOrderTrigger::webhookDisable)
         .webhookRequest(ShopifyNewPaidOrderTrigger::webhookRequest);
@@ -56,8 +54,7 @@ public class ShopifyNewPaidOrderTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook(webhookUrl, "ORDERS_PAID", context)),
-            null);
+        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook(webhookUrl, "ORDERS_PAID", context)), null);
     }
 
     protected static void webhookDisable(

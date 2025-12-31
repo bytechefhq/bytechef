@@ -28,10 +28,9 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.NOTE;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.TAGS;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.USER_ERRORS_PROPERTY;
-import static com.bytechef.component.shopify.util.ShopifyUtils.checkForUserError;
-import static com.bytechef.component.shopify.util.ShopifyUtils.sendGraphQlQuery;
+import static com.bytechef.component.shopify.util.ShopifyUtils.executeGraphQlOperation;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
@@ -53,7 +52,7 @@ public class ShopifyUpdateOrderAction {
                 .label("Order ID")
                 .description("ID of the order to update.")
                 .required(true)
-                .options((ActionDefinition.OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions),
+                .options((OptionsFunction<String>) ShopifyOptionsUtils::getOrderIdOptions),
             string(NOTE)
                 .label("Note")
                 .description("An optional note that a shop owner can attach to the order.")
@@ -62,7 +61,8 @@ public class ShopifyUpdateOrderAction {
                 .label("Email")
                 .description("The customer's email address.")
                 .required(false),
-            array(TAGS).label("Tags")
+            array(TAGS)
+                .label("Tags")
                 .description("Tags attached to the order.")
                 .items(
                     string("tag")
@@ -118,12 +118,6 @@ public class ShopifyUpdateOrderAction {
                 EMAIL, inputParameters.getString(EMAIL, ""),
                 TAGS, inputParameters.getList(TAGS, List.of())));
 
-        Map<String, Object> body = sendGraphQlQuery(query, context, variables);
-
-        Object bodyContent = body.get("orderUpdate");
-
-        checkForUserError(bodyContent);
-
-        return bodyContent;
+        return executeGraphQlOperation(query, context, variables, "orderUpdate");
     }
 }

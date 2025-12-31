@@ -16,8 +16,6 @@
 
 package com.bytechef.component.shopify.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.util.ShopifyTriggerUtils.subscribeWebhook;
@@ -44,7 +42,7 @@ public class ShopifyNewCancelledOrderTrigger {
         .title("New Cancelled Order")
         .description("Triggers when order is cancelled.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(object().properties()))
+        .output()
         .webhookEnable(ShopifyNewCancelledOrderTrigger::webhookEnable)
         .webhookDisable(ShopifyNewCancelledOrderTrigger::webhookDisable)
         .webhookRequest(ShopifyNewCancelledOrderTrigger::webhookRequest);
