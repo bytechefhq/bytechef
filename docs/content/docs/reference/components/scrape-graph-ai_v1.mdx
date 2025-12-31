@@ -209,6 +209,139 @@ Type: OBJECT
 ```
 
 
+### Start SmartCrawler
+Name: startCrawl
+
+`Start a new web crawl request with AI extraction or markdown conversion.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The starting URL for the crawl. | true |
+| prompt | Prompt | STRING | Instructions for data extraction. Required when extraction_mode is true. | false |
+| extraction_mode | Extraction Mode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When false, enables markdown conversion mode (NO AI/LLM processing, 2 credits per page). Default is true. | false |
+| cache_website | Cache Website | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to cache the website content. | false |
+| depth | Depth | INTEGER | Maximum crawl depth. | false |
+| max_pages | Max Pages | INTEGER | Maximum number of pages to crawl. | false |
+| same_domain_only | Same Domain Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to crawl only the same domain. | false |
+| batch_size | Batch Size | INTEGER | Number of pages to process in each batch. | false |
+| schema | Schema | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | JSON Schema object for structured output. | false |
+| rules | Rules | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(exclude), [STRING]\(include_paths), [STRING]\(exclude_paths), BOOLEAN\(same_domain)&#125; </details> | Crawl rules for filtering URLs. | false |
+| sitemap | Sitemap | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use sitemap.xml for discovery. | false |
+| render_heavy_js | Render Heavy JS | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable heavy JavaScript rendering. | false |
+| stealth | Stealth | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable stealth mode to bypass bot protection using advanced anti-detection techniques. Adds +4 credits to the request cost. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Start SmartCrawler",
+  "name" : "startCrawl",
+  "parameters" : {
+    "url" : "",
+    "prompt" : "",
+    "extraction_mode" : false,
+    "cache_website" : false,
+    "depth" : 1,
+    "max_pages" : 1,
+    "same_domain_only" : false,
+    "batch_size" : 1,
+    "schema" : { },
+    "rules" : {
+      "exclude" : [ "" ],
+      "include_paths" : [ "" ],
+      "exclude_paths" : [ "" ],
+      "same_domain" : false
+    },
+    "sitemap" : false,
+    "render_heavy_js" : false,
+    "stealth" : false
+  },
+  "type" : "scrapeGraphAi/v1/startCrawl"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| task_id | STRING | Unique identifier for the crawl task. Use this task_id to retrieve the crawl result. |
+
+
+
+
+#### Output Example
+```json
+{
+  "task_id" : ""
+}
+```
+
+
+### Get SmartCrawler Status
+Name: getCrawlStatus
+
+`Get the status and results of a previous smartcrawl request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| task_id | Task Id | STRING | The ID of the crawl job task. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get SmartCrawler Status",
+  "name" : "getCrawlStatus",
+  "parameters" : {
+    "task_id" : ""
+  },
+  "type" : "scrapeGraphAi/v1/getCrawlStatus"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| status | STRING | Overall status of the request. |
+| result | OBJECT <details> <summary> Properties </summary> &#123;STRING\(status), &#123;&#125;\(llm_result), [STRING]\(crawled_urls), [&#123;STRING\(url), STRING\(markdown)&#125;]\(pages)&#125; </details> | The crawl job result. |
+
+
+
+
+#### Output Example
+```json
+{
+  "status" : "",
+  "result" : {
+    "status" : "",
+    "llm_result" : { },
+    "crawled_urls" : [ "" ],
+    "pages" : [ {
+      "url" : "",
+      "markdown" : ""
+    } ]
+  }
+}
+```
+
+
 
 
 <hr />
