@@ -74,7 +74,7 @@ import tools.jackson.databind.json.JsonMapper;
  * @author Ivica Cardic
  */
 @WebMvcTest(value = WorkflowTestApiController.class)
-class WorkflowTestApiControllerTest {
+class WorkflowTestApiControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
