@@ -20,11 +20,12 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.ORDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -34,24 +35,24 @@ import org.junit.jupiter.api.Test;
  */
 class ShopifyDeleteOrderActionTest extends AbstractShopifyActionTest {
 
-    private final Object mockedObject = Map.of("orderDelete", Map.of());
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ORDER_ID, "testOrderId"));
 
     @Test
     void testPerform() throws Exception {
         shopifyUtilsMockedStatic
-            .when(() -> ShopifyUtils.sendGraphQlQuery(
+            .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
                 actionContextArgumentCaptor.capture(),
-                (Map<String, Object>) objectArgumentCaptor.capture()))
-            .thenReturn(mockedObject);
+                mapArgumentCaptor.capture(),
+                stringArgumentCaptor.capture()))
+            .thenReturn(Map.of());
 
-        Optional<PerformFunction> performFunction = ShopifyDeleteOrderAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> performFunction =
+            ShopifyDeleteOrderAction.ACTION_DEFINITION.getPerform();
 
         assertTrue(performFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction singleConnectionPerformFunction = (PerformFunction) performFunction.get();
 
         Object result = singleConnectionPerformFunction.apply(
             mockedParameters, null, mockedActionContext);
@@ -72,8 +73,8 @@ class ShopifyDeleteOrderActionTest extends AbstractShopifyActionTest {
 
         Map<String, Object> expectedVariables = Map.of(ORDER_ID, "testOrderId");
 
-        assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-        assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+        assertEquals(List.of(expectedQuery, "orderDelete"), stringArgumentCaptor.getAllValues());
+        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
         assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
     }
 }

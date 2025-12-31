@@ -36,7 +36,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Domiter
  */
-public abstract class AbstractShopifyTriggerTest {
+abstract class AbstractShopifyTriggerTest {
 
     protected ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
@@ -51,12 +51,12 @@ public abstract class AbstractShopifyTriggerTest {
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         shopifyTriggerUtilsMockedStatic = mockStatic(ShopifyTriggerUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         shopifyTriggerUtilsMockedStatic.close();
     }
 

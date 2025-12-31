@@ -43,9 +43,10 @@ import org.mockito.MockedStatic;
 class ShopifyOptionsUtilsTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = forClass(Map.class);
     private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -59,7 +60,7 @@ class ShopifyOptionsUtilsTest {
                 .when(() -> ShopifyUtils.sendGraphQlQuery(
                     stringArgumentCaptor.capture(),
                     contextArgumentCaptor.capture(),
-                    (Map<String, Object>) objectArgumentCaptor.capture()))
+                    mapArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
             List<Option<String>> result = ShopifyOptionsUtils.getOrderIdOptions(
@@ -92,7 +93,7 @@ class ShopifyOptionsUtilsTest {
             Map<String, Object> expectedVariables = Map.of("first", 250);
 
             assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-            assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+            assertEquals(expectedVariables, mapArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
@@ -108,7 +109,7 @@ class ShopifyOptionsUtilsTest {
                 .when(() -> ShopifyUtils.sendGraphQlQuery(
                     stringArgumentCaptor.capture(),
                     contextArgumentCaptor.capture(),
-                    (Map<String, Object>) objectArgumentCaptor.capture()))
+                    mapArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
             List<Object> result = getLineItemsList(mockedContext, mockedLineItems);
@@ -138,7 +139,7 @@ class ShopifyOptionsUtilsTest {
             Map<String, Object> expectedVariables = Map.of(PRODUCT_ID, "productId");
 
             assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-            assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+            assertEquals(expectedVariables, mapArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
@@ -153,7 +154,7 @@ class ShopifyOptionsUtilsTest {
                 .when(() -> ShopifyUtils.sendGraphQlQuery(
                     stringArgumentCaptor.capture(),
                     contextArgumentCaptor.capture(),
-                    (Map<String, Object>) objectArgumentCaptor.capture()))
+                    mapArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
             List<Option<String>> result = ShopifyOptionsUtils.getProductIdOptions(
@@ -178,7 +179,7 @@ class ShopifyOptionsUtilsTest {
 
             assertEquals(expectedQuery, stringArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+            assertEquals(expectedVariables, mapArgumentCaptor.getValue());
         }
     }
 }

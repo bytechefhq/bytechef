@@ -38,8 +38,9 @@ import org.mockito.MockedStatic;
 class ShopifyTriggerUtilsTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = forClass(Map.class);
     private final Context mockedContext = mock(Context.class);
-    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -54,7 +55,7 @@ class ShopifyTriggerUtilsTest {
                 .when(() -> ShopifyUtils.sendGraphQlQuery(
                     stringArgumentCaptor.capture(),
                     contextArgumentCaptor.capture(),
-                    (Map<String, Object>) objectArgumentCaptor.capture()))
+                    mapArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
 
             String result = subscribeWebhook(mockedWebhookUrl, mockedTopic, mockedContext);
@@ -90,7 +91,7 @@ class ShopifyTriggerUtilsTest {
                     "uri", "webhookUrl"));
 
             assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-            assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+            assertEquals(expectedVariables, mapArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }
@@ -104,7 +105,7 @@ class ShopifyTriggerUtilsTest {
                 .when(() -> ShopifyUtils.sendGraphQlQuery(
                     stringArgumentCaptor.capture(),
                     contextArgumentCaptor.capture(),
-                    (Map<String, Object>) objectArgumentCaptor.capture()))
+                    mapArgumentCaptor.capture()))
                 .thenReturn(null);
 
             unsubscribeWebhook(mockedParameters, mockedContext);
@@ -124,7 +125,7 @@ class ShopifyTriggerUtilsTest {
             Map<String, Object> expectedVariables = Map.of(ID, "id");
 
             assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-            assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+            assertEquals(expectedVariables, mapArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
         }
     }

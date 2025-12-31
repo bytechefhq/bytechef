@@ -25,8 +25,8 @@ import static com.bytechef.component.shopify.constant.ShopifyConstants.TAGS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.shopify.util.ShopifyUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
  */
 class ShopifyUpdateOrderActionTest extends AbstractShopifyActionTest {
 
-    private final Object mockedObject = Map.of("orderUpdate", Map.of());
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             ORDER_ID, "orderId",
@@ -51,18 +50,19 @@ class ShopifyUpdateOrderActionTest extends AbstractShopifyActionTest {
     @Test
     void testPerform() throws Exception {
         shopifyUtilsMockedStatic
-            .when(() -> ShopifyUtils.sendGraphQlQuery(
+            .when(() -> ShopifyUtils.executeGraphQlOperation(
                 stringArgumentCaptor.capture(),
                 actionContextArgumentCaptor.capture(),
-                (Map<String, Object>) objectArgumentCaptor.capture()))
-            .thenReturn(mockedObject);
+                mapArgumentCaptor.capture(),
+                stringArgumentCaptor.capture()))
+            .thenReturn(Map.of());
 
-        Optional<PerformFunction> performFunction = ShopifyUpdateOrderAction.ACTION_DEFINITION.getPerform();
+        Optional<? extends BasePerformFunction> performFunction =
+            ShopifyUpdateOrderAction.ACTION_DEFINITION.getPerform();
 
         assertTrue(performFunction.isPresent());
 
-        SingleConnectionPerformFunction singleConnectionPerformFunction =
-            (SingleConnectionPerformFunction) performFunction.get();
+        PerformFunction singleConnectionPerformFunction = (PerformFunction) performFunction.get();
 
         Object result = singleConnectionPerformFunction.apply(
             mockedParameters, null, mockedActionContext);
@@ -92,8 +92,8 @@ class ShopifyUpdateOrderActionTest extends AbstractShopifyActionTest {
                 EMAIL, "email",
                 TAGS, List.of("tag1", "tag2")));
 
-        assertEquals(expectedQuery, stringArgumentCaptor.getValue());
-        assertEquals(expectedVariables, objectArgumentCaptor.getValue());
+        assertEquals(List.of(expectedQuery, "orderUpdate"), stringArgumentCaptor.getAllValues());
+        assertEquals(expectedVariables, mapArgumentCaptor.getValue());
         assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
     }
 }
