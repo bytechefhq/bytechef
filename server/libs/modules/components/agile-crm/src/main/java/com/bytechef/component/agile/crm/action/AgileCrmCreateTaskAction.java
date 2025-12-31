@@ -19,14 +19,10 @@ package com.bytechef.component.agile.crm.action;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.DUE;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.PRIORITY_TYPE;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.SUBJECT;
+import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.TASK_OUTPUT_PROPERTY;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -79,74 +75,7 @@ public class AgileCrmCreateTaskAction {
                 .label("Due Date")
                 .description("The due date of the task.")
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        number("id")
-                            .description("The ID of the task."),
-                        string("type")
-                            .description("The type of the task."),
-                        string("priority_type")
-                            .description("The priority of the task."),
-                        integer("due")
-                            .description("The due date of the task."),
-                        integer("task_completed_time")
-                            .description("The time when task was completed."),
-                        integer("task_start_time")
-                            .description("The time when task was started."),
-                        integer("created_time")
-                            .description("The time when task was created."),
-                        bool("is_complete")
-                            .description("Whether the task is completed."),
-                        array("contacts")
-                            .description("Contacts that are connected to the task.")
-                            .items(
-                                object()
-                                    .properties(
-                                        number("id")
-                                            .description("The ID of the contact."),
-                                        string("type")
-                                            .description("The type of the contact."),
-                                        integer("created_time")
-                                            .description("The time when contact was created."),
-                                        integer("updated_time")
-                                            .description("The time when contact was updated."))),
-                        string("subject")
-                            .description("The subject of the task."),
-                        string("entity_type")
-                            .description("The entity type."),
-                        array("notes")
-                            .description("Notes of the task."),
-                        array("note_ids")
-                            .description("Notes ID."),
-                        integer("progress")
-                            .description("The progress of the task."),
-                        string("status")
-                            .description("The status of the task."),
-                        array("deal_ids")
-                            .description("IDs of the deals that are connected to the task."),
-                        object("taskOwner")
-                            .description("Owner of the task.")
-                            .properties(
-                                number("id")
-                                    .description("The ID of the owner."),
-                                string("domain")
-                                    .description("The domain of the owner."),
-                                string("email")
-                                    .description("The email of the owner."),
-                                string("phone")
-                                    .description("The phone number of the owner."),
-                                string("name")
-                                    .description("The name of the owner."),
-                                string("pic")
-                                    .description("The picture of the owner."),
-                                string("schedule_id")
-                                    .description("The schedule ID of the owner."),
-                                string("calendar_url")
-                                    .description("The calendar URL of the owner."),
-                                string("calendarURL")
-                                    .description("The calendar URL of the owner.")))))
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(AgileCrmCreateTaskAction::perform);
 
     private AgileCrmCreateTaskAction() {

@@ -18,6 +18,8 @@ package com.bytechef.component.agile.crm.trigger;
 
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.CREATED_TIME;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.LAST_TIME_CHECKED;
+import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.TASK_OUTPUT_PROPERTY;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -44,7 +46,7 @@ public class AgileCrmNewTaskTrigger {
         .title("New Task")
         .description("Triggers when a new task is added.")
         .type(TriggerType.POLLING)
-        .output()
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .poll(AgileCrmNewTaskTrigger::poll);
 
     private AgileCrmNewTaskTrigger() {
@@ -74,7 +76,8 @@ public class AgileCrmNewTaskTrigger {
             }
         }
 
-        newTasks.sort(Comparator.comparing((Map<String, Object> t) -> (Integer) t.get(CREATED_TIME)).reversed());
+        newTasks.sort(Comparator.comparing((Map<String, Object> t) -> (Integer) t.get(CREATED_TIME))
+            .reversed());
 
         return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now), false);
     }
