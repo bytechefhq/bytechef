@@ -224,6 +224,7 @@ public class AiCopilotConfiguration {
             .build();
     }
 
+    @Bean
     JdbcTemplate pgVectorJdbcTemplate() {
         return new JdbcTemplate(pgVectorDataSource());
     }
