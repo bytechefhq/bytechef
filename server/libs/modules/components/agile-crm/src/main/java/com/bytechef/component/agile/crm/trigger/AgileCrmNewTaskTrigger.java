@@ -31,6 +31,7 @@ import com.bytechef.component.definition.TypeReference;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +73,8 @@ public class AgileCrmNewTaskTrigger {
                 newTasks.add(task);
             }
         }
+
+        newTasks.sort(Comparator.comparing((Map<String, Object> t) -> (Integer) t.get(CREATED_TIME)).reversed());
 
         return new PollOutput(newTasks, Map.of(LAST_TIME_CHECKED, now), false);
     }
