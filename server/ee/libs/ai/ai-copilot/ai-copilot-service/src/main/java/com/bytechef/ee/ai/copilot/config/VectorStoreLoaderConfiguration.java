@@ -38,9 +38,9 @@ import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.context.event.EventListener;
 
 /**
  * @version ee
@@ -79,18 +79,13 @@ public class VectorStoreLoaderConfiguration {
     }
 
     // TODO Enable vector store initialization on startup
-    // @EventListener(ApplicationStartedEvent.class)
+    @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
-        Resource resource = new ClassPathResource(WORKFLOWS);
+        Path projectRoot = Paths.get(System.getProperty("user.dir"));
+        Path componentsPath = projectRoot.resolve("server/libs/modules/components");
 
-        try {
-            if (resource.exists() && resource.isFile()) {
-                Path resourcePath = Paths.get(resource.getURI());
-
-                initializeVectorStoreTable(resourcePath);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (Files.exists(componentsPath) && Files.isDirectory(componentsPath)) {
+            initializeVectorStoreTable(componentsPath);
         }
     }
 
@@ -495,12 +490,47 @@ public class VectorStoreLoaderConfiguration {
         }
     }
 
-    private void storeDocuments(
-        List<Map<String, Object>> vectorStoreList, Path workflowsPath) {
+    private static void storeComponentDocuments(
+        Path componentsBasePath, BatchingStrategy batchingStrategy,
+        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
 
+        List<Document> documentList = new ArrayList<>();
+
+        if (!Files.exists(componentsBasePath) || !Files.isDirectory(componentsBasePath)) {
+            return;
+        }
+
+        try (var componentDirs = Files.list(componentsBasePath)) {
+            componentDirs
+                .filter(Files::isDirectory)
+                .forEach(componentDir -> {
+                    try {
+                        Path readmePath = componentDir.resolve("src/main/resources/README.mdx");
+
+                        if (Files.exists(readmePath) && Files.isReadable(readmePath)) {
+                            String componentName = componentDir.getFileName()
+                                .toString();
+                            String document = Files.readString(readmePath);
+
+                            addToDocuments(vectorStoreList, componentName, document, documentList);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error reading README.mdx for component: " +
+                            componentDir.getFileName(), e);
+                    }
+                });
+        }
+
+        for (List<Document> batch : batchingStrategy.batch(documentList)) {
+            vectorStore.add(batch);
+        }
+    }
+
+    private void storeDocuments(
+        List<Map<String, Object>> vectorStoreList, Path componentsBasePath) {
         try {
-            storeDocumentsFromPath(workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
-            storeDocuments(strategy, vectorStoreList, vectorStore);
+            // Store component README.mdx files
+            storeComponentDocuments(componentsBasePath, strategy, vectorStoreList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
