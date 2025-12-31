@@ -451,6 +451,28 @@ Type: POLLING
 Type: OBJECT
 
 
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | The ID of the task. |
+| type | STRING | The type of the task. |
+| priority_type | STRING | The priority of the task. |
+| due | INTEGER | The due date of the task. |
+| task_completed_time | INTEGER | The time when task was completed. |
+| task_start_time | INTEGER | The time when task was started. |
+| created_time | INTEGER | The time when task was created. |
+| is_complete | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the task is completed. |
+| contacts | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(type), INTEGER\(created_time), INTEGER\(updated_time)&#125;] </details> | Contacts that are connected to the task. |
+| subject | STRING | The subject of the task. |
+| entity_type | STRING | The entity type. |
+| notes | ARRAY <details> <summary> Items </summary> [] </details> | Notes of the task. |
+| note_ids | ARRAY <details> <summary> Items </summary> [] </details> | Notes ID. |
+| progress | INTEGER | The progress of the task. |
+| status | STRING | The status of the task. |
+| deal_ids | ARRAY <details> <summary> Items </summary> [] </details> | IDs of the deals that are connected to the task. |
+| taskOwner | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125; </details> | Owner of the task. |
+
 
 
 
