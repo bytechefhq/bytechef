@@ -1,0 +1,36 @@
+extend type Query {
+    connectionDefinition(componentName: String!, componentVersion: Int!): ConnectionDefinition!
+    connectionDefinitions(componentName: String!, componentVersion: Int!): [ConnectionDefinition!]!
+}
+
+type ConnectionDefinition {
+    authorizationRequired: Boolean!
+    authorizations: [Authorization!]
+    baseUri: String
+    componentDescription: String
+    componentName: String!
+    componentTitle: String
+    properties: [Property!]
+    version: Int!
+}
+
+type Authorization {
+    description: String
+    name: String
+    properties: [Property!]
+    title: String
+    type: AuthorizationType
+}
+
+enum AuthorizationType {
+    API_KEY
+    BASIC_AUTH
+    BEARER_TOKEN
+    CUSTOM
+    DIGEST_AUTH
+    OAUTH2_AUTHORIZATION_CODE
+    OAUTH2_AUTHORIZATION_CODE_PKCE
+    OAUTH2_CLIENT_CREDENTIALS
+    OAUTH2_IMPLICIT_CODE
+    OAUTH2_RESOURCE_OWNER_PASSWORD
+}

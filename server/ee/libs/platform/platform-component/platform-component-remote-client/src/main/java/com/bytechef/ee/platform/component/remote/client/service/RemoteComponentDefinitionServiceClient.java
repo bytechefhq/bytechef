@@ -87,6 +87,11 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
+    public List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),

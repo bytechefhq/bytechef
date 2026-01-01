@@ -17,39 +17,39 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.service.ActionDefinitionService;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * Exposes TriggerDefinition over GraphQL.
+ * Exposes ActionDefinition over GraphQL.
  *
- * @author Ivica Cardic
+ * @author ByteChef
  */
 @Controller
 @ConditionalOnCoordinator
-public class TriggerDefinitionGraphQlController {
+public class ActionDefinitionGraphQlController {
 
-    private final TriggerDefinitionService triggerDefinitionService;
+    private final ActionDefinitionService actionDefinitionService;
 
-    public TriggerDefinitionGraphQlController(TriggerDefinitionService triggerDefinitionService) {
-        this.triggerDefinitionService = triggerDefinitionService;
+    public ActionDefinitionGraphQlController(ActionDefinitionService actionDefinitionService) {
+        this.actionDefinitionService = actionDefinitionService;
     }
 
     @QueryMapping
-    public TriggerDefinition triggerDefinition(
-        @Argument String componentName, @Argument int componentVersion, @Argument String triggerName) {
+    public ActionDefinition actionDefinition(
+        @Argument String componentName, @Argument int componentVersion, @Argument String actionName) {
 
-        return triggerDefinitionService.getTriggerDefinition(componentName, componentVersion, triggerName);
+        return actionDefinitionService.getActionDefinition(componentName, componentVersion, actionName);
     }
 
     @QueryMapping
-    public List<TriggerDefinition> triggerDefinitions(
+    public List<ActionDefinition> actionDefinitions(
         @Argument String componentName, @Argument int componentVersion) {
 
-        return triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion);
+        return actionDefinitionService.getActionDefinitions(componentName, componentVersion);
     }
 }

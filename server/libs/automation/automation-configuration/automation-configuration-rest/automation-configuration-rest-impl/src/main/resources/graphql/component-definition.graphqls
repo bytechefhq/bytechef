@@ -1,0 +1,4 @@
+extend type Query {
+    componentDefinitions(actionDefinitions: Boolean, connectionDefinitions: Boolean, triggerDefinitions: Boolean, include: [String]): [ComponentDefinition!]!
+    componentDefinitionSearch(query: String!): [ComponentDefinition!]!
+}

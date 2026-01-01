@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -55,29 +55,35 @@ public class ActionDefinition {
         com.bytechef.component.definition.ActionDefinition actionDefinition, String componentName,
         int componentVersion) {
 
-        this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
+        this.batch = actionDefinition.getBatch()
+            .orElse(false);
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = Validate.notNull(getDescription(actionDefinition), "description");
-        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
+        this.help = actionDefinition.getHelp()
+            .map(Help::new)
+            .orElse(null);
         this.name = Validate.notNull(actionDefinition.getName(), "name");
-        this.outputDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
-        this.outputResponse = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
+        this.outputDefined = actionDefinition.getOutputDefinition()
+            .isPresent();
+        this.outputFunctionDefined = actionDefinition.getOutputDefinition()
+            .map(outputDefinition -> outputDefinition.getOutput()
+                .isPresent())
+            .orElse(false);
+        this.outputResponse = actionDefinition.getOutputDefinition()
+            .map(ActionDefinition::toOutputResponse)
+            .orElse(null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
-        this.singleConnection = OptionalUtils.mapOrElse(
-            actionDefinition.getPerform(),
-            perform -> perform instanceof com.bytechef.component.definition.ActionDefinition.PerformFunction,
-            false);
+            actionDefinition.getProperties()
+                .orElse(List.of()),
+            Property::toProperty);
+        this.singleConnection = actionDefinition.getPerform()
+            .map(perform -> perform instanceof PerformFunction)
+            .orElse(false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");
-        this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getWorkflowNodeDescription(), workflowNodeDescriptionFunction -> true, false);
+        this.workflowNodeDescriptionDefined = actionDefinition.getWorkflowNodeDescription()
+            .isPresent();
     }
 
     @Override
@@ -181,13 +187,15 @@ public class ActionDefinition {
     }
 
     private static String getDescription(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(
-            actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+        return actionDefinition.getDescription()
+            .orElse(
+                actionDefinition.getTitle()
+                    .orElse(actionDefinition.getName()));
     }
 
     private static String getTitle(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
+        return actionDefinition.getTitle()
+            .orElse(actionDefinition.getName());
     }
 
     private static OutputResponse toOutputResponse(

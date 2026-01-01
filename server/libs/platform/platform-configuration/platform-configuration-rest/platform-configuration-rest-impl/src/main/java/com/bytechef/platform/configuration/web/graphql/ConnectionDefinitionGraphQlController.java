@@ -17,39 +17,39 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * Exposes TriggerDefinition over GraphQL.
+ * Exposes ConnectionDefinition over GraphQL.
  *
- * @author Ivica Cardic
+ * @author ByteChef
  */
 @Controller
 @ConditionalOnCoordinator
-public class TriggerDefinitionGraphQlController {
+public class ConnectionDefinitionGraphQlController {
 
-    private final TriggerDefinitionService triggerDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
 
-    public TriggerDefinitionGraphQlController(TriggerDefinitionService triggerDefinitionService) {
-        this.triggerDefinitionService = triggerDefinitionService;
+    public ConnectionDefinitionGraphQlController(ConnectionDefinitionService connectionDefinitionService) {
+        this.connectionDefinitionService = connectionDefinitionService;
     }
 
     @QueryMapping
-    public TriggerDefinition triggerDefinition(
-        @Argument String componentName, @Argument int componentVersion, @Argument String triggerName) {
+    public ConnectionDefinition connectionDefinition(
+        @Argument String componentName, @Argument Integer componentVersion) {
 
-        return triggerDefinitionService.getTriggerDefinition(componentName, componentVersion, triggerName);
+        return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
     }
 
     @QueryMapping
-    public List<TriggerDefinition> triggerDefinitions(
-        @Argument String componentName, @Argument int componentVersion) {
+    public List<ConnectionDefinition> connectionDefinitions(
+        @Argument String componentName, @Argument Integer componentVersion) {
 
-        return triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion);
+        return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
     }
 }
