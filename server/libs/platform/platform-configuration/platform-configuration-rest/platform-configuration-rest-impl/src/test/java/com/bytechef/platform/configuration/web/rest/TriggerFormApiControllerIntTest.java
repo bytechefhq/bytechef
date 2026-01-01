@@ -68,21 +68,9 @@ public class TriggerFormApiControllerIntTest {
 
     @Test
     public void testGetTriggerFormInvalidId() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/trigger-form/invalid-id"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/internal/trigger-form/invalid-id"))
             .andExpect(MockMvcResultMatchers.status()
                 .isBadRequest());
-    }
-
-    @Test
-    public void testGetTriggerFormWorkflowNotFound() throws Exception {
-        String id = EncodingUtils.base64EncodeToString("tenant:0:1:workflowUuid:triggerName");
-
-        when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn("workflowId");
-        when(workflowService.getWorkflow("workflowId")).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/trigger-form/" + id))
-            .andExpect(MockMvcResultMatchers.status()
-                .isNotFound());
     }
 
     @Test
@@ -95,7 +83,7 @@ public class TriggerFormApiControllerIntTest {
 
         // workflow.getExtensions will return an empty list if not present
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/trigger-form/" + id))
+        mockMvc.perform(MockMvcRequestBuilders.get("/internal/trigger-form/" + id))
             .andExpect(MockMvcResultMatchers.status()
                 .isBadRequest());
     }

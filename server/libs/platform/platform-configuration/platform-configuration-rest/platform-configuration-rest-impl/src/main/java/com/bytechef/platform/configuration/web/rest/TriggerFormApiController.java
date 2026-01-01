@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,11 +84,25 @@ public class TriggerFormApiController implements TriggerFormApi {
         return ResponseEntity.ok(conversionService.convert(parameters, TriggerFormModel.class));
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> getParameters(
         WorkflowExecutionId workflowExecutionId, String workflowId, List<WorkflowTrigger> workflowTriggers) {
 
         String triggerName = workflowExecutionId.getTriggerName();
+
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId, workflowTriggers, triggerName);
+
+        Map<String, Object> parameters = new HashMap<>(workflowTrigger.getParameters());
+
+        if (parameters.containsKey("customFormStyling")) {
+            parameters.put(
+                "customFormStyling", HtmlSanitizerUtils.sanitizeCss((String) parameters.get("customFormStyling")));
+        }
+
+        return parameters;
+    }
+
+    private static @NonNull WorkflowTrigger getWorkflowTrigger(
+        String workflowId, List<WorkflowTrigger> workflowTriggers, String triggerName) {
 
         WorkflowTrigger workflowTrigger = null;
 
@@ -105,13 +120,6 @@ public class TriggerFormApiController implements TriggerFormApi {
                 "Workflow does not contain trigger: " + triggerName + " for workflowId: " + workflowId);
         }
 
-        Map<String, Object> parameters = new HashMap<>(workflowTrigger.getParameters());
-
-        if (parameters.containsKey("customFormStyling")) {
-            parameters.put(
-                "customFormStyling", HtmlSanitizerUtils.sanitizeCss((String) parameters.get("customFormStyling")));
-        }
-
-        return parameters;
+        return workflowTrigger;
     }
 }
