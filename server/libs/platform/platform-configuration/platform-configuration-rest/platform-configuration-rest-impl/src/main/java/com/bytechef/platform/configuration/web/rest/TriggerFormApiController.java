@@ -19,12 +19,14 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.commons.util.HtmlSanitizerUtils;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.web.rest.model.TriggerFormModel;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.convert.ConversionService;
@@ -103,6 +105,13 @@ public class TriggerFormApiController implements TriggerFormApi {
                 "Workflow does not contain trigger: " + triggerName + " for workflowId: " + workflowId);
         }
 
-        return (Map<String, Object>) workflowTrigger.getParameters();
+        Map<String, Object> parameters = new HashMap<>(workflowTrigger.getParameters());
+
+        if (parameters.containsKey("customFormStyling")) {
+            parameters.put(
+                "customFormStyling", HtmlSanitizerUtils.sanitizeCss((String) parameters.get("customFormStyling")));
+        }
+
+        return parameters;
     }
 }
