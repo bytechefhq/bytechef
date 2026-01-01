@@ -27,8 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Test configuration for ProjectGraphQlController tests. Provides mock beans for all dependencies required by the
- * controller.
+ * @author Ivica Cardic
  */
 @Configuration
 public class AutomationConfigurationGraphQlTestConfiguration {
