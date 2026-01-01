@@ -8,6 +8,7 @@ export * from './EnvironmentApi';
 export * from './Oauth2Api';
 export * from './TaskDispatcherDefinitionApi';
 export * from './TriggerDefinitionApi';
+export * from './TriggerFormApi';
 export * from './WorkflowNodeDescriptionApi';
 export * from './WorkflowNodeDynamicPropertiesApi';
 export * from './WorkflowNodeOptionApi';
