@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The status of an integration.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-11-20T06:27:36.329713+01:00[Europe/Zagreb]", comments = "Generator version: 7.17.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-01-02T08:44:57.118801+01:00[Europe/Zagreb]", comments = "Generator version: 7.18.0")
 public enum IntegrationStatusModel {
   
   DRAFT("DRAFT"),
