@@ -1,0 +1,4 @@
+type Help {
+    description: String
+    documentationUrl: String
+}

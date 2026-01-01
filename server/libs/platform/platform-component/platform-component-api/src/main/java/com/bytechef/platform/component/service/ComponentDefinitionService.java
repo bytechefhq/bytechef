@@ -35,8 +35,9 @@ public interface ComponentDefinitionService {
 
     List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
-        @Nullable List<String> include,
-        PlatformType platformType);
+        @Nullable List<String> include, PlatformType platformType);
+
+    List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 
