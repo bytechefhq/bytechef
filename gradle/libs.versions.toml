@@ -23,6 +23,7 @@ com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.9.0"
 com-github-spotbugs-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
+com-googlecode-owasp-java-html-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1"
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 commons-validator = "commons-validator:commons-validator:1.10.1"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.41"
