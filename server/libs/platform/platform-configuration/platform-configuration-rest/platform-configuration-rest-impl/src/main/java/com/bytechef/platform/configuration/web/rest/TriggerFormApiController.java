@@ -19,19 +19,18 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.dto.TriggerFormDTO;
+import com.bytechef.platform.configuration.web.rest.model.TriggerFormModel;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,22 +38,26 @@ import org.springframework.web.server.ResponseStatusException;
  * @author Ivica Cardic
  */
 @RestController
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
-public class TriggerFormApiController {
+public class TriggerFormApiController implements TriggerFormApi {
 
+    private final ConversionService conversionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerFormApiController(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, WorkflowService workflowService) {
+        ConversionService conversionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        WorkflowService workflowService) {
 
+        this.conversionService = conversionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.workflowService = workflowService;
     }
 
-    @GetMapping("/api/trigger-form/{id}")
-    public ResponseEntity<TriggerFormDTO> getTriggerForm(@PathVariable String id) {
+    @Override
+    public ResponseEntity<TriggerFormModel> getTriggerForm(String id) {
         WorkflowExecutionId workflowExecutionId;
 
         try {
@@ -71,15 +74,11 @@ public class TriggerFormApiController {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        if (workflow == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow not found: " + workflowId);
-        }
-
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         Map<String, Object> parameters = getParameters(workflowExecutionId, workflowId, workflowTriggers);
 
-        return ResponseEntity.ok(ConvertUtils.convertValue(parameters, TriggerFormDTO.class));
+        return ResponseEntity.ok(conversionService.convert(parameters, TriggerFormModel.class));
     }
 
     @SuppressWarnings("unchecked")

@@ -28,6 +28,6 @@ public class PlatformConfigurationAuthorizeHttpRequestContributor implements Aut
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/trigger-form/**");
+        return List.of("/api/platform/internal/trigger-form/**");
     }
 }
