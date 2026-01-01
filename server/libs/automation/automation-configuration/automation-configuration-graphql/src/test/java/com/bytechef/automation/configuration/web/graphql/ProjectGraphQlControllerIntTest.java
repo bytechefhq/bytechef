@@ -35,7 +35,6 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.time.Instant;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -159,7 +158,6 @@ public class ProjectGraphQlControllerIntTest {
     }
 
     @Test
-    @Disabled
     void testGetProjects() {
         // Given
         List<Project> mockProjects = List.of(
@@ -172,7 +170,7 @@ public class ProjectGraphQlControllerIntTest {
             .documentName("projects")
             .execute()
             .path("projects")
-            .entityList(Project.class)
+            .entityList(Object.class)
             .hasSize(2)
             .path("projects[0]")
             .matchesJson("""
@@ -349,6 +347,8 @@ public class ProjectGraphQlControllerIntTest {
         Project project = new Project();
         project.setId(id);
         project.setName(name);
+        project.setVersion(0);
+
         return project;
     }
 

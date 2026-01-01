@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.web.rest.config;
 
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
@@ -32,7 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ComponentDefinitionService.class, ConnectionFacade.class, WebhookTriggerTestFacade.class,
+    ComponentDefinitionService.class, ConnectionFacade.class, JobService.class, WebhookTriggerTestFacade.class,
     WorkspaceConnectionFacade.class
 })
 public @interface AutomationConfigurationRestConfigurationSharedMocks {
