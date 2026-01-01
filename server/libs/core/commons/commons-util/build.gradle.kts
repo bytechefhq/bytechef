@@ -6,6 +6,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation(libs.com.googlecode.owasp.java.html.sanitizer)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
