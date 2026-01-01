@@ -9,6 +9,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/EnvironmentApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/TriggerFormApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDescriptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPropertiesApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
@@ -42,6 +43,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteClusterEl
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/FieldOptionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetClusterElementParameterDisplayConditions200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
@@ -72,6 +74,8 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskPropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerFormInputModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerFormModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UnifiedApiCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateClusterElementParameterRequestModel.java
