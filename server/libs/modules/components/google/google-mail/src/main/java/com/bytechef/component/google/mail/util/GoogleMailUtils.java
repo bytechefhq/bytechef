@@ -458,7 +458,8 @@ public class GoogleMailUtils {
                 fileEntries.add(
                     context.file(
                         file -> file.storeContent(
-                            messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
+                            messagePart.getFilename() == null ? "attachment" : messagePart.getFilename(),
+                            new ByteArrayInputStream(attachment.decodeData()))));
             }
         }
 

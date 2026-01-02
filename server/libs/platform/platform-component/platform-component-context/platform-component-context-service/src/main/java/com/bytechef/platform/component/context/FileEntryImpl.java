@@ -19,14 +19,15 @@ package com.bytechef.platform.component.context;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
-    private String extension;
-    private String mimeType;
+    private @Nullable String extension;
+    private @Nullable String mimeType;
     private String name;
     private String url;
 
@@ -34,19 +35,18 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
     }
 
     public FileEntryImpl(FileEntry fileEntry) {
-        this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+        this(fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
     }
 
-    public FileEntryImpl(String extension, String mimeType, String name, String url) {
-        this.extension = Objects.requireNonNull(extension);
-        this.mimeType = Objects.requireNonNull(mimeType);
+    public FileEntryImpl(String name, @Nullable String extension, @Nullable String mimeType, String url) {
+        this.extension = extension;
+        this.mimeType = mimeType;
         this.name = Objects.requireNonNull(name);
         this.url = Objects.requireNonNull(url);
     }
 
     @Override
-
-    public String getExtension() {
+    public @Nullable String getExtension() {
         return extension;
     }
 
@@ -56,7 +56,7 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
     }
 
     @Override
-    public String getMimeType() {
+    public @Nullable String getMimeType() {
         return mimeType;
     }
 
@@ -73,9 +73,9 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
     @Override
     public String toString() {
         return "FileEntryImpl{" +
-            "extension='" + extension + '\'' +
+            "name='" + name + '\'' +
+            ", extension='" + extension + '\'' +
             ", mimeType='" + mimeType + '\'' +
-            ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
     }
