@@ -41,40 +41,4 @@ public class FormConstants {
     public static final String PLACEHOLDER = "placeholder";
     public static final String REQUIRED = "required";
     public static final String USE_WORKFLOW_TIMEZONE = "useWorkflowTimezone";
-
-    public enum FieldType {
-        CHECKBOX(1),
-        CUSTOM_HTML(12),
-        DATE_PICKER(2),
-        DATETIME_PICKER(3),
-        EMAIL_INPUT(8),
-        FILE_INPUT(4),
-        HIDDEN_FIELD(13),
-        INPUT(6),
-        NUMBER_INPUT(9),
-        PASSWORD_INPUT(10),
-        RADIO(11),
-        SELECT(7),
-        TEXTAREA(5);
-
-        private final int value;
-
-        FieldType(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public static FieldType fromValue(int value) {
-            for (FieldType fieldType : values()) {
-                if (fieldType.value == value) {
-                    return fieldType;
-                }
-            }
-
-            throw new IllegalArgumentException("Invalid FieldType value: " + value);
-        }
-    }
 }
