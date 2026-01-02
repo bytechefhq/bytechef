@@ -5,11 +5,7 @@ import {useCallback, useMemo, useState} from 'react';
 
 type ActiveViewType = 'all' | 'filtered';
 
-export const useComponentFiltering = ({
-    actionComponentDefinitions,
-}: {
-    actionComponentDefinitions: ComponentDefinitionBasic[];
-}) => {
+export const useComponentFiltering = ({componentDefinitions}: {componentDefinitions: ComponentDefinitionBasic[]}) => {
     const [filterState, setFilterState] = useState<{
         activeView: ActiveViewType;
         filteredCount: number;
@@ -78,7 +74,7 @@ export const useComponentFiltering = ({
     const setActiveView = useCallback(
         (view: ActiveViewType) => {
             setFilterState((state) => {
-                const count = calculateFilteredComponentsCount(actionComponentDefinitions, state.selectedCategories);
+                const count = calculateFilteredComponentsCount(componentDefinitions, state.selectedCategories);
 
                 if (view === 'all' && state.selectedCategories.length > 0) {
                     return {
@@ -100,17 +96,17 @@ export const useComponentFiltering = ({
                 return {...state, activeView: view};
             });
         },
-        [actionComponentDefinitions, calculateFilteredComponentsCount]
+        [componentDefinitions, calculateFilteredComponentsCount]
     );
 
     const uniqueCategories = useMemo(() => {
-        if (!actionComponentDefinitions?.length) {
+        if (!componentDefinitions?.length) {
             return [];
         }
 
         const categories: {icon: JSX.Element | null; label: string}[] = [];
 
-        actionComponentDefinitions.forEach((component) => {
+        componentDefinitions.forEach((component) => {
             component.componentCategories?.forEach((componentCategory) => {
                 const label = componentCategory.label;
 
@@ -124,7 +120,7 @@ export const useComponentFiltering = ({
         });
 
         return categories;
-    }, [actionComponentDefinitions]);
+    }, [componentDefinitions]);
 
     const filteredCategories = useMemo(() => {
         const categoriesFromFilteredComponents = uniqueCategories.filter((category) =>
@@ -146,17 +142,17 @@ export const useComponentFiltering = ({
     }, [filterState.searchValue, filterState.selectedCategories, uniqueCategories]);
 
     const filteredComponents = useMemo(() => {
-        if (!actionComponentDefinitions) {
+        if (!componentDefinitions) {
             return [];
         }
 
         if (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) {
-            return actionComponentDefinitions.filter((component) => {
+            return componentDefinitions.filter((component) => {
                 return !(!ff_3158 && component.name === 'claudeCode');
             });
         }
 
-        return actionComponentDefinitions.filter((component) => {
+        return componentDefinitions.filter((component) => {
             const categoryLabels = getCategoryLabels(component);
 
             if (!ff_3158 && component.name === 'claudeCode') {
@@ -167,13 +163,7 @@ export const useComponentFiltering = ({
                 categoryLabels.includes((category || '').toLowerCase())
             );
         });
-    }, [
-        actionComponentDefinitions,
-        ff_3158,
-        filterState.activeView,
-        filterState.selectedCategories,
-        getCategoryLabels,
-    ]);
+    }, [componentDefinitions, ff_3158, filterState.activeView, filterState.selectedCategories, getCategoryLabels]);
 
     return {
         deselectAllCategories,
