@@ -81,7 +81,7 @@ const WorkflowCodeEditorSheet = ({
         closeWorkflowTestStream();
 
         if (jobId) {
-            workflowTestApi.stopWorkflowTest({jobId}).finally(() => {
+            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

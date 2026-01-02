@@ -43,13 +43,14 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         setShowLeaveDialog(false);
 
         if (jobId) {
-            await workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
+            await workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
         }
 
         if (pendingAction === 'reload') {
             latestRunningRef.current = false;
             isUnloadingRef.current = true;
             suppressBeforeUnloadPromptRef.current = true;
+
             window.location.reload();
         } else if (pendingAction === 'nav') {
             latestRunningRef.current = false;
@@ -93,27 +94,27 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         }
     }, []);
 
-    const stopBestEffort = useCallback(async () => {
+    const stopBestEffort = useCallback(() => {
         const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
 
         if (!jobId) {
             return;
         }
 
-        await workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
+        workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
     }, [getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
 
-    const onPageHide = useCallback(async () => {
+    const onPageHide = useCallback(() => {
         isUnloadingRef.current = true;
 
-        await stopBestEffort();
+        stopBestEffort();
     }, [stopBestEffort]);
 
-    const onVisibilityChange = useCallback(async () => {
+    const onVisibilityChange = useCallback(() => {
         if (document.visibilityState === 'hidden') {
             isUnloadingRef.current = true;
 
-            await stopBestEffort();
+            stopBestEffort();
         }
     }, [stopBestEffort]);
 
@@ -150,7 +151,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
             const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
 
             if (jobId) {
-                workflowTestApi.stopWorkflowTest({jobId}).finally(() => persistJobId(null));
+                workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
             }
         };
     }, [

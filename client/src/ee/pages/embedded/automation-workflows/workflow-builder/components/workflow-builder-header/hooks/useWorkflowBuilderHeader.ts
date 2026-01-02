@@ -180,7 +180,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         setStreamRequest(null);
 
         if (jobId) {
-            workflowTestApi.stopWorkflowTest({jobId}).finally(() => {
+            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

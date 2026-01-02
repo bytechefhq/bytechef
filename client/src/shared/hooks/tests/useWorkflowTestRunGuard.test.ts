@@ -233,7 +233,7 @@ describe('useWorkflowTestRunGuard', () => {
             });
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId});
+            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
             expect(mockPersistJobId).toHaveBeenCalledWith(null);
             expect(window.location.reload).toHaveBeenCalled();
         });
@@ -256,7 +256,7 @@ describe('useWorkflowTestRunGuard', () => {
             });
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId});
+            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
             expect(mockPersistJobId).toHaveBeenCalledWith(null);
             expect(mockBlocker.proceed).toHaveBeenCalled();
         });
@@ -278,7 +278,7 @@ describe('useWorkflowTestRunGuard', () => {
             });
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId});
+            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
         });
 
         it('should stop workflow on visibilitychange when hidden', async () => {
@@ -298,7 +298,7 @@ describe('useWorkflowTestRunGuard', () => {
             });
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId});
+            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
             visibilitySpy.mockRestore();
         });
     });
@@ -317,7 +317,7 @@ describe('useWorkflowTestRunGuard', () => {
             unmount();
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId});
+            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
         });
 
         it('should NOT stop workflow on unmount if it is NOT running', () => {
