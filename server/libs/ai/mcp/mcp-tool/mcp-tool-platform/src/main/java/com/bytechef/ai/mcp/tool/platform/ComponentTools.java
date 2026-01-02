@@ -41,8 +41,11 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -74,6 +77,7 @@ public class ComponentTools {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final ConnectionService connectionService;
+    private final VectorStore vectorStore;
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
         {
@@ -96,11 +100,12 @@ public class ComponentTools {
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        ConnectionService connectionService) {
+        ConnectionService connectionService, VectorStore vectorStore) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.connectionService = connectionService;
+        this.vectorStore = vectorStore;
     }
 
     // Helper methods
@@ -117,6 +122,22 @@ public class ComponentTools {
                 logger.debug("Retrieved component {}", componentName);
             }
 
+            Filter.Expression filterExpression = new Filter.Expression(
+                Filter.ExpressionType.AND,
+                new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("category"), new Filter.Value("readme")),
+                new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("name"), new Filter.Value(componentName))
+            );
+
+            List<Document> documentList = vectorStore.similaritySearch(
+                org.springframework.ai.vectorstore.SearchRequest.builder()
+                    .query(componentName)
+                    .filterExpression(filterExpression)
+                    .topK(1)
+                    .build()
+            );
+
+            String extra = documentList.isEmpty() ? null : documentList.getFirst().getText();
+
             return new ComponentInfo(
                 componentDefinition.getName(),
                 componentDefinition.getDescription(),
@@ -131,7 +152,8 @@ public class ComponentTools {
                 componentDefinition.getActions()
                     .stream()
                     .map(ActionDefinition::getName)
-                    .toList());
+                    .toList(),
+                extra);
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
 
@@ -685,8 +707,8 @@ public class ComponentTools {
         @JsonProperty("description") @JsonPropertyDescription("The description of the component") String description,
         @JsonProperty("categories") @JsonPropertyDescription("The categories that the component belongs to") List<String> category,
         @JsonProperty("triggers") @JsonPropertyDescription("Triggers that are defined in the component") List<String> triggers,
-        @JsonProperty("actions") @JsonPropertyDescription("Actions that are defined in the component") List<String> actions) {
-
+        @JsonProperty("actions") @JsonPropertyDescription("Actions that are defined in the component") List<String> actions,
+        @JsonProperty("extra instructions") @JsonPropertyDescription("Optional extra instructions on using this component") String readme) {
     }
 
     /**

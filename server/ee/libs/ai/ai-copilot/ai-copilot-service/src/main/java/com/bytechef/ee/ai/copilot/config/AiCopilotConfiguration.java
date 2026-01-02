@@ -11,6 +11,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectToolsImpl;
 import com.bytechef.ai.mcp.tool.automation.impl.ProjectWorkflowToolsImpl;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -51,11 +52,13 @@ import org.springframework.ai.vectorstore.observation.VectorStoreObservationConv
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -225,12 +228,20 @@ public class AiCopilotConfiguration {
     }
 
     @Bean
+    @Primary
+    JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
+    @Bean
+    @Qualifier("pgVectorJdbcTemplate")
     JdbcTemplate pgVectorJdbcTemplate() {
         return new JdbcTemplate(pgVectorDataSource());
     }
 
     @Bean
     public PgVectorStore vectorStore(
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
         EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
@@ -238,7 +249,7 @@ public class AiCopilotConfiguration {
 
         var initializeSchema = properties.isInitializeSchema();
 
-        return PgVectorStore.builder(pgVectorJdbcTemplate(), embeddingModel)
+        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
             .idType(properties.getIdType())
             .vectorTableName(properties.getTableName())
@@ -258,7 +269,7 @@ public class AiCopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
-        ProjectWorkflowToolsImpl projectWorkflowTools, TaskTools taskTools, WorkflowService workflowService)
+        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools, WorkflowService workflowService)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
@@ -269,7 +280,7 @@ public class AiCopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(systemPromptResource))
             .state(new State())
-            .tools(List.of(projectTools, projectWorkflowTools, taskTools))
+            .tools(List.of(projectTools, projectWorkflowTools, componentTools, taskTools))
             .workflowService(workflowService)
             .build();
     }
