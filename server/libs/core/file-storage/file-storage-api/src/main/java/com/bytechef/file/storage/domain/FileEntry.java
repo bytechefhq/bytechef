@@ -22,6 +22,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -62,7 +63,7 @@ public class FileEntry {
         this.url = url;
     }
 
-    public FileEntry(String name, String extension, String mimeType, String url) {
+    public FileEntry(String name, @Nullable String extension, @Nullable String mimeType, String url) {
         Assert.notNull(name, "'name' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
@@ -112,11 +113,11 @@ public class FileEntry {
         return Objects.hash(name, url);
     }
 
-    public String getExtension() {
+    public @Nullable String getExtension() {
         return extension;
     }
 
-    public String getMimeType() {
+    public @Nullable String getMimeType() {
         return mimeType;
     }
 
@@ -138,9 +139,9 @@ public class FileEntry {
     @Override
     public String toString() {
         return "FileEntry{" +
-            "extension='" + extension + '\'' +
+            "name='" + name + '\'' +
+            ", extension='" + extension + '\'' +
             ", mimeType='" + mimeType + '\'' +
-            ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
     }

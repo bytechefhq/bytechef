@@ -35,7 +35,7 @@ public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
         JsonNode jsonNode = ctxt.readTree(jp);
 
         return new FileEntryImpl(
-            asText("extension", jsonNode), asText("mimeType", jsonNode), asText("name", jsonNode),
+            asText("name", jsonNode), asText("extension", jsonNode), asText("mimeType", jsonNode),
             asText("url", jsonNode));
     }
 

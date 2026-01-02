@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,9 +86,7 @@ public class ActionApiController implements ActionApi {
                         String filename = MapUtils.getRequiredString(entryValue, FILENAME);
                         String value = MapUtils.getRequiredString(entryValue, VALUE);
 
-                        bodyContent.put(
-                            entry.getKey(),
-                            new FileEntryImpl(new FileEntry(filename, URL_PREFIX + value)));
+                        bodyContent.put(entry.getKey(), new FileEntryImpl(new FileEntry(filename, URL_PREFIX + value)));
                     } else {
                         bodyContent.put(entry.getKey(), entryValue.get(VALUE));
                     }
@@ -110,7 +109,9 @@ public class ActionApiController implements ActionApi {
 
     private static class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
+        @Nullable
         private String extension;
+        @Nullable
         private String mimeType;
         private String name;
         private String url;
@@ -119,23 +120,24 @@ public class ActionApiController implements ActionApi {
         }
 
         public FileEntryImpl(FileEntry fileEntry) {
-            this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+            this(fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
         }
 
-        public FileEntryImpl(String extension, String mimeType, String name, String url) {
-            this.extension = Objects.requireNonNull(extension);
-            this.mimeType = Objects.requireNonNull(mimeType);
+        public FileEntryImpl(String name, @Nullable String extension, @Nullable String mimeType, String url) {
+            this.extension = extension;
+            this.mimeType = mimeType;
             this.name = Objects.requireNonNull(name);
             this.url = Objects.requireNonNull(url);
         }
 
         @Override
-
+        @Nullable
         public String getExtension() {
             return extension;
         }
 
         @Override
+        @Nullable
         public String getMimeType() {
             return mimeType;
         }

@@ -433,7 +433,10 @@ public abstract class AbstractWebhookTriggerController {
                 @SuppressWarnings("unchecked")
                 FileEntry fileEntry = new FileEntry((Map<String, ?>) webhookResponse.getBody());
 
-                bodyBuilder.contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
+                bodyBuilder.contentType(
+                    fileEntry.getMimeType() == null
+                        ? MediaType.APPLICATION_OCTET_STREAM
+                        : MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
 
                 responseEntity = bodyBuilder.body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
 

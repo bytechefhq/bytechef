@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.jackson.JacksonComponent;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -142,20 +143,21 @@ public class WebhookRequestDeserializer extends ValueDeserializer<WebhookRequest
         private FileEntryImpl() {
         }
 
-        public FileEntryImpl(String name, String extension, String mimeType, String url) {
-            this.extension = Objects.requireNonNull(extension);
-            this.mimeType = Objects.requireNonNull(mimeType);
+        public FileEntryImpl(String name, @Nullable String extension, @Nullable String mimeType, String url) {
+            this.extension = extension;
+            this.mimeType = mimeType;
             this.name = Objects.requireNonNull(name);
             this.url = Objects.requireNonNull(url);
         }
 
         @Override
-
+        @Nullable
         public String getExtension() {
             return extension;
         }
 
         @Override
+        @Nullable
         public String getMimeType() {
             return mimeType;
         }
