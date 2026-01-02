@@ -125,18 +125,18 @@ public class ComponentTools {
             Filter.Expression filterExpression = new Filter.Expression(
                 Filter.ExpressionType.AND,
                 new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("category"), new Filter.Value("readme")),
-                new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("name"), new Filter.Value(componentName))
-            );
+                new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("name"),
+                    new Filter.Value(componentName)));
 
             List<Document> documentList = vectorStore.similaritySearch(
                 org.springframework.ai.vectorstore.SearchRequest.builder()
                     .query(componentName)
                     .filterExpression(filterExpression)
                     .topK(1)
-                    .build()
-            );
+                    .build());
 
-            String extra = documentList.isEmpty() ? null : documentList.getFirst().getText();
+            String extra = documentList.isEmpty() ? null : documentList.getFirst()
+                .getText();
 
             return new ComponentInfo(
                 componentDefinition.getName(),

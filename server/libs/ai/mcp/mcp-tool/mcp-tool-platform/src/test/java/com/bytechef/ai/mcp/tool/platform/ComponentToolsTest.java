@@ -50,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.ai.vectorstore.VectorStore;
 
 class ComponentToolsTest {
 
@@ -66,11 +67,15 @@ class ComponentToolsTest {
     @Mock
     private ConnectionService connectionService;
 
+    @Mock
+    private VectorStore vectorStore;
+
     @BeforeEach
     void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService);
+            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService,
+            vectorStore);
     }
 
     @Test

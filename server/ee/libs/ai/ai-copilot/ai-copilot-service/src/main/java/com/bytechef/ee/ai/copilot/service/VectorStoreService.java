@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.service;
 import com.bytechef.ee.ai.copilot.domain.VectorStore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ public class VectorStoreService {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public VectorStoreService(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
