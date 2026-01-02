@@ -36,7 +36,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.form.constant.FormConstants.FieldType;
+import com.bytechef.component.form.util.FieldType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
