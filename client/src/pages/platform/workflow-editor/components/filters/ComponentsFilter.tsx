@@ -13,8 +13,8 @@ import {BotIcon, CircleMinusIcon, ListFilterIcon, SearchIcon, XIcon} from 'lucid
 import {ReactNode, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-interface ActionComponentsFilterProps {
-    actionComponentDefinitions: ComponentDefinitionBasic[];
+interface ComponentsFilterProps {
+    componentDefinitions: ComponentDefinitionBasic[];
     deselectAllCategories: () => void;
     filterState: {
         activeView: 'all' | 'filtered';
@@ -27,18 +27,22 @@ interface ActionComponentsFilterProps {
     setActiveView: (view: 'all' | 'filtered') => void;
     setSearchValue: (value: string) => void;
     toggleCategory: (category: string) => void;
+    filterLabel: string;
+    filterTooltip: string;
 }
 
-const ActionComponentsFilter = ({
-    actionComponentDefinitions,
+const ComponentsFilter = ({
+    componentDefinitions,
     deselectAllCategories,
+    filterLabel,
     filterState,
+    filterTooltip,
     filteredCategories,
     filteredComponents,
     setActiveView,
     setSearchValue,
     toggleCategory,
-}: ActionComponentsFilterProps) => {
+}: ComponentsFilterProps) => {
     const handleDropdownOpenChange = useCallback(
         (open: boolean) => {
             if (open) {
@@ -64,7 +68,7 @@ const ActionComponentsFilter = ({
                 >
                     <span>All</span>
 
-                    <div className="rounded-md bg-background px-2 py-1">{actionComponentDefinitions.length}</div>
+                    <div className="rounded-md bg-background px-2 py-1">{componentDefinitions.length}</div>
                 </Button>
 
                 <Button
@@ -92,7 +96,7 @@ const ActionComponentsFilter = ({
                     <DropdownMenuTrigger asChild>
                         <TooltipTrigger asChild>
                             <Button
-                                aria-label="Filter actions"
+                                aria-label={`Filter ${filterLabel}`}
                                 className="data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                 icon={<ListFilterIcon />}
                                 size="iconSm"
@@ -101,7 +105,7 @@ const ActionComponentsFilter = ({
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
-                    <TooltipContent>Filter actions by category</TooltipContent>
+                    <TooltipContent>{filterTooltip}</TooltipContent>
                 </Tooltip>
 
                 <DropdownMenuContent align="start" className="mr-2 overflow-hidden p-1">
@@ -175,4 +179,4 @@ const ActionComponentsFilter = ({
     );
 };
 
-export default ActionComponentsFilter;
+export default ComponentsFilter;
