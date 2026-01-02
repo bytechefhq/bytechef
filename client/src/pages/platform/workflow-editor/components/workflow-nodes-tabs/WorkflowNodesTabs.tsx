@@ -66,9 +66,9 @@ const WorkflowNodesTabs = ({
         if (previousActionComponentsLength === actionComponentDefinitions.length) {
             return;
         }
-        
+
         setPreviousActionComponentsLength(actionComponentDefinitions.length);
-        
+
         if (actionFiltering.filterState.selectedCategories.length > 0) {
             actionFiltering.setActiveView(actionFiltering.filterState.activeView);
         } else if (actionFiltering.filterState.activeView === 'filtered') {
@@ -87,9 +87,9 @@ const WorkflowNodesTabs = ({
         if (previousTriggerComponentsLength === triggerComponentDefinitions.length) {
             return;
         }
-        
+
         setPreviousTriggerComponentsLength(triggerComponentDefinitions.length);
-        
+
         if (triggerFiltering.filterState.selectedCategories.length > 0) {
             triggerFiltering.setActiveView(triggerFiltering.filterState.activeView);
         } else if (triggerFiltering.filterState.activeView === 'filtered') {
