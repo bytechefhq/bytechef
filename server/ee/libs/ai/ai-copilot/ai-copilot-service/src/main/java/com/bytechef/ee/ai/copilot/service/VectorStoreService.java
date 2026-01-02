@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.postgresql.util.PGobject;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class VectorStoreService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public VectorStoreService(JdbcTemplate jdbcTemplate) {
+    public VectorStoreService(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
