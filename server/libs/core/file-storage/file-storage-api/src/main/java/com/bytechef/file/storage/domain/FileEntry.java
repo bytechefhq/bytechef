@@ -33,6 +33,7 @@ public class FileEntry {
     private static final String SPLITTER = "_;_";
     private static final char UNIX_NAME_SEPARATOR = '/';
     private static final char WINDOWS_NAME_SEPARATOR = '\\';
+    private static final String DEFAULT_EXTENSION = "bin";
 
     private String extension;
     private String mimeType;
@@ -50,17 +51,10 @@ public class FileEntry {
         Assert.notNull(filename, "'filename' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
-        this.name = filename.substring(indexOfLastSeparator(filename) + 1);
+        var name = filename.substring(indexOfLastSeparator(filename) + 1);
+        var extension = getExtension(name);
 
-        int lastDotIndex = name.lastIndexOf(".");
-
-        if (lastDotIndex > 0) {
-            this.extension = name.substring(lastDotIndex + 1);
-
-            this.mimeType = MimeTypeUtils.getMimeType(extension);
-        }
-
-        this.url = url;
+        this(name, extension, MimeTypeUtils.getMimeType(extension), url);
     }
 
     public FileEntry(String name, @Nullable String extension, @Nullable String mimeType, String url) {
@@ -146,10 +140,21 @@ public class FileEntry {
             '}';
     }
 
-    private int indexOfLastSeparator(final String fileName) {
+    private static int indexOfLastSeparator(final String fileName) {
         int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
         int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
 
         return Math.max(lastUnixPos, lastWindowsPos);
     }
+
+    private static String getExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf(".");
+
+        if (lastDotIndex > 0) {
+            return fileName.substring(lastDotIndex + 1);
+        }
+
+        return DEFAULT_EXTENSION;
+    }
+
 }
