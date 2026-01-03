@@ -48,7 +48,15 @@ if (process.env.NODE_ENV === 'mock') {
     renderApp();
 }
 
-const publicRoutes = ['/activate', '/register', '/password-reset', '/password-reset/finish', '/verify-email'];
+const publicRoutes = [
+    '/activate',
+    '/chat',
+    '/form',
+    '/register',
+    '/password-reset',
+    '/password-reset/finish',
+    '/verify-email',
+];
 
 async function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
@@ -67,7 +75,7 @@ async function renderApp() {
 
     if (
         !isEmbeddedWorkflowBuilder &&
-        !publicRoutes.includes(window.location.pathname) &&
+        !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
         !authenticationStore.getState().sessionHasBeenFetched
     ) {
         const result = await authenticationStore.getState().getAccount();

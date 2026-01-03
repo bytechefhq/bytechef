@@ -13,11 +13,21 @@ import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/aut
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
+import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
+
+const getTriggerUrl = (type: 'form' | 'chat', environmentId?: number, staticWebhookUrl?: string) => {
+    if (!staticWebhookUrl) {
+        return '';
+    }
+
+    const webhookId = staticWebhookUrl.substring(staticWebhookUrl.lastIndexOf('/webhooks/') + '/webhooks/'.length);
+
+    return `/${type}/${environmentId}/${webhookId}`;
+};
 
 const ProjectDeploymentWorkflowListItem = ({
     environmentId,
@@ -64,6 +74,9 @@ const ProjectDeploymentWorkflowListItem = ({
         workflow.triggers &&
         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
+
+    const formTrigger =
+        workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
 
     const handleWorkflowClick = () => {
         if (workflow) {
@@ -155,7 +168,7 @@ const ProjectDeploymentWorkflowListItem = ({
                             </Tooltip>
                         )}
 
-                        {!hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                        {!hostedChatTrigger && !formTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -171,21 +184,19 @@ const ProjectDeploymentWorkflowListItem = ({
                             </Tooltip>
                         )}
 
-                        {hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                        {formTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
-                                        icon={hostedChatTrigger ? <MessageCircleMoreIcon /> : <ClipboardIcon />}
+                                        icon={<FormIcon />}
                                         onClick={() =>
                                             window.open(
-                                                `/chat/${environmentId === 2 ? '' : environmentId === 1 ? 'staging/' : 'development/'}` +
-                                                    projectDeploymentWorkflow.staticWebhookUrl?.substring(
-                                                        projectDeploymentWorkflow.staticWebhookUrl?.lastIndexOf(
-                                                            '/webhooks/'
-                                                        ) + 10,
-                                                        projectDeploymentWorkflow.staticWebhookUrl?.length
-                                                    ),
+                                                getTriggerUrl(
+                                                    'form',
+                                                    environmentId,
+                                                    projectDeploymentWorkflow.staticWebhookUrl
+                                                ),
                                                 '_blank'
                                             )
                                         }
@@ -194,7 +205,32 @@ const ProjectDeploymentWorkflowListItem = ({
                                     />
                                 </TooltipTrigger>
 
-                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                <TooltipContent>Click to open a form</TooltipContent>
+                            </Tooltip>
+                        )}
+
+                        {hostedChatTrigger && projectDeploymentWorkflow.staticWebhookUrl && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={!projectDeploymentWorkflow.enabled}
+                                        icon={<MessageCircleMoreIcon />}
+                                        onClick={() =>
+                                            window.open(
+                                                getTriggerUrl(
+                                                    'chat',
+                                                    environmentId,
+                                                    projectDeploymentWorkflow.staticWebhookUrl
+                                                ),
+                                                '_blank'
+                                            )
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Open hosted chat (URL is not copied)</TooltipContent>
                             </Tooltip>
                         )}
                     </div>
