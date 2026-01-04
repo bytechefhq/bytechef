@@ -1,12 +1,11 @@
 import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import {UseFormReturn} from 'react-hook-form';
-
-import {FormInputType} from '../util/triggerForm-utils';
 
 interface CheckboxFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
-    formInput: Partial<FormInputType>;
+    formInput: Partial<TriggerFormInput>;
     name: string;
 }
 

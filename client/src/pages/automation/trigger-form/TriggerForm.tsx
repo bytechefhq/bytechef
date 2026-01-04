@@ -1,6 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {Form} from '@/components/ui/form';
 import {PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
+import {useGetTriggerFormQuery} from '@/shared/queries/platform/triggerForms.queries';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useParams} from 'react-router-dom';
@@ -14,16 +16,31 @@ import {InputFieldRenderer} from './components/InputFieldRenderer';
 import {RadioFieldRenderer} from './components/RadioFieldRenderer';
 import {SelectFieldRenderer} from './components/SelectFieldRenderer';
 import {TextAreaFieldRenderer} from './components/TextAreaFieldRenderer';
-import {FieldType, FormInputType, TriggerFormType, fetchTriggerFormDefinition} from './util/triggerForm-utils';
+
+export enum FieldType {
+    CHECKBOX = 1,
+    DATE_PICKER = 2,
+    DATETIME_PICKER = 3,
+    FILE_INPUT = 4,
+    TEXTAREA = 5,
+    INPUT = 6,
+    SELECT = 7,
+    EMAIL_INPUT = 8,
+    NUMBER_INPUT = 9,
+    PASSWORD_INPUT = 10,
+    RADIO = 11,
+    CUSTOM_HTML = 12,
+    HIDDEN_FIELD = 13,
+}
 
 export default function TriggerForm() {
     const {environmentId, workflowExecutionId} = useParams<{environmentId: string; workflowExecutionId: string}>();
 
-    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [definition, setDefinition] = useState<TriggerFormType | null>(null);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const {data: definition, error, isLoading: loading} = useGetTriggerFormQuery(workflowExecutionId ?? '');
 
     const form = useForm<Record<string, unknown>>({
         defaultValues: {},
@@ -36,11 +53,11 @@ export default function TriggerForm() {
         if (!workflowExecutionId) return;
 
         setSubmitting(true);
-        setError(null);
+        setSubmitError(null);
 
         try {
             const hasFiles = ui?.inputs.some(
-                (input) => input.fieldType === FieldType.FILE_INPUT && values[input.fieldName]
+                (input) => input.fieldName && input.fieldType === FieldType.FILE_INPUT && values[input.fieldName]
             );
 
             let body: BodyInit;
@@ -94,7 +111,7 @@ export default function TriggerForm() {
 
             setSubmitted(true);
         } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : 'Failed to submit form');
+            setSubmitError(e instanceof Error ? e.message : 'Failed to submit form');
         } finally {
             setSubmitting(false);
         }
@@ -118,62 +135,26 @@ export default function TriggerForm() {
     }, [definition]);
 
     useEffect(() => {
-        if (!workflowExecutionId) {
-            return;
+        if (definition?.inputs) {
+            const defaultValues: Record<string, unknown> = {};
+
+            definition.inputs.forEach((input) => {
+                if (input.fieldType === FieldType.CUSTOM_HTML || !input.fieldName) {
+                    return;
+                }
+
+                if (input.defaultValue !== undefined) {
+                    if (input.fieldType === FieldType.CHECKBOX) {
+                        defaultValues[input.fieldName] = !!input.defaultValue;
+                    } else {
+                        defaultValues[input.fieldName] = input.defaultValue;
+                    }
+                }
+            });
+
+            form.reset(defaultValues);
         }
-
-        const controller = new AbortController();
-
-        const fetchDefinition = async () => {
-            setError(null);
-
-            try {
-                const triggerFormDefinition = await fetchTriggerFormDefinition(workflowExecutionId, controller.signal);
-
-                if (controller.signal.aborted) {
-                    return;
-                }
-
-                setDefinition(triggerFormDefinition);
-
-                if (triggerFormDefinition.inputs) {
-                    const defaultValues: Record<string, unknown> = {};
-
-                    triggerFormDefinition.inputs.forEach((input) => {
-                        if (input.fieldType === FieldType.CUSTOM_HTML) {
-                            return;
-                        }
-
-                        if (input.defaultValue !== undefined) {
-                            if (input.fieldType === FieldType.CHECKBOX) {
-                                defaultValues[input.fieldName] = !!input.defaultValue;
-                            } else {
-                                defaultValues[input.fieldName] = input.defaultValue;
-                            }
-                        }
-                    });
-
-                    form.reset(defaultValues);
-                }
-            } catch (e: unknown) {
-                if (e instanceof Error && e.name === 'AbortError') {
-                    return;
-                }
-
-                setError(e instanceof Error ? e.message : 'Failed to load trigger definition');
-            } finally {
-                if (!controller.signal.aborted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchDefinition();
-
-        return () => {
-            controller.abort();
-        };
-    }, [form, workflowExecutionId]);
+    }, [definition, form]);
 
     if (loading) {
         return (
@@ -185,11 +166,13 @@ export default function TriggerForm() {
         );
     }
 
-    if (error) {
+    if (error || submitError) {
         return (
             <div className="h-full overflow-auto">
                 <div className="p-6">
-                    <div className="text-sm text-destructive">{error}</div>
+                    <div className="text-sm text-destructive">
+                        {error ? (error.message ? error.message : 'Failed to load trigger form') : submitError}
+                    </div>
                 </div>
             </div>
         );
@@ -217,7 +200,7 @@ export default function TriggerForm() {
         );
     }
 
-    const renderField = (name: string, formInput: Partial<FormInputType>) => {
+    const renderField = (name: string, formInput: Partial<TriggerFormInput>) => {
         const {fieldType} = formInput;
 
         switch (fieldType) {
@@ -250,15 +233,15 @@ export default function TriggerForm() {
 
     return (
         <div className="h-full overflow-auto">
-            <div className="mx-auto w-full max-w-2xl p-6">
-                {+(environmentId ?? PRODUCTION_ENVIRONMENT) !== PRODUCTION_ENVIRONMENT && (
-                    <div className="mb-4 space-x-1 uppercase">
-                        <span>Environment:</span>
+            {+(environmentId ?? PRODUCTION_ENVIRONMENT) !== PRODUCTION_ENVIRONMENT && (
+                <div className="absolute space-x-1 p-3 uppercase">
+                    <span>Environment:</span>
 
-                        <span className="font-semibold">{environmentName}</span>
-                    </div>
-                )}
+                    <span className="font-semibold">{environmentName}</span>
+                </div>
+            )}
 
+            <div className="mx-auto mt-6 w-full max-w-2xl p-6">
                 {ui.customFormStyling && <style>{ui.customFormStyling}</style>}
 
                 <div className="mb-6">

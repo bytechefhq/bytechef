@@ -1,7 +1,8 @@
+import {TriggerForm as TriggerFormType} from '@/shared/middleware/platform/configuration';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {fireEvent, render, screen, waitFor} from '../../../shared/util/test-utils';
-import TriggerForm from './TriggerForm';
+import TriggerForm, {FieldType} from './TriggerForm';
 
 const mockWorkflowExecutionId = 'test-id';
 const mockEnvironmentId = '0';
@@ -13,26 +14,21 @@ vi.mock('react-router-dom', () => ({
     }),
 }));
 
-vi.mock('./util/triggerForm-utils', () => ({
-    FieldType: {
-        CHECKBOX: 1,
-        CUSTOM_HTML: 12,
-        DATE_PICKER: 2,
-        DATETIME_PICKER: 3,
-        EMAIL_INPUT: 8,
-        FILE_INPUT: 4,
-        HIDDEN_FIELD: 13,
-        INPUT: 6,
-        NUMBER_INPUT: 9,
-        PASSWORD_INPUT: 10,
-        RADIO: 11,
-        SELECT: 7,
-        TEXTAREA: 5,
-    },
-    fetchTriggerFormDefinition: vi.fn(),
+const {mockGetTriggerForm} = vi.hoisted(() => ({
+    mockGetTriggerForm: vi.fn(),
 }));
 
-import {FieldType, TriggerFormType, fetchTriggerFormDefinition} from './util/triggerForm-utils';
+vi.mock('@/shared/middleware/platform/configuration', async (importOriginal) => {
+    const actual = (await importOriginal()) as Record<string, unknown>;
+    return {
+        ...actual,
+        TriggerFormApi: vi.fn().mockImplementation(function () {
+            return {
+                getTriggerForm: mockGetTriggerForm,
+            };
+        }),
+    };
+});
 
 describe('TriggerForm', () => {
     beforeEach(() => {
@@ -69,7 +65,7 @@ describe('TriggerForm', () => {
     };
 
     it('should show loading state and then render the form', async () => {
-        vi.mocked(fetchTriggerFormDefinition).mockResolvedValue(mockDefinition);
+        mockGetTriggerForm.mockResolvedValue(mockDefinition);
 
         render(<TriggerForm />);
 
@@ -85,7 +81,7 @@ describe('TriggerForm', () => {
     });
 
     it('should show error message when fetching definition fails', async () => {
-        vi.mocked(fetchTriggerFormDefinition).mockRejectedValueOnce(new Error('Failed to fetch'));
+        mockGetTriggerForm.mockRejectedValueOnce(new Error('Failed to fetch'));
 
         render(<TriggerForm />);
 
@@ -93,7 +89,7 @@ describe('TriggerForm', () => {
     });
 
     it('should handle form submission successfully', async () => {
-        vi.mocked(fetchTriggerFormDefinition).mockResolvedValue(mockDefinition);
+        mockGetTriggerForm.mockResolvedValue(mockDefinition);
         vi.spyOn(global, 'fetch').mockResolvedValue({
             ok: true,
         } as Response);
@@ -120,7 +116,7 @@ describe('TriggerForm', () => {
     });
 
     it('should show error message when submission fails', async () => {
-        vi.mocked(fetchTriggerFormDefinition).mockResolvedValue(mockDefinition);
+        mockGetTriggerForm.mockResolvedValue(mockDefinition);
         vi.spyOn(global, 'fetch').mockResolvedValue({
             ok: false,
             statusText: 'Server Error',
@@ -150,7 +146,7 @@ describe('TriggerForm', () => {
                 },
             ],
         };
-        vi.mocked(fetchTriggerFormDefinition).mockResolvedValue(fileMockDefinition);
+        mockGetTriggerForm.mockResolvedValue(fileMockDefinition);
         vi.spyOn(global, 'fetch').mockResolvedValue({
             ok: true,
         } as Response);

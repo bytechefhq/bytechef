@@ -1,10 +1,9 @@
 import {FormDescription} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import sanitize from 'sanitize-html';
 
-import {FormInputType} from '../util/triggerForm-utils';
-
 interface CustomHTMLFieldRendererProps {
-    formInput: Partial<FormInputType>;
+    formInput: Partial<TriggerFormInput>;
 }
 
 export const CustomHTMLFieldRenderer = ({formInput}: CustomHTMLFieldRendererProps) => {

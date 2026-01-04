@@ -1,11 +1,10 @@
 import {FormControl, FormDescription, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import {Controller, UseFormReturn} from 'react-hook-form';
-
-import {FormInputType} from '../util/triggerForm-utils';
 
 interface FileInputFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
-    formInput: Partial<FormInputType>;
+    formInput: Partial<TriggerFormInput>;
     name: string;
 }
 

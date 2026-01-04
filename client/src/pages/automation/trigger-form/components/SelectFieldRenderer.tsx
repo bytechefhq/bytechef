@@ -1,13 +1,12 @@
 import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import {UseFormReturn} from 'react-hook-form';
-
-import {FormInputType} from '../util/triggerForm-utils';
 
 interface SelectFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
-    formInput: Partial<FormInputType>;
+    formInput: Partial<TriggerFormInput>;
     name: string;
 }
 
@@ -112,7 +111,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
 
                         <SelectContent>
                             {options.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>
+                                <SelectItem key={opt.value} value={opt.value as string}>
                                     {opt.label}
                                 </SelectItem>
                             ))}
