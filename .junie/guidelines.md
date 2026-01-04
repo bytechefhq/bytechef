@@ -319,7 +319,7 @@ Access the application at http://localhost:8080
 
 ## Coding Conventions
 
-- Do not use short or cryptic variable names; prefer clear, descriptive names that communicate intent.
+- Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 - Blank line before control statements (Java)
   - Insert exactly one empty line before control statements to visually separate logic.
   - Applies to: `if`, `else if`, `else`, `for`, enhanced `for`, `while`, `do { ... } while (...)`, `switch`, `try`/`catch`/`finally`.
