@@ -205,7 +205,6 @@ dependencies {
             .forEach { implementation(project(it.path)) }
     }
 
-    runtimeOnly("io.netty:netty-resolver-dns-native-macos::osx-aarch_64")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
