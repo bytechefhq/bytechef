@@ -4,6 +4,20 @@ import {FieldType} from '@/pages/automation/trigger-form/TriggerForm';
 import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import {UseFormReturn} from 'react-hook-form';
 
+const getInputTypeFromFieldType = (fieldType?: number): string => {
+    if (fieldType === undefined) {
+        return 'text';
+    }
+
+    const fieldTypeMap: Record<number, string> = {
+        [FieldType.EMAIL_INPUT]: 'email',
+        [FieldType.NUMBER_INPUT]: 'number',
+        [FieldType.PASSWORD_INPUT]: 'password',
+    };
+
+    return fieldTypeMap[fieldType] ?? 'text';
+};
+
 interface InputFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
     formInput: Partial<TriggerFormInput>;
@@ -14,15 +28,7 @@ export const InputFieldRenderer = ({form, formInput, name}: InputFieldRendererPr
     const {fieldDescription, fieldLabel, fieldName, fieldType, placeholder, required} = formInput;
 
     const label = fieldLabel || fieldName || name;
-
-    const type =
-        fieldType === FieldType.EMAIL_INPUT
-            ? 'email'
-            : fieldType === FieldType.NUMBER_INPUT
-              ? 'number'
-              : fieldType === FieldType.PASSWORD_INPUT
-                ? 'password'
-                : 'text';
+    const type = getInputTypeFromFieldType(fieldType);
 
     return (
         <FormField

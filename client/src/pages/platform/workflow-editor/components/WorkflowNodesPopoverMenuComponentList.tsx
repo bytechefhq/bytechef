@@ -93,23 +93,26 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
                 setFilteredTriggerComponentDefinitions(
                     componentDefinitions
-                        .filter(
-                            ({name, title, triggersCount}) =>
-                                triggersCount &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
+                        .filter(({name, title, triggersCount}) => {
+                            const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
+                            const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
+
+                            return triggersCount && (nameIncludes || titleIncludes);
+                        })
                         .filter(({name}) => (!ff_3827 && name !== 'form') || ff_3827)
                 );
 
                 if (clusterElementType) {
                     setFilteredClusterElementComponentDefinitions(
-                        componentDefinitions.filter(
-                            ({clusterElementsCount, name, title}) =>
+                        componentDefinitions.filter(({clusterElementsCount, name, title}) => {
+                            const nameIncludes = name?.toLowerCase().includes(filter.toLowerCase());
+                            const titleIncludes = title?.toLowerCase().includes(filter.toLowerCase());
+
+                            return (
                                 clusterElementsCount?.[convertNameToSnakeCase(clusterElementType as string)] &&
-                                (name?.toLowerCase().includes(filter.toLowerCase()) ||
-                                    title?.toLowerCase().includes(filter.toLowerCase()))
-                        )
+                                (nameIncludes || titleIncludes)
+                            );
+                        })
                     );
                 }
             }

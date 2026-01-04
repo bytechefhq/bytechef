@@ -47,7 +47,10 @@ export default function TriggerForm() {
         mode: 'onSubmit',
     });
 
-    const environmentName = toEnvironmentName(environmentId ? +environmentId : PRODUCTION_ENVIRONMENT);
+    const environmentName = useMemo(
+        () => toEnvironmentName(environmentId ? +environmentId : PRODUCTION_ENVIRONMENT),
+        [environmentId]
+    );
 
     const handleSubmit = async (values: Record<string, unknown>) => {
         if (!workflowExecutionId) return;
@@ -56,7 +59,7 @@ export default function TriggerForm() {
         setSubmitError(null);
 
         try {
-            const hasFiles = ui?.inputs.some(
+            const hasFiles = uiDefinition?.inputs.some(
                 (input) => input.fieldName && input.fieldType === FieldType.FILE_INPUT && values[input.fieldName]
             );
 
@@ -69,22 +72,25 @@ export default function TriggerForm() {
                 formData.append('submittedAt', Date.now().toString());
 
                 for (const key in values) {
-                    const value = values[key];
+                    const valueItem = values[key];
 
-                    if (Array.isArray(value)) {
-                        value.forEach((v) => {
-                            if (v instanceof File) {
-                                formData.append(`body.${key}`, v);
-                            } else if (v !== undefined && v !== null) {
-                                formData.append(`body.${key}`, typeof v === 'object' ? JSON.stringify(v) : String(v));
+                    if (Array.isArray(valueItem)) {
+                        valueItem.forEach((value) => {
+                            if (value instanceof File) {
+                                formData.append(`body.${key}`, value);
+                            } else if (value !== undefined && value !== null) {
+                                formData.append(
+                                    `body.${key}`,
+                                    typeof value === 'object' ? JSON.stringify(value) : String(value)
+                                );
                             }
                         });
-                    } else if (value instanceof File) {
-                        formData.append(`body.${key}`, value);
-                    } else if (value !== undefined && value !== null) {
+                    } else if (valueItem instanceof File) {
+                        formData.append(`body.${key}`, valueItem);
+                    } else if (valueItem !== undefined && valueItem !== null) {
                         formData.append(
                             `body.${key}`,
-                            typeof value === 'object' ? JSON.stringify(value) : String(value)
+                            typeof valueItem === 'object' ? JSON.stringify(valueItem) : String(valueItem)
                         );
                     }
                 }
@@ -99,25 +105,25 @@ export default function TriggerForm() {
                 headers['Content-Type'] = 'application/json';
             }
 
-            const res = await fetch(`/webhooks/${workflowExecutionId}`, {
+            const triggerFormSubmitRequest = await fetch(`/webhooks/${workflowExecutionId}`, {
                 body,
                 headers,
                 method: 'POST',
             });
 
-            if (!res.ok) {
-                throw new Error(`Submission failed: ${res.statusText}`);
+            if (!triggerFormSubmitRequest.ok) {
+                throw new Error(`Submission failed: ${triggerFormSubmitRequest.statusText}`);
             }
 
             setSubmitted(true);
-        } catch (e: unknown) {
-            setSubmitError(e instanceof Error ? e.message : 'Failed to submit form');
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const ui = useMemo(() => {
+    const uiDefinition = useMemo(() => {
         if (!definition) {
             return null;
         }
@@ -170,9 +176,9 @@ export default function TriggerForm() {
         return (
             <div className="h-full overflow-auto">
                 <div className="p-6">
-                    <div className="text-sm text-destructive">
+                    <span className="text-sm text-destructive">
                         {error ? (error.message ? error.message : 'Failed to load trigger form') : submitError}
-                    </div>
+                    </span>
                 </div>
             </div>
         );
@@ -190,12 +196,12 @@ export default function TriggerForm() {
         );
     }
 
-    if (!ui || !definition) {
+    if (!uiDefinition || !definition) {
         return (
             <div className="h-full overflow-auto">
-                <div className="mx-auto w-full max-w-2xl p-6 text-center text-sm text-muted-foreground">
+                <span className="mx-auto w-full max-w-2xl p-6 text-center text-sm text-muted-foreground">
                     No definition found.
-                </div>
+                </span>
             </div>
         );
     }
@@ -242,37 +248,37 @@ export default function TriggerForm() {
             )}
 
             <div className="mx-auto mt-6 w-full max-w-2xl p-6">
-                {ui.customFormStyling && <style>{ui.customFormStyling}</style>}
+                {uiDefinition.customFormStyling && <style>{uiDefinition.customFormStyling}</style>}
 
                 <div className="mb-6">
-                    <h1 className="text-2xl font-semibold tracking-tight">{ui.title}</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight">{uiDefinition.title}</h1>
 
-                    {ui.subtitle && (
-                        <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{ui.subtitle}</p>
+                    {uiDefinition.subtitle && (
+                        <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
+                            {uiDefinition.subtitle}
+                        </p>
                     )}
                 </div>
 
                 <Form {...form}>
                     <form className="space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
-                        {ui.inputs?.length ? (
-                            ui.inputs.map((formInput, idx) => {
+                        {uiDefinition.inputs?.length ? (
+                            uiDefinition.inputs.map((formInput, idx) => {
                                 const name = formInput.fieldName || `field_${idx}`;
 
                                 return <div key={name}>{renderField(name, formInput)}</div>;
                             })
                         ) : (
-                            <div className="text-sm text-muted-foreground">No inputs defined.</div>
+                            <span className="text-sm text-muted-foreground">No inputs defined.</span>
                         )}
 
-                        <div className="pt-2">
-                            <Button disabled={submitting} type="submit">
-                                {submitting ? 'Submitting...' : ui.buttonLabel}
-                            </Button>
-                        </div>
+                        <Button className="mt-2" disabled={submitting} type="submit">
+                            {submitting ? 'Submitting...' : uiDefinition.buttonLabel}
+                        </Button>
                     </form>
                 </Form>
 
-                {ui.appendAttribution && (
+                {uiDefinition.appendAttribution && (
                     <div className="mt-8 space-x-1 border-t pt-4 text-center text-xs text-muted-foreground">
                         <span>Powered by</span>
 

@@ -14,7 +14,7 @@ const ProjectDeploymentWorkflowList = ({
     projectId,
     projectVersion,
 }: {
-    environmentId?: number;
+    environmentId: number;
     projectId: number;
     projectDeploymentId: number;
     projectDeploymentEnabled: boolean;

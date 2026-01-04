@@ -36,7 +36,7 @@ const ProjectDeploymentList = ({
                         {!!projectDeployment.projectDeploymentWorkflows?.length && (
                             <CollapsibleContent>
                                 <ProjectDeploymentWorkflowList
-                                    environmentId={projectDeployment.environmentId}
+                                    environmentId={projectDeployment.environmentId!}
                                     projectDeploymentEnabled={
                                         projectDeploymentMap.has(projectDeployment.id!)
                                             ? projectDeploymentMap.get(projectDeployment.id!)!

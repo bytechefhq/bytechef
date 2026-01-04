@@ -3,10 +3,10 @@
 import {Button} from '@/components/ui/button';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {cn} from '@/shared/util/cn-utils';
 import {format} from 'date-fns';
 import {CalendarIcon} from 'lucide-react';
 import {ChangeEvent, useEffect, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 export default function DateTimePicker({onChange, value}: {onChange: (date: Date | undefined) => void; value?: Date}) {
     const [date, setDate] = useState<Date | undefined>(value);
@@ -22,8 +22,8 @@ export default function DateTimePicker({onChange, value}: {onChange: (date: Date
         onChange(selectedDate);
     };
 
-    const handleTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const [hours, minutes] = e.target.value.split(':').map(Number);
+    const handleTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const [hours, minutes] = event.target.value.split(':').map(Number);
 
         if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
             return;
@@ -47,7 +47,7 @@ export default function DateTimePicker({onChange, value}: {onChange: (date: Date
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
+                    className={twMerge('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
                     variant="outline"
                 >
                     <CalendarIcon className="mr-2 size-4" />
