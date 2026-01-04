@@ -20,7 +20,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +35,6 @@ public class FileStorageServiceRegistry {
             fileStorageServices, FileStorageService::getType, fileStorageService -> fileStorageService);
     }
 
-    @NonNull
     public FileStorageService getFileStorageService(String type) {
         return fileStorageServiceMap.get(type);
     }

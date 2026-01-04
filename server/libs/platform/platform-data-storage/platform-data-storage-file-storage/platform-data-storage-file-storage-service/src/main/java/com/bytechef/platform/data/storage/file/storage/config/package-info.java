@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 ByteChef
+ * Copyright 2023-present ByteChef Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.dto;
+@NullMarked
+package com.bytechef.platform.data.storage.file.storage.config;
 
-import com.bytechef.platform.workflow.execution.dto.JobDTO;
-import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.jspecify.annotations.NonNull;
-
-/**
- * @author Ivica Cardic
- */
-@SuppressFBWarnings("EI")
-public record WorkflowTestExecutionDTO(@NonNull JobDTO job, TriggerExecutionDTO triggerExecution) {
-}
+import org.jspecify.annotations.NullMarked;

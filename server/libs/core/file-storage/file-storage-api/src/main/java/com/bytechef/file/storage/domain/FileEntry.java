@@ -22,7 +22,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
