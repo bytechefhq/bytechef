@@ -2,7 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {fireEvent, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
-import ActionComponentsFilter from '../components/filters/ActionComponentsFilter';
+import TriggerComponentsFilter from '../components/filters/TriggerComponentsFilter';
 
 const mockComponentDefinitions = [
     {
@@ -29,10 +29,11 @@ const mockToggleCategory = vi.fn();
 const mockSetActiveView = vi.fn();
 const mockDeselectAllCategories = vi.fn();
 
-const renderActionComponentsFilter = (customState = {}) => {
+const renderTriggerComponentsFilter = (customState = {}) => {
     const mockFilterState = {
         activeView: 'all' as const,
         filteredCount: 0,
+        savedCategories: [],
         searchValue: '',
         selectedCategories: [],
         ...customState,
@@ -40,8 +41,7 @@ const renderActionComponentsFilter = (customState = {}) => {
 
     render(
         <TooltipProvider>
-            <ActionComponentsFilter
-                actionComponentDefinitions={mockComponentDefinitions}
+            <TriggerComponentsFilter
                 deselectAllCategories={mockDeselectAllCategories}
                 filterState={mockFilterState}
                 filteredCategories={mockFilteredCategories}
@@ -49,6 +49,7 @@ const renderActionComponentsFilter = (customState = {}) => {
                 setActiveView={mockSetActiveView}
                 setSearchValue={mockSetSearchValue}
                 toggleCategory={mockToggleCategory}
+                triggerComponentDefinitions={mockComponentDefinitions}
             />
         </TooltipProvider>
     );
@@ -62,8 +63,8 @@ afterEach(() => {
     resetAll();
 });
 
-it('Should render the ActionComponentsFilter component with "All" button visible and showing the number of components, and "Filtered" button invisible', () => {
-    renderActionComponentsFilter();
+it('Should render the TriggerComponentsFilter component with "All" button visible and showing the number of components, and "Filtered" button invisible', () => {
+    renderTriggerComponentsFilter();
 
     expect(screen.getByLabelText('All button')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
@@ -71,9 +72,9 @@ it('Should render the ActionComponentsFilter component with "All" button visible
 });
 
 it('should open the dropdown and show the list of categories, but have the "Deselect" button hidden when the dropdown menu trigger is clicked', async () => {
-    renderActionComponentsFilter();
+    renderTriggerComponentsFilter();
 
-    const filterDropdownButton = screen.getByLabelText('Filter actions');
+    const filterDropdownButton = screen.getByLabelText('Filter triggers');
 
     expect(filterDropdownButton).toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Find category')).not.toBeInTheDocument();
@@ -90,9 +91,9 @@ it('should open the dropdown and show the list of categories, but have the "Dese
 });
 
 it('should call "toggleCategory" with correct category name on click', async () => {
-    renderActionComponentsFilter();
+    renderTriggerComponentsFilter();
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    userEvent.click(screen.getByLabelText('Filter triggers'));
 
     await waitFor(() => {
         userEvent.click(screen.getByText('Category1'));
@@ -102,9 +103,9 @@ it('should call "toggleCategory" with correct category name on click', async () 
 });
 
 it('should call "setSearchValue" with correct value when the search input value changes', async () => {
-    renderActionComponentsFilter();
+    renderTriggerComponentsFilter();
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    userEvent.click(screen.getByLabelText('Filter triggers'));
 
     await waitFor(() => {
         const searchInput = screen.getByPlaceholderText('Find category');
@@ -116,11 +117,11 @@ it('should call "setSearchValue" with correct value when the search input value 
 });
 
 it('should show the "X" icon when the search input has a value and call "setSearchValue" with empty string when the button is clicked', async () => {
-    renderActionComponentsFilter({
+    renderTriggerComponentsFilter({
         searchValue: 'test',
     });
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    userEvent.click(screen.getByLabelText('Filter triggers'));
 
     await waitFor(() => {
         expect(screen.getByLabelText('Clear search input')).toBeInTheDocument();
@@ -132,7 +133,7 @@ it('should show the "X" icon when the search input has a value and call "setSear
 });
 
 it('should call "setActiveView" with "filtered" when the "Filtered" button is clicked', async () => {
-    renderActionComponentsFilter({
+    renderTriggerComponentsFilter({
         activeView: 'all',
     });
 
@@ -146,7 +147,7 @@ it('should call "setActiveView" with "filtered" when the "Filtered" button is cl
 });
 
 it('should call "setActiveView" with "all" when the "All" button is clicked', async () => {
-    renderActionComponentsFilter({
+    renderTriggerComponentsFilter({
         activeView: 'filtered',
     });
 
@@ -160,7 +161,7 @@ it('should call "setActiveView" with "all" when the "All" button is clicked', as
 });
 
 it('Should show "Filtered" button as visible with correct "filteredCount" and "Deselect" button as visible when there are selected categories', async () => {
-    renderActionComponentsFilter({
+    renderTriggerComponentsFilter({
         filteredCount: 2,
         selectedCategories: ['Category1'],
     });
@@ -169,7 +170,7 @@ it('Should show "Filtered" button as visible with correct "filteredCount" and "D
 
     expect(screen.getByText('2')).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    userEvent.click(screen.getByLabelText('Filter triggers'));
 
     await waitFor(() => {
         expect(screen.getByLabelText('Deselect button')).not.toHaveClass('hidden');
@@ -177,12 +178,12 @@ it('Should show "Filtered" button as visible with correct "filteredCount" and "D
 });
 
 it('should call "deselectAllCategories" when "Deselect" button is clicked', async () => {
-    renderActionComponentsFilter({
+    renderTriggerComponentsFilter({
         filteredCount: 2,
         selectedCategories: ['Category1'],
     });
 
-    userEvent.click(screen.getByLabelText('Filter actions'));
+    userEvent.click(screen.getByLabelText('Filter triggers'));
 
     await waitFor(() => {
         expect(screen.getByLabelText('Deselect button')).not.toHaveClass('hidden');
