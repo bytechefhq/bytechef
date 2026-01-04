@@ -191,7 +191,7 @@ public class ExampleComponentHandler implements ComponentHandler {
 ## Code Style and Best Practices
 
 ### Variable Naming
-- Do not use short or cryptic variable names; prefer clear, descriptive names that communicate intent
+- Do not use short or cryptic variable names on both the server and client sides; prefer clear, descriptive names that communicate intent.
 
 ### Blank Line Before Control Statements (Java)
 - Insert exactly one empty line before control statements to improve visual separation of logic:
