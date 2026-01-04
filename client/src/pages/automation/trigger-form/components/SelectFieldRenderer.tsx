@@ -38,12 +38,15 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                         {fieldDescription && <FormDescription>{fieldDescription}</FormDescription>}
 
                         <div className="flex flex-col gap-2">
-                            {options.map((opt) => (
-                                <label className="flex items-center gap-2 text-sm" key={opt.value}>
+                            {options.map((option) => (
+                                <label className="flex items-center gap-2 text-sm" key={option.value}>
                                     <Checkbox
-                                        checked={Array.isArray(field.value) ? field.value.includes(opt.value) : false}
+                                        checked={
+                                            Array.isArray(field.value) ? field.value.includes(option.value) : false
+                                        }
                                         onCheckedChange={(checked) => {
                                             const current: string[] = Array.isArray(field.value) ? field.value : [];
+
                                             if (checked) {
                                                 if (
                                                     maxSelection &&
@@ -52,14 +55,15 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                                                 ) {
                                                     return;
                                                 }
-                                                field.onChange([...current, opt.value]);
+
+                                                field.onChange([...current, option.value]);
                                             } else {
-                                                field.onChange(current.filter((v) => v !== opt.value));
+                                                field.onChange(current.filter((v) => v !== option.value));
                                             }
                                         }}
                                     />
 
-                                    <span>{opt.label}</span>
+                                    <span>{option.label}</span>
                                 </label>
                             ))}
                         </div>

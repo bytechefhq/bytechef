@@ -19,7 +19,7 @@ import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
 
-const getTriggerUrl = (type: 'form' | 'chat', environmentId?: number, staticWebhookUrl?: string) => {
+const getTriggerUrl = (type: 'form' | 'chat', environmentId: number, staticWebhookUrl?: string) => {
     if (!staticWebhookUrl) {
         return '';
     }
@@ -39,7 +39,7 @@ const ProjectDeploymentWorkflowListItem = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
-    environmentId?: number;
+    environmentId: number;
     filteredComponentNames?: string[];
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
@@ -59,8 +59,19 @@ const ProjectDeploymentWorkflowListItem = ({
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
     const {toast} = useToast();
-
     const queryClient = useQueryClient();
+
+    const formTrigger =
+        workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
+
+    const formTriggerUrl = getTriggerUrl('form', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
+
+    const hostedChatTrigger =
+        workflow.triggers &&
+        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
+        (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
+
+    const hostedChatTriggerUrl = getTriggerUrl('chat', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
@@ -69,14 +80,6 @@ const ProjectDeploymentWorkflowListItem = ({
             });
         },
     });
-
-    const hostedChatTrigger =
-        workflow.triggers &&
-        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
-        (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
-
-    const formTrigger =
-        workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
 
     const handleWorkflowClick = () => {
         if (workflow) {
@@ -190,16 +193,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
                                         icon={<FormIcon />}
-                                        onClick={() =>
-                                            window.open(
-                                                getTriggerUrl(
-                                                    'form',
-                                                    environmentId,
-                                                    projectDeploymentWorkflow.staticWebhookUrl
-                                                ),
-                                                '_blank'
-                                            )
-                                        }
+                                        onClick={() => window.open(formTriggerUrl, '_blank')}
                                         size="icon"
                                         variant="ghost"
                                     />
@@ -215,16 +209,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
                                         icon={<MessageCircleMoreIcon />}
-                                        onClick={() =>
-                                            window.open(
-                                                getTriggerUrl(
-                                                    'chat',
-                                                    environmentId,
-                                                    projectDeploymentWorkflow.staticWebhookUrl
-                                                ),
-                                                '_blank'
-                                            )
-                                        }
+                                        onClick={() => window.open(hostedChatTriggerUrl, '_blank')}
                                         size="icon"
                                         variant="ghost"
                                     />
