@@ -1,11 +1,10 @@
 import {FormField} from '@/components/ui/form';
+import {TriggerFormInput} from '@/shared/middleware/platform/configuration';
 import {UseFormReturn} from 'react-hook-form';
-
-import {FormInputType} from '../util/triggerForm-utils';
 
 interface HiddenFieldRendererProps {
     form: UseFormReturn<Record<string, unknown>>;
-    formInput: Partial<FormInputType>;
+    formInput: Partial<TriggerFormInput>;
     name: string;
 }
 
