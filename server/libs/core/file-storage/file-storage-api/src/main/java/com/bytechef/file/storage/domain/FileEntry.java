@@ -51,10 +51,13 @@ public class FileEntry {
         Assert.notNull(filename, "'filename' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
-        var name = filename.substring(indexOfLastSeparator(filename) + 1);
-        var extension = getExtension(name);
+        String name = filename.substring(indexOfLastSeparator(filename) + 1);
+        String extension = getExtension(name);
 
-        this(name, extension, MimeTypeUtils.getMimeType(extension), url);
+        this.name = name;
+        this.extension = extension;
+        this.mimeType = MimeTypeUtils.getMimeType(extension);
+        this.url = url;
     }
 
     public FileEntry(String name, @Nullable String extension, @Nullable String mimeType, String url) {
