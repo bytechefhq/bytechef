@@ -19,7 +19,7 @@ package com.bytechef.tenant.concurrent;
 import com.bytechef.tenant.TenantContext;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -33,14 +33,12 @@ public class TenantThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
     }
 
     @Override
-    @NonNull
-    public Future<?> submit(@NonNull Runnable task) {
+    public @NonNull Future<?> submit(@NonNull Runnable task) {
         return super.submit(getTenantRunnable(task));
     }
 
     @Override
-    @NonNull
-    public <T> Future<T> submit(@NonNull Callable<T> task) {
+    public <T> @NonNull Future<T> submit(@NonNull Callable<T> task) {
         return super.submit(getTenantCallable(task));
     }
 

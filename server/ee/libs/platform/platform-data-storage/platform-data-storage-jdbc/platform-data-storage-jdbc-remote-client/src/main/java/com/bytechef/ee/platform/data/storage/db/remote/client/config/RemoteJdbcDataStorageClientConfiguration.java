@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -51,45 +50,42 @@ public class RemoteJdbcDataStorageClientConfiguration {
 
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
 
-        @NonNull
         @Override
         public <T> Optional<T> fetch(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull PlatformType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
             return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
-        @NonNull
         @Override
         public <T> T get(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull PlatformType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
             return jdbcDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
-        @NonNull
         @Override
         public <T> Map<String, T> getAll(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, long environmentId,
-            @NonNull PlatformType type) {
+            String componentName, DataStorageScope scope, String scopeId, long environmentId,
+            PlatformType type) {
 
             return jdbcDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
         public void put(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull Object value, long environmentId, @NonNull PlatformType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, Object value, long environmentId, PlatformType type) {
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, environmentId, type, value);
         }
 
         @Override
         public void delete(
-            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, long environmentId, @NonNull PlatformType type) {
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
 
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }

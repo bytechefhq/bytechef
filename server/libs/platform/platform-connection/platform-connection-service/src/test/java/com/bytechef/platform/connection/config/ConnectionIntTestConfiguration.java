@@ -38,13 +38,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.lang.NonNull;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -165,8 +165,7 @@ public class ConnectionIntTestConfiguration {
         }
 
         @Override
-        @NonNull
-        protected List<?> userConverters() {
+        protected @NonNull List<?> userConverters() {
             return Arrays.asList(
                 new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
                 new EncryptedStringToMapWrapperConverter(encryption, objectMapper));

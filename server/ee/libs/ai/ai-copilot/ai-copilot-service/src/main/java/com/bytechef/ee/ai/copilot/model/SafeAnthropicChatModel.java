@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.model;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.Collections;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -22,7 +23,6 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.core.retry.RetryTemplate;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
 
 /**
@@ -51,8 +51,7 @@ public class SafeAnthropicChatModel extends AnthropicChatModel {
     }
 
     @Override
-    @NonNull
-    public Flux<ChatResponse> stream(Prompt prompt) {
+    public @NonNull Flux<ChatResponse> stream(Prompt prompt) {
         return super.stream(prompt)
             .map(this::ensureNonNullResult);
     }

@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -51,11 +51,10 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
             .ifPresent(dataStorageRepository::delete);
     }
 
-    @NonNull
     @Override
     @SuppressWarnings("unchecked")
     @Transactional
-    public <T> Optional<T> fetch(
+    public <T> @NonNull Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
@@ -65,10 +64,9 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
-    @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T get(
+    public <T> @NonNull T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
@@ -76,10 +74,9 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
             .orElseThrow();
     }
 
-    @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> getAll(
+    public <T> @NonNull Map<String, T> getAll(
         String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
 
         return dataStorageRepository
