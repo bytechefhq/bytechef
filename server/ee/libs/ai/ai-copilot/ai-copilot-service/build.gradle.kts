@@ -9,10 +9,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-anthropic")
     implementation("org.springframework.ai:spring-ai-openai")
     implementation("org.springframework.data:spring-data-jdbc")
-    implementation(files("../libs/ag-ui/core-0.0.1.jar"))
-    implementation(files("../libs/ag-ui/json-0.0.1.jar"))
-    implementation(files("../libs/ag-ui/server-0.0.1.jar"))
-    implementation(files("../libs/ag-ui/spring-ai-1.0.1.jar"))
+    implementation(files("../libs/ag-ui"))  // Using extracted classes from core, json, server, spring-ai JARs
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
