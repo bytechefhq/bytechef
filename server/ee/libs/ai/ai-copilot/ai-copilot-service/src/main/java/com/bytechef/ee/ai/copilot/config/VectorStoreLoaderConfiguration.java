@@ -187,46 +187,6 @@ public class VectorStoreLoaderConfiguration {
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
-    private static boolean containsFile(
-        List<Map<String, Object>> vectorStoreList, String fileName, String componentName, String categoryName) {
-
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
-            .anyMatch(map -> fileName.equals(map.get(NAME)) && componentName.equals(map.get(COMPONENT_NAME))
-                && categoryName.equals(map.get(CATEGORY)));
-    }
-
-    private static void storeDocumentsFromPath(
-        Path path, String suffix, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
-
-        List<Document> documentList = new ArrayList<>();
-
-        Files.walkFileTree(path, new SimpleFileVisitor<>() {
-
-            @Override
-            @SuppressFBWarnings("NP")
-            public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
-                if (StringUtils.endsWith(filePath.toString(), suffix)) {
-                    Path fileNamePath = filePath.getFileName();
-
-                    String fileName = fileNamePath.toString();
-
-                    fileName = fileName.replace(suffix, "");
-
-                    String document = Files.readString(filePath);
-
-                    addToDocuments(vectorStoreList, fileName, document, documentList);
-                }
-
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        for (List<Document> batch : batchingStrategy.batch(documentList)) {
-            vectorStore.add(batch);
-        }
-    }
-
     private static void storeComponentDocuments(
         Path componentsBasePath, BatchingStrategy batchingStrategy,
         List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
