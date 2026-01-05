@@ -269,7 +269,8 @@ public class AiCopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectToolsImpl projectTools,
-        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools, WorkflowService workflowService)
+        ProjectWorkflowToolsImpl projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        WorkflowService workflowService)
         throws AGUIException {
 
         String name = Source.WORKFLOW_EDITOR.name();
