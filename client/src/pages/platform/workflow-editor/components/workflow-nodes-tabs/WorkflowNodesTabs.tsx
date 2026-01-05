@@ -2,11 +2,10 @@ import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {useComponentFiltering} from '../../hooks/useComponentFiltering';
-import ActionComponentsFilter from '../filters/ActionComponentsFilter';
-import TriggerComponentsFilter from '../filters/TriggerComponentsFilter';
+import ComponentsFilter from '../filters/ComponentsFilter';
 import WorkflowNodesTabContent from './WorkflowNodesTabContent';
 
 type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
@@ -45,13 +44,6 @@ const WorkflowNodesTabs = ({
         !hideActionComponents ? 'components' : !hideClusterElementComponents ? 'clusterElements' : 'triggers'
     );
 
-    const [previousActionComponentsLength, setPreviousActionComponentsLength] = useState(
-        actionComponentDefinitions.length
-    );
-    const [previousTriggerComponentsLength, setPreviousTriggerComponentsLength] = useState(
-        triggerComponentDefinitions.length
-    );
-
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
     const actionFiltering = useComponentFiltering({
@@ -62,47 +54,40 @@ const WorkflowNodesTabs = ({
         componentDefinitions: triggerComponentDefinitions,
     });
 
+    const previousActionComponentsCountRef = useRef(actionComponentDefinitions.length);
+    const previousTriggerComponentsCountRef = useRef(triggerComponentDefinitions.length);
+
     useEffect(() => {
-        if (previousActionComponentsLength === actionComponentDefinitions.length) {
+        const currentCount = actionComponentDefinitions.length;
+
+        if (previousActionComponentsCountRef.current === currentCount) {
             return;
         }
 
-        setPreviousActionComponentsLength(actionComponentDefinitions.length);
+        previousActionComponentsCountRef.current = currentCount;
 
         if (actionFiltering.filterState.selectedCategories.length > 0) {
             actionFiltering.setActiveView(actionFiltering.filterState.activeView);
         } else if (actionFiltering.filterState.activeView === 'filtered') {
             actionFiltering.setActiveView('all');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        actionComponentDefinitions.length,
-        actionFiltering.filterState.activeView,
-        actionFiltering.filterState.selectedCategories.length,
-        previousActionComponentsLength,
-        actionFiltering.setActiveView,
-    ]);
+    }, [actionComponentDefinitions.length, actionFiltering]);
 
     useEffect(() => {
-        if (previousTriggerComponentsLength === triggerComponentDefinitions.length) {
+        const currentCount = triggerComponentDefinitions.length;
+
+        if (previousTriggerComponentsCountRef.current === currentCount) {
             return;
         }
 
-        setPreviousTriggerComponentsLength(triggerComponentDefinitions.length);
+        previousTriggerComponentsCountRef.current = currentCount;
 
         if (triggerFiltering.filterState.selectedCategories.length > 0) {
             triggerFiltering.setActiveView(triggerFiltering.filterState.activeView);
         } else if (triggerFiltering.filterState.activeView === 'filtered') {
             triggerFiltering.setActiveView('all');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        triggerComponentDefinitions.length,
-        triggerFiltering.filterState.activeView,
-        triggerFiltering.filterState.selectedCategories.length,
-        previousTriggerComponentsLength,
-        triggerFiltering.setActiveView,
-    ]);
+    }, [triggerComponentDefinitions.length, triggerFiltering]);
 
     const availableTriggers = useMemo(() => {
         return triggerFiltering.filteredComponents.map(
@@ -214,22 +199,30 @@ const WorkflowNodesTabs = ({
             </div>
 
             {activeTab === 'triggers' && (
-                <TriggerComponentsFilter
+                <ComponentsFilter
+                    componentDefinitions={triggerComponentDefinitions}
                     deselectAllCategories={triggerFiltering.deselectAllCategories}
+                    filterConfig={{
+                        label: 'triggers',
+                        tooltip: 'Filter triggers by category',
+                    }}
                     filterState={triggerFiltering.filterState}
                     filteredCategories={triggerFiltering.filteredCategories}
                     filteredComponents={triggerFiltering.filteredComponents}
                     setActiveView={triggerFiltering.setActiveView}
                     setSearchValue={triggerFiltering.setSearchValue}
                     toggleCategory={triggerFiltering.toggleCategory}
-                    triggerComponentDefinitions={triggerComponentDefinitions}
                 />
             )}
 
             {activeTab === 'components' && (
-                <ActionComponentsFilter
-                    actionComponentDefinitions={actionComponentDefinitions}
+                <ComponentsFilter
+                    componentDefinitions={actionComponentDefinitions}
                     deselectAllCategories={actionFiltering.deselectAllCategories}
+                    filterConfig={{
+                        label: 'actions',
+                        tooltip: 'Filter actions by category',
+                    }}
                     filterState={actionFiltering.filterState}
                     filteredCategories={actionFiltering.filteredCategories}
                     filteredComponents={actionFiltering.filteredComponents}

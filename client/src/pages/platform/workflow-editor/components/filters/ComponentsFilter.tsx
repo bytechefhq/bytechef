@@ -13,30 +13,40 @@ import {BotIcon, CircleMinusIcon, ListFilterIcon, SearchIcon, XIcon} from 'lucid
 import {ReactNode, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+export interface FilterStateProps {
+    activeView: 'all' | 'filtered';
+    selectedCategories: string[];
+    searchValue: string;
+    filteredCount: number;
+}
+
+export interface FilterCategoryProps {
+    label: string;
+    icon?: ReactNode;
+}
+
+export interface FilterConfigProps {
+    label: string;
+    tooltip: string;
+}
+
 interface ComponentsFilterProps {
     componentDefinitions: ComponentDefinitionBasic[];
     deselectAllCategories: () => void;
-    filterState: {
-        activeView: 'all' | 'filtered';
-        selectedCategories: string[];
-        searchValue: string;
-        filteredCount: number;
-    };
-    filteredCategories: {label: string; icon?: ReactNode}[];
+    filterConfig: FilterConfigProps;
+    filterState: FilterStateProps;
+    filteredCategories: FilterCategoryProps[];
     filteredComponents: ComponentDefinitionBasic[];
     setActiveView: (view: 'all' | 'filtered') => void;
     setSearchValue: (value: string) => void;
     toggleCategory: (category: string) => void;
-    filterLabel: string;
-    filterTooltip: string;
 }
 
 const ComponentsFilter = ({
     componentDefinitions,
     deselectAllCategories,
-    filterLabel,
+    filterConfig,
     filterState,
-    filterTooltip,
     filteredCategories,
     filteredComponents,
     setActiveView,
@@ -96,7 +106,7 @@ const ComponentsFilter = ({
                     <DropdownMenuTrigger asChild>
                         <TooltipTrigger asChild>
                             <Button
-                                aria-label={`Filter ${filterLabel}`}
+                                aria-label={`Filter ${filterConfig.label}`}
                                 className="data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                 icon={<ListFilterIcon />}
                                 size="iconSm"
@@ -105,7 +115,7 @@ const ComponentsFilter = ({
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
-                    <TooltipContent>{filterTooltip}</TooltipContent>
+                    <TooltipContent>{filterConfig.tooltip}</TooltipContent>
                 </Tooltip>
 
                 <DropdownMenuContent align="start" className="mr-2 overflow-hidden p-1">
