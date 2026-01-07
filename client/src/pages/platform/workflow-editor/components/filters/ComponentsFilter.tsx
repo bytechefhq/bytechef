@@ -13,19 +13,19 @@ import {BotIcon, CircleMinusIcon, ListFilterIcon, SearchIcon, XIcon} from 'lucid
 import {ReactNode, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface FilterStateProps {
+interface FilterStateProps {
     activeView: 'all' | 'filtered';
     selectedCategories: string[];
     searchValue: string;
     filteredCount: number;
 }
 
-export interface FilterCategoryProps {
+interface FilterCategoryProps {
     label: string;
     icon?: ReactNode;
 }
 
-export interface FilterConfigProps {
+interface FilterConfigProps {
     label: string;
     tooltip: string;
 }
