@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -72,19 +73,40 @@ public class VectorStoreLoaderConfiguration {
     }
 
     private static void addToDocuments(
-        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents) {
+        List<Map<String, Object>> vectorStoreMetadataList, String name, String json, List<Document> documents,
+        VectorStore vectorStore) {
 
-        if (!containsFile(vectorStores, name, README)) {
-            String cleanedDocument = preprocessDocument(json);
+        String cleanedDocument = preprocessDocument(json);
+        int hash = cleanedDocument.hashCode();
 
+        if (!containsVectorStoreFile(vectorStoreMetadataList, name, README)) {
             if (!cleanedDocument.isEmpty()) {
-                // Split the document into chunks
-                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+                addToDocuments(name, documents, cleanedDocument, hash);
+            }
+        } else {
+            Optional<Map<String, Object>> vectorStoreFileMetadata =
+                getVectorStoreFile(vectorStoreMetadataList, name, README);
+            if (vectorStoreFileMetadata.isPresent()) {
+                int vectorHash = (int) vectorStoreFileMetadata.get()
+                    .get("hash");
+                if (vectorHash != hash) {
+                    deleteFromVectorStore(vectorStore, name, README, hash);
 
-                for (String chunk : chunks) {
-                    documents.add(new Document(chunk, Map.of(CATEGORY, README, NAME, name)));
+                    addToDocuments(name, documents, cleanedDocument, hash);
                 }
             }
+        }
+    }
+
+    private static void deleteFromVectorStore(VectorStore vectorStore, String name, String category, int hash) {
+        vectorStore.delete(String.format("name == '%s' AND category == '%s' AND hash == '%d'", name, category, hash));
+    }
+
+    private static void addToDocuments(String name, List<Document> documents, String cleanedDocument, int hash) {
+        List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+
+        for (String chunk : chunks) {
+            documents.add(new Document(chunk, Map.of(CATEGORY, README, NAME, name, "hash", hash)));
         }
     }
 
@@ -180,16 +202,24 @@ public class VectorStoreLoaderConfiguration {
         return chunks;
     }
 
-    private static boolean containsFile(
+    private static boolean containsVectorStoreFile(
         List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
 
         return !vectorStoreList.isEmpty() && vectorStoreList.stream()
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
+    private static Optional<Map<String, Object>> getVectorStoreFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
+
+        return vectorStoreList.stream()
+            .filter(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)))
+            .findFirst();
+    }
+
     private static void storeComponentDocuments(
         Path componentsBasePath, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
+        List<Map<String, Object>> vectorStoreMetadataList, VectorStore vectorStore) throws IOException {
 
         List<Document> documentList = new ArrayList<>();
 
@@ -209,7 +239,7 @@ public class VectorStoreLoaderConfiguration {
                                 .toString();
                             String document = Files.readString(readmePath);
 
-                            addToDocuments(vectorStoreList, componentName, document, documentList);
+                            addToDocuments(vectorStoreMetadataList, componentName, document, documentList, vectorStore);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException("Error reading README.mdx for component: " +
@@ -224,9 +254,9 @@ public class VectorStoreLoaderConfiguration {
     }
 
     private void storeDocuments(
-        List<Map<String, Object>> vectorStoreList, Path componentsBasePath) {
+        List<Map<String, Object>> vectorStoreMetadataList, Path componentsBasePath) {
         try {
-            storeComponentDocuments(componentsBasePath, strategy, vectorStoreList, vectorStore);
+            storeComponentDocuments(componentsBasePath, strategy, vectorStoreMetadataList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
