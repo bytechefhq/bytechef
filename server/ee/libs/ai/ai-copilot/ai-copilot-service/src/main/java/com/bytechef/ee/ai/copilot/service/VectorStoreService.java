@@ -32,14 +32,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class VectorStoreService {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final VectorStoreRowMapper ROW_MAPPER = new VectorStoreRowMapper();
-
+    private final VectorStoreRowMapper rowMapper;
     private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public VectorStoreService(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public VectorStoreService(@Qualifier("pgVectorJdbcTemplate") JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.rowMapper = new VectorStoreRowMapper(objectMapper);
     }
 
     public long count() {
@@ -50,10 +49,16 @@ public class VectorStoreService {
 
     public List<VectorStore> findAll() {
         return jdbcTemplate.query(
-            "SELECT id, content, metadata, embedding::text as embedding FROM vector_store", ROW_MAPPER);
+            "SELECT id, content, metadata, embedding::text as embedding FROM vector_store", rowMapper);
     }
 
     private static class VectorStoreRowMapper implements RowMapper<VectorStore> {
+
+        private final ObjectMapper objectMapper;
+
+        public VectorStoreRowMapper(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public VectorStore mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -79,7 +84,7 @@ public class VectorStoreService {
                     metadataJson = metadataObj.toString();
                 }
 
-                return OBJECT_MAPPER.readValue(metadataJson, new TypeReference<>() {});
+                return objectMapper.readValue(metadataJson, new TypeReference<>() {});
             } catch (Exception e) {
                 throw new SQLException("Failed to parse metadata JSON", e);
             }
