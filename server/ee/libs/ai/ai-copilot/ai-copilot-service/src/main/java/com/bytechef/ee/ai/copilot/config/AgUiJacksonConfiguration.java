@@ -63,8 +63,8 @@ public class AgUiJacksonConfiguration {
     }
 
     /**
-     * Mixin for BaseEvent to enable polymorphic JSON deserialization.
-     * Maps the "type" field to concrete event implementation classes.
+     * Mixin for BaseEvent to enable polymorphic JSON deserialization. Maps the "type" field to concrete event
+     * implementation classes.
      */
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -87,9 +87,12 @@ public class AgUiJacksonConfiguration {
         @JsonSubTypes.Type(value = com.agui.core.event.TextMessageStartEvent.class, name = "TEXT_MESSAGE_START"),
         @JsonSubTypes.Type(value = com.agui.core.event.ThinkingEndEvent.class, name = "THINKING_END"),
         @JsonSubTypes.Type(value = com.agui.core.event.ThinkingStartEvent.class, name = "THINKING_START"),
-        @JsonSubTypes.Type(value = com.agui.core.event.ThinkingTextMessageContentEvent.class, name = "THINKING_TEXT_MESSAGE_CONTENT"),
-        @JsonSubTypes.Type(value = com.agui.core.event.ThinkingTextMessageEndEvent.class, name = "THINKING_TEXT_MESSAGE_END"),
-        @JsonSubTypes.Type(value = com.agui.core.event.ThinkingTextMessageStartEvent.class, name = "THINKING_TEXT_MESSAGE_START"),
+        @JsonSubTypes.Type(
+            value = com.agui.core.event.ThinkingTextMessageContentEvent.class, name = "THINKING_TEXT_MESSAGE_CONTENT"),
+        @JsonSubTypes.Type(
+            value = com.agui.core.event.ThinkingTextMessageEndEvent.class, name = "THINKING_TEXT_MESSAGE_END"),
+        @JsonSubTypes.Type(
+            value = com.agui.core.event.ThinkingTextMessageStartEvent.class, name = "THINKING_TEXT_MESSAGE_START"),
         @JsonSubTypes.Type(value = com.agui.core.event.ToolCallArgsEvent.class, name = "TOOL_CALL_ARGS"),
         @JsonSubTypes.Type(value = com.agui.core.event.ToolCallChunkEvent.class, name = "TOOL_CALL_CHUNK"),
         @JsonSubTypes.Type(value = com.agui.core.event.ToolCallEndEvent.class, name = "TOOL_CALL_END"),
@@ -100,8 +103,8 @@ public class AgUiJacksonConfiguration {
     }
 
     /**
-     * Mixin for State to enable dynamic JSON property handling.
-     * Uses @JsonAnyGetter and @JsonAnySetter for flexible state management.
+     * Mixin for State to enable dynamic JSON property handling. Uses @JsonAnyGetter and @JsonAnySetter for flexible
+     * state management.
      */
     interface StateMixin {
         @com.fasterxml.jackson.annotation.JsonAnyGetter
