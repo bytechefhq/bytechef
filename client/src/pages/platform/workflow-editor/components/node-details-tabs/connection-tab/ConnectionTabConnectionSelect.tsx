@@ -277,11 +277,13 @@ const ConnectionTabConnectionSelect = ({
                     required={required}
                     value={connectionId !== undefined ? connectionId.toString() : undefined}
                 >
-                    <div className="flex space-x-2 bg-white">
+                    <div className="flex w-full space-x-2">
                         {componentConnections && componentConnections.length > 0 && (
-                            <SelectTrigger>
-                                <SelectValue placeholder="Choose Connection..." />
-                            </SelectTrigger>
+                            <div className="flex-1 bg-content-onsurface-primary">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Choose Connection..." />
+                                </SelectTrigger>
+                            </div>
                         )}
 
                         {connectionId !== undefined && (
