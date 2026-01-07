@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
  * @author Marko Kriskovic
  */
 @Service
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class VectorStoreService {
 
     private final VectorStoreRowMapper rowMapper;

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnProperty(name = "bytechef.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ProjectToolsImpl implements ProjectTools {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectToolsImpl.class);
