@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Flow.Publisher;
 
 /**
  * @author Ivica Cardic
@@ -148,14 +149,24 @@ public interface ActionDefinition {
     Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
     /**
-     *
+     * Represents a base interface for defining output functions within the system. This interface serves as a
+     * foundational contract for more specialized output function definitions, enabling consistency and extendability in
+     * handling output-related operations. <br>
+     * Implementations of this interface are expected to be stateless and thread-safe, ensuring that they can be reused
+     * across various contexts without introducing side effects or concurrency issues. <br>
+     * It extends the {@code com.bytechef.definition.BaseOutputFunction}, inheriting its core functionalities while
+     * allowing for additional behavior to be implemented by child interfaces or classes.
      */
     interface BaseOutputFunction extends com.bytechef.definition.BaseOutputFunction {
 
     }
 
     /**
-     *
+     * Represents the base interface for defining custom action execution logic. Implementations of this interface
+     * typically serve as a foundational contract for creating functional interfaces that require the execution of
+     * specific actions within a defined context, using parameters and configuration. <br>
+     * This interface is designed to be extended by more specific functional interfaces to enable the dynamic execution
+     * of business processes, workflows, or other operations.
      */
     interface BasePerformFunction {
 
@@ -234,6 +245,74 @@ public interface ActionDefinition {
          */
         Optional<Map<String, ?>> apply(Parameters inputParameters, Parameters continueParameters, ActionContext context)
             throws Exception;
+    }
+
+    /**
+     * Functional interface for handling Server-Sent Events (SSE) within an action or application. This interface
+     * provides a mechanism to emit data to clients in real-time by invoking the {@code handle} method with an
+     * appropriate {@link SseEmitter} implementation.
+     */
+    @FunctionalInterface
+    interface SseEmitterHandler {
+
+        /**
+         * Handles the emission of server-sent events (SSE) by processing and managing the event stream through the
+         * provided emitter. This method is responsible for controlling the lifecycle of the event emission, including
+         * sending data, handling completion, errors, and timeout scenarios.
+         *
+         * @param sseEmitter the {@code Emitter} instance used to manage and emit server-sent events to connected
+         *                   clients. This emitter provides methods for sending data, completing the event stream,
+         *                   handling errors, and registering timeout listeners.
+         */
+        void handle(SseEmitter sseEmitter);
+
+        /**
+         * Represents an abstraction for handling server-sent events (SSE) by allowing data emission to connected
+         * clients and managing event lifecycle events such as completion, errors, and timeouts.
+         */
+        interface SseEmitter {
+
+            /**
+             * Registers a listener to be invoked when a timeout event occurs.
+             *
+             * @param timeoutListener a {@code Runnable} to be executed upon a timeout event. This listener should
+             *                        contain the logic to handle or respond to the timeout condition.
+             */
+            void addTimeoutListener(Runnable timeoutListener);
+
+            /**
+             * Marks the completion of the event emission process. Once this method is called, the emitter signals that
+             * no further events will be sent to the connected clients, and the lifecycle of the connection or event
+             * stream is concluded. Any subsequent attempts to emit events after invoking this method will typically
+             * result in a runtime error or be ignored depending on the implementation.
+             */
+            void complete();
+
+            /**
+             * Marks the event emission process as completed with an error. This method signals the occurrence of an
+             * error during the event lifecycle, preventing further events from being sent to the connected clients.
+             * Once invoked, the emitter transitions into an error state and terminates the connection or event stream
+             * with the provided exception.
+             *
+             * @param throwable the {@code Throwable} instance representing the error or exception that caused the
+             *                  termination of the event emission process. It provides context about the failure for
+             *                  logging or client-side handling.
+             */
+            void error(Throwable throwable);
+
+            /**
+             * Sends the specified data to the connected clients or destination. This method handles the emission of
+             * data for server-sent events (SSE) or similar mechanisms as supported by the implementation. The exact
+             * behavior of this method, such as handling of errors, buffering, or serialization, depends on the specific
+             * implementation of the emitter interface.
+             *
+             * @param data the object containing the data to be sent. This could include any type of object that is
+             *             serializable or transmittable according to the underlying emitter's implementation. It is the
+             *             caller's responsibility to ensure compatibility of the provided data with the expected format
+             *             or protocol.
+             */
+            void send(Object data);
+        }
     }
 
     /**
@@ -318,6 +397,7 @@ public interface ActionDefinition {
          * @return
          */
         ProviderException apply(int statusCode, Object body, ActionContext actionContext) throws Exception;
+
     }
 
     /**
@@ -368,6 +448,70 @@ public interface ActionDefinition {
             Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters,
             ActionContext context)
 
+            throws Exception;
+    }
+
+    /**
+     * Functional interface that extends {@link PerformFunction} to support streaming operations that return
+     * asynchronous event streams during action execution. <br/>
+     * This interface is specifically designed for actions that need to stream multiple events or data chunks over time
+     * rather than returning a single result. It uses the Reactive Streams {@link Publisher} API to enable non-blocking,
+     * backpressure-aware streaming of events throughout the duration of the action execution. <br/>
+     * Implementations of this interface should return a {@link Publisher} that emits events asynchronously, allowing
+     * consumers to subscribe and receive streamed data as it becomes available. This is particularly useful for
+     * long-running operations, real-time data processing, or scenarios where results need to be delivered incrementally
+     * rather than all at once. <br/>
+     * The returned {@link Publisher} will continue to stream events for the entire duration of the action execution,
+     * completing when the action is finished or terminating with an error if the action fails.
+     *
+     * @see PerformFunction
+     * @see Publisher
+     * @see ActionContext
+     * @see Parameters
+     */
+    @FunctionalInterface
+    interface StreamPerformFunction extends PerformFunction {
+
+        /**
+         * Applies the streaming perform function to execute an action and returns a Publisher that streams events.
+         * <br/>
+         * This method executes the action with the provided input and connection parameters within the given context,
+         * returning a Publisher that asynchronously emits events throughout the duration of the action execution. The
+         * Publisher enables non-blocking, backpressure-aware streaming of results, allowing consumers to receive data
+         * incrementally as it becomes available rather than waiting for a single complete result.
+         *
+         * @param inputParameters      the input parameters for the action execution, containing the data required to
+         *                             perform the action
+         * @param connectionParameters the connection parameters containing authentication and configuration details
+         *                             required to connect to external services
+         * @param context              the action execution context providing access to runtime environment,
+         *                             configuration, and utility services
+         * @return a Publisher that emits events asynchronously during action execution, completing when the action
+         *         finishes or terminating with an error if the action fails
+         * @throws Exception if an error occurs during action execution or setup
+         */
+        Publisher<?> apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+            throws Exception;
+    }
+
+    /**
+     * A perform function variant that returns {@link SseEmitterHandler} used to stream events to clients during the
+     * action execution. The workflow engine will wait until the returned emitter signals completion before proceeding
+     * to the next task.
+     */
+    @FunctionalInterface
+    interface SseStreamResponsePerformFunction extends PerformFunction {
+
+        /**
+         * Execute the action and return an {@link SseEmitterHandler} used to stream events.
+         *
+         * @param inputParameters      the input parameters for the action
+         * @param connectionParameters the parameters related to the connection
+         * @param context              the context in which the action is executed
+         * @return the {@link SseEmitterHandler} that will stream events for the duration of this action
+         * @throws Exception if an error occurs during the execution of the action
+         */
+        SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
