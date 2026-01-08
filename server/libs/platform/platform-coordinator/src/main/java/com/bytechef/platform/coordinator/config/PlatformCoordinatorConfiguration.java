@@ -76,7 +76,7 @@ public class PlatformCoordinatorConfiguration {
         Optional<JobExecutionCounter> jobExecutionCounter) {
 
         return new NotificationJobStatusApplicationEventListener(
-            jobExecutionCounter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
+            jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
             notificationService);
     }
 

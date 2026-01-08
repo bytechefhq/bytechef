@@ -32,14 +32,14 @@ import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Matija Petanjek
  */
 public class NotificationJobStatusApplicationEventListener implements ApplicationEventListener {
 
-    private final Optional<JobExecutionCounter> jobExecutionCounter;
+    private final @Nullable JobExecutionCounter jobExecutionCounter;
     private final JobService jobService;
     private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
@@ -47,7 +47,7 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
 
     @SuppressFBWarnings("EI")
     public NotificationJobStatusApplicationEventListener(
-        Optional<JobExecutionCounter> jobExecutionCounter, JobService jobService,
+        @Nullable JobExecutionCounter jobExecutionCounter, JobService jobService,
         NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
@@ -66,8 +66,9 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
 
             Job job = jobService.getJob(jobStatusApplicationEvent.getJobId());
 
-            jobExecutionCounter.ifPresent(
-                jobExecutionCounter -> jobExecutionCounter.process(jobStatusApplicationEvent, job));
+            if (jobExecutionCounter != null) {
+                jobExecutionCounter.process(jobStatusApplicationEvent, job);
+            }
 
             Job.Status status = jobStatusApplicationEvent.getStatus();
 
