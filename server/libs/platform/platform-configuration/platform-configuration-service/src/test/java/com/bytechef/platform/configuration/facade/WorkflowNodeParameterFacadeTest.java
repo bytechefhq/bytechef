@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,7 +58,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1395,14 +1395,14 @@ public class WorkflowNodeParameterFacadeTest {
             task.put("name", "loop1");
             task.put("type", "loop/v1");
 
-            List<String> arrayItem = List.of(RandomStringUtils.randomAlphanumeric(20));
+            List<String> arrayItem = List.of(secure().nextAlphanumeric(20));
             Map<String, Object> parameters = new TreeMap<>();
             parameters.put("items", List.of(arrayItem));
 
             Map<String, Object> iteratee = new HashMap<>();
             iteratee.put("name", "logger1");
             iteratee.put("type", "logger/v1/info");
-            iteratee.put("parameters", Map.of("text", RandomStringUtils.randomAlphanumeric(20)));
+            iteratee.put("parameters", Map.of("text", secure().nextAlphanumeric(20)));
             iteratee.put("metadata", new HashMap<>());
 
             parameters.put("iteratee", List.of(iteratee));
@@ -2332,13 +2332,12 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    @SuppressWarnings({
+        "checkstyle:methodlengthcheck", "rawtypes", "unchecked"
+    })
     void testUpdateWorkflowNodeParameterDisplayConditionNotEvaluatedForWrongType() {
         // Given - Testing bug where display conditions for NUMBER type properties are evaluated when updating STRING
         // type parameters.
-        //
-        // Real scenario: When conditions[0][0] is set to STRING variant (e.g., by setting value1 first),
-        // and then updating value2, only STRING variant display conditions should be evaluated.
-        // The bug was that ALL variants (NUMBER, BOOLEAN, etc.) were being checked.
         String workflowId = "678a28b3-1e50-4356-b3d6-1fa8128698c9";
         String workflowNodeName = "condition_1";
         String parameterPath = "conditions[0][0].value2";
@@ -2432,15 +2431,10 @@ public class WorkflowNodeParameterFacadeTest {
                     String condition = (String) map.get("displayCondition");
 
                     // Simulate all conditions evaluating to true for this test
-                    if (condition.equals("=rawExpression == false")) {
-                        return Map.of("displayCondition", true);
-                    }
+                    if (condition.equals("=rawExpression == false") ||
+                        condition.equals("=conditions[0][0].operation != 'EMPTY'") ||
+                        condition.equals("=!contains({'EMPTY','REGEX'}, conditions[0][0].operation)")) {
 
-                    if (condition.equals("=conditions[0][0].operation != 'EMPTY'")) {
-                        return Map.of("displayCondition", true);
-                    }
-
-                    if (condition.equals("=!contains({'EMPTY','REGEX'}, conditions[0][0].operation)")) {
                         return Map.of("displayCondition", true);
                     }
                 }
