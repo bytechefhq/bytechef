@@ -25,4 +25,5 @@ public class ChatConstants {
     public static final String CHAT = "chat";
     public static final String CONVERSATION_ID = "conversationId";
     public static final String MESSAGE = "message";
+    public static final String STREAM = "stream";
 }

@@ -23,6 +23,7 @@ import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiCreateImageAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiCreateSpeechAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiCreateTranscriptionAction;
+import com.bytechef.component.ai.llm.openai.action.OpenAiStreamChatAction;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiChatModel;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
 import com.bytechef.component.ai.llm.openai.connection.OpenAiConnection;
@@ -47,6 +48,7 @@ public class OpenAiComponentHandler implements ComponentHandler {
         .connection(OpenAiConnection.CONNECTION_DEFINITION)
         .actions(
             OpenAiChatAction.ACTION_DEFINITION,
+            OpenAiStreamChatAction.ACTION_DEFINITION,
             OpenAiCreateImageAction.ACTION_DEFINITION,
             OpenAiCreateSpeechAction.ACTION_DEFINITION,
             OpenAiCreateTranscriptionAction.ACTION_DEFINITION)

@@ -16,8 +16,18 @@
 
 package com.bytechef.component.ai.llm.anthropic.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -25,6 +35,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,4 +59,18 @@ public class AnthropicConstants {
         .description("ID of the model to use.")
         .options(MODELS)
         .required(true);
+
+    public static final List<Property> ASK_PROPERTIES = List.of(
+        CHAT_MODEL_PROPERTY,
+        FORMAT_PROPERTY,
+        PROMPT_PROPERTY,
+        SYSTEM_PROMPT_PROPERTY,
+        ATTACHMENTS_PROPERTY,
+        MESSAGES_PROPERTY,
+        MAX_TOKENS_PROPERTY,
+        RESPONSE_PROPERTY,
+        TEMPERATURE_PROPERTY,
+        TOP_P_PROPERTY,
+        TOP_K_PROPERTY,
+        STOP_PROPERTY);
 }
