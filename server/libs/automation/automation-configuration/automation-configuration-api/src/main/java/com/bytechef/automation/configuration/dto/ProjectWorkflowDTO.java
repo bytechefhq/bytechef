@@ -29,9 +29,10 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
     private final int projectVersion;
     private final long projectWorkflowId;
+    private final boolean sseStreamResponse;
     private final String workflowUuid;
 
-    public ProjectWorkflowDTO(Workflow workflow, ProjectWorkflow projectWorkflow) {
+    public ProjectWorkflowDTO(Workflow workflow, ProjectWorkflow projectWorkflow, boolean sseStreamResponse) {
         super(
             workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getDefinition(), workflow.getDescription(),
             workflow.getFormat(), workflow.getId(), workflow.getInputs(), workflow.getLabel(),
@@ -40,10 +41,13 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
         this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
+        this.sseStreamResponse = sseStreamResponse;
         this.workflowUuid = projectWorkflow.getUuidAsString();
     }
 
-    public ProjectWorkflowDTO(WorkflowDTO workflowDTO, ProjectWorkflow projectWorkflow) {
+    public ProjectWorkflowDTO(
+        WorkflowDTO workflowDTO, ProjectWorkflow projectWorkflow, boolean sseStreamResponse) {
+
         super(
             workflowDTO.getCreatedBy(), workflowDTO.getCreatedDate(), workflowDTO.getDefinition(),
             workflowDTO.getDescription(), workflowDTO.getFormat(), workflowDTO.getId(), workflowDTO.getInputs(),
@@ -53,6 +57,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
         this.projectVersion = projectWorkflow.getProjectVersion();
         this.projectWorkflowId = projectWorkflow.getId();
+        this.sseStreamResponse = sseStreamResponse;
         this.workflowUuid = projectWorkflow.getUuidAsString();
     }
 
@@ -62,6 +67,10 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
 
     public long getProjectWorkflowId() {
         return projectWorkflowId;
+    }
+
+    public boolean isSseStreamResponse() {
+        return sseStreamResponse;
     }
 
     public String getWorkflowUuid() {
@@ -83,12 +92,12 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
         }
 
         return projectVersion == that.projectVersion && projectWorkflowId == that.projectWorkflowId &&
-            Objects.equals(workflowUuid, that.workflowUuid);
+            sseStreamResponse == that.sseStreamResponse && Objects.equals(workflowUuid, that.workflowUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), projectWorkflowId, workflowUuid);
+        return Objects.hash(super.hashCode(), projectWorkflowId, sseStreamResponse, workflowUuid);
     }
 
     @Override
@@ -97,6 +106,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             "projectWorkflowId=" + projectWorkflowId +
             ", workflowUuid='" + workflowUuid + '\'' +
             ", projectVersion=" + projectVersion +
+            ", sseStreamResponse=" + sseStreamResponse +
             "} " + super.toString();
     }
 }
