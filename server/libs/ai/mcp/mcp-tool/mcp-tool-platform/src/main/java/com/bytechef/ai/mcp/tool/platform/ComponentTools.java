@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,7 +137,7 @@ public class ComponentTools {
                         new Filter.Value(componentName)));
 
                 List<Document> documentList = vectorStore.similaritySearch(
-                    org.springframework.ai.vectorstore.SearchRequest.builder()
+                    SearchRequest.builder()
                         .query(componentName)
                         .filterExpression(filterExpression)
                         .topK(1)
