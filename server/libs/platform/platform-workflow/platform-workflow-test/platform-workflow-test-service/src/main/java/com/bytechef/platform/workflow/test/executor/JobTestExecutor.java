@@ -38,8 +38,9 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
@@ -230,7 +231,7 @@ public class JobTestExecutor {
             new TaskStatusEventDTO(jobId, e.getTaskExecutionId(), STARTED, null, null, e.getCreateDate(), null)));
     }
 
-    public AutoCloseable addSseStreamBridge(long jobId, JobSyncExecutor.SseStreamBridge bridge) {
+    public AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge) {
         return jobSyncExecutor.addSseStreamBridge(jobId, bridge);
     }
 

@@ -21,7 +21,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
@@ -461,7 +460,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     /**
      * Bridge that broadcasts streamed payloads to all currently attached SSE clients for this job key.
      */
-    private class SseStreamBridge implements JobSyncExecutor.SseStreamBridge {
+    private class SseStreamBridge implements com.bytechef.platform.job.sync.SseStreamBridge {
 
         private final String key;
 

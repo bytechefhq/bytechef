@@ -25,7 +25,7 @@ dependencies {
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
-    testImplementation(project(":server:libs:platform:platform-coordinator"))
+    testImplementation(project(":server:libs:platform:platform-job-sync"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.executor;
 
-import com.bytechef.component.definition.ActionDefinition.EmitterHandler;
+import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Ivica Cardic
  */
-class Emitter implements EmitterHandler.Emitter {
+class SseEmitter implements SseEmitterHandler.SseEmitter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Emitter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SseEmitter.class);
 
     private final CopyOnWriteArrayList<Consumer<Object>> eventListeners = new CopyOnWriteArrayList<>();
 
@@ -50,11 +50,11 @@ class Emitter implements EmitterHandler.Emitter {
     private volatile boolean errored;
     private volatile @Nullable Throwable lastError;
 
-    public Emitter() {
+    public SseEmitter() {
         this.timeout = null;
     }
 
-    public Emitter(Long timeoutMillis) {
+    public SseEmitter(Long timeoutMillis) {
         this.timeout = timeoutMillis;
     }
 

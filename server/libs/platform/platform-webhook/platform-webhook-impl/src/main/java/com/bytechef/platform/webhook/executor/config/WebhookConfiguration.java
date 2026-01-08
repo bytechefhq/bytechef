@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.webhook.executor.config;
 
-import static com.bytechef.platform.coordinator.job.JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR;
+import static com.bytechef.platform.job.sync.executor.JobSyncExecutor.MemoryMessageFactory.Role.COORDINATOR;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -39,8 +39,8 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.coordinator.file.storage.InMemoryTaskFileStorage;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;

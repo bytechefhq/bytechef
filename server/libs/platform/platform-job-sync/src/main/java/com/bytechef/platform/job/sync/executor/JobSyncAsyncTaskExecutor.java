@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.execution.domain.TaskExecution;

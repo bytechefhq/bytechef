@@ -27,7 +27,7 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;

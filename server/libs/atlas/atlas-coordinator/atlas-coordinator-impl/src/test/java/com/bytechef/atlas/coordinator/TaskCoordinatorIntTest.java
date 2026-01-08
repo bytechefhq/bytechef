@@ -53,7 +53,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

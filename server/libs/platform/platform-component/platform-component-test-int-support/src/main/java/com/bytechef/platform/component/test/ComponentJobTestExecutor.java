@@ -38,7 +38,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

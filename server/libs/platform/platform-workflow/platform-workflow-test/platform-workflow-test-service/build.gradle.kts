@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
-    implementation(project(":server:libs:platform:platform-coordinator"))
+    implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     implementation(project(":server:libs:modules:components:map"))
