@@ -4,7 +4,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
+import {CANVAS_BACKGROUND_COLOR, MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -314,7 +314,7 @@ const WorkflowEditor = ({
                     />
                 )}
 
-                <Background color="#ccc" size={2} variant={BackgroundVariant.Dots} />
+                <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
                 <Controls
                     className="m-2 mb-3 rounded-md border border-stroke-neutral-secondary bg-background"
