@@ -27,9 +27,13 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.concurrent.Flow.Publisher;
+import org.jspecify.annotations.Nullable;
+import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClient.StreamResponseSpec;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.lang.Nullable;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Marko Kriskovic
@@ -80,6 +84,50 @@ public interface ChatModel {
             .call();
 
         return ModelUtils.getChatResponse(callResponseSpec, inputParameters, responseFormatRequired, context);
+    }
+
+    default Publisher<?> stream(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(
+            inputParameters, connectionParameters, true);
+
+        List<org.springframework.ai.chat.messages.Message> messages = ModelUtils.getMessages(
+            inputParameters, context, true);
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
+            chatModel, inputParameters, true, context);
+
+        SimpleLoggerAdvisor simpleLoggerAdvisor = SimpleLoggerAdvisor.builder()
+            .build();
+
+        StreamResponseSpec streamResponseSpec = chatClientRequestSpec
+            .messages(messages)
+            .advisors(simpleLoggerAdvisor)
+            .stream();
+
+        try {
+            Flux<String> contentFlux = streamResponseSpec.content();
+
+            return FlowAdapters.toFlowPublisher(contentFlux);
+        } catch (Throwable ignoredContent) {
+            Flux<?> contentFlux = streamResponseSpec.chatResponse()
+                .map(chatResponse -> {
+                    Object payload = chatResponse;
+
+                    String text = chatResponse.getResult()
+                        .getOutput()
+                        .getText();
+
+                    if (text != null) {
+                        payload = text;
+                    }
+
+                    return payload;
+                });
+
+            return FlowAdapters.toFlowPublisher(contentFlux);
+        }
     }
 
     private ChatClient.ChatClientRequestSpec createPrompt(

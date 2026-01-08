@@ -27,27 +27,30 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
-import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Flow;
+import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Ivica Cardic
  */
-public class AiAgentChatAction extends AbstractAiAgentChatAction {
+public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
     public final ChatActionDefinitionWrapper actionDefinition;
 
-    public AiAgentChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public AiAgentStreamChatAction(ClusterElementDefinitionService clusterElementDefinitionService) {
         super(clusterElementDefinitionService);
 
         actionDefinition = new ChatActionDefinitionWrapper(
-            action(CHAT)
-                .title("Chat")
-                .description("Chat with the AI agent.")
+            action(CHAT + "Stream")
+                .title("Chat (stream)")
+                .description("Chat with the AI agent and stream the response.")
                 .properties(CHAT_PROPERTIES)
                 .output(
                     (MultipleConnectionsOutputFunction) (
@@ -63,19 +66,45 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         @Override
         public Optional<? extends BasePerformFunction> getPerform() {
-            return Optional.of((MultipleConnectionsPerformFunction) AiAgentChatAction.this::perform);
+            return Optional.of((MultipleConnectionsStreamPerformFunction) AiAgentStreamChatAction.this::perform);
         }
     }
 
-    protected Object perform(
-        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
-        ActionContext context) throws Exception {
+    protected Flow.Publisher<?> perform(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
+        Parameters extensions, ActionContext context) throws Exception {
 
-        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, context);
 
-        ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
+        SimpleLoggerAdvisor simpleLoggerAdvisor = SimpleLoggerAdvisor.builder()
+            .build();
 
-        return ModelUtils.getChatResponse(call, inputParameters, context);
+        var streamResponseSpec = chatClientRequestSpec
+            .advisors(simpleLoggerAdvisor)
+            .stream();
+
+        try {
+            Flux<String> contentFlux = streamResponseSpec.content();
+
+            return FlowAdapters.toFlowPublisher(contentFlux);
+        } catch (Throwable ignoredContent) {
+            Flux<?> contentFlux = streamResponseSpec.chatResponse()
+                .map(chatResponse -> {
+                    Object payload = chatResponse;
+
+                    String text = chatResponse.getResult()
+                        .getOutput()
+                        .getText();
+
+                    if (text != null) {
+                        payload = text;
+                    }
+
+                    return payload;
+                });
+
+            return FlowAdapters.toFlowPublisher(contentFlux);
+        }
     }
 }
