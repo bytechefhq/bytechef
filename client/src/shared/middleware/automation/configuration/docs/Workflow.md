@@ -28,6 +28,7 @@ Name | Type
 `triggers` | [Array&lt;WorkflowTrigger&gt;](WorkflowTrigger.md)
 `version` | number
 `projectWorkflowId` | number
+`sseStreamResponse` | boolean
 `workflowUuid` | string
 
 ## Example
@@ -58,6 +59,7 @@ const example = {
   "triggers": null,
   "version": null,
   "projectWorkflowId": null,
+  "sseStreamResponse": null,
   "workflowUuid": null,
 } satisfies Workflow
 
