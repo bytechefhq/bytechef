@@ -47,7 +47,7 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -100,9 +100,10 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(
-            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+            Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION,
             taskFileStorage.storeTaskExecutionOutput(
-                Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
+                Objects.requireNonNull(taskExecution.getJobId()), Objects.requireNonNull(taskExecution.getId()),
+                Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
             null, evaluator, getEventPublisher(syncMessageBroker), currentThreadExecutorService::execute,

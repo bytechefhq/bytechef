@@ -34,7 +34,7 @@ import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -84,7 +84,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                         job.getParentTaskExecutionId());
 
                     eventPublisher.publishEvent(
-                        new StopJobEvent(Validate.notNull(subflowTaskExecution.getJobId(), "jobId")));
+                        new StopJobEvent(Objects.requireNonNull(subflowTaskExecution.getJobId())));
 
                 }
                 case FAILED -> {
@@ -104,7 +104,8 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                     if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(
                             taskFileStorage.storeTaskExecutionOutput(
-                                Validate.notNull(completionTaskExecution.getId(), "id"), output));
+                                Objects.requireNonNull(completionTaskExecution.getJobId()),
+                                Objects.requireNonNull(completionTaskExecution.getId()), output));
                     } else {
                         // TODO check, it seems wrong
                         completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)), evaluator);
