@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -161,7 +160,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             mapTaskExecution = taskExecutionService.getTaskExecutionForUpdate(taskExecutionParentId);
 
             if (taskExecution.getOutput() != null) {
-                Long mapTaskExecutionId = Validate.notNull(mapTaskExecution.getId(), "id");
+                Long mapTaskExecutionId = Objects.requireNonNull(mapTaskExecution.getId());
 
                 List<Object> outputs;
 
@@ -184,7 +183,9 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
                     outputs.set(iterationIndex, value);
                 }
 
-                mapTaskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(mapTaskExecutionId, outputs));
+                mapTaskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        Objects.requireNonNull(mapTaskExecution.getJobId()), mapTaskExecutionId, outputs));
             }
 
             long iterationsLeft = counterService.decrement(taskExecutionParentId);
