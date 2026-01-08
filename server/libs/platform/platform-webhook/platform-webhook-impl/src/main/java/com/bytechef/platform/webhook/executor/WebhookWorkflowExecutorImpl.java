@@ -19,7 +19,6 @@ package com.bytechef.platform.webhook.executor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -27,6 +26,7 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
@@ -39,19 +39,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -117,8 +111,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    public SseEmitter executeSseStream(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        final SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
+    public List<Long> executeSseStream(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
 
         try {
             TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
@@ -141,7 +135,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                     jobIds.add(jobId);
 
                     CompletableFuture.runAsync(
-                        () -> sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId))));
+                        () -> sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId))));
                 }
             } else {
                 Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
@@ -156,14 +150,11 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 jobIds.add(jobId);
 
                 CompletableFuture.runAsync(
-                    () -> sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId))));
+                    () -> sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId))));
             }
 
-            List<AutoCloseable> handles = new ArrayList<>();
-
             for (Long jobId : jobIds) {
-                handles.add(
-                    jobSyncExecutor.addSseStreamBridge(jobId, payload -> sendEvent(emitter, "stream", payload)));
+                jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
             }
 
             String currentTenant = TenantContext.getCurrentTenantId();
@@ -173,59 +164,19 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                     for (Long jobId : jobIds) {
                         jobSyncExecutor.awaitJob(jobId, false);
                     }
-                } finally {
-                    try {
-                        emitter.complete();
-                    } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
-                        }
-                    }
 
-                    for (AutoCloseable handle : handles) {
-                        try {
-                            handle.close();
-                        } catch (Exception exception) {
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(exception.getMessage(), exception);
-                            }
-                        }
-                    }
+                    sseStreamBridge.onComplete();
+                } catch (Exception exception) {
+                    sseStreamBridge.onError(exception);
                 }
             }));
 
-            emitter.onCompletion(() -> {
-                for (AutoCloseable handle : handles) {
-                    try {
-                        handle.close();
-                    } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            });
-
-            emitter.onTimeout(() -> {
-                for (AutoCloseable handle : handles) {
-                    try {
-                        handle.close();
-                    } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            });
+            return jobIds;
         } catch (Exception e) {
-            try {
-                sendEvent(emitter, "error", e.getMessage());
-            } finally {
-                emitter.complete();
-            }
-        }
+            sseStreamBridge.onError(e);
 
-        return emitter;
+            throw e;
+        }
     }
 
     @Override
@@ -273,18 +224,5 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
-    }
-
-    private void sendEvent(SseEmitter emitter, String name, Object data) {
-        try {
-            emitter.send(
-                SseEmitter.event()
-                    .name(name)
-                    .data(data instanceof String ? JsonUtils.write(data) : data));
-        } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
-            }
-        }
     }
 }
