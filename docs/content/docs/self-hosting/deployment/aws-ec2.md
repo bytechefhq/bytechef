@@ -3,6 +3,7 @@ description: "ByteChef on AWS EC2. Deploy and manage ByteChef applications on Am
 title: AWS EC2
 ---
 
+<<<<<<< HEAD
 __AWS EC2__ is a self-hosted instance for running ByteChef in cloud-hosted self-managed environments. It provides scalable compute capacity, reliable infrastructure, and flexible deployment options while maintaining full control over your ByteChef instance.
 
 ByteChef supports deployment on EC2 using the [Docker](/self-hosting/deployment/local-docker) self-hosted instance. This guide covers EC2 instance setup, security configuration, and ByteChef deployment steps.
@@ -126,3 +127,6 @@ docker exec postgres pg_dump -U postgres bytechef > backup.sql
 * Review __[Docker configuration](/self-hosting/deployment/local-docker)__ for detailed Docker setup
 * Configure __[PostgreSQL](/self-hosting/deployment/local-docker#postgresql-configuration)__ for production use
 * Explore __[Kubernetes](/self-hosting/deployment/kubernetes)__ for high availability deployments
+=======
+Documentation for deploying on AWS EC2 is coming soon. Please check back later!
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)

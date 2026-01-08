@@ -3,6 +3,7 @@ description: "ByteChef on Azure. Deploy and manage ByteChef on Microsoft Azure c
 title: Azure
 ---
 
+<<<<<<< HEAD
 __Microsoft Azure__ is a self-hosted instance for running ByteChef. Just like other innstannces, it provides scalable compute capacity and flexible deployment while maintaining full control over your ByteChef instance.
 
 ByteChef supports deployment on Azure using __Docker__. This guide covers Azure's self-hosted instance setup and security configuration.
@@ -186,3 +187,6 @@ sudo certbot --nginx -d your-domain.com
 * Review __[Docker configuration](/self-hosting/deployment/local-docker)__ for detailed Docker setup
 * Configure __[PostgreSQL](/self-hosting/deployment/local-docker#postgresql-configuration)__ for production use
 * Explore __[Kubernetes](/self-hosting/deployment/kubernetes)__ for high availability deployments
+=======
+Documentation for deploying on Microsoft Azure is coming soon. Please check back later!
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)

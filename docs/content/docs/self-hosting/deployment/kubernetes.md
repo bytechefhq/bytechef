@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 description: "ByteChef Kubernetes Deployment. Learn how to deploy and manage ByteChef clusters on Kubernetes platforms."
 title: Kubernetes
 ---
@@ -115,3 +116,10 @@ helm upgrade bytechef . \
 - [Review ByteChef configuration options](/self-hosting/deployment/kubernetes)
 - [Check out our Docker setup](/self-hosting/deployment/local-docker)
 - [Build your initial automation](/automation/quick-start/configure-workflow-trigger)
+=======
+description: "ByteChef Kubernetes Deployment. Deploy and manage ByteChef clusters on Kubernetes platforms."
+title: Kubernetes
+---
+
+Coming soon...
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)

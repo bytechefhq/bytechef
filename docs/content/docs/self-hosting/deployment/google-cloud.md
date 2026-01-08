@@ -1,5 +1,6 @@
 ---
 description: "ByteChef on Google Cloud. Deploy ByteChef on Google Cloud Platform with comprehensive guides."
+<<<<<<< HEAD
 title: Google Cloud Platform
 ---
 
@@ -130,3 +131,9 @@ sudo certbot --nginx -d your-domain.com
 * Review __[Docker configuration](/self-hosting/deployment/local-docker)__ for detailed Docker setup
 * Configure __[PostgreSQL](/self-hosting/deployment/local-docker#postgresql-configuration)__ for production use
 * Explore __[Kubernetes](/self-hosting/deployment/kubernetes)__ for high availability deployments
+=======
+title: Google Cloud
+---
+
+Documentation for deploying on Google Cloud Platform is coming soon. Please check back later!
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)

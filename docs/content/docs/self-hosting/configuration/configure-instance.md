@@ -3,6 +3,7 @@ description: "ByteChef Configure Instance. Learn to configure your ByteChef depl
 title: Configure Instance
 ---
 
+<<<<<<< HEAD
 ByteChef configuration controls how your self-hosted instance behaves, connects to external services, and runs in different environments. All configuration is applied through environment variables and is evaluated when the instance starts.
 
 This page explains how configuration works, where it's applied, and how it relates to other deployment docs.
@@ -78,3 +79,7 @@ Configuration affects multiple parts of the system:
 - Changing encryption-related configuration can make existing data unreadable
 
 Detailed configuration options are documented in [Environment Variables](/self-hosting/configuration/environment-variables)
+=======
+
+Documentation for configuring your ByteChef instance is coming soon. Please check back later!
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)

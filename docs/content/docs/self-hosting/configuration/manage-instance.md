@@ -3,6 +3,7 @@ description: "ByteChef Manage Instance. Manage and maintain your ByteChef instan
 title: Manage Instance
 ---
 
+<<<<<<< HEAD
 In this section, we will explore the self-hosted ByteChef instance management credentials, for configuring and monitoring your self-hosted ByteChef deployment instance.
 
 ## Deployment Information
@@ -281,3 +282,6 @@ docker logs bytechef
 # Kubernetes
 kubectl logs deployment/bytechef
 ```
+=======
+Documentation for managing your ByteChef instance is coming soon. Please check back later!
+>>>>>>> 002576c3f5 (docs: Update Docker deployment documentation and clean up files)
