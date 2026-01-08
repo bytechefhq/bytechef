@@ -400,8 +400,11 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                     jobId, (event) -> sendToEmitter(key, createEvent("task", event))));
 
             handles.add(
-                testWorkflowExecutor.addErrorListener(
-                    jobId, (event) -> sendToEmitter(key, createEvent("error", event))));
+                testWorkflowExecutor.addErrorListener(jobId, (event) -> {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Received error event for job {}: {}", jobId, event);
+                    }
+                }));
 
             handles.add(testWorkflowExecutor.addSseStreamBridge(jobId, new SseStreamBridge(key)));
 
@@ -427,9 +430,9 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         try {
             emitter.send(event);
-        } catch (Exception ex) {
+        } catch (Exception exception) {
             if (logger.isTraceEnabled()) {
-                logger.trace(ex.getMessage(), ex);
+                logger.trace(exception.getMessage(), exception);
             }
 
             this.emitter.invalidate(key);
