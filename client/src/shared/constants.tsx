@@ -190,3 +190,5 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
 };
 
 export const DEFAULT_CANVAS_WIDTH = 670;
+
+export const CANVAS_BACKGROUND_COLOR = '#E2E8F0';
