@@ -31,6 +31,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
@@ -125,6 +126,11 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     @Override
     public AutoCloseable addErrorListener(long jobId, Consumer<ExecutionErrorEventDTO> listener) {
         return jobTestExecutor.addErrorListener(jobId, listener);
+    }
+
+    @Override
+    public AutoCloseable addSseStreamBridge(long jobId, JobSyncExecutor.SseStreamBridge bridge) {
+        return jobTestExecutor.addSseStreamBridge(jobId, bridge);
     }
 
     @SuppressWarnings("unchecked")

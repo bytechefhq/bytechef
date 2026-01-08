@@ -18,9 +18,7 @@ package com.bytechef.platform.coordinator.job;
 
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
-import com.bytechef.atlas.configuration.domain.ControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
@@ -88,24 +86,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.domain.Page;
 
 /**
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
@@ -124,6 +118,7 @@ public class JobSyncExecutor {
     private final TaskFileStorage taskFileStorage;
     private final Cache<String, CopyOnWriteArrayList<Consumer<TaskStartedApplicationEvent>>> taskStartedListeners =
         createCache();
+    private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges = createCache();
     private final long timeout;
     private final WorkflowService workflowService;
 
@@ -143,8 +138,7 @@ public class JobSyncExecutor {
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
         ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
-        MemoryMessageFactory memoryMessageFactory,
-        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        MemoryMessageFactory memoryMessageFactory, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
@@ -176,11 +170,14 @@ public class JobSyncExecutor {
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         JobSyncAsyncTaskExecutor jobSyncAsyncTaskExecutor = new JobSyncAsyncTaskExecutor(
-            taskExecutor, maxTaskExecutions);
+            coordinatorEventPublisher, taskExecutor, maxTaskExecutions);
 
         TaskWorker taskWorker = new TaskWorker(
             null, evaluator, coordinatorEventPublisher, jobSyncAsyncTaskExecutor, taskHandlerResolverChain,
-            taskFileStorage, List.of(new WebhookResponseTaskExecutionPostOutputProcessor()));
+            taskFileStorage,
+            List.of(
+                new WebhookResponseTaskExecutionPostOutputProcessor(),
+                new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
 
         MemoryMessageBroker workerMessageBroker = memoryMessageFactory.get(MemoryMessageFactory.Role.WORKER);
 
@@ -335,6 +332,29 @@ public class JobSyncExecutor {
     }
 
     /**
+     * Registers an {@link SseStreamBridge} for the specified job ID, allowing external systems to receive streamed
+     * payloads and lifecycle callbacks. Returns an {@link AutoCloseable} that can be used to unregister the bridge.
+     *
+     * @param jobId  the unique identifier of the job associated with the stream bridge
+     * @param bridge the {@link SseStreamBridge} to be registered for handling streamed events
+     * @return an {@link AutoCloseable} to unregister the specified stream bridge when no longer needed
+     */
+    public AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge) {
+        String key = getKey(jobId);
+
+        sseStreamBridges.get(key, k -> new CopyOnWriteArrayList<>())
+            .add(bridge);
+
+        return () -> {
+            var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
+
+            if (sseStreamBridges != null) {
+                sseStreamBridges.remove(bridge);
+            }
+        };
+    }
+
+    /**
      * Waits for the completion of a job identified by the specified job ID and, if specified, verifies for errors. Once
      * the job is completed, its details are fetched and processed.
      *
@@ -404,6 +424,21 @@ public class JobSyncExecutor {
     }
 
     /**
+     * Starts a new job using the provided job parameters and factory function.
+     *
+     * @param jobParametersDTO   an object containing the parameters required to configure the job
+     * @param jobFactoryFunction a function used to create and configure the job instance
+     * @return the unique identifier of the created job
+     */
+    public long startJob(JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction) {
+        JobFacade jobFacade = new JobFacadeImpl(
+            coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
+            taskExecutionService, taskFileStorage, workflowService);
+
+        return jobFacade.createJob(jobParametersDTO);
+    }
+
+    /**
      * Stops a running job identified by its unique job ID. This method publishes an event to notify the job
      * coordination system about the stop request for the specified job.
      *
@@ -424,13 +459,11 @@ public class JobSyncExecutor {
     }
 
     private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError) {
-        Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
-
-        long jobId = Validate.notNull(job.getId(), "id");
+        long jobId = jobFacade.createJob(jobParametersDTO);
 
         waitForJobCompletion(jobId);
 
-        job = jobService.getJob(jobId);
+        Job job = jobService.getJob(jobId);
 
         if (checkForError) {
             checkForError(job);
@@ -483,8 +516,8 @@ public class JobSyncExecutor {
         try {
             notifyErrorListeners(event);
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(exception.getMessage(), exception);
             }
         }
 
@@ -493,8 +526,8 @@ public class JobSyncExecutor {
         try {
             taskExecutionErrorEventListener.onErrorEvent(event);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Error while handling ERROR_EVENTS in default listener (ignored in this context)", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Error while handling ERROR_EVENTS in default listener (ignored in this context)", e);
             }
         }
     }
@@ -503,6 +536,18 @@ public class JobSyncExecutor {
         Optional<Job> jobOptional = jobService.fetchJob(event.getJobId());
 
         if (jobOptional.isEmpty()) {
+            return;
+        }
+
+        Job job = jobOptional.get();
+
+        if (job.getStatus() != Job.Status.STARTED) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                    "Skipping stop event for job id={} as it is already in status {}", event.getJobId(),
+                    job.getStatus());
+            }
+
             return;
         }
 
@@ -519,16 +564,16 @@ public class JobSyncExecutor {
         try {
             taskCoordinator.onTaskExecutionCompleteEvent(event);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
                     "Error while handling TASK_EXECUTION_COMPLETE_EVENTS in coordinator (ignored in this context)", e);
             }
         }
     }
 
     private void handleWorkerTaskExecutionEvent(
-        TaskExecutionEvent taskExecutionEvent, int maxTaskExecutions,
-        JobSyncAsyncTaskExecutor jobSyncAsyncTaskExecutor, TaskWorker taskWorker) {
+        TaskExecutionEvent taskExecutionEvent, int maxTaskExecutions, JobSyncAsyncTaskExecutor jobSyncAsyncTaskExecutor,
+        TaskWorker taskWorker) {
 
         if (maxTaskExecutions != UNLIMITED_TASK_EXECUTIONS) {
             jobSyncAsyncTaskExecutor.incrementAndCheck(taskExecutionEvent);
@@ -541,8 +586,8 @@ public class JobSyncExecutor {
         Job job = jobService.getJob(jobId);
 
         if (job.getStatus() != Job.Status.STARTED) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping task scheduling for non-STARTED job (status={}): {}", job.getStatus(), jobId);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Skipping task scheduling for non-STARTED job (status={}): {}", job.getStatus(), jobId);
             }
 
             return;
@@ -566,8 +611,8 @@ public class JobSyncExecutor {
             String message =
                 "Task execution failed for job " + job.getId() + " but no error details are available.";
 
-            if (logger.isWarnEnabled()) {
-                logger.warn(
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(
                     "Detected FAILED task execution without error details for jobId={}, taskExecutionId={}",
                     job.getId(), taskExecution.getId());
             }
@@ -629,19 +674,22 @@ public class JobSyncExecutor {
         jobStatusListeners.invalidate(key);
         taskExecutionCompleteListeners.invalidate(key);
         taskStartedListeners.invalidate(key);
+        sseStreamBridges.invalidate(key);
     }
 
     private void notifyTaskExecutionCompleteListeners(
         TaskExecutionCompleteEvent event) {
         Long jobId = null;
+
         try {
             var taskExecution = event.getTaskExecution();
+
             if (taskExecution != null) {
                 jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(exception.getMessage(), exception);
             }
         }
 
@@ -658,8 +706,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -669,15 +717,16 @@ public class JobSyncExecutor {
         Long jobId = null;
 
         try {
-            if (event instanceof TaskExecutionErrorEvent tee) {
-                var te = tee.getTaskExecution();
-                if (te != null) {
-                    jobId = Validate.notNull(te.getJobId(), "jobId");
+            if (event instanceof TaskExecutionErrorEvent taskExecutionErrorEvent) {
+                var taskExecution = taskExecutionErrorEvent.getTaskExecution();
+
+                if (taskExecution != null) {
+                    jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
                 }
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(exception.getMessage(), exception);
             }
         }
 
@@ -695,8 +744,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -713,8 +762,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -731,8 +780,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -758,10 +807,10 @@ public class JobSyncExecutor {
         CountDownLatch latch = jobCompletionLatches.computeIfAbsent(getKey(jobId), id -> new CountDownLatch(1));
 
         try {
-            Optional<TaskExecution> last = taskExecutionService.fetchLastJobTaskExecution(jobId);
+            Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
 
-            if (last.isPresent()) {
-                TaskExecution taskExecution = last.get();
+            if (lastTaskExecutionOptional.isPresent()) {
+                TaskExecution taskExecution = lastTaskExecutionOptional.get();
 
                 TaskExecution.Status status = taskExecution.getStatus();
 
@@ -772,8 +821,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (Exception e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(e.getMessage(), e);
             }
         }
 
@@ -786,8 +835,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (InterruptedException | TimeoutException exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(exception.getMessage());
             }
 
             job.setStatus(Job.Status.FAILED);
@@ -813,129 +862,43 @@ public class JobSyncExecutor {
         MemoryMessageBroker get(Role role);
     }
 
-    private static class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskDispatcherResolver {
+    /**
+     * Represents a functional interface that serves as a stream bridge for handling event payloads, completion events,
+     * and errors during the streaming process. This interface provides a mechanism to manage the lifecycle of streaming
+     * events, including processing payloads, handling errors, and cleanup after stream completion.
+     */
+    @FunctionalInterface
+    public interface SseStreamBridge {
 
-        @Override
-        public void dispatch(ControlTask controlTask) {
+        /**
+         * Handles an event payload forwarded to the stream bridge. This method is invoked to process payloads streamed
+         * as part of the event lifecycle.
+         *
+         * @param payload the payload object to be handled by the stream bridge. It represents the data associated with
+         *                a particular event and should not be null.
+         */
+        void onEvent(Object payload);
+
+        /**
+         * Invoked to signal the completion of the stream. This method is a lifecycle callback intended to handle any
+         * necessary cleanup or finalization steps after the stream has ended. <br/>
+         * It is typically called when the stream successfully completes without any errors or interruptions. The
+         * default implementation is a no-op and may be overridden by implementations of {@code SseStreamBridge} to
+         * provide specific behavior upon stream completion.
+         */
+        default void onComplete() {
         }
 
-        @Override
-        public @Nullable TaskDispatcher<? extends Task> resolve(Task task) {
-            if (task instanceof ControlTask) {
-                return this;
-            }
-
-            return null;
-        }
-    }
-
-    private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction) implements JobService {
-
-        @Override
-        public Job getJob(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Page<Job> getJobsPage(int pageNumber) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job getTaskExecutionJob(long taskExecutionId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
-            return jobFactoryFunction.apply(jobParametersDTO);
-        }
-
-        @Override
-        public void deleteJob(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<Job> fetchJob(Long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<Job> fetchLastJob() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<Job> fetchLastWorkflowJob(String workflowId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<Job> fetchLastWorkflowJob(List<String> workflowIds) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job resumeToStatusStarted(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job setStatusToStarted(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job setStatusToStopped(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Job update(Job job) {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private class JobSyncAsyncTaskExecutor implements AsyncTaskExecutor {
-
-        private final int maxTaskExecutions;
-        private final Map<String, AtomicInteger> taskExecutionCounters = new ConcurrentHashMap<>();
-        private final TaskExecutor taskExecutor;
-
-        private JobSyncAsyncTaskExecutor(TaskExecutor taskExecutor, int maxTaskExecutions) {
-            this.maxTaskExecutions = maxTaskExecutions;
-            this.taskExecutor = taskExecutor;
-        }
-
-        @Override
-        public void execute(Runnable task) {
-            taskExecutor.execute(task);
-        }
-
-        private void incrementAndCheck(TaskExecutionEvent taskExecutionEvent) {
-            TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
-
-            AtomicInteger taskExecutionCounter = taskExecutionCounters.computeIfAbsent(
-                getKey(
-                    Validate.notNull(taskExecution.getJobId(), "jobId")),
-                (key) -> new AtomicInteger(0));
-
-            if (taskExecutionCounter.incrementAndGet() > maxTaskExecutions) {
-                taskExecution.setError(
-                    new ExecutionError(
-                        String.format(
-                            "Maximum number of task executions (%d) exceeded in the workflow builder",
-                            maxTaskExecutions),
-                        List.of()));
-                taskExecution.setStatus(TaskExecution.Status.FAILED);
-
-                coordinatorEventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
-            }
-        }
-
-        private void clearCounter(long jobId) {
-            taskExecutionCounters.remove(getKey(jobId));
+        /**
+         * Invoked when an error occurs during the streaming process. This method serves as a lifecycle callback that
+         * allows handling of exceptions or errors that may arise while processing the stream. <br/>
+         * Implementations of this method are expected to provide custom error-handling logic such as logging the error,
+         * propagating it, or performing any necessary cleanup operations.
+         *
+         * @param throwable the {@code Throwable} instance representing the error encountered. It provides details about
+         *                  the nature of the failure and should not be {@code null}.
+         */
+        default void onError(Throwable throwable) {
         }
     }
 }
