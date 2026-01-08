@@ -35,7 +35,6 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
@@ -43,11 +42,11 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.coordinator.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
@@ -101,7 +100,7 @@ public class WorkflowTestConfiguration {
         JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
-        TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
 
         return new JobTestExecutor(
             componentDefinitionService, contextService, evaluator,

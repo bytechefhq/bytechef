@@ -133,7 +133,7 @@ public class JobFacadeImpl implements JobFacade {
 
             currentTaskExecution.setOutput(
                 taskFileStorage.storeTaskExecutionOutput(
-                    Objects.requireNonNull(currentTaskExecution.getId()), Map.of("approved", approved)));
+                    jobId, Objects.requireNonNull(currentTaskExecution.getId()), Map.of("approved", approved)));
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(currentTaskExecution));
         }
