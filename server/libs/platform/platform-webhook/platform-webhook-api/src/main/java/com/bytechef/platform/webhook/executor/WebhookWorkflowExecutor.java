@@ -18,9 +18,10 @@ package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
@@ -38,11 +39,14 @@ public interface WebhookWorkflowExecutor {
     WebhookValidateResponse validateOnEnable(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     /**
-     * Streams Server-Sent Events (SSE) for a given workflow execution.
+     * Initiates a workflow execution with Server-Sent Events (SSE) streaming support. Returns a list of job IDs
+     * representing the started jobs and registers the provided SSE stream bridge to receive workflow execution events.
      *
      * @param workflowExecutionId the identifier of the workflow execution for which the SSE stream is initiated
      * @param webhookRequest      the webhook request containing headers, parameters, and body related to the event
-     * @return an instance of {@code SseEmitter} for streaming events
+     * @param sseStreamBridge     the bridge that will receive SSE events (start, stream, error, etc.)
+     * @return a list of job IDs that were started for this workflow execution
      */
-    SseEmitter executeSseStream(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    List<Long> executeSseStream(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge);
 }

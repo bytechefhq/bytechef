@@ -18,6 +18,7 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -25,6 +26,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -32,7 +34,12 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +58,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @CrossOrigin
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebhookTriggerController.class);
 
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
@@ -133,7 +142,32 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                 WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
                 WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-                return webhookWorkflowExecutor.executeSseStream(workflowExecutionId, webhookRequest);
+                SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
+
+                try {
+                    List<Long> jobIds = webhookWorkflowExecutor.executeSseStream(
+                        workflowExecutionId, webhookRequest, new WebhookSseStreamBridge(emitter));
+
+                    emitter.onError((throwable) -> {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("SSE stream error for jobs: {}", jobIds, throwable);
+                        }
+                    });
+
+                    emitter.onTimeout(() -> {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("SSE stream timed out for jobs: {}", jobIds);
+                        }
+                    });
+                } catch (Exception e) {
+                    try {
+                        sendEvent(emitter, "error", e.getMessage());
+                    } finally {
+                        emitter.complete();
+                    }
+                }
+
+                return emitter;
             }));
     }
 
@@ -149,5 +183,74 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                     ? null
                     : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
             .body(response.body());
+    }
+
+    private static void sendEvent(SseEmitter emitter, String name, Object data) {
+        try {
+            emitter.send(
+                SseEmitter.event()
+                    .name(name)
+                    .data(data instanceof String ? JsonUtils.write(data) : data));
+        } catch (Exception exception) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(exception.getMessage(), exception);
+            }
+        }
+    }
+
+    /**
+     * Bridge that broadcasts streamed payloads to SSE clients for webhook workflow execution.
+     */
+    private static class WebhookSseStreamBridge implements SseStreamBridge {
+
+        private final SseEmitter emitter;
+
+        private WebhookSseStreamBridge(SseEmitter emitter) {
+            this.emitter = emitter;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void onEvent(Object payload) {
+            if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
+                String event = (String) map.get("event");
+                Object data = ((Map<String, Object>) payload).entrySet()
+                    .stream()
+                    .filter(entry -> !"event".equals(entry.getKey()))
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+
+                sendEvent(emitter, event, data);
+            } else {
+                sendEvent(emitter, "stream", payload);
+            }
+        }
+
+        @Override
+        public void onComplete() {
+            try {
+                emitter.complete();
+            } catch (Exception exception) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(exception.getMessage(), exception);
+                }
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            try {
+                sendEvent(emitter, "error", Objects.toString(throwable.getMessage(), "An error occurred"));
+            } finally {
+                try {
+                    emitter.complete();
+                } catch (Exception exception) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(exception.getMessage(), exception);
+                    }
+                }
+            }
+        }
     }
 }
