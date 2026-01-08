@@ -31,8 +31,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -92,10 +92,6 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
         return jobTestExecutor.start(workflowTestParameters.jobParametersDTO());
     }
 
-    private record WorkflowTestParameters(
-        JobParametersDTO jobParametersDTO, TriggerExecutionDTO triggerExecutionDTO) {
-    }
-
     @Override
     public WorkflowTestExecutionDTO awaitTestResult(long jobId) {
         JobDTO jobDTO = jobTestExecutor.await(jobId);
@@ -129,7 +125,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     }
 
     @Override
-    public AutoCloseable addSseStreamBridge(long jobId, JobSyncExecutor.SseStreamBridge bridge) {
+    public AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge) {
         return jobTestExecutor.addSseStreamBridge(jobId, bridge);
     }
 
@@ -222,5 +218,9 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
         return new WorkflowTestParameters(
             new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap)),
             triggerExecutionDTO);
+    }
+
+    private record WorkflowTestParameters(
+        JobParametersDTO jobParametersDTO, TriggerExecutionDTO triggerExecutionDTO) {
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.file.storage;
+package com.bytechef.platform.job.sync.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -32,8 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
 import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
@@ -245,7 +245,7 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<Consumer<TaskStatusEventDTO>> taskStartedListener = new AtomicReference<>();
         AtomicReference<Consumer<TaskStatusEventDTO>> taskCompletedListener = new AtomicReference<>();
         AtomicReference<Consumer<ExecutionErrorEventDTO>> errorListener = new AtomicReference<>();
-        AtomicReference<JobSyncExecutor.SseStreamBridge> sseStreamBridge = new AtomicReference<>();
+        AtomicReference<SseStreamBridge> sseStreamBridge = new AtomicReference<>();
 
         given(workflowTestFacade.addJobStatusListener(eq(jobId), any())).willAnswer(inv -> {
             jobListener.set(inv.getArgument(1));
@@ -309,7 +309,7 @@ class WorkflowTestApiControllerIntTest {
         Consumer<TaskStatusEventDTO> taskStatusEventStartedConsumer = taskStartedListener.get();
         Consumer<TaskStatusEventDTO> taskStatusEventCompletedConsumer = taskCompletedListener.get();
         Consumer<ExecutionErrorEventDTO> executionErrorEventConsumer = errorListener.get();
-        JobSyncExecutor.SseStreamBridge sseStreamBridgeBridge = sseStreamBridge.get();
+        SseStreamBridge sseStreamBridgeBridge = sseStreamBridge.get();
 
         assertThat(jobStatusEventConsumer).isNotNull();
         assertThat(taskStatusEventStartedConsumer).isNotNull();

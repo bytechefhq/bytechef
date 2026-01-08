@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.test.facade;
 
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
 import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
@@ -120,10 +120,10 @@ public interface WorkflowTestFacade {
      * streaming of events associated with the given job.
      *
      * @param jobId  The unique identifier of the job for which the SSE stream bridge is to be added.
-     * @param bridge An instance of {@link JobSyncExecutor.SseStreamBridge} that handles the streaming of server-sent
-     *               events for the specified job.
+     * @param bridge An instance of {@link SseStreamBridge} that handles the streaming of server-sent events for the
+     *               specified job.
      * @return An {@link AutoCloseable} instance that can be used to unregister the SSE stream bridge and stop the
      *         streaming of events.
      */
-    AutoCloseable addSseStreamBridge(long jobId, JobSyncExecutor.SseStreamBridge bridge);
+    AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge);
 }

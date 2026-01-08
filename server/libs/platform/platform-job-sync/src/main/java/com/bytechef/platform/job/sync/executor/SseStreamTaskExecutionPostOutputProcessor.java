@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor.SseStreamBridge;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -60,9 +59,10 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
 
-    private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges;
+    private final Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges;
 
-    SseStreamTaskExecutionPostOutputProcessor(Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges) {
+    SseStreamTaskExecutionPostOutputProcessor(
+        Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges) {
         this.sseStreamBridges = sseStreamBridges;
     }
 

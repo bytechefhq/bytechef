@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.file.storage;
+package com.bytechef.platform.job.sync.file.storage;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.file.storage.TaskFileStorage;

@@ -15,6 +15,6 @@
  */
 
 @NullMarked
-package com.bytechef.platform.coordinator.file.storage;
+package com.bytechef.platform.job.sync.file.storage;
 
 import org.jspecify.annotations.NullMarked;

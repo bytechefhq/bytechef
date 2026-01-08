@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-@NullMarked
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.exception;
 
-import org.jspecify.annotations.NullMarked;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.exception.AbstractErrorType;
+
+/**
+ * @author Ivica Cardic
+ */
+public class TaskExecutionErrorType extends AbstractErrorType {
+
+    public static final TaskExecutionErrorType TASK_EXECUTION_FAILED = new TaskExecutionErrorType(100);
+
+    private TaskExecutionErrorType(int errorKey) {
+        super(TaskExecution.class, errorKey);
+    }
+}

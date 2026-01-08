@@ -42,7 +42,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

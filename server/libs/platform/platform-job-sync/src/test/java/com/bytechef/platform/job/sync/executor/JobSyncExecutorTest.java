@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

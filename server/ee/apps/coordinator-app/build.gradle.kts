@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
+    implementation(project(":server:libs:platform:platform-coordinator"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-service"))

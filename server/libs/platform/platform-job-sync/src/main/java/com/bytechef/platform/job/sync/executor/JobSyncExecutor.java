@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.coordinator.job;
+package com.bytechef.platform.job.sync.executor;
 
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
@@ -70,7 +70,7 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
-import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
+import com.bytechef.platform.job.sync.exception.TaskExecutionErrorType;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
@@ -118,7 +118,8 @@ public class JobSyncExecutor {
     private final TaskFileStorage taskFileStorage;
     private final Cache<String, CopyOnWriteArrayList<Consumer<TaskStartedApplicationEvent>>> taskStartedListeners =
         createCache();
-    private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges = createCache();
+    private final Cache<String, CopyOnWriteArrayList<com.bytechef.platform.job.sync.SseStreamBridge>> sseStreamBridges =
+        createCache();
     private final long timeout;
     private final WorkflowService workflowService;
 
@@ -332,14 +333,16 @@ public class JobSyncExecutor {
     }
 
     /**
-     * Registers an {@link SseStreamBridge} for the specified job ID, allowing external systems to receive streamed
-     * payloads and lifecycle callbacks. Returns an {@link AutoCloseable} that can be used to unregister the bridge.
+     * Registers an {@link com.bytechef.platform.job.sync.SseStreamBridge} for the specified job ID, allowing external
+     * systems to receive streamed payloads and lifecycle callbacks. Returns an {@link AutoCloseable} that can be used
+     * to unregister the bridge.
      *
      * @param jobId  the unique identifier of the job associated with the stream bridge
-     * @param bridge the {@link SseStreamBridge} to be registered for handling streamed events
+     * @param bridge the {@link com.bytechef.platform.job.sync.SseStreamBridge} to be registered for handling streamed
+     *               events
      * @return an {@link AutoCloseable} to unregister the specified stream bridge when no longer needed
      */
-    public AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge) {
+    public AutoCloseable addSseStreamBridge(long jobId, com.bytechef.platform.job.sync.SseStreamBridge bridge) {
         String key = getKey(jobId);
 
         sseStreamBridges.get(key, k -> new CopyOnWriteArrayList<>())
@@ -862,43 +865,4 @@ public class JobSyncExecutor {
         MemoryMessageBroker get(Role role);
     }
 
-    /**
-     * Represents a functional interface that serves as a stream bridge for handling event payloads, completion events,
-     * and errors during the streaming process. This interface provides a mechanism to manage the lifecycle of streaming
-     * events, including processing payloads, handling errors, and cleanup after stream completion.
-     */
-    @FunctionalInterface
-    public interface SseStreamBridge {
-
-        /**
-         * Handles an event payload forwarded to the stream bridge. This method is invoked to process payloads streamed
-         * as part of the event lifecycle.
-         *
-         * @param payload the payload object to be handled by the stream bridge. It represents the data associated with
-         *                a particular event and should not be null.
-         */
-        void onEvent(Object payload);
-
-        /**
-         * Invoked to signal the completion of the stream. This method is a lifecycle callback intended to handle any
-         * necessary cleanup or finalization steps after the stream has ended. <br/>
-         * It is typically called when the stream successfully completes without any errors or interruptions. The
-         * default implementation is a no-op and may be overridden by implementations of {@code SseStreamBridge} to
-         * provide specific behavior upon stream completion.
-         */
-        default void onComplete() {
-        }
-
-        /**
-         * Invoked when an error occurs during the streaming process. This method serves as a lifecycle callback that
-         * allows handling of exceptions or errors that may arise while processing the stream. <br/>
-         * Implementations of this method are expected to provide custom error-handling logic such as logging the error,
-         * propagating it, or performing any necessary cleanup operations.
-         *
-         * @param throwable the {@code Throwable} instance representing the error encountered. It provides details about
-         *                  the nature of the failure and should not be {@code null}.
-         */
-        default void onError(Throwable throwable) {
-        }
-    }
 }
