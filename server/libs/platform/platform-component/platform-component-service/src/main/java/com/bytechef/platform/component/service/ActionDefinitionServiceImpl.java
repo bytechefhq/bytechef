@@ -43,6 +43,8 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
@@ -197,9 +199,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId, workflowId,
                 null, environmentId, type, editorEnvironment);
 
-            return executeMultipleConnectionsPerform(
-                (MultipleConnectionsPerformFunction) basePerformFunction, inputParameters, componentConnections,
-                extensions, actionContext);
+            if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
+                return executeMultipleConnectionsPerform(
+                    performFunction, inputParameters, componentConnections, extensions, actionContext);
+            } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
+                return executeMultipleConnectionsStreamPerform(
+                    performFunction, inputParameters, componentConnections, extensions, actionContext);
+            } else {
+                return executeMultipleConnectionsSseStreamResponsePerform(
+                    (MultipleConnectionsSseStreamResponsePerformFunction) basePerformFunction, inputParameters,
+                    componentConnections, extensions, actionContext);
+            }
         }
     }
 
@@ -350,6 +360,32 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private Object executeMultipleConnectionsPerform(
         MultipleConnectionsPerformFunction performFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            return performFunction.apply(
+                ParametersFactory.createParameters(inputParameters), componentConnections,
+                ParametersFactory.createParameters(extensions), context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private Object executeMultipleConnectionsStreamPerform(
+        MultipleConnectionsStreamPerformFunction performFunction, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
+
+        try {
+            return performFunction.apply(
+                ParametersFactory.createParameters(inputParameters), componentConnections,
+                ParametersFactory.createParameters(extensions), context);
+        } catch (Exception e) {
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
+    }
+
+    private Object executeMultipleConnectionsSseStreamResponsePerform(
+        MultipleConnectionsSseStreamResponsePerformFunction performFunction, Map<String, ?> inputParameters,
         Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, ActionContext context) {
 
         try {

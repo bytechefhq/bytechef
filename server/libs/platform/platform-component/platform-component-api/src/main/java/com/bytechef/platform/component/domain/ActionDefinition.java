@@ -18,6 +18,8 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.SseStreamResponsePerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsSseStreamResponsePerformFunction;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -45,6 +47,7 @@ public class ActionDefinition {
     private boolean outputSchemaDefined;
     private List<? extends Property> properties;
     boolean singleConnection;
+    private boolean sseStreamResponse;
     private String title;
     private boolean workflowNodeDescriptionDefined;
 
@@ -81,6 +84,10 @@ public class ActionDefinition {
         this.singleConnection = actionDefinition.getPerform()
             .map(perform -> perform instanceof PerformFunction)
             .orElse(false);
+        this.sseStreamResponse = actionDefinition.getPerform()
+            .map(perform -> perform instanceof SseStreamResponsePerformFunction ||
+                perform instanceof MultipleConnectionsSseStreamResponsePerformFunction)
+            .orElse(false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");
         this.workflowNodeDescriptionDefined = actionDefinition.getWorkflowNodeDescription()
             .isPresent();
@@ -98,7 +105,7 @@ public class ActionDefinition {
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
             Objects.equals(outputResponse, that.outputResponse) &&
             Objects.equals(outputSchemaDefined, that.outputSchemaDefined) &&
-            Objects.equals(properties, that.properties) &&
+            Objects.equals(properties, that.properties) && sseStreamResponse == that.sseStreamResponse &&
             Objects.equals(title, that.title) && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
@@ -106,7 +113,7 @@ public class ActionDefinition {
     public int hashCode() {
         return Objects.hash(
             batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
-            outputResponse, outputSchemaDefined, properties, title, workflowNodeDescriptionDefined);
+            outputResponse, outputSchemaDefined, properties, sseStreamResponse, title, workflowNodeDescriptionDefined);
     }
 
     public String getComponentName() {
@@ -162,6 +169,10 @@ public class ActionDefinition {
         return singleConnection;
     }
 
+    public boolean isSseStreamResponse() {
+        return sseStreamResponse;
+    }
+
     public boolean isWorkflowNodeDescriptionDefined() {
         return workflowNodeDescriptionDefined;
     }
@@ -176,12 +187,12 @@ public class ActionDefinition {
             ", description='" + description + '\'' +
             ", properties=" + properties +
             ", batch=" + batch +
-            ", batch=" + batch +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
             ", outputResponseDefined=" + outputSchemaDefined +
             ", help=" + help +
+            ", sseStreamResponse=" + sseStreamResponse +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             '}';
     }
