@@ -792,9 +792,9 @@ public class JobSyncExecutor {
 
     private void receive(MemoryMessageBroker messageBroker, MessageRoute messageRoute, Receiver receiver) {
         messageBroker.receive(messageRoute, message -> {
-            TenantContext.setCurrentTenantId((String) ((MessageEvent<?>) message).getMetadata(CURRENT_TENANT_ID));
+            String tenantId = (String) ((MessageEvent<?>) message).getMetadata(CURRENT_TENANT_ID);
 
-            receiver.receive(message);
+            TenantContext.runWithTenantId(tenantId, () -> receiver.receive(message));
         });
     }
 

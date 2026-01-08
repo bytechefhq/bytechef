@@ -81,17 +81,7 @@ public class TaskDispatcherIntTestConfiguration {
             public void execute(Runnable task) {
                 String tenantId = TenantContext.getCurrentTenantId();
 
-                executor.execute(() -> {
-                    String currentTenantId = TenantContext.getCurrentTenantId();
-
-                    try {
-                        TenantContext.setCurrentTenantId(tenantId);
-
-                        task.run();
-                    } finally {
-                        TenantContext.setCurrentTenantId(currentTenantId);
-                    }
-                });
+                executor.execute(() -> TenantContext.runWithTenantId(tenantId, task::run));
             }
         };
     }

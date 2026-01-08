@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.coordinator.config;
 
+import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Coordinator.Trigger.Subscriptions;
@@ -30,6 +32,7 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -95,45 +98,48 @@ public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
         TriggerCoordinator triggerCoordinator) {
 
         public void onApplicationEvent(ApplicationEvent applicationEvent) {
-            process(applicationEvent);
-
-            triggerCoordinator.onApplicationEvent(applicationEvent);
+            TenantContext.runWithTenantId(
+                (String) applicationEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onApplicationEvent(applicationEvent));
         }
 
         public void onErrorEvent(ErrorEvent errorEvent) {
-            process(errorEvent);
-
-            triggerCoordinator.onErrorEvent(errorEvent);
+            TenantContext.runWithTenantId(
+                (String) errorEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onErrorEvent((ErrorEvent) process(errorEvent)));
         }
 
         public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
-            process(triggerExecutionCompleteEvent);
-
-            triggerCoordinator.onTriggerExecutionCompleteEvent(triggerExecutionCompleteEvent);
+            TenantContext.runWithTenantId(
+                (String) triggerExecutionCompleteEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onTriggerExecutionCompleteEvent(
+                    (TriggerExecutionCompleteEvent) process(triggerExecutionCompleteEvent)));
         }
 
         public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
-            process(triggerListenerEvent);
-
-            triggerCoordinator.onTriggerListenerEvent(triggerListenerEvent);
+            TenantContext.runWithTenantId(
+                (String) triggerListenerEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onTriggerListenerEvent((TriggerListenerEvent) process(triggerListenerEvent)));
         }
 
         public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
-            process(triggerPollEvent);
-
-            triggerCoordinator.onTriggerPollEvent(triggerPollEvent);
+            TenantContext.runWithTenantId(
+                (String) triggerPollEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onTriggerPollEvent((TriggerPollEvent) process(triggerPollEvent)));
         }
 
         public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
-            process(triggerWebhookEvent);
-
-            triggerCoordinator.onTriggerWebhookEvent(triggerWebhookEvent);
+            TenantContext.runWithTenantId(
+                (String) triggerWebhookEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> triggerCoordinator.onTriggerWebhookEvent((TriggerWebhookEvent) process(triggerWebhookEvent)));
         }
 
-        private void process(MessageEvent<?> messageEvent) {
+        private MessageEvent<?> process(MessageEvent<?> messageEvent) {
             for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
-                messageEventPostReceiveProcessor.process(messageEvent);
+                messageEvent = messageEventPostReceiveProcessor.process(messageEvent);
             }
+
+            return messageEvent;
         }
     }
 }

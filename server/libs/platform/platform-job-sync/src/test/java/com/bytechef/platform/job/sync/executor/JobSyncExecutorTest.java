@@ -182,8 +182,7 @@ class JobSyncExecutorTest {
             Thread thread = new Thread(() -> {
                 try {
                     // Ensure TenantContext is set in the waiter thread so latch keys match
-                    TenantContext.setCurrentTenantId(TENANT);
-                    jobSyncExecutor.awaitJob(jobId, false);
+                    TenantContext.runWithTenantId(TENANT, () -> jobSyncExecutor.awaitJob(jobId, false));
                 } finally {
                     awaitReturnedLatch.countDown();
                 }
