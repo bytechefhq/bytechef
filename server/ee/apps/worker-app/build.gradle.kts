@@ -53,7 +53,6 @@ dependencies {
     }
 
     implementation(project(":server:ee:libs:config:observability-config"))
-    implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))

@@ -152,7 +152,6 @@ dependencies {
     implementation(project(":server:ee:libs:config:cloud-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
-    implementation(project(":server:ee:libs:config:tenant-multi-message-event-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
     implementation(project(":server:ee:libs:core:cloud:cloud-aws"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))

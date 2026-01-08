@@ -38,9 +38,7 @@ public class RemoteMultiTenantFilter extends OncePerRequestFilter {
 
         String currentTenantId = request.getHeader(TenantConstants.CURRENT_TENANT_ID);
 
-        TenantContext.setCurrentTenantId(currentTenantId);
-
-        filterChain.doFilter(request, response);
+        TenantContext.runWithTenantId(currentTenantId, () -> filterChain.doFilter(request, response));
     }
 
     @Override

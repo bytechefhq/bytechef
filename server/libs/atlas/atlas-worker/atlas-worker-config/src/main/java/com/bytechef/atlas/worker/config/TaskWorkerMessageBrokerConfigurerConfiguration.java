@@ -16,6 +16,8 @@
 
 package com.bytechef.atlas.worker.config;
 
+import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
+
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
@@ -24,6 +26,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -71,21 +74,23 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TaskWorker taskWorker) {
 
         public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
-            process(taskExecutionEvent);
-
-            taskWorker.onTaskExecutionEvent(taskExecutionEvent);
+            TenantContext.runWithTenantId(
+                (String) taskExecutionEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskWorker.onTaskExecutionEvent((TaskExecutionEvent) process(taskExecutionEvent)));
         }
 
         public void onCancelControlTaskEvent(MessageEvent<?> messageEvent) {
-            process(messageEvent);
-
-            taskWorker.onCancelControlTaskEvent(messageEvent);
+            TenantContext.runWithTenantId(
+                (String) messageEvent.getMetadata(CURRENT_TENANT_ID),
+                () -> taskWorker.onCancelControlTaskEvent(process(messageEvent)));
         }
 
-        private void process(MessageEvent<?> messageEvent) {
+        private MessageEvent<?> process(MessageEvent<?> messageEvent) {
             for (MessageEventPostReceiveProcessor messageEventPostReceiveProcessor : messageEventPostReceiveProcessors) {
-                messageEventPostReceiveProcessor.process(messageEvent);
+                messageEvent = messageEventPostReceiveProcessor.process(messageEvent);
             }
+
+            return messageEvent;
         }
     }
 }

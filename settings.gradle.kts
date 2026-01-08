@@ -467,7 +467,6 @@ include("server:ee:libs:automation:automation-security-web:automation-security-w
 include("server:ee:libs:config:cloud-config")
 include("server:ee:libs:config:observability-config")
 include("server:ee:libs:config:tenant-multi-data-config")
-include("server:ee:libs:config:tenant-multi-message-event-config")
 include("server:ee:libs:config:tenant-multi-security-config")
 
 include("server:ee:libs:core:cloud:cloud-aws")
