@@ -39,6 +39,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.coordinator.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutorImpl;
@@ -81,10 +82,10 @@ public class WebhookConfiguration {
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
-        WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
 
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobPrincipalAccessorRegistry,
@@ -98,8 +99,7 @@ public class WebhookConfiguration {
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
-                taskExecutionService, taskExecutor,
-                taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             triggerSyncExecutor, taskFileStorage);
     }
 

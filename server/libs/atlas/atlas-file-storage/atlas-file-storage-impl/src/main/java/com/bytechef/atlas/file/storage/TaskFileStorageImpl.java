@@ -64,9 +64,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public FileEntry storeContextValue(
-        long stackId, Context.Classname classname, Map<String, ?> value) {
-
+    public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
     }
@@ -87,7 +85,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public FileEntry storeTaskExecutionOutput(long taskExecutionId, Object output) {
+    public FileEntry storeTaskExecutionOutput(long jobId, long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json", CompressionUtils.compress(JsonUtils.write(output)));
     }
