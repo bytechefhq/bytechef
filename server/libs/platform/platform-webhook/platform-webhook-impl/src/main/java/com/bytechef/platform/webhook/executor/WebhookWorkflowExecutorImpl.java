@@ -155,7 +155,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
                 jobIds.add(jobId);
 
-                sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId)));
+                CompletableFuture.runAsync(
+                    () -> sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId))));
             }
 
             List<AutoCloseable> handles = new ArrayList<>();

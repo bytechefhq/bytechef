@@ -154,7 +154,7 @@ public class WorkflowApiControllerIntTest {
             }
 
             ProjectWorkflowDTO workflow = new ProjectWorkflowDTO(
-                new Workflow("workflow1", "{}", Workflow.Format.JSON), projectWorkflow);
+                new Workflow("workflow1", "{}", Workflow.Format.JSON), projectWorkflow, false);
 
             when(projectWorkflowFacade.getProjectWorkflows(1L))
                 .thenReturn(List.of(workflow));
@@ -250,6 +250,6 @@ public class WorkflowApiControllerIntTest {
         return new ProjectWorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), false, null, List.of())), List.of()),
-            projectWorkflow);
+            projectWorkflow, false);
     }
 }

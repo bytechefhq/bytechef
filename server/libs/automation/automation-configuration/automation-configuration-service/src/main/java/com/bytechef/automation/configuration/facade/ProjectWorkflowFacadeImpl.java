@@ -290,7 +290,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
 
-        return new ProjectWorkflowDTO(workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow);
+        return new ProjectWorkflowDTO(
+            workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
+            workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId()));
     }
 
     @Override
@@ -298,7 +300,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public ProjectWorkflowDTO getProjectWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        return new ProjectWorkflowDTO(workflowFacade.getWorkflow(workflowId), projectWorkflow);
+        return new ProjectWorkflowDTO(
+            workflowFacade.getWorkflow(workflowId), projectWorkflow,
+            workflowFacade.hasSseStreamResponse(workflowId));
     }
 
     @Override
@@ -307,7 +311,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         return projectWorkflowService.getProjectWorkflows()
             .stream()
             .map(projectWorkflow -> workflowFacade.fetchWorkflow(projectWorkflow.getWorkflowId())
-                .map(workflowDTO -> new ProjectWorkflowDTO(workflowDTO, projectWorkflow))
+                .map(workflowDTO -> new ProjectWorkflowDTO(
+                    workflowDTO, projectWorkflow,
+                    workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
                 .orElse(null))
             .filter(Objects::nonNull)
             .toList();
@@ -322,7 +328,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             .getProjectWorkflows(project.getId(), project.getLastProjectVersion())
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
-                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
+                workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
             .sorted(
                 (projectWorkflow1, projectWorkflow2) -> {
                     String label1 = projectWorkflow1.getLabel();
@@ -342,13 +349,14 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
                 .stream()
                 .map(projectWorkflow -> new ProjectWorkflowDTO(
-                    workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                    workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow,
+                    workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId())))
                 .toList();
         } else {
             return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
                 .stream()
                 .map(projectWorkflow -> new ProjectWorkflowDTO(
-                    workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                    workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
                 .toList();
         }
     }

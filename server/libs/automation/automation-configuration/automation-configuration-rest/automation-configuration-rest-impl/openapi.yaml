@@ -1481,6 +1481,10 @@ components:
               type: "integer"
               format: "int64"
               readOnly: true
+            sseStreamResponse:
+              description: "Indicates if the workflow has SSE stream response"
+              type: "boolean"
+              readOnly: true
             workflowUuid:
               description: "The workflow uuid"
               type: "string"
