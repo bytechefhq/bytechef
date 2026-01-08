@@ -25,9 +25,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.openai.action.OpenAiChatAction.CHAT_MODEL;
 import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.CHAT_MODEL_PROPERTY;
 
-import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -60,7 +60,6 @@ public class OpenAiChatModel {
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
 
-        return OpenAiChatAction.CHAT_MODEL.createChatModel(
-            inputParameters, connectionParameters, responseFormatRequired);
+        return CHAT_MODEL.createChatModel(inputParameters, connectionParameters, responseFormatRequired);
     }
 }

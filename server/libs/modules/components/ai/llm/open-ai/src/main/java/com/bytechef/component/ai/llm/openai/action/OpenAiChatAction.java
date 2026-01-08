@@ -18,34 +18,19 @@ package com.bytechef.component.ai.llm.openai.action;
 
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
-import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.CHAT_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.openai.constant.OpenAiConstants.ASK_PROPERTIES;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
@@ -70,23 +55,7 @@ public class OpenAiChatAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
-        .properties(
-            CHAT_MODEL_PROPERTY,
-            FORMAT_PROPERTY,
-            PROMPT_PROPERTY,
-            SYSTEM_PROMPT_PROPERTY,
-            ATTACHMENTS_PROPERTY,
-            MESSAGES_PROPERTY,
-            RESPONSE_PROPERTY,
-            MAX_TOKENS_PROPERTY,
-            N_PROPERTY,
-            TEMPERATURE_PROPERTY,
-            TOP_P_PROPERTY,
-            FREQUENCY_PENALTY_PROPERTY,
-            PRESENCE_PENALTY_PROPERTY,
-            LOGIT_BIAS_PROPERTY,
-            STOP_PROPERTY,
-            USER_PROPERTY)
+        .properties(ASK_PROPERTIES)
         .output(ModelUtils::output)
         .perform(OpenAiChatAction::perform);
 

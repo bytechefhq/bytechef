@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.anthropic.cluster;
 
+import static com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction.CHAT_MODEL;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -23,7 +24,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PR
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
-import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -52,7 +52,6 @@ public class AntropicChatModel {
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
 
-        return AnthropicChatAction.CHAT_MODEL.createChatModel(
-            inputParameters, connectionParameters, responseFormatRequired);
+        return CHAT_MODEL.createChatModel(inputParameters, connectionParameters, responseFormatRequired);
     }
 }

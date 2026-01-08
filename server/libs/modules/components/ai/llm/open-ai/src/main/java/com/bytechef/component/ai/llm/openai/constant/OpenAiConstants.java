@@ -16,7 +16,22 @@
 
 package com.bytechef.component.ai.llm.openai.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -63,6 +78,24 @@ public final class OpenAiConstants {
         .description("ID of the model to use.")
         .required(true)
         .options(CHAT_MODELS);
+
+    public static final List<Property> ASK_PROPERTIES = List.of(
+        CHAT_MODEL_PROPERTY,
+        FORMAT_PROPERTY,
+        PROMPT_PROPERTY,
+        SYSTEM_PROMPT_PROPERTY,
+        ATTACHMENTS_PROPERTY,
+        MESSAGES_PROPERTY,
+        RESPONSE_PROPERTY,
+        MAX_TOKENS_PROPERTY,
+        N_PROPERTY,
+        TEMPERATURE_PROPERTY,
+        TOP_P_PROPERTY,
+        FREQUENCY_PENALTY_PROPERTY,
+        PRESENCE_PENALTY_PROPERTY,
+        LOGIT_BIAS_PROPERTY,
+        STOP_PROPERTY,
+        USER_PROPERTY);
 
     private OpenAiConstants() {
     }
