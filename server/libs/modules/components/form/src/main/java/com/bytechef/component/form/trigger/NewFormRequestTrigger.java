@@ -80,8 +80,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -272,7 +272,7 @@ public class NewFormRequestTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters webhookEnableOutput, TriggerContext context) {
 
-        Assert.notNull(body.getContent(), "Body content is required.");
+        Objects.requireNonNull(body.getContent(), "Body content is required.");
 
         boolean ignoreBots = inputParameters.getBoolean(IGNORE_BOTS, false);
 
