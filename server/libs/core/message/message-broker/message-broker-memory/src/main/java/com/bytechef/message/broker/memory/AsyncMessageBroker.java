@@ -16,8 +16,6 @@
 
 package com.bytechef.message.broker.memory;
 
-import com.bytechef.commons.util.ConvertUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.route.MessageRoute;
 import java.util.List;
@@ -72,8 +70,7 @@ public class AsyncMessageBroker extends AbstractMessageBroker {
         }
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            executor.execute(() -> receiver.receive(
-                ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass())));
+            executor.execute(() -> receiver.receive(message));
         }
     }
 
