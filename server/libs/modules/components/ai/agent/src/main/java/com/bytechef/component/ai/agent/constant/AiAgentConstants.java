@@ -16,6 +16,12 @@
 
 package com.bytechef.component.ai.agent.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.ai.llm.constant.LLMConstants;
+import com.bytechef.component.definition.Property;
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -24,4 +30,14 @@ public class AiAgentConstants {
     public static final String AI_AGENT = "aiAgent";
     public static final String CHAT = "chat";
     public static final String CONVERSATION_ID = "conversationId";
+
+    public static final List<Property> CHAT_PROPERTIES = List.of(
+        LLMConstants.FORMAT_PROPERTY,
+        LLMConstants.PROMPT_PROPERTY,
+        LLMConstants.SYSTEM_PROMPT_PROPERTY,
+        LLMConstants.ATTACHMENTS_PROPERTY,
+        LLMConstants.MESSAGES_PROPERTY,
+        LLMConstants.RESPONSE_PROPERTY,
+        string(CONVERSATION_ID)
+            .description("The conversation id used in conjunction with memory."));
 }

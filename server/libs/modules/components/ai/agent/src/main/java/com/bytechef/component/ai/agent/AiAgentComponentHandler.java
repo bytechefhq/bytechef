@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.action.AiAgentChatAction;
+import com.bytechef.component.ai.agent.action.AiAgentStreamChatAction;
 import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -46,7 +47,9 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .description("With the AI Agent, you can chat with the AI agent.")
                 .icon("path:assets/ai-agent.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(aiAgentChatAction.actionDefinition)
+                .actions(
+                    aiAgentChatAction.actionDefinition,
+                    new AiAgentStreamChatAction(clusterElementDefinitionService).actionDefinition)
                 .clusterElements(new AiAgentChatTool(aiAgentChatAction).clusterElementDefinition));
     }
 
