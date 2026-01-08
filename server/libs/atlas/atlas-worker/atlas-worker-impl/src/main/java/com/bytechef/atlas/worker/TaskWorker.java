@@ -209,8 +209,12 @@ public class TaskWorker {
                     output = taskExecutionPostOutputProcessor.process(taskExecution, output);
                 }
 
-                taskExecution.setOutput(
-                    taskFileStorage.storeTaskExecutionOutput(Validate.notNull(taskExecution.getId(), "id"), output));
+                if (output != null) {
+                    taskExecution.setOutput(
+                        taskFileStorage.storeTaskExecutionOutput(
+                            Objects.requireNonNull(taskExecution.getJobId()),
+                            Objects.requireNonNull(taskExecution.getId()), output));
+                }
             }
 
             taskExecution.setEndDate(Instant.now());
