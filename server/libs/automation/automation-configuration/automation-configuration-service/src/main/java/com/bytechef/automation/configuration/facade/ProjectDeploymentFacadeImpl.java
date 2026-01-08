@@ -35,7 +35,6 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
@@ -743,9 +742,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
-        return OptionalUtils.mapOrElse(
-            principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION), this::getJobEndDate,
-            null);
+        return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
+            .map(this::getJobEndDate)
+            .orElse(null);
     }
 
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {
@@ -767,7 +766,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
                 triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
-                triggerWorkflowNodeType.operation());
+                Objects.requireNonNull(triggerWorkflowNodeType.operation()));
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
                 !Objects.equals(triggerDefinition.getName(), "manual")) {
@@ -797,7 +796,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Instant getWorkflowLastExecutionDate(List<String> workflowIds) {
-        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
+        return jobService.fetchLastWorkflowJob(workflowIds)
+            .map(Job::getEndDate)
+            .orElse(null);
     }
 
     private String getWorkflowUuid(
