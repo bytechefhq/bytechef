@@ -22,7 +22,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
+import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
@@ -78,24 +78,25 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     private final Cache<String, List<SseEmitter.SseEventBuilder>> pendingEvents = createCache();
     private final Cache<String, CompletableFuture<WorkflowTestExecutionModel>> workflowExecutions = createCache();
     private final TempFileStorage tempFileStorage;
-    private final WorkflowTestFacade workflowTestFacade;
+    private final TestWorkflowExecutor testWorkflowExecutor;
 
     @Autowired
     @SuppressFBWarnings("EI")
     public WorkflowTestApiController(
-        ConversionService conversionService, TempFileStorage tempFileStorage, WorkflowTestFacade workflowTestFacade) {
+        ConversionService conversionService, TempFileStorage tempFileStorage,
+        TestWorkflowExecutor testWorkflowExecutor) {
 
-        this(conversionService, tempFileStorage, workflowTestFacade, 100);
+        this(conversionService, tempFileStorage, testWorkflowExecutor, 100);
     }
 
     @SuppressFBWarnings("EI")
     public WorkflowTestApiController(
-        ConversionService conversionService, TempFileStorage tempFileStorage, WorkflowTestFacade workflowTestFacade,
+        ConversionService conversionService, TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor,
         int maxPendingEvents) {
 
         this.conversionService = conversionService;
         this.tempFileStorage = tempFileStorage;
-        this.workflowTestFacade = workflowTestFacade;
+        this.testWorkflowExecutor = testWorkflowExecutor;
         this.maxPendingEvents = Math.max(1, maxPendingEvents);
     }
 
@@ -211,7 +212,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         if (future != null && !future.isDone()) {
             future.cancel(true);
         } else {
-            workflowTestFacade.stopTest(Long.parseLong(jobId));
+            testWorkflowExecutor.stopTest(Long.parseLong(jobId));
 
             try {
                 sendToEmitter(key, createEvent("error", "Aborted"));
@@ -259,7 +260,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
 
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
-        long jobId = workflowTestFacade.startTestWorkflow(id, inputs, environmentId);
+        long jobId = testWorkflowExecutor.startTestWorkflow(id, inputs, environmentId);
 
         String key = TenantCacheKeyUtils.getKey(jobId);
 
@@ -273,14 +274,14 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         CompletableFuture<WorkflowTestExecutionModel> future =
             CompletableFuture.supplyAsync(() -> TenantContext.callWithTenantId(
                 currentTenantId, () -> Objects.requireNonNull(conversionService.convert(
-                    workflowTestFacade.awaitTestResult(jobId), WorkflowTestExecutionModel.class))));
+                    testWorkflowExecutor.awaitTestResult(jobId), WorkflowTestExecutionModel.class))));
 
         workflowExecutions.put(key, future);
 
         future.whenComplete((result, throwable) -> {
             try {
                 if (throwable instanceof CancellationException) {
-                    workflowTestFacade.stopTest(jobId);
+                    testWorkflowExecutor.stopTest(jobId);
 
                     sendToEmitter(key, createEvent("error", "Aborted"));
                 } else if (throwable != null) {
@@ -387,22 +388,22 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         listenerHandles.get(key, k -> {
             List<AutoCloseable> handles = new ArrayList<>();
 
-            handles.add(workflowTestFacade.addJobStatusListener(
+            handles.add(testWorkflowExecutor.addJobStatusListener(
                 jobId, (event) -> sendToEmitter(key, createEvent("job", event))));
 
             handles.add(
-                workflowTestFacade.addTaskStartedListener(
+                testWorkflowExecutor.addTaskStartedListener(
                     jobId, (event) -> sendToEmitter(key, createEvent("task", event))));
 
             handles.add(
-                workflowTestFacade.addTaskExecutionCompleteListener(
+                testWorkflowExecutor.addTaskExecutionCompleteListener(
                     jobId, (event) -> sendToEmitter(key, createEvent("task", event))));
 
             handles.add(
-                workflowTestFacade.addErrorListener(
+                testWorkflowExecutor.addErrorListener(
                     jobId, (event) -> sendToEmitter(key, createEvent("error", event))));
 
-            handles.add(workflowTestFacade.addSseStreamBridge(jobId, new SseStreamBridge(key)));
+            handles.add(testWorkflowExecutor.addSseStreamBridge(jobId, new SseStreamBridge(key)));
 
             return handles;
         });

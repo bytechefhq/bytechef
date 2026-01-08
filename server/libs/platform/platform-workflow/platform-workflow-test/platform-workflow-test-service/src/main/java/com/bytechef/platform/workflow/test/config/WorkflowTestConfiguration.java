@@ -46,11 +46,14 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
-import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
+import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
+import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutorImpl;
 import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
@@ -86,15 +89,16 @@ import tools.jackson.databind.ObjectMapper;
 public class WorkflowTestConfiguration {
 
     @Bean
-    JobTestExecutor jobTestExecutor(
+    TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
-        ObjectMapper objectMapper, TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService, WorkflowService workflowService) {
+        ObjectMapper objectMapper, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
-
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
         JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
@@ -102,7 +106,7 @@ public class WorkflowTestConfiguration {
 
         TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage();
 
-        return new JobTestExecutor(
+        return new TestWorkflowExecutorImpl(
             componentDefinitionService, contextService, evaluator,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, 1000,
@@ -117,7 +121,8 @@ public class WorkflowTestConfiguration {
                     contextService, counterService, evaluator, jobService, asyncMessageBroker, taskExecutionService,
                     taskFileStorage),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
-            taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
+            taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
+            workflowNodeOutputFacade, workflowTestConfigurationService);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

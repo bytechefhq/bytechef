@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -40,9 +41,8 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
-import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -59,16 +59,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-public class WorkflowTestFacadeTest {
+public class TestWorkflowExecutorTest {
 
     private static final String WORKFLOW_ID = "wf-1";
     private static final long ENVIRONMENT_ID = 10L;
 
     @Mock
     private ComponentDefinitionService componentDefinitionService;
-
-    @Mock
-    private JobTestExecutor jobTestExecutor;
 
     @Mock
     private WorkflowService workflowService;
@@ -80,14 +77,21 @@ public class WorkflowTestFacadeTest {
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Mock
+    private JobSyncExecutor jobSyncExecutor;
+
+    @Mock
     private Workflow workflow;
 
-    private WorkflowTestFacadeImpl facade;
+    private TestWorkflowExecutorImpl testWorkflowExecutor;
 
     @BeforeEach
     void beforeEach() {
-        facade = new WorkflowTestFacadeImpl(
-            componentDefinitionService, jobTestExecutor, workflowService, workflowNodeOutputFacade,
+        testWorkflowExecutor = new TestWorkflowExecutorImpl(
+            componentDefinitionService, mock(com.bytechef.atlas.execution.service.ContextService.class),
+            mock(com.bytechef.evaluator.Evaluator.class), jobSyncExecutor,
+            mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
+            mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
+            mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
             workflowTestConfigurationService);
     }
 
@@ -110,20 +114,23 @@ public class WorkflowTestFacadeTest {
             .thenReturn(Optional.of(workflowTestConfiguration));
 
         // And a job is executed
-        JobDTO jobDTO = new JobDTO(mock(com.bytechef.atlas.execution.domain.Job.class));
-        when(jobTestExecutor.execute(any(JobParametersDTO.class))).thenReturn(jobDTO);
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
 
         // When
         Map<String, Object> inputs = new HashMap<>();
 
         inputs.put("inKey", "inVal");
 
-        WorkflowTestExecutionDTO result = facade.testWorkflow(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.testWorkflow(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
 
         // Then the job was executed with merged inputs and connection metadata
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
 
-        verify(jobTestExecutor).execute(captor.capture());
+        verify(jobSyncExecutor).startJob(captor.capture());
 
         JobParametersDTO jobParametersDTO = captor.getValue();
 
@@ -144,7 +151,6 @@ public class WorkflowTestFacadeTest {
         assertThat(metaMap.get("nodeA")).containsEntry("connKey", 42L);
         assertThat(result).isNotNull();
         assertThat(result.triggerExecution()).isNull();
-        assertThat(result.job()).isSameAs(jobDTO);
     }
 
     @Test
@@ -191,17 +197,19 @@ public class WorkflowTestFacadeTest {
             .thenReturn(Optional.of(workflowTestConfiguration));
 
         // And a job execution result
-        JobDTO jobDTO = new JobDTO(mock(com.bytechef.atlas.execution.domain.Job.class));
+        Job job = mock(Job.class);
 
-        when(jobTestExecutor.execute(any(JobParametersDTO.class))).thenReturn(jobDTO);
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
 
         // When inputs are empty, facade should build inputs from trigger sample
-        WorkflowTestExecutionDTO result = facade.testWorkflow(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.testWorkflow(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
 
         // Then JobParameters contain the flattened sample under trigger name and cfg inputs
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
 
-        verify(jobTestExecutor).execute(captor.capture());
+        verify(jobSyncExecutor).startJob(captor.capture());
 
         JobParametersDTO jobParametersDTO = captor.getValue();
 
@@ -212,7 +220,6 @@ public class WorkflowTestFacadeTest {
         assertThat(inputs.get("myTrigger")).isInstanceOf(Map.class);
         assertThat(((Map<?, ?>) inputs.get("myTrigger")).get("x")).isEqualTo(1);
         assertThat(result.triggerExecution()).isNotNull();
-        assertThat(result.job()).isSameAs(jobDTO);
     }
 
     @Test
@@ -229,15 +236,15 @@ public class WorkflowTestFacadeTest {
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Optional.of(workflowTestConfiguration));
 
-        when(jobTestExecutor.start(any(JobParametersDTO.class))).thenReturn(99L);
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(99L);
 
-        long jobId = facade.startTestWorkflow(WORKFLOW_ID, Map.of("in", 2), ENVIRONMENT_ID);
+        long jobId = testWorkflowExecutor.startTestWorkflow(WORKFLOW_ID, Map.of("in", 2), ENVIRONMENT_ID);
 
         assertThat(jobId).isEqualTo(99L);
 
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
 
-        verify(jobTestExecutor).start(captor.capture());
+        verify(jobSyncExecutor).startJob(captor.capture());
 
         JobParametersDTO params = captor.getValue();
 
@@ -249,20 +256,21 @@ public class WorkflowTestFacadeTest {
 
     @Test
     void testAwaitTestResultReturnsJobAndNullTrigger() {
-        JobDTO jobDTO = new JobDTO(mock(com.bytechef.atlas.execution.domain.Job.class));
+        Job job = mock(Job.class);
 
-        when(jobTestExecutor.await(anyLong())).thenReturn(jobDTO);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(123L);
 
-        WorkflowTestExecutionDTO res = facade.awaitTestResult(123L);
+        WorkflowTestExecutionDTO res = testWorkflowExecutor.awaitTestResult(123L);
 
-        assertThat(res.job()).isSameAs(jobDTO);
+        assertThat(res.job()).isNotNull();
         assertThat(res.triggerExecution()).isNull();
     }
 
     @Test
     void testStopTestDelegates() {
-        facade.stopTest(555L);
-        verify(jobTestExecutor).stop(555L);
+        testWorkflowExecutor.stopTest(555L);
+        verify(jobSyncExecutor).stopJob(555L);
     }
 
     @Test
@@ -271,14 +279,14 @@ public class WorkflowTestFacadeTest {
         AutoCloseable tc = () -> {};
         AutoCloseable ec = () -> {};
 
-        when(jobTestExecutor.addJobStatusListener(anyLong(), any())).thenReturn(jc);
-        when(jobTestExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(tc);
-        when(jobTestExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(tc);
-        when(jobTestExecutor.addErrorListener(anyLong(), any())).thenReturn(ec);
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(jc);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(tc);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(tc);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(ec);
 
-        assertThat(facade.addJobStatusListener(1L, event -> {})).isSameAs(jc);
-        assertThat(facade.addTaskStartedListener(1L, event -> {})).isSameAs(tc);
-        assertThat(facade.addTaskExecutionCompleteListener(1L, event -> {})).isSameAs(tc);
-        assertThat(facade.addErrorListener(1L, event -> {})).isSameAs(ec);
+        assertThat(testWorkflowExecutor.addJobStatusListener(1L, event -> {})).isSameAs(jc);
+        assertThat(testWorkflowExecutor.addTaskStartedListener(1L, event -> {})).isSameAs(tc);
+        assertThat(testWorkflowExecutor.addTaskExecutionCompleteListener(1L, event -> {})).isSameAs(tc);
+        assertThat(testWorkflowExecutor.addErrorListener(1L, event -> {})).isSameAs(ec);
     }
 }

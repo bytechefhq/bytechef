@@ -39,7 +39,7 @@ import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
 import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
-import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
+import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.nio.charset.StandardCharsets;
@@ -84,7 +84,7 @@ class WorkflowTestApiControllerIntTest {
     private TempFileStorage tempFileStorage;
 
     @MockitoBean
-    private WorkflowTestFacade workflowTestFacade;
+    private TestWorkflowExecutor testWorkflowExecutor;
 
     @Autowired
     private WorkflowTestApiController controller;
@@ -100,8 +100,8 @@ class WorkflowTestApiControllerIntTest {
     void testStartStreamEmitsStartAndResult() throws Exception {
         long jobId = 123L;
 
-        given(workflowTestFacade.startTestWorkflow(eq("wf-1"), any(), eq(1L))).willReturn(jobId);
-        given(workflowTestFacade.awaitTestResult(eq(jobId)))
+        given(testWorkflowExecutor.startTestWorkflow(eq("wf-1"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.awaitTestResult(eq(jobId)))
             .willReturn(new WorkflowTestExecutionDTO(new JobDTO(new Job()), null));
 
         var mvcResult = mockMvc.perform(
@@ -133,12 +133,12 @@ class WorkflowTestApiControllerIntTest {
     void testStopAbortsActiveStreamAndInvokesFacade() throws Exception {
         long jobId = 456L;
 
-        given(workflowTestFacade.startTestWorkflow(eq("wf-2"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.startTestWorkflow(eq("wf-2"), any(), eq(1L))).willReturn(jobId);
 
         // Make awaitTestResult block so the stream stays open until we call stop
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(workflowTestFacade.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -197,7 +197,7 @@ class WorkflowTestApiControllerIntTest {
         // Assert the stream carried SSE lines and the run was stopped via facade invocation.
         assertThat(captured).contains("event:");
 
-        verify(workflowTestFacade, times(1)).stopTest(eq(jobId));
+        verify(testWorkflowExecutor, times(1)).stopTest(eq(jobId));
     }
 
     @Test
@@ -227,11 +227,11 @@ class WorkflowTestApiControllerIntTest {
     void testListenerForwardingEmitsJobTaskAndErrorEvents() throws Exception {
         long jobId = 777L;
 
-        given(workflowTestFacade.startTestWorkflow(eq("wf-3"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.startTestWorkflow(eq("wf-3"), any(), eq(1L))).willReturn(jobId);
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(workflowTestFacade.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -247,31 +247,31 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<Consumer<ExecutionErrorEventDTO>> errorListener = new AtomicReference<>();
         AtomicReference<SseStreamBridge> sseStreamBridge = new AtomicReference<>();
 
-        given(workflowTestFacade.addJobStatusListener(eq(jobId), any())).willAnswer(inv -> {
+        given(testWorkflowExecutor.addJobStatusListener(eq(jobId), any())).willAnswer(inv -> {
             jobListener.set(inv.getArgument(1));
 
             return (AutoCloseable) () -> {};
         });
 
-        given(workflowTestFacade.addTaskStartedListener(eq(jobId), any())).willAnswer(inv -> {
+        given(testWorkflowExecutor.addTaskStartedListener(eq(jobId), any())).willAnswer(inv -> {
             taskStartedListener.set(inv.getArgument(1));
 
             return (AutoCloseable) () -> {};
         });
 
-        given(workflowTestFacade.addTaskExecutionCompleteListener(eq(jobId), any())).willAnswer(inv -> {
+        given(testWorkflowExecutor.addTaskExecutionCompleteListener(eq(jobId), any())).willAnswer(inv -> {
             taskCompletedListener.set(inv.getArgument(1));
 
             return (AutoCloseable) () -> {};
         });
 
-        given(workflowTestFacade.addErrorListener(eq(jobId), any())).willAnswer(inv -> {
+        given(testWorkflowExecutor.addErrorListener(eq(jobId), any())).willAnswer(inv -> {
             errorListener.set(inv.getArgument(1));
 
             return (AutoCloseable) () -> {};
         });
 
-        given(workflowTestFacade.addSseStreamBridge(eq(jobId), any())).willAnswer(inv -> {
+        given(testWorkflowExecutor.addSseStreamBridge(eq(jobId), any())).willAnswer(inv -> {
             sseStreamBridge.set(inv.getArgument(1));
 
             return (AutoCloseable) () -> {};
@@ -358,11 +358,11 @@ class WorkflowTestApiControllerIntTest {
         long jobId = 888L;
 
         // Configure start and block to keep run active
-        given(workflowTestFacade.startTestWorkflow(eq("wf-4"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.startTestWorkflow(eq("wf-4"), any(), eq(1L))).willReturn(jobId);
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(workflowTestFacade.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(2, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -469,9 +469,9 @@ class WorkflowTestApiControllerIntTest {
     void testPendingEventsClearedOnStop() throws Exception {
         long jobId = 889L;
 
-        given(workflowTestFacade.startTestWorkflow(eq("wf-5"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.startTestWorkflow(eq("wf-5"), any(), eq(1L))).willReturn(jobId);
         CountDownLatch latch = new CountDownLatch(1);
-        given(workflowTestFacade.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(2, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -598,10 +598,10 @@ class WorkflowTestApiControllerIntTest {
         @Bean
         WorkflowTestApiController workflowTestApiController(
             ConversionService conversionService, TempFileStorage tempFileStorage,
-            WorkflowTestFacade workflowTestFacade) {
+            TestWorkflowExecutor testWorkflowExecutor) {
 
             // Use a small buffer to make bounded behavior easy to assert in tests
-            return new WorkflowTestApiController(conversionService, tempFileStorage, workflowTestFacade, 3);
+            return new WorkflowTestApiController(conversionService, tempFileStorage, testWorkflowExecutor, 3);
         }
     }
 
