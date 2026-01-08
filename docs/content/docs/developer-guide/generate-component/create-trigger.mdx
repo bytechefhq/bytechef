@@ -1,19 +1,18 @@
 ---
-title: "Create Trigger"
-description: "How to create a trigger for a component."
+description: "Generate custom triggers for ByteChef components. Learn how to implement this in your ByteChef workflows."
+title: Create Trigger
 ---
 
-## Create Trigger [toc]
-
-When creating a trigger for generated component, it must be added manually. Follow the [instructions in Build Component section](/developer-guide/build-component/create-trigger) to create `NewComponentDummyTrigger` class that defines the trigger.
-
-Once this class is created, update Component Handler as follows:
-In `NewComponentComponentHandler`, override the `getTriggers()` method:
+In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/component/newcomponent/trigger` package, the `NewComponentDummyTrigger` class defines the trigger. The `TRIGGER_DEFINITION` constant contains all the details about the trigger, including its name, title, description, properties and others.
 
 ```java
-
-@Override
-public List<ModifiableTriggerDefinition> getTriggers() {
-    return List.of(NewComponentDummyTrigger.TRIGGER_DEFINITION);
-}
+public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = action("dummy")
+    .title("Dummy Trigger")
+    .description("Trigger description.")
+    .properties()
+    .output(
+        outputSchema(
+            string()));
 ```
+
+For more information about any method in the `TRIGGER_DEFINITION`, refer to the [trigger documentation](/reference/triggers).

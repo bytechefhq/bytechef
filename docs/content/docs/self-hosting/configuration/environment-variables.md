@@ -1,6 +1,6 @@
 ---
+description: "ByteChef Environment Variables. Complete reference for configuring AI, cloud, database, and application settings."
 title: Environment Variables
-description: Configuration options for ByteChef through environment variables
 ---
 
 ByteChef can be configured using environment variables. This page documents all available environment variables, organized by category.

@@ -1,8 +1,6 @@
 ---
+description: "ByteChef Kubernetes Deployment. Deploy and manage ByteChef clusters on Kubernetes platforms."
 title: Kubernetes
-description: Deploy ByteChef on Kubernetes
 ---
-
-# Kubernetes
 
 Coming soon...
