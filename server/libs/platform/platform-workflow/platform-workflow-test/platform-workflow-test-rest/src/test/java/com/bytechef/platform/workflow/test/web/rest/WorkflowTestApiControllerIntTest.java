@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
@@ -244,6 +245,7 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<Consumer<TaskStatusEventDTO>> taskStartedListener = new AtomicReference<>();
         AtomicReference<Consumer<TaskStatusEventDTO>> taskCompletedListener = new AtomicReference<>();
         AtomicReference<Consumer<ExecutionErrorEventDTO>> errorListener = new AtomicReference<>();
+        AtomicReference<JobSyncExecutor.SseStreamBridge> sseStreamBridge = new AtomicReference<>();
 
         given(workflowTestFacade.addJobStatusListener(eq(jobId), any())).willAnswer(inv -> {
             jobListener.set(inv.getArgument(1));
@@ -269,6 +271,12 @@ class WorkflowTestApiControllerIntTest {
             return (AutoCloseable) () -> {};
         });
 
+        given(workflowTestFacade.addSseStreamBridge(eq(jobId), any())).willAnswer(inv -> {
+            sseStreamBridge.set(inv.getArgument(1));
+
+            return (AutoCloseable) () -> {};
+        });
+
         CompletableFuture<MvcResult> startFuture = CompletableFuture.supplyAsync(() -> {
             try {
                 return mockMvc.perform(
@@ -288,7 +296,8 @@ class WorkflowTestApiControllerIntTest {
         // Give time for the controller to register listeners
         for (int i = 0; i < 10; i++) {
             if (jobListener.get() != null && taskStartedListener.get() != null &&
-                taskCompletedListener.get() != null && errorListener.get() != null) {
+                taskCompletedListener.get() != null && errorListener.get() != null &&
+                sseStreamBridge.get() != null) {
 
                 break;
             }
@@ -300,11 +309,13 @@ class WorkflowTestApiControllerIntTest {
         Consumer<TaskStatusEventDTO> taskStatusEventStartedConsumer = taskStartedListener.get();
         Consumer<TaskStatusEventDTO> taskStatusEventCompletedConsumer = taskCompletedListener.get();
         Consumer<ExecutionErrorEventDTO> executionErrorEventConsumer = errorListener.get();
+        JobSyncExecutor.SseStreamBridge sseStreamBridgeBridge = sseStreamBridge.get();
 
         assertThat(jobStatusEventConsumer).isNotNull();
         assertThat(taskStatusEventStartedConsumer).isNotNull();
         assertThat(taskStatusEventCompletedConsumer).isNotNull();
         assertThat(executionErrorEventConsumer).isNotNull();
+        assertThat((Object) sseStreamBridgeBridge).isNotNull();
 
         // Fire synthetic events
         jobStatusEventConsumer.accept(new JobStatusEventDTO(jobId, "STARTED", Instant.now()));
@@ -313,6 +324,7 @@ class WorkflowTestApiControllerIntTest {
         taskStatusEventCompletedConsumer.accept(
             new TaskStatusEventDTO(jobId, 1L, COMPLETED, "t", "type", null, Instant.now()));
         executionErrorEventConsumer.accept(new ExecutionErrorEventDTO(jobId, "Oops"));
+        sseStreamBridgeBridge.onEvent("Chunk 1");
 
         // Allow a brief moment for SSE forwarding to flush before finishing
         Duration duration = Duration.ofMillis(50);
@@ -337,6 +349,8 @@ class WorkflowTestApiControllerIntTest {
 
         // Some encoders buffer only initial lines in the test HTTP body; at minimum ensure SSE lines are present
         assertThat(captured).contains("event:");
+        assertThat(captured).contains("event: stream");
+        assertThat(captured).contains("\"Chunk 1\"");
     }
 
     @Test
@@ -595,7 +609,7 @@ class WorkflowTestApiControllerIntTest {
         long deadline = System.currentTimeMillis() + 1000;
 
         while (System.currentTimeMillis() < deadline) {
-            Object runs = ReflectionTestUtils.getField(controller, "runs");
+            Object runs = ReflectionTestUtils.getField(controller, "workflowExecutions");
 
             if (runs instanceof Cache<?, ?> cache) {
                 @SuppressWarnings("unchecked")

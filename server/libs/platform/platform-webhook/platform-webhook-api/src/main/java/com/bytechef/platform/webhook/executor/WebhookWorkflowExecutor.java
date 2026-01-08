@@ -19,7 +19,8 @@ package com.bytechef.platform.webhook.executor;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
@@ -35,4 +36,13 @@ public interface WebhookWorkflowExecutor {
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     WebhookValidateResponse validateOnEnable(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+
+    /**
+     * Streams Server-Sent Events (SSE) for a given workflow execution.
+     *
+     * @param workflowExecutionId the identifier of the workflow execution for which the SSE stream is initiated
+     * @param webhookRequest      the webhook request containing headers, parameters, and body related to the event
+     * @return an instance of {@code SseEmitter} for streaming events
+     */
+    SseEmitter executeSseStream(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

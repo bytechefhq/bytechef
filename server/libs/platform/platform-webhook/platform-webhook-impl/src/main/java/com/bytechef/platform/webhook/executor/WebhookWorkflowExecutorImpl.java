@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.executor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -31,18 +32,26 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.Nullable;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -72,8 +81,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    @Nullable
-    public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public @Nullable Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
         TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
@@ -106,6 +114,117 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         }
 
         return outputs;
+    }
+
+    @Override
+    public SseEmitter executeSseStream(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        final SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
+
+        try {
+            TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
+
+            String workflowId = getWorkflowId(workflowExecutionId);
+            Map<String, ?> inputMap = getInputMap(workflowExecutionId);
+            List<Long> jobIds = new ArrayList<>();
+
+            if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> values) {
+                for (Object value : values) {
+                    Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
+
+                    inputs.put(workflowExecutionId.getTriggerName(), value);
+
+                    long jobId = jobSyncExecutor.startJob(
+                        new JobParametersDTO(workflowId, inputs),
+                        jobParameters -> principalJobFacade.createSyncJob(
+                            jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+
+                    jobIds.add(jobId);
+
+                    CompletableFuture.runAsync(
+                        () -> sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId))));
+                }
+            } else {
+                Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
+
+                inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
+
+                long jobId = jobSyncExecutor.startJob(
+                    new JobParametersDTO(workflowId, inputs),
+                    jobParameters -> principalJobFacade.createSyncJob(
+                        jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+
+                jobIds.add(jobId);
+
+                sendEvent(emitter, "start", Map.of("jobId", String.valueOf(jobId)));
+            }
+
+            List<AutoCloseable> handles = new ArrayList<>();
+
+            for (Long jobId : jobIds) {
+                handles.add(
+                    jobSyncExecutor.addSseStreamBridge(jobId, payload -> sendEvent(emitter, "stream", payload)));
+            }
+
+            String currentTenant = TenantContext.getCurrentTenantId();
+
+            CompletableFuture.runAsync(() -> TenantContext.runWithTenantId(currentTenant, () -> {
+                try {
+                    for (Long jobId : jobIds) {
+                        jobSyncExecutor.awaitJob(jobId, false);
+                    }
+                } finally {
+                    try {
+                        emitter.complete();
+                    } catch (Exception exception) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
+                        }
+                    }
+
+                    for (AutoCloseable handle : handles) {
+                        try {
+                            handle.close();
+                        } catch (Exception exception) {
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(exception.getMessage(), exception);
+                            }
+                        }
+                    }
+                }
+            }));
+
+            emitter.onCompletion(() -> {
+                for (AutoCloseable handle : handles) {
+                    try {
+                        handle.close();
+                    } catch (Exception exception) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
+                        }
+                    }
+                }
+            });
+
+            emitter.onTimeout(() -> {
+                for (AutoCloseable handle : handles) {
+                    try {
+                        handle.close();
+                    } catch (Exception exception) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(exception.getMessage(), exception);
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            try {
+                sendEvent(emitter, "error", e.getMessage());
+            } finally {
+                emitter.complete();
+            }
+        }
+
+        return emitter;
     }
 
     @Override
@@ -153,5 +272,18 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+    }
+
+    private void sendEvent(SseEmitter emitter, String name, Object data) {
+        try {
+            emitter.send(
+                SseEmitter.event()
+                    .name(name)
+                    .data(data instanceof String ? JsonUtils.write(data) : data));
+        } catch (Exception exception) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(exception.getMessage(), exception);
+            }
+        }
     }
 }

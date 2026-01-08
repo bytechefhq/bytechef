@@ -230,6 +230,10 @@ public class JobTestExecutor {
             new TaskStatusEventDTO(jobId, e.getTaskExecutionId(), STARTED, null, null, e.getCreateDate(), null)));
     }
 
+    public AutoCloseable addSseStreamBridge(long jobId, JobSyncExecutor.SseStreamBridge bridge) {
+        return jobSyncExecutor.addSseStreamBridge(jobId, bridge);
+    }
+
     private DefinitionResult getDefinition(TaskExecution taskExecution) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
 

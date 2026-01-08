@@ -34,6 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @author Ivica Cardic
@@ -65,6 +67,15 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
+    /**
+     * Executes a workflow based on the provided webhook trigger. Supports HEAD, GET, and POST HTTP methods for
+     * triggering different behaviors within the workflow.
+     *
+     * @param id                  the unique identifier of the workflow execution, extracted from the path variable.
+     * @param httpServletRequest  the HTTP request object containing client request details and metadata.
+     * @param httpServletResponse the HTTP response object to send responses back to the client.
+     * @return a {@link ResponseEntity} object representing the outcome of the workflow execution.
+     */
     @RequestMapping(
         method = {
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
@@ -98,6 +109,32 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
             return responseEntity;
         });
+    }
+
+    /**
+     * Handles Server-Sent Events (SSE) streaming for workflow execution based on the webhook trigger. This method
+     * configures a REST endpoint to stream events in real time to the client.
+     *
+     * @param id                 the unique identifier of the workflow execution, extracted from the path variable.
+     * @param httpServletRequest the HTTP request object containing client request details and metadata.
+     * @return an {@link SseEmitter} object that streams events to the client.
+     */
+    @RequestMapping(
+        method = {
+            RequestMethod.GET, RequestMethod.POST
+        }, value = "/webhooks/{id}/sse",
+        produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter>
+        sseStreamWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        return ResponseEntity.ok(
+            TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+                WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+
+                return webhookWorkflowExecutor.executeSseStream(workflowExecutionId, webhookRequest);
+            }));
     }
 
     private ResponseEntity<?> doValidateOnEnable(
