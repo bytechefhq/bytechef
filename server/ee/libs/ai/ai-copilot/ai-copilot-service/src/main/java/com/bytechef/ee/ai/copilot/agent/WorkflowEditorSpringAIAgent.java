@@ -56,9 +56,9 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             ## Additional Rules
 
             - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - When operating in ASK mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain.
-            - If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
-            - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses.
+            - When operating in ASK mode, the assistant must not modify, propose modifications to, or generate new versions of the workflow definition. The assistant may only describe, clarify, or explain. If the user expresses the need to do those things, instruct them to switch to BUILD mode.
+            - If no node is selected, the assistant must use the broader workflow context as the primary basis for responses. If a current selected node is available, the assistant must prioritize all answers using that node as the primary context.
+            - If asked about a component or how to create the connection, getComponent() tool will get extra instructions from the documentation. You will also provide a link to the ByteChef documentation of the component https://docs.bytechef.io/reference/components/{componentName}
             - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
             """;
 
