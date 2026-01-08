@@ -220,6 +220,19 @@ const ConnectionTabConnectionSelect = ({
         ]
     );
 
+    const handleOnConnectionCreate = useCallback(
+        async (newConnectionId: number) => {
+            await queryClient.invalidateQueries({
+                queryKey: ConnectionKeys!.connections,
+            });
+
+            handleValueChange(newConnectionId, key);
+
+            setConnectionId(newConnectionId);
+        },
+        [ConnectionKeys, handleValueChange, key, queryClient]
+    );
+
     // Sync connectionId from prop to state (one-way sync)
     useEffect(() => {
         const workflowConnectionId = workflowTestConfigurationConnection?.connectionId;
@@ -357,11 +370,7 @@ const ConnectionTabConnectionSelect = ({
                     connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowConnectionDialog(false)}
-                    onConnectionCreate={(newConnectionId) => {
-                        handleValueChange(newConnectionId, key);
-
-                        setConnectionId(newConnectionId);
-                    }}
+                    onConnectionCreate={handleOnConnectionCreate}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
                 />
