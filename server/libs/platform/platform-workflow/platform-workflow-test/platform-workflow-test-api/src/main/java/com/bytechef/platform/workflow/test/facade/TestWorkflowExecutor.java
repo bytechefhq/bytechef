@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowTestFacade {
+public interface TestWorkflowExecutor {
 
     /**
      * Tests the execution of a workflow given its identifier, input parameters, and execution environment.
