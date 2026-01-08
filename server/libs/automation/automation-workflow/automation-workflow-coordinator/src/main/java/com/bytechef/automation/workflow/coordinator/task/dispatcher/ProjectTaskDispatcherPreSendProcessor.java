@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.PlatformType;
@@ -62,7 +61,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long projectDeploymentId = principalJobService.getJobPrincipalId(
+        long projectDeploymentId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION);
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);
@@ -96,9 +95,10 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     public boolean canProcess(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long projectDeploymentId = OptionalUtils.orElse(
-            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION),
-            null);
+        Long projectDeploymentId =
+            principalJobService
+                .fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION)
+                .orElse(null);
 
         return projectDeploymentId != null;
     }
