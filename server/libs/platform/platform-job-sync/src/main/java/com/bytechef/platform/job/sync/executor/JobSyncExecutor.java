@@ -528,9 +528,14 @@ public class JobSyncExecutor {
         // events lack required fields (e.g., missing error on TaskExecution).
         try {
             taskExecutionErrorEventListener.onErrorEvent(event);
-        } catch (Exception e) {
+        } catch (IllegalStateException exception) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Error while handling ERROR_EVENTS in default listener", exception);
+            }
+        } catch (Exception exception) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Error while handling ERROR_EVENTS in default listener (ignored in this context)", e);
+                LOGGER.debug(
+                    "Error while handling ERROR_EVENTS in default listener (ignored in this context)", exception);
             }
         }
     }
@@ -566,10 +571,10 @@ public class JobSyncExecutor {
 
         try {
             taskCoordinator.onTaskExecutionCompleteEvent(event);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(
-                    "Error while handling TASK_EXECUTION_COMPLETE_EVENTS in coordinator (ignored in this context)", e);
+                    "Error while handling TASK_EXECUTION_COMPLETE_EVENTS in coordinator", exception);
             }
         }
     }
@@ -823,9 +828,9 @@ public class JobSyncExecutor {
                     return;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(e.getMessage(), e);
+                LOGGER.trace(exception.getMessage(), exception);
             }
         }
 
