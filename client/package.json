@@ -33,7 +33,7 @@
     "playwright:ui": "playwright test --ui",
     "playwright:headed": "playwright test --headed",
     "playwright:debug": "playwright test --debug",
-    "test:all": "npm run test && npm run test:e2e",
+    "test:all": "npm run test && npm run playwright",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile --typescript",
     "lint": "eslint src --max-warnings=0",
