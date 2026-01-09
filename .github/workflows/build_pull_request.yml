@@ -93,6 +93,7 @@ jobs:
         working-directory: client
         run: |
           npm ci
+          npx playwright install --with-deps
           npm run check
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
