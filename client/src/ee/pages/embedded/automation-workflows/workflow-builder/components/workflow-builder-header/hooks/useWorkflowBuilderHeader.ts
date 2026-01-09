@@ -39,14 +39,12 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
                 showBottomPanel: state.showBottomPanel,
             }))
         );
-    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                setCurrentNode: state.setCurrentNode,
-                setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
-                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-            }))
-        );
+    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            setCurrentNode: state.setCurrentNode,
+            setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
+        }))
+    );
     const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
         useShallow((state) => ({
             resetMessages: state.resetMessages,
@@ -224,13 +222,12 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
     }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
 
     // Stop the workflow execution when:
-    // - The node details panel is opened (this always cancels runs, regardless of chat mode), or
     // - We are in chat mode (`chatTrigger` is true) and the chat panel is not open (`!workflowTestChatPanelOpen`)
     useEffect(() => {
-        if (workflowNodeDetailsPanelOpen || (chatTrigger && !workflowTestChatPanelOpen)) {
+        if (chatTrigger && !workflowTestChatPanelOpen) {
             handleStopClick();
         }
-    }, [chatTrigger, handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
+    }, [chatTrigger, handleStopClick, workflowTestChatPanelOpen]);
 
     useEffect(() => {
         if (workflowTestStreamError) {
