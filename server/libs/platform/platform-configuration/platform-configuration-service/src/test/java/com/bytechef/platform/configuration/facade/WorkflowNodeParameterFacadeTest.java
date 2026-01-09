@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -2327,6 +2328,225 @@ public class WorkflowNodeParameterFacadeTest {
 
             // Then
             assertNotNull(result);
+            verify(workflowService).update(anyString(), anyString(), anyInt());
+        }
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterDisplayConditionNotEvaluatedForWrongType() {
+        // Given - Testing bug where display conditions for NUMBER type properties are evaluated when updating STRING
+        // type parameters.
+        //
+        // Real scenario: When conditions[0][0] is set to STRING variant (e.g., by setting value1 first),
+        // and then updating value2, only STRING variant display conditions should be evaluated.
+        // The bug was that ALL variants (NUMBER, BOOLEAN, etc.) were being checked.
+        String workflowId = "678a28b3-1e50-4356-b3d6-1fa8128698c9";
+        String workflowNodeName = "condition_1";
+        String parameterPath = "conditions[0][0].value2";
+        Object value = "value1";
+        String type = "STRING";
+        boolean includeInMetadata = true;
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+        List<Property> properties = new ArrayList<>();
+
+        Property rawExpressionProperty = mock(Property.class);
+
+        when(rawExpressionProperty.getName()).thenReturn("rawExpression");
+
+        lenient().when(rawExpressionProperty.getType())
+            .thenReturn(com.bytechef.component.definition.Property.Type.BOOLEAN);
+
+        properties.add(rawExpressionProperty);
+
+        ArrayProperty conditionsArrayProperty = mock(ArrayProperty.class);
+
+        when(conditionsArrayProperty.getName()).thenReturn("conditions");
+        when(conditionsArrayProperty.getDisplayCondition()).thenReturn("rawExpression == false");
+
+        // Mock the array items - these represent the object variants (boolean, number, string, etc.)
+        List<Property> arrayItems = new ArrayList<>();
+
+        // NUMBER variant object with its properties
+        // These stubs are lenient because they should NOT be used - the filtering should exclude them
+        ObjectProperty numberObjectProperty = mock(ObjectProperty.class);
+
+        lenient().when(numberObjectProperty.getName())
+            .thenReturn("number");
+
+        List<Property> numberProperties = new ArrayList<>();
+        Property numberValue2Property = mock(Property.class);
+
+        lenient().when(numberValue2Property.getName())
+            .thenReturn("value2");
+        lenient().when(numberValue2Property.getDisplayCondition())
+            .thenReturn("conditions[0][0].operation != 'EMPTY'");
+        lenient().when(numberValue2Property.getType())
+            .thenReturn(com.bytechef.component.definition.Property.Type.NUMBER);
+
+        numberProperties.add(numberValue2Property);
+
+        lenient().when(numberObjectProperty.getProperties())
+            .thenReturn((List) numberProperties);
+
+        arrayItems.add(numberObjectProperty);
+
+        // STRING variant object with its properties
+        ObjectProperty stringObjectProperty = mock(ObjectProperty.class);
+
+        when(stringObjectProperty.getName()).thenReturn("string");
+
+        List<Property> stringProperties = new ArrayList<>();
+        Property stringValue2Property = mock(Property.class);
+
+        when(stringValue2Property.getName()).thenReturn("value2");
+        when(stringValue2Property.getDisplayCondition())
+            .thenReturn("!contains({'EMPTY','REGEX'}, conditions[0][0].operation)");
+
+        lenient().when(stringValue2Property.getType())
+            .thenReturn(com.bytechef.component.definition.Property.Type.STRING);
+
+        stringProperties.add(stringValue2Property);
+
+        when(stringObjectProperty.getProperties()).thenReturn((List) stringProperties);
+        arrayItems.add(stringObjectProperty);
+
+        when(conditionsArrayProperty.getItems()).thenReturn((List) arrayItems);
+
+        properties.add(conditionsArrayProperty);
+
+        when(actionDefinition.getProperties()).thenReturn((List) properties);
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+        when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong()))
+            .thenReturn(Map.of());
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
+
+        when(evaluator.evaluate(any(Map.class), any(Map.class)))
+            .thenAnswer(invocation -> {
+                Map<String, Object> map = invocation.getArgument(0);
+
+                if (map.containsKey("displayCondition")) {
+                    String condition = (String) map.get("displayCondition");
+
+                    // Simulate all conditions evaluating to true for this test
+                    if (condition.equals("=rawExpression == false")) {
+                        return Map.of("displayCondition", true);
+                    }
+
+                    if (condition.equals("=conditions[0][0].operation != 'EMPTY'")) {
+                        return Map.of("displayCondition", true);
+                    }
+
+                    if (condition.equals("=!contains({'EMPTY','REGEX'}, conditions[0][0].operation)")) {
+                        return Map.of("displayCondition", true);
+                    }
+                }
+
+                return map;
+            });
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> conditionItem = new HashMap<>();
+
+            conditionItem.put("operation", "CONTAINS");
+            conditionItem.put("value1", "test");
+
+            List<List<Map<String, Object>>> conditions = new ArrayList<>();
+
+            conditions.add(List.of(conditionItem));
+
+            parameters.put("conditions", conditions);
+
+            Map<String, Object> metadata = new HashMap<>();
+            Map<String, Object> ui = new HashMap<>();
+            Map<String, String> dynamicPropertyTypes = new HashMap<>();
+
+            // In reality, the metadata stores types for individual properties, not the parent object
+            // The parent type "conditions[0][0]" is inferred from child properties
+            // Simulate that value1 was already set as STRING (from a previous update)
+            dynamicPropertyTypes.put("conditions[0][0].value1", "STRING");
+            dynamicPropertyTypes.put("conditions[0]", "ARRAY");
+
+            ui.put("dynamicPropertyTypes", dynamicPropertyTypes);
+
+            metadata.put("ui", ui);
+
+            Map<String, Object> task = new HashMap<>();
+
+            task.put("name", workflowNodeName);
+            task.put("type", "condition/v1/condition");
+            task.put("parameters", parameters);
+            task.put("metadata", metadata);
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
+            tasks.add(task);
+
+            Map<String, Object> definitionMap = new HashMap<>();
+
+            definitionMap.put("tasks", tasks);
+
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(definitionMap);
+            mockedJsonUtils.when(() -> JsonUtils.writeWithDefaultPrettyPrinter(any()))
+                .thenReturn("{}");
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            when(workflow.getVersion()).thenReturn(1);
+            when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            // When
+            ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, workflowNodeName, parameterPath, value, type, includeInMetadata, 0);
+
+            // Then
+            assertNotNull(result);
+            assertNotNull(result.displayConditions());
+
+            Map<String, ?> metadata1 = result.metadata();
+
+            assertNotNull(metadata1);
+
+            Map<String, Boolean> displayConditions = result.displayConditions();
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> resultMetadata = (Map<String, Object>) metadata1.get("ui");
+
+            if (resultMetadata != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, String> resultDynamicTypes = (Map<String, String>) resultMetadata.get(
+                    "dynamicPropertyTypes");
+
+                assertNotNull(resultDynamicTypes);
+                assertEquals(
+                    "STRING", resultDynamicTypes.get("conditions[0][0].value2"),
+                    "Metadata should be updated with the new property type");
+            }
+
+            // Main assertions: NUMBER type conditions should NOT be evaluated
+            assertFalse(
+                displayConditions.containsKey("conditions[0][0].operation != 'EMPTY'"),
+                "NUMBER type display condition should NOT be evaluated for STRING type parameter");
+
+            // STRING type conditions SHOULD be evaluated
+            assertTrue(
+                displayConditions.containsKey("!contains({'EMPTY','REGEX'}, conditions[0][0].operation)"),
+                "STRING type display condition should be evaluated for STRING type parameter");
+
+            // The parent array's condition should also be evaluated (not type-specific)
+            assertTrue(
+                displayConditions.containsKey("rawExpression == false"),
+                "Parent array display condition should be evaluated");
+
             verify(workflowService).update(anyString(), anyString(), anyInt());
         }
     }
