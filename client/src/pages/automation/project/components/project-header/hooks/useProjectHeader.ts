@@ -195,8 +195,10 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         closeWorkflowTestStream();
         setStreamRequest(null);
 
-        if (jobId) {
-            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
+        const currentJobId = jobId || getPersistedJobId();
+
+        if (currentJobId) {
+            workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });
@@ -213,6 +215,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         bottomResizablePanelRef,
         chatTrigger,
         closeWorkflowTestStream,
+        getPersistedJobId,
         jobId,
         persistJobId,
         setStreamRequest,
