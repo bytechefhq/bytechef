@@ -547,6 +547,51 @@ public class HttpClientExecutorTest {
         assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
     }
 
+    @Test
+    public void testHandleResponseWithCharsetInContentType() {
+        TestHttpResponse testHttpResponse = new TestHttpResponse(
+            "{\"key1\":\"value1\", \"key2\":\"value2\"}",
+            HttpHeaders.of(Map.of("content-type", List.of("application/json; charset=utf-8")), (s, s2) -> true),
+            200);
+
+        Http.Configuration.ConfigurationBuilder configurationBuilder =
+            Http.Configuration.newConfiguration()
+                .responseType(Http.ResponseType.JSON);
+
+        Http.Response response =
+            httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "<root><key1>value1</key1><key2>value2</key2></root>",
+            HttpHeaders.of(Map.of("content-type", List.of("application/xml; charset=utf-8")), (s, s2) -> true),
+            200);
+
+        response = httpClientExecutor.handleResponse(
+            testHttpResponse, configurationBuilder.responseType(Http.ResponseType.XML)
+                .build());
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+
+        testHttpResponse = new TestHttpResponse(
+            "{\"message\":\"success\"}",
+            HttpHeaders.of(Map.of("content-type", List.of("application/json; charset=ISO-8859-1")), (s, s2) -> true),
+            200);
+
+        response = httpClientExecutor.handleResponse(
+            testHttpResponse, configurationBuilder.responseType(Http.ResponseType.JSON)
+                .build());
+
+        assertNotNull(response.getBody());
+
+        assertEquals(Map.of("message", "success"), response.getBody());
+    }
+
     private static class TestResponseImpl implements Http.Response {
 
         private final Map<String, List<String>> headers;

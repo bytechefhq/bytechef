@@ -509,8 +509,12 @@ class HttpClientExecutor {
         Optional<String> contentTypeOptional = httpHeaders.firstValue("content-type");
 
         return contentTypeOptional
-            .map(contentType -> Strings.CI.equals(contentType, responseType.getContentType()) ||
-                Strings.CI.equals(contentType, String.valueOf(responseType.getType())))
+            .map(contentType -> {
+                String mediaType = contentType.split(";")[0].trim();
+
+                return Strings.CI.equals(mediaType, responseType.getContentType()) ||
+                    Strings.CI.equals(mediaType, String.valueOf(responseType.getType()));
+            })
             .orElse(true);
 
     }
