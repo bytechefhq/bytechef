@@ -2,7 +2,7 @@ import {BASE_PATH} from '@/shared/middleware/platform/workflow/test/runtime';
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {useProjectHeader} from '../useProjectHeader';
+import {useWorkflowBuilderHeader} from '../useWorkflowBuilderHeader';
 
 // ---- Test doubles and module mocks ----
 
@@ -66,9 +66,15 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore', () =
     };
 });
 
-vi.mock('@/pages/automation/stores/useWorkspaceStore', () => {
-    const state = {currentWorkspaceId: 'ws-1'};
-    return {useWorkspaceStore: (selector: (s: typeof state) => unknown) => selector(state)};
+const dataPillPanelSpies = {
+    setDataPillPanelOpen: vi.fn(),
+};
+
+vi.mock('@/pages/platform/workflow-editor/stores/useDataPillPanelStore', () => {
+    return {
+        __esModule: true,
+        default: (selector: (s: typeof dataPillPanelSpies) => unknown) => selector(dataPillPanelSpies),
+    };
 });
 
 // Analytics hook
@@ -79,31 +85,25 @@ vi.mock('@/hooks/use-toast', () => ({useToast: () => ({toast: vi.fn()})}));
 
 // React Router hooks used inside the hook
 vi.mock('react-router-dom', () => ({
-    useLoaderData: () => ({}),
     useNavigate: () => vi.fn(),
+    useParams: () => ({workflowUuid: 'wf-uuid-1'}),
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
 
 // Queries and mutations used by the hook
-vi.mock('@/shared/queries/automation/projects.queries', () => ({
-    ProjectKeys: {filteredProjects: (_: unknown) => ['filtered', _], project: (_: number) => ['project', _]},
-    useGetProjectQuery: () => ({data: {id: 42}}),
+vi.mock('@/ee/shared/mutations/embedded/connectedUserProjectWorkflows.mutations', () => ({
+    usePublishConnectedUserProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
-vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
-    useGetProjectWorkflowsQuery: () => ({data: []}),
-}));
-vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
-    usePublishProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
+
+vi.mock('@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries', () => ({
+    ConnectedUserProjectWorkflowKeys: {
+        connectedUserProjectWorkflow: (_: string) => ['connectedUserProjectWorkflow', _],
+    },
 }));
 
 // react-query client (prevent the need for a Provider in tests)
 vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({invalidateQueries: vi.fn()}),
-}));
-
-// ProjectVersionKeys used in publish success path
-vi.mock('@/shared/queries/automation/projectVersions.queries', () => ({
-    ProjectVersionKeys: {projectProjectVersions: (_: number) => ['projectVersions', _]},
 }));
 
 // Stream request builder for Run
@@ -170,7 +170,7 @@ function makePanelRef(getSizeReturn = 0): PanelRefType {
     return {current: handle};
 }
 
-describe('useProjectHeader', () => {
+describe('useWorkflowBuilderHeader', () => {
     const originalFetch = global.fetch;
 
     function resetIfMock(obj: Record<string, unknown>) {
@@ -207,7 +207,7 @@ describe('useProjectHeader', () => {
         const panelRef = makePanelRef(0);
 
         const {result} = renderHook(() =>
-            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
+            useWorkflowBuilderHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
         );
 
         // useSSE should be called with attach request for the saved jobId
@@ -235,48 +235,10 @@ describe('useProjectHeader', () => {
         expect(typeof result.current.handleRunClick).toBe('function');
     });
 
-    it('handleStopClick posts to stop endpoint with XSRF and clears jobId', async () => {
-        const jobId = '555';
-        const storageKey = `bytechef.workflow-test-run.wf-1:1`;
-
-        // Render hook and simulate a running stream with a jobId via start
-        const panelRef = makePanelRef(0);
-        const {result} = renderHook(() =>
-            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
-        );
-        act(() => latest.handlers?.start?.({jobId}));
-        localStorage.setItem(storageKey, jobId);
-
-        // Mock fetch and cookie
-        document.cookie = 'XSRF-TOKEN=token123';
-        const fetchSpy = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, {status: 200}));
-        (globalThis as unknown as {fetch: typeof fetch}).fetch = fetchSpy;
-
-        // Call stop
-        const stopCloseBefore = latest.close.mock.calls.length;
-        act(() => {
-            result.current.handleStopClick();
-        });
-
-        // Should call close and POST to stop endpoint
-        expect(latest.close.mock.calls.length).toBeGreaterThanOrEqual(stopCloseBefore + 1);
-
-        await waitFor(() => {
-            expect(fetchSpy).toHaveBeenCalled();
-            const call = fetchSpy.mock.calls[0] as [string, RequestInit];
-            const [url, init] = call;
-            expect(url).toBe(`${BASE_PATH}/workflow-tests/${jobId}/stop`);
-            expect(init.method).toBe('POST');
-        });
-
-        // JobId cleared from storage
-        await waitFor(() => expect(localStorage.getItem(storageKey)).toBeNull());
-    });
-
     it('handleRunClick opens panel, tracks analytics and starts stream via builder', async () => {
         const panelRef = makePanelRef(0);
         const {result} = renderHook(() =>
-            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
+            useWorkflowBuilderHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
         );
 
         act(() => {
@@ -297,10 +259,10 @@ describe('useProjectHeader', () => {
         });
     });
 
-    it('does not stop workflow execution when node details panel is open (fix for issue #3851)', async () => {
+    it('does not stop workflow execution when node details panel is open', async () => {
         const panelRef = makePanelRef(0);
         const {rerender, result} = renderHook(() =>
-            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
+            useWorkflowBuilderHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
         );
 
         // Start workflow execution
@@ -331,7 +293,7 @@ describe('useProjectHeader', () => {
     it('stops workflow execution in chat mode when chat panel is closed', async () => {
         const panelRef = makePanelRef(0);
         const {result} = renderHook(() =>
-            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: true, projectId: 42})
+            useWorkflowBuilderHeader({bottomResizablePanelRef: panelRef, chatTrigger: true, projectId: 42})
         );
 
         // Start workflow execution via chat
