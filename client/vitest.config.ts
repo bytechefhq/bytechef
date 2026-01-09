@@ -13,6 +13,7 @@ export default defineConfig({
             reporter: ['html', 'lcov', 'text'],
         },
         environment: 'jsdom',
+        exclude: ['node_modules', 'test/playwright/**'],
         globals: true,
         setupFiles: '.vitest/setup.ts',
     },
