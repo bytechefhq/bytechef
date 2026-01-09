@@ -30,7 +30,12 @@ const WorkflowTestRunLeaveDialog = ({onCancel, onConfirm, open}: WorkflowTestRun
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
+                <AlertDialogAction
+                    className="bg-surface-brand-primary text-content-onsurface-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                    onClick={onConfirm}
+                >
+                    Confirm
+                </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
