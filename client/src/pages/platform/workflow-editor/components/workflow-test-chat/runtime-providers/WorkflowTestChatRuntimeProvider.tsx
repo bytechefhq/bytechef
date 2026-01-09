@@ -60,6 +60,9 @@ export function WorkflowTestChatRuntimeProvider({
         setWorkflowIsRunning(true);
 
         try {
+            // Prepare an empty assistant message so streaming appears immediately
+            setMessage({content: '', role: 'assistant'} as ThreadMessageLike);
+
             const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id!,

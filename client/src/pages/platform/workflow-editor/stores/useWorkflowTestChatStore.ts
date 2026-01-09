@@ -10,6 +10,8 @@ interface WorkflowTestChatStateI {
 
     messages: ThreadMessageLike[];
     setMessage: (message: ThreadMessageLike) => void;
+    appendToLastAssistantMessage: (delta: string) => void;
+    setLastAssistantMessageContent: (content: string) => void;
     resetMessages: () => void;
 
     workflowTestChatPanelOpen: boolean;
@@ -38,6 +40,40 @@ const useWorkflowTestChatStore = create<WorkflowTestChatStateI>()(
                     return {
                         ...state,
                         messages: [...state.messages, message],
+                    };
+                }),
+            appendToLastAssistantMessage: (delta: string) =>
+                set((state) => {
+                    const messages = [...state.messages];
+                    // find last assistant message
+                    for (let i = messages.length - 1; i >= 0; i--) {
+                        const msg = messages[i] as ThreadMessageLike & {content?: string; role?: string};
+                        if (msg && msg.role === 'assistant') {
+                            const current = typeof msg.content === 'string' ? msg.content : '';
+                            const chunk = typeof delta === 'string' ? delta : String(delta ?? '');
+                            messages[i] = {...msg, content: current + chunk};
+                            return {...state, messages};
+                        }
+                    }
+                    // no assistant message yet; create one
+                    return {
+                        ...state,
+                        messages: [...messages, {content: delta, role: 'assistant'} as ThreadMessageLike],
+                    };
+                }),
+            setLastAssistantMessageContent: (content: string) =>
+                set((state) => {
+                    const messages = [...state.messages];
+                    for (let i = messages.length - 1; i >= 0; i--) {
+                        const msg = messages[i] as ThreadMessageLike & {content?: string; role?: string};
+                        if (msg && msg.role === 'assistant') {
+                            messages[i] = {...msg, content};
+                            return {...state, messages};
+                        }
+                    }
+                    return {
+                        ...state,
+                        messages: [...messages, {content, role: 'assistant'} as ThreadMessageLike],
                     };
                 }),
             resetMessages: () => set({messages: []}),

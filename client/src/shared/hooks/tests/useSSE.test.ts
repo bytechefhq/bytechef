@@ -160,29 +160,57 @@ describe('useSSE', () => {
             rs.enqueue('event: stream\n');
             rs.enqueue('data:Hello\n\n');
 
-            // Case 2: "data: Hello" (one space) -> should result in " Hello"
-            // Current code: "data: Hello" -> slice(5) -> " Hello" -> slice(1) -> "Hello" (BUG)
+            // Case 2: "data: Hello" (one space) -> should result in "Hello" (spec says remove it)
             rs.enqueue('event: stream\n');
             rs.enqueue('data: Hello\n\n');
 
-            // Case 3: Leading space in content
-            // If payload is " how", SseEmitter might send "data:  how"
-            // Current code: "data:  how" -> slice(5) -> " how" -> slice(1) -> "how" (BAD)
+            // Case 3: "data:  how" (two spaces) -> should result in " how"
             rs.enqueue('event: stream\n');
             rs.enqueue('data:  how\n\n');
 
-            // Case 3: "data: " followed by "data: world" -> should result in "\nworld" or just " world" if joined?
-            // Actually SSE joins multiple data lines with \n
+            // Case 4: JSON encoded " world" (robust way)
+            // "data: \" world\"" (one space before quote from protocol) -> results in "\" world\"" -> JSON.parse -> " world"
             rs.enqueue('event: stream\n');
-            rs.enqueue('data: \n');
-            rs.enqueue('data: world\n\n');
+            rs.enqueue('data: " world"\n\n');
 
             rs.close();
         });
 
-        await waitFor(() => expect(onStream).toHaveBeenCalledWith('Hello'));
-        await waitFor(() => expect(onStream).toHaveBeenCalledWith(' Hello'));
-        await waitFor(() => expect(onStream).toHaveBeenCalledWith('  how'));
-        await waitFor(() => expect(onStream).toHaveBeenCalledWith(' \n world'));
+        await waitFor(() => expect(onStream).toHaveBeenNthCalledWith(1, 'Hello'));
+        await waitFor(() => expect(onStream).toHaveBeenNthCalledWith(2, 'Hello'));
+        await waitFor(() => expect(onStream).toHaveBeenNthCalledWith(3, ' how'));
+        await waitFor(() => expect(onStream).toHaveBeenNthCalledWith(4, ' world'));
+    });
+
+    it('supports CRLF as event and line separator', async () => {
+        const rs = makeStream();
+        const fetchSpy = vi
+            .fn<typeof fetch>()
+            .mockImplementation(() =>
+                Promise.resolve(new Response(rs.stream, {headers: {'Content-Type': 'text/event-stream'}, status: 200}))
+            );
+
+        global.fetch = fetchSpy;
+
+        const onStream = vi.fn();
+
+        const req: SSERequestType = {init: {method: 'GET'}, url: '/sse'};
+        renderHook(() => useSSE(req, {eventHandlers: {stream: onStream}}));
+
+        act(() => {
+            // Use CRLF
+            rs.enqueue('event: stream\r\n');
+            rs.enqueue('data: line1\r\n');
+            rs.enqueue('data: line2\r\n\r\n');
+
+            // Mixed CRLF and LF just in case
+            rs.enqueue('event: stream\n');
+            rs.enqueue('data: line3\r\n\r\n');
+
+            rs.close();
+        });
+
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith('line1\nline2'));
+        await waitFor(() => expect(onStream).toHaveBeenCalledWith('line3'));
     });
 });

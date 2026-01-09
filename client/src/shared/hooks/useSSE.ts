@@ -4,6 +4,7 @@ type EventHandlersType = Record<string, (data: unknown) => void>;
 
 const EVENT_PREFIX = 'event:';
 const DATA_PREFIX = 'data:';
+const SPACE = ' ';
 
 export type UseSSEOptionsType = {
     eventHandlers?: EventHandlersType;
@@ -27,7 +28,7 @@ function parseAndDispatchSSE(
     customHandlers?: EventHandlersType
 ) {
     // SSE events are separated by blank lines. Lines can be: event:, data:, id:, retry:
-    const events = chunk.split(/\n\n+/);
+    const events = chunk.split(/\r?\n\r?\n+/);
 
     for (const event of events) {
         if (!event.trim()) {
@@ -36,13 +37,23 @@ function parseAndDispatchSSE(
 
         const dataLines: string[] = [];
         let eventType = 'message';
-        const lines = event.split(/\n/);
+        const lines = event.split(/\r?\n/);
 
         for (const line of lines) {
             if (line.startsWith(EVENT_PREFIX)) {
-                eventType = line.slice(EVENT_PREFIX.length).trim();
+                let value = line.slice(EVENT_PREFIX.length);
+
+                if (value.startsWith(SPACE)) {
+                    value = value.slice(SPACE.length);
+                }
+
+                eventType = value;
             } else if (line.startsWith(DATA_PREFIX)) {
-                const dataLine = line.slice(DATA_PREFIX.length);
+                let dataLine = line.slice(DATA_PREFIX.length);
+
+                if (dataLine.startsWith(SPACE)) {
+                    dataLine = dataLine.slice(SPACE.length);
+                }
 
                 dataLines.push(dataLine);
             }
@@ -148,7 +159,7 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     buffer += decoder.decode(value, {stream: true});
 
                     // Process complete events separated by double newlines; keep trailing partial in the buffer
-                    const parts = buffer.split(/\n\n/);
+                    const parts = buffer.split(/\r?\n\r?\n/);
 
                     buffer = parts.pop() || '';
 

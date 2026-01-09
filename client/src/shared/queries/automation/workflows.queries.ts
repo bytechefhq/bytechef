@@ -5,6 +5,11 @@ import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowKeys = {
     workflow: (id: string) => [...WorkflowKeys.workflows, id],
+    workflowByWorkflowExecutionId: (workflowExecutionId: string) => [
+        ...WorkflowKeys.workflows,
+        'execution',
+        workflowExecutionId,
+    ],
     workflows: ['automationWorkflows'],
 };
 
