@@ -86,7 +86,12 @@ const Projects = () => {
                                     <ProjectDialog
                                         project={undefined}
                                         triggerNode={
-                                            <Button onSelect={(event) => event.preventDefault()}>New Project</Button>
+                                            <Button
+                                                aria-label="Create Project"
+                                                onSelect={(event) => event.preventDefault()}
+                                            >
+                                                New Project
+                                            </Button>
                                         }
                                     />
 
@@ -113,7 +118,10 @@ const Projects = () => {
                                     </DropdownMenu>
                                 </ButtonGroup>
                             ) : (
-                                <ProjectDialog project={undefined} triggerNode={<Button label="New Project" />} />
+                                <ProjectDialog
+                                    project={undefined}
+                                    triggerNode={<Button aria-label="Create Project" label="New Project" />}
+                                />
                             )
                         }
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
@@ -142,7 +150,7 @@ const Projects = () => {
                                 <ButtonGroup className="mx-auto">
                                     <ProjectDialog
                                         project={undefined}
-                                        triggerNode={<Button label="Create Project" />}
+                                        triggerNode={<Button aria-label="Create Project" label="Create Project" />}
                                     />
 
                                     <DropdownMenu>
