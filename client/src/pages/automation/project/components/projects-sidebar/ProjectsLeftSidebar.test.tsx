@@ -278,4 +278,123 @@ describe('ProjectsLeftSidebar', () => {
         // onSuccess toast etc. are called within mutation; test by checking that input is reset to empty string
         await waitFor(() => expect(fileInput.value).toBe(''));
     });
+
+    it('updates selectedProjectId when projectId prop changes', async () => {
+        const workflows1 = [{id: 'wa'}, {id: 'wb'}];
+        const workflows2 = [{id: 'wc'}, {id: 'wd'}];
+
+        // Initially render with projectId = 5
+        setupQueries({selectedProjectId: 5, workflows: workflows1});
+
+        const {rerender} = renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        // Verify initial workflows are displayed
+        await waitFor(() => {
+            const items = screen.getAllByTestId('workflow-item');
+            expect(items).toHaveLength(2);
+            expect(screen.getByText('Workflow:wa')).toBeInTheDocument();
+        });
+
+        // Verify useGetProjectWorkflowsQuery was called with projectId = 5
+        expect(mockGetProjectWorkflowsQuery).toHaveBeenCalledWith(5, true);
+
+        // Now change projectId to 7
+        setupQueries({selectedProjectId: 7, workflows: workflows2});
+
+        rerender(
+            <QueryClientProvider client={queryClient}>
+                <TooltipProvider>
+                    <ProjectsLeftSidebar {...baseProps} projectId={7} />
+                </TooltipProvider>
+            </QueryClientProvider>
+        );
+
+        // Verify the query was called with the new projectId
+        await waitFor(() => {
+            expect(mockGetProjectWorkflowsQuery).toHaveBeenCalledWith(7, true);
+        });
+
+        // Verify new workflows are displayed
+        await waitFor(() => {
+            const items = screen.getAllByTestId('workflow-item');
+            expect(items).toHaveLength(2);
+            expect(screen.getByText('Workflow:wc')).toBeInTheDocument();
+        });
+    });
+
+    it('handles NaN projectId by defaulting to 0 (All projects)', async () => {
+        const projects = [{id: 11}, {id: 22}];
+        setupQueries({projects, selectedProjectId: 0, workflows: [{id: 'wa'}]});
+
+        // Pass NaN as projectId (simulating parseInt(undefined))
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={NaN} />);
+
+        // Should show ProjectWorkflowsList for all projects (selectedProjectId = 0)
+        await waitFor(() => {
+            expect(screen.getByTestId('project-select')).toHaveTextContent('ProjectSelect:0');
+        });
+
+        const items = await screen.findAllByTestId('project-workflows-list');
+        expect(items).toHaveLength(projects.length);
+
+        // Verify the "all workflows" query was called with enabled=true
+        expect(mockGetWorkflowsQuery).toHaveBeenCalledWith(true);
+        // And the project-specific query was disabled (NaN is converted to 0)
+        expect(mockGetProjectWorkflowsQuery).toHaveBeenCalledWith(0, false);
+    });
+
+    it('updates from NaN to valid projectId when prop changes after initial load', async () => {
+        const projects = [{id: 11}, {id: 22}];
+        const workflows = [{id: 'wa'}, {id: 'wb'}];
+
+        // Start with NaN projectId (initial state after login before URL params are parsed)
+        setupQueries({projects, selectedProjectId: 0, workflows: [{id: 'initial'}]});
+
+        const {rerender} = renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={NaN} />);
+
+        // Initially should show all projects
+        await waitFor(() => {
+            expect(screen.getByTestId('project-select')).toHaveTextContent('ProjectSelect:0');
+        });
+
+        // Now update to a valid projectId (simulating URL params being parsed)
+        setupQueries({selectedProjectId: 5, workflows});
+
+        rerender(
+            <QueryClientProvider client={queryClient}>
+                <TooltipProvider>
+                    <ProjectsLeftSidebar {...baseProps} projectId={5} />
+                </TooltipProvider>
+            </QueryClientProvider>
+        );
+
+        // Should now show the specific project
+        await waitFor(() => {
+            expect(screen.getByTestId('project-select')).toHaveTextContent('ProjectSelect:5');
+        });
+
+        // Verify the project-specific query was called with the valid projectId
+        await waitFor(() => {
+            expect(mockGetProjectWorkflowsQuery).toHaveBeenCalledWith(5, true);
+        });
+
+        // Verify workflows for the specific project are displayed
+        const items = await screen.findAllByTestId('workflow-item');
+        expect(items).toHaveLength(workflows.length);
+    });
+
+    it('handles zero projectId correctly (should show all projects)', async () => {
+        const projects = [{id: 11}, {id: 22}];
+        setupQueries({projects, selectedProjectId: 0, workflows: [{id: 'wa'}]});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={0} />);
+
+        // Should show all projects
+        await waitFor(() => {
+            expect(screen.getByTestId('project-select')).toHaveTextContent('ProjectSelect:0');
+        });
+
+        const items = await screen.findAllByTestId('project-workflows-list');
+        expect(items).toHaveLength(projects.length);
+    });
 });

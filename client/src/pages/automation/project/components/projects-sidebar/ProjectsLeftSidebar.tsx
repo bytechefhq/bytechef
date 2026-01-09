@@ -40,7 +40,7 @@ const ProjectsLeftSidebar = ({
     onProjectClick,
     projectId,
 }: ProjectsLeftSidebarProps) => {
-    const [selectedProjectId, setSelectedProjectId] = useState(projectId || 0);
+    const [selectedProjectId, setSelectedProjectId] = useState(!isNaN(projectId) ? projectId : 0);
     const [sortBy, setSortBy] = useState('last-edited');
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -119,6 +119,10 @@ const ProjectsLeftSidebar = ({
             refetchProjects();
         }
     }, [selectedProjectId, refetchProjects]);
+
+    useEffect(() => {
+        setSelectedProjectId(!isNaN(projectId) ? projectId : 0);
+    }, [projectId]);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
