@@ -1,9 +1,11 @@
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workflow/test/models/WorkflowTestExecution';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {extractStreamChunk} from '@/shared/util/stream-utils';
 import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -37,6 +39,12 @@ export function useWorkflowTestStream({
             setWorkflowTestExecution: state.setWorkflowTestExecution,
         }))
     );
+    const {appendToLastAssistantMessage, setLastAssistantMessageContent} = useWorkflowTestChatStore(
+        useShallow((state) => ({
+            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+        }))
+    );
 
     const {getPersistedJobId, persistJobId} = usePersistJobId(workflowId, currentEnvironmentId);
 
@@ -57,6 +65,13 @@ export function useWorkflowTestStream({
                     const resultData = typeof data === 'string' ? JSON.parse(data) : data;
 
                     const workflowTestExecution = WorkflowTestExecutionFromJSON(resultData);
+
+                    const message = workflowTestExecution.job?.outputs?.message ?? '';
+
+                    // Do not overwrite streamed content with empty final text
+                    if (message && message.trim().length > 0) {
+                        setLastAssistantMessageContent(message);
+                    }
 
                     setWorkflowTestExecution(workflowTestExecution);
 
@@ -80,6 +95,13 @@ export function useWorkflowTestStream({
 
                 if (onStart) {
                     onStart(jobId);
+                }
+            },
+            stream: (data) => {
+                const chunk = extractStreamChunk(data);
+
+                if (chunk) {
+                    appendToLastAssistantMessage(chunk);
                 }
             },
         },

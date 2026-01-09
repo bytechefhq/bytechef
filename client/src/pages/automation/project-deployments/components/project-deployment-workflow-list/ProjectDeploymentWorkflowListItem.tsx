@@ -19,14 +19,19 @@ import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
 
-const getTriggerUrl = (type: 'form' | 'chat', environmentId: number, staticWebhookUrl?: string) => {
+const getTriggerUrl = (
+    type: 'form' | 'chat',
+    environmentId: number,
+    sseStreamResponseEnabled: boolean,
+    staticWebhookUrl?: string
+) => {
     if (!staticWebhookUrl) {
         return '';
     }
 
     const webhookId = staticWebhookUrl.substring(staticWebhookUrl.lastIndexOf('/webhooks/') + '/webhooks/'.length);
 
-    return `/${type}/${environmentId}/${webhookId}`;
+    return `/${type}/${environmentId}/${webhookId}${sseStreamResponseEnabled ? '?sseStream=true' : ''}`;
 };
 
 const ProjectDeploymentWorkflowListItem = ({
@@ -64,14 +69,24 @@ const ProjectDeploymentWorkflowListItem = ({
     const formTrigger =
         workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
 
-    const formTriggerUrl = getTriggerUrl('form', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
+    const formTriggerUrl = getTriggerUrl(
+        'form',
+        environmentId,
+        workflow.sseStreamResponse ?? false,
+        projectDeploymentWorkflow.staticWebhookUrl
+    );
 
     const hostedChatTrigger =
         workflow.triggers &&
         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
-    const hostedChatTriggerUrl = getTriggerUrl('chat', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
+    const hostedChatTriggerUrl = getTriggerUrl(
+        'chat',
+        environmentId,
+        workflow.sseStreamResponse ?? false,
+        projectDeploymentWorkflow.staticWebhookUrl
+    );
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
