@@ -15,6 +15,8 @@ export async function login(page: Page, email: string, password: string, remembe
         await page.getByLabel('Stay logged in').check();
     }
 
+    console.log('Logging in...');
+
     await page.getByRole('button', {name: /log in/i}).click();
 
     await page.waitForURL((url) => url.pathname !== '/login', {timeout: 10000});
