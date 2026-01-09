@@ -37,19 +37,9 @@ test('should show validation errors on empty login form submission', async ({pag
         await page.getByRole('button', {name: /log in/i}).click();
     });
 
-    await test.step('Wait for validation to appear', async () => {
-        await page.waitForTimeout(500);
-    });
-
     await test.step('Verify validation errors are displayed', async () => {
-        const emailError = page.getByText(/email is required/i);
-        const passwordError = page.getByText(/password is required/i);
+        await expect(page.getByText(/email is required/i)).toBeVisible();
 
-        if (await emailError.isVisible().catch(() => false)) {
-            await expect(emailError).toBeVisible();
-        }
-        if (await passwordError.isVisible().catch(() => false)) {
-            await expect(passwordError).toBeVisible();
-        }
+        await expect(page.getByText(/password is required/i)).toBeVisible();
     });
 });
