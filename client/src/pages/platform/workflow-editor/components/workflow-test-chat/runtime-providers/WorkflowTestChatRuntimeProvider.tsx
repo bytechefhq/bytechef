@@ -44,7 +44,18 @@ export function WorkflowTestChatRuntimeProvider({
 
     const {setStreamRequest} = useWorkflowTestStream({
         onError: () => setIsRunning(false),
-        onResult: () => setIsRunning(false),
+        onResult: (execution) => {
+            setIsRunning(false);
+
+            const outputMessage = execution.job?.outputs?.message;
+
+            if (outputMessage) {
+                setMessage({
+                    content: [{text: String(outputMessage), type: 'text'}],
+                    role: 'assistant',
+                });
+            }
+        },
         workflowId: workflow.id!,
     });
 
