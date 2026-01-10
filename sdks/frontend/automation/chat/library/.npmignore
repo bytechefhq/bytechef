@@ -1,0 +1,39 @@
+# Source files
+src/
+*.ts
+*.tsx
+!dist/**/*.d.ts
+
+# Config files
+vite.config.ts
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+vitest.config.ts
+.prettierrc
+eslint.config.js
+tailwind.config.js
+postcss.config.js
+
+# Development
+.storybook/
+*.stories.tsx
+*.test.tsx
+src/test/
+coverage/
+.vitest/
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+
+# Other
+.DS_Store
+*.log
+node_modules/
+.git/
+.github/

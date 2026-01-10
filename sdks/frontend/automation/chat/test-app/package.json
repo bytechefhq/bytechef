@@ -1,0 +1,38 @@
+{
+    "name": "@bytechef/automation-chat-test-app",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "next dev",
+        "dev:local": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "format": "prettier --check .",
+        "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
+        "link:library": "npm link @bytechef/automation-chat",
+        "unlink:library": "npm unlink @bytechef/automation-chat",
+        "install:local": "npm install @bytechef/automation-chat@latest --registry http://localhost:4873"
+    },
+    "dependencies": {
+        "@bytechef/automation-chat": "^0.1.0",
+        "next": "16.1.1",
+        "react": "19.2.3",
+        "react-dom": "19.2.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.21.0",
+        "@tailwindcss/postcss": "4.1.18",
+        "@types/node": "^22.13.8",
+        "@types/react": "19.1.6",
+        "@types/react-dom": "19.1.6",
+        "eslint": "^9.31.0",
+        "eslint-config-next": "16.1.1",
+        "postcss": "^8.5.6",
+        "prettier": "3.5.2",
+        "tailwindcss": "4.1.18",
+        "typescript": "^5.7.3",
+        "typescript-eslint": "^8.25.0"
+    }
+}
