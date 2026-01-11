@@ -8,6 +8,8 @@ interface Integration {
     name: string;
 }
 
+type Environment = 'DEVELOPMENT' | 'STAGE' | 'PRODUCTION';
+
 export default function Home() {
     const [kid, setKid] = useState('');
     const [privateKey, setPrivateKey] = useState('');
@@ -19,9 +21,11 @@ export default function Home() {
     const [error, setError] = useState('');
     const [integrations, setIntegrations] = useState<Integration[]>([]);
     const [integrationsLoading, setIntegrationsLoading] = useState(false);
+    const [baseUrl, setBaseUrl] = useState('http://127.0.0.1:5173');
+    const [environment, setEnvironment] = useState<Environment>('DEVELOPMENT');
 
     // Function to fetch integrations from the /integrations endpoint
-    const fetchIntegrations = async () => {
+    const fetchIntegrations = async (environment: Environment) => {
         if (!jwtToken) {
             return;
         }
@@ -34,8 +38,9 @@ export default function Home() {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${jwtToken}`
-                }
+                    Authorization: `Bearer ${jwtToken}`,
+                    'X-Environment': environment,
+                },
             });
 
             const data = await response.json();
@@ -100,15 +105,15 @@ export default function Home() {
     // Effect to fetch integrations when JWT token changes
     useEffect(() => {
         if (jwtToken) {
-            fetchIntegrations();
+            fetchIntegrations(environment);
         }
     }, [jwtToken]);
 
     const {openDialog} = useConnectDialog({
-        baseUrl: 'http://127.0.0.1:5173',
-        environment: 'DEVELOPMENT',
-        integrationId: integrationId,
-        jwtToken: jwtToken,
+        baseUrl,
+        environment,
+        integrationId,
+        jwtToken,
     });
 
     const handleConnect = () => {
@@ -125,13 +130,33 @@ export default function Home() {
 
             <div className="form-group">
                 <label>
-                    Key ID (kid):
+                    Base URL:
                     <input
                         type="text"
-                        value={kid}
-                        onChange={(e) => setKid(e.target.value)}
-                        placeholder="Enter Key ID"
+                        value={baseUrl}
+                        onChange={(e) => setBaseUrl(e.target.value)}
+                        placeholder="Enter Base URL"
                     />
+                </label>
+            </div>
+
+            <div className="form-group">
+                <label>
+                    Environment:
+                    <select
+                        value={environment}
+                        onChange={(e) => {
+                            const environment = e.target.value as Environment;
+
+                            setEnvironment(environment);
+
+                            fetchIntegrations(environment);
+                        }}
+                    >
+                        <option value="DEVELOPMENT">DEVELOPMENT</option>
+                        <option value="STAGE">STAGE</option>
+                        <option value="PRODUCTION">PRODUCTION</option>
+                    </select>
                 </label>
             </div>
 
@@ -142,6 +167,18 @@ export default function Home() {
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}
                         placeholder="Enter Private Key (PEM format)"
+                    />
+                </label>
+            </div>
+
+            <div className="form-group">
+                <label>
+                    Key ID (kid):
+                    <input
+                        type="text"
+                        value={kid}
+                        onChange={(e) => setKid(e.target.value)}
+                        placeholder="Enter Key ID"
                     />
                 </label>
             </div>
@@ -177,14 +214,12 @@ export default function Home() {
                         value={integrationId}
                         onChange={(e) => setIntegrationId(e.target.value)}
                         disabled={!jwtToken || integrationsLoading}
-                        className={!jwtToken ? "disabled" : ""}
+                        className={!jwtToken ? 'disabled' : ''}
                     >
                         {integrations.length === 0 && !integrationsLoading && (
                             <option value="">No integrations available</option>
                         )}
-                        {integrationsLoading && (
-                            <option value="">Loading integrations...</option>
-                        )}
+                        {integrationsLoading && <option value="">Loading integrations...</option>}
                         {integrations.map((integration) => (
                             <option key={integration.id} value={integration.id}>
                                 {integration.name}
@@ -192,9 +227,7 @@ export default function Home() {
                         ))}
                     </select>
                 </label>
-                {!jwtToken && (
-                    <p className="help-text">Generate JWT token first to load integrations</p>
-                )}
+                {!jwtToken && <p className="help-text">Generate JWT token first to load integrations</p>}
             </div>
 
             <div className="button-group">
@@ -202,7 +235,11 @@ export default function Home() {
                     {isLoading ? 'Calculating...' : 'Calculate JWT Token'}
                 </button>
 
-                <button onClick={handleConnect} className="primary" disabled={!jwtToken || isLoading || integrationsLoading || !integrationId}>
+                <button
+                    onClick={handleConnect}
+                    className="primary"
+                    disabled={!jwtToken || isLoading || integrationsLoading || !integrationId}
+                >
                     Connect
                 </button>
             </div>

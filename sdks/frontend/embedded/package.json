@@ -1,0 +1,27 @@
+{
+  "name": "@bytechef/embedded-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace for ByteChef Embedded SDK development",
+  "scripts": {
+    "registry:start": "verdaccio --config verdaccio.config.yaml",
+    "registry:stop": "pkill -f verdaccio",
+    "dev": "concurrently \"npm:dev:library\" \"npm:dev:test-app\"",
+    "dev:library": "cd library/react && npm run watch",
+    "dev:test-app": "cd test-apps/react && npm run dev",
+    "setup:link": "cd library/react && npm run build && npm link && cd ../../test-apps/react && npm link @bytechef/embedded-react",
+    "setup:registry": "npm run registry:start",
+    "publish:library": "cd library/react && npm run build && npm run publish:local",
+    "install:test-app": "cd test-apps/react && npm run install:local",
+    "build:all": "cd library/react && npm run build",
+    "clean": "rm -rf library/react/dist library/react/node_modules test-apps/react/.next test-apps/react/node_modules verdaccio-storage"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "verdaccio": "^6.2.4"
+  },
+  "workspaces": [
+    "library/react",
+    "test-apps/react"
+  ]
+}
