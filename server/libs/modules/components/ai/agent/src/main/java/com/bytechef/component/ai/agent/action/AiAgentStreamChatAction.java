@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.agent.action;
 
-import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
@@ -48,7 +47,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         super(clusterElementDefinitionService);
 
         actionDefinition = new ChatActionDefinitionWrapper(
-            action(CHAT + "Stream")
+            action("streamChat")
                 .title("Chat (stream)")
                 .description("Chat with the AI agent and stream the response.")
                 .properties(CHAT_PROPERTIES)
