@@ -22,6 +22,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.bytechef.tenant.TenantContext;
@@ -173,9 +174,11 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         future.whenComplete((result, throwable) -> {
             try {
-                if (throwable instanceof CancellationException) {
-                    sendToEmitter(key, createEvent("error", "Aborted"));
-                } else if (throwable != null) {
+                if (throwable != null) {
+                    if (throwable instanceof CancellationException) {
+                        testWorkflowExecutor.stop(jobId);
+                    }
+
                     sendToEmitter(
                         key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
                 } else {
@@ -212,7 +215,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         if (future != null && !future.isDone()) {
             future.cancel(true);
         } else {
-            testWorkflowExecutor.stopTest(Long.parseLong(jobId));
+            testWorkflowExecutor.stop(Long.parseLong(jobId));
 
             try {
                 sendToEmitter(key, createEvent("error", "Aborted"));
@@ -260,7 +263,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
 
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
-        long jobId = testWorkflowExecutor.startTestWorkflow(id, inputs, environmentId);
+        long jobId = testWorkflowExecutor.start(id, inputs, environmentId);
 
         String key = TenantCacheKeyUtils.getKey(jobId);
 
@@ -273,18 +276,19 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         CompletableFuture<WorkflowTestExecutionModel> future =
             CompletableFuture.supplyAsync(() -> TenantContext.callWithTenantId(
-                currentTenantId, () -> Objects.requireNonNull(conversionService.convert(
-                    testWorkflowExecutor.awaitTestResult(jobId), WorkflowTestExecutionModel.class))));
+                currentTenantId, () -> Objects.requireNonNull(
+                    conversionService.convert(
+                        testWorkflowExecutor.awaitExecution(jobId), WorkflowTestExecutionModel.class))));
 
         workflowExecutions.put(key, future);
 
         future.whenComplete((result, throwable) -> {
             try {
-                if (throwable instanceof CancellationException) {
-                    testWorkflowExecutor.stopTest(jobId);
+                if (throwable != null) {
+                    if (throwable instanceof CancellationException) {
+                        testWorkflowExecutor.stop(jobId);
+                    }
 
-                    sendToEmitter(key, createEvent("error", "Aborted"));
-                } else if (throwable != null) {
                     sendToEmitter(
                         key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
                 } else {
@@ -406,7 +410,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                     }
                 }));
 
-            handles.add(testWorkflowExecutor.addSseStreamBridge(jobId, new SseStreamBridge(key)));
+            handles.add(testWorkflowExecutor.addSseStreamBridge(jobId, new WebhookSseStreamBridge(key)));
 
             return handles;
         });
@@ -464,11 +468,11 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     /**
      * Bridge that broadcasts streamed payloads to all currently attached SSE clients for this job key.
      */
-    private class SseStreamBridge implements com.bytechef.platform.job.sync.SseStreamBridge {
+    private class WebhookSseStreamBridge implements SseStreamBridge {
 
         private final String key;
 
-        private SseStreamBridge(String key) {
+        private WebhookSseStreamBridge(String key) {
             this.key = key;
         }
 

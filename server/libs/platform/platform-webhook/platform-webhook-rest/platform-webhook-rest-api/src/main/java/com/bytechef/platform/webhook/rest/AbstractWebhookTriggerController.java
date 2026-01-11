@@ -140,7 +140,7 @@ public abstract class AbstractWebhookTriggerController {
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
-            webhookWorkflowExecutor.execute(workflowExecutionId, webhookRequest);
+            webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest);
 
             responseEntity = ResponseEntity.ok()
                 .build();

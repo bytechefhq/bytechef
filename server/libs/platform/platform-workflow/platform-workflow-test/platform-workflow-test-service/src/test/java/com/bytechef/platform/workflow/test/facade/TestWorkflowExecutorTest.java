@@ -96,7 +96,7 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void testWorkflowNoTriggersMergesInputsAndExecutesJob() {
+    void executeNoTriggersMergesInputsAndExecutesJob() {
         // Given a workflow without triggers
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
         when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
@@ -125,7 +125,7 @@ public class TestWorkflowExecutorTest {
 
         inputs.put("inKey", "inVal");
 
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.testWorkflow(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.execute(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
 
         // Then the job was executed with merged inputs and connection metadata
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
@@ -154,7 +154,7 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void testWorkflowWithTriggerEmptyInputsBuildsTriggerDTOAndFlattensSampleForNonBatch() {
+    void executeWithTriggerEmptyInputsBuildsTriggerDTOAndFlattensSampleForNonBatch() {
         // Given a workflow with one trigger
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
 
@@ -204,7 +204,7 @@ public class TestWorkflowExecutorTest {
         when(job.getId()).thenReturn(1L);
 
         // When inputs are empty, facade should build inputs from trigger sample
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.testWorkflow(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.execute(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
 
         // Then JobParameters contain the flattened sample under trigger name and cfg inputs
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
@@ -223,7 +223,7 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void testStartTestWorkflowMergesInputsAndReturnsJobId() {
+    void testStartMergesInputsAndReturnsJobId() {
         // Given a workflow without triggers and test config inputs
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
         when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
@@ -238,7 +238,7 @@ public class TestWorkflowExecutorTest {
 
         when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(99L);
 
-        long jobId = testWorkflowExecutor.startTestWorkflow(WORKFLOW_ID, Map.of("in", 2), ENVIRONMENT_ID);
+        long jobId = testWorkflowExecutor.start(WORKFLOW_ID, Map.of("in", 2), ENVIRONMENT_ID);
 
         assertThat(jobId).isEqualTo(99L);
 
@@ -255,21 +255,21 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void testAwaitTestResultReturnsJobAndNullTrigger() {
+    void testAwaitExecutionReturnsJobAndNullTrigger() {
         Job job = mock(Job.class);
 
         when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
         when(job.getId()).thenReturn(123L);
 
-        WorkflowTestExecutionDTO res = testWorkflowExecutor.awaitTestResult(123L);
+        WorkflowTestExecutionDTO res = testWorkflowExecutor.awaitExecution(123L);
 
         assertThat(res.job()).isNotNull();
         assertThat(res.triggerExecution()).isNull();
     }
 
     @Test
-    void testStopTestDelegates() {
-        testWorkflowExecutor.stopTest(555L);
+    void testStopDelegates() {
+        testWorkflowExecutor.stop(555L);
         verify(jobSyncExecutor).stopJob(555L);
     }
 

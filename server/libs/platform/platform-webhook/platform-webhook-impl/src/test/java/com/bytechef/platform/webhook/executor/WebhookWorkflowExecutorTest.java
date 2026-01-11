@@ -31,12 +31,12 @@ public class WebhookWorkflowExecutorTest {
     }
 
     @Test
-    public void testExecute() {
+    public void testExecuteAsyncSync() {
         // TODO
     }
 
     @Test
-    public void testValidateAndExecute() {
+    public void testValidateAndExecuteAsync() {
         // TODO
     }
 }

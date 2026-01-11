@@ -113,13 +113,6 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
-    public WorkflowTestExecutionDTO awaitTestResult(long jobId) {
-        JobDTO jobDTO = await(jobId);
-
-        return new WorkflowTestExecutionDTO(jobDTO, null);
-    }
-
-    @Override
     public AutoCloseable addJobStatusListener(long jobId, Consumer<JobStatusEventDTO> listener) {
         return jobSyncExecutor.addJobStatusListener(jobId, (JobStatusApplicationEvent event) -> {
             Job.Status status = event.getStatus();
@@ -163,23 +156,30 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
-    public long startTestWorkflow(String workflowId, Map<String, Object> inputs, long environmentId) {
+    public WorkflowTestExecutionDTO awaitExecution(long jobId) {
+        JobDTO jobDTO = await(jobId);
+
+        return new WorkflowTestExecutionDTO(jobDTO, null);
+    }
+
+    @Override
+    public WorkflowTestExecutionDTO execute(String workflowId, Map<String, Object> inputs, long environmentId) {
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+
+        return new WorkflowTestExecutionDTO(
+            execute(workflowTestParameters.jobParametersDTO()), workflowTestParameters.triggerExecutionDTO());
+    }
+
+    @Override
+    public long start(String workflowId, Map<String, Object> inputs, long environmentId) {
         WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
 
         return start(workflowTestParameters.jobParametersDTO());
     }
 
     @Override
-    public void stopTest(long jobId) {
+    public void stop(long jobId) {
         jobSyncExecutor.stopJob(jobId);
-    }
-
-    @Override
-    public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs, long environmentId) {
-        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
-
-        return new WorkflowTestExecutionDTO(
-            execute(workflowTestParameters.jobParametersDTO()), workflowTestParameters.triggerExecutionDTO());
     }
 
     @SuppressWarnings("unchecked")
