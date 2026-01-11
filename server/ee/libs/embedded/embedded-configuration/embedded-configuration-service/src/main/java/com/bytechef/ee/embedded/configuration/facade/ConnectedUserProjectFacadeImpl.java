@@ -196,7 +196,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
         String workflowId = projectWorkflowService
-            .getProjectDeploymentWorkflowId(
+            .getProjectWorkflowWorkflowId(
                 projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
                 workflowUuid);
 

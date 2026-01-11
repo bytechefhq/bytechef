@@ -4,7 +4,7 @@ dependencies {
     implementation("org.springframework.graphql:spring-graphql")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
-    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 }

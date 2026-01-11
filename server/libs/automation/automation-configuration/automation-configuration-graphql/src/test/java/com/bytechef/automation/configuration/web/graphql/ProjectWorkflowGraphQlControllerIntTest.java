@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import java.time.Instant;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
         "bytechef.coordinator.enabled=true",
         "spring.graphql.schema.locations=classpath*:/graphql/",
     })
+@AutomationConfigurationGraphQlConfigurationSharedMocks
 public class ProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired

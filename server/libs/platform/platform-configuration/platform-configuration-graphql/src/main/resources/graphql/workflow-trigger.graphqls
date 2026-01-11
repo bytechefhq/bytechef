@@ -1,0 +1,7 @@
+type WorkflowTrigger {
+    name: String!
+    label: String
+    type: String!
+    parameters: Map
+    description: String
+}
