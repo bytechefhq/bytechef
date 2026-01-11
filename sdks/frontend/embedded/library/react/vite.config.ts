@@ -1,9 +1,8 @@
 /// <reference types="vite/client" />
-/// <reference types="vitest" />
 import path, {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {globSync} from 'glob';
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import {libInjectCss} from 'vite-plugin-lib-inject-css';
@@ -25,7 +24,7 @@ export default defineConfig({
             formats: ['es'],
         },
         rollupOptions: {
-            external: ['react', 'react-dom', 'react/jsx-runtime'],
+            external: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'],
             // https://rollupjs.org/configuration-options/#input
             input: Object.fromEntries(
                 globSync(['src/components/**/index.{ts,tsx}', 'src/main.ts'])
@@ -54,12 +53,11 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: './src/test/setup.ts',
-        // you might want to disable it, if you don't have tests that rely on CSS
-        // since parsing CSS is slow
         css: true,
         coverage: {
-            include: ['src/components'],
-            exclude: ['**/*.stories.tsx'],
+            provider: 'v8',
+            include: ['src/components', 'src/hooks', 'src/utils'],
+            exclude: ['**/*.stories.tsx', '**/*.test.tsx'],
         },
     },
 });

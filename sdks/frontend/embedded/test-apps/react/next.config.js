@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    swcMinify: true,
+    transpilePackages: ['@bytechef/embedded-react'],
+    experimental: {
+        optimizePackageImports: ['@bytechef/embedded-react'],
+    },
+    turbopack: {},
 };
 
-module.exports = nextConfig;
+export default nextConfig;
