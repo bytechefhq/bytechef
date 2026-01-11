@@ -69,9 +69,47 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    public void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         eventPublisher.publishEvent(
             new TriggerWebhookEvent(new WebhookParameters(workflowExecutionId, webhookRequest)));
+    }
+
+    @Override
+    public CompletableFuture<Void> executeAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
+
+        TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
+
+        String workflowId = getWorkflowId(workflowExecutionId);
+        Map<String, ?> inputMap = getInputMap(workflowExecutionId);
+
+        if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?>) {
+            throw new IllegalStateException("Trigger output value must not be a collection");
+        }
+
+        Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
+
+        inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
+
+        long jobId = TenantContext.callWithTenantId(
+            workflowExecutionId.getTenantId(), () -> jobSyncExecutor.startJob(
+                new JobParametersDTO(workflowId, inputs),
+                jobParameters -> principalJobFacade.createSyncJob(
+                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType())));
+
+        return CompletableFuture.runAsync(() -> {
+            AutoCloseable handle = jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
+
+            sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+
+            TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+                try {
+                    jobSyncExecutor.awaitJob(jobId, false);
+                } finally {
+                    handle.close();
+                }
+            });
+        });
     }
 
     @Override
@@ -111,82 +149,13 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    public List<Long> executeSseStream(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
-
-        try {
-            TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
-
-            String workflowId = getWorkflowId(workflowExecutionId);
-            Map<String, ?> inputMap = getInputMap(workflowExecutionId);
-            List<Long> jobIds = new ArrayList<>();
-
-            if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> values) {
-                for (Object value : values) {
-                    Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
-
-                    inputs.put(workflowExecutionId.getTriggerName(), value);
-
-                    long jobId = jobSyncExecutor.startJob(
-                        new JobParametersDTO(workflowId, inputs),
-                        jobParameters -> principalJobFacade.createSyncJob(
-                            jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
-
-                    jobIds.add(jobId);
-
-                    CompletableFuture.runAsync(
-                        () -> sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId))));
-                }
-            } else {
-                Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
-
-                inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
-
-                long jobId = jobSyncExecutor.startJob(
-                    new JobParametersDTO(workflowId, inputs),
-                    jobParameters -> principalJobFacade.createSyncJob(
-                        jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
-
-                jobIds.add(jobId);
-
-                CompletableFuture.runAsync(
-                    () -> sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId))));
-            }
-
-            for (Long jobId : jobIds) {
-                jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
-            }
-
-            String currentTenant = TenantContext.getCurrentTenantId();
-
-            CompletableFuture.runAsync(() -> TenantContext.runWithTenantId(currentTenant, () -> {
-                try {
-                    for (Long jobId : jobIds) {
-                        jobSyncExecutor.awaitJob(jobId, false);
-                    }
-
-                    sseStreamBridge.onComplete();
-                } catch (Exception exception) {
-                    sseStreamBridge.onError(exception);
-                }
-            }));
-
-            return jobIds;
-        } catch (Exception e) {
-            sseStreamBridge.onError(e);
-
-            throw e;
-        }
-    }
-
-    @Override
     public WebhookValidateResponse validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
         WebhookValidateResponse response = webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (response.status() == HttpStatus.OK.getValue()) {
-            execute(workflowExecutionId, webhookRequest);
+            executeAsync(workflowExecutionId, webhookRequest);
         }
 
         return response;
@@ -204,23 +173,23 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap,
         Object triggerOutputValue) {
 
-        return new JobParametersDTO(
-            workflowId,
-            MapUtils.concat(
-                (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue)));
+        Map<String, Object> concat = MapUtils.concat(
+            (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue));
+
+        return new JobParametersDTO(workflowId, concat);
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());

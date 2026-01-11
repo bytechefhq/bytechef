@@ -100,8 +100,8 @@ class WorkflowTestApiControllerIntTest {
     void testStartStreamEmitsStartAndResult() throws Exception {
         long jobId = 123L;
 
-        given(testWorkflowExecutor.startTestWorkflow(eq("wf-1"), any(), eq(1L))).willReturn(jobId);
-        given(testWorkflowExecutor.awaitTestResult(eq(jobId)))
+        given(testWorkflowExecutor.start(eq("wf-1"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.awaitExecution(eq(jobId)))
             .willReturn(new WorkflowTestExecutionDTO(new JobDTO(new Job()), null));
 
         var mvcResult = mockMvc.perform(
@@ -133,12 +133,12 @@ class WorkflowTestApiControllerIntTest {
     void testStopAbortsActiveStreamAndInvokesFacade() throws Exception {
         long jobId = 456L;
 
-        given(testWorkflowExecutor.startTestWorkflow(eq("wf-2"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.start(eq("wf-2"), any(), eq(1L))).willReturn(jobId);
 
         // Make awaitTestResult block so the stream stays open until we call stop
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitExecution(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -197,7 +197,7 @@ class WorkflowTestApiControllerIntTest {
         // Assert the stream carried SSE lines and the run was stopped via facade invocation.
         assertThat(captured).contains("event:");
 
-        verify(testWorkflowExecutor, times(1)).stopTest(eq(jobId));
+        verify(testWorkflowExecutor, times(1)).stop(eq(jobId));
     }
 
     @Test
@@ -227,11 +227,11 @@ class WorkflowTestApiControllerIntTest {
     void testListenerForwardingEmitsJobTaskAndErrorEvents() throws Exception {
         long jobId = 777L;
 
-        given(testWorkflowExecutor.startTestWorkflow(eq("wf-3"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.start(eq("wf-3"), any(), eq(1L))).willReturn(jobId);
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitExecution(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -358,11 +358,11 @@ class WorkflowTestApiControllerIntTest {
         long jobId = 888L;
 
         // Configure start and block to keep run active
-        given(testWorkflowExecutor.startTestWorkflow(eq("wf-4"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.start(eq("wf-4"), any(), eq(1L))).willReturn(jobId);
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitExecution(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(2, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {
@@ -469,9 +469,9 @@ class WorkflowTestApiControllerIntTest {
     void testPendingEventsClearedOnStop() throws Exception {
         long jobId = 889L;
 
-        given(testWorkflowExecutor.startTestWorkflow(eq("wf-5"), any(), eq(1L))).willReturn(jobId);
+        given(testWorkflowExecutor.start(eq("wf-5"), any(), eq(1L))).willReturn(jobId);
         CountDownLatch latch = new CountDownLatch(1);
-        given(testWorkflowExecutor.awaitTestResult(eq(jobId))).willAnswer(inv -> {
+        given(testWorkflowExecutor.awaitExecution(eq(jobId))).willAnswer(inv -> {
             try {
                 latch.await(2, TimeUnit.SECONDS);
             } catch (InterruptedException ignored) {

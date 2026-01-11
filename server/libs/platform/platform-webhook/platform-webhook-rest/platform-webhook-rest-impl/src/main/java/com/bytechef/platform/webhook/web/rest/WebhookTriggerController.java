@@ -34,9 +34,9 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,42 +133,27 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
             RequestMethod.GET, RequestMethod.POST
         }, value = "/webhooks/{id}/sse",
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter>
-        sseStreamWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest) {
+    public SseEmitter sseStreamWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest)
+        throws Exception {
+
+        SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return ResponseEntity.ok(
-            TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
-                WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
-                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+        WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+        WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-                SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
+        CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
+            workflowExecutionId, webhookRequest, new WebhookSseStreamBridge(emitter));
 
-                try {
-                    List<Long> jobIds = webhookWorkflowExecutor.executeSseStream(
-                        workflowExecutionId, webhookRequest, new WebhookSseStreamBridge(emitter));
+        future.whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+                sendEvent(emitter, "error", Objects.toString(throwable.getMessage(), "An error occurred"));
+            }
 
-                    emitter.onError((throwable) -> {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("SSE stream error for jobs: {}", jobIds, throwable);
-                        }
-                    });
+            emitter.complete();
+        });
 
-                    emitter.onTimeout(() -> {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("SSE stream timed out for jobs: {}", jobIds);
-                        }
-                    });
-                } catch (Exception e) {
-                    try {
-                        sendEvent(emitter, "error", e.getMessage());
-                    } finally {
-                        emitter.complete();
-                    }
-                }
-
-                return emitter;
-            }));
+        return emitter;
     }
 
     private ResponseEntity<?> doValidateOnEnable(

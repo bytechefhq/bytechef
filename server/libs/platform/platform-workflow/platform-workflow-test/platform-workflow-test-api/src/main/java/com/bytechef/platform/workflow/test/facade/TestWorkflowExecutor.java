@@ -25,46 +25,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
+ * An interface for managing and testing workflow executions. Provides functionality to monitor workflow execution
+ * events, execute workflows in test environments, and manage lifecycle actions such as starting and stopping workflows.
+ *
  * @author Ivica Cardic
  */
 public interface TestWorkflowExecutor {
-
-    /**
-     * Tests the execution of a workflow given its identifier, input parameters, and execution environment.
-     *
-     * @param workflowId    The unique identifier of the workflow to be tested.
-     * @param inputs        A map of input parameters to be supplied to the workflow during execution.
-     * @param environmentId The unique identifier of the environment in which the workflow will be executed.
-     * @return A {@code WorkflowTestExecutionDTO} object that encapsulates the details of the test execution, including
-     *         the executed job and any associated trigger execution details.
-     */
-    WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs, long environmentId);
-
-    /**
-     * Initiates the test workflow execution for the specified workflow ID and environment.
-     *
-     * @param workflowId    The unique identifier of the workflow to be tested.
-     * @param inputs        A map of input parameters required to execute the workflow.
-     * @param environmentId The identifier of the environment in which the workflow is to be tested.
-     * @return The unique job ID assigned to the test workflow execution.
-     */
-    long startTestWorkflow(String workflowId, Map<String, Object> inputs, long environmentId);
-
-    /**
-     * Waits for the result of a test workflow execution associated with a specific job ID.
-     *
-     * @param jobId The unique identifier of the job whose test result is being awaited.
-     * @return A {@link WorkflowTestExecutionDTO} object containing details about the test execution, including job and
-     *         trigger execution information.
-     */
-    WorkflowTestExecutionDTO awaitTestResult(long jobId);
-
-    /**
-     * Attempts to stop the running test job with the given job id.
-     *
-     * @param jobId The job identifier
-     */
-    void stopTest(long jobId);
 
     /**
      * Registers a listener to monitor job status updates for a specific job. The listener will be triggered with
@@ -126,4 +92,41 @@ public interface TestWorkflowExecutor {
      *         streaming of events.
      */
     AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge);
+
+    /**
+     * Waits for the result of a workflow execution associated with a specific job ID.
+     *
+     * @param jobId The unique identifier of the job whose result is being awaited.
+     * @return A {@link WorkflowTestExecutionDTO} object containing details about the execution, including job and
+     *         trigger execution information.
+     */
+    WorkflowTestExecutionDTO awaitExecution(long jobId);
+
+    /**
+     * Tests the execution of a workflow given its identifier, input parameters, and execution environment.
+     *
+     * @param workflowId    The unique identifier of the workflow to be tested.
+     * @param inputs        A map of input parameters to be supplied to the workflow during execution.
+     * @param environmentId The unique identifier of the environment in which the workflow will be executed.
+     * @return A {@code WorkflowTestExecutionDTO} object that encapsulates the details of the execution, including the
+     *         executed job and any associated trigger execution details.
+     */
+    WorkflowTestExecutionDTO execute(String workflowId, Map<String, Object> inputs, long environmentId);
+
+    /**
+     * Initiates the execution of a workflow with the specified identifier, inputs, and execution environment.
+     *
+     * @param workflowId    The unique identifier of the workflow to be started.
+     * @param inputs        A map of input parameters to be supplied to the workflow during its execution.
+     * @param environmentId The unique identifier of the environment in which the workflow will execute.
+     * @return The job ID associated with the started workflow execution.
+     */
+    long start(String workflowId, Map<String, Object> inputs, long environmentId);
+
+    /**
+     * Stops the execution of a workflow associated with the specified job ID.
+     *
+     * @param jobId The unique identifier of the job whose workflow execution is to be stopped.
+     */
+    void stop(long jobId);
 }
