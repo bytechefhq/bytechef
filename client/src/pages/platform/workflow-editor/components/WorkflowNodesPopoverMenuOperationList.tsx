@@ -10,6 +10,7 @@ import {
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
@@ -95,6 +96,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
             }))
         );
 
+    const ff_2311 = useFeatureFlagsStore()('ff-2311');
+    const ff_2894 = useFeatureFlagsStore()('ff-2894');
+
     const {captureComponentUsed} = useAnalytics();
 
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -117,8 +121,29 @@ const WorkflowNodesPopoverMenuOperationList = ({
     }, [clusterElementType, clusterElements]);
 
     const operations = useMemo(
-        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElementOperations : actions),
-        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElementOperations, actions]
+        () =>
+            (trigger
+                ? triggers
+                : clusterElementsCanvasOpen && clusterElement
+                  ? clusterElementOperations
+                  : actions
+            )?.filter(
+                (operation) =>
+                    (((!ff_2311 && !['streamAsk', 'streamResponseToRequest'].includes(operation.name)) || ff_2311) &&
+                        !ff_2894 &&
+                        !['streamChat', 'streamResponseToRequest'].includes(operation.name)) ||
+                    ff_2894
+            ),
+        [
+            trigger,
+            triggers,
+            clusterElementsCanvasOpen,
+            clusterElement,
+            clusterElementOperations,
+            actions,
+            ff_2311,
+            ff_2894,
+        ]
     );
 
     const getNodeData = useCallback(
