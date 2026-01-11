@@ -38,7 +38,7 @@ const WorkflowTemplates = () => {
                                 authorName={template.authorName}
                                 categories={template.categories}
                                 description={template.workflow.description}
-                                icons={icons}
+                                icons={icons as string[]}
                                 key={template.id}
                                 templateId={template.id!}
                                 title={template.workflow.label}
