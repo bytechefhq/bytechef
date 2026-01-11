@@ -726,7 +726,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return oldProjectDeploymentWorkflows.stream()
             .filter(curProjectDeploymentWorkflow -> {
                 String projectDeploymentWorkflowUuid =
-                    projectWorkflowService.getProjectDeploymentWorkflowUuid(
+                    projectWorkflowService.getProjectWorkflowUuid(
                         projectDeployment.getId(), curProjectDeploymentWorkflow.getWorkflowId());
 
                 return Objects.equals(

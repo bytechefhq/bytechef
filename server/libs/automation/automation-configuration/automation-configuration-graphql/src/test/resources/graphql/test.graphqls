@@ -16,14 +16,22 @@ type ApiKey {
     name: String
 }
 
+type Category {
+    id: ID
+    name: String
+}
+
+type ComponentDefinition {
+    name: String
+}
+
 type Environment {
     id: ID
     name: String
 }
 
-type Category {
-    id: ID
-    name: String
+type Map {
+    key: String
 }
 
 type Tag {
@@ -32,6 +40,8 @@ type Tag {
     color: String
 }
 
-type ComponentDefinition {
-    name: String
+type Workflow {
+    id: ID!
+    description: String
+    label: String!
 }

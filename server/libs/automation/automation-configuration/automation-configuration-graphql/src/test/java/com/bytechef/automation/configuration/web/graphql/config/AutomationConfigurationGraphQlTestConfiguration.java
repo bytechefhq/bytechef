@@ -16,10 +16,13 @@
 
 package com.bytechef.automation.configuration.web.graphql.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.service.TagService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -58,7 +61,25 @@ public class AutomationConfigurationGraphQlTestConfiguration {
 
     @Bean
     @Primary
+    public ProjectWorkflowService projectWorkflowService() {
+        return Mockito.mock(ProjectWorkflowService.class);
+    }
+
+    @Bean
+    @Primary
     public TagService tagService() {
         return Mockito.mock(TagService.class);
+    }
+
+    @Bean
+    @Primary
+    public WorkflowService workflowService() {
+        return Mockito.mock(WorkflowService.class);
+    }
+
+    @Bean
+    @Primary
+    public WorkflowFacade workflowFacade() {
+        return Mockito.mock(WorkflowFacade.class);
     }
 }

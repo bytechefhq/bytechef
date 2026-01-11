@@ -10,6 +10,33 @@ extend type Mutation {
     importWorkflowTemplate(id: String!, projectId: ID!, sharedWorkflow: Boolean!): ID!
 }
 
+type ProjectWorkflow {
+    id: ID!
+    projectId: ID!
+    workflowId: String!
+    projectVersion: Int!
+    uuid: String
+    sseStreamResponse: Boolean!
+    workflow: Workflow!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
+type SharedWorkflow {
+    description: String
+    exported: Boolean!
+    projectVersion: Int
+    publicUrl: String
+}
+
+type SharedWorkflowInfo {
+    description: String
+    label: String!
+}
+
 type WorkflowTemplate {
     authorEmail: String
     authorName: String
@@ -23,16 +50,4 @@ type WorkflowTemplate {
     projectVersion: Int
     publicUrl: String
     workflow: SharedWorkflowInfo!
-}
-
-type SharedWorkflow {
-    description: String
-    exported: Boolean!
-    projectVersion: Int
-    publicUrl: String
-}
-
-type SharedWorkflowInfo {
-    description: String
-    label: String!
 }

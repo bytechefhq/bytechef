@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -54,6 +55,7 @@ import org.springframework.test.context.ContextConfiguration;
         "bytechef.coordinator.enabled=true",
         "spring.graphql.schema.locations=classpath*:/graphql/"
     })
+@AutomationConfigurationGraphQlConfigurationSharedMocks
 public class ProjectGraphQlControllerIntTest {
 
     @Autowired

@@ -16,15 +16,22 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -37,10 +44,19 @@ import org.springframework.stereotype.Controller;
 public class ProjectWorkflowGraphQlController {
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
+    private final ProjectWorkflowService projectWorkflowService;
+    private final WorkflowFacade workflowFacade;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowGraphQlController(ProjectWorkflowFacade projectWorkflowFacade) {
+    public ProjectWorkflowGraphQlController(
+        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        WorkflowFacade workflowFacade, WorkflowService workflowService) {
+
         this.projectWorkflowFacade = projectWorkflowFacade;
+        this.projectWorkflowService = projectWorkflowService;
+        this.workflowFacade = workflowFacade;
+        this.workflowService = workflowService;
     }
 
     @MutationMapping
@@ -67,6 +83,23 @@ public class ProjectWorkflowGraphQlController {
     @QueryMapping(name = "preBuiltWorkflowTemplates")
     public List<WorkflowTemplateDTO> preBuiltWorkflowTemplates(@Argument String query, @Argument String category) {
         return projectWorkflowFacade.getPreBuiltWorkflowTemplates(query, category);
+    }
+
+    @SchemaMapping(typeName = "ProjectDeploymentWorkflow", field = "projectWorkflow")
+    public ProjectWorkflow projectWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
+
+        return projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+    }
+
+    @SchemaMapping(typeName = "ProjectWorkflow", field = "sseStreamResponse")
+    public boolean sseStreamResponse(ProjectWorkflow projectWorkflow) {
+        return workflowFacade.hasSseStreamResponse(projectWorkflow.getWorkflowId());
+    }
+
+    @SchemaMapping(typeName = "ProjectWorkflow", field = "workflow")
+    public Workflow workflow(ProjectWorkflow projectWorkflow) {
+        return workflowService.getWorkflow(projectWorkflow.getWorkflowId());
     }
 
     @QueryMapping(name = "sharedWorkflow")

@@ -3,11 +3,11 @@ dependencies {
     implementation("org.springframework.graphql:spring-graphql")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
-    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-category:platform-category-api"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 

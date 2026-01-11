@@ -5,6 +5,6 @@ enum EnvironmentEnum {
 }
 
 type Environment {
-    id: ID
-    name: String
+    id: ID!
+    name: String!
 }

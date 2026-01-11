@@ -57,9 +57,9 @@ public interface ProjectWorkflowService {
 
     List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowUuid);
 
-    String getProjectDeploymentWorkflowId(long projectDeploymentId, String workflowUuid);
+    String getProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid);
 
-    String getProjectDeploymentWorkflowUuid(long projectDeploymentId, String workflowId);
+    String getProjectWorkflowUuid(long projectDeploymentId, String workflowId);
 
     ProjectWorkflow getWorkflowProjectWorkflow(String workflowId);
 

@@ -137,14 +137,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
             .fetchProjectDeploymentWorkflow(
                 apiCollection.getProjectDeploymentId(),
-                projectWorkflowService.getProjectDeploymentWorkflowId(
+                projectWorkflowService.getProjectWorkflowWorkflowId(
                     apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()))
             .orElseGet(() -> {
                 ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
                 newProjectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
                 newProjectDeploymentWorkflow.setWorkflowId(
-                    projectWorkflowService.getProjectDeploymentWorkflowId(
+                    projectWorkflowService.getProjectWorkflowWorkflowId(
                         apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()));
 
                 return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
@@ -466,7 +466,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflow(apiCollectionEndpoint.getProjectDeploymentWorkflowId());
 
-        String workflowUuid = projectWorkflowService.getProjectDeploymentWorkflowUuid(
+        String workflowUuid = projectWorkflowService.getProjectWorkflowUuid(
             projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId());
 
         return new ApiCollectionEndpointDTO(

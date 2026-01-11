@@ -180,7 +180,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.headers(), MapUtils.concat(webhookRequest.parameters(), variables),
                 webhookRequest.body(), webhookRequest.method());
 
-            String workflowUuid = projectWorkflowService.getProjectDeploymentWorkflowUuid(
+            String workflowUuid = projectWorkflowService.getProjectWorkflowUuid(
                 projectDeployment.getId(), projectDeploymentWorkflow.getWorkflowId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
