@@ -74,8 +74,6 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import tools.jackson.core.type.TypeReference;
@@ -84,8 +82,6 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 class HttpClientExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private final ApplicationContext applicationContext;
     private final TempFileStorage tempFileStorage;
@@ -111,15 +107,13 @@ class HttpClientExecutor {
             HttpRequest httpRequest = createHttpRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
-                    httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType());
-            }
+            context.log(log -> log.debug(
+                "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
+                httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType()));
 
             httpResponse = httpClient.send(httpRequest, createResponseBodyHandler(configuration));
 
-            return handleResponse(httpResponse, configuration);
+            return handleResponse(httpResponse, configuration, context);
         }
     }
 
@@ -183,7 +177,7 @@ class HttpClientExecutor {
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
                     componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
-                    isAction));
+                    isAction, context));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -234,15 +228,18 @@ class HttpClientExecutor {
         return httpRequestBuilder.build();
     }
 
-    Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration) {
+    Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration, Context context) {
         HttpHeaders httpHeaders = httpResponse.headers();
         ResponseType responseType = configuration.getResponseType();
         int statusCode = httpResponse.statusCode();
 
         if (statusCode != 204 && ((responseType == null) || !matches(responseType, httpHeaders))) {
-            logger.warn(
-                "Unexpected response body content-type type: {} can not be converted to {}",
-                httpHeaders.firstValue("content-type"), responseType);
+            String contentType = httpHeaders.firstValue("content-type")
+                .orElse(null);
+
+            context.log(log -> log.warn(
+                "Unexpected response body content-type type: {} can not be converted to {}", contentType,
+                responseType));
 
             return new ResponseImpl(httpHeaders.map(), null, statusCode);
         }
@@ -417,14 +414,15 @@ class HttpClientExecutor {
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
-        @Nullable AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction) {
+        @Nullable AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean isAction,
+        Context context) {
 
         return new Methanol.Interceptor() {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
                 throws IOException, InterruptedException {
 
-                logger.trace("Intercepting request to analyze response");
+                context.log(log -> log.trace("Intercepting request to analyze response"));
 
                 HttpResponse<T> httpResponse = chain.forward(httpRequest);
 
@@ -457,7 +455,7 @@ class HttpClientExecutor {
 
             @Override
             public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
-                logger.trace("Intercepting ASYNC request to analyze response");
+                context.log(log -> log.trace("Intercepting ASYNC request to analyze response"));
 
                 return chain.forwardAsync(httpRequest);
             }
