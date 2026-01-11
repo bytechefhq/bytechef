@@ -18,7 +18,6 @@ package com.bytechef.component.ai.llm.anthropic.action;
 
 import static com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction.CHAT_MODEL;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.ASK_PROPERTIES;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -32,7 +31,7 @@ import java.util.concurrent.Flow;
  */
 public class AnthropicStreamChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK + "Stream")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("streamAsk")
         .title("Ask (stream)")
         .description("Ask anything you want and stream the response.")
         .properties(ASK_PROPERTIES)

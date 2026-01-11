@@ -719,7 +719,7 @@
     "description": "Ask anything you want and stream the response.",
     "help": null,
     "metadata": null,
-    "name": "askStream",
+    "name": "streamAsk",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
