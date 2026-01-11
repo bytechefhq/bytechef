@@ -152,7 +152,11 @@ public class GithubUtils {
                 .configuration(responseType(Http.ResponseType.JSON))
                 .execute();
 
-            items.addAll(response.getBody(new TypeReference<>() {}));
+            List<Map<String, ?>> body = response.getBody(new TypeReference<>() {});
+
+            if (body != null) {
+                items.addAll(body);
+            }
 
             if (isEditorEnvironment) {
                 break;
