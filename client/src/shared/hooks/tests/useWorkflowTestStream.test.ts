@@ -140,4 +140,168 @@ describe('useWorkflowTestStream', () => {
         expect(onError).toHaveBeenCalled();
         expect(result.current.error).toBe(errorMessage);
     });
+
+    it('should handle stream event with valid chunk', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.stream({text: 'streaming text'});
+        });
+    });
+
+    it('should return close function from useSSE', () => {
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        expect(result.current.close).toBe(mockClose);
+    });
+
+    it('should return error from useSSE', () => {
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        expect(result.current.error).toBe(mockError);
+    });
+
+    it('should provide persistJobId function', () => {
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        act(() => {
+            result.current.persistJobId('new-job-id');
+        });
+
+        expect(mockPersistJobId).toHaveBeenCalledWith('new-job-id');
+    });
+
+    it('should handle result with message content', () => {
+        const onResult = vi.fn();
+        renderHook(() =>
+            useWorkflowTestStream({
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {outputs: {message: 'Result message'}, status: 'COMPLETED'}});
+        });
+
+        expect(mockPersistJobId).toHaveBeenCalledWith(null);
+    });
+
+    it('should handle result with empty message', () => {
+        const onResult = vi.fn();
+        renderHook(() =>
+            useWorkflowTestStream({
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {outputs: {message: ''}, status: 'COMPLETED'}});
+        });
+
+        expect(onResult).toHaveBeenCalled();
+    });
+
+    it('should handle result with no outputs', () => {
+        const onResult = vi.fn();
+        renderHook(() =>
+            useWorkflowTestStream({
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {status: 'COMPLETED'}});
+        });
+
+        expect(onResult).toHaveBeenCalled();
+    });
+
+    it('should handle result with string data', () => {
+        const onResult = vi.fn();
+        renderHook(() =>
+            useWorkflowTestStream({
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result('{"job":{"status":"COMPLETED"}}');
+        });
+
+        expect(onResult).toHaveBeenCalled();
+    });
+
+    it('should handle result with invalid JSON', () => {
+        const onResult = vi.fn();
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        renderHook(() =>
+            useWorkflowTestStream({
+                onResult,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result('{invalid json}');
+        });
+
+        expect(consoleErrorSpy).toHaveBeenCalled();
+        expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+        expect(mockPersistJobId).toHaveBeenCalledWith(null);
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    it('should handle start event with string data', () => {
+        const onStart = vi.fn();
+        renderHook(() =>
+            useWorkflowTestStream({
+                onStart,
+                workflowId: 'workflow-123',
+            })
+        );
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start('{"jobId":456}');
+        });
+
+        expect(onStart).toHaveBeenCalledWith('456');
+    });
+
+    it('should handle stream event with empty chunk', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.stream({text: ''});
+        });
+    });
 });
