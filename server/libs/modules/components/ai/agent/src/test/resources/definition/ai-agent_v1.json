@@ -547,7 +547,7 @@
     "description": "Chat with the AI agent and stream the response.",
     "help": null,
     "metadata": null,
-    "name": "chatStream",
+    "name": "streamChat",
     "outputDefinition": {
       "output": { },
       "outputResponse": null,
