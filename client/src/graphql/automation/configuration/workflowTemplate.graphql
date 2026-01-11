@@ -8,6 +8,7 @@ query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
         }
         components {
             connection {
+                componentName
                 version
             }
             icon

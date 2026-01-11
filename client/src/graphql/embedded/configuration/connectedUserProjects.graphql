@@ -17,6 +17,11 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
             workflow {
                 id
                 label
+                triggers {
+                    name
+                    type
+                    parameters
+                }
             }
         }
         environmentId

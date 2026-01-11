@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
+import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
@@ -15,24 +16,10 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const projectDeploymentApi = new ProjectDeploymentApi();
-
-const getTriggerUrl = (
-    type: 'form' | 'chat',
-    environmentId: number,
-    sseStreamResponseEnabled: boolean,
-    staticWebhookUrl?: string
-) => {
-    if (!staticWebhookUrl) {
-        return '';
-    }
-
-    const webhookId = staticWebhookUrl.substring(staticWebhookUrl.lastIndexOf('/webhooks/') + '/webhooks/'.length);
-
-    return `/${type}/${environmentId}/${webhookId}${sseStreamResponseEnabled ? '?sseStream=true' : ''}`;
-};
 
 const ProjectDeploymentWorkflowListItem = ({
     environmentId,
@@ -63,30 +50,21 @@ const ProjectDeploymentWorkflowListItem = ({
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
+    const navigate = useNavigate();
     const {toast} = useToast();
     const queryClient = useQueryClient();
 
     const formTrigger =
         workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
 
-    const formTriggerUrl = getTriggerUrl(
-        'form',
-        environmentId,
-        workflow.sseStreamResponse ?? false,
-        projectDeploymentWorkflow.staticWebhookUrl
-    );
+    const formTriggerPageUrl = getPageUrl('form', environmentId, projectDeploymentWorkflow.staticWebhookUrl);
 
     const hostedChatTrigger =
         workflow.triggers &&
         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
-    const hostedChatTriggerUrl = getTriggerUrl(
-        'chat',
-        environmentId,
-        workflow.sseStreamResponse ?? false,
-        projectDeploymentWorkflow.staticWebhookUrl
-    );
+    const hostedChatTriggerPageUrl = getPageUrl('chat', undefined, projectDeploymentWorkflow.staticWebhookUrl);
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
@@ -192,7 +170,12 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
                                         icon={<ClipboardIcon />}
-                                        onClick={() => copyToClipboard(projectDeploymentWorkflow.staticWebhookUrl!)}
+                                        onClick={() =>
+                                            copyToClipboard(
+                                                projectDeploymentWorkflow.staticWebhookUrl! +
+                                                    (workflow.sseStreamResponse ? '/sse' : '')
+                                            )
+                                        }
                                         size="icon"
                                         variant="ghost"
                                     />
@@ -208,7 +191,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
                                         icon={<FormIcon />}
-                                        onClick={() => window.open(formTriggerUrl, '_blank')}
+                                        onClick={() => navigate(formTriggerPageUrl)}
                                         size="icon"
                                         variant="ghost"
                                     />
@@ -224,7 +207,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Button
                                         disabled={!projectDeploymentWorkflow.enabled}
                                         icon={<MessageCircleMoreIcon />}
-                                        onClick={() => window.open(hostedChatTriggerUrl, '_blank')}
+                                        onClick={() => window.open(hostedChatTriggerPageUrl, '_self')}
                                         size="icon"
                                         variant="ghost"
                                     />

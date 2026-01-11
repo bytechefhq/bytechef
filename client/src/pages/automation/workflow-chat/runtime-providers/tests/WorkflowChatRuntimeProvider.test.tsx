@@ -37,7 +37,7 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('renders children', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="test" workflowExecutionId="workflow-123">
+                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),
@@ -49,7 +49,11 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('accepts sseStream prop', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="test" sseStream={true} workflowExecutionId="workflow-123">
+                <WorkflowChatRuntimeProvider
+                    environmentName="test"
+                    sseStreamResponse={true}
+                    workflowExecutionId="workflow-123"
+                >
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),
@@ -61,7 +65,7 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('initializes with correct environment', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="production" workflowExecutionId="workflow-123">
+                <WorkflowChatRuntimeProvider environmentName="production" workflowExecutionId="workflow-123">
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),
@@ -73,7 +77,7 @@ describe('WorkflowChatRuntimeProvider', () => {
     it('handles different workflow execution IDs', () => {
         const {result} = renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="test" workflowExecutionId="different-workflow-456">
+                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="different-workflow-456">
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),
@@ -94,7 +98,7 @@ describe('WorkflowChatRuntimeProvider', () => {
 
         renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="test" workflowExecutionId="workflow-123">
+                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),
@@ -117,7 +121,7 @@ describe('WorkflowChatRuntimeProvider', () => {
 
         renderHook(() => null, {
             wrapper: ({children}) => (
-                <WorkflowChatRuntimeProvider environment="test" workflowExecutionId="workflow-123">
+                <WorkflowChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
                     {children}
                 </WorkflowChatRuntimeProvider>
             ),

@@ -1,44 +1,52 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
-import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
-import {PRODUCTION_ENVIRONMENT, toEnvironmentName} from '@/shared/constants';
-import {useEffect, useMemo} from 'react';
-import {useParams, useSearchParams} from 'react-router-dom';
+import {toEnvironmentName} from '@/shared/constants';
+import {useWorkflowChatProjectDeploymentWorkflowQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useMemo} from 'react';
+import {useParams} from 'react-router-dom';
 
 const WorkflowChat = () => {
-    const {environmentId, workflowExecutionId} = useParams();
-    const [searchParams] = useSearchParams();
+    const {workflowExecutionId} = useParams();
 
-    const reset = useWorkflowChatStore((state) => state.reset);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const environmentName = useMemo(
-        () => toEnvironmentName(environmentId ? +environmentId : PRODUCTION_ENVIRONMENT),
-        [environmentId]
+    const environmentName = useMemo(() => toEnvironmentName(currentEnvironmentId), [currentEnvironmentId]);
+
+    const {data} = useWorkflowChatProjectDeploymentWorkflowQuery(
+        {
+            id: workflowExecutionId!,
+        },
+        {
+            enabled: !!workflowExecutionId,
+        }
     );
 
-    const sseStream = useMemo(() => searchParams.get('sseStream') === 'true', [searchParams]);
+    const chatName = useMemo(() => {
+        if (data?.projectDeploymentWorkflow) {
+            const workflow = data.projectDeploymentWorkflow.projectWorkflow?.workflow;
 
-    useEffect(() => {
-        return () => {
-            reset();
-        };
-    }, [reset]);
+            return workflow?.label || 'Untitled Workflow';
+        }
+
+        return null;
+    }, [data]);
 
     return (
-        <div className="size-full bg-surface-main">
+        <div className="flex flex-1">
             <WorkflowChatRuntimeProvider
-                environment={environmentName}
-                sseStream={sseStream}
-                workflowExecutionId={workflowExecutionId ?? ''}
+                environmentName={environmentName}
+                sseStreamResponse={data?.projectDeploymentWorkflow?.projectWorkflow?.sseStreamResponse}
+                workflowExecutionId={workflowExecutionId!}
             >
-                <div className="flex size-full flex-col">
-                    {+(environmentId ?? PRODUCTION_ENVIRONMENT) !== PRODUCTION_ENVIRONMENT && (
-                        <div className="absolute space-x-1 p-3 uppercase">
-                            <span>Environment:</span>
-
-                            <span className="font-semibold">{environmentName}</span>
-                        </div>
-                    )}
+                <div className="relative flex size-full flex-col pt-14">
+                    <div className="absolute top-0 flex items-center space-x-4 p-4">
+                        {chatName && (
+                            <div className="space-x-1">
+                                <span className="font-semibold">{chatName}</span>
+                            </div>
+                        )}
+                    </div>
 
                     <Thread />
                 </div>

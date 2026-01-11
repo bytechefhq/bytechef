@@ -24,13 +24,13 @@ const attachmentAdapter = new CompositeAttachmentAdapter([
 
 export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProvider({
     children,
-    environment,
-    sseStream,
+    environmentName,
+    sseStreamResponse,
     workflowExecutionId,
 }: Readonly<{
-    environment: string;
+    environmentName: string;
     workflowExecutionId: string;
-    sseStream?: boolean;
+    sseStreamResponse?: boolean;
     children: ReactNode;
 }>) {
     const [isRunning, setIsRunning] = useState(false);
@@ -118,14 +118,14 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                 }
             }
 
-            if (sseStream) {
+            if (sseStreamResponse) {
                 setMessage({content: '', role: 'assistant'});
 
                 setStreamRequest({
                     init: {
                         body: formData,
                         headers: {
-                            'X-Environment': environment,
+                            'X-Environment': environmentName,
                         },
                         method: 'POST',
                     },
@@ -135,7 +135,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                 const result = await fetch('/webhooks/' + workflowExecutionId, {
                     body: formData,
                     headers: {
-                        'X-Environment': environment,
+                        'X-Environment': environmentName,
                     },
                     method: 'POST',
                     // if the user hits the "cancel" button or escape keyboard key, cancel the request
@@ -170,7 +170,7 @@ export const WorkflowChatRuntimeProvider = memo(function WorkflowChatRuntimeProv
                 setIsRunning(false);
             }
         },
-        [environment, setMessage, sseStream, workflowExecutionId]
+        [environmentName, setMessage, sseStreamResponse, workflowExecutionId]
     );
 
     const runtime = useExternalStoreRuntime(
