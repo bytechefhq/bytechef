@@ -1,3 +1,7 @@
+import {
+    appendToLastAssistantMessage as appendHelper,
+    setLastAssistantMessageContent as setContentHelper,
+} from '@/shared/util/assistant-message-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 
 /* eslint-disable sort-keys */
@@ -34,37 +38,13 @@ export const useWorkflowChatStore = create<WorkflowChatStateI>()(
                 messages: [...state.messages, message],
             })),
         appendToLastAssistantMessage: (delta: string) =>
-            set((state) => {
-                const messages = [...state.messages];
-                // find last assistant message
-                for (let i = messages.length - 1; i >= 0; i--) {
-                    const msg = messages[i] as ThreadMessageLike & {content?: string; role?: string};
-                    if (msg && msg.role === 'assistant') {
-                        const current = typeof msg.content === 'string' ? msg.content : '';
-                        const chunk = typeof delta === 'string' ? delta : String(delta ?? '');
-                        messages[i] = {...msg, content: current + chunk};
-                        return {messages};
-                    }
-                }
-                // no assistant message yet; create one
-                return {
-                    messages: [...messages, {content: delta, role: 'assistant'} as ThreadMessageLike],
-                };
-            }),
+            set((state) => ({
+                messages: appendHelper(state.messages, delta),
+            })),
         setLastAssistantMessageContent: (content: string) =>
-            set((state) => {
-                const messages = [...state.messages];
-                for (let i = messages.length - 1; i >= 0; i--) {
-                    const msg = messages[i] as ThreadMessageLike & {content?: string; role?: string};
-                    if (msg && msg.role === 'assistant') {
-                        messages[i] = {...msg, content};
-                        return {messages};
-                    }
-                }
-                return {
-                    messages: [...messages, {content, role: 'assistant'} as ThreadMessageLike],
-                };
-            }),
+            set((state) => ({
+                messages: setContentHelper(state.messages, content),
+            })),
         resetMessages: () => set({messages: []}),
         reset: () => set({...initialState, conversationId: generateId()}),
     }))
