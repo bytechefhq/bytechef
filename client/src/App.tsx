@@ -21,6 +21,7 @@ import {
     LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
+    MessageCircleMoreIcon,
     ServerIcon,
     Settings2Icon,
     SquareIcon,
@@ -73,6 +74,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Workflow Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
+    {href: '/automation/chat', icon: MessageCircleMoreIcon, name: 'Workflow Chat'},
 ];
 
 const embeddedNavigation: NavigationType[] = [

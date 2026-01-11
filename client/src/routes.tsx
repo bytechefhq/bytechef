@@ -47,6 +47,7 @@ const ProjectTemplates = lazy(() => import('@/pages/automation/templates/project
 const Projects = lazy(() => import('@/pages/automation/projects/Projects'));
 const Sessions = lazy(() => import('@/pages/account/settings/Sessions'));
 const WorkflowChat = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChat'));
+const WorkflowChatContainer = lazy(() => import('@/pages/automation/workflow-chat/WorkflowChatContainer'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
@@ -349,14 +350,6 @@ export const getRouter = (queryClient: QueryClient) =>
             path: 'form/:environmentId/:workflowExecutionId',
         },
         {
-            element: <WorkflowChat />,
-            path: 'chat/:workflowExecutionId',
-        },
-        {
-            element: <WorkflowChat />,
-            path: 'chat/:environmentId/:workflowExecutionId',
-        },
-        {
             children: [
                 {
                     element: (
@@ -577,6 +570,22 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'connections',
+                                },
+                                {
+                                    children: [
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <LazyLoadWrapper>
+                                                        <WorkflowChat />
+                                                    </LazyLoadWrapper>
+                                                </PrivateRoute>
+                                            ),
+                                            path: ':workflowExecutionId',
+                                        },
+                                    ],
+                                    element: <WorkflowChatContainer />,
+                                    path: 'chat',
                                 },
                                 {
                                     children: [
