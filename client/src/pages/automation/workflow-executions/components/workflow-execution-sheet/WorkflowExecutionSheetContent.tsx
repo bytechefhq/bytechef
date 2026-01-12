@@ -29,9 +29,9 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
         <div className="flex size-full flex-col">
             <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
 
-            <ResizablePanelGroup className="px-2" direction="horizontal">
+            <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={50}>
-                    <ScrollArea className="mb-4 h-full pr-4">
+                    <ScrollArea className="mb-4 h-full pl-1 pr-4">
                         <Accordion
                             className="space-y-2"
                             collapsible

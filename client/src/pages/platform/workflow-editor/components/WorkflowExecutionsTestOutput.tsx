@@ -70,7 +70,7 @@ const WorkflowExecutionsTestOutput = ({
 
     return (
         <div className="flex size-full flex-col">
-            <div className="flex items-center justify-between border-b border-stroke-neutral-secondary px-3 py-1">
+            <div className="flex items-center justify-between border-b border-stroke-neutral-secondary py-1">
                 {job ? (
                     <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
@@ -101,7 +101,7 @@ const WorkflowExecutionsTestOutput = ({
                             {workflowTestExecution?.job && (
                                 <ResizablePanelGroup direction="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
-                                        <ScrollArea className="h-full pr-4">
+                                        <ScrollArea className="h-full pl-1 pr-4">
                                             <Accordion
                                                 className="space-y-2"
                                                 collapsible
