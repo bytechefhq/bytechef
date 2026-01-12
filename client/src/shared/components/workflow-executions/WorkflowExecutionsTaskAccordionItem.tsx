@@ -26,7 +26,7 @@ const WorkflowExecutionsTaskAccordionItem = ({
         >
             <AccordionTrigger
                 className={twMerge(
-                    'group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline [&[data-state=open]]:border-stroke-brand-primary [&[data-state=open]]:hover:border-stroke-brand-secondary',
+                    'group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&[data-state=open]]:border-stroke-brand-primary [&[data-state=open]]:hover:border-stroke-brand-secondary',
                     selectedTaskExecutionId === taskTreeItem.task.id &&
                         'border-stroke-brand-primary bg-surface-neutral-secondary hover:bg-surface-neutral-secondary [&[data-state=open]]:border-stroke-brand-primary',
                     !hasChildren &&
@@ -54,7 +54,7 @@ const WorkflowExecutionsTaskAccordionItem = ({
                                         key={iterationValue}
                                         value={iterationValue}
                                     >
-                                        <AccordionTrigger className="group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-4 hover:border-stroke-brand-primary hover:no-underline [&[data-state=open]]:border-stroke-brand-primary [&[data-state=open]]:hover:border-stroke-brand-secondary">
+                                        <AccordionTrigger className="group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&[data-state=open]]:border-stroke-brand-primary [&[data-state=open]]:hover:border-stroke-brand-secondary">
                                             <div className="flex w-full items-center justify-between">
                                                 <span className="text-sm font-medium text-foreground">
                                                     Loop iteration {index + 1}
