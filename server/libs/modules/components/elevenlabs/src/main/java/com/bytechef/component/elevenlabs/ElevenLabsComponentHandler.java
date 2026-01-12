@@ -26,7 +26,6 @@ import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSoundEffectActio
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSpeechAction;
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSpeechWithTimingAction;
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateTranscriptAction;
-import com.bytechef.component.elevenlabs.action.ElevenLabsStreamSpeechAction;
 import com.bytechef.component.elevenlabs.connection.ElevenLabsConnection;
 import com.google.auto.service.AutoService;
 
@@ -48,14 +47,12 @@ public class ElevenLabsComponentHandler implements ComponentHandler {
             ElevenLabsCreateSoundEffectAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechWithTimingAction.ACTION_DEFINITION,
-            ElevenLabsCreateTranscriptAction.ACTION_DEFINITION,
-            ElevenLabsStreamSpeechAction.ACTION_DEFINITION)
+            ElevenLabsCreateTranscriptAction.ACTION_DEFINITION)
         .clusterElements(
             tool(ElevenLabsCreateSoundEffectAction.ACTION_DEFINITION),
             tool(ElevenLabsCreateSpeechAction.ACTION_DEFINITION),
             tool(ElevenLabsCreateSpeechWithTimingAction.ACTION_DEFINITION),
-            tool(ElevenLabsCreateTranscriptAction.ACTION_DEFINITION),
-            tool(ElevenLabsStreamSpeechAction.ACTION_DEFINITION));
+            tool(ElevenLabsCreateTranscriptAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
