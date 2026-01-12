@@ -1,5 +1,4 @@
 import PageLoader from '@/components/PageLoader';
-import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {DEFAULT_CANVAS_WIDTH} from '@/shared/constants';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -10,7 +9,7 @@ import {lazy, useEffect, useRef, useState} from 'react';
 const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
-    const {project, workflow} = workflowExecution;
+    const {workflow} = workflowExecution;
     const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_WIDTH);
 
     const rootDivRef = useRef<HTMLDivElement>(null);
@@ -51,16 +50,6 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
 
     return (
         <div className="flex size-full flex-col" ref={rootDivRef}>
-            <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
-                <SheetTitle>
-                    <span>
-                        {project?.name} / {workflow?.label}
-                    </span>
-                </SheetTitle>
-
-                <SheetCloseButton />
-            </SheetHeader>
-
             <ReactFlowProvider>
                 <PageLoader
                     errors={[componentsError, taskDispatcherDefinitionsError]}
