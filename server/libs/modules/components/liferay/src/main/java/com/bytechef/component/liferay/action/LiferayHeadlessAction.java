@@ -17,6 +17,7 @@
 package com.bytechef.component.liferay.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
@@ -75,7 +76,7 @@ public class LiferayHeadlessAction {
                         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
                         if (endpoint.contains("batch")) {
-                            return List.of(string(BODY)
+                            return List.of(array(BODY)
                                 .label("Body")
                                 .description("JSON structure of body")
                                 .required(false));
@@ -125,7 +126,7 @@ public class LiferayHeadlessAction {
             .configuration(
                 responseType(ResponseType.JSON))
             .body(
-                getBody((List<String>) hiddenProperties.get(BODY), properties, context))
+                getBody((List<String>) hiddenProperties.get(BODY), properties))
             .execute();
 
         return response.getBody();
@@ -177,9 +178,9 @@ public class LiferayHeadlessAction {
                     parameterName -> List.of(String.valueOf(properties.get(parameterName)))));
     }
 
-    private static Body getBody(List<String> parameterNames, Map<String, ?> properties, Context context) {
+    private static Body getBody(List<String> parameterNames, Map<String, ?> properties) {
         if (properties.containsKey(BODY)) {
-            return Body.of((List<?>) context.json(json -> json.read((String) properties.get(BODY))));
+            return Body.of((List<?>) properties.get(BODY));
         }
 
         return Body.of(parameterNames
