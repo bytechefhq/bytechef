@@ -1,0 +1,41 @@
+---
+title: "Bearer Authentication"
+description: "Learn how to use Bearer Tokens to connect to third-party services in ByteChef"
+---
+
+# Bearer Authentication
+
+Bearer Authentication (also called token authentication) is an HTTP authentication scheme that involves security tokens called bearer tokens. The name "Bearer authentication" can be understood as "give access to the bearer of this token."
+
+## How it Works
+
+When using Bearer Authentication, ByteChef includes the token in the `Authorization` header of every HTTP request, prefixed with the word `Bearer`.
+
+Example header:
+`Authorization: Bearer <your_token>`
+
+## Finding Your Bearer Token
+
+Bearer tokens are often generated as personal access tokens (PATs) or as part of an OAuth 2.0 flow. You can typically find them in the:
+- Developer Settings
+- API Credentials
+- Personal Access Tokens section
+
+of the service you want to connect to.
+
+## Setting Up Bearer Token Connections
+
+To set up a Bearer Authentication connection in ByteChef:
+
+1. Go to the **Connections** tab.
+2. Click **New Connection** and select a service that uses Bearer Authentication.
+3. Enter your **Token** in the provided field.
+4. Click **Save** to create the connection.
+
+## Security
+
+Bearer tokens should be treated with extreme care, as anyone who has the token has full access to the associated resources. ByteChef encrypts all stored bearer tokens using AES-256 at rest to ensure they are protected.
+
+---
+
+Related: [Troubleshooting Bearer Auth](/automation/connect-data/troubleshooting#api-key--bearer-auth-issues)

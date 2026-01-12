@@ -1,0 +1,33 @@
+---
+title: "Basic Authentication"
+description: "Learn how to use Basic Authentication to connect to third-party services in ByteChef"
+---
+
+# Basic Authentication
+
+Basic Authentication is a simple authentication scheme built into the HTTP protocol. It uses a username and a password to authenticate requests.
+
+## How it Works
+
+When using Basic Authentication, ByteChef combines your username and password, encodes them using Base64, and includes them in the `Authorization` header of every HTTP request.
+
+Example header:
+`Authorization: Basic ZGVtbzpwQDU1dzByZA==`
+
+## Setting Up Basic Auth Connections
+
+To set up a Basic Authentication connection in ByteChef:
+
+1. Go to the **Connections** tab.
+2. Click **New Connection** and select a service that uses Basic Auth.
+3. Enter your **Username** (sometimes an email address or an API token).
+4. Enter your **Password** or **Secret**.
+5. Click **Save** to create the connection.
+
+## Security
+
+While Basic Authentication is simple, it should always be used over HTTPS to ensure that your credentials are not transmitted in plain text. ByteChef stores your credentials securely using AES-256 encryption at rest.
+
+---
+
+Related: [Troubleshooting Basic Auth](/automation/connect-data/troubleshooting#api-key--basic-auth-issues)
