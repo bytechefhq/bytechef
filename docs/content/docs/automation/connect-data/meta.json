@@ -4,6 +4,6 @@
   "icon": "Link",
   "pages": [
     "overview",
-    "how-to-guides/index"
-  ]
+    "authentication",
+    "troubleshooting"]
 }

@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Authentication",
+  "description": "Learn about different authentication methods supported by ByteChef",
+  "pages": [
+    "api-key",
+    "basic",
+    "bearer",
+    "oauth2"
+  ]
+}

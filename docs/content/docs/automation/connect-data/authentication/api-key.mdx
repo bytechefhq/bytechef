@@ -1,0 +1,44 @@
+---
+title: "API Key Authentication"
+description: "Learn how to use API Keys to connect to third-party services in ByteChef"
+---
+
+# API Key Authentication
+
+API Key authentication is a simple way to authenticate with many third-party services. An API key is a unique identifier used to authenticate a user, developer, or calling program to an API.
+
+## How it Works
+
+When you use an API key, ByteChef includes the key in the header or as a query parameter in every request made to the service's API.
+
+Example header:
+`X-API-Key: abcdef12345`
+
+Example query parameter:
+`?api_key=abcdef12345`
+
+## Finding Your API Key
+
+API keys are usually found in the settings or developer dashboard of the service you want to connect to. Look for sections named:
+- API Settings
+- Developer Tools
+- Security
+- Integrations
+
+## Setting Up API Key Connections
+
+To set up an API key connection in ByteChef:
+
+1. Go to the **Connections** tab.
+2. Click **New Connection** and select a service that uses API Keys.
+3. Enter your API Key in the provided field.
+4. Some services may also require an **API Secret** or an **App ID**.
+5. Click **Save** to create the connection.
+
+## Security
+
+API keys should be treated with the same level of security as passwords. ByteChef encrypts all stored API keys using AES-256 at rest to ensure they are protected.
+
+---
+
+Related: [Troubleshooting API Keys](/automation/connect-data/troubleshooting#api-key--basic-auth-issues)
