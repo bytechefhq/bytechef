@@ -48,6 +48,7 @@ public class ShopifyComponentHandler implements ComponentHandler {
         .icon("path:assets/shopify.svg")
         .categories(ComponentCategory.E_COMMERCE)
         .connection(ShopifyConnection.CONNECTION_DEFINITION)
+        .customAction(true)
         .actions(
             ShopifyCancelOrderAction.ACTION_DEFINITION,
             ShopifyCloseOrderAction.ACTION_DEFINITION,
