@@ -1,4 +1,6 @@
+import Badge from '@/components/Badge/Badge';
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
+import {CheckIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
@@ -17,7 +19,7 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
     const taskExecutionsCount = job?.taskExecutions?.length || 0;
 
     return (
-        <header className="flex w-full flex-col gap-y-3 px-3 py-4">
+        <header className="flex w-full items-center gap-x-3 px-3 py-4">
             <div className="flex items-center gap-x-2">
                 <span
                     className={twMerge(
@@ -25,7 +27,16 @@ const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExe
                         'text-base font-bold uppercase'
                     )}
                 >
-                    {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}
+                    {taskExecutionsCompleted && triggerExecutionCompleted ? (
+                        <Badge
+                            icon={<CheckIcon className="size-5 text-success" />}
+                            label="DONE"
+                            styleType="success-outline"
+                            weight="semibold"
+                        />
+                    ) : (
+                        <Badge label="Workflow failed" styleType="destructive-filled" weight="semibold" />
+                    )}
                 </span>
             </div>
 
