@@ -100,7 +100,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         return CompletableFuture.runAsync(() -> {
             AutoCloseable handle = jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge);
 
-            sseStreamBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+            sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
 
             TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
                 try {
