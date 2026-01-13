@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import java.util.Collections;
@@ -48,6 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -96,7 +102,7 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void executeNoTriggersMergesInputsAndExecutesJob() {
+    void executeSyncNoTriggersMergesInputsAndExecutesJob() {
         // Given a workflow without triggers
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
         when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
@@ -125,7 +131,7 @@ public class TestWorkflowExecutorTest {
 
         inputs.put("inKey", "inVal");
 
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.execute(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(WORKFLOW_ID, inputs, ENVIRONMENT_ID);
 
         // Then the job was executed with merged inputs and connection metadata
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
@@ -154,7 +160,7 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void executeWithTriggerEmptyInputsBuildsTriggerDTOAndFlattensSampleForNonBatch() {
+    void executeSyncWithTriggerEmptyInputsBuildsTriggerDTOAndFlattensSampleForNonBatch() {
         // Given a workflow with one trigger
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
 
@@ -204,7 +210,7 @@ public class TestWorkflowExecutorTest {
         when(job.getId()).thenReturn(1L);
 
         // When inputs are empty, facade should build inputs from trigger sample
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.execute(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(WORKFLOW_ID, Map.of(), ENVIRONMENT_ID);
 
         // Then JobParameters contain the flattened sample under trigger name and cfg inputs
         ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
@@ -223,70 +229,310 @@ public class TestWorkflowExecutorTest {
     }
 
     @Test
-    void testStartMergesInputsAndReturnsJobId() {
-        // Given a workflow without triggers and test config inputs
+    void executeAsyncSuccessfulExecutionFlow() throws Exception {
+        // Given a workflow without triggers
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
         when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
 
-        Map<String, Object> cfgInputs = Map.of("cfg", 1);
-
         WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
-            ENVIRONMENT_ID, cfgInputs, WORKFLOW_ID, List.of());
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
 
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Optional.of(workflowTestConfiguration));
 
-        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(99L);
-
-        long jobId = testWorkflowExecutor.start(WORKFLOW_ID, Map.of("in", 2), ENVIRONMENT_ID);
-
-        assertThat(jobId).isEqualTo(99L);
-
-        ArgumentCaptor<JobParametersDTO> captor = ArgumentCaptor.forClass(JobParametersDTO.class);
-
-        verify(jobSyncExecutor).startJob(captor.capture());
-
-        JobParametersDTO params = captor.getValue();
-
-        Map<String, Object> inputs = params.getInputs();
-
-        assertThat(inputs.get("in")).isEqualTo(2);
-        assertThat(inputs.get("cfg")).isEqualTo(1);
-    }
-
-    @Test
-    void testAwaitExecutionReturnsJobAndNullTrigger() {
         Job job = mock(Job.class);
 
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
         when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
-        when(job.getId()).thenReturn(123L);
+        when(job.getId()).thenReturn(1L);
 
-        WorkflowTestExecutionDTO res = testWorkflowExecutor.awaitExecution(123L);
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
 
-        assertThat(res.job()).isNotNull();
-        assertThat(res.triggerExecution()).isNull();
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        String[] afterStartKey = new String[1];
+        String[] afterFutureKey = new String[1];
+        String[] whenCompleteKey = new String[1];
+        SseStreamBridge[] sseStreamBridge = new SseStreamBridge[1];
+
+        // When
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID,
+            Map.of("key", "value"),
+            ENVIRONMENT_ID,
+            key -> afterStartKey[0] = key,
+            key -> {
+                sseStreamBridge[0] = mock(SseStreamBridge.class);
+
+                return sseStreamBridge[0];
+            },
+            (key, future) -> {
+                afterFutureKey[0] = key;
+
+                future.join();
+            },
+            key -> whenCompleteKey[0] = key);
+
+        // Then verify callbacks were invoked with the same key
+        assertThat(afterStartKey[0]).isNotNull()
+            .isEqualTo(afterFutureKey[0])
+            .isEqualTo(whenCompleteKey[0]);
+
+        verify(jobSyncExecutor).startJob(any(JobParametersDTO.class));
+        verify(sseStreamBridge[0], times(2)).onEvent(any(Map.class));
+        verify(jobSyncExecutor).addJobStatusListener(anyLong(), any());
+        verify(mockHandle, times(5)).close();
     }
 
     @Test
-    void testStopDelegates() {
+    @SuppressWarnings("rawtypes")
+    @SuppressFBWarnings("RV")
+    void executeAsyncGenericExceptionSendsErrorEvent() throws Exception {
+        // Given a workflow without triggers
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class)))
+            .thenThrow(new RuntimeException("Execution failed"));
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        SseStreamBridge mockSseStreamBridge = mock(SseStreamBridge.class);
+
+        String[] whenCompleteKey = new String[1];
+        CountDownLatch latch = new CountDownLatch(1);
+
+        // When
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID,
+            Map.of(),
+            ENVIRONMENT_ID,
+            key -> {},
+            key -> mockSseStreamBridge,
+            (key, future) -> {
+                // Do not join - let it run asynchronously
+            },
+            key -> {
+                whenCompleteKey[0] = key;
+                latch.countDown();
+            });
+
+        latch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+
+        // Then verify error event contains the exception message (start event + error event = 2)
+        ArgumentCaptor<Map> eventCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(mockSseStreamBridge, times(2)).onEvent(eventCaptor.capture());
+
+        List<Map> events = eventCaptor.getAllValues();
+
+        Map errorEvent = events.stream()
+            .filter(event -> "error".equals(event.get("event")))
+            .findFirst()
+            .orElse(null);
+
+        assertThat(errorEvent).isNotNull();
+        assertThat(errorEvent.get("payload")).asString()
+            .contains("Execution failed");
+
+        assertThat(whenCompleteKey[0]).isNotNull();
+
+        verify(jobSyncExecutor, never()).stopJob(anyLong());
+    }
+
+    @Test
+    void executeAsyncCallbackExecutionOrder() {
+        // Given a workflow without triggers
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        List<String> callbackOrder = new java.util.ArrayList<>();
+
+        // When
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID,
+            Map.of(),
+            ENVIRONMENT_ID,
+            key -> callbackOrder.add("afterStart"),
+            key -> {
+                callbackOrder.add("sseStreamBridgeFactory");
+
+                return mock(SseStreamBridge.class);
+            },
+            (key, future) -> {
+                callbackOrder.add("afterFuture");
+
+                future.join();
+
+                callbackOrder.add("afterFutureComplete");
+            },
+            key -> callbackOrder.add("whenComplete"));
+
+        // Then verify callback execution order
+        // Note: whenComplete fires after afterFutureComplete because future.join() blocks until completion
+        assertThat(callbackOrder).containsExactly(
+            "afterStart",
+            "sseStreamBridgeFactory",
+            "afterFuture",
+            "afterFutureComplete",
+            "whenComplete");
+    }
+
+    @Test
+    void executeAsyncListenerRegistrationAndUnregistration() throws Exception {
+        // Given a workflow without triggers
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        // When
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID,
+            Map.of(),
+            ENVIRONMENT_ID,
+            key -> {},
+            key -> mock(SseStreamBridge.class),
+            (key, future) -> future.join(),
+            key -> {});
+
+        verify(jobSyncExecutor).addJobStatusListener(anyLong(), any());
+        verify(jobSyncExecutor).addTaskStartedListener(anyLong(), any());
+        verify(jobSyncExecutor).addTaskExecutionCompleteListener(anyLong(), any());
+        verify(jobSyncExecutor).addErrorListener(anyLong(), any());
+        verify(jobSyncExecutor).addSseStreamBridge(anyLong(), any());
+        verify(mockHandle, times(5)).close();
+    }
+
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void executeAsyncSendsStartAndResultEvents() throws Exception {
+        // Given a workflow without triggers
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class))).thenReturn(job);
+        when(job.getId()).thenReturn(1L);
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        SseStreamBridge mockSseStreamBridge = mock(SseStreamBridge.class);
+
+        // When
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID,
+            Map.of(),
+            ENVIRONMENT_ID,
+            key -> {},
+            key -> mockSseStreamBridge,
+            (key, future) -> future.join(),
+            key -> {});
+
+        // Then verify SSE events were sent in order
+        ArgumentCaptor<Map> eventCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(mockSseStreamBridge, org.mockito.Mockito.atLeastOnce()).onEvent(eventCaptor.capture());
+
+        List<Map> events = eventCaptor.getAllValues();
+
+        Map startEvent = events.stream()
+            .filter(event -> "start".equals(event.get("event")))
+            .findFirst()
+            .orElse(null);
+
+        assertThat(startEvent).isNotNull();
+
+        Object payload = startEvent.get("payload");
+
+        assertThat(payload).isInstanceOf(Map.class);
+        assertThat(((Map<?, ?>) payload).get("jobId")).isEqualTo("1");
+
+        Map resultEvent = events.stream()
+            .filter(event -> "result".equals(event.get("event")))
+            .findFirst()
+            .orElse(null);
+
+        assertThat(resultEvent).isNotNull();
+        assertThat(resultEvent.get("payload")).isInstanceOf(WorkflowTestExecutionDTO.class);
+    }
+
+    @Test
+    void testStop() {
         testWorkflowExecutor.stop(555L);
+
         verify(jobSyncExecutor).stopJob(555L);
-    }
-
-    @Test
-    void testListenerRegistrationMethodsDelegate() {
-        AutoCloseable jc = () -> {};
-        AutoCloseable tc = () -> {};
-        AutoCloseable ec = () -> {};
-
-        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(jc);
-        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(tc);
-        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(tc);
-        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(ec);
-
-        assertThat(testWorkflowExecutor.addJobStatusListener(1L, event -> {})).isSameAs(jc);
-        assertThat(testWorkflowExecutor.addTaskStartedListener(1L, event -> {})).isSameAs(tc);
-        assertThat(testWorkflowExecutor.addTaskExecutionCompleteListener(1L, event -> {})).isSameAs(tc);
-        assertThat(testWorkflowExecutor.addErrorListener(1L, event -> {})).isSameAs(ec);
     }
 }
