@@ -18,12 +18,15 @@ package com.bytechef.component.date.helper.action;
 
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
@@ -31,19 +34,22 @@ import org.junit.jupiter.api.Test;
 class DateHelperGetTimeFromNowActionTest {
 
     private String run(LocalDateTime inputDate) {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(DATE, inputDate));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(DATE, inputDate));
 
         return DateHelperGetTimeFromNowAction.perform(mockedParameters, null, null);
     }
 
     @Test
     void testPerformInTwoMonths() {
-        LocalDateTime now = LocalDateTime.now()
-            .plusSeconds(1);
-        LocalDateTime futureDate = now.plusMonths(2);
+        LocalDateTime mockedNow = LocalDateTime.of(2026, 1, 12, 15, 0, 0);
+        LocalDateTime futureDate = mockedNow.plusMonths(2);
 
-        assertEquals("in 2 months, 2 days", run(futureDate));
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedLocalDateTime.when(LocalDateTime::now)
+                .thenReturn(mockedNow);
+
+            assertEquals("in 1 month, 29 days", run(futureDate));
+        }
     }
 
     @Test
@@ -57,11 +63,15 @@ class DateHelperGetTimeFromNowActionTest {
 
     @Test
     void testPerformOneMonthAgo() {
-        LocalDateTime now = LocalDateTime.now()
-            .plusSeconds(1);
-        LocalDateTime pastDate = now.minusMonths(1);
+        LocalDateTime mockedNow = LocalDateTime.of(2026, 1, 12, 15, 0, 0);
+        LocalDateTime pastDate = mockedNow.minusMonths(1);
 
-        assertEquals("1 month ago", run(pastDate));
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedLocalDateTime.when(LocalDateTime::now)
+                .thenReturn(mockedNow);
+
+            assertEquals("1 month, 1 day ago", run(pastDate));
+        }
     }
 
     @Test
