@@ -17,12 +17,12 @@
 package com.bytechef.platform.workflow.test.facade;
 
 import com.bytechef.platform.job.sync.SseStreamBridge;
-import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
-import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
-import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * An interface for managing and testing workflow executions. Provides functionality to monitor workflow execution
@@ -33,74 +33,22 @@ import java.util.function.Consumer;
 public interface TestWorkflowExecutor {
 
     /**
-     * Registers a listener to monitor job status updates for a specific job. The listener will be triggered with
-     * {@link JobStatusEventDTO} objects whenever the job status changes.
+     * Executes a workflow asynchronously.
      *
-     * @param jobId    The unique identifier of the job whose status updates should be monitored.
-     * @param listener The consumer that will process {@link JobStatusEventDTO} instances representing job status
-     *                 changes.
-     * @return An {@link AutoCloseable} instance that can be used to unregister the listener and stop receiving job
-     *         status updates.
+     * @param workflowId           The unique identifier of the workflow to execute.
+     * @param inputs               A map of input parameters required for the workflow execution.
+     * @param environmentId        The ID of the environment in which the workflow runs.
+     * @param afterStartCallback   A function that is invoked after the workflow starts, providing an SseStreamBridge.
+     * @param afterFutureCallback  A bi-consumer called with the workflow ID and a CompletableFuture representing the
+     *                             execution.
+     * @param whenCompleteCallback A consumer that is called when the workflow execution is complete with the workflow
+     *                             ID.
      */
-    AutoCloseable addJobStatusListener(long jobId, Consumer<JobStatusEventDTO> listener);
-
-    /**
-     * Registers a listener to monitor task start events for a specific job. The listener will be triggered with
-     * {@link TaskStatusEventDTO} objects whenever a task in the given job transitions to the "STARTED" state.
-     *
-     * @param jobId    The unique identifier of the job for which task start events should be monitored.
-     * @param listener The consumer that will process {@link TaskStatusEventDTO} instances representing task start
-     *                 events.
-     * @return An {@link AutoCloseable} instance that can be used to unregister the listener and stop receiving task
-     *         start notifications.
-     */
-    AutoCloseable addTaskStartedListener(long jobId, Consumer<TaskStatusEventDTO> listener);
-
-    /**
-     * Registers a listener to monitor task execution completion events for a specific job. The listener will be
-     * triggered with {@link TaskStatusEventDTO} objects whenever a task in the given job transitions to the "COMPLETED"
-     * state.
-     *
-     * @param jobId    The unique identifier of the job for which task completion events should be monitored.
-     * @param listener The consumer that will process {@link TaskStatusEventDTO} instances representing task completion
-     *                 events.
-     * @return An {@link AutoCloseable} instance that can be used to unregister the listener and stop receiving task
-     *         completion notifications.
-     */
-    AutoCloseable addTaskExecutionCompleteListener(long jobId, Consumer<TaskStatusEventDTO> listener);
-
-    /**
-     * Registers a listener to monitor error events for a specific job. The listener will be triggered with
-     * {@link ExecutionErrorEventDTO} objects whenever an error occurs during the execution of the specified job.
-     *
-     * @param jobId    The unique identifier of the job for which error events should be monitored.
-     * @param listener The consumer that will process {@link ExecutionErrorEventDTO} instances representing execution
-     *                 error events.
-     * @return An {@link AutoCloseable} instance that can be used to unregister the listener and stop receiving
-     *         execution error notifications.
-     */
-    AutoCloseable addErrorListener(long jobId, Consumer<ExecutionErrorEventDTO> listener);
-
-    /**
-     * Registers an SSE (Server-Sent Events) stream bridge for a specific job. The bridge facilitates the real-time
-     * streaming of events associated with the given job.
-     *
-     * @param jobId  The unique identifier of the job for which the SSE stream bridge is to be added.
-     * @param bridge An instance of {@link SseStreamBridge} that handles the streaming of server-sent events for the
-     *               specified job.
-     * @return An {@link AutoCloseable} instance that can be used to unregister the SSE stream bridge and stop the
-     *         streaming of events.
-     */
-    AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge);
-
-    /**
-     * Waits for the result of a workflow execution associated with a specific job ID.
-     *
-     * @param jobId The unique identifier of the job whose result is being awaited.
-     * @return A {@link WorkflowTestExecutionDTO} object containing details about the execution, including job and
-     *         trigger execution information.
-     */
-    WorkflowTestExecutionDTO awaitExecution(long jobId);
+    void executeAsync(
+        String workflowId, Map<String, Object> inputs, long environmentId,
+        Consumer<String> afterStartCallback, Function<String, SseStreamBridge> sseStreamBridgeFactory,
+        BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback,
+        Consumer<String> whenCompleteCallback);
 
     /**
      * Tests the execution of a workflow given its identifier, input parameters, and execution environment.
@@ -111,17 +59,7 @@ public interface TestWorkflowExecutor {
      * @return A {@code WorkflowTestExecutionDTO} object that encapsulates the details of the execution, including the
      *         executed job and any associated trigger execution details.
      */
-    WorkflowTestExecutionDTO execute(String workflowId, Map<String, Object> inputs, long environmentId);
-
-    /**
-     * Initiates the execution of a workflow with the specified identifier, inputs, and execution environment.
-     *
-     * @param workflowId    The unique identifier of the workflow to be started.
-     * @param inputs        A map of input parameters to be supplied to the workflow during its execution.
-     * @param environmentId The unique identifier of the environment in which the workflow will execute.
-     * @return The job ID associated with the started workflow execution.
-     */
-    long start(String workflowId, Map<String, Object> inputs, long environmentId);
+    WorkflowTestExecutionDTO executeSync(String workflowId, Map<String, Object> inputs, long environmentId);
 
     /**
      * Stops the execution of a workflow associated with the specified job ID.

@@ -16,16 +16,9 @@
 
 package com.bytechef.platform.workflow.test.facade;
 
-import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.COMPLETED;
-import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.coordinator.event.ErrorEvent;
-import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
-import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -37,7 +30,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -60,19 +52,25 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
-import com.bytechef.platform.workflow.test.dto.ExecutionErrorEventDTO;
-import com.bytechef.platform.workflow.test.dto.JobStatusEventDTO;
-import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -80,6 +78,8 @@ import tools.jackson.core.type.TypeReference;
  */
 @SuppressFBWarnings("PREDICTABLE_RANDOM")
 public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestWorkflowExecutorImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -113,57 +113,61 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
-    public AutoCloseable addJobStatusListener(long jobId, Consumer<JobStatusEventDTO> listener) {
-        return jobSyncExecutor.addJobStatusListener(jobId, (JobStatusApplicationEvent event) -> {
-            Job.Status status = event.getStatus();
+    public void executeAsync(
+        String workflowId, Map<String, Object> inputs, long environmentId, Consumer<String> afterStartCallback,
+        Function<String, SseStreamBridge> sseStreamBridgeFactory,
+        BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback,
+        Consumer<String> whenCompleteCallback) {
 
-            listener.accept(new JobStatusEventDTO(jobId, status.name(), event.getCreateDate()));
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+
+        long jobId = jobSyncExecutor.startJob(workflowTestParameters.jobParametersDTO());
+
+        String key = TenantCacheKeyUtils.getKey(jobId);
+
+        afterStartCallback.accept(key);
+
+        SseStreamBridge sseStreamBridge = sseStreamBridgeFactory.apply(key);
+
+        List<AutoCloseable> handles = registerListeners(jobId, sseStreamBridge);
+
+        String currentTenantId = TenantContext.getCurrentTenantId();
+
+        CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.supplyAsync(
+            () -> TenantContext.callWithTenantId(currentTenantId, () -> {
+                sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
+
+                JobDTO jobDTO = await(jobId);
+
+                return new WorkflowTestExecutionDTO(jobDTO, null);
+            }));
+
+        afterFutureCallback.accept(key, future);
+
+        future.whenComplete((result, throwable) -> {
+            try {
+                if (throwable != null) {
+                    if (throwable instanceof CancellationException) {
+                        stop(jobId);
+                    }
+
+                    sseStreamBridge.onEvent(
+                        Map.of(
+                            "event", "error",
+                            "payload", Objects.toString(throwable.getMessage(), "An error occurred")));
+                } else {
+                    sseStreamBridge.onEvent(Map.of("event", "result", "payload", result));
+                }
+            } finally {
+                whenCompleteCallback.accept(key);
+
+                unregisterListeners(handles);
+            }
         });
     }
 
     @Override
-    public AutoCloseable addTaskStartedListener(long jobId, Consumer<TaskStatusEventDTO> listener) {
-        return jobSyncExecutor.addTaskStartedListener(jobId, (TaskStartedApplicationEvent e) -> listener.accept(
-            new TaskStatusEventDTO(jobId, e.getTaskExecutionId(), STARTED, null, null, e.getCreateDate(), null)));
-    }
-
-    @Override
-    public AutoCloseable addTaskExecutionCompleteListener(long jobId, Consumer<TaskStatusEventDTO> listener) {
-        return jobSyncExecutor.addTaskExecutionCompleteListener(jobId, (TaskExecutionCompleteEvent event) -> {
-            TaskExecution taskExecution = event.getTaskExecution();
-
-            listener.accept(
-                new TaskStatusEventDTO(
-                    jobId, Objects.requireNonNull(taskExecution.getId()), COMPLETED, taskExecution.getName(),
-                    taskExecution.getType(), taskExecution.getStartDate(), taskExecution.getEndDate()));
-        });
-    }
-
-    @Override
-    public AutoCloseable addErrorListener(long jobId, Consumer<ExecutionErrorEventDTO> listener) {
-        return jobSyncExecutor.addErrorListener(jobId, (ErrorEvent err) -> {
-            ExecutionError executionError = err.getError();
-
-            String message = executionError != null ? executionError.getMessage() : "Error";
-
-            listener.accept(new ExecutionErrorEventDTO(jobId, message));
-        });
-    }
-
-    @Override
-    public AutoCloseable addSseStreamBridge(long jobId, SseStreamBridge bridge) {
-        return jobSyncExecutor.addSseStreamBridge(jobId, bridge);
-    }
-
-    @Override
-    public WorkflowTestExecutionDTO awaitExecution(long jobId) {
-        JobDTO jobDTO = await(jobId);
-
-        return new WorkflowTestExecutionDTO(jobDTO, null);
-    }
-
-    @Override
-    public WorkflowTestExecutionDTO execute(String workflowId, Map<String, Object> inputs, long environmentId) {
+    public WorkflowTestExecutionDTO executeSync(String workflowId, Map<String, Object> inputs, long environmentId) {
         WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
 
         return new WorkflowTestExecutionDTO(
@@ -171,15 +175,81 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
-    public long start(String workflowId, Map<String, Object> inputs, long environmentId) {
-        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
-
-        return start(workflowTestParameters.jobParametersDTO());
-    }
-
-    @Override
     public void stop(long jobId) {
         jobSyncExecutor.stopJob(jobId);
+    }
+
+    private JobDTO await(long jobId) {
+        Job job = jobSyncExecutor.awaitJob(jobId, false);
+
+        try {
+            return new JobDTO(
+                job, getOutputs(job),
+                CollectionUtils.map(
+                    taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
+                    taskExecution -> {
+                        Map<String, ?> context = taskFileStorage.readContextValue(
+                            contextService.peek(
+                                Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+
+                        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                        DefinitionResult definitionResult = getDefinition(taskExecution);
+
+                        Object output = taskExecution.getOutput() == null
+                            ? null
+                            : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                        return new TaskExecutionDTO(
+                            taskExecution, definitionResult.title(), definitionResult.icon(),
+                            workflowTask.evaluateParameters(context, evaluator), output);
+                    }));
+        } finally {
+            jobSyncExecutor.deleteJob(Validate.notNull(job.getId(), "id"));
+        }
+    }
+
+    private JobDTO execute(JobParametersDTO jobParametersDTO) {
+        long jobId = jobSyncExecutor.startJob(jobParametersDTO);
+
+        return await(jobId);
+    }
+
+    private DefinitionResult getDefinition(TaskExecution taskExecution) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
+
+        if (componentDefinitionService.hasComponentDefinition(
+            workflowNodeType.name(), workflowNodeType.version())) {
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+
+            return new DefinitionResult(componentDefinition.getTitle(), componentDefinition.getIcon());
+        }
+
+        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+            workflowNodeType.name(), workflowNodeType.version());
+
+        return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> getOutputs(Job job) {
+        Map<String, ?> outputs = null;
+
+        if (job.getOutputs() != null) {
+            outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+            if (outputs.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+                ActionDefinition.WebhookResponse webhookResponse = MapUtils.getRequired(
+                    outputs, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+
+                outputs = (Map<String, ?>) webhookResponse.getBody();
+            } else {
+                outputs = taskFileStorage.readContextValue(job.getOutputs());
+            }
+        }
+
+        return outputs;
     }
 
     @SuppressWarnings("unchecked")
@@ -273,84 +343,47 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             triggerExecutionDTO);
     }
 
-    protected JobDTO await(long jobId) {
-        Job job = jobSyncExecutor.awaitJob(jobId, false);
+    private List<AutoCloseable> registerListeners(long jobId, SseStreamBridge sseStreamBridge) {
+        List<AutoCloseable> handles = new ArrayList<>();
 
-        try {
-            return new JobDTO(
-                job, getOutputs(job),
-                CollectionUtils.map(
-                    taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
-                    taskExecution -> {
-                        Map<String, ?> context = taskFileStorage.readContextValue(
-                            contextService.peek(
-                                Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+        handles.add(jobSyncExecutor.addJobStatusListener(
+            jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "job", "payload", event))));
 
-                        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-                        DefinitionResult definitionResult = getDefinition(taskExecution);
+        handles.add(
+            jobSyncExecutor.addTaskStartedListener(
+                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
 
-                        Object output = taskExecution.getOutput() == null
-                            ? null
-                            : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+        handles.add(
+            jobSyncExecutor.addTaskExecutionCompleteListener(
+                jobId, (event) -> sseStreamBridge.onEvent(Map.of("event", "task", "payload", event))));
 
-                        return new TaskExecutionDTO(
-                            taskExecution, definitionResult.title(), definitionResult.icon(),
-                            workflowTask.evaluateParameters(context, evaluator), output);
-                    }));
-        } finally {
-            jobSyncExecutor.deleteJob(Validate.notNull(job.getId(), "id"));
-        }
+        handles.add(
+            jobSyncExecutor.addErrorListener(jobId, (event) -> {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Received error event for job {}: {}", jobId, event);
+                }
+            }));
+
+        handles.add(jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge));
+
+        return handles;
     }
 
-    protected JobDTO execute(JobParametersDTO jobParametersDTO) {
-        long jobId = start(jobParametersDTO);
-
-        return await(jobId);
-    }
-
-    private DefinitionResult getDefinition(TaskExecution taskExecution) {
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
-
-        if (componentDefinitionService.hasComponentDefinition(
-            workflowNodeType.name(), workflowNodeType.version())) {
-
-            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                workflowNodeType.name(), workflowNodeType.version());
-
-            return new DefinitionResult(componentDefinition.getTitle(), componentDefinition.getIcon());
-        }
-
-        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-            workflowNodeType.name(), workflowNodeType.version());
-
-        return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, ?> getOutputs(Job job) {
-        Map<String, ?> outputs = null;
-
-        if (job.getOutputs() != null) {
-            outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-            if (outputs.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
-                ActionDefinition.WebhookResponse webhookResponse = MapUtils.getRequired(
-                    outputs, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
-
-                outputs = (Map<String, ?>) webhookResponse.getBody();
-            } else {
-                outputs = taskFileStorage.readContextValue(job.getOutputs());
+    private void unregisterListeners(List<AutoCloseable> handles) {
+        if (handles != null) {
+            for (AutoCloseable handle : handles) {
+                try {
+                    handle.close();
+                } catch (Exception exception) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(exception.getMessage(), exception);
+                    }
+                }
             }
         }
-
-        return outputs;
     }
 
-    protected long start(JobParametersDTO jobParametersDTO) {
-        return jobSyncExecutor.startJob(jobParametersDTO);
-    }
-
-    record DefinitionResult(String title, String icon) {
+    private record DefinitionResult(String title, String icon) {
     }
 
     private record WorkflowTestParameters(
