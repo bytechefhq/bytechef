@@ -23,9 +23,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
-import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -36,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -45,7 +43,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,30 +69,23 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     private static final Pattern TEXT_PATTERN = Pattern.compile(
         "<attachment[^>]*>(.*?)</attachment>", Pattern.DOTALL);
 
-    private final ConversionService conversionService;
     private final Cache<String, SseEmitter> emitter = createCache();
-    private final Cache<String, List<AutoCloseable>> listenerHandles = createCache();
     private final int maxPendingEvents;
     private final Cache<String, List<SseEmitter.SseEventBuilder>> pendingEvents = createCache();
-    private final Cache<String, CompletableFuture<WorkflowTestExecutionModel>> workflowExecutions = createCache();
+    private final Cache<String, CompletableFuture<WorkflowTestExecutionDTO>> workflowExecutions = createCache();
     private final TempFileStorage tempFileStorage;
     private final TestWorkflowExecutor testWorkflowExecutor;
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public WorkflowTestApiController(
-        ConversionService conversionService, TempFileStorage tempFileStorage,
-        TestWorkflowExecutor testWorkflowExecutor) {
-
-        this(conversionService, tempFileStorage, testWorkflowExecutor, 100);
+    public WorkflowTestApiController(TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor) {
+        this(tempFileStorage, testWorkflowExecutor, 100);
     }
 
     @SuppressFBWarnings("EI")
     public WorkflowTestApiController(
-        ConversionService conversionService, TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor,
-        int maxPendingEvents) {
+        TempFileStorage tempFileStorage, TestWorkflowExecutor testWorkflowExecutor, int maxPendingEvents) {
 
-        this.conversionService = conversionService;
         this.tempFileStorage = tempFileStorage;
         this.testWorkflowExecutor = testWorkflowExecutor;
         this.maxPendingEvents = Math.max(1, maxPendingEvents);
@@ -113,7 +103,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         final String key = TenantCacheKeyUtils.getKey(jobId);
         final SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
-        CompletableFuture<WorkflowTestExecutionModel> future = workflowExecutions.getIfPresent(key);
+        CompletableFuture<WorkflowTestExecutionDTO> future = workflowExecutions.getIfPresent(key);
 
         if (future == null) {
             List<SseEmitter.SseEventBuilder> bufferedEvents = pendingEvents.getIfPresent(key);
@@ -167,28 +157,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
             return emitter;
         }
 
-        registerEmitter(key, jobId, emitter);
+        registerEmitter(key, emitter);
 
         CompletableFuture.runAsync(() -> sendToEmitter(
             key, createEvent("start", Map.of("jobId", String.valueOf(jobId)))));
-
-        future.whenComplete((result, throwable) -> {
-            try {
-                if (throwable != null) {
-                    if (throwable instanceof CancellationException) {
-                        testWorkflowExecutor.stop(jobId);
-                    }
-
-                    sendToEmitter(
-                        key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
-                } else {
-                    sendToEmitter(key, createEvent("result", result));
-                }
-            } finally {
-                completeAndClearEmitter(key);
-                unregisterListeners(key);
-            }
-        });
 
         return emitter;
     }
@@ -210,7 +182,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         final String key = TenantCacheKeyUtils.getKey(jobId);
 
-        CompletableFuture<WorkflowTestExecutionModel> future = workflowExecutions.getIfPresent(key);
+        CompletableFuture<WorkflowTestExecutionDTO> future = workflowExecutions.getIfPresent(key);
 
         if (future != null && !future.isDone()) {
             future.cancel(true);
@@ -220,10 +192,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
             try {
                 sendToEmitter(key, createEvent("error", "Aborted"));
             } finally {
-                workflowExecutions.invalidate(key);
-                pendingEvents.invalidate(key);
-                completeAndClearEmitter(key);
-                unregisterListeners(key);
+                whenComplete(key);
             }
         }
 
@@ -263,44 +232,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
 
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
-        long jobId = testWorkflowExecutor.start(id, inputs, environmentId);
 
-        String key = TenantCacheKeyUtils.getKey(jobId);
-
-        registerEmitter(key, jobId, emitter);
-
-        CompletableFuture.runAsync(() -> sendToEmitter(
-            key, createEvent("start", Map.of("jobId", String.valueOf(jobId)))));
-
-        String currentTenantId = TenantContext.getCurrentTenantId();
-
-        CompletableFuture<WorkflowTestExecutionModel> future =
-            CompletableFuture.supplyAsync(() -> TenantContext.callWithTenantId(
-                currentTenantId, () -> Objects.requireNonNull(
-                    conversionService.convert(
-                        testWorkflowExecutor.awaitExecution(jobId), WorkflowTestExecutionModel.class))));
-
-        workflowExecutions.put(key, future);
-
-        future.whenComplete((result, throwable) -> {
-            try {
-                if (throwable != null) {
-                    if (throwable instanceof CancellationException) {
-                        testWorkflowExecutor.stop(jobId);
-                    }
-
-                    sendToEmitter(
-                        key, createEvent("error", Objects.toString(throwable.getMessage(), "An error occurred")));
-                } else {
-                    sendToEmitter(key, createEvent("result", result));
-                }
-            } finally {
-                workflowExecutions.invalidate(key);
-                pendingEvents.invalidate(key);
-                completeAndClearEmitter(key);
-                unregisterListeners(key);
-            }
-        });
+        testWorkflowExecutor.executeAsync(
+            id, inputs, environmentId, (key) -> registerEmitter(key, emitter), WebhookSseStreamBridge::new,
+            workflowExecutions::put, this::whenComplete);
 
         return emitter;
     }
@@ -372,7 +307,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         return fileEntries;
     }
 
-    private void registerEmitter(String key, long jobId, SseEmitter emitter) {
+    private void registerEmitter(String key, SseEmitter emitter) {
         this.emitter.put(key, emitter);
 
         List<SseEmitter.SseEventBuilder> bufferedEvents = pendingEvents.getIfPresent(key);
@@ -384,36 +319,6 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                 sendToEmitter(key, eventBuilder);
             }
         }
-
-        registerListenersIfAbsent(key, jobId);
-    }
-
-    private void registerListenersIfAbsent(String key, long jobId) {
-        listenerHandles.get(key, k -> {
-            List<AutoCloseable> handles = new ArrayList<>();
-
-            handles.add(testWorkflowExecutor.addJobStatusListener(
-                jobId, (event) -> sendToEmitter(key, createEvent("job", event))));
-
-            handles.add(
-                testWorkflowExecutor.addTaskStartedListener(
-                    jobId, (event) -> sendToEmitter(key, createEvent("task", event))));
-
-            handles.add(
-                testWorkflowExecutor.addTaskExecutionCompleteListener(
-                    jobId, (event) -> sendToEmitter(key, createEvent("task", event))));
-
-            handles.add(
-                testWorkflowExecutor.addErrorListener(jobId, (event) -> {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Received error event for job {}: {}", jobId, event);
-                    }
-                }));
-
-            handles.add(testWorkflowExecutor.addSseStreamBridge(jobId, new WebhookSseStreamBridge(key)));
-
-            return handles;
-        });
     }
 
     private void sendToEmitter(String key, SseEmitter.SseEventBuilder event) {
@@ -443,22 +348,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         }
     }
 
-    private void unregisterListeners(String key) {
-        List<AutoCloseable> handles = listenerHandles.getIfPresent(key);
-
-        if (handles != null) {
-            listenerHandles.invalidate(key);
-
-            for (AutoCloseable handle : handles) {
-                try {
-                    handle.close();
-                } catch (Exception exception) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(exception.getMessage(), exception);
-                    }
-                }
-            }
-        }
+    private void whenComplete(String key) {
+        workflowExecutions.invalidate(key);
+        pendingEvents.invalidate(key);
+        completeAndClearEmitter(key);
     }
 
     @SuppressFBWarnings("EI")
@@ -478,7 +371,20 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
         @Override
         public void onEvent(Object payload) {
-            sendToEmitter(key, createEvent("stream", payload));
+            if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
+                String event = (String) map.get("event");
+                Object data = map.entrySet()
+                    .stream()
+                    .filter(entry -> !"event".equals(entry.getKey()))
+                    .findFirst()
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+
+                sendToEmitter(key, createEvent(event, data));
+            } else {
+                sendToEmitter(key, createEvent("stream", payload));
+
+            }
         }
 
         @Override
