@@ -195,11 +195,10 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void onEvent(Object payload) {
             if (payload instanceof Map<?, ?> map && map.containsKey("event")) {
                 String event = (String) map.get("event");
-                Object data = ((Map<String, Object>) payload).entrySet()
+                Object data = map.entrySet()
                     .stream()
                     .filter(entry -> !"event".equals(entry.getKey()))
                     .findFirst()
