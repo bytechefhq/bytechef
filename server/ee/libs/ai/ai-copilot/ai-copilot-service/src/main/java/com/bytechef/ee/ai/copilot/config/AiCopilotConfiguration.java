@@ -17,7 +17,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.OpenAi;
-import com.bytechef.config.ApplicationProperties.Ai.Copilot.Vectorstore;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.model.SafeAnthropicChatModel;

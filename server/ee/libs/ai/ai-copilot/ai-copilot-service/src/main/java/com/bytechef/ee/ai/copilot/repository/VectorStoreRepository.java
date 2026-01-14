@@ -8,14 +8,14 @@
 package com.bytechef.ee.ai.copilot.repository;
 
 import com.bytechef.ee.ai.copilot.domain.VectorStore;
+import com.bytechef.platform.jdbc.ConditionalJdbcRepository;
 import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
 
 /**
  * @version ee
  *
  * @author Marko Kriskovic
  */
-@Repository
+@ConditionalJdbcRepository
 public interface VectorStoreRepository extends ListCrudRepository<VectorStore, Long> {
 }

@@ -1,9 +1,26 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.ee.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
+import javax.sql.DataSource;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
@@ -34,22 +51,19 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableJdbcRepositories(
     basePackages = "com.bytechef.ee.ai.copilot.repository",
     jdbcOperationsRef = "pgVectorNamedParameterJdbcTemplate",
     dataAccessStrategyRef = "pgVectorDataAccessStrategy",
-    transactionManagerRef = "pgVectorTxManager"
-)
+    transactionManagerRef = "pgVectorTxManager")
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class PgVectorConfiguration {
     private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
     private final ApplicationProperties.Datasource datasource;
 
     @SuppressFBWarnings("EI")
-    public PgVectorConfiguration(ApplicationProperties applicationProperties){
+    public PgVectorConfiguration(ApplicationProperties applicationProperties) {
         this.datasource = applicationProperties.getDatasource();
         this.pgVector = applicationProperties.getAi()
             .getCopilot()
@@ -122,24 +136,23 @@ public class PgVectorConfiguration {
     @Bean
     @Primary
     DataAccessStrategy dataAccessStrategy(
-        NamedParameterJdbcOperations ops,
-        JdbcConverter jdbcConverter,
-        RelationalMappingContext context,
-        Dialect jdbcDialect) {
+        NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
+        RelationalMappingContext context, Dialect jdbcDialect) {
 
-        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context, jdbcConverter, ops,
-            new SqlParametersFactory(context, jdbcConverter), new InsertStrategyFactory(ops, jdbcDialect), QueryMappingConfiguration.EMPTY);
+        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context,
+            jdbcConverter, operations,
+            new SqlParametersFactory(context, jdbcConverter), new InsertStrategyFactory(operations, jdbcDialect),
+            QueryMappingConfiguration.EMPTY);
     }
 
     @Bean(name = "pgVectorDataAccessStrategy")
     DataAccessStrategy pgVectorDataAccessStrategy(
-        @Qualifier("pgVectorNamedParameterJdbcTemplate") NamedParameterJdbcOperations ops,
-        JdbcConverter jdbcConverter,
-        RelationalMappingContext context,
-        Dialect jdbcDialect) {
+        @Qualifier("pgVectorNamedParameterJdbcTemplate") NamedParameterJdbcOperations operations,
+        JdbcConverter jdbcConverter, RelationalMappingContext context, Dialect jdbcDialect) {
 
-        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context, jdbcConverter, ops,
-            new SqlParametersFactory(context, jdbcConverter), new InsertStrategyFactory(ops, jdbcDialect), QueryMappingConfiguration.EMPTY);
+        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context,
+            jdbcConverter, operations, new SqlParametersFactory(context, jdbcConverter),
+            new InsertStrategyFactory(operations, jdbcDialect), QueryMappingConfiguration.EMPTY);
     }
 
     @Bean

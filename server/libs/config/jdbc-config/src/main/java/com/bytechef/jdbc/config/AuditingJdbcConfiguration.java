@@ -34,11 +34,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Configuration
 @EnableJdbcAuditing(auditorAwareRef = "springSecurityAuditorAware", dateTimeProviderRef = "auditingDateTimeProvider")
 @EnableJdbcRepositories(
-    basePackages = "com.bytechef"
-    , excludeFilters = @ComponentScan.Filter(
-        type = FilterType.REGEX,
-        pattern = "com\\.bytechef\\.ee\\.ai\\.copilot\\.repository\\..*")
-)
+    basePackages = "com.bytechef",
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ANNOTATION, classes = com.bytechef.platform.jdbc.ConditionalJdbcRepository.class))
 public class AuditingJdbcConfiguration {
 
     private static final String SYSTEM = "system";
