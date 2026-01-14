@@ -49,6 +49,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-2197');
         }
 
+        if (navItem.href === 'users') {
+            return isFeatureFlagEnabled('ff-3900');
+        }
+
         return true;
     });
 
