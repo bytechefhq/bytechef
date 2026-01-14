@@ -1,10 +1,17 @@
-import {expect, test} from '@playwright/test';
+import {type Locator, expect, test} from '@playwright/test';
 
 import {ProjectsPage} from '../../pages/projectsPage';
-import {TEST_PROJECT, TEST_USER, TEST_WORKFLOW} from '../../utils/constants';
+import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
+import {ROUTES, TEST_USER} from '../../utils/constants';
+import getRandomString from '../../utils/getRandomString';
 import {login} from '../../utils/login';
 
 test.describe('Projects', () => {
+    const randomString = getRandomString();
+
+    const projectName = `project_${randomString}`;
+    const workflowName = `workflow_${randomString}`;
+
     let projectsPage: ProjectsPage;
 
     test.beforeEach(async ({page}) => {
@@ -12,48 +19,66 @@ test.describe('Projects', () => {
 
         projectsPage = new ProjectsPage(page);
 
-        await projectsPage.goto();
+        await page.goto('/automation/projects');
 
         await projectsPage.waitForPageLoad();
     });
 
-    test('should create a new project', async () => {
-        await projectsPage.createProject(TEST_PROJECT.name);
+    test('should create a new project', async ({page}) => {
+        let projectId: string;
 
-        const projectName = projectsPage.getProjectByName(TEST_PROJECT.name);
+        await test.step('Create a new project', async () => {
+            await expect(projectsPage.createProjectButton).toBeVisible({timeout: 10000});
 
-        await expect(projectName).toBeVisible();
+            projectId = await projectsPage.createProject(projectName);
+
+            expect(projectId).toBeDefined();
+        });
+
+        await test.step('Assert that the project is created', async () => {
+            const projectItem = page.getByLabel(projectId);
+
+            await expect(projectItem).toBeVisible({timeout: 20000});
+        });
+
+        await test.step('Delete the project', async () => {
+            await projectsPage.deleteProject(projectId);
+        });
     });
 
-    test('should create a new workflow', async () => {
-        await projectsPage.createWorkflow(TEST_WORKFLOW.name);
+    test('should create a new workflow', async ({page}) => {
+        let projectId: string;
+        let projectItem: Locator;
 
-        const workflowLabel = projectsPage.getWorkflowByName(TEST_WORKFLOW.name);
+        await test.step('Create a new project', async () => {
+            projectId = await projectsPage.createProject(projectName);
 
-        await expect(workflowLabel).toBeVisible();
+            projectItem = page.getByLabel(projectId);
 
-        await projectsPage.waitForNetworkIdle();
+            await expect(projectItem).toBeVisible({timeout: 10000});
+        });
 
-        await expect(projectsPage.triggerNode).toBeVisible({timeout: 10000});
-    });
+        await test.step('Create a new workflow', async () => {
+            const createWorkflowButton = projectItem.getByRole('button', {name: 'Create Workflow'});
 
-    test.afterAll(async ({browser}) => {
-        const context = await browser.newContext();
+            await clickAndExpectToBeVisible({
+                target: projectsPage.createWorkflowDialogHeading,
+                trigger: createWorkflowButton,
+            });
 
-        const page = await context.newPage();
+            await projectsPage.workflowFormLabelInput.fill(workflowName);
 
-        try {
-            await login(page, TEST_USER.email, TEST_USER.password);
+            await projectsPage.saveButton.click();
 
-            const cleanupProjectsPage = new ProjectsPage(page);
+            await expect(page).toHaveURL(new RegExp(`${projectId}`), {timeout: 10000});
+        });
 
-            await cleanupProjectsPage.goto();
+        await test.step('Delete the project and assert that it is deleted', async () => {
+            await page.goto(ROUTES.projects);
 
-            await page.waitForLoadState('networkidle');
+            await page.waitForLoadState('domcontentloaded');
 
-            await cleanupProjectsPage.deleteProject(TEST_PROJECT.name);
-        } finally {
-            await context.close();
-        }
+            await projectsPage.deleteProject(projectId);
+        });
     });
 });
