@@ -120,7 +120,7 @@ class MultiTenantAccountControllerIntTest {
         ManagedUserVM firstUser = new ManagedUserVM();
 
         firstUser.setLogin("test-register-duplicate-email");
-        firstUser.setPassword("password");
+        firstUser.setPassword("Password1");
         firstUser.setFirstName("Alice");
         firstUser.setLastName("Test");
         firstUser.setEmail("test-register-duplicate-email@example.com");
@@ -215,7 +215,7 @@ class MultiTenantAccountControllerIntTest {
         ManagedUserVM validUser = new ManagedUserVM();
 
         validUser.setLogin("test-register-valid");
-        validUser.setPassword("password");
+        validUser.setPassword("Password1");
         validUser.setFirstName("Alice");
         validUser.setLastName("Test");
         validUser.setEmail("test-register-valid@example.com");
@@ -277,7 +277,7 @@ class MultiTenantAccountControllerIntTest {
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
 
         keyAndPassword.setKey(resetKey);
-        keyAndPassword.setNewPassword("new password");
+        keyAndPassword.setNewPassword("NewPassword1");
 
         restAccountMockMvc
             .perform(
@@ -300,7 +300,7 @@ class MultiTenantAccountControllerIntTest {
         KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
 
         keyAndPassword.setKey("wrong reset key");
-        keyAndPassword.setNewPassword("new password");
+        keyAndPassword.setNewPassword("NewPassword1");
 
         restAccountMockMvc
             .perform(
