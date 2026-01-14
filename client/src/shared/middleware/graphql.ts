@@ -77,6 +77,15 @@ export type AdminUser = {
   uuid?: Maybe<Scalars['String']['output']>;
 };
 
+export type AdminUserPage = {
+  __typename?: 'AdminUserPage';
+  content: Array<Maybe<AdminUser>>;
+  number: Scalars['Int']['output'];
+  size: Scalars['Int']['output'];
+  totalElements: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type ApiKey = {
   __typename?: 'ApiKey';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -383,6 +392,7 @@ export type DataTableTagsEntry = {
 
 export type DataTableWebhook = {
   __typename?: 'DataTableWebhook';
+  environmentId: Scalars['Long']['output'];
   id: Scalars['ID']['output'];
   type: DataTableWebhookType;
   url: Scalars['String']['output'];
@@ -1210,7 +1220,7 @@ export type Query = {
   triggerDefinitions: Array<TriggerDefinition>;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
-  users?: Maybe<Array<Maybe<AdminUser>>>;
+  users?: Maybe<AdminUserPage>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
@@ -1491,6 +1501,12 @@ export type QueryUnifiedApiComponentDefinitionsArgs = {
 
 export type QueryUserArgs = {
   login: Scalars['String']['input'];
+};
+
+
+export type QueryUsersArgs = {
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2076,6 +2092,43 @@ export type UpdateMcpServerUrlMutationVariables = Exact<{
 
 
 export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+
+export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AuthoritiesQuery = { __typename?: 'Query', authorities: Array<string> };
+
+export type DeleteUserMutationVariables = Exact<{
+  login: Scalars['String']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+
+export type InviteUserMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+}>;
+
+
+export type InviteUserMutation = { __typename?: 'Mutation', inviteUser: boolean };
+
+export type UpdateUserMutationVariables = Exact<{
+  login: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } };
+
+export type UsersQueryVariables = Exact<{
+  pageNumber?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUserPage', number: number, size: number, totalElements: number, totalPages: number, content: Array<{ __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } | null> } | null };
 
 
 
@@ -3395,6 +3448,129 @@ export const useUpdateMcpServerUrlMutation = <
       {
     mutationKey: ['updateMcpServerUrl'],
     mutationFn: (variables?: UpdateMcpServerUrlMutationVariables) => fetcher<UpdateMcpServerUrlMutation, UpdateMcpServerUrlMutationVariables>(UpdateMcpServerUrlDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AuthoritiesDocument = `
+    query authorities {
+  authorities
+}
+    `;
+
+export const useAuthoritiesQuery = <
+      TData = AuthoritiesQuery,
+      TError = unknown
+    >(
+      variables?: AuthoritiesQueryVariables,
+      options?: Omit<UseQueryOptions<AuthoritiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AuthoritiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AuthoritiesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['authorities'] : ['authorities', variables],
+    queryFn: fetcher<AuthoritiesQuery, AuthoritiesQueryVariables>(AuthoritiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteUserDocument = `
+    mutation deleteUser($login: String!) {
+  deleteUser(login: $login)
+}
+    `;
+
+export const useDeleteUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteUser'],
+    mutationFn: (variables?: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const InviteUserDocument = `
+    mutation inviteUser($email: String!, $password: String!, $role: String!) {
+  inviteUser(email: $email, password: $password, role: $role)
+}
+    `;
+
+export const useInviteUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<InviteUserMutation, TError, InviteUserMutationVariables, TContext>) => {
+    
+    return useMutation<InviteUserMutation, TError, InviteUserMutationVariables, TContext>(
+      {
+    mutationKey: ['inviteUser'],
+    mutationFn: (variables?: InviteUserMutationVariables) => fetcher<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateUserDocument = `
+    mutation updateUser($login: String!, $role: String!) {
+  updateUser(login: $login, role: $role) {
+    id
+    login
+    email
+    firstName
+    lastName
+    activated
+    authorities
+  }
+}
+    `;
+
+export const useUpdateUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
+      {
+    mutationKey: ['updateUser'],
+    mutationFn: (variables?: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UsersDocument = `
+    query users($pageNumber: Int, $pageSize: Int) {
+  users(pageNumber: $pageNumber, pageSize: $pageSize) {
+    content {
+      id
+      login
+      email
+      firstName
+      lastName
+      activated
+      authorities
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `;
+
+export const useUsersQuery = <
+      TData = UsersQuery,
+      TError = unknown
+    >(
+      variables?: UsersQueryVariables,
+      options?: Omit<UseQueryOptions<UsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<UsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<UsersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['users'] : ['users', variables],
+    queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
     ...options
   }
     )};
