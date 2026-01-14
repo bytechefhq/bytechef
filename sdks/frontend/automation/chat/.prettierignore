@@ -1,0 +1,5 @@
+# openapi typescript fetch client
+coverage
+dist
+**/src/components/assistant-ui
+**/src/components/ui

@@ -32,6 +32,7 @@ npm run setup:link
 ```
 
 This command does the following:
+
 1. Builds the library
 2. Creates a global npm link for `@bytechef/automation-chat`
 3. Links the test app to use the globally linked library
@@ -41,18 +42,21 @@ This command does the following:
 Open **two terminal windows**:
 
 **Terminal 1 - Library (with watch mode):**
+
 ```bash
 cd library
 npm run watch
 ```
 
 **Terminal 2 - Test App:**
+
 ```bash
 cd test-app
 npm run dev
 ```
 
 Now:
+
 - Make changes to the library source code in `library/src/`
 - Vite will automatically rebuild the library
 - Next.js will detect the changes and hot reload the test app
@@ -77,6 +81,7 @@ This approach sets up a local npm registry, useful for testing the full publish/
 ### Prerequisites
 
 Install dependencies:
+
 ```bash
 # From the automation/chat directory
 npm install
@@ -85,6 +90,7 @@ npm install
 ### Start the Local Registry
 
 **Terminal 1 - Registry Server:**
+
 ```bash
 npm run registry:start
 ```
@@ -94,6 +100,7 @@ This starts Verdaccio on `http://localhost:4873`. Keep this terminal running.
 ### Publish the Library
 
 **Terminal 2 - Publish:**
+
 ```bash
 # Build and publish to local registry
 npm run publish:library
@@ -116,16 +123,16 @@ When using the local registry, you need to republish after changes:
 
 1. Make changes to library code
 2. Rebuild and republish:
-   ```bash
-   cd library
-   npm run build
-   npm run publish:local
-   ```
+    ```bash
+    cd library
+    npm run build
+    npm run publish:local
+    ```
 3. Reinstall in test app:
-   ```bash
-   cd ../test-app
-   npm install @bytechef/automation-chat@latest --registry http://localhost:4873
-   ```
+    ```bash
+    cd ../test-app
+    npm install @bytechef/automation-chat@latest --registry http://localhost:4873
+    ```
 4. Next.js will hot reload with the new version
 
 ### Configure Registry Scope
@@ -138,6 +145,7 @@ To automatically use the local registry for `@bytechef` packages, edit `.npmrc`:
 ```
 
 Then you can use standard npm commands:
+
 ```bash
 npm install @bytechef/automation-chat@latest
 ```
@@ -164,12 +172,14 @@ cd test-app && npm run dev      # Terminal 2
 ```
 
 **Advantages:**
+
 - ✅ Instant hot reload
 - ✅ See changes immediately
 - ✅ No need to republish
 - ✅ Best developer experience
 
 **When to use:**
+
 - Active feature development
 - Debugging issues
 - Rapid iteration
@@ -224,72 +234,77 @@ automation/chat/
 
 ### Workspace Root (`automation/chat/`)
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Run both library watch mode and test app concurrently |
-| `npm run setup:link` | One-time setup for npm link development |
-| `npm run registry:start` | Start Verdaccio local registry |
-| `npm run registry:stop` | Stop Verdaccio |
-| `npm run publish:library` | Build and publish library to local registry |
-| `npm run install:test-app` | Install library from local registry into test app |
-| `npm run build:all` | Build the library |
-| `npm run clean` | Clean all build artifacts and node_modules |
+| Script                     | Description                                           |
+| -------------------------- | ----------------------------------------------------- |
+| `npm run dev`              | Run both library watch mode and test app concurrently |
+| `npm run setup:link`       | One-time setup for npm link development               |
+| `npm run registry:start`   | Start Verdaccio local registry                        |
+| `npm run registry:stop`    | Stop Verdaccio                                        |
+| `npm run publish:library`  | Build and publish library to local registry           |
+| `npm run install:test-app` | Install library from local registry into test app     |
+| `npm run build:all`        | Build the library                                     |
+| `npm run clean`            | Clean all build artifacts and node_modules            |
 
 ### Library (`library/`)
 
-| Script | Description |
-|--------|-------------|
-| `npm run build` | Build the library once |
-| `npm run watch` | Build and watch for changes (hot reload) |
-| `npm run link:local` | Create global npm link |
-| `npm run unlink:local` | Remove global npm link |
-| `npm run publish:local` | Publish to local registry |
-| `npm run test` | Run tests |
-| `npm run test:watch` | Run tests in watch mode |
+| Script                  | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `npm run build`         | Build the library once                   |
+| `npm run watch`         | Build and watch for changes (hot reload) |
+| `npm run link:local`    | Create global npm link                   |
+| `npm run unlink:local`  | Remove global npm link                   |
+| `npm run publish:local` | Publish to local registry                |
+| `npm run test`          | Run tests                                |
+| `npm run test:watch`    | Run tests in watch mode                  |
 
 ### Test App (`test-app/`)
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start Next.js development server |
-| `npm run link:library` | Link to global @bytechef/automation-chat |
-| `npm run unlink:library` | Unlink from global package |
-| `npm run install:local` | Install from local registry |
-| `npm run build` | Build production test app |
+| Script                   | Description                              |
+| ------------------------ | ---------------------------------------- |
+| `npm run dev`            | Start Next.js development server         |
+| `npm run link:library`   | Link to global @bytechef/automation-chat |
+| `npm run unlink:library` | Unlink from global package               |
+| `npm run install:local`  | Install from local registry              |
+| `npm run build`          | Build production test app                |
 
 ## Troubleshooting
 
 ### Changes not appearing in test app
 
 **Using npm link:**
+
 1. Ensure `npm run watch` is running in library directory
 2. Check that the test app is linked: `ls -la test-app/node_modules/@bytechef/automation-chat` (should show symlink)
 3. Try restarting the Next.js dev server
 
 **Using Verdaccio:**
+
 1. You need to republish after changes
 2. Ensure test app is installing from local registry: check `@bytechef:registry` in `.npmrc`
 
 ### "Cannot find module @bytechef/automation-chat"
 
 1. Check if the library is linked or installed:
-   ```bash
-   cd test-app
-   ls -la node_modules/@bytechef
-   ```
+
+    ```bash
+    cd test-app
+    ls -la node_modules/@bytechef
+    ```
 
 2. Try reinstalling:
-   ```bash
-   # If using npm link
-   npm run setup:link
 
-   # If using registry
-   npm run install:test-app
-   ```
+    ```bash
+    # If using npm link
+    npm run setup:link
+
+    # If using registry
+    npm run install:test-app
+    ```
 
 ### Port 4873 already in use
 
 Another Verdaccio instance may be running:
+
 ```bash
 npm run registry:stop
 # or manually
@@ -299,6 +314,7 @@ pkill -f verdaccio
 ### Build errors after switching methods
 
 Clean and rebuild:
+
 ```bash
 npm run clean
 npm install
@@ -315,6 +331,7 @@ npm run setup:link  # or your preferred method
 ### Type errors in test app
 
 The test app may cache old type definitions:
+
 ```bash
 cd test-app
 rm -rf .next
@@ -332,9 +349,10 @@ npm run dev
 4. **Use Verdaccio before publishing** - Test the full publish workflow with the local registry before publishing to npm
 
 5. **Keep terminals organized** - Use separate terminals for:
-   - Library watch mode
-   - Test app dev server
-   - Registry server (if using Verdaccio)
+
+    - Library watch mode
+    - Test app dev server
+    - Registry server (if using Verdaccio)
 
 6. **Clean when switching methods** - If switching between npm link and registry, run `npm run clean` and reinstall
 
