@@ -175,7 +175,9 @@ const Projects = () => {
                                     </DropdownMenu>
                                 </ButtonGroup>
                             ) : (
-                                <ProjectDialog triggerNode={<Button label="Create Project" />} />
+                                <ProjectDialog
+                                    triggerNode={<Button aria-label="Create Project" label="Create Project" />}
+                                />
                             )
                         }
                         icon={<FolderIcon className="size-24 text-gray-300" />}

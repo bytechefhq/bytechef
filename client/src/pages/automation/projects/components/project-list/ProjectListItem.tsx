@@ -218,11 +218,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     return (
         <>
             <div
+                aria-label={`${project.name}_container`}
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
-                    <div className="flex-1">
+                    <div
+                        aria-label={project.id?.toString() ?? project.name}
+                        className="flex-1"
+                        data-testid="project-item"
+                    >
                         <div className="flex items-center gap-2">
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
                                 <Link
@@ -398,6 +403,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     aria-label="More Project Actions"
+                                    data-testid={`${project.id}-moreProjectActionsButton`}
                                     icon={<EllipsisVerticalIcon />}
                                     size="icon"
                                     variant="ghost"

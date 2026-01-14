@@ -26,6 +26,7 @@ const WorkflowSelect = ({
     projectWorkflows,
 }: WorkflowSelectProps) => (
     <Select
+        aria-label={`Select workflow (${currentWorkflowLabel})`}
         defaultValue={projectWorkflowId.toString()}
         name="projectWorkflowSelect"
         onValueChange={(value) => onValueChange(+value)}

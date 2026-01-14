@@ -149,7 +149,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent aria-label="Project Dialog" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveProject)}>
                         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
