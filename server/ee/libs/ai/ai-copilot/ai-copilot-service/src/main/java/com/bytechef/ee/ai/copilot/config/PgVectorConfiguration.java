@@ -30,10 +30,10 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
@@ -47,39 +47,25 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableJdbcRepositories(
     basePackages = "com.bytechef.ee.ai.copilot.repository",
-    jdbcOperationsRef = "pgVectorNamedParameterJdbcTemplate",
-    dataAccessStrategyRef = "pgVectorDataAccessStrategy",
+    jdbcAggregateOperationsRef = "pgVectorJdbcAggregateTemplate",
     transactionManagerRef = "pgVectorTxManager")
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class PgVectorConfiguration {
+
     private final ApplicationProperties.Ai.Copilot.Vectorstore.PgVector pgVector;
-    private final ApplicationProperties.Datasource datasource;
 
     @SuppressFBWarnings("EI")
     public PgVectorConfiguration(ApplicationProperties applicationProperties) {
-        this.datasource = applicationProperties.getDatasource();
         this.pgVector = applicationProperties.getAi()
             .getCopilot()
             .getVectorstore()
             .getPgVector();
-    }
-
-    @Bean
-    @Primary
-    DataSource dataSource(DataSourceProperties properties) {
-        return DataSourceBuilder.create(properties.getClassLoader())
-            .type(HikariDataSource.class)
-            .url(datasource.getUrl())
-            .username(datasource.getUsername())
-            .password(datasource.getPassword())
-            .build();
     }
 
     @Bean(name = "pgVectorDataSource")
@@ -92,18 +78,6 @@ public class PgVectorConfiguration {
             .build();
     }
 
-    @Bean
-    @Primary
-    JdbcClient jdbcClient(DataSource dataSource) {
-        return JdbcClient.create(dataSource);
-    }
-
-    @Bean
-    @Primary
-    JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
-
     @Bean(name = "pgVectorJdbcTemplate")
     JdbcTemplate pgVectorJdbcTemplate(@Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
         return new JdbcTemplate(pgVectorDataSource);
@@ -112,37 +86,15 @@ public class PgVectorConfiguration {
     @Bean(name = "pgVectorNamedParameterJdbcTemplate")
     NamedParameterJdbcOperations pgVectorNamedParameterJdbcTemplate(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
+
         return new NamedParameterJdbcTemplate(pgVectorDataSource);
     }
 
     @Bean(name = "pgVectorTxManager")
     PlatformTransactionManager pgVectorTransactionManager(
         @Qualifier("pgVectorDataSource") DataSource pgVectorDataSource) {
+
         return new JdbcTransactionManager(pgVectorDataSource);
-    }
-
-    @Bean
-    @Primary
-    NamedParameterJdbcOperations jdbcOperations(DataSource dataSource) {
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
-
-    @Bean
-    @Primary
-    PlatformTransactionManager transactionManager(DataSource dataSource) {
-        return new JdbcTransactionManager(dataSource);
-    }
-
-    @Bean
-    @Primary
-    DataAccessStrategy dataAccessStrategy(
-        NamedParameterJdbcOperations operations, JdbcConverter jdbcConverter,
-        RelationalMappingContext context, Dialect jdbcDialect) {
-
-        return new DefaultDataAccessStrategy(new SqlGeneratorSource(context, jdbcConverter, jdbcDialect), context,
-            jdbcConverter, operations,
-            new SqlParametersFactory(context, jdbcConverter), new InsertStrategyFactory(operations, jdbcDialect),
-            QueryMappingConfiguration.EMPTY);
     }
 
     @Bean(name = "pgVectorDataAccessStrategy")
@@ -155,8 +107,16 @@ public class PgVectorConfiguration {
             new InsertStrategyFactory(operations, jdbcDialect), QueryMappingConfiguration.EMPTY);
     }
 
+    @Bean(name = "pgVectorJdbcAggregateTemplate")
+    JdbcAggregateTemplate pgVectorJdbcAggregateTemplate(
+        ApplicationContext applicationContext, RelationalMappingContext context, JdbcConverter jdbcConverter,
+        @Qualifier("pgVectorDataAccessStrategy") DataAccessStrategy dataAccessStrategy) {
+
+        return new JdbcAggregateTemplate(applicationContext, context, jdbcConverter, dataAccessStrategy);
+    }
+
     @Bean
-    public PgVectorStore vectorStore(
+    public PgVectorStore pgVectorStore(
         @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
         EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
         ObjectProvider<ObservationRegistry> observationRegistry,
