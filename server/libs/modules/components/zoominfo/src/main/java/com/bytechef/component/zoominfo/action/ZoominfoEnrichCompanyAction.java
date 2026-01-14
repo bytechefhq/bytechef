@@ -39,7 +39,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoominfo.util.ZoominfoUtils;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -101,22 +100,24 @@ public class ZoominfoEnrichCompanyAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/companies/enrich"))
             .body(
-                Body.of(Map.of(
-                    "data", Map.of(
-                        "type", "CompanyEnrich",
-                        "attributes",
-                        Map.of(
-                            OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS),
-                            "matchCompanyInput", Map.of(
-                                COMPANY_ID, inputParameters.getRequiredInteger(COMPANY_ID),
-                                COMPANY_NAME, inputParameters.getString(COMPANY_NAME),
-                                COMPANY_WEBSITE, inputParameters.getString(COMPANY_WEBSITE),
-                                COMPANY_PHONE, inputParameters.getString(COMPANY_PHONE),
-                                COMPANY_STREET, inputParameters.getString(COMPANY_STREET),
-                                COMPANY_CITY, inputParameters.getString(COMPANY_CITY),
-                                COMPANY_STATE, inputParameters.getString(COMPANY_STATE),
-                                COMPANY_ZIPCODE, inputParameters.getString(COMPANY_ZIPCODE),
-                                COMPANY_COUNTRY, inputParameters.getString(COMPANY_COUNTRY)))))))
+                Body.of("data", new Object[] {
+                    "type", "CompanyEnrich",
+                    "attributes",
+                    new Object[] {
+                        OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS),
+                        "matchCompanyInput", new Object[] {
+                            COMPANY_ID, inputParameters.getRequiredInteger(COMPANY_ID),
+                            COMPANY_NAME, inputParameters.getString(COMPANY_NAME),
+                            COMPANY_WEBSITE, inputParameters.getString(COMPANY_WEBSITE),
+                            COMPANY_PHONE, inputParameters.getString(COMPANY_PHONE),
+                            COMPANY_STREET, inputParameters.getString(COMPANY_STREET),
+                            COMPANY_CITY, inputParameters.getString(COMPANY_CITY),
+                            COMPANY_STATE, inputParameters.getString(COMPANY_STATE),
+                            COMPANY_ZIPCODE, inputParameters.getString(COMPANY_ZIPCODE),
+                            COMPANY_COUNTRY, inputParameters.getString(COMPANY_COUNTRY)
+                        }
+                    }
+                }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
