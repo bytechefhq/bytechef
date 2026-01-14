@@ -1,6 +1,7 @@
 dependencies {
     api(project(":sdks:backend:java:component-api"))
 
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-jackson")
     implementation(project(":server:libs:config:jackson-config"))
