@@ -62,10 +62,10 @@ import {ByteChefChat} from '@bytechef/automation-chat';
 import '@bytechef/automation-chat/dist/style.css';
 
 <ByteChefChat
-  config={{
-    webhookUrl: 'https://your-bytechef-instance.com/webhooks/your-webhook-id/sse',
-  }}
-/>
+    config={{
+        webhookUrl: 'https://your-bytechef-instance.com/webhooks/your-webhook-id/sse',
+    }}
+/>;
 ```
 
 ### Modal Chat
@@ -75,12 +75,12 @@ import {ByteChefChatModal} from '@bytechef/automation-chat';
 import '@bytechef/automation-chat/dist/style.css';
 
 <ByteChefChatModal
-  config={{
-    webhookUrl: 'https://your-bytechef-instance.com/webhooks/your-webhook-id/sse',
-    title: 'Chat with us',
-  }}
-  position="bottom-right"
-/>
+    config={{
+        webhookUrl: 'https://your-bytechef-instance.com/webhooks/your-webhook-id/sse',
+        title: 'Chat with us',
+    }}
+    position="bottom-right"
+/>;
 ```
 
 ## ✨ Features
@@ -124,6 +124,7 @@ npm run build      # Build for production
 ### Technology Stack
 
 **Library:**
+
 - React 19.2+ with TypeScript
 - Vite 6.2 for building
 - @assistant-ui/react for chat UI
@@ -132,6 +133,7 @@ npm run build      # Build for production
 - Vitest for testing
 
 **Test App:**
+
 - Next.js 16 with App Router
 - TypeScript
 - TailwindCSS
