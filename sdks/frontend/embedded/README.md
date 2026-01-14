@@ -63,16 +63,16 @@ All packages are synchronized with the following versions:
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Run library watch + test app dev server |
-| `npm run setup:link` | Set up npm link for hot reload |
-| `npm run registry:start` | Start local npm registry |
-| `npm run registry:stop` | Stop local registry |
-| `npm run publish:library` | Publish library to local registry |
+| Script                     | Description                                     |
+| -------------------------- | ----------------------------------------------- |
+| `npm run dev`              | Run library watch + test app dev server         |
+| `npm run setup:link`       | Set up npm link for hot reload                  |
+| `npm run registry:start`   | Start local npm registry                        |
+| `npm run registry:stop`    | Stop local registry                             |
+| `npm run publish:library`  | Publish library to local registry               |
 | `npm run install:test-app` | Install library in test app from local registry |
-| `npm run build:all` | Build the library |
-| `npm run clean` | Clean all build artifacts |
+| `npm run build:all`        | Build the library                               |
+| `npm run clean`            | Clean all build artifacts                       |
 
 ## Contributing
 
