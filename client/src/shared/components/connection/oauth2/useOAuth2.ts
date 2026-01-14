@@ -162,7 +162,26 @@ const useOAuth2 = (props: Oauth2Props) => {
                 return;
             }
 
-            curStateRef.current = message?.data?.payload?.state;
+            // Validate state to prevent CSRF attacks
+            const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+            const receivedState = message?.data?.payload?.state;
+
+            if (!receivedState || savedState !== receivedState) {
+                setUI({
+                    error: 'OAuth error: State mismatch.',
+                    loading: false,
+                });
+
+                if (onError) {
+                    onError('OAuth error: State mismatch.');
+                }
+
+                cleanup(intervalRef, popupRef, handleMessageListener);
+
+                return;
+            }
+
+            curStateRef.current = receivedState;
 
             try {
                 const error = message?.data?.error;

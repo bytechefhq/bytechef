@@ -30,14 +30,7 @@
 
     <script>
         // Constants
-        const OAUTH_STATE_KEY = 'react-use-oauth2-state-key';
         const OAUTH_RESPONSE = 'react-use-oauth2-response';
-
-        function checkState(receivedState) {
-            const state = sessionStorage.getItem(OAUTH_STATE_KEY);
-
-            return state === receivedState;
-        }
 
         // Utility function to convert query string to object
         function queryToObject(query) {
@@ -81,20 +74,15 @@
                     error: errorMessage,
                     type: OAUTH_RESPONSE
                 }, '*');
-            } else if (state && checkState(state)) {
+            }
+            // Handle success case - let parent window validate state
+            else {
                 messageElement.textContent = 'Authentication successful! You can close this window.';
 
                 window.opener.postMessage({
                     payload,
                     type: OAUTH_RESPONSE
                 }, '*');
-            } else {
-                messageElement.textContent = 'OAuth error: State mismatch.';
-
-                window.opener.postMessage({
-                    error: 'OAuth error: State mismatch.',
-                    type: OAUTH_RESPONSE,
-                });
             }
 
             // Auto-close window after successful authentication (optional)
