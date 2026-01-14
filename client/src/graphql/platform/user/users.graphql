@@ -1,0 +1,17 @@
+    query users($pageNumber: Int, $pageSize: Int) {
+    users(pageNumber: $pageNumber, pageSize: $pageSize) {
+        content {
+            id
+            login
+            email
+            firstName
+            lastName
+            activated
+            authorities
+        }
+        number
+        size
+        totalElements
+        totalPages
+    }
+}
