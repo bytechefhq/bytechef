@@ -126,25 +126,28 @@ public class ComponentTools {
                 logger.debug("Retrieved component {}", componentName);
             }
 
-            String extra = null;
+            String extraInstructions = null;
 
             if (vectorStore != null) {
                 Filter.Expression filterExpression = new Filter.Expression(
                     Filter.ExpressionType.AND,
-                    new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("category"),
-                        new Filter.Value("readme")),
-                    new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key("name"),
-                        new Filter.Value(componentName)));
+                    new Filter.Expression(
+                        Filter.ExpressionType.EQ, new Filter.Key("category"), new Filter.Value("readme")),
+                    new Filter.Expression(
+                        Filter.ExpressionType.EQ, new Filter.Key("name"), new Filter.Value(componentName)));
 
-                List<Document> documentList = vectorStore.similaritySearch(
+                List<Document> documents = vectorStore.similaritySearch(
                     SearchRequest.builder()
                         .query(componentName)
                         .filterExpression(filterExpression)
                         .topK(1)
                         .build());
 
-                extra = documentList.isEmpty() ? null : documentList.getFirst()
-                    .getText();
+                if (!documents.isEmpty()) {
+                    Document document = documents.getFirst();
+
+                    extraInstructions = document.getText();
+                }
             }
 
             return new ComponentInfo(
@@ -162,7 +165,7 @@ public class ComponentTools {
                     .stream()
                     .map(ActionDefinition::getName)
                     .toList(),
-                extra);
+                extraInstructions);
         } catch (Exception e) {
             logger.error("Failed to get component {}", componentName, e);
 
