@@ -78,6 +78,7 @@ const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integra
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
+const Users = lazy(() => import('@/pages/settings/platform/users/Users'));
 
 const getAccountRoutes = (path: string) => ({
     children: [
@@ -185,6 +186,18 @@ const platformSettingsRoutes = {
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
                         <LazyLoadWrapper>
+                            <Users />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'users',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
                             <AiProviders />
                         </LazyLoadWrapper>
                     </EEVersion>
@@ -252,6 +265,10 @@ const platformSettingsRoutes = {
     navItems: [
         {
             title: 'Organization',
+        },
+        {
+            href: 'users',
+            title: 'Users',
         },
         {
             href: 'ai-providers',
