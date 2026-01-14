@@ -1,109 +1,86 @@
-import {Locator, Page} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
+
+import {clickAndExpectToBeHidden} from '../utils/clickAndExpectToBeHidden';
+import {clickAndExpectToBeVisible} from '../utils/clickAndExpectToBeVisible';
 
 export class ProjectsPage {
-    readonly buttons: {
-        createProject: Locator;
-        createWorkflow: Locator;
-        save: Locator;
-        moreProjectActions: Locator;
-        deleteProject: Locator;
-        confirmProjectDeletion: Locator;
-    };
-
-    readonly form: {
-        projectNameInput: Locator;
-        workflowLabelInput: Locator;
-    };
-
-    readonly dialogs: {
-        deleteConfirmationHeading: Locator;
-    };
-
-    readonly triggerNode: Locator;
+    readonly createProjectButton: Locator;
+    readonly createProjectDialog: Locator;
+    readonly createWorkflowDialogHeading: Locator;
+    readonly deleteConfirmationDialogHeading: Locator;
+    readonly deleteProjectConfirmationButton: Locator;
+    readonly deleteProjectDropdownButton: Locator;
+    readonly projectFormNameInput: Locator;
+    readonly saveButton: Locator;
+    readonly workflowFormLabelInput: Locator;
 
     private readonly page: Page;
 
     constructor(page: Page) {
         this.page = page;
-
-        this.buttons = {
-            confirmProjectDeletion: page.getByLabel('Confirm Project Deletion'),
-            createProject: page.getByRole('button', {name: 'Create Project'}),
-            createWorkflow: page.getByRole('button', {name: 'Create Workflow'}),
-            deleteProject: page.getByLabel('Delete Project'),
-            moreProjectActions: page.getByLabel('More Project Actions').first(),
-            save: page.getByRole('button', {name: 'Save'}),
-        };
-
-        this.form = {
-            projectNameInput: page.getByRole('textbox', {name: 'Name'}),
-            workflowLabelInput: page.getByRole('textbox', {name: 'Label'}),
-        };
-
-        this.dialogs = {
-            deleteConfirmationHeading: page.getByRole('heading', {name: 'Are you absolutely sure?'}),
-        };
-
-        this.triggerNode = page.locator('[data-nodetype="trigger"]').filter({hasText: 'Manual'});
-    }
-
-    async goto(): Promise<void> {
-        await this.page.goto('/automation/projects');
+        this.createProjectButton = page.locator('button[aria-label="Create Project"]');
+        this.createProjectDialog = page.getByRole('dialog', {name: 'Create Project'});
+        this.createWorkflowDialogHeading = page.getByRole('heading', {name: 'Create Workflow'});
+        this.deleteConfirmationDialogHeading = page.getByRole('heading', {name: 'Are you absolutely sure?'});
+        this.deleteProjectConfirmationButton = page.getByLabel('Confirm Project Deletion');
+        this.deleteProjectDropdownButton = page.getByLabel('Delete Project');
+        this.projectFormNameInput = page.getByRole('textbox', {name: 'Name'});
+        this.saveButton = page.getByRole('button', {name: 'Save'});
+        this.workflowFormLabelInput = page.getByRole('textbox', {name: 'Label'});
     }
 
     async waitForPageLoad(): Promise<void> {
         await this.page.waitForURL(/\/automation\/projects/, {timeout: 10000});
 
-        await this.page.waitForLoadState('networkidle');
+        await this.page.waitForLoadState('domcontentloaded', {timeout: 10000});
 
-        await this.buttons.createProject.waitFor({state: 'visible', timeout: 10000});
+        await expect(this.createProjectButton).toBeVisible({timeout: 60000});
     }
 
-    async createProject(projectName: string): Promise<void> {
-        await this.buttons.createProject.click();
+    async createProject(projectName: string): Promise<string> {
+        await this.createProjectButton.click();
 
-        await this.form.projectNameInput.fill(projectName);
+        await expect(this.createProjectDialog).toBeVisible({timeout: 10000});
 
-        await this.buttons.save.click();
+        await this.projectFormNameInput.fill(projectName);
+
+        await this.saveButton.click();
+
+        await expect(this.createProjectDialog).toBeHidden({timeout: 10000});
+
+        await expect(this.page.getByText(projectName).first()).toBeVisible({timeout: 20000});
+
+        const projectItem = this.page.getByTestId('project-item').filter({hasText: projectName}).first();
+
+        const projectId = (await projectItem.getAttribute('aria-label')) ?? projectName;
+
+        return projectId;
     }
 
-    async createWorkflow(workflowLabel: string): Promise<void> {
-        await this.buttons.createWorkflow.click();
+    async deleteProject(projectId: string): Promise<void> {
+        await this.page.waitForLoadState('domcontentloaded');
 
-        await this.form.workflowLabelInput.fill(workflowLabel);
+        const projectItem = this.page.getByLabel(projectId);
 
-        await this.buttons.save.click();
-    }
+        await expect(projectItem).toBeVisible({timeout: 20000});
 
-    getProjectByName(projectName: string): Locator {
-        return this.page.getByText(projectName).first();
-    }
+        const moreProjectActionsButton = this.page.getByTestId(`${projectId}-moreProjectActionsButton`);
 
-    getWorkflowByName(workflowName: string): Locator {
-        return this.page.getByText(workflowName);
-    }
+        await expect(moreProjectActionsButton).toBeVisible({timeout: 60000});
 
-    async waitForNetworkIdle(): Promise<void> {
-        await this.page.waitForLoadState('networkidle');
-    }
+        await clickAndExpectToBeVisible({
+            target: this.deleteProjectDropdownButton,
+            trigger: moreProjectActionsButton,
+        });
 
-    async deleteProject(projectName: string): Promise<void> {
-        const testProjectText = this.getProjectByName(projectName);
+        await clickAndExpectToBeVisible({
+            target: this.deleteConfirmationDialogHeading,
+            trigger: this.deleteProjectDropdownButton,
+        });
 
-        if (await testProjectText.isVisible().catch(() => false)) {
-            if (await this.buttons.moreProjectActions.isVisible().catch(() => false)) {
-                await this.buttons.moreProjectActions.click();
-
-                await this.buttons.deleteProject.waitFor({state: 'visible', timeout: 5000});
-
-                await this.buttons.deleteProject.click();
-
-                await this.dialogs.deleteConfirmationHeading.waitFor({state: 'visible', timeout: 5000});
-
-                await this.buttons.confirmProjectDeletion.click();
-
-                await testProjectText.waitFor({state: 'hidden', timeout: 10000}).catch(() => {});
-            }
-        }
+        await clickAndExpectToBeHidden({
+            target: moreProjectActionsButton,
+            trigger: this.deleteProjectConfirmationButton,
+        });
     }
 }
