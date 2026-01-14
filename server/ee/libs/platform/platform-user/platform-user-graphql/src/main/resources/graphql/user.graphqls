@@ -1,0 +1,35 @@
+extend type Query {
+    users(pageNumber: Int, pageSize: Int): AdminUserPage
+    user(login: String!): AdminUser
+}
+
+extend type Mutation {
+    deleteUser(login: String!): Boolean!
+    inviteUser(email: String!, password: String!, role: String!): Boolean!
+    updateUser(login: String!, role: String!): AdminUser!
+}
+
+type AdminUser {
+    id: ID
+    uuid: String
+    login: String
+    firstName: String
+    lastName: String
+    email: String
+    imageUrl: String
+    activated: Boolean
+    langKey: String
+    createdBy: String
+    createdDate: Long
+    lastModifiedBy: String
+    lastModifiedDate: Long
+    authorities: [String]
+}
+
+type AdminUserPage {
+    content: [AdminUser]!
+    totalElements: Int!
+    totalPages: Int!
+    number: Int!
+    size: Int!
+}
