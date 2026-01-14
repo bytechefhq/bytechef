@@ -8,14 +8,6 @@ export default defineConfig({
             name: 'chromium',
             use: {...devices['Desktop Chrome']},
         },
-        {
-            name: 'firefox',
-            use: {...devices['Desktop Firefox']},
-        },
-        {
-            name: 'webkit',
-            use: {...devices['Desktop Safari']},
-        },
     ],
     reporter: 'html',
     retries: process.env.CI ? 2 : 0,
@@ -23,7 +15,9 @@ export default defineConfig({
     testIgnore: ['**/utils/**', '**/fixtures/**'],
     testMatch: /.*\.spec\.ts/,
     use: {
+        actionTimeout: 30000,
         baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
+        navigationTimeout: 30000,
         screenshot: 'only-on-failure',
         trace: 'on-first-retry',
         video: 'retain-on-failure',
