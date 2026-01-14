@@ -55,6 +55,42 @@ Type: STRING
 
 
 
+### Change Type
+Name: changeType
+
+`Change the type of the input text to number.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The input text to be changed to a number. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Change Type",
+  "name" : "changeType",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/changeType"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
 ### Concatenate
 Name: concatenate
 
@@ -131,6 +167,89 @@ Type: BOOLEAN
 
 
 
+### Escape Characters
+Name: escapeCharacters
+
+`Escape characters in a string, specified in the input.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text in which you want to escape characters. | true |
+| escapeCharacters | Escape Characters | ARRAY <details> <summary> Items </summary> [STRING\($escapeCharacter)] </details> | Characters you want to escape. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Escape Characters",
+  "name" : "escapeCharacters",
+  "parameters" : {
+    "text" : "",
+    "escapeCharacters" : [ "" ]
+  },
+  "type" : "textHelper/v1/escapeCharacters"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Extract All by Regular Expression
+Name: extractAllRegEx
+
+`Extract all strings that match a given pattern.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text on which regular expression will be used on. | true |
+| regularExpression | Regular Expression | STRING | Regular expression that will be used for extracting strings. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract All by Regular Expression",
+  "name" : "extractAllRegEx",
+  "parameters" : {
+    "text" : "",
+    "regularExpression" : ""
+  },
+  "type" : "textHelper/v1/extractAllRegEx"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+
+
+
+
+#### Output Example
+```json
+[ "" ]
+```
+
+
 ### Extract Content from HTML
 Name: extractContentFromHtml
 
@@ -165,6 +284,89 @@ Name: extractContentFromHtml
 #### Output
 
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Extract Key by Regular Expression
+Name: extractKeyRegEx
+
+`Extract first string that match a given pattern.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| keyValueObject | Key-Value Object | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object on which regular expression will be used on. | true |
+| regularExpression | Regular Expression | STRING | Extract key by regex match. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Key by Regular Expression",
+  "name" : "extractKeyRegEx",
+  "parameters" : {
+    "keyValueObject" : { },
+    "regularExpression" : ""
+  },
+  "type" : "textHelper/v1/extractKeyRegEx"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+
+
+
+
+#### Output Example
+```json
+[ "" ]
+```
+
+
+### Extract by Regular Expression
+Name: extractRegEx
+
+`Extract first string that match a given pattern.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text on which regular expression will be used on. | true |
+| regularExpression | Regular Expression | STRING | Regular expression that will be used for extracting strings. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract by Regular Expression",
+  "name" : "extractRegEx",
+  "parameters" : {
+    "text" : "",
+    "regularExpression" : ""
+  },
+  "type" : "textHelper/v1/extractRegEx"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
 
 
 
@@ -256,6 +458,325 @@ Type: STRING
 
 
 
+### Get Domain From Email Address
+Name: getDomainFromEmail
+
+`Extracts domain from the given email address.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Email | STRING | The email you want to extract domain from. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Domain From Email Address",
+  "name" : "getDomainFromEmail",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/getDomainFromEmail"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Domain From URL
+Name: getDomainFromURL
+
+`Extracts domain from the given URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | URL | STRING | The URL you want to extract domain from. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Domain From URL",
+  "name" : "getDomainFromURL",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/getDomainFromURL"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get First Middle and Last Name
+Name: getFirstMiddleLastName
+
+`From full name extract first, middle and last name.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fullName | Full Name | STRING | The full name. | true |
+| isFirstNameFirst | Is First Name First? | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Is the first name listed first in the full name? | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get First Middle and Last Name",
+  "name" : "getFirstMiddleLastName",
+  "parameters" : {
+    "fullName" : "",
+    "isFirstNameFirst" : false
+  },
+  "type" : "textHelper/v1/getFirstMiddleLastName"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| firstName | STRING | First name. |
+| middleName | STRING | Middle name |
+| lastName | STRING | Last name |
+
+
+
+
+#### Output Example
+```json
+{
+  "firstName" : "",
+  "middleName" : "",
+  "lastName" : ""
+}
+```
+
+
+### Get Text After
+Name: getTextAfter
+
+`Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and ending of the string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text that will be searched for the pattern. | true |
+| pattern | Pattern | STRING | Pattern after which substring will be extracted. | true |
+| matchNumber | Match Number | INTEGER | Specifies which match to use for extracting the substring when multiple matches exist. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Text After",
+  "name" : "getTextAfter",
+  "parameters" : {
+    "text" : "",
+    "pattern" : "",
+    "matchNumber" : 1
+  },
+  "type" : "textHelper/v1/getTextAfter"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Text Before
+Name: getTextBefore
+
+`Given a string and a pattern, this operation will return the substring between where the pattern was found depending on the match number and beginning of the string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text that will be searched for the pattern. | true |
+| pattern | Pattern | STRING | Pattern after which substring will be extracted. | true |
+| matchNumber | Match Number | INTEGER | Specifies which match to use for extracting the substring when multiple matches exist. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Text Before",
+  "name" : "getTextBefore",
+  "parameters" : {
+    "text" : "",
+    "pattern" : "",
+    "matchNumber" : 1
+  },
+  "type" : "textHelper/v1/getTextBefore"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Text Between
+Name: getTextBetween
+
+`Extract text between two patterns.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text that will be searched for the patterns. | true |
+| patternStart | Start Pattern | STRING | Start pattern from where substring will be extracted. | true |
+| patternEnd | End Pattern | STRING | End pattern to where substring will be extracted. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Text Between",
+  "name" : "getTextBetween",
+  "parameters" : {
+    "text" : "",
+    "patternStart" : "",
+    "patternEnd" : ""
+  },
+  "type" : "textHelper/v1/getTextBetween"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Text Length
+Name: getTextLength
+
+`Returns length of the given text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text of which the length will be returned of. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Text Length",
+  "name" : "getTextLength",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/getTextLength"
+}
+```
+
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
+
+
+
+### Hex Encode/Decode
+Name: hexEncodeDecode
+
+`Hex encode/decode a specified string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text that will be encoded or decoded. | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> <span>ENCODE</span>, <span>DECODE</span> </details> | Select whether to encode or decode the text. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Hex Encode/Decode",
+  "name" : "hexEncodeDecode",
+  "parameters" : {
+    "text" : "",
+    "operation" : ""
+  },
+  "type" : "textHelper/v1/hexEncodeDecode"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
 ### HTML to Markdown
 Name: HTMLToMarkdown
 
@@ -284,6 +805,42 @@ Name: HTMLToMarkdown
 
 
 Type: STRING
+
+
+
+
+
+
+
+
+### Is Domain?
+Name: isDomain
+
+`Check if a string is a valid domain.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text to be checked as a valid domain name. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Domain?",
+  "name" : "isDomain",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/isDomain"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
 
 
 
@@ -466,6 +1023,44 @@ Name: selectLastNCharacters
     "numberOfCharacters" : 1
   },
   "type" : "textHelper/v1/selectLastNCharacters"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Shorten
+Name: shorten
+
+`Shorten string to a max allowed length.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text that will be shortened. | true |
+| length | Length | INTEGER | Maximum allowed length of the string. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Shorten",
+  "name" : "shorten",
+  "parameters" : {
+    "text" : "",
+    "length" : 1
+  },
+  "type" : "textHelper/v1/shorten"
 }
 ```
 
