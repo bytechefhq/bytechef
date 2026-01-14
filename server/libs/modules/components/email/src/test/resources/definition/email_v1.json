@@ -973,30 +973,6 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "If selected the connection will use TLS when connecting to server.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Use TLS",
-      "metadata": { },
-      "name": "tls",
-      "options": [ {
-        "description": null,
-        "label": "True",
-        "value": true
-      }, {
-        "description": null,
-        "label": "False",
-        "value": false
-      } ],
-      "placeholder": null,
-      "required": null,
-      "type": "BOOLEAN"
-    }, {
-      "advancedOption": null,
-      "controlType": "SELECT",
-      "defaultValue": null,
       "description": "Connection security activates cryptographic protocol to secure communication over a network.",
       "displayCondition": null,
       "exampleValue": null,

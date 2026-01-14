@@ -19,7 +19,6 @@ package com.bytechef.component.email.connection;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -42,9 +41,6 @@ public class EmailConnection {
             string(HOST)
                 .label("Host")
                 .required(true),
-            bool(EmailConstants.TLS)
-                .label("Use TLS")
-                .description("If selected the connection will use TLS when connecting to server."),
             string(CRYPTOGRAPHIC_PROTOCOL)
                 .controlType(Property.ControlType.SELECT)
                 .label("Connection Security")
