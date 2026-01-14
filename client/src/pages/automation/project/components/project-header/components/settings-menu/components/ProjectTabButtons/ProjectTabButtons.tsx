@@ -55,6 +55,7 @@ const ProjectTabButtons = ({
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
             <Button
+                aria-label="Edit Project Button"
                 className="dropdown-menu-item"
                 icon={<EditIcon />}
                 label="Edit"
@@ -63,6 +64,7 @@ const ProjectTabButtons = ({
             />
 
             <Button
+                aria-label="Duplicate Project Button"
                 className="dropdown-menu-item"
                 icon={<CopyIcon />}
                 label="Duplicate"
@@ -72,6 +74,7 @@ const ProjectTabButtons = ({
 
             {ff_1042 && (
                 <Button
+                    aria-label="Share ProjectButton"
                     className="dropdown-menu-item"
                     icon={<Share2Icon />}
                     label="Share"
@@ -82,6 +85,7 @@ const ProjectTabButtons = ({
 
             {ff_2939 && (
                 <Button
+                    aria-label="Share Project with Community Button"
                     className="dropdown-menu-item"
                     icon={<Share2Icon />}
                     label="Share with Community"
@@ -96,6 +100,7 @@ const ProjectTabButtons = ({
 
             {ff_2482 && (
                 <Button
+                    aria-label="Export Project"
                     className="dropdown-menu-item"
                     icon={<DownloadIcon />}
                     label="Export"
@@ -109,6 +114,7 @@ const ProjectTabButtons = ({
             {ff_1039 && (
                 <EEVersion hidden={true}>
                     <Button
+                        aria-label="Pull Project from Git"
                         className="dropdown-menu-item"
                         disabled={!projectGitConfigurationEnabled}
                         icon={<GitPullRequestArrowIcon />}
@@ -118,6 +124,7 @@ const ProjectTabButtons = ({
                     />
 
                     <Button
+                        aria-label="Git Configuration"
                         className="dropdown-menu-item"
                         icon={<GitBranchIcon />}
                         label="Git Configuration"
@@ -130,6 +137,7 @@ const ProjectTabButtons = ({
             )}
 
             <Button
+                aria-label="Project History"
                 className="dropdown-menu-item"
                 icon={<HistoryIcon />}
                 label="Project History"
@@ -140,6 +148,7 @@ const ProjectTabButtons = ({
             <Separator />
 
             <Button
+                aria-label="Delete Project"
                 className="dropdown-menu-item-destructive"
                 icon={<Trash2Icon />}
                 label="Delete"
