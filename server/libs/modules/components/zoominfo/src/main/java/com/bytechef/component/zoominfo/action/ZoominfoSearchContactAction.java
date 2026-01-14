@@ -99,18 +99,19 @@ public class ZoominfoSearchContactAction {
                 .queryParameters(PAGE_SIZE, pageSize, PAGE_NUMBER, nextPageNumber)
                 .body(
                     Body.of(
-                        Map.of(
-                            "data", Map.of(
-                                "type", "ContactSearch",
-                                "attributes",
-                                Map.of(
-                                    EMAIL, inputParameters.getString(EMAIL),
-                                    FULL_NAME, inputParameters.getString(FULL_NAME),
-                                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                                    LAST_NAME, inputParameters.getString(LAST_NAME),
-                                    JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                                    DEPARTMENT, inputParameters.getString(DEPARTMENT),
-                                    COMPANY_NAME, inputParameters.getString(COMPANY_NAME))))))
+                        "data", new Object[] {
+                            "type", "ContactSearch",
+                            "attributes",
+                            new Object[] {
+                                EMAIL, inputParameters.getString(EMAIL),
+                                FULL_NAME, inputParameters.getString(FULL_NAME),
+                                FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                                LAST_NAME, inputParameters.getString(LAST_NAME),
+                                JOB_TITLE, inputParameters.getString(JOB_TITLE),
+                                DEPARTMENT, inputParameters.getString(DEPARTMENT),
+                                COMPANY_NAME, inputParameters.getString(COMPANY_NAME)
+                            }
+                        }))
                 .configuration(responseType(ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});

@@ -40,7 +40,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoominfo.util.ZoominfoUtils;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -105,23 +104,25 @@ public class ZoominfoEnrichContactAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/contacts/enrich"))
             .body(
-                Body.of(Map.of(
-                    "data", Map.of(
-                        "type", "ContactEnrich",
-                        "attributes",
-                        Map.of(
-                            OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS),
-                            "matchPersonInput", Map.of(
-                                PERSON_ID, inputParameters.getRequiredInteger(PERSON_ID),
-                                FULL_NAME, inputParameters.getString(FULL_NAME),
-                                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                                LAST_NAME, inputParameters.getString(LAST_NAME),
-                                EMAIL, inputParameters.getString(EMAIL),
-                                PHONE, inputParameters.getString(PHONE),
-                                JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                                EXTERNAL_URL, inputParameters.getString(EXTERNAL_URL),
-                                COMPANY_ID, inputParameters.getInteger(COMPANY_ID),
-                                COMPANY_NAME, inputParameters.getString(COMPANY_NAME)))))))
+                Body.of("data", new Object[] {
+                    "type", "ContactEnrich",
+                    "attributes",
+                    new Object[] {
+                        OUTPUT_FIELDS, inputParameters.getList(OUTPUT_FIELDS),
+                        "matchPersonInput", new Object[] {
+                            PERSON_ID, inputParameters.getRequiredInteger(PERSON_ID),
+                            FULL_NAME, inputParameters.getString(FULL_NAME),
+                            FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                            LAST_NAME, inputParameters.getString(LAST_NAME),
+                            EMAIL, inputParameters.getString(EMAIL),
+                            PHONE, inputParameters.getString(PHONE),
+                            JOB_TITLE, inputParameters.getString(JOB_TITLE),
+                            EXTERNAL_URL, inputParameters.getString(EXTERNAL_URL),
+                            COMPANY_ID, inputParameters.getInteger(COMPANY_ID),
+                            COMPANY_NAME, inputParameters.getString(COMPANY_NAME)
+                        }
+                    }
+                }))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
