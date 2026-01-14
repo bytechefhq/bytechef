@@ -455,7 +455,7 @@
       }, {
         "description": null,
         "label": "Sunday",
-        "value": 0
+        "value": 1
       } ],
       "optionsDataSource": null,
       "placeholder": null,
@@ -979,7 +979,7 @@
       }, {
         "description": null,
         "label": "Sunday",
-        "value": 0
+        "value": 1
       } ],
       "optionsDataSource": null,
       "placeholder": null,
