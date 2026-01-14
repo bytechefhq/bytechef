@@ -193,16 +193,16 @@ const useOAuth2 = (props: Oauth2Props) => {
                     });
 
                     if (onError) {
-                        await onError(error);
+                        onError(error);
                     }
                 } else {
                     const payload = message?.data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
-                        await onCodeSuccess(payload);
+                        onCodeSuccess(payload);
                     } else {
                         if (onTokenSuccess) {
-                            await onTokenSuccess(payload);
+                            onTokenSuccess(payload);
                         }
                     }
 
