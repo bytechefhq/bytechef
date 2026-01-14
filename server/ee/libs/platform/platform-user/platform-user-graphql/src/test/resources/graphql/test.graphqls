@@ -1,0 +1,8 @@
+# Test-only GraphQL base operations for GraphQL slice tests in this module.
+# The base Query type is provided by another schema via classpath.
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
