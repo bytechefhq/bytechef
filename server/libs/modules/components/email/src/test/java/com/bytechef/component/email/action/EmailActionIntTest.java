@@ -97,6 +97,7 @@ public class EmailActionIntTest {
         parameterMap.put(EmailConstants.HOST, "localhost");
         parameterMap.put(Authorization.USERNAME, "bytecheftest");
         parameterMap.put(Authorization.PASSWORD, "bytecheftest");
+        parameterMap.put(EmailConstants.CRYPTOGRAPHIC_PROTOCOL, "");
 
         return MockParametersFactory.create(parameterMap);
     }
@@ -104,7 +105,7 @@ public class EmailActionIntTest {
     private Parameters getReceieveEmailActionParameters(int port) {
         HashMap<String, Object> parameterMap = new HashMap<>();
 
-        parameterMap.put(EmailConstants.PORT, String.valueOf(port));
+        parameterMap.put(EmailConstants.PORT, port);
         parameterMap.put(EmailConstants.PROTOCOL, EmailProtocol.imap.name());
 
         return MockParametersFactory.create(parameterMap);
@@ -113,7 +114,7 @@ public class EmailActionIntTest {
     private Parameters getSendEmailActionParameters(int port) {
         HashMap<String, Object> parameterMap = new HashMap<>();
 
-        parameterMap.put(EmailConstants.PORT, String.valueOf(port));
+        parameterMap.put(EmailConstants.PORT, port);
         parameterMap.put("from", "test.from@test.com");
         parameterMap.put("to", List.of("bytecheftest@bytechef.io"));
         parameterMap.put("cc", List.of("test.cc@test.com"));

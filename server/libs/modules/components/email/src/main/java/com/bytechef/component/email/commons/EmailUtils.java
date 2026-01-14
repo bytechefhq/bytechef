@@ -19,6 +19,7 @@ package com.bytechef.component.email.commons;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.email.constant.EmailConstants.CRYPTOGRAPHIC_PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
+import static com.bytechef.component.email.constant.EmailConstants.SSL;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.Parameters;
@@ -37,12 +38,13 @@ public class EmailUtils {
         props.setProperty("mail.store.protocol", protocol.name());
         props.setProperty("mail.debug", "true");
 
-        if (connectionParameters.containsKey(CRYPTOGRAPHIC_PROTOCOL)) {
-            if (TLS.contentEquals(connectionParameters.getRequiredString(CRYPTOGRAPHIC_PROTOCOL))) {
-                props.put(String.format("mail.%s.starttls.enable", protocol), "true");
-            } else {
+        switch (connectionParameters.getRequiredString(CRYPTOGRAPHIC_PROTOCOL)) {
+            case TLS -> props.put(String.format("mail.%s.starttls.enable", protocol), "true");
+            case SSL -> {
                 props.put(String.format("mail.%s.ssl.enable", protocol), "true");
                 props.put(String.format("mail.%s.ssl.trust", protocol), connectionParameters.getRequiredString(HOST));
+            }
+            default -> {
             }
         }
 
