@@ -1,4 +1,4 @@
-# ByteChef Client - Agent Instructions
+# ByteChef Agent Instructions
 
 This file provides context and guidelines for working with the ByteChef client codebase. It's automatically loaded by Cursor to maintain consistency across the team.
 
@@ -6,16 +6,16 @@ This file provides context and guidelines for working with the ByteChef client c
 
 ByteChef is a workflow automation platform. The client is a React application built with:
 
--   **Framework**: React 19.2.3 with TypeScript
--   **Build Tool**: Vite 7.3.0
--   **State Management**: Zustand 5.0.9
--   **Data Fetching**: TanStack Query (React Query) 5.90.16
--   **Routing**: React Router DOM 7.11.0
--   **Forms**: React Hook Form 7.69.0 + Zod 4.3.4
+-   **Framework**: React with TypeScript
+-   **Build Tool**: Vite
+-   **State Management**: Zustand
+-   **Data Fetching**: TanStack Query (React Query)
+-   **Routing**: React Router DOM
+-   **Forms**: React Hook Form + Zod
 -   **UI Components**: Radix UI + shadcn/ui
--   **Styling**: Tailwind CSS 3.4.17
--   **Testing**: Vitest 4.0.16 (unit/component) + Playwright 1.48.0 (E2E)
--   **Internationalization**: Lingui 5.7.0
+-   **Styling**: Tailwind CSS
+-   **Testing**: Vitest (unit/component) + Playwright (E2E)
+-   **Internationalization**: Lingui
 -   **Code Generation**: GraphQL Codegen for TypeScript + React Query hooks
 -   **Workflow Editor**: Built with `@xyflow/react` for node-based workflow visualization
 -   **Rich Text Inputs**: Built with TipTap (ProseMirror-based) for rich text editing
@@ -299,7 +299,7 @@ const form = useForm<z.infer<typeof formSchema>>({
 
 ```
 src/
-├── components/          # Reusable UI components
+├── components/        # Reusable UI components
 │   ├── ui/            # shadcn/ui base components
 │   └── [Component]/   # Component folders with .tsx, .test.tsx, .stories.tsx
 ├── pages/             # Page components (route-level)
@@ -320,9 +320,11 @@ src/
 ├── mocks/             # MSW mocks for testing
 └── styles/            # Global styles
 
-tests/
-└── e2e/               # Playwright E2E tests
-    ├── helpers/       # Test helper functions
+test/
+└── playwright/        # Playwright E2E tests
+    ├── pages/         # Pages split into module-like units
+    ├── tests/         # Tests split into module-like units
+    ├── utils/         # Test helper functions
     └── fixtures/      # Test fixtures
 ```
 
@@ -480,6 +482,7 @@ import {twMerge} from 'tailwind-merge';
 11. ❌ Don't use abbreviations for variables/parameters: `e`, `err`, `res`, `req`, `val`, `idx` → Use full names: `event`, `error`, `response`, `request`, `value`, `index`
 12. ❌ Don't use single-letter parameters in methods: `(a, b)`, `(acc, item)` → Use descriptive names: `(firstNumber, secondNumber)`, `(accumulator, item)`
 13. ❌ Don't use em dashes (—) or en dashes (–) → Use regular hyphens (-) instead
+14. ❌ Don't add comments, only allowed comments are just above a `useEffect` explaining their behaviour in human language
 
 ## Code Generation
 
