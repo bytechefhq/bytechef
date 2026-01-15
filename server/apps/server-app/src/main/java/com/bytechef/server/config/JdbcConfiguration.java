@@ -29,6 +29,10 @@ import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
+import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
@@ -43,6 +47,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
@@ -101,6 +106,7 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Bean
     @Primary
+    @ConditionalOnProperty(prefix = "bytechef.datasource", name = "url")
     DataSource dataSource(DataSourceProperties properties) {
         return DataSourceBuilder.create(properties.getClassLoader())
             .type(HikariDataSource.class)
@@ -152,7 +158,11 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
             new FileEntryToStringConverter(objectMapper),
+            new ListDoubleToPGObjectConverter(),
+            new MapToPGObjectConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
+            new PGObjectToListDoubleConverter(),
+            new PGobjectToMapConverter(objectMapper),
             new StringToDataEntryValueWrapperConverter(),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToFileEntryConverter(objectMapper),
