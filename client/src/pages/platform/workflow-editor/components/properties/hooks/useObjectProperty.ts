@@ -14,19 +14,28 @@ import saveProperty from '../../../utils/saveProperty';
 
 interface BuildOrderedPropertyKeysProps {
     dynamicPropertyTypes: Record<string, string> | undefined;
-    parameterObject: {[key: string]: object[] | undefined};
+    parameterObject: {[key: string]: unknown};
     path: string;
     properties: Array<PropertyAllType> | undefined;
 }
 
 interface BuildPropertyFromParameterKeyProps {
     baseProperty: PropertyAllType;
+    displayCondition?: string;
     dynamicPropertyTypes: Record<string, string> | undefined;
     parameterKey: string;
     parameterObject: {[key: string]: unknown};
     path: string;
     properties: Array<PropertyAllType>;
 }
+
+const getPropertyKey = (name: string | undefined, displayCondition?: string): string => {
+    if (!name) {
+        return '';
+    }
+
+    return displayCondition ? `${name}::${displayCondition}` : name;
+};
 
 interface UseObjectPropertyProps {
     onDeleteClick?: (path: string) => void;
@@ -40,7 +49,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
-    const [parameterObject, setParameterObject] = useState<{[key: string]: object[] | undefined}>({});
+    const [parameterObject, setParameterObject] = useState<{[key: string]: unknown}>({});
 
     const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -129,7 +138,13 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             }
 
             setSubProperties((previousSubProperties) =>
-                previousSubProperties?.filter((property) => property.name !== subProperty.name)
+                previousSubProperties?.filter((property) => {
+                    const compositePropertyKey = getPropertyKey(property.name, property.displayCondition);
+
+                    const compositeSubPropertyKey = getPropertyKey(subProperty.name, subProperty.displayCondition);
+
+                    return compositePropertyKey !== compositeSubPropertyKey;
+                })
             );
 
             if (onDeleteClick) {
@@ -149,7 +164,9 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     if (property.name) {
                         orderedKeys.push(property.name);
 
-                        subPropertyKeySet.add(property.name);
+                        const compositePropertyKey = getPropertyKey(property.name, property.displayCondition);
+
+                        subPropertyKeySet.add(compositePropertyKey);
                     }
                 });
             }
@@ -164,10 +181,12 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                         const isArrayIndexPattern = /\[\d+\]/.test(subPropertyName);
 
                         if (subPropertyName && !subPropertyName.includes('.') && !isArrayIndexPattern) {
-                            if (!subPropertyKeySet.has(subPropertyName)) {
+                            const compositePropertyKey = getPropertyKey(subPropertyName);
+
+                            if (!subPropertyKeySet.has(compositePropertyKey)) {
                                 orderedKeys.push(subPropertyName);
 
-                                subPropertyKeySet.add(subPropertyName);
+                                subPropertyKeySet.add(compositePropertyKey);
                             }
                         }
                     }
@@ -176,10 +195,12 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
             if (parameterObject) {
                 Object.keys(parameterObject).forEach((key) => {
-                    if (!subPropertyKeySet.has(key)) {
+                    const compositePropertyKey = getPropertyKey(key);
+
+                    if (!subPropertyKeySet.has(compositePropertyKey)) {
                         orderedKeys.push(key);
 
-                        subPropertyKeySet.add(key);
+                        subPropertyKeySet.add(compositePropertyKey);
                     }
                 });
             }
@@ -192,15 +213,22 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     const buildPropertyFromParameterKey = useCallback(
         ({
             baseProperty,
+            displayCondition,
             dynamicPropertyTypes,
             parameterKey,
             parameterObject,
             path,
             properties,
         }: BuildPropertyFromParameterKeyProps): PropertyAllType => {
-            const matchingProperty = properties.find((property) => property.name === parameterKey) as
-                | PropertyAllType
-                | undefined;
+            let matchingProperty = properties.find(
+                (property) => property.name === parameterKey && property.displayCondition === displayCondition
+            ) as PropertyAllType | undefined;
+
+            if (!matchingProperty) {
+                matchingProperty = !displayCondition
+                    ? (properties.find((property) => property.name === parameterKey) as PropertyAllType | undefined)
+                    : undefined;
+            }
 
             let parameterItemType = dynamicPropertyTypes?.[`${path}.${parameterKey}`];
             const parameterKeyValue = parameterObject[parameterKey];
@@ -240,6 +268,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
                     ] as ControlType,
                     custom: true,
                     defaultValue: parameterKeyValue,
+                    displayCondition,
                     expressionEnabled: true,
                     label: parameterKey,
                     name: parameterKey,
@@ -272,20 +301,72 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             properties: properties as Array<PropertyAllType>,
         });
 
-        if (!objectParameterKeys.length) {
+        if (!objectParameterKeys.length && !properties?.length) {
             return;
         }
 
-        const preexistingProperties = objectParameterKeys.map((parameterKey) =>
-            buildPropertyFromParameterKey({
-                baseProperty: property,
-                dynamicPropertyTypes,
-                parameterKey,
-                parameterObject,
-                path,
-                properties: properties as Array<PropertyAllType>,
-            })
-        );
+        const preexistingProperties: Array<PropertyAllType> = [];
+        const processedKeys = new Set<string>();
+
+        if (properties?.length) {
+            properties.forEach((propertyDefinition) => {
+                if (!propertyDefinition.name) {
+                    return;
+                }
+
+                const parameterKeyValue = parameterObject[propertyDefinition.name];
+
+                if (parameterKeyValue !== undefined || objectParameterKeys.includes(propertyDefinition.name)) {
+                    const builtProperty = buildPropertyFromParameterKey({
+                        baseProperty: property,
+                        displayCondition: propertyDefinition.displayCondition,
+                        dynamicPropertyTypes,
+                        parameterKey: propertyDefinition.name,
+                        parameterObject,
+                        path,
+                        properties: properties as Array<PropertyAllType>,
+                    });
+
+                    const finalProperty = {
+                        ...builtProperty,
+                        ...propertyDefinition,
+                        defaultValue: parameterKeyValue !== undefined ? parameterKeyValue : builtProperty.defaultValue,
+                    } as PropertyAllType;
+
+                    preexistingProperties.push(finalProperty);
+
+                    const compositePropertyKey = getPropertyKey(
+                        propertyDefinition.name,
+                        propertyDefinition.displayCondition
+                    );
+
+                    processedKeys.add(compositePropertyKey);
+                }
+            });
+        }
+
+        objectParameterKeys.forEach((parameterKey) => {
+            const parameterKeyValue = parameterObject[parameterKey];
+
+            if (parameterKeyValue !== undefined) {
+                const builtProperty = buildPropertyFromParameterKey({
+                    baseProperty: property,
+                    dynamicPropertyTypes,
+                    parameterKey,
+                    parameterObject,
+                    path,
+                    properties: properties as Array<PropertyAllType>,
+                });
+
+                const compositePropertyKey = getPropertyKey(builtProperty.name, builtProperty.displayCondition);
+
+                if (!processedKeys.has(compositePropertyKey)) {
+                    preexistingProperties.push(builtProperty);
+
+                    processedKeys.add(compositePropertyKey);
+                }
+            }
+        });
 
         if (preexistingProperties.length) {
             setSubProperties(preexistingProperties as Array<PropertyAllType>);
@@ -368,7 +449,9 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     // update parameterObject when workflowDefinition changes
     useEffect(() => {
         if (workflow.definition && path) {
-            const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path);
+            const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path) as {
+                [key: string]: unknown;
+            };
 
             setParameterObject(resolvedParameterObject);
         }
@@ -377,6 +460,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     return {
         availablePropertyTypes,
         calculatedPath: path,
+        getPropertyKey,
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
