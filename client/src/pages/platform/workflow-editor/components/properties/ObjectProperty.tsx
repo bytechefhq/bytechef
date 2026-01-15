@@ -23,6 +23,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const {
         availablePropertyTypes,
         calculatedPath,
+        getPropertyKey,
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
@@ -67,7 +68,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                                 />
                             ) : undefined
                         }
-                        key={`${property.name}_${subProperty.name}_${index}`}
+                        key={
+                            getPropertyKey(subProperty.name, subProperty.displayCondition) ||
+                            `${property.name}_${subProperty.name}_${index}`
+                        }
                         objectName={arrayName ? '' : name}
                         operationName={operationName}
                         path={`${calculatedPath}.${subProperty.name}`}
