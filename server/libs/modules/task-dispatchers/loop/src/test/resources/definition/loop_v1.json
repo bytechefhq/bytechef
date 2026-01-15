@@ -9,7 +9,7 @@
     "controlType": "ARRAY_BUILDER",
     "defaultValue": null,
     "description": "List of items to iterate over.",
-    "displayCondition": null,
+    "displayCondition": "loopForever == false",
     "exampleValue": null,
     "expressionEnabled": null,
     "hidden": null,
