@@ -169,10 +169,10 @@ public class AccountController {
                 "No user was found for this activation key", AccountErrorType.USER_NOT_FOUND);
         }
 
-        if (tenantService.isMultiTenantEnabled()) {
-            String tenantId = tenantService.createTenant();
+        User user = userOptional.get();
 
-            User user = userOptional.get();
+        if (tenantService.isMultiTenantEnabled() && !tenantService.tenantIdsByUserEmailExist(user.getEmail())) {
+            String tenantId = tenantService.createTenant();
 
             user.setId(null);
 
