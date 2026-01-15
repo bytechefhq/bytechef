@@ -20,6 +20,9 @@ import com.bytechef.exception.AbstractErrorType;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Ivica Cardic
+ */
 public class AccountErrorType extends AbstractErrorType {
 
     public static final AccountErrorType USER_NOT_FOUND = new AccountErrorType(100, HttpStatus.INTERNAL_SERVER_ERROR);
