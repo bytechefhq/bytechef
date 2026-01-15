@@ -17,7 +17,7 @@
 package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
@@ -25,34 +25,31 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.TE
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * @author Nikolina Špehar
  */
-public class TextHelperChangeTypeAction {
+public class TextHelperIsNumericAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("changeType")
-        .title("Change Type")
-        .description("Change the type of the input text to number.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("isNumeric")
+        .title("Is Numeric?")
+        .description("Check if a text string is a number.")
         .properties(
             string(TEXT)
-                .description("The input text to be changed to a number.")
+                .description("The input text that will be checked. Decimal point is a point '.'.")
                 .label("Text")
                 .required(true))
-        .output(outputSchema(number().description("Number input text")))
-        .perform(TextHelperChangeTypeAction::perform);
+        .output(outputSchema(bool().description("Whether the input text is number.")))
+        .perform(TextHelperIsNumericAction::perform);
 
-    private TextHelperChangeTypeAction() {
+    private TextHelperIsNumericAction() {
     }
 
-    public static double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         String text = inputParameters.getRequiredString(TEXT);
 
-        try {
-            return Double.parseDouble(text);
-        } catch (NumberFormatException numberFormatException) {
-            throw new ProviderException(text + " can not be converted to number.");
-        }
+        return NumberUtils.isCreatable(text);
     }
 }

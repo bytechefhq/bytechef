@@ -34,25 +34,40 @@ import com.bytechef.component.text.helper.action.TextHelperExtractRegExAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractUrlsAction;
 import com.bytechef.component.text.helper.action.TextHelperFormatCurrencyAction;
 import com.bytechef.component.text.helper.action.TextHelperGetDomainFromEmailAction;
-import com.bytechef.component.text.helper.action.TextHelperGetDomainFromURLAction;
+import com.bytechef.component.text.helper.action.TextHelperGetDomainFromUrlAction;
 import com.bytechef.component.text.helper.action.TextHelperGetFirstMiddleLastNameAction;
 import com.bytechef.component.text.helper.action.TextHelperGetTextAfterAction;
 import com.bytechef.component.text.helper.action.TextHelperGetTextBeforeAction;
 import com.bytechef.component.text.helper.action.TextHelperGetTextBetweenAction;
 import com.bytechef.component.text.helper.action.TextHelperGetTextLengthAction;
-import com.bytechef.component.text.helper.action.TextHelperHTMLToMarkdownAction;
 import com.bytechef.component.text.helper.action.TextHelperHexEncodeDecodeAction;
+import com.bytechef.component.text.helper.action.TextHelperHtmlToMarkdownAction;
 import com.bytechef.component.text.helper.action.TextHelperIsDomainAction;
+import com.bytechef.component.text.helper.action.TextHelperIsEmailAction;
+import com.bytechef.component.text.helper.action.TextHelperIsNumericAction;
+import com.bytechef.component.text.helper.action.TextHelperIsUrlAction;
 import com.bytechef.component.text.helper.action.TextHelperLowerCaseAction;
-import com.bytechef.component.text.helper.action.TextHelperMarkdownToHTMLAction;
+import com.bytechef.component.text.helper.action.TextHelperMarkdownToHtmlAction;
+import com.bytechef.component.text.helper.action.TextHelperMatchAction;
+import com.bytechef.component.text.helper.action.TextHelperParseEmailAction;
+import com.bytechef.component.text.helper.action.TextHelperParseEmailListAction;
+import com.bytechef.component.text.helper.action.TextHelperParseUrlAction;
+import com.bytechef.component.text.helper.action.TextHelperProperCaseAction;
+import com.bytechef.component.text.helper.action.TextHelperRegularExpressionMatchTestAction;
+import com.bytechef.component.text.helper.action.TextHelperRemoveCharactersAction;
+import com.bytechef.component.text.helper.action.TextHelperRemoveSpecialCharactersAction;
 import com.bytechef.component.text.helper.action.TextHelperReplaceAction;
 import com.bytechef.component.text.helper.action.TextHelperSelectFirstNCharactersAction;
 import com.bytechef.component.text.helper.action.TextHelperSelectLastNCharactersAction;
+import com.bytechef.component.text.helper.action.TextHelperSentenceCaseAction;
 import com.bytechef.component.text.helper.action.TextHelperShortenAction;
 import com.bytechef.component.text.helper.action.TextHelperSplitAction;
+import com.bytechef.component.text.helper.action.TextHelperStripHtmlTagsAction;
 import com.bytechef.component.text.helper.action.TextHelperTrimWhitespaceAction;
+import com.bytechef.component.text.helper.action.TextHelperUnderscoreAction;
 import com.bytechef.component.text.helper.action.TextHelperUpperCaseAction;
 import com.bytechef.component.text.helper.action.TextHelperUrlEncodeDecodeAction;
+import com.bytechef.component.text.helper.action.TextHelperUrlEncodeDecodeKeyValuePairAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -79,25 +94,40 @@ public class TextHelperComponentHandler implements ComponentHandler {
             TextHelperExtractUrlsAction.ACTION_DEFINITION,
             TextHelperFormatCurrencyAction.ACTION_DEFINITION,
             TextHelperGetDomainFromEmailAction.ACTION_DEFINITION,
-            TextHelperGetDomainFromURLAction.ACTION_DEFINITION,
+            TextHelperGetDomainFromUrlAction.ACTION_DEFINITION,
             TextHelperGetFirstMiddleLastNameAction.ACTION_DEFINITION,
             TextHelperGetTextAfterAction.ACTION_DEFINITION,
             TextHelperGetTextBeforeAction.ACTION_DEFINITION,
             TextHelperGetTextBetweenAction.ACTION_DEFINITION,
             TextHelperGetTextLengthAction.ACTION_DEFINITION,
             TextHelperHexEncodeDecodeAction.ACTION_DEFINITION,
-            TextHelperHTMLToMarkdownAction.ACTION_DEFINITION,
+            TextHelperHtmlToMarkdownAction.ACTION_DEFINITION,
             TextHelperIsDomainAction.ACTION_DEFINITION,
+            TextHelperIsEmailAction.ACTION_DEFINITION,
+            TextHelperIsNumericAction.ACTION_DEFINITION,
+            TextHelperIsUrlAction.ACTION_DEFINITION,
             TextHelperLowerCaseAction.ACTION_DEFINITION,
-            TextHelperMarkdownToHTMLAction.ACTION_DEFINITION,
+            TextHelperMarkdownToHtmlAction.ACTION_DEFINITION,
+            TextHelperMatchAction.ACTION_DEFINITION,
+            TextHelperParseEmailAction.ACTION_DEFINITION,
+            TextHelperParseEmailListAction.ACTION_DEFINITION,
+            TextHelperParseUrlAction.ACTION_DEFINITION,
+            TextHelperProperCaseAction.ACTION_DEFINITION,
+            TextHelperRegularExpressionMatchTestAction.ACTION_DEFINITION,
+            TextHelperRemoveCharactersAction.ACTION_DEFINITION,
+            TextHelperRemoveSpecialCharactersAction.ACTION_DEFINITION,
             TextHelperReplaceAction.ACTION_DEFINITION,
             TextHelperSelectFirstNCharactersAction.ACTION_DEFINITION,
             TextHelperSelectLastNCharactersAction.ACTION_DEFINITION,
+            TextHelperSentenceCaseAction.ACTION_DEFINITION,
             TextHelperShortenAction.ACTION_DEFINITION,
             TextHelperSplitAction.ACTION_DEFINITION,
+            TextHelperStripHtmlTagsAction.ACTION_DEFINITION,
             TextHelperTrimWhitespaceAction.ACTION_DEFINITION,
+            TextHelperUnderscoreAction.ACTION_DEFINITION,
             TextHelperUpperCaseAction.ACTION_DEFINITION,
-            TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION)
+            TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION,
+            TextHelperUrlEncodeDecodeKeyValuePairAction.ACTION_DEFINITION)
         .clusterElements(
             tool(TextHelperBase64EncodeDecodeAction.ACTION_DEFINITION),
             tool(TextHelperChangeTypeAction.ACTION_DEFINITION),
@@ -111,25 +141,40 @@ public class TextHelperComponentHandler implements ComponentHandler {
             tool(TextHelperExtractUrlsAction.ACTION_DEFINITION),
             tool(TextHelperFormatCurrencyAction.ACTION_DEFINITION),
             tool(TextHelperGetDomainFromEmailAction.ACTION_DEFINITION),
-            tool(TextHelperGetDomainFromURLAction.ACTION_DEFINITION),
+            tool(TextHelperGetDomainFromUrlAction.ACTION_DEFINITION),
             tool(TextHelperGetFirstMiddleLastNameAction.ACTION_DEFINITION),
             tool(TextHelperGetTextAfterAction.ACTION_DEFINITION),
             tool(TextHelperGetTextBeforeAction.ACTION_DEFINITION),
             tool(TextHelperGetTextBetweenAction.ACTION_DEFINITION),
             tool(TextHelperGetTextLengthAction.ACTION_DEFINITION),
             tool(TextHelperHexEncodeDecodeAction.ACTION_DEFINITION),
-            tool(TextHelperHTMLToMarkdownAction.ACTION_DEFINITION),
+            tool(TextHelperHtmlToMarkdownAction.ACTION_DEFINITION),
             tool(TextHelperIsDomainAction.ACTION_DEFINITION),
+            tool(TextHelperIsEmailAction.ACTION_DEFINITION),
+            tool(TextHelperIsNumericAction.ACTION_DEFINITION),
+            tool(TextHelperIsUrlAction.ACTION_DEFINITION),
             tool(TextHelperLowerCaseAction.ACTION_DEFINITION),
-            tool(TextHelperMarkdownToHTMLAction.ACTION_DEFINITION),
+            tool(TextHelperMarkdownToHtmlAction.ACTION_DEFINITION),
+            tool(TextHelperMatchAction.ACTION_DEFINITION),
+            tool(TextHelperParseEmailAction.ACTION_DEFINITION),
+            tool(TextHelperParseEmailListAction.ACTION_DEFINITION),
+            tool(TextHelperParseUrlAction.ACTION_DEFINITION),
+            tool(TextHelperProperCaseAction.ACTION_DEFINITION),
+            tool(TextHelperRegularExpressionMatchTestAction.ACTION_DEFINITION),
+            tool(TextHelperRemoveCharactersAction.ACTION_DEFINITION),
+            tool(TextHelperRemoveSpecialCharactersAction.ACTION_DEFINITION),
             tool(TextHelperReplaceAction.ACTION_DEFINITION),
             tool(TextHelperSelectFirstNCharactersAction.ACTION_DEFINITION),
             tool(TextHelperSelectLastNCharactersAction.ACTION_DEFINITION),
+            tool(TextHelperSentenceCaseAction.ACTION_DEFINITION),
             tool(TextHelperShortenAction.ACTION_DEFINITION),
             tool(TextHelperSplitAction.ACTION_DEFINITION),
+            tool(TextHelperStripHtmlTagsAction.ACTION_DEFINITION),
             tool(TextHelperTrimWhitespaceAction.ACTION_DEFINITION),
+            tool(TextHelperUnderscoreAction.ACTION_DEFINITION),
             tool(TextHelperUpperCaseAction.ACTION_DEFINITION),
-            tool(TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION));
+            tool(TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION),
+            tool(TextHelperUrlEncodeDecodeKeyValuePairAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

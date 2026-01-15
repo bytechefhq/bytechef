@@ -19,37 +19,35 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ControlType;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
+import org.apache.commons.text.WordUtils;
 
 /**
- * @author Monika Kušter
+ * @author Nikolina Špehar
  */
-public class TextHelperHTMLToMarkdownAction {
+public class TextHelperProperCaseAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("HTMLToMarkdown")
-        .title("HTML to Markdown")
-        .description("Converts HTML to markdown.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("properCase")
+        .title("Match")
+        .description("Capitalize the first letter of every word.")
         .properties(
-            string(HTML)
-                .label("HTML Content")
-                .description("HTML content to be converted to markdown.")
-                .controlType(ControlType.TEXT_AREA)
+            string(TEXT)
+                .label("Text")
+                .description("The text that will be turned into proper case.")
                 .required(true))
-        .output(outputSchema(string().description("Markdown content.")))
-        .perform(TextHelperHTMLToMarkdownAction::perform);
+        .output(outputSchema(string().description("The text in proper case.")))
+        .perform(TextHelperProperCaseAction::perform);
 
-    private TextHelperHTMLToMarkdownAction() {
+    private TextHelperProperCaseAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return FlexmarkHtmlConverter.builder()
-            .build()
-            .convert(inputParameters.getRequiredString(HTML));
+        String text = inputParameters.getRequiredString(TEXT);
+
+        return WordUtils.capitalize(text);
     }
 }

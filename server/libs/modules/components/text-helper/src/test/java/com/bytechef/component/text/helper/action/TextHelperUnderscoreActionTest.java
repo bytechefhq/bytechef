@@ -18,10 +18,8 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,22 +27,43 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class TextHelperChangeTypeActionTest {
+class TextHelperUnderscoreActionTest {
 
-    @Test
-    void testPerformValidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
+    private static String run(String input) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, input));
 
-        double result = TextHelperChangeTypeAction.perform(mockedParameters, null, null);
-
-        assertEquals(42.0, result);
+        return TextHelperUnderscoreAction.perform(mockedParameters, null, null);
     }
 
     @Test
-    void testPerformInvalidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
+    void convertsBasicSentence() {
+        String input = "Hello, World!";
+        String expected = "hello_world";
 
-        assertThrows(ProviderException.class,
-            () -> TextHelperChangeTypeAction.perform(mockedParameters, null, null));
+        assertEquals(expected, run(input));
+    }
+
+    @Test
+    void removesSpecialCharacters() {
+        String input = "Java@#$ Is *** Awesome!!!";
+        String expected = "java_is_awesome";
+
+        assertEquals(expected, run(input));
+    }
+
+    @Test
+    void handlesMultipleSpaces() {
+        String input = "  Too   many   spaces  ";
+        String expected = "too_many_spaces";
+
+        assertEquals(expected, run(input));
+    }
+
+    @Test
+    void keepsNumbers() {
+        String input = "Version 2 Release 10";
+        String expected = "version_2_release_10";
+
+        assertEquals(expected, run(input));
     }
 }
