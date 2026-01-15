@@ -26,46 +26,41 @@ import static com.bytechef.component.gotify.constant.GotifyConstants.TITLE;
 import static com.bytechef.component.gotify.constant.GotifyConstants.TOP_NAMESPACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class GotifySendMessageActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of();
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        MESSAGE, "message", PRIORITY, 2, TITLE, "title", EXTRAS,
-        List.of(Map.of(TOP_NAMESPACE, "top", SUB_NAMESPACE, "sub", EXTRA_INFO_KEY, "key", EXTRA_INFO_VALUE, "value"))));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(MESSAGE, "message", PRIORITY, 2, TITLE, "title", EXTRAS, List.of(Map.of(
+            TOP_NAMESPACE, "top", SUB_NAMESPACE, "sub", EXTRA_INFO_KEY, "key", EXTRA_INFO_VALUE, "value"))));
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
+    void testPerform(Context mockedContext, Response mockedResponse, Executor mockedExecutor) {
+        ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of());
 
         Map<String, Object> result = GotifySendMessageAction.perform(
             mockedParameters, mockedParameters, mockedContext);
