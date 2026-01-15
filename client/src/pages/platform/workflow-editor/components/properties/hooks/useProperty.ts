@@ -535,7 +535,7 @@ export const useProperty = ({
 
             let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
 
-            if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+            if (type === 'INTEGER' && typeof mentionInputValue === 'string' && !mentionInputValue.startsWith('${')) {
                 actualValue = parseInt(value);
             } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
                 actualValue = parseFloat(value);
@@ -548,7 +548,11 @@ export const useProperty = ({
                     let actualValue: boolean | null | number | string =
                         type === 'BOOLEAN' ? defaultValueString === 'true' : defaultValueString;
 
-                    if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+                    if (
+                        type === 'INTEGER' &&
+                        typeof mentionInputValue === 'string' &&
+                        !mentionInputValue.startsWith('${')
+                    ) {
                         actualValue = parseInt(defaultValueString);
                     } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
                         actualValue = parseFloat(defaultValueString);
