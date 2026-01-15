@@ -17,14 +17,13 @@
 package com.bytechef.component.google.mail.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
+import static com.bytechef.component.google.mail.definition.Format.FULL;
+import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 import static com.bytechef.google.commons.GoogleUtils.getCalendarTimezone;
 import static com.bytechef.google.commons.GoogleUtils.translateGoogleIOException;
 
@@ -32,6 +31,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.google.mail.definition.Format;
+import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.gmail.Gmail;
@@ -56,16 +57,8 @@ public class GoogleMailNewEmailPollingTrigger {
         .title("New Email Polling")
         .description("Periodically checks your Gmail inbox for any new incoming emails.")
         .type(TriggerType.POLLING)
-        .output(
-            outputSchema(
-                array()
-                    .items(
-                        object()
-                            .properties(
-                                string(ID)
-                                    .description("ID of the message."),
-                                string(THREAD_ID)
-                                    .description("The ID of the thread the message belongs to.")))))
+        .properties(FORMAT_PROPERTY)
+        .output(GoogleMailUtils::getMessageOutput)
         .poll(GoogleMailNewEmailPollingTrigger::poll);
 
     private GoogleMailNewEmailPollingTrigger() {
@@ -95,7 +88,8 @@ public class GoogleMailNewEmailPollingTrigger {
 
             String query = "is:unread after:" + zonedDateTime.toEpochSecond();
 
-            List<Message> messages = fetchUnreadMessages(gmail, query, editorEnvironment);
+            List<Object> messages = fetchUnreadMessages(
+                gmail, query, inputParameters.get(FORMAT, Format.class, SIMPLE), context, editorEnvironment);
 
             return new PollOutput(messages, Map.of(LAST_TIME_CHECKED, now), false);
         } catch (IOException e) {
@@ -103,10 +97,11 @@ public class GoogleMailNewEmailPollingTrigger {
         }
     }
 
-    private static List<Message> fetchUnreadMessages(Gmail gmail, String query, boolean editorEnvironment)
+    private static List<Object> fetchUnreadMessages(
+        Gmail gmail, String query, Format format, TriggerContext context, boolean editorEnvironment)
         throws IOException {
 
-        List<Message> messages = new ArrayList<>();
+        List<Object> messages = new ArrayList<>();
 
         String nextPageToken = null;
         long pageSize = editorEnvironment ? 1L : 500L;
@@ -121,7 +116,19 @@ public class GoogleMailNewEmailPollingTrigger {
                 .execute();
 
             if (listMessagesResponse.getMessages() != null) {
-                messages.addAll(listMessagesResponse.getMessages());
+                for (Message message : listMessagesResponse.getMessages()) {
+                    Message fetchedMessage = gmail.users()
+                        .messages()
+                        .get(ME, message.getId())
+                        .setFormat(format == SIMPLE ? FULL.getMapping() : format.getMapping())
+                        .execute();
+
+                    if (format.equals(SIMPLE)) {
+                        messages.add(getSimpleMessage(fetchedMessage, context, gmail));
+                    } else {
+                        messages.add(fetchedMessage);
+                    }
+                }
             }
 
             nextPageToken = listMessagesResponse.getNextPageToken();
