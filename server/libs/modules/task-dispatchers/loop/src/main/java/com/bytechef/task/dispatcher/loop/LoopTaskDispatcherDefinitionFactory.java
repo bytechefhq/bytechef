@@ -57,7 +57,8 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .properties(
             array(ITEMS)
                 .label("List of items")
-                .description("List of items to iterate over."),
+                .description("List of items to iterate over.")
+                .displayCondition("%s == false".formatted(LOOP_FOREVER)),
             bool(LOOP_FOREVER)
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
