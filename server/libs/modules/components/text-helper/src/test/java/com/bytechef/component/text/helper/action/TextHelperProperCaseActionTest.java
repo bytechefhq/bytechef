@@ -18,10 +18,8 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,22 +27,46 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class TextHelperChangeTypeActionTest {
+class TextHelperProperCaseActionTest {
 
-    @Test
-    void testPerformValidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "42"));
+    private static String run(String text) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, text));
 
-        double result = TextHelperChangeTypeAction.perform(mockedParameters, null, null);
-
-        assertEquals(42.0, result);
+        return TextHelperProperCaseAction.perform(mockedParameters, null, null);
     }
 
     @Test
-    void testPerformInvalidNumber() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(TEXT, "not a number"));
+    void shouldCapitalizeSingleWord() {
+        assertEquals("Hello", run("hello"));
+    }
 
-        assertThrows(ProviderException.class,
-            () -> TextHelperChangeTypeAction.perform(mockedParameters, null, null));
+    @Test
+    void shouldCapitalizeMultipleWords() {
+        assertEquals("Hello World", run("hello world"));
+    }
+
+    @Test
+    void shouldPreserveLeadingAndTrailingSpaces() {
+        assertEquals(" Hello World ", run(" hello world "));
+    }
+
+    @Test
+    void shouldHandleMultipleSpacesBetweenWords() {
+        assertEquals("Hello   World", run("hello   world"));
+    }
+
+    @Test
+    void shouldHandleSingleCharacterWords() {
+        assertEquals("A B C", run("a b c"));
+    }
+
+    @Test
+    void shouldReturnEmptyStringWhenInputIsEmpty() {
+        assertEquals("", run(""));
+    }
+
+    @Test
+    void shouldHandleNumbersAndSymbols() {
+        assertEquals("Hello 123 World!", run("hello 123 world!"));
     }
 }

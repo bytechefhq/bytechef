@@ -19,50 +19,37 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.MARKDOWN;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.HTML;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profile.pegdown.Extensions;
-import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
-import com.vladsch.flexmark.util.ast.Document;
-import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
  * @author Monika Kušter
  */
-public class TextHelperMarkdownToHTMLAction {
+public class TextHelperHtmlToMarkdownAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("markdownToHTML")
-        .title("Markdown to HTML")
-        .description("Converts markdown to HTML.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("HtmlToMarkdown")
+        .title("HTML to Markdown")
+        .description("Converts HTML to markdown.")
         .properties(
-            string(MARKDOWN)
-                .label("Markdown content")
-                .description("Markdown content to convert to HTML.")
+            string(HTML)
+                .label("HTML Content")
+                .description("HTML content to be converted to markdown.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output(outputSchema(string().description("HTML content.")))
-        .perform(TextHelperMarkdownToHTMLAction::perform);
+        .output(outputSchema(string().description("Markdown content.")))
+        .perform(TextHelperHtmlToMarkdownAction::perform);
 
-    private TextHelperMarkdownToHTMLAction() {
+    private TextHelperHtmlToMarkdownAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        DataHolder dataHolder = PegdownOptionsAdapter.flexmarkOptions(true, Extensions.ALL);
-
-        Document document = Parser
-            .builder(dataHolder)
+        return FlexmarkHtmlConverter.builder()
             .build()
-            .parse(inputParameters.getRequiredString(MARKDOWN));
-
-        return HtmlRenderer
-            .builder(dataHolder)
-            .build()
-            .render(document);
+            .convert(inputParameters.getRequiredString(HTML));
     }
 }
