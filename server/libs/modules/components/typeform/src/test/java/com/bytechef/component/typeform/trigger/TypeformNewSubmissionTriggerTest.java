@@ -16,23 +16,22 @@
 
 package com.bytechef.component.typeform.trigger;
 
+import static com.bytechef.component.typeform.constant.TypeformConstants.FORM_ID;
 import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,19 @@ import org.mockito.MockedStatic;
  */
 class TypeformNewSubmissionTriggerTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
+        forClass(ConfigurationBuilder.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http mockedHttp = mock(Http.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Parameters parameters = MockParametersFactory.create(Map.of());
+    private final Parameters mockedInputParameters = MockParametersFactory.create(Map.of(FORM_ID, "abc"));
+    private final Parameters mockedOutputParameters = MockParametersFactory.create(Map.of(ID, "xy"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testWebhookEnable() {
@@ -56,54 +63,72 @@ class TypeformNewSubmissionTriggerTest {
         UUID uuid = UUID.randomUUID();
 
         try (MockedStatic<UUID> uuidMockedStatic = mockStatic(UUID.class)) {
-
             uuidMockedStatic.when(UUID::randomUUID)
                 .thenReturn(uuid);
 
-            when(mockedTriggerContext.http(any()))
+            when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+                .thenAnswer(inv -> {
+                    ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                    return value.apply(mockedHttp);
+                });
+            when(mockedHttp.put(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
+            when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.execute())
                 .thenReturn(mockedResponse);
 
-            WebhookEnableOutput webhookEnableOutput = TypeformNewSubmissionTrigger.webhookEnable(parameters, parameters,
-                webhookUrl, "", mockedTriggerContext);
+            WebhookEnableOutput webhookEnableOutput = TypeformNewSubmissionTrigger.webhookEnable(
+                mockedInputParameters, null, webhookUrl, "", mockedTriggerContext);
 
-            Http.Body body = bodyArgumentCaptor.getValue();
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(
+                Map.of(ID, uuid.toString()), null);
 
-            Object content = body.getContent();
+            assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-            assertEquals(Map.of(
-                "enabled", true,
-                "url", webhookUrl,
-                "event_types", List.of(Map.of("form_response", true))), content);
+            ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
 
-            Map<String, ?> webhookParameters = webhookEnableOutput.parameters();
-            Instant webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+            assertNotNull(capturedFunction);
 
-            Map<String, Object> expectedParameters = Map.of(ID, uuid.toString());
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Http.Configuration configuration = configurationBuilder.build();
+            Http.ResponseType responseType = configuration.getResponseType();
 
-            assertEquals(expectedParameters, webhookParameters);
-            assertNull(webhookExpirationDate);
+            assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+            assertEquals("/forms/abc/webhooks/" + uuid, stringArgumentCaptor.getValue());
+            assertEquals(
+                Http.Body.of(
+                    Map.of(
+                        "enabled", true,
+                        "url", webhookUrl,
+                        "event_types", Map.of("form_response", true)),
+                    Http.BodyContentType.JSON),
+                bodyArgumentCaptor.getValue());
         }
     }
 
     @Test
     void testWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedTriggerContext.http(httpFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedHttp);
+            });
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        TypeformNewSubmissionTrigger.webhookDisable(parameters, parameters, parameters, "", mockedTriggerContext);
+        TypeformNewSubmissionTrigger.webhookDisable(
+            mockedInputParameters, null, mockedOutputParameters, "", mockedTriggerContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).configuration(any());
-        verify(mockedExecutor, times(1)).execute();
+        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+
+        assertNotNull(capturedFunction);
+        assertEquals("/forms/abc/webhooks/xy", stringArgumentCaptor.getValue());
     }
 }
