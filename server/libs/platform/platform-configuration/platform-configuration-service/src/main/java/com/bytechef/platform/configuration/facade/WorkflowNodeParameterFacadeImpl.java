@@ -993,6 +993,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     } else {
                         findIndexes(indexGroup + remainingExpression, nextParameters, currentIndexes, allIndexes);
                     }
+                } else if (!currentIndexes.isEmpty()) {
+                    allIndexes.add(new ArrayList<>(currentIndexes));
                 }
             } else if (currentParameters instanceof List<?> currentList) {
                 for (int i = 0; i < currentList.size(); i++) {
