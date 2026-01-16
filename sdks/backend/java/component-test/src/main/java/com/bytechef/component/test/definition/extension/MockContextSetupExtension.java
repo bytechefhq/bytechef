@@ -24,6 +24,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import java.lang.reflect.Parameter;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -49,27 +50,26 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        ExtensionContext.Store store = extensionContext.getStore(Namespace.create(MockContextSetupExtension.class));
-        store.put(Context.class, mockedContext);
-        store.put(Response.class, mockedResponse);
-        store.put(Executor.class, mockedExecutor);
+        ExtensionContext.Store extensionContextStore = extensionContext.getStore(
+            Namespace.create(MockContextSetupExtension.class));
+
+        extensionContextStore.put(Context.class, mockedContext);
+        extensionContextStore.put(Response.class, mockedResponse);
+        extensionContextStore.put(Executor.class, mockedExecutor);
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
         throws ParameterResolutionException {
 
-        return parameterContext.getParameter()
-            .getType() == Context.class
-            || parameterContext.getParameter()
-                .getType() == Http.Response.class
-            || parameterContext.getParameter()
-                .getType() == Http.Executor.class;
+        Parameter parameter = parameterContext.getParameter();
+
+        return parameter.getType() == Context.class ||
+            parameter.getType() == Http.Response.class ||
+            parameter.getType() == Http.Executor.class;
     }
 
     @Override
@@ -79,25 +79,21 @@ public class MockContextSetupExtension implements BeforeEachCallback, ParameterR
         ExtensionContext.Store extensionContextStore = extensionContext.getStore(
             Namespace.create(MockContextSetupExtension.class));
 
-        if (parameterContext.getParameter()
-            .getType() == Context.class) {
+        Parameter parameter = parameterContext.getParameter();
 
+        if (parameter.getType() == Context.class) {
             return extensionContextStore.get(Context.class);
-
-        } else if (parameterContext.getParameter()
-            .getType() == Http.Response.class) {
-
-            return extensionContextStore.get(Http.Response.class);
-
-        } else if (parameterContext.getParameter()
-            .getType() == Http.Executor.class) {
-
-            return extensionContextStore.get(Http.Executor.class);
-
-        } else {
-            throw new ParameterResolutionException(
-                "Unsupported parameter type: " + parameterContext.getParameter()
-                    .getType());
         }
+
+        if (parameter.getType() == Http.Response.class) {
+            return extensionContextStore.get(Http.Response.class);
+        }
+
+        if (parameter.getType() == Http.Executor.class) {
+            return extensionContextStore.get(Http.Executor.class);
+        }
+
+        throw new ParameterResolutionException(
+            "Unsupported parameter type: " + parameter.getType());
     }
 }
