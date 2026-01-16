@@ -316,7 +316,15 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
                 const parameterKeyValue = parameterObject[propertyDefinition.name];
 
-                if (parameterKeyValue !== undefined || objectParameterKeys.includes(propertyDefinition.name)) {
+                // Include properties if:
+                // 1. They have a parameter value, OR
+                // 2. They are in the ordered keys, OR
+                // 3. They have a displayCondition (visibility determined by Property component)
+                if (
+                    parameterKeyValue !== undefined ||
+                    objectParameterKeys.includes(propertyDefinition.name) ||
+                    propertyDefinition.displayCondition
+                ) {
                     const builtProperty = buildPropertyFromParameterKey({
                         baseProperty: property,
                         displayCondition: propertyDefinition.displayCondition,
