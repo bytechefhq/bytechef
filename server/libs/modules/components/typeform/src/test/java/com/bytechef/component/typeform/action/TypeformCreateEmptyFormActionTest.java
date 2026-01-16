@@ -37,7 +37,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Kušter
  */
-class TypeformCreateFormActionTest {
+class TypeformCreateEmptyFormActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
@@ -61,7 +61,7 @@ class TypeformCreateFormActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object perform = TypeformCreateFormAction.perform(parameters, parameters, mockedActionContext);
+        Object perform = TypeformCreateEmptyFormAction.perform(parameters, null, mockedActionContext);
 
         assertEquals(mockedObject, perform);
 
