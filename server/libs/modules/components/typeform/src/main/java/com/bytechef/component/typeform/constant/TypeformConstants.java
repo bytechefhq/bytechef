@@ -21,6 +21,7 @@ package com.bytechef.component.typeform.constant;
  */
 public class TypeformConstants {
 
+    public static final String FORM_ID = "formId";
     public static final String HREF = "href";
     public static final String ID = "id";
     public static final String TITLE = "title";

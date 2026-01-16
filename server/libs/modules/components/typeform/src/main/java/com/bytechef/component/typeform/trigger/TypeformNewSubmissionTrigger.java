@@ -16,10 +16,9 @@
 
 package com.bytechef.component.typeform.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.typeform.constant.TypeformConstants.FORM_ID;
 import static com.bytechef.component.typeform.constant.TypeformConstants.ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -34,7 +33,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.typeform.util.TypeformUtils;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,14 +46,14 @@ public class TypeformNewSubmissionTrigger {
         .description("Triggers when form is submitted.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
-            string("form")
-                .label("Form Name")
-                .options((OptionsFunction<String>) TypeformUtils::getFormOptions)
+            string(FORM_ID)
+                .label("Form ID")
+                .description(
+                    "ID for the form. Find in your form URL. For example, in the URL " +
+                        "\"https://mysite.typeform.com/to/u6nXL7\" the form id is u6nXL7.")
+                .options((OptionsFunction<String>) TypeformUtils::getFormIdOptions)
                 .required(true))
-        .output(
-            outputSchema(
-                // TODO
-                object()))
+        .output()
         .webhookEnable(TypeformNewSubmissionTrigger::webhookEnable)
         .webhookDisable(TypeformNewSubmissionTrigger::webhookDisable)
         .webhookRequest(TypeformNewSubmissionTrigger::webhookRequest);
@@ -69,12 +67,12 @@ public class TypeformNewSubmissionTrigger {
 
         UUID uuid = UUID.randomUUID();
 
-        context.http(http -> http.put("/forms/" + inputParameters.getRequiredString("form") + "/webhooks/" + uuid))
+        context.http(http -> http.put("/forms/" + inputParameters.getRequiredString(FORM_ID) + "/webhooks/" + uuid))
             .body(
                 Http.Body.of(
                     "enabled", true,
                     "url", webhookUrl,
-                    "event_types", List.of(Map.of("form_response", true))))
+                    "event_types", Map.of("form_response", true)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
@@ -87,9 +85,8 @@ public class TypeformNewSubmissionTrigger {
 
         context.http(
             http -> http.delete(
-                "/forms/" + inputParameters.getRequiredString("form") + "/webhooks/" +
-                    outputParameters.getRequiredString(ID)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
+                "/forms/%s/webhooks/%s".formatted(
+                    inputParameters.getRequiredString(FORM_ID), outputParameters.getRequiredString(ID))))
             .execute();
     }
 
@@ -97,8 +94,6 @@ public class TypeformNewSubmissionTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, Parameters output, TriggerContext context) {
 
-        // TODO
-
-        return null;
+        return body.getContent();
     }
 }
