@@ -1281,8 +1281,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private static String replaceIndexes(String expression, List<Integer> indexes) {
+        Integer lastIndex = null;
+
         for (Integer index : indexes) {
             expression = expression.replaceFirst("\\[index]", "[" + index + "]");
+            lastIndex = index;
+        }
+
+        if (lastIndex != null && expression.contains("[index]")) {
+            expression = expression.replace("[index]", "[" + lastIndex + "]");
         }
 
         return expression;
